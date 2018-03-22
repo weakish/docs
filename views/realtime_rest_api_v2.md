@@ -92,9 +92,35 @@ Push 的格式与[推送 REST API 消息内容](push_guide.html#消息内容_Dat
 }
 ```
 
+### 修改广播消息
+
+该接口要求使用 master key。
+
+广播消息修改仅对当前还未收到该广播消息的设备生效，如果目标设备已经收到了该广播消息则无法修改。请慎重发送广播消息。
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": "", "timestamp": 123}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/messages/{message_id}
+```
+
+参数 | 约束 | 说明
+---|---|---
+from_client | 必填 | 消息的发件人 client ID
+message | 必填 | 消息体
+timestamp | 必填 | 消息的时间戳
+
+返回：
+```
+{"result": {}} 
+```
+
 ### 删除广播消息
 
-调用此 API 将删除已发布的广播消息。本接口要求使用 master key。
+调用此 API 将删除已发布的广播消息，仅对还未收到广播消息的设备生效，已收到广播消息的设备无法删除消息。本接口要求使用 master key。
 
 ```sh
 curl -X DELETE \
@@ -127,7 +153,6 @@ curl -X GET \
 conv_id | 必填 | 服务号 id
 limit | 可选 | 返回消息条数
 skip | 可选 | 跳过消息条数，用于翻页
-
 
 ### 查询应用内所有历史消息
 
