@@ -53,7 +53,7 @@ use \LeanCloud\Client;
 use \LeanCloud\Object;
 // 参数依次为 AppId, AppKey, MasterKey
 Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
-Client::setServerUrl("https://{{host}}.api.lncld.net");
+Client::setServerUrl("https://{{host}}");
 
 $testObject = new Object("TestObject");
 $testObject->set("words", "Hello World!");
