@@ -168,7 +168,7 @@ push | 可选 | 附带的推送内容，如果设置，所有 iOS 和 Windows Ph
 ### 修改给所有订阅者发送的消息
 
 该接口要求使用 master key。
-从 Objective-C SDK v6.0.0、Android SDK v4.4.0、JavaScript SDK v3.5.0 开始，我们支持了新的修改与撤回消息功能。修改或撤回消息后，即使已经收到并已缓存在客户端的消息也会被修改或撤回。对于老版本的 SDK，仅能修改或撤>回服务器端的消息记录，并不能修改或撤回客户端已缓存的消息记录。
+从 Objective-C SDK v6.0.0、Android SDK v4.4.0、JavaScript SDK v3.5.0 开始，我们支持了新的修改与撤回消息功能。修改或撤回消息后，即使已经收到并已缓存在客户端的消息也会被修改或撤回。对于老版本的 SDK，仅能修改或撤回服务器端的消息记录，并不能修改或撤回客户端已缓存的消息记录。
 
 ```sh
 curl -X PUT \
@@ -247,7 +247,7 @@ priority | 可选 | 定义消息优先级，可选值为 high、normal、low，�
 ### 修改给用户单独发送的消息
 
 该接口要求使用 master key。
-从 Objective-C SDK v6.0.0、Android SDK v4.4.0、JavaScript SDK v3.5.0 开始，我们支持了新的修改与撤回消息功能。修改或撤回消息后，即使已经收到并已缓存在客户端的消息也会被修改或撤回。对于老版本的 SDK，仅能修改或撤>回服务器端的消息记录，并不能修改或撤回客户端已缓存的消息记录。
+从 Objective-C SDK v6.0.0、Android SDK v4.4.0、JavaScript SDK v3.5.0 开始，我们支持了新的修改与撤回消息功能。修改或撤回消息后，即使已经收到并已缓存在客户端的消息也会被修改或撤回。对于老版本的 SDK，仅能修改或撤回服务器端的消息记录，并不能修改或撤回客户端已缓存的消息记录。
 
 ```sh
 curl -X PUT \
@@ -306,7 +306,7 @@ curl -X GET \
   https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers/{client_id}/messages
 ```
 
-参数、返回值与「[查询历史消息](#查询历史消息)」相同。
+参数和返回值与 [查询历史消息](#查询历史消息) 相同。
 
 ### 黑名单
 
