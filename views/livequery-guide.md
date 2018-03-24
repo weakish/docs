@@ -1,4 +1,5 @@
 {% import "views/_helper.njk" as docs %}
+{% import "views/_parts.html" as parts %}
 # 实时数据同步 LiveQuery 开发指南
 
 LiveQuery 的使用场景有：
@@ -63,6 +64,8 @@ AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
 // 如果在浏览器中使用 script 标签的方式，需要引入 av-live-query-min.js：
 // 推荐使用 CDN：
 <script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-live-query-min.js"></script>
+
+{{ parts.debugLiveQuery(true) }}
 ```
 ```cs
 // LiveQuery 需要依赖实时通信模块，接入该模块的方法请参考安装指南： 

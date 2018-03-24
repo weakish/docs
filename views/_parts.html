@@ -89,8 +89,10 @@ DEBUG=leancloud* npm start
 // 或使用云引擎 CLI 启动应用时打开调试，日志会输出到 应用控制台 > 云引擎 > 日志：
 DEBUG=leancloud:* lean up
 
-// 浏览器的 Console 中设置 localStorage
+// 在浏览器的 Console 中设置 localStorage
 localStorage.setItem('debug', 'leancloud*');
+
+{{ debugLiveQuery() }}
 ```
 {%- endif -%}
 {% if segment == "all" or segment == "python" -%}
@@ -109,7 +111,7 @@ Client::setDebug(true);
 ```
 {%- endif %}
 
-{{ alert("在应用发布之前，请关闭调试日志，以免暴露敏感数据。") }}
+{{ alert(turningOffDebuggingReminder()) }}
 {%- endif %}
 {%- endmacro %}
 
@@ -125,4 +127,15 @@ authData 的数据<u>默认为不可查询</u>，也就是说它既不包含在�
 
 {% macro generalEmail() -%}
 <business@leancloud.rocks>
+{%- endmacro %}
+
+{% macro debugLiveQuery(verbose = false) -%}
+// 如果使用 LiveQuery，可以为其开启调试日志。
+{% if verbose -%}// 在浏览器的 Console 中设置 localStorage{%- endif %}
+localStorage.setItem('debug', 'LC*');
+{% if verbose -%}// {{ turningOffDebuggingReminder() }}{%- endif %}
+{%- endmacro %}
+
+{% macro turningOffDebuggingReminder() -%}
+在应用发布之前，请关闭调试日志，以免暴露敏感数据。
 {%- endmacro %}
