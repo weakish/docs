@@ -21,7 +21,7 @@
 
 ## 初始化
 
-首先进入 {% if node=='qcloud' %}**控制台** > **设置** > **应用 Key**{% else %}[控制台 > 设置 > 应用 Key](/app.html?appid={{appid}}#/key){% endif %} 来获取 App ID 以及 App Key。
+首先进入 [控制台 > 设置 > 应用 Key](/app.html?appid={{appid}}#/key) 来获取 App ID 以及 App Key。
 
 {% block init_with_app_keys %}{% endblock %}
 
@@ -37,7 +37,6 @@ SDK 的初始化方法默认使用**中国大陆节点**，如需切换到 [其�
 
 - 中国大陆节点 **leancloud.cn**（SDK 初始化方法**默认**使用该节点）
 - 北美节点 **us.leancloud.cn**（服务北美市场）
-{# - ~~香港节点，服务东南亚市场~~（未上线，准备中）#}
 
 {{ docs.alert("各个节点彼此独立，开发者账号无法跨节点来创建应用或调用 API。") }}
 
@@ -71,30 +70,14 @@ round-trip min/avg/max/stddev = 6.288/7.984/9.689/0.997 ms
 
 {% block save_a_hello_world %}{% endblock %}
 
-然后打开 {% if node=='qcloud' %}**控制台** > **存储** > **数据** > **TestObject**{% else %}[控制台 > 存储 > 数据 > TestObject](/data.html?appid={{appid}}#/TestObject){% endif %}，如果看到如下内容，说明 SDK 已经正确地执行了上述代码，安装完毕。
+然后打开 [控制台 > 存储 > 数据 > TestObject](/data.html?appid={{appid}}#/TestObject)，如果看到如下内容，说明 SDK 已经正确地执行了上述代码，安装完毕。
 
 
 ![testobject_saved](images/testobject_saved.png)
 
 如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
 
-## 问题排查
-
-### 401 Unauthorized
-
-如果 SDK 抛出 401 异常或者查看本地网络访问日志存在：
-
-```json
-{
-  "code": 401,
-  "error": "Unauthorized."
-}
-```
-则可认定为 App ID 或者 App Key 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 App ID 匹配 B 应用的 App Key，这样就会出现服务端鉴权失败的错误。
-
-### 客户端无法访问网络
-
-客户端尤其是手机端，应用在访问网络的时候需要申请一定的权限。
+{{ include.sdkSetupFAQ() }}
 
 {% block permission_access_network_config %}{% endblock %}
 

@@ -2,6 +2,26 @@
   alert  
 %}
 
+{% macro sdkSetupFAQ() -%}
+## 问题排查
+
+### 401 Unauthorized
+
+如果 SDK 抛出 401 异常或者查看本地网络访问日志存在：
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+则可认定为 App ID 或者 App Key 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 App ID 匹配 B 应用的 App Key，这样就会出现服务端鉴权失败的错误。
+
+### 客户端无法访问网络
+
+客户端尤其是手机端，应用在访问网络的时候需要申请一定的权限。
+{%- endmacro%}
+
 {% macro setService(service=api) %}
 
 <script type="text/javascript">
