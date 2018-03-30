@@ -1,8 +1,8 @@
 {% import "views/_data.njk" as data %}
 {% import "views/_helper.njk" as docs %}
-# 在微信小程序中使用 {% if node == 'qcloud' %}TAB{% else %}LeanCloud{% endif %}
+# 在微信小程序与小游戏中使用 {% if node == 'qcloud' %}TAB{% else %}LeanCloud{% endif %}
 
-微信小程序是一个全新的跨平台移动应用平台，LeanCloud 为小程序提供一站式后端云服务，为你免去服务器维护、证书配置等繁琐的工作，大幅降低你的开发和运维成本。本文说明了如何在微信小程序中使用 LeanCloud 提供的各项服务。
+微信小程序是一个全新的跨平台移动应用平台，小游戏是小程序的一个类目，在小程序的基础上开放了游戏相关的 API。LeanCloud 为小程序提供一站式后端云服务，为你免去服务器维护、证书配置等繁琐的工作，大幅降低你的开发和运维成本。本文说明了如何在微信小程序与小游戏中使用 LeanCloud 提供的各项服务。
 
 ## Demo
 我们在小程序上实现了 LeanTodo 应用。在这个 Demo 中你可以看到：
@@ -32,16 +32,7 @@
 要使用 LeanCloud 的数据存储、用户系统、调用云引擎等功能，需要使用 LeanCloud 存储 SDK。
 
 ### 安装与初始化
-2. 前往 [下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-weapp-min.js`，移动到 `libs` 目录。如果需要使用 [LiveQuery](livequery-guide.html) 功能，需要下载 `av-weapp-live-query-min.js`。
-3. 在 `app.js` 中使用 `const AV = require('./libs/av-weapp-min.js');` 获得 `AV` 的引用。在其他文件中使用时请将路径替换成对应的相对路径。 
-4. 在 `app.js` 中初始化应用： 
-  ```javascript 
-  // LeanCloud 应用的 ID 和 Key
-  AV.init({ 
-    appId: '{{appid}}', 
-    appKey: '{{appkey}}', 
-  }); 
-  ```
+请参阅《[JavaScript SDK 安装指南](sdk_setup-js.html)》中对应平台的说明。
 
 ### 对象存储
 所有的对象存储 API 都能正常使用，详细的用法请参考 [JavaScript 数据存储开发指南](leanstorage_guide-js.html)。
@@ -177,17 +168,20 @@ wx.getUserInfo({
 
 微信开放平台使用 [unionid](https://mp.weixin.qq.com/debug/wxadoc/dev/api/uinionID.html) 来区分用户的唯一性，也就是说同一个微信开放平台帐号下的移动应用、网站应用和公众帐号（包括小程序），用户的 unionid 都是同一个，而 openid 会是多个。
 
-开发者需要自行获得用户的 unionid，然后调用 `AV.User.signUpOrlogInWithAuthData()` 投入 unionid 完成登录授权（而不应该再使用 `AV.User.loginWithWeapp()`）。另外要注意参数 authData 的格式，`openid` 和 `uid` 一定要书写正确：
+开发者需要自行获得用户的 unionid，然后调用 `AV.User.signUpOrlogInWithAuthDataAndUnionId()` 投入 unionid 完成登录授权（而不应该再使用 `AV.User.loginWithWeapp()`）：
 
   ```javascript
-AV.User.signUpOrlogInWithAuthData({
-  'openid' : openid,
-  'uid' : unionid,
+AV.User.signUpOrlogInWithAuthData{
+  uid: openid,
+  access_token: session_key,
   ...其他可选属性
-}, 'lc_weapp_union');
+}, 'weapp_union', unionid, {
+  unionIdPlatform: 'weixin', // 指定为 weixin 即可通过 unionid 与其他 weixin 平台的帐号打通
+  asMainAccount: false,
+}).then(console.log, console.error);
   ```
 
-为确保同一个 uid 只存在一条记录，建议为 `authData.lc_weapp_union.uid` 加上唯一索引。进入 **控制台** > **存储** > 选择 `_User` 表 > **其他** > **索引**，勾选 **authData** 然后在出现的输入框中键入 `authData.lc_weapp_union.uid`，点击 **创建**。
+为确保同一个 uid 只存在一条记录，你还需要为 `authData.weapp_union.uid` 加上唯一索引。进入 **控制台** > **存储** > 选择 `_User` 表 > **其他** > **索引**，勾选 **authData** 然后在出现的输入框中键入 `authData.weapp_union.uid`，点击 **创建**。
 
 {{ 
   docs.note(
@@ -239,15 +233,17 @@ SDK 所有的云引擎相关的 API 都能正常使用，详细的用法请参�
 要使用 LeanCloud 的聊天、实时消息功能，需要使用 LeanCloud 实时通讯 SDK。
 
 ### 安装与初始化
-2. 前往 [下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `realtime.weapp.min.js`，移动到 `libs` 目录。
-3. 在 `app.js` 中使用 `const Realtime = require('./libs/realtime.weapp.min.js').Realtime;` 获得 `Realtime` 的引用。在其他文件中使用时请将路径替换成对应的相对路径。
-4. 在 `app.js` 中初始化应用：
-  ```javascript
-  const realtime = new Realtime({
-    appId: '{{appid}}',
-    appKey: '{{appKey}}',
-  });
-  ```
+请参阅《[JavaScript SDK 安装指南](sdk_setup-js.html)》中对应平台的说明。
+
+在 `app.js` 中初始化应用：
+
+```javascript
+const { Realtime } = require('./libs/realtime.weapp.min.js');
+const realtime = new Realtime({
+  appId: '{{appid}}',
+  appKey: '{{appkey}}',
+});
+```
 
 需要特别注意的是，由于小程序限制了同时只能有一个 WebSocket 连接，因此推荐的用法是初始化 Realtime 一次，挂载到全局的 App 实例上，然后在所有需要的时候都使用这个 realtime 实例。
 
@@ -378,7 +374,7 @@ AV.Cloud.run('order').then((data) => {
 ## FAQ
 
 ### 配置 download 合法域名时显示「该域名因违规被禁止设置。」
-目前 https://clouddn.com 已经被微信屏蔽，因此该域名下的文件无法通过 `wx.downloadFile` 下载到用户的设备上（只是通过 image 的 src 属性展示图片不受影响）。如果确实需要使用 `wx.downloadFile`，可以在 [控制台 > 存储 > 设置 > 文件](/dashboard/storage.html?appid={{appid}}#/storage/conf) 中勾选 **启动 https 域名**，目前对应的域名还没有被屏蔽。
+请前往 [控制台 > 存储 > 设置 > 文件](/dashboard/storage.html?appid={{appid}}#/storage/conf) 配置你自己的文件域名。
 
 ### Access denied by api domain white list
 如果你的应用启用并配置了 [Web 安全域名](data_security.html#Web_应用安全设置)，你可能会 catch 到 `Access denied by api domain white list` 异常，请将提示的域名添加至应用的 Web 安全域名列表。
