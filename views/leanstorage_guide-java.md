@@ -103,7 +103,7 @@
     AVQuery query = new AVQuery("Account");
     AVObject account = query.getFirst();
     
-    account.increment("balance", -amount);
+    account.increment("balance", amount);
 
     AVSaveOption option = new AVSaveOption();
     option.query(new AVQuery("Account").whereGreaterThanOrEqualTo("balance",-amount));

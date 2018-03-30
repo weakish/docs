@@ -206,7 +206,7 @@ public class CustomUserProvider implements LCChatProfileProvider {
 2. 通过指定一个已经存在的 AVIMConversation id 的方式，开启单人、多人或者开放式聊天室；<br/>
 此时，通过调用 `LCIMConstants.CONVERSATION_ID, "particularConversationId")` 来传递特定对话 Id。
 
-下面的代码展示了如果通过第一种方式来开启聊天界面：
+下面的代码展示了如何通过第一种方式来开启聊天界面：
 
 ```java
 LCChatKit.getInstance().open("Tom", new AVIMClientCallback() {
