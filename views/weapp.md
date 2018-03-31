@@ -171,7 +171,7 @@ wx.getUserInfo({
 开发者需要自行获得用户的 unionid，然后调用 `AV.User.signUpOrlogInWithAuthDataAndUnionId()` 投入 unionid 完成登录授权（而不应该再使用 `AV.User.loginWithWeapp()`）：
 
   ```javascript
-AV.User.signUpOrlogInWithAuthData{
+AV.User.signUpOrlogInWithAuthDataAndUnionId({
   uid: openid,
   access_token: session_key,
   ...其他可选属性
