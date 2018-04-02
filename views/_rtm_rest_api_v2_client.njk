@@ -22,6 +22,26 @@ client_ids | 必选 | 要查询的 client ID 列表，最多 20 个
 {"results":["client1"]}
 ```
 
+### 查询未读消息数
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'conv_id=...' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/unread-count
+```
+
+参数 | 约束 | 说明
+---|---|---
+conv_id | 可选 | 对话 ID，若不传此参数，查询 client 在所有对话中的未读消息数
+
+返回
+
+```
+{"count":1}
+```
 
 ### 强制下线
 
