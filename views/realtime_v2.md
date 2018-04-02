@@ -233,39 +233,41 @@ TextMessage  ImageMessage  AudioMessage  VideoMessage  LocationMessage   。。�
 
 #### 离线推送通知
 
-对离线的 iOS 和 Windows Phone 用户，每次有离线消息时，我们会触发一个对应平台的推送通知。通知的过期时间是 7 天，也就是说，如果一个设备 7 天内没有连接到 APNs 或 MPNs，系统将不会再给这个设备推送通知。
+对离线的 iOS 和 Windows Phone 用户，每次有离线消息时，我们提供发送离线推送通知的功能。要想使用本功能，用户需要 **自定义推送的内容**，目前有三种方式，按优先级从高到低依次为：
 
-这部分平台的用户，在完成登录时，SDK 会自动关联当前的 Client ID 和设备。关联的方式是通过设备**订阅**名为 Client ID 的 Channel 实现的。开发者可以在数据存储的 `_Installation` 表中的 `channels` 字段查到这组关联关系。在实际离线推送时，系统根据用户 Client ID 找到对应的关联设备进行推送。由于实时通信触发的推送量比较大，内容单一， 所以云端不会保留这部分记录，在 **控制台 > 消息 > 推送记录** 中也无法找到这些记录。您有三种方式自定义推送的内容：
+1. 动态内容方式
 
-##### 静态内容方式
+  如果希望推送通知显示动态内容，比如消息的实际内容，或根据消息内容、对话信息等上下文信息来自定义内容，则需要通过 [云引擎 Hook `_receiversOffline`](#_receiversOffline) 来实现。该类型优先级最高。
 
-由于不同平台的不同限制，且用户的消息正文可能还包含上层协议，所以我们允许用户在控制台中为应用设置一个静态的 APNs JSON，推送一条内容固定的通知。
+2. 消息附件方式
+  
+  - 对于 SDK，通过各个 SDK 提供的 API 设置这条消息可能产生的推送内容，比如 JS 的是 [pushData 参数](https://leancloud.github.io/js-realtime-sdk/docs/Conversation.html#send)
+  - 对于 REST，通过 [push_data 参数](./realtime_rest_api_v2.html#发消息)设定
 
-{% if node=='qcloud' %}
-进入 `控制台 > 消息 > 实时消息 > 设置 > iOS 用户离线推送设置`，填入：
-{% else %}
-进入 [控制台 > 消息 > 实时消息 > 设置 > iOS 用户离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
-{% endif %}
+3. 静态内容方式
 
-```
-{"alert":"您有新的消息", "badge":"Increment"}
-```
+  由于不同平台的不同限制，且用户的消息正文可能还包含上层协议，所以我们允许用户在控制台中为应用设置一个静态的 APNs JSON，推送一条内容固定的通知。
+  {% if node=='qcloud' %}
+  进入 `控制台 > 消息 > 实时消息 > 设置 > iOS 用户离线推送设置`，填入：
+  {% else %}
+  进入 [控制台 > 消息 > 实时消息 > 设置 > iOS 用户离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
+  {% endif %}
+  ```
+  {"alert":"您有新的消息", "badge":"Increment"}
+  ```
+  注意，`Increment` 大小写敏感，表示自动增加应用 badge 上的数字计数。清除 badge 的操作请参考 [iOS 推送指南 &middot; 清除 badge](ios_push_guide.html#清除_Badge)。
+  
+  ![image](images/realtime_ios_push.png)
 
-注意，`Increment` 大小写敏感，表示自动增加应用 badge 上的数字计数。清除 badge 的操作请参考 [iOS 推送指南 &middot; 清除 badge](ios_push_guide.html#清除_Badge)。
+  此外，您还可以设置声音等推送属性，具体的字段可以参考[推送 &middot; 消息内容 Data](./push_guide.html#消息内容_Data)。
 
-![image](images/realtime_ios_push.png)
+##### 限制
 
-此外，您还可以设置声音等推送属性，具体的字段可以参考[推送 &middot; 消息内容 Data](./push_guide.html#消息内容_Data)。
+通知的过期时间是 7 天，也就是说，如果一个设备 7 天内没有连接到 APNs 或 MPNs，系统将不会再给这个设备推送通知。
 
-##### 动态内容方式
+##### 原理
 
-如果希望推送通知显示动态内容，比如消息的实际内容，或根据消息内容、对话信息等上下文信息来自定义内容，则需要通过 [云引擎 Hook `_receiversOffline`](#_receiversOffline) 来实现。
-
-##### 消息附件方式
-
-您可以在使用 SDK 发送消息时，通过 SDK 的 API 设置这条消息可能产生的推送内容。
-
-当同时使用以上多种方式的时候，设置的优先级为“动态内容方式” > “消息附件方式” > “静态内容方式”。
+这部分平台的用户，在完成登录时，SDK 会自动关联当前的 Client ID 和设备。关联的方式是通过设备**订阅**名为 Client ID 的 Channel 实现的。开发者可以在数据存储的 `_Installation` 表中的 `channels` 字段查到这组关联关系。在实际离线推送时，系统根据用户 Client ID 找到对应的关联设备进行推送。由于实时通信触发的推送量比较大，内容单一， 所以云端不会保留这部分记录，在 **控制台 > 消息 > 推送记录** 中也无法找到这些记录。
 
 ##### 其他设置
 
