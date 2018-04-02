@@ -181,6 +181,9 @@ post.save()
         AVUser anotherUser= list.get(0);
         acl.setWriteAccess(anotherUser,true);
 
+        // 将 ACL 实例赋予 Post对象
+        post.setACL(acl);
+
         //保存到云端
         post.saveInBackground();
       } else {
