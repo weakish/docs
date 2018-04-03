@@ -1601,7 +1601,7 @@ NSString *sessionToken = currentUser.sessionToken;
 {% block file_as_avatar %}
 
 ```objc
-AVFile *file = [AVFile fileWithURL:@"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"];
+AVFile *file = [AVFile fileWithRemoteURL:[NSURL URLWithString: @"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"]];
 AVObject *todo = [AVObject objectWithClassName:@"Todo"];
 [todo setObject:file forKey:@"girl"];
 [todo setObject:@"明星" forKey:@"topic"];
