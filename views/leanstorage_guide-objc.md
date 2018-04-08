@@ -1378,6 +1378,38 @@ AVQuery *query = [AVQuery andQueryWithSubqueries:[NSArray arrayWithObjects:start
 ```
 {% endblock %}
 
+{% block anonymous_user_login %}
+```objc
+[AVAnonymousUtils logInWithBlock:^(AVUser *user, NSError *error) {
+    if (user && !error) {
+        // 登录成功
+    } else {
+        // 登录失败
+    }
+}];
+```
+{% endblock %}
+
+{% block setup_username_and_password_for_anonymous_user %}
+```objc
+// 获取匿名用户
+AVUser *user = [AVUser currentUser];
+
+// 完善匿名用户信息
+user.username = @"Tom";
+user.password = @"cat!@#123";
+user.email    = @"tom@leancloud.cn";
+
+[user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // 用户信息完善成功
+    } else {
+        // 用户信息完善失败
+    }
+}];
+```
+{% endblock %}
+
 {% block text_subclass %}
 ## 子类化
 子类化推荐给进阶的开发者在进行代码重构的时候做参考。
