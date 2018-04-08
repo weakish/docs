@@ -389,8 +389,6 @@
 * 信息 - `Exceeded Limit`
 * 含义 -  当前 IP 超过并发限制。使用云引擎时遇到 http 响应码为 529 的错误页面，解决方案请参考 [Exceeded Limit](leanengine_faq.html#Exceeded_Limit_是什么意思_)。
 
-{% if node != 'qcloud' and node != 'us' %}
-
 ## 600
 
 * 信息 - `Invalid SMS signature.`
@@ -430,7 +428,11 @@
 
 * 信息 - `Fails to render SMS template.`
 * 含义 - 渲染短信模板失败，通常是模板语法问题，我们的短信模板仅支持 [handlerbars](http://handlebarsjs.com/) 模板语法。
-  {% endif %}
+
+## 608
+
+* 信息 - `Missing validate token.`
+* 含义 - 缺少图形验证码功能要求的 token。请按照 [开通图形验证码服务](sms-guide.html#开通图形验证码服务) 来正确集成，或者在应用控制台中关闭「短信设置」里「强制短信验证服务使用图形验证码」选项。
 
 ## 700
 
