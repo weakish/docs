@@ -34,18 +34,19 @@ public class Employee : AVObject
     [AVFieldName("displayName")]
     public string DisplayName
     {
-        get { return GetProperty<string>(); }
-        set { SetProperty<string>(value); }
+        get { return GetProperty<string>("DisplayName"); }
+        set { SetProperty<string>(value, "DisplayName"); }
     }
 
     [AVFieldName("positions")]
     public List<string> Positions
     {
-        get { return GetProperty<List<string>>(); }
-        set { SetProperty<List<string>>(value); }
+        get { return GetProperty<List<string>>("DisplayName"); }
+        set { SetProperty<List<string>>(value, "DisplayName"); }
     }
 }
 ```
+[AVFieldName("displayName")]中的**displayName**为存储后台中对应的“列名”，DisplayName为自定义属性名。
 
 然后在系统启动之后，注册子类:
 
