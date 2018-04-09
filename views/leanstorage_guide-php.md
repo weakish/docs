@@ -1149,3 +1149,15 @@ $query->find();
 {# 2018-01-10 Not applicable to PHP: https://github.com/leancloud/docs/issues/2429#issuecomment-356483624  #}
 {% block text_user_isAuthenticated %}
 {% endblock %}
+
+{% block anonymous_user_login %}
+```
+暂不支持
+```
+{% endblock %}
+
+{% block setup_username_and_password_for_anonymous_user %}
+```
+暂不支持
+```
+{% endblock %}

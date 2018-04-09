@@ -1694,4 +1694,13 @@ todo.fetch({
 
 {% endblock %}
 
-{# --End--主模板留空的代码段落，子模板根据自身实际功能给予实现 #}
+{% block anonymous_user_login %}
+```js
+AV.User.signUpOrlogInWithAuthData({
+    id: '随机 UUID 全部小写的 hex 数字'
+  }, 
+  'anonymous'
+)
+```
+{% endblock %}
+{% block anonymous_user_save %}{%  endblock %}

@@ -1658,3 +1658,25 @@ AVUser.getCurrentUser().isAuthenticated(new AVCallback<Boolean>() {
 });
 ```
 {% endblock %}
+
+{% block anonymous_user_login %}
+```java
+AVAnonymousUtils.logIn(new LogInCallback() {
+  public void done(T user, AVException e) {
+  };
+});
+```
+{% endblock %}
+
+{% block setup_username_and_password_for_anonymous_user %}
+```java
+AVUser currentUSer = AVUser.getCurrentUser();
+currentUser.setEmail("email");
+currentUser.setPassword("password");
+currentUser.setUsername("username");
+currentUser.signUpInBackground(new SignUpCallback() {
+  public void done(AVException e) {
+  }
+});
+```
+{% endblock %}

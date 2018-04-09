@@ -1088,17 +1088,17 @@ CQL 是 {{productName}} 独创的使用类似 SQL 语法来实现云端查询功
 
 ### 匿名用户
 
-使用匿名用户，可以让应用不提供注册步骤也能创建用户。
-
-以下代码演示了如何登录匿名用户：
+使用匿名用户，可以让应用不提供注册步骤也能创建用户：
 
 {% block anonymous_user_login %}{% endblock %}
 
+{% block anonymous_user_save %}
 如果有需要，应用还可以让匿名用户完善信息，例如设置用户名、密码和邮箱等：
 
 {% block setup_username_and_password_for_anonymous_user %}{% endblock %}
 
 如果没有完善信息，匿名用户一旦登出，其身份就会永久消失。
+{% endblock %}
 
 ## 角色
 关于用户与角色的关系，我们有一个更为详尽的文档介绍这部分的内容，并且针对权限管理有深入的讲解，详情请阅读《[ACL 权限管理指南](acl-guide.html)》。

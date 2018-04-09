@@ -1434,4 +1434,14 @@ leancloud.push.send(data, cql='select * from _Installation where installationId=
 {% block save_eventually %}{% endblock %}
 
 
-{# --End--主模板留空的代码段落，子模板根据自身实际功能给予实现 #}
+{% block anonymous_user_login %}
+```
+暂不支持
+```
+{% endblock %}
+
+{% block setup_username_and_password_for_anonymous_user %}
+```
+暂不支持
+```
+{% endblock %}
