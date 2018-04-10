@@ -225,7 +225,7 @@ public void GuanYULogIn()
     {
         // 监听自己被邀请加入对话
         guanyu.OnInvited += Guanyu_OnInvited;
-        // 监听接收消息
+        // 监听接收消息，注意：在不需要时使用guanyu.OnMessageReceived -= Guanyu_OnMessageReceived移除注册，避免异常和泄露
         guanyu.OnMessageReceived += Guanyu_OnMessageReceived;
     });
 }
@@ -265,7 +265,7 @@ public void GuanYULogIn()
     {
         // 监听自己被邀请加入对话
         guanyu.OnInvited += Guanyu_OnInvited;
-        // 监听接收消息
+        // 监听接收消息，注意：在不需要时使用guanyu.OnMessageReceived -= Guanyu_OnMessageReceived移除注册，避免异常和泄露
         guanyu.OnMessageReceived += Guanyu_OnMessageReceived;
         // 构建对话的查询
         var query = guanyu.GetQuery();
@@ -728,7 +728,7 @@ avRealtime.CreateClient("1002").ContinueWith(t =>
 {
     // 监听自己被邀请加入对话
     guanyu.OnInvited += Guanyu_OnInvited;
-    // 监听接收消息
+    // 监听接收消息，注意：在不需要时使用guanyu.OnMessageReceived -= Guanyu_OnMessageReceived移除注册，避免异常和泄露
     guanyu.OnMessageReceived += Guanyu_OnMessageReceived;
     // 构建对话的查询
     var query = guanyu.GetQuery();
