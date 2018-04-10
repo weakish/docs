@@ -41,8 +41,8 @@ public class Employee : AVObject
     [AVFieldName("positions")]
     public List<string> Positions
     {
-        get { return GetProperty<List<string>>("DisplayName"); }
-        set { SetProperty<List<string>>(value, "DisplayName"); }
+        get { return GetProperty<List<string>>("Positions"); }
+        set { SetProperty<List<string>>(value, "Positions"); }
     }
 }
 ```
