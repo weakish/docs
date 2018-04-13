@@ -63,7 +63,7 @@ Cloud::define("averageStars", function($params, $user) {
 {% block cloudFuncTimeout %}
 ### 云函数超时
 
-云引擎超时时间默认为 30 秒，如果超过阈值，进程将被强制 kill：
+云引擎超时时间默认为 15 秒，如果超过阈值，进程将被强制 kill：
 
 * 客户端将收到 HTTP status code 为 50X 响应。
 * 服务端会出现类似这样的日志：`WARNING: [pool www] child ... exited on signal 9 (SIGKILL) after ... seconds from start`。
