@@ -699,6 +699,43 @@ public void QueryMessageHistory()
 `beforeTimeStampPoint`|DateTime?|从 `beforeTimeStampPoint` 开始向前查询|`conversation.QueryMessageAsync(beforeTimeStampPoint:DateTime.Now)`
 `afterTimeStampPoint`|DateTime?|拉取截止到 `afterTimeStampPoint` 时间戳（不包含）|`conversation.QueryMessageAsync(afterTimeStampPoint:DateTime.Now.AddDays(2))`
 
+## 聊天记录（进阶）
+
+除了实时通信，LeanCloud 还提供了更灵活的获取聊天记录的机制。例如：
+
+- 当我们处于离线状态时，也有可能收到好友发来的消息，称为「离线消息」。
+- 当我们希望追踪消息的状态（消息是否已读），称为「未读消息」。
+
+针对以上需求，SDK 中添加了 `AVIMClient.AutoRead` 字段来控制「消息接收回执」。
+
+### 场景模拟
+
+#### 场景一
+
+只关心实时在线消息，不关心离线消息和未读消息，则不需要设置 AutoRead。AutoRead 默认值为 true，SDK 会自动发送消息「已读回执」。
+
+#### 场景二
+
+除了关心实时在线消息，还关心离线消息，但不关心「消息是否真正已读」。（同场景一）
+
+此场景下，用户可以在上线时根据会话的 `AVIMConversation.Unread` 获得离线消息数据，可以根据需要拉取消息记录。
+
+**注意：SDK 会在调用「拉取消息」接口和「获取消息」回调时，自动发送消息「已读回执」。**
+
+**注意：由于在线状态下会自动发送消息「已读回执」，则如果此会话之前有离线消息，也会将离线消息标记为已读，所以如有需要，请在上线时及时对离线消息做缓存处理。**
+
+#### 场景三
+
+除了关心实时在线消息，还要关心消息状态（已读/未读），**则必须将 AutoRead 设置为 false**，即「手动发送消息已读回执」。
+
+用户可根据会话的 `AVIMConversation.Unread` 获得未读消息数据，这时的未读消息包含三部分：
+* 上次在线收到，但是「未手动发送消息已读回执」的消息
+* 上次离线之后收到的「离线消息」
+* 本次在线收到的消息，但是也「未手动发送消息已读回执」的消息
+
+请开发者根据需要，通过 `AVIMConversation.ReadAsync(IAVIMMessage message = null, DateTime? readAt = null)` 接口发送消息已读回执。
+提示：一般情况只需要将「最新消息」或「当前时间」作为参数标记「已读」状态即可，可参考 QQ 或微信。
+
 {{ imPartial.signature() }}
 
 ### 游戏中常见的鉴权和 LeanCloud 签名结合
