@@ -12,7 +12,7 @@ LiveQuery 的使用场景有：
 
 {# 2017-06-09 因为 docs 没为 CDN 加速，视频尺寸大，所以特别对待，放在七牛上。 #}
 <div style="border:2px solid #ccc; margin-bottom:1em;">
-  <video src="https://dn-lhzo7z96.qbox.me/1496988080458" controls autoplay muted preload="auto" width="100%" height="100%" >
+  <video src="https://lc-lhzo7z96.cn-n1.lcfile.com/1496988080458" controls autoplay muted preload="auto" width="100%" height="100%" >
 HTML5 Video is required for this demo. 您的浏览器不支持播放 HTML5 视频。
   </video>
 </div>
