@@ -170,9 +170,7 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
 
 初始化**必须**在 Unity Editor 上将 `AVInitializeBehaviour` 挂载在某一个 GameObject 下，如下图：
 
-![AVInitializeBehaviour](https://dn-lhzo7z96.qbox.me/1490770179090)
-
-![mount](https://dn-lhzo7z96.qbox.me/1490770533536)
+![AVInitializeBehaviour](images/unity/avinitializebehaviour.png)
 
 假设还需要使用实时通讯，请在任意一个 `MonoBehaviour` 启动的时候调用如下代码：
 
