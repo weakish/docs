@@ -403,14 +403,14 @@ curl -X DELETE \
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  -H "Content-Type: application/json" \ 
+  -H "Content-Type: application/json" \
   -d '{"clientId": "client", "role": "role"}' \
   https://{{host}}/1.2/rtm/conversations/{conv_id}/member-infos
 ```
 
 参数 | 说明
 --- | ---
-client_id | 要禁言的 id，字符串
+clientId | 用户 ID，字符串
 role | 角色，可选值 Member、Manager、Owner
 
 返回
@@ -427,6 +427,10 @@ curl -X DELETE \
   -H "X-LC-Key: {{masterkey}},master" \
   https://{{host}}/1.2/rtm/conversations/{conv_id}/member-infos/{info-id}
 ```
+
+参数 | 说明
+--- | ---
+info-id | 该记录对应的 objectId
 
 返回
 ```
@@ -447,8 +451,9 @@ curl -X PUT \
 
 参数 | 说明
 --- | ---
-client_id | 要禁言的 id，字符串。可选
+clientId | 用户 ID，字符串
 role | 角色，可选值 Member、Manager、Owner。可选
+info-id | 该记录对应的 objectId
 
 返回
 ```
@@ -473,6 +478,7 @@ curl -X GET \
 --- | ---
 skip | 
 limit | 与 skip 联合使用实现分页
+role | 本次查询只希望包含该角色
 
 返回
 ```
