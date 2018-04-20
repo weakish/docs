@@ -706,7 +706,7 @@ public void QueryMessageHistory()
 - 当我们处于离线状态时，也有可能收到好友发来的消息，称为「离线消息」。
 - 当我们希望追踪消息的状态（消息是否已读），称为「未读消息」。
 
-针对以上需求，SDK 中添加了 `AVIMClient.AutoRead` 字段来控制「消息接收回执」。
+针对以上需求，SDK 中添加了 `AVIMClient.CurrentConfiguration.AutoRead` 字段来控制「消息接收回执」。
 
 ### 场景模拟
 
@@ -735,6 +735,39 @@ public void QueryMessageHistory()
 
 请开发者根据需要，通过 `AVIMConversation.ReadAsync(IAVIMMessage message = null, DateTime? readAt = null)` 接口发送消息已读回执。
 提示：一般情况只需要将「最新消息」或「当前时间」作为参数标记「已读」状态即可，可参考 QQ 或微信。
+
+示例代码：
+
+显示「未读消息红点」示例代码：
+
+```cs
+AVIMConversationQuery query = client.GetQuery();
+query.FindAsync().ContinueWith((task) =>
+{
+    if (task.IsCanceled || task.IsFaulted) 
+    {
+        Debug.LogError(task.Exception.Message);
+    } 
+    else 
+    {
+        foreach (AVIMConversation conversation in task.Result)
+        {
+            AVIMConversation.UnreadState state = conversation.Unread;
+            if (state == null)
+                continue;
+            // TODO 显示未读消息数量 
+            // state.Count
+        }
+    }
+});
+```
+
+手动标记「消息已读回执」示例代码：
+
+```cs
+AVIMConversation.UnreadState state = conversation.Unread;
+conversation.ReadAsync(state.LastMessage);
+```
 
 {{ imPartial.signature() }}
 
