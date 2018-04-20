@@ -706,7 +706,7 @@ public void QueryMessageHistory()
 - 当我们处于离线状态时，也有可能收到好友发来的消息，称为「离线消息」。
 - 当我们希望追踪消息的状态（消息是否已读），称为「未读消息」。
 
-针对以上需求，SDK 中添加了 `AVIMClient.AutoRead` 字段来控制「消息接收回执」。
+针对以上需求，SDK 中添加了 `AVIMClient.CurrentConfiguration.AutoRead` 字段来控制「消息接收回执」。
 
 ### 场景模拟
 
