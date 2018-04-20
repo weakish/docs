@@ -6,6 +6,7 @@ angular.module('app').controller('WeappDomainsCtrl', [
     '$compile',
     function ($http, $scope, $rootScope, $timeout, $compile) {
         $scope.domains = {
+          upload: '正在获取配置',
           download: '正在获取配置'
         };
 
@@ -43,19 +44,29 @@ angular.module('app').controller('WeappDomainsCtrl', [
               appKey: currentApp.app_key,
               masterKey: currentApp.master_key,
             });
-            new AV.File('weapp-domains-generator-test-file.txt', {
+            var file = new AV.File('weapp-domains-generator-test-file.txt', {
               base64: 'ZmVlbCBmcmVlIHRvIGRlbGV0ZSB0aGlzIGZpbGUu',
-            }).save().then(function(file) {
+            });
+            file._fileToken().then(function(uploadInfo) {
+              console.log(uploadInfo);
               var downloadDomain;
-              var result = file.url().match(/\:\/\/([^\/]*)/);
+              var result = uploadInfo.url.match(/\:\/\/([^\/]*)/);
               if (result) {
-                downloadDomain = result[1];
+                downloadDomain = result[1].toLowerCase();
               } else {
-                throw new Error('invalid file url');
+                downloadDomain = '获取文件域名异常';
               }
-              console.log(downloadDomain);
               $scope.domains.download = downloadDomain;
+              var uploadDomain;
+              var result = uploadInfo.upload_url.match(/\:\/\/([^\/]*)/);
+              if (result) {
+                uploadDomain = result[1].toLowerCase();
+              } else {
+                uploadDomain = '获取文件域名异常';
+              }
+              $scope.domains.upload = uploadDomain;
               $scope.$digest();
+              file.id = uploadInfo.objectId;
               return file.destroy({
                 useMasterKey: true
               });

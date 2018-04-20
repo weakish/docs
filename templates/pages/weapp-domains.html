@@ -84,15 +84,7 @@ title: 小程序域名白名单配置
           </tr>
           <tr>
             <th><strong>uploadFile 域名</strong></th>
-            <td>
-              {% if node === 'qcloud' %}
-              sh.file.myqcloud.com
-              {% elseif node === 'us' %}
-              <span ng-bind="domains.download"></span>
-              {% else %}
-              upload.qiniup.com
-              {% endif %}
-            </td>
+            <td ng-bind="domains.upload"></td>
           </tr>
           <tr>
             <th><strong>downloadFile 域名</strong><small class="help-block mb-0">仅在使用 <code>wx.downloadFile</code> 时需要配置</small></th>

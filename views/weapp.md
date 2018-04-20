@@ -177,7 +177,7 @@ AV.User.signUpOrlogInWithAuthDataAndUnionId({
   ...其他可选属性
 }, 'weapp_union', unionid, {
   unionIdPlatform: 'weixin', // 指定为 weixin 即可通过 unionid 与其他 weixin 平台的帐号打通
-  asMainAccount: false,
+  asMainAccount: true,
 }).then(console.log, console.error);
   ```
 
