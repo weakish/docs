@@ -736,6 +736,39 @@ public void QueryMessageHistory()
 请开发者根据需要，通过 `AVIMConversation.ReadAsync(IAVIMMessage message = null, DateTime? readAt = null)` 接口发送消息已读回执。
 提示：一般情况只需要将「最新消息」或「当前时间」作为参数标记「已读」状态即可，可参考 QQ 或微信。
 
+示例代码：
+
+显示「未读消息红点」示例代码：
+
+```cs
+AVIMConversationQuery query = client.GetQuery();
+query.FindAsync().ContinueWith((task) =>
+{
+    if (task.IsCanceled || task.IsFaulted) 
+    {
+        Debug.LogError(task.Exception.Message);
+    } 
+    else 
+    {
+        foreach (AVIMConversation conversation in task.Result)
+        {
+            AVIMConversation.UnreadState state = conversation.Unread;
+            if (state == null)
+                continue;
+            // TODO 显示未读消息数量 
+            // state.Count
+        }
+    }
+});
+```
+
+手动标记「消息已读回执」示例代码：
+
+```cs
+AVIMConversation.UnreadState state = conversation.Unread;
+conversation.ReadAsync(state.LastMessage);
+```
+
 {{ imPartial.signature() }}
 
 ### 游戏中常见的鉴权和 LeanCloud 签名结合
