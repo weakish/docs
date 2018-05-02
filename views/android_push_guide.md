@@ -401,7 +401,7 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用小
 
 当小米通知栏消息被点击后，如果已经设置了 [自定义 Receiver](#自定义_Receiver)，则 SDK 会发送一个 action 为 `com.avos.avoscloud.mi_notification_action` 的 broadcast。如有需要，开发者可以通过订阅此消息获取点击事件，否则 SDK 会默认打开 [启动推送服务](#启动推送服务) 对应设置的 Activity。
 
-### 华为推送（仅中国节点）
+### 华为推送-老版本（仅中国节点）
 
 #### 环境配置
 
@@ -494,7 +494,150 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 
 #### 提升透传消息到达率
 
-当使用华为推送发透传消息时，如果目标设备上 App 进程被杀，会出现推送消息无法接收的情况。这个是华为 ROM 对透传消息广播的限制导致的，需要引导用户在华为 “权限设置” 中对 App 开启自启动权限来避免。
+当使用华为推送发透传消息时，如果目标设备上 App 进程被杀，会出现推送消息无法接收的情况。这个是华为 ROM 对透传消息广播的限制导致的，需要引导用户在华为 「权限设置」中对 App 开启自启动权限来避免。
+
+### 华为推送-HMS 版本（仅中国节点）
+
+#### 环境配置
+
+1. **注册华为账号**：在 [华为开发者联盟](http://developer.huawei.com/cn/consumer/) 注册华为开发者账号（[详细流程](http://developer.huawei.com/cn/consumer/wiki/index.php?title=%E6%B3%A8%E5%86%8C%E7%99%BB%E5%BD%95)）。
+2. **创建华为应用**：实名认证通过后，需要创建华为移动应用并配置 Push 权益（[详细流程](http://developer.huawei.com/cn/consumer/wiki/index.php?title=%E6%8E%A5%E5%85%A5%E8%AF%B4%E6%98%8E#2.1_.E6.B3.A8.E5.86.8C)）。
+3. **设置华为的 AppId 及 AppKey**：在 [华为开发者联盟控制中心](http://developer.huawei.com/cn/consumer/devunion/openPlatform/html/memberCenter.html#appManage#) > **应用管理** > **移动应用详情**  可以查到具体的华为推送服务应用的 AppId 及 AppSecret，将此 AppId 及 AppSecret 通过 {% if node == 'qcloud' %}LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**{% else %}[LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/messaging.html?appid={{appid}}#/message/push/conf){% endif %} 与 LeanCloud 应用关联。
+
+#### 接入 SDK
+
+##### 获取 HMS SDK 和 HMS Agent SDK
+华为 HMS 推送 SDK 分为两部分，一个是 HMS SDK，一个是 HMS Agent SDK，两者需要主版本号一致才能正常使用（当前 LeanCloud 混合推送基于 v2.6.0 这一主版本），具体可以参见 [华为 SDK 获取](http://developer.huawei.com/consumer/cn/service/hms/catalog/HuaweiJointOperation.html?page=hmssdk_jointOper_sdkdownload)。
+
+HMS SDK 可以直接通过 jar 包加入，HMS Agent SDK 则需要下载解压之后把源码完全拷贝进入工程（也可以将 https://github.com/leancloud/android-sdk-all/hmsagent 作为 module 直接加入工程）。
+
+> 注意：华为 HMS 推送不能与老的 HwPush 共存，如果切换到 HMS 推送，则需要将原来的 HwPush SDK 全部删除干净才行。
+
+##### 修改应用 manifest 配置
+
+首先导入 `avoscloud-mixpush` 包，修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+
+```
+dependencies {
+    compile ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar')
+}
+```
+
+注：如果是通过 jar 包导入，则需要手动下载 jar 包：[华为 Push SDK](http://developer.huawei.com/cn/consumer/wiki/index.php?title=PushSDK%E4%B8%8B%E8%BD%BD)。
+
+然后配置相关 AndroidManifest，添加 Permission：
+
+```xml
+    <!-- HMS-SDK引导升级HMS功能，访问OTA服务器需要网络权限 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- HMS-SDK引导升级HMS功能，保存下载的升级包需要SD卡写权限 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- 检测网络状态 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- 检测wifi状态 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <!-- 为了获取用户手机的IMEI，用来唯一的标识用户。 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <!-- 如果是安卓8.0，应用编译配置的targetSdkVersion>=26，请务必添加以下权限 -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+```
+
+再添加 service 与 receiver。开发者要将其中的 `<包名>` 替换为自己的应用的 package：
+
+```xml
+        <!-- 华为推送要求的设置（appId） -->
+        <meta-data
+            android:name="com.huawei.hms.client.appid"
+            android:value="<please use your HMS appId>">
+        </meta-data>
+
+        <!-- 华为推送要求的 updateProvider -->
+        <provider
+            android:name="com.huawei.hms.update.provider.UpdateProvider"
+            android:authorities="<包名>.hms.update.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+        </provider>
+
+        <!-- 华为推送要求的 activity -->
+        <activity
+            android:name="com.huawei.hms.activity.BridgeActivity"
+            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent">
+            <meta-data
+                android:name="hwc-theme"
+                android:value="androidhwext:style/Theme.Emui.Translucent"/>
+        </activity>
+
+        <!-- 接收通道发来的通知栏消息 -->
+        <receiver android:name="com.huawei.hms.support.api.push.PushEventReceiver">
+            <intent-filter>
+                <action android:name="com.huawei.intent.action.PUSH"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- LeanCloud 自定义 receiver -->
+        <receiver android:name="com.avos.avoscloud.AVHMSPushMessageReceiver">
+            <intent-filter>
+
+                <!-- 必须，用于接收TOKEN -->
+                <action android:name="com.huawei.android.push.intent.REGISTRATION"/>
+                <!-- 必须，用于接收消息 -->
+                <action android:name="com.huawei.android.push.intent.RECEIVE"/>
+                <!-- 可选，用于点击通知栏或通知栏上的按钮后触发onEvent回调 -->
+                <action android:name="com.huawei.android.push.intent.CLICK"/>
+                <!-- 可选，查看PUSH通道是否连接，不查看则不需要 -->
+                <action android:name="com.huawei.intent.action.PUSH_STATE"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- 开发者自定义的打开推送消息的目的 activity，如果不指定则默认是打开应用。-->
+        <activity android:name="<please use your own activity name>">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="lcpushscheme" android:host="cn.leancloud.push" android:path="/notify_detail"/>
+            </intent-filter>
+        </activity>
+
+```
+
+#### 具体使用
+
+1. 在 `AVOSCloud.initialize` 时调用 `AVMixPushManager.registerHMSPush(context, profile)` 即可。参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
+
+LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华为推送：
+
+  - EMUI 系统
+  - manifest 正确填写
+
+2. 在应用启动的第一个页面的 `onCreate` 中调用 `AVMixPushManager.connectHMS(activity)` 即可。
+
+#### 提升透传消息到达率
+
+当使用华为推送发透传消息时，如果目标设备上 App 进程被杀，会出现推送消息无法接收的情况。这个是华为 ROM 对透传消息广播的限制导致的，需要引导用户在华为 「权限设置」中对 App 开启自启动权限来避免。
+
+#### 使用特定 activity 响应推送消息
+
+华为推送消息，在用户点击了通知栏信息之后，默认是打开应用，用户也可以指定特定的 activity 来响应推送启动事件，开发者需要在 manifest 文件的 application 中定义如下的 activity：
+```
+        <!-- 开发者自定义的打开推送消息的目的 activity，如果不指定则默认是打开应用。-->
+        <activity android:name="<please use your own activity name>">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="lcpushscheme" android:host="cn.leancloud.push" android:path="/notify_detail"/>
+            </intent-filter>
+        </activity>
+```
+这里 intent-filter 的内容不能修改，在目标 activity 的 `onCreate` 函数中可以从 bundle 中通过 `content` key 可以获得推送内容（JSON 格式）。
+
+#### 参考 demo
+我们提供了一个 [最新的华为推送 demo](https://github.com/leancloud/mixpush-demos/tree/master/huawei)，可供你在接入过程中参考。
 
 ### 魅族推送（仅中国节点）
 
