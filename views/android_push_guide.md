@@ -547,7 +547,7 @@ dependencies {
         <!-- 华为推送要求的设置（appId） -->
         <meta-data
             android:name="com.huawei.hms.client.appid"
-            android:value="100259225">
+            android:value="<please use your HMS appId>">
         </meta-data>
 
         <!-- 华为推送要求的 updateProvider -->
