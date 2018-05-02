@@ -365,7 +365,7 @@ JavaScript SDK 由于平台的特殊性（运行在单线程运行的浏览器�
 
 如果你的应用的确是内部应用（做好了相关的安全措施，外部访问不到），可以在 `AV.init`之后增加下面的代码来让 JavaScript SDK 发送 Master Key：
 ```
-AV._useMasterKey = true;
+AV._config.useMasterKey = true;
 ```
 
 ### Web 端会暴露 App Key 和 App Id，怎么保证安全性？
