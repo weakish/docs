@@ -511,6 +511,8 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 
 HMS SDK 可以直接通过 jar 包加入，HMS Agent SDK 则需要下载解压之后把源码完全拷贝进入工程（也可以将 https://github.com/leancloud/android-sdk-all/hmsagent 作为 module 直接加入工程）。
 
+> 注意：华为 HMS 推送不能与老的 HwPush 共存，如果切换到 HMS 推送，则需要将原来的 HwPush SDK 全部删除干净才行。
+
 ##### 修改应用 manefiest 配置。
 
 首先导入 `avoscloud-mixpush` 包，修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
@@ -634,6 +636,8 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 ```
 这里 intent-filter 的内容不能修改，在目标 activity 的 onCreate 函数中可以从 bundle 中通过 `content` key 可以获得推送内容（JSON 格式）。
 
+#### 参考 demo
+我们提供了一个[最新的华为推送 demo](https://github.com/leancloud/mixpush-demos/tree/master/huawei)，可供你在接入过程中参考。
 
 ### 魅族推送（仅中国节点）
 
