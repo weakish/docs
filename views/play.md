@@ -46,10 +46,6 @@ Play.RPC("rpcResult", PlayRPCTargets.All, winnerId);
 
 ```
 
-## 限制
-* 房间内发送消息速率最大不超过 500 msg/s
-* 每条消息大小不超过 1KB
-
 ## 开始使用
 
 * [快速入门]()：使用 Play 快速实现一个炸金花小游戏
