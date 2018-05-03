@@ -283,6 +283,8 @@ Play.CreateRoom(roomConfig);
 public override void OnAuthenticated()
 {
     Play.FetchRoomList();
+    // 或者一次性查询 30 个 room
+    // Play.FetchRoomList(30);
 }
 
 [PlayEvent]
@@ -291,6 +293,12 @@ public override void OnFetchedRoomList(IEnumerable<PlayRoom> rooms)
     Play.Log(rooms.Count());
 }
 ```
+
+如果还想继续查询更多，只要继续调用 `Play.FetchRoomList()` 即可，如果想从头重新开始查询，只要传入一个 reset 参数即可：
+
+```cs
+Play.FetchRoomList(reset:true);
+``` 
 
 
 注意：房间的变化频率较快，所以本地 SDK 并没有做缓存，调用加入之后，需要监听加入的回调来判断是否真正加入成功，详细请看下一章节[加入房间](#加入房间)。
