@@ -3,7 +3,7 @@
 ## 前言
 Play 是一个基于 C# 编写的 Unity 的组件，它具备如下几项主要的功能（包括但不限于）：
 
-- 建立于云端的长连接
+- 建立于云端的双向通讯长连接
 - 创建对战房间（PlayRoom）
 - 获取房间列表
 - 加入房间
@@ -48,6 +48,16 @@ Play 是基于 C# 开发运行在 Unity 的 Mono .NET 下的 SDK，因此开发�
 
 
 ![import-play-sdk](images/link-play-init-script.png)
+
+
+### 打开客户端日志
+
+如下代码将打开客户端的日志，可以帮助调试和进行问题反馈：
+
+```cs
+// 日志都会使用 Unity.Debug 打印在控制台
+Play.ToggleLog();
+```
 
 ## 使用 UserID 建立与服务端的通信
 
@@ -269,7 +279,17 @@ Play.CreateRoom(roomConfig);
 20 是 SDK 默认设置的数量，可以通过修改 limit 参数来修改这一数值。
 
 ```cs
+[PlayEvent]
+public override void OnAuthenticated()
+{
+    Play.FetchRoomList();
+}
 
+[PlayEvent]
+public override void OnFetchedRoomList(IEnumerable<PlayRoom> rooms)
+{
+    Play.Log(rooms.Count());
+}
 ```
 
 
@@ -338,12 +358,15 @@ Play.JoinRandomRoom();
 
 ### 根据条件随机加入
 
+配合前面的[设置房间的自定义属性](#设置房间的自定义属性)的代码：
+
 ```cs
 var randomLobbyMatchKeys = new Hashtable
 {
     { "rankPoints", 3000 }
 };
 
+// 根据 key-value 匹配加入
 Play.JoinRandomRoom(randomLobbyMatchKeys);
 ```
 
