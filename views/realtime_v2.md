@@ -513,6 +513,8 @@ convId   | 消息所属对话的 ID
 offlinePeers | 数组，离线的收件人列表
 content | 消息内容
 timestamp | 服务器收到消息的时间戳（毫秒）
+mentionAll | 布尔类型，表示本消息是否 @ 了所有成员
+mentionOfflinePeers | 被本消息 @ 且离线的成员 ID。如果 mentionAll 为 true，则该参数为空，表示所有 offlinePeers 参数内的成员全部被 @
 
 #### 返回
 
@@ -632,6 +634,8 @@ convId | 对话 id。
 mute | 是否关闭当前对话提醒。
 attr | 待设置的对话属性。
 
+mute 和 attr 参数互斥，不会同时传递。
+
 #### 返回
 
 参数 |约束| 说明
@@ -640,6 +644,8 @@ reject | 可选 | 是否拒绝，默认为 **false**。
 code | 可选 | 当 reject 为 true 时可以下发一个应用自定义的整型错误码。
 attr | 可选 | 修改后的待设置对话属性，如果不提供则保持原参数中的对话属性。
 mute | 可选 | 修改后的关闭对话提醒设置，如果不提供则保持原参数中的关闭提醒设置。
+
+mute 和 attr 参数互斥，不能同时返回。并且返回值必须与请求对应，请求中如果带着 attr，则返回值中只有 attr 参数有效，返回 mute 会被丢弃。同理，请求中如果带着 mute，返回值中如果有 attr 则 attr 会被丢弃。
 
 ### 部署环境
 

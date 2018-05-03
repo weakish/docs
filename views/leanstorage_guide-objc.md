@@ -530,14 +530,14 @@ AVGeoPoint *point = [AVGeoPoint geoPointWithLatitude:39.9 longitude:116.4];
 
 {% block code_create_avfile_from_url %}
 ```objc
-    AVFile *file =[AVFile fileWithRemoteURL:@"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"];
+   AVFile *file =[AVFile fileWithRemoteURL:[NSURL URLWithString:@"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"]];
 ```
 {% endblock %}
 
 {% block code_upload_file %}
 ```objc
     [file uploadWithCompletionHandler:^(BOOL succeeded, NSError *error) {
-        NSLog(file.url);//返回一个唯一的 Url 地址
+        NSLog(@"%@", file.url);//返回一个唯一的 Url 地址
     }];
 ```
 {% endblock %}
@@ -555,7 +555,7 @@ AVGeoPoint *point = [AVGeoPoint geoPointWithLatitude:39.9 longitude:116.4];
 
 {% block code_file_image_thumbnail %}
 ```objc
-AVFile *file = [AVFile fileWithRemoteURL:@"文件-url"];
+AVFile *file = [AVFile fileWithRemoteURL:[NSURL URLWithString:@"文件-url"]];
 [file getThumbnail:YES width:100 height:100 withBlock:^(UIImage *image, NSError *error) {
     // code
 }];
@@ -1198,7 +1198,7 @@ AVQuery *query = [AVQuery andQueryWithSubqueries:[NSArray arrayWithObjects:start
 {% block code_send_sms_code_for_loginOrSignup %}
 
 ```objc
-    [AVOSCloud requestSmsCodeWithPhoneNumber:@"13577778888" callback:^(BOOL succeeded, NSError *error) {
+     [AVSMS requestShortMessageForPhoneNumber:@"13577778888" options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
         // 发送失败可以查看 error 里面提供的信息
     }];
 ```
