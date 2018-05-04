@@ -12,9 +12,8 @@
 * 通过「房间属性」控制及存储房间数据，例如 房间的总金币等
 * 通过「玩家属性」控制和存储房间内玩家的数据和状态，例如 玩家的金币数，玩家的闲置，准备，游戏状态
 * 通过 RPC 接口完成远程调用操作，例如 玩家选择跟牌，棋牌等操作
-* 以及经典棋牌类游戏「炸金花」的基本玩法
 
-[工程地址](https://github.com/leancloud/Play-SDK-dotNET)
+![该工程的全部代码请点击此处查看](https://github.com/leancloud/Play-SDK-dotNET)
 
 开发环境及版本：
 
@@ -89,7 +88,7 @@ Demo 在加入房间成功后，会设置默认状态为 IDLE，并跳转至「�
 [PlayEvent]
 public override void OnJoinedRoom() 
 {
-    // 当玩家加入房间后，默认设置为「空闲」状态
+    // 当玩家加入房间后，玩家默认设置为「空闲」状态
     Debug.Log("joined room");
     Hashtable prop = new Hashtable();
     prop.Add(Constants.PROP_STATUS, Constants.PLAYER_STATUS_IDLE);
@@ -263,14 +262,15 @@ public void rpcFollow(int playerId)
     IEnumerable<LeanCloud.Player> players = Play.Room.Players;
     LeanCloud.Player player = players.FirstOrDefault(p => p.ActorID == playerId);
     int gold = (int)player.CustomProperties[Constants.PROP_GOLD];
-    gold -= 100;
+    int followGold = 100;
+    gold -= followGold;
     Hashtable goldProp = new Hashtable();
     goldProp.Add(Constants.PROP_GOLD, gold);
     player.CustomProperties = goldProp;
 
     // 增加房间金币
     int roomGold = (int)Play.Room.CustomProperties[Constants.PROP_ROOM_GOLD];
-    roomGold += 100;
+    roomGold += followGold;
     Hashtable prop = new Hashtable();
     prop.Add(Constants.PROP_ROOM_GOLD, roomGold);
     Play.Room.CustomProperties = prop;
