@@ -46,7 +46,7 @@ public class Employee : AVObject
     }
 }
 ```
-[AVFieldName("displayName")]中的**displayName**为存储后台中对应的“列名”，DisplayName为自定义属性名。
+[AVFieldName("displayName")] 中的 **displayName** 为存储后台中对应的「列名」，DisplayName 为自定义属性名。
 
 然后在系统启动之后，注册子类:
 
