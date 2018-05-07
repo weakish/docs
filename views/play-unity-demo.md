@@ -1,6 +1,10 @@
-# Play Demo - 炸金花
+# Play 快速入门 - 实现一个「炸金花」Demo
 
-本文是基于 LeanCloud 最新发布的实时对战 Play SDK 制作 Unity 简化版实时对战类游戏「炸金花」的最佳实践，目的在于让用户迅速了解如何使用 Play。
+本文是基于 Play SDK for Unity（C#）制作的简化版在线对战类游戏「炸金花」，目的在于让用户迅速了解如何使用 Play。
+
+## 内测申请
+
+Play 正在内测中，如果您没有内测资格，请[点击此处查看并申请内测](https://www.leancloud.cn/play)。如果您已经拥有内测资格，请继续阅读文档并使用。
 
 ## Demo
 
@@ -13,7 +17,7 @@
 * 通过「玩家属性」控制和存储房间内玩家的数据和状态，例如 玩家的金币数，玩家的闲置，准备，游戏状态
 * 通过 RPC 接口完成远程调用操作，例如 玩家选择跟牌，棋牌等操作
 
-[该工程的全部代码请点击此处查看](https://github.com/leancloud/Play-SDK-dotNET)
+[请点击此处查看该工程的全部代码](https://github.com/leancloud/Play-SDK-dotNET)
 
 开发环境及版本：
 
