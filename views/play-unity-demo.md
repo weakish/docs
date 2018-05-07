@@ -13,7 +13,7 @@
 * 通过「玩家属性」控制和存储房间内玩家的数据和状态，例如 玩家的金币数，玩家的闲置，准备，游戏状态
 * 通过 RPC 接口完成远程调用操作，例如 玩家选择跟牌，棋牌等操作
 
-![该工程的全部代码请点击此处查看](https://github.com/leancloud/Play-SDK-dotNET)
+[该工程的全部代码请点击此处查看](https://github.com/leancloud/Play-SDK-dotNET)
 
 开发环境及版本：
 
@@ -38,7 +38,7 @@
 通过输入用户的 UserID 连接至 Play，此处的 UserID 由开发者提供，可以是用户名，昵称等，或任意字段的组合。
 UserID 最好是字母和数字的组合。
 
-![连接](images/unity/playdemo_1.png)
+![连接](images/unity/playdemo-1.png)
 
 **注意：请保证 UserID 唯一**
 
@@ -64,7 +64,7 @@ public override void OnAuthenticated()
 
 用户可以通过 Play.CreateRoom(room) 创建房间
 
-![创建 / 加入房间](images/unity/playdemo_2.png)
+![创建 / 加入房间](images/unity/playdemo-2.png)
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -106,7 +106,7 @@ Demo 中「房主」和「普通玩家」的操作是不一样的，默认当「
 
 这时，需要同步普通玩家的状态，这里需要用到 SDK 的「玩家属性」的功能。通过设置「玩家属性」，SDK 会将「变更的属性」自动同步给房间内的所有玩家（包括自己）。
 
-![同步准备状态](images/unity/playdemo_3.png)
+![同步准备状态](images/unity/playdemo-3.png)
 
 ```cs
 // 设置玩家的状态为「准备」
@@ -171,7 +171,7 @@ void onPlayerStatusPropertiesChanged(LeanCloud.Player player, Hashtable updatedP
 
 「房主」在所有玩家准备完成后，开始游戏。
 
-![用户操作示例](images/unity/playdemo_4.png)
+![用户操作示例](images/unity/playdemo-4.png)
 
 其中最重要的是给每个玩家随机发 3 张牌，这里我们需要将 3 张牌的数据存放至「玩家属性」中。而牌的类型是我们自定义的，为了兼容这种模式，需要将牌的对象数据序列化成 json 字符串后设置。当获得后，再反序列化为「牌的对象」。
 注：我们这里用到了 JSON .NET 第三方库，这里也可以选用其他的序列化方式，只要符合 CustomProperties 的类型即可。
@@ -395,7 +395,7 @@ public void rpcResult(int winnerId)
 }
 ```
 
-![比赛结果](images/unity/playdemo_5.png)
+![比赛结果](images/unity/playdemo-5.png)
 
 ### 算分逻辑
 
@@ -410,7 +410,7 @@ public void rpcResult(int winnerId)
 		- Fight
 			- PokerType
 
-请参考![炸金花玩法](https://baike.baidu.com/item/%E7%82%B8%E9%87%91%E8%8A%B1/8806924?fr=aladdin)
+请参考[炸金花玩法](https://baike.baidu.com/item/%E7%82%B8%E9%87%91%E8%8A%B1/8806924?fr=aladdin)
 
 注：Demo 主要展现 Play SDK 功能，所以在原有玩法上做了简化。
 
