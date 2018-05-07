@@ -397,19 +397,6 @@ public void rpcResult(int winnerId)
 
 ![比赛结果](images/unity/playdemo-5.png)
 
-### 算分逻辑
-
-注：不关心 Demo 玩法的开发者可以忽略此处代码，不会影响对 Play SDK 的理解和认识。
-
-**PokerType** 是炸金花中定义的牌型类，包括 牌型的基本数据及牌型判断。
-
-根据炸金花中出现的所有牌型定义类型（继承于 PokerType），不同的牌型有不同的算分规则及其区间，详情可参考以下目录中的代码：
-
-- Assets
-	- Script
-		- Fight
-			- PokerType
-
 请参考[炸金花玩法](https://baike.baidu.com/item/%E7%82%B8%E9%87%91%E8%8A%B1/8806924?fr=aladdin)
 
 注：Demo 主要展现 Play SDK 功能，所以在原有玩法上做了简化。
