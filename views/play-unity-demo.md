@@ -397,7 +397,5 @@ public void rpcResult(int winnerId)
 
 ![比赛结果](images/unity/playdemo-5.png)
 
-请参考[炸金花玩法](https://baike.baidu.com/item/%E7%82%B8%E9%87%91%E8%8A%B1/8806924?fr=aladdin)
-
 注：Demo 主要展现 Play SDK 功能，所以在原有玩法上做了简化。
 
