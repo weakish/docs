@@ -8,7 +8,7 @@ Play 是专门针对多人在线对战游戏推出的后端服务。其灵活的
 
 
 ## 核心功能
-这里给出简单的示例代码使您更快地了解到整体流程，详细的开发指南请参考 [Play SDK for Unity(C#) 开发指南]()。
+这里给出简单的示例代码使您更快地了解到整体流程，详细的开发指南请参考 [Play SDK for Unity（C#）开发指南](play-unity.html)。
 
 
 ### 连接服务器
@@ -46,7 +46,11 @@ Play.RPC("rpcResult", PlayRPCTargets.All, winnerId);
 
 ```
 
+## 内测申请
+
+Play 正在内测中，如果您没有内测资格，请[点击此处查看并申请内测](https://www.leancloud.cn/play)。如果您已经拥有内测资格，请继续阅读文档并使用。
+
 ## 开始使用
 
-* [快速入门]()：使用 Play 快速实现一个炸金花小游戏
-* [Play SDK for Unity(C#) 开发指南]()：对 Play 所有功能及接口的详细介绍。
+* [快速入门](play-unity-demo.html)：使用 Play 快速实现一个炸金花小游戏
+* [Play SDK for Unity(C#) 开发指南](play-unity.html)：对 Play 所有功能及接口的详细介绍。
