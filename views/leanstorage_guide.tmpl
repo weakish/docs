@@ -171,7 +171,7 @@ INSERT INTO Todo (title, content) VALUES ('工程师周会', '每周工程师会
 
 {% block code_object_fetch %}{% endblock %}
 
-在更新对象操作后，对象本地的 `{{updatedAtName}}` 字段（最后更新时间）会被刷新，直到下一次 save 或 fetch 操作，`{{updatedAtName}}` 的最新值才会被同步到云端，这样做是为了减少网络流量传输。
+在更新对象操作后，对象本地的 `{{updatedAtName}}` 字段（最后更新时间）会被刷新，直到下一次 save 操作，`{{updatedAtName}}` 的最新值才会被同步到云端，这样做是为了减少网络流量传输。
 
 #### 同步指定属性
 
