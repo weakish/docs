@@ -48,7 +48,7 @@ Play.RPC("rpcResult", PlayRPCTargets.All, winnerId);
 
 ## 内测申请
 
-Play 正在内测中，如果您没有内测资格，请[点击此处查看并申请内测](https://www.leancloud.cn/play)。如果您已经拥有内测资格，请继续阅读文档并使用。
+Play 正在内测中，如果您没有内测资格，请[申请内测](https://jinshuju.net/f/VxOfsR)。如果您已经拥有内测资格，请继续阅读文档并使用。
 
 ## 开始使用
 
