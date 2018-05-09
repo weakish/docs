@@ -388,6 +388,21 @@ var randomLobbyMatchKeys = new Hashtable
 Play.JoinRandomRoom(randomLobbyMatchKeys);
 ```
 
+## 快速加入
+
+快速加入解决的需求是：优先随机加入，如果没有符合条件的直接创建，很多棋牌游戏里面的「快速开始」对应的就是这个功能：
+
+1. 优先去加入一个缺人的房间
+2. 如果所有房间都满员，则会主动创建一个房间并且加入进去，等待其他玩家加入
+
+对应的实例代码如下：
+
+```cs
+Play.JoinOrCreate();
+```
+
+如果加入成功则会回调 `OnJoinedRoom`，如果是创建成功，则会先调用 `OnCreatedRoom` 然后再调用 `OnJoinedRoom`。
+
 
 ## MasterClient
 
