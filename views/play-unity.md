@@ -3,8 +3,8 @@
 ## 前言
 Play 是一个基于 C# 编写的 Unity 的组件，它具备如下几项主要的功能（包括但不限于）：
 
-- 建立于云端的双向通讯长连接
-- 创建对战房间（PlayRoom）
+- 使用 UserID 建立与服务端的通信
+- 创建对战房间(PlayRoom)
 - 获取房间列表
 - 加入房间
 - 随机加入房间
@@ -33,6 +33,8 @@ Play 是基于 C# 开发运行在 Unity 的 Mono .NET 下的 SDK，因此开发�
 - C# 的编程基础知识，重点是：Attribute，Event 等概念。
 - WebSocket 是什么？如何使用 WebSocket 实现服务端和客户端的互相通信？
 - 帧同步和状态同步的两种网游类型分别是如何实现的？
+
+以上问题答案请开发者自行学习掌握。
 
 ## SDK 的下载和导入以及初始化
 
@@ -94,7 +96,7 @@ namespace PlayDocSample
             Play.ToggleLog(true);
             // 设置 UserID
             Play.UserID = "hjiang";
-            // 声明游戏版本，不同游戏版本的玩家会被分配在不同的隔离区域中
+            // 声明游戏版本，不同的游戏版本的玩家是不会匹配到同一个房间
             Play.Connect("0.0.1");
         }
 
@@ -110,10 +112,10 @@ namespace PlayDocSample
 
 ### 重要的步骤
 
-在上述的实例中可以看见，代码中声明了一个 `ConnectSample` 类，它继承自 `PlayMonoBehaviour` ，并且在一定会有一个无惨的构造函数，并且调用了父类的 `base()` 构造函数，最后要为所有的时间毁掉加上 `[PlayEvent]` 属性标记，这些都是**必须的**，之后的实例代码都会如此做，开发者的代码也需要遵守这一约定，少了一项，事件回调就不会生效。
+在上述的实例中可以看见，代码中声明了一个 `ConnectSample` 类，它继承自 `PlayMonoBehaviour` ，并且在一定会有一个无参的构造函数，并且调用了父类的 `base()` 构造函数，最后要为所有的事件回调加上 `[PlayEvent]` 属性标记，这些都是**必须的**，之后的实例代码都会如此做，开发者的代码也需要遵守这一约定，少了一项，事件回调就不会生效。
 
 
-## 创建房间（Room）
+## 创建房间(PlayRoom)
 
 ### 指定房间名
 
@@ -191,7 +193,7 @@ Play.CreateRoom();
 
 ### 指定玩家 ID 
 
-这个功能的解决的需求是：只允许一些特定的 ID 玩家可以加入到房间
+这个功能的解决的需求是：只允许一些特定的 ID 玩家可以加入到房间或者当前玩家开好房间，等待一些特定的朋友来加入。实例代码如下：
 
 
 ```cs
@@ -220,7 +222,7 @@ Play.CreateRoom(roomConfig,"max4-room");
 
 ### 设置房间的自定义属性
 
-房间的自定义属性指的是一些 key-value 的键值对，在创建成功之后，云端也会保留一份拷贝(注意这里不是持久化存储，当该房间失效之后)
+房间的自定义属性指的是一些 key-value 的键值对，在创建成功之后，云端也会保留一份拷贝(注意这里不是持久化存储，当该房间失效之后所有的自定义属性都会被销毁)
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -240,7 +242,7 @@ Play.CreateRoom(roomConfig);
 
 ### 是否开放房间允许别人加入
 
-创建一个房间，然后不希望其他人家加入（比如单人的闯关或者单人副本的网游）：
+创建一个房间，然后不希望其他人家加入，比如在一些支持 1 至 8 人的卡牌游戏当中，房主可以选择在已经有 4 位玩家的时候锁住房间，并开始 4 人游戏模式：
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -272,7 +274,7 @@ Play.CreateRoom(roomConfig);
 2. 所有成员都掉线，并且都没有重连回来，超过 30 分钟，云端就会认为失效
 
 
-## 获取房间列表
+<!-- ## 获取房间列表
 
 ### 一次性拉取 20 个房间
 
@@ -294,14 +296,17 @@ public override void OnFetchedRoomList(IEnumerable<PlayRoom> rooms)
 }
 ```
 
-如果还想继续查询更多，只要继续调用 `Play.FetchRoomList()` 即可，如果想从头重新开始查询，只要传入一个 reset 参数即可：
+如果还想继续查询更多，只要继续调用 `Play.FetchRoomList()` 即可，如果想从头重新开始查询（从当前时间最新的房间开始），只要传入一个 reset 参数即可：
 
 ```cs
 Play.FetchRoomList(reset:true);
 ``` 
 
+即使掉线了，只要重连回来，SDK 都会记录查询的索引标记，可以继续调用 `Play.FetchRoomList()` 来获取更多的房间。 -->
+
 
 注意：房间的变化频率较快，所以本地 SDK 并没有做缓存，调用加入之后，需要监听加入的回调来判断是否真正加入成功，详细请看下一章节[加入房间](#加入房间)。
+
 
 ## 加入房间
 
@@ -364,6 +369,11 @@ public class SampleJoinRoom : PlayMonoBehaviour
 Play.JoinRandomRoom();
 ```
 
+除非是所有可用的房间都满员了，才会出现随机加入失败的情况，一般情况下都会成功。
+
+如果随机加入失败，可以选择[创建房间](#创建房间)
+
+
 ### 根据条件随机加入
 
 配合前面的[设置房间的自定义属性](#设置房间的自定义属性)的代码：
@@ -386,6 +396,16 @@ Play.JoinRandomRoom(randomLobbyMatchKeys);
 1. 房间最初的创建者，在他加入之后，自动成为第一任 MasterClient
 2. A 创建了房间，随后 B 和 C 加入，然后因为 A 的网络异常，TA 掉线了，这个时候服务端会从现有的 B 和 C 里面挑选一个座位新任的 MasterClient，并且会下发 `OnMasterClientSwitched` 的事件回调通知
 3. 前面条件 2 在 A 回来之后，A 也不会重新成为 MasterClient
+
+如下代码演示如何监听 MasterClient 产生变化的事件回调：
+
+```cs
+[PlayEvent]
+public override void OnMasterClientSwitched(Player masterPlayer) 
+{
+    Play.Log("new master client is",masterPlayer.UserID);
+}
+```
 
 ## 房间的自定义属性
 
@@ -556,11 +576,86 @@ Play.RPC("OnSomebodySayHello", PlayRPCTargets.Others, "hello");
 Play.RPC("OnSomebodySayHello", PlayRPCTargets.OthersBuffered, "hello");
 ```
 
-
-### 退出房间
+## 退出房间
 
 ```cs
 Play.LeaveRoom();
+```
+
+退出成功的回调如下：
+
+
+```cs
+[PlayEvent]
+public override void OnLeftRoom()
+{
+    Play.Log("OnLeftRoom");
+}
+```
+
+## 内置属性
+
+### 当前加入的房间
+
+```cs
+var room = Play.Room;
+```
+
+### 当前房间里面所有玩家的列表
+
+```cs
+var players = Play.Players;
+
+// 获取通过 room 来获取
+var playersInRoom = Play.Room.Players;
+
+// 以上两行语句获取的列表是一样的
+```
+
+### 当前玩家
+
+```cs
+var player = Play.Player;
+```
+
+### 当前玩家的 UserID
+
+```cs
+var userId = Play.UserID;
+```
+
+### 当前所处在的游戏大厅
+
+```cs
+var lobby = Play.Lobby;
+```
+
+### 当前游戏版本
+
+```cs
+var gameVersion = Play.GameVersion;
+```
+
+
+## 断线重连
+
+SDK 内置了断线重连的机制，但是 SDK 重连的逻辑如下：
+
+1. 发现连接断开（网络异常或者其他原因导致 websocket 失效），SDK 会触发 `OnDisconnected` 回调
+2. 尝试重新打开 websocket 连接，但是并没有重新加入到原来的房间
+3. 开发者需要根据自身的游戏行为来判断是否要主动重新加入到原来的房间(比如某些竞速类的游戏掉线了就可能会被剔除房间)
+
+
+实例代码如下：
+
+```cs
+[PlayEvent]
+public override void OnDisconnected()
+{
+    Play.Log("OnDisconnected");
+    // 如果是网络问题并且你的游戏允许断线之后玩家再次加入 Room 继续游戏，可以调用 Rejoin 接口
+    Play.RejoinRoom();//从 SDK 中的 Play.Room 读取房间信息
+}
 ```
 
 
