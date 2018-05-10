@@ -286,7 +286,7 @@ roomConfig.IsOpen = false;
 Play.CreateRoom(roomConfig);
 ```
 
-### 房间是否在可见
+### 房间是否可见
 
 创建一个房间是否允许其他人查看，在一些对黑的游戏局里面，房主开好房间之后，不会公开显示出来。
 
@@ -634,6 +634,8 @@ Play.Player.CustomProperties = cards;
 RPC 是提供给开发者自定义消息的一种方式，开发者可以通过定义 RPC ，发送 RPC 消息来实现多端的通信。
 
 注意，当前玩家必须处于一个房间内才可以发送 RPC 游戏，否则 RPC 消息不会触发。
+
+另外，SDK 内置的回调都会有 `[PlayEvent]`，而开发者自定义的 RPC 回调则必须有 `[PlayRPC]` 修饰符。
 
 ### 定义 RPC 方法
 
