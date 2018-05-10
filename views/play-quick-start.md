@@ -71,11 +71,10 @@ public override void OnNewPlayerJoinedRoom (Player player)
 {
 	Debug.Log("OnNewPlayerJoinedRoom");
 	if (Play.Player.IsMasterClient) {
-		// 房主决策胜负
+		// 如果当前玩家是房主，则由当前玩家执行分配点数，判断胜负逻辑
 		int count = Play.Room.Players.Count();
 		if (count == 2) {
 			// 两个人即开始游戏
-			// 生成手势数据
 			List<int> points = new List<int>();
 			// 按 actorID 排序玩家
 			List<Player> players = Play.Players.OrderBy(p => p.ActorID).ToList();
@@ -85,18 +84,22 @@ public override void OnNewPlayerJoinedRoom (Player player)
 				// 生成一个随机点数
 				int point = Random.Range(0, 10);
 				points.Add(point);
-				// 通过 CustomPlayerProperty 设置用户随机手势
+				// 通过 CustomPlayerProperty 设置用户随机点数
 				Hashtable prop = new Hashtable();
 				prop.Add("POINT", point);
+				// 通过设置玩家的 Properties，可以触发所有玩家的 OnPlayerCustomPropertiesChanged(Player player, Hashtable updatedProperties) 回调
 				p.CustomProperties = prop;
 				Debug.LogFormat("{0}: {1}", p.UserID, point);
 				maxPoint = Mathf.Max(maxPoint, point);
 			}
 
 			// 计算比赛结果，使用 RPC 通知玩家
+			// 得到当前最大点数索引
 			int maxPointIndex = points.FindIndex(p => p == maxPoint);
+			// 根据索引得到最大点数的玩家
 			Player winner = players[maxPointIndex];
 			Debug.Log("winner ID: " + winner.UserID);
+			// 使用胜利者的 UserId 作为 RPC 参数，通知所有玩家
 			Play.RPC("RPCResult", PlayRPCTargets.All, winner.UserID);
 		}
 	}
