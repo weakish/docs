@@ -105,6 +105,13 @@ public override void OnPlayerCustomPropertiesChanged (Player player, Hashtable u
 
 ### 如何通过 RPC 通知玩家消息
 
+在判断出胜利者之后，通过 RPC 机制通知玩家。
+
+```cs
+// 使用房主作为胜利者，将其 UserId 作为 RPC 参数，通知所有玩家
+Play.RPC("RPCResult", PlayRPCTargets.All, Play.Room.MasterClientId);
+```
+
 当玩家接收到 RPC 消息后，根据参数做出胜负提示。
 
 ```cs
