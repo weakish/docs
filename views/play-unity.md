@@ -188,15 +188,9 @@ namespace TestUnit.NetFx46.Docs
 
 ##### 适用场景  
 
-1. 根据用户输入名称创建房间
+* 根据用户输入名称创建房间
   ```cs
   var roomName = inputLable.text;
-  Play.CreateRoom(roomName);
-  ```
-2. 基于一定规则自动生成房间名
-  ```cs
-  // 例如创建一个天梯对战房间，基于一定的天梯分数加上一些特定的前缀
-  var roomName = "ranked-" + 1000;
   Play.CreateRoom(roomName);
   ```
 
@@ -208,10 +202,6 @@ namespace TestUnit.NetFx46.Docs
 ```cs
 Play.CreateRoom();
 ```
-
-##### 适用场景
-
-无需用户输入，直接创建一个新房间。
 
 #### 指定玩家 ID 
 
@@ -227,9 +217,11 @@ Play.CreateRoom(new string[] { "bill", "steve" });
 Play.CreateRoom(new string[] { "bill", "steve" },"RichMen");
 ```
 
+注意，这种方式创建成功之后，被指定的玩家（例如上述代码中的 steve）也还需要调用一次 `JoinRoom("RichMen")` 主动加入到这个房间，`Play.CreateRoom(new string[] { "bill", "steve" });` 只是表示 bill 和 steve 已经把房间位置给「占位」了，但是等到他们自己上线之后，还需要主动加入才能真正进入房间。
+
 ##### 适用场景
 
-1. 好友组局一起玩游戏
+*. 好友组局一起玩游戏
   代码参照基础用法里面的示例。
 
 #### 限制玩家人数
@@ -251,7 +243,7 @@ Play.CreateRoom(roomConfig,"max4-room");
 
 ##### 适用场景
 
-1. 游戏本身有严格的人数要求，比如三国杀区分 1v1 两人局/五人局/3v3 六人局和标准八人局
+*. 游戏本身有严格的人数要求，比如三国杀区分 1v1两人局/五人局/3v3六人局和标准八人局
   下面示例将会创建一个 3v3 六人局的三国杀房间：
   ```cs
   var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -371,11 +363,11 @@ public class SampleJoinRoom : PlayMonoBehaviour
 }
 ```
 
-加入成功则会回调 OnJoinedRoom，加入失败则会回调 OnJoinRoomFailed。
+加入成功则会回调 `OnJoinedRoom`，加入失败则会回调 `OnJoinRoomFailed`。
 
 ##### 适用场景
 
-1. 与好友一起游戏 - 用户自己输入了一个房间名，并且创建成功，然后通过聊天工具告诉了好友，然后好友通过房间名直接加入进来
+* 与好友一起游戏 - 用户自己输入了一个房间名，并且创建成功，然后通过聊天工具告诉了好友，然后好友通过房间名直接加入进来
   ```cs
   var roomName = "get_from_qq";
   Play.JoinRoom(roomName);
@@ -393,11 +385,13 @@ Play.JoinRandomRoom();
 
 除非是所有可用的房间都满员了，才会出现随机加入失败的情况，一般情况下都会成功。
 
-如果随机加入失败，可以选择[创建房间](#创建房间)
+
+如果随机加入失败，会触发 `OnJoinedRoomFailed` 回调，可以选择在这个回调里面继续[创建房间](#创建房间)。
+
 
 ##### 适用场景
 
-1. 快速加入已有房间（不创建新的房间）
+* 快速加入已有房间（不创建新的房间）
 
 #### 根据条件随机加入
 
@@ -415,11 +409,13 @@ var randomLobbyMatchKeys = new Hashtable
 Play.JoinRandomRoom(randomLobbyMatchKeys);
 ```
 
+加入成功则会回调 `OnJoinedRoom`，加入失败则会回调 `OnJoinRoomFailed`。
+
 ### 加入或者创建
 
 #### 基础用法 
 
-快速计入解决的需求是：优先检测传入的 room name 对应的房间是否存在，如果存在就直接加入，如果不存在，就直接创建：
+解决的需求是：优先检测传入的 room name 对应的房间是否存在，如果存在就直接加入，如果不存在，就直接创建：
 
 
 对应的实例代码如下：
@@ -450,7 +446,7 @@ Play.JoinOrCreate(roomConfig);
 
 #### 适用场景
 
-1. 两人（或者多人）约定了一个房间名，但是这些人进入游戏的时间不一样，因此所有人都调用 `JoinOrCreate` 并且传入一样的名字，则 SDK 会确保这些人一定会加入到一个相同的房间内。
+* 两人（或者多人）约定了一个房间名，但是这些人进入游戏的时间不一样，因此所有人都调用 `JoinOrCreate` 并且传入一样的名字，则 SDK 会确保这些人一定会加入到一个相同的房间内。
 
 
 ## 开始游戏
