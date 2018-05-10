@@ -88,6 +88,6 @@ Play 正在内测中，如果您没有内测资格，请[申请内测](https://j
 
 ## 开始使用
 
-* [快速入门](play-quick-start.html)：快速使用 Play 运行一个小 Demo
+* [快速入门](play-quick-start.html)：快速接入 Play 并运行一个小 Demo
 * [Play SDK for Unity(C#) 开发指南](play-unity.html)：对 Play 所有功能及接口的详细介绍。
 * [实现小游戏「炸金花」](play-unity-demo.html)
