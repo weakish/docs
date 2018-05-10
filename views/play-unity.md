@@ -288,14 +288,14 @@ Play.CreateRoom(roomConfig);
 
 ### 房间是否可见
 
-创建一个房间是否允许其他人查看，在一些对黑的游戏局里面，房主开好房间之后，不会公开显示出来。
+创建一个房间的时候选择不可见，这个房间就不会被其他人匹配到（其他人调用 `JoinRandomRoom` 的时候不会参与匹配）：
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
 
 roomConfig.IsVisible = false;
 
-// 如果不设置 IsVisible，云端创建的房间默认都是可见的
+// 如果不设置 IsVisible，云端创建的房间默认都会参与 JoinRandomRoom 的匹配中
 Play.CreateRoom(roomConfig);
 ```
 
