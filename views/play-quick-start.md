@@ -108,6 +108,7 @@ public override void OnPlayerCustomPropertiesChanged (Player player, Hashtable u
 在判断出胜利者之后，通过 RPC 机制通知玩家。
 
 ```cs
+// 此行代码在 OnNewPlayerJoinedRoom (Player player) 中已被调用过
 // 使用房主作为胜利者，将其 UserId 作为 RPC 参数，通知所有玩家
 Play.RPC("RPCResult", PlayRPCTargets.All, Play.Room.MasterClientId);
 ```
