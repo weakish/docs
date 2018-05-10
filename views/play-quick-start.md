@@ -2,6 +2,10 @@
 
 Hi, 亲爱的开发者，欢迎使用 LeanCloud Play。本教程将模拟一个比较大小的场景，向你讲解 Play SDK 的核心使用方法。
 
+## 内测申请
+
+Play 正在内测中，如果您没有内测资格，请[查看并申请内测](https://blog.leancloud.cn/6177/)。
+
 ## 你将学到什么
 
 * 如何在 Unity 中安装 SDK，并初始化
