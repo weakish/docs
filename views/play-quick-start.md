@@ -75,32 +75,20 @@ public override void OnNewPlayerJoinedRoom (Player player)
 		int count = Play.Room.Players.Count();
 		if (count == 2) {
 			// 两个人即开始游戏
-			List<int> points = new List<int>();
-			// 按 actorID 排序玩家
-			List<Player> players = Play.Players.OrderBy(p => p.ActorID).ToList();
-			int maxPoint = -1;
-			for (int i = 0; i < 2; i++) {
-				Player p = players[i];
-				// 生成一个随机点数
-				int point = Random.Range(0, 10);
-				points.Add(point);
-				// 通过 CustomPlayerProperty 设置用户随机点数
+			foreach (Player p in Play.Players) {
 				Hashtable prop = new Hashtable();
-				prop.Add("POINT", point);
+				if (p.IsMasterClient) {
+					// 如果是房主，则设置 10 分
+					prop.Add("POINT", 10);
+				} else {
+					// 否则设置 5 分
+					prop.Add("POINT", 5);
+				}
 				// 通过设置玩家的 Properties，可以触发所有玩家的 OnPlayerCustomPropertiesChanged(Player player, Hashtable updatedProperties) 回调
 				p.CustomProperties = prop;
-				Debug.LogFormat("{0}: {1}", p.UserID, point);
-				maxPoint = Mathf.Max(maxPoint, point);
 			}
-
-			// 计算比赛结果，使用 RPC 通知玩家
-			// 得到当前最大点数索引
-			int maxPointIndex = points.FindIndex(p => p == maxPoint);
-			// 根据索引得到最大点数的玩家
-			Player winner = players[maxPointIndex];
-			Debug.Log("winner ID: " + winner.UserID);
-			// 使用胜利者的 UserId 作为 RPC 参数，通知所有玩家
-			Play.RPC("RPCResult", PlayRPCTargets.All, winner.UserID);
+			// 使用房主作为胜利者，将其 UserId 作为 RPC 参数，通知所有玩家
+			Play.RPC("RPCResult", PlayRPCTargets.All, Play.Room.MasterClientId);
 		}
 	}
 }
