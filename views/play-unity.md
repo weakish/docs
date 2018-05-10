@@ -243,7 +243,7 @@ Play.CreateRoom(roomConfig,"max4-room");
 
 ##### 适用场景
 
-* 游戏本身有严格的人数要求，比如三国杀区分 1v1 两人局/五人局/3v3 六人局和标准八人局
+* 游戏本身有严格的人数要求，比如三国杀区分 1v1 两人局/五人局/3v3 六人局和标准八人局
   下面示例将会创建一个 3v3 六人局的三国杀房间：
   ```cs
   var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -411,7 +411,7 @@ Play.JoinRandomRoom(randomLobbyMatchKeys);
 
 加入成功则会回调 `OnJoinedRoom`，加入失败则会回调 `OnJoinRoomFailed`。
 
-注意，不可见的房间是不会参与随机房间的匹配的。
+注意，不可见的房间是不会参与随机房间的匹配的。
 
 ### 加入或者创建
 
