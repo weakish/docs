@@ -49,7 +49,7 @@ roomConfig.IsVisible = false;
 Play.JoinOrCreateRoom(roomConfig, nameEveryFriendKnows);
 ```
 
-更多匹配接口请参考文档[房间匹配](play-unity.html#加入房间)
+更多匹配接口请参考文档[房间匹配](play-unity.html#房间匹配)
 
 
 ### 游戏内发送消息
@@ -83,10 +83,11 @@ Play.LeaveRoom();
 
 ## 内测申请
 
-Play 正在内测中，如果您没有内测资格，请[申请内测](https://jinshuju.net/f/VxOfsR)。如果您已经拥有内测资格，请继续阅读文档并使用。
+Play 正在内测中，如果您没有内测资格，请[申请内测](https://jinshuju.net/f/VxOfsR)。
 
 
 ## 开始使用
 
-* [快速入门](play-unity-demo.html)：使用 Play 快速实现一个炸金花小游戏
+* [快速入门](play-quick-start.html)：快速使用 Play 运行一个小 Demo
 * [Play SDK for Unity(C#) 开发指南](play-unity.html)：对 Play 所有功能及接口的详细介绍。
+* [实现小游戏「炸金花」](play-unity-demo.html)
