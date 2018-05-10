@@ -1,13 +1,19 @@
 # Play 服务总览
-Play 是专门针对多人在线对战游戏推出的后端服务。其灵活的功能可以让你轻松实现游戏内房间匹配、在线对战消息同步等功能。
+Play 是专门针对多人在线对战游戏推出的后端服务。您不需要搭建自己的后端系统，就可以轻松实现游戏内房间匹配、在线对战消息同步等功能。
+
+
+## 核心功能
+* 房间匹配： 就像《第五人格》、《王者荣耀》、《吃鸡》等对战类手游，玩家只需点击「自由匹配」就可以随机进入某个房间，或者玩家也可以自己新开房间。
+* 多人在线对战： 客户端与服务端使用实时 WebSocket 通道进行双向通信，确保游戏内所有消息能够快速同步。
+* 游戏逻辑运算： 由主客户端控制游戏逻辑。当主客户端掉线时，LeanCloud Play 会自动将网络状态最好客户端切换为主客户端，确保游戏顺畅进行；您也可以选择在服务端编写游戏逻辑（服务端游戏逻辑支持尚在开发中）。
+* 多平台支持： 基于 Unity 引擎开发的 SDK 已上线，全面支持多个平台。
 
 ## 特性
 * 美国及国内节点同步支持，满足您向全球推广和发行游戏的需求。
 * 沿用了 LeanCloud 现有的可横向扩展的架构，支持动态扩容，从容应对海量并发。
 * 在久经考验的底层架构上进行了深度优化与改进，可以稳定承接每秒亿级的消息下发量。
 
-
-## 核心功能
+## 游戏核心流程
 这里给出简单的示例代码使您更快地了解到整体流程，详细的开发指南请参考 [Play SDK for Unity（C#）开发指南](play-unity.html)。
 
 
@@ -17,38 +23,70 @@ Play 是专门针对多人在线对战游戏推出的后端服务。其灵活的
 
 ```
 Play.UserID = "HJiang";
-Play.Connect("0.0.1");
+// 连接服务器时需要声明游戏版本，不同的游戏版本的玩家不会匹配到同一个房间
+Play.Connect("0.0.1"); 
 ```
 
 ### 房间匹配
-为用户随机匹配一个房间加入游戏
-
+#### 随机加入
 ```
-// 随机加入一个游戏房间
+// 实际意义上的随机加入，如果所有的房间都满员了，会出现随机加入失败的情况。
 Play.JoinRandomRoom();
 ```
 
-### 游戏内发送消息
+#### 自由匹配
+这里符合当前手游中「自由匹配」的场景，具体逻辑如下：
+* 优先随机加入某个缺人的房间
+* 如果所有房间都满员，则会主动创建一个房间并且加入进去，等待其他玩家加入
 
 ```
-// 定义名为 rpcResult 的 RPC 方法
+Play.JoinOrCreateRoom();
+```
+
+#### 和好友一起玩
+只要好友都知道房间的名字，就可以同时加入某个房间。
+```
+var roomConfig = PlayRoom.PlayRoomConfig.Default;
+// 如果房间不可见，不知道房间名字的人无法加入。如果房间设置为可见，则会有其他玩家匹配进来。这里设置为不允许朋友之外的人加入。
+roomConfig.IsVisible = false;
+Play.JoinOrCreateRoom(roomConfig, nameEveryFriendKnows);
+```
+
+更多房间匹配接口请参考文档[房间匹配](play-unity.html#加入房间)
+
+
+### 游戏内发送消息
+通过发消息的方式将游戏内的数据同步给房间内的所有用户，例如通知下一个用户操作：
+
+```
+// 定义名为 rpcNotify 的 RPC 方法。当其他客户端发消息时指定该方法时，这个方法会被自动触发。
 [PlayRPC]
-public void rpcResult(int winnerId) 
+public void rpcNotify(int playerId) 
 {
-  Debug.Log("winnerId: " + winnerId);
-  ui.showWin();
+  Debug.Log("notify playerId: " + playerId);
 }
 ```
 
 ```
-// 向所有人发送游戏消息，收到消息的玩家的 rpcResult 方法会自动被触发
-Play.RPC("rpcResult", PlayRPCTargets.All, winnerId);
+// 向 masterClient 发送游戏消息，masterClient 的 rpcNotify 方法会被自动触发。
+// masterClient 为客户端主机，负责控制游戏逻辑的运算。
+Play.RPC("rpcNotify", PlayRPCTargets.MasterClient, playerId);
 
 ```
+
+更详细的用法及介绍，请参考 [masterClient](play-unity.html#MasterClient) 及 [远程调用函数 - RPC](play-unity.html#远程调用函数-RPC)
+
+### 退出房间
+
+```
+Play.LeaveRoom();
+```
+
 
 ## 内测申请
 
 Play 正在内测中，如果您没有内测资格，请[申请内测](https://jinshuju.net/f/VxOfsR)。如果您已经拥有内测资格，请继续阅读文档并使用。
+
 
 ## 开始使用
 
