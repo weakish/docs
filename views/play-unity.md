@@ -1,4 +1,4 @@
-# Play 游戏开发指南 &middot; Unity
+# Play 开发指南 &middot; Unity
 
 ## 前言
 Play 是一个基于 C# 编写的 Unity 的组件，它具备如下几项主要的功能（包括但不限于）：
@@ -115,10 +115,13 @@ namespace PlayDocSample
 在上述的实例中可以看见，代码中声明了一个 `ConnectSample` 类，它继承自 `PlayMonoBehaviour` ，并且在一定会有一个无参的构造函数，并且调用了父类的 `base()` 构造函数，最后要为所有的事件回调加上 `[PlayEvent]` 属性标记，这些都是**必须的**，之后的实例代码都会如此做，开发者的代码也需要遵守这一约定，少了一项，事件回调就不会生效。
 
 
-## 创建房间(PlayRoom)
+## 房间匹配
 
-### 指定房间名
+### 创建房间(PlayRoom)
 
+#### 指定房间名
+
+##### 基础用法
 ```cs
 using LeanCloud;
 
@@ -183,18 +186,28 @@ namespace TestUnit.NetFx46.Docs
 注：因为创建房间的逻辑和顺序都一致，因此本小节之后介绍创建房间时，为了更好的阅读体验和强调重点，不再给出每一种回调的实例代码，请参照上述代码即可。
 
 
-### 随机房间名
+##### 适用场景  
 
+* 根据用户输入名称创建房间
+  ```cs
+  var roomName = inputLable.text;
+  Play.CreateRoom(roomName);
+  ```
+
+#### 随机房间名
+
+##### 基础用法
 如果不传入任何参数创建房间，**客户端会随机生成一个名称**，这个不用开发者担心，算法是经过测试，名字重复的概率约等于 GUID 重复的概率，所以几乎不可能。
 
 ```cs
 Play.CreateRoom();
 ```
 
-### 指定玩家 ID 
+#### 指定玩家 ID 
+
+##### 基础用法
 
 这个功能的解决的需求是：只允许一些特定的 ID 玩家可以加入到房间或者当前玩家开好房间，等待一些特定的朋友来加入。实例代码如下：
-
 
 ```cs
 // 指定 bill 和 steve
@@ -204,7 +217,16 @@ Play.CreateRoom(new string[] { "bill", "steve" });
 Play.CreateRoom(new string[] { "bill", "steve" },"RichMen");
 ```
 
-### 限制玩家人数
+注意，这种方式创建成功之后，被指定的玩家（例如上述代码中的 steve）也还需要调用一次 `JoinRoom("RichMen")` 主动加入到这个房间，`Play.CreateRoom(new string[] { "bill", "steve" });` 只是表示 bill 和 steve 已经把房间位置给「占位」了，但是等到他们自己上线之后，还需要主动加入才能真正进入房间。
+
+##### 适用场景
+
+* 好友组局一起玩游戏
+  代码参照基础用法里面的示例。
+
+#### 限制玩家人数
+
+##### 基础用法
 
 目前 Play 所有的房间最多允许 **10** 人同时在一个房间进行游戏对战，有一些游戏甚至需要设置房间最多只有更少的人，比如斗地主只允许 3 个人加入，一旦人满了，其他的人是不可以加入的，因此在创建房间的时候可以设置房间的 MaxPlayerCount：
 
@@ -219,6 +241,17 @@ Play.CreateRoom(roomConfig);
 Play.CreateRoom(roomConfig,"max4-room");
 ```
 
+##### 适用场景
+
+* 游戏本身有严格的人数要求，比如三国杀区分 1v1 两人局/五人局/3v3 六人局和标准八人局
+  下面示例将会创建一个 3v3 六人局的三国杀房间：
+  ```cs
+  var roomConfig = PlayRoom.PlayRoomConfig.Default;
+
+  roomConfig.MaxPlayerCount = 6;
+  // 房间名随机即可，因为 room name 没有必要一定要显示出来
+  Play.CreateRoom(roomConfig);
+  ```
 
 ### 设置房间的自定义属性
 
@@ -242,7 +275,7 @@ Play.CreateRoom(roomConfig);
 
 ### 是否开放房间允许别人加入
 
-创建一个房间，然后不希望其他人家加入，比如在一些支持 1 至 8 人的卡牌游戏当中，房主可以选择在已经有 4 位玩家的时候锁住房间，并开始 4 人游戏模式：
+创建一个房间，然后不希望其他人家加入，比如有一些定时副本，玩家创建好房间之后，等到副本开始之后，再允许其他玩家加入：
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -253,14 +286,16 @@ roomConfig.IsOpen = false;
 Play.CreateRoom(roomConfig);
 ```
 
-### 房间是否在列表中可见
+### 房间是否可见
+
+创建一个房间的时候选择不可见，这个房间就不会被其他人匹配到（其他人调用 `JoinRandomRoom` 的时候不会参与匹配）：
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
 
 roomConfig.IsVisible = false;
 
-// 如果不设置 IsVisible，云端创建的房间默认都是可见的
+// 如果不设置 IsVisible，云端创建的房间默认都会参与 JoinRandomRoom 的匹配中
 Play.CreateRoom(roomConfig);
 ```
 
@@ -274,43 +309,11 @@ Play.CreateRoom(roomConfig);
 2. 所有成员都掉线，并且都没有重连回来，超过 30 分钟，云端就会认为失效
 
 
-<!-- ## 获取房间列表
+### 加入房间
 
-### 一次性拉取 20 个房间
+#### 根据 Name 加入
 
-20 是 SDK 默认设置的数量，可以通过修改 limit 参数来修改这一数值。
-
-```cs
-[PlayEvent]
-public override void OnAuthenticated()
-{
-    Play.FetchRoomList();
-    // 或者一次性查询 30 个 room
-    // Play.FetchRoomList(30);
-}
-
-[PlayEvent]
-public override void OnFetchedRoomList(IEnumerable<PlayRoom> rooms)
-{
-    Play.Log(rooms.Count());
-}
-```
-
-如果还想继续查询更多，只要继续调用 `Play.FetchRoomList()` 即可，如果想从头重新开始查询（从当前时间最新的房间开始），只要传入一个 reset 参数即可：
-
-```cs
-Play.FetchRoomList(reset:true);
-``` 
-
-即使掉线了，只要重连回来，SDK 都会记录查询的索引标记，可以继续调用 `Play.FetchRoomList()` 来获取更多的房间。 -->
-
-
-注意：房间的变化频率较快，所以本地 SDK 并没有做缓存，调用加入之后，需要监听加入的回调来判断是否真正加入成功，详细请看下一章节[加入房间](#加入房间)。
-
-
-## 加入房间
-
-### 根据 Name 加入
+##### 基础用法
 
 ```cs
 public class SampleJoinRoom : PlayMonoBehaviour
@@ -360,10 +363,21 @@ public class SampleJoinRoom : PlayMonoBehaviour
 }
 ```
 
-加入成功则会回调 OnJoinedRoom，加入失败则会回调 OnJoinRoomFailed。
+加入成功则会回调 `OnJoinedRoom`，加入失败则会回调 `OnJoinRoomFailed`。
 
+##### 适用场景
 
-### 随机加入
+* 与好友一起游戏 - 用户自己输入了一个房间名，并且创建成功，然后通过聊天工具告诉了好友，然后好友通过房间名直接加入进来
+  ```cs
+  var roomName = "get_from_qq";
+  Play.JoinRoom(roomName);
+  ```
+
+#### 随机加入
+
+##### 基础用法
+
+随机加入任何一个开放的有空位的房间：
 
 ```cs
 Play.JoinRandomRoom();
@@ -371,10 +385,17 @@ Play.JoinRandomRoom();
 
 除非是所有可用的房间都满员了，才会出现随机加入失败的情况，一般情况下都会成功。
 
-如果随机加入失败，可以选择[创建房间](#创建房间)
+如果随机加入失败，会触发 `OnJoinedRoomFailed` 回调，可以选择在这个回调里面继续[创建房间](#创建房间)。
 
+注意，不可见的房间是不会参与随机房间的匹配的。
 
-### 根据条件随机加入
+##### 适用场景
+
+* 快速加入已有房间（不创建新的房间）
+
+#### 根据条件随机加入
+
+##### 基础用法
 
 配合前面的[设置房间的自定义属性](#设置房间的自定义属性)的代码：
 
@@ -388,21 +409,82 @@ var randomLobbyMatchKeys = new Hashtable
 Play.JoinRandomRoom(randomLobbyMatchKeys);
 ```
 
-## 快速加入
+加入成功则会回调 `OnJoinedRoom`，加入失败则会回调 `OnJoinRoomFailed`。
 
-快速加入解决的需求是：优先随机加入，如果没有符合条件的直接创建，很多棋牌游戏里面的「快速开始」对应的就是这个功能：
+注意，不可见的房间是不会参与随机房间的匹配的。
 
-1. 优先去加入一个缺人的房间
-2. 如果所有房间都满员，则会主动创建一个房间并且加入进去，等待其他玩家加入
+### 加入或者创建
+
+#### 基础用法 
+
+解决的需求是：优先检测传入的 room name 对应的房间是否存在，如果存在就直接加入，如果不存在，就直接创建：
+
 
 对应的实例代码如下：
 
 ```cs
-Play.JoinOrCreate();
+var roomName = "i-want-this-name";
+Play.JoinOrCreate(roomName);
+```
+
+或者指定一些 key-value 的自定义属性，例如，我要加入一个指定名字的房间，如果没有不存在，请帮我创建这个房间并且把我指定的自定义属性也赋值给房间：
+
+```cs
+var createWithAttributes = new Hashtable
+{
+    { "rankPoints", 1000 }
+};
+
+var roomConfig = PlayRoom.PlayRoomConfig.Default;
+
+roomConfig.CustomRoomProperties = createWithAttributes;
+
+roomConfig.LobbyMatchKeys = new string[] { "rankPoints" };
+
+Play.JoinOrCreate(roomConfig);
 ```
 
 如果加入成功则会回调 `OnJoinedRoom`，如果是创建成功，则会先调用 `OnCreatedRoom` 然后再调用 `OnJoinedRoom`。
 
+#### 适用场景
+
+* 两人（或者多人）约定了一个房间名，但是这些人进入游戏的时间不一样，因此所有人都调用 `JoinOrCreate` 并且传入一样的名字，则 SDK 会确保这些人一定会加入到一个相同的房间内。
+
+
+## 开始游戏
+
+<!-- ## 获取房间列表
+
+### 一次性拉取 20 个房间
+
+20 是 SDK 默认设置的数量，可以通过修改 limit 参数来修改这一数值。
+
+```cs
+[PlayEvent]
+public override void OnAuthenticated()
+{
+    Play.FetchRoomList();
+    // 或者一次性查询 30 个 room
+    // Play.FetchRoomList(30);
+}
+
+[PlayEvent]
+public override void OnFetchedRoomList(IEnumerable<PlayRoom> rooms)
+{
+    Play.Log(rooms.Count());
+}
+```
+
+如果还想继续查询更多，只要继续调用 `Play.FetchRoomList()` 即可，如果想从头重新开始查询（从当前时间最新的房间开始），只要传入一个 reset 参数即可：
+
+```cs
+Play.FetchRoomList(reset:true);
+``` 
+
+即使掉线了，只要重连回来，SDK 都会记录查询的索引标记，可以继续调用 `Play.FetchRoomList()` 来获取更多的房间。 
+
+
+注意：房间的变化频率较快，所以本地 SDK 并没有做缓存，调用加入之后，需要监听加入的回调来判断是否真正加入成功，详细请看下一章节[加入房间](#加入房间)。-->
 
 ## MasterClient
 
@@ -490,7 +572,6 @@ public override void OnJoinedRoom()
 上述代码的含义是：如果当前 level 是 1000 那么就修改为 level 值为 1200，否则就不修改。
 
 
-
 ### 收到房间属性被修改的通知
 
 
@@ -524,7 +605,6 @@ public override void OnNewPlayerJoinedRoom(Player player)
 
 在玩家加入房间之后，初始化 TA 的自定义属性。
 
-
 ### 收到玩家的属性被修改的通知
 
 注意，这里有一个点，不论是 A 修改了自己的属性，还是 A 修改了其他人的属性，都会在这里进行事件回调的通知：
@@ -549,9 +629,13 @@ Play.Player.CustomProperties = cards;
 上述操作也会触发 `OnPlayerCustomPropertiesChanged`
 
 
-## 远程调用函数 - RPC 
+## 远程调用函数 - RPC
 
 RPC 是提供给开发者自定义消息的一种方式，开发者可以通过定义 RPC ，发送 RPC 消息来实现多端的通信。
+
+注意，当前玩家必须处于一个房间内才可以发送 RPC 游戏，否则 RPC 消息不会触发。
+
+另外，SDK 内置的回调都会有 `[PlayEvent]`，而开发者自定义的 RPC 回调则必须有 `[PlayRPC]` 修饰符。
 
 ### 定义 RPC 方法
 
@@ -608,7 +692,9 @@ public override void OnLeftRoom()
 }
 ```
 
-## 内置属性
+## 内置的属性访问器
+
+通过 SDK 开放的属性访问器，可以快捷的读取如下信息：
 
 ### 当前加入的房间
 
@@ -658,9 +744,8 @@ SDK 内置了断线重连的机制，但是 SDK 重连的逻辑如下：
 
 1. 发现连接断开（网络异常或者其他原因导致 websocket 失效），SDK 会触发 `OnDisconnected` 回调
 2. 尝试重新打开 websocket 连接，但是并没有重新加入到原来的房间
-3. 开发者需要根据自身的游戏行为来判断是否要主动重新加入到原来的房间(比如某些竞速类的游戏掉线了就可能会被剔除房间)
+3. SDK 提供了重新加入房间的接口（参照随后的实例代码），发生掉线之后，开发者需要根据自身的游戏行为来判断是否要主动重新加入到原来的房间(比如某些竞速类的游戏掉线了就可能会被剔除房间)
 
-
 实例代码如下：
 
 ```cs
