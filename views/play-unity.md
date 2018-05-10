@@ -1,4 +1,4 @@
-# Play 游戏开发指南 &middot; Unity
+# Play 开发指南 &middot; Unity
 
 ## 前言
 Play 是一个基于 C# 编写的 Unity 的组件，它具备如下几项主要的功能（包括但不限于）：
@@ -115,10 +115,13 @@ namespace PlayDocSample
 在上述的实例中可以看见，代码中声明了一个 `ConnectSample` 类，它继承自 `PlayMonoBehaviour` ，并且在一定会有一个无参的构造函数，并且调用了父类的 `base()` 构造函数，最后要为所有的事件回调加上 `[PlayEvent]` 属性标记，这些都是**必须的**，之后的实例代码都会如此做，开发者的代码也需要遵守这一约定，少了一项，事件回调就不会生效。
 
 
-## 创建房间(PlayRoom)
+## 房间匹配
 
-### 指定房间名
+### 创建房间(PlayRoom)
 
+#### 指定房间名
+
+##### 基础用法
 ```cs
 using LeanCloud;
 
@@ -183,18 +186,38 @@ namespace TestUnit.NetFx46.Docs
 注：因为创建房间的逻辑和顺序都一致，因此本小节之后介绍创建房间时，为了更好的阅读体验和强调重点，不再给出每一种回调的实例代码，请参照上述代码即可。
 
 
-### 随机房间名
+##### 适用场景  
 
+1. 根据用户输入名称创建房间
+  ```cs
+  var roomName = inputLable.text;
+  Play.CreateRoom(roomName);
+  ```
+2. 基于一定规则自动生成房间名
+  ```cs
+  // 例如创建一个天梯对战房间，基于一定的天梯分数加上一些特定的前缀
+  var roomName = "ranked-" + 1000;
+  Play.CreateRoom(roomName);
+  ```
+
+#### 随机房间名
+
+##### 基础用法
 如果不传入任何参数创建房间，**客户端会随机生成一个名称**，这个不用开发者担心，算法是经过测试，名字重复的概率约等于 GUID 重复的概率，所以几乎不可能。
 
 ```cs
 Play.CreateRoom();
 ```
 
-### 指定玩家 ID 
+##### 适用场景
+
+无需用户输入，直接创建一个新房间。
+
+#### 指定玩家 ID 
+
+##### 基础用法
 
 这个功能的解决的需求是：只允许一些特定的 ID 玩家可以加入到房间或者当前玩家开好房间，等待一些特定的朋友来加入。实例代码如下：
-
 
 ```cs
 // 指定 bill 和 steve
@@ -204,7 +227,14 @@ Play.CreateRoom(new string[] { "bill", "steve" });
 Play.CreateRoom(new string[] { "bill", "steve" },"RichMen");
 ```
 
-### 限制玩家人数
+##### 适用场景
+
+1. 好友组局一起玩游戏
+  代码参照基础用法里面的示例。
+
+#### 限制玩家人数
+
+##### 基础用法
 
 目前 Play 所有的房间最多允许 **10** 人同时在一个房间进行游戏对战，有一些游戏甚至需要设置房间最多只有更少的人，比如斗地主只允许 3 个人加入，一旦人满了，其他的人是不可以加入的，因此在创建房间的时候可以设置房间的 MaxPlayerCount：
 
@@ -219,6 +249,17 @@ Play.CreateRoom(roomConfig);
 Play.CreateRoom(roomConfig,"max4-room");
 ```
 
+##### 适用场景
+
+1. 游戏本身有严格的人数要求，比如三国杀区分 1v1 两人局/五人局/3v3 六人局和标准八人局
+  下面示例将会创建一个 3v3 六人局的三国杀房间：
+  ```cs
+  var roomConfig = PlayRoom.PlayRoomConfig.Default;
+
+  roomConfig.MaxPlayerCount = 6;
+  // 房间名随机即可，因为 room name 没有必要一定要显示出来
+  Play.CreateRoom(roomConfig);
+  ```
 
 ### 设置房间的自定义属性
 
@@ -242,7 +283,7 @@ Play.CreateRoom(roomConfig);
 
 ### 是否开放房间允许别人加入
 
-创建一个房间，然后不希望其他人家加入，比如在一些支持 1 至 8 人的卡牌游戏当中，房主可以选择在已经有 4 位玩家的时候锁住房间，并开始 4 人游戏模式：
+创建一个房间，然后不希望其他人家加入，比如有一些定时副本，玩家创建好房间之后，等到副本开始之后，再允许其他玩家加入：
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -254,6 +295,8 @@ Play.CreateRoom(roomConfig);
 ```
 
 ### 房间是否在列表中可见
+
+创建一个房间是否允许其他人在列表中查看，在一些对黑的游戏局里面，房主开好房间之后，不会在列表中公开显示出来。
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -274,43 +317,11 @@ Play.CreateRoom(roomConfig);
 2. 所有成员都掉线，并且都没有重连回来，超过 30 分钟，云端就会认为失效
 
 
-<!-- ## 获取房间列表
+### 加入房间
 
-### 一次性拉取 20 个房间
+#### 根据 Name 加入
 
-20 是 SDK 默认设置的数量，可以通过修改 limit 参数来修改这一数值。
-
-```cs
-[PlayEvent]
-public override void OnAuthenticated()
-{
-    Play.FetchRoomList();
-    // 或者一次性查询 30 个 room
-    // Play.FetchRoomList(30);
-}
-
-[PlayEvent]
-public override void OnFetchedRoomList(IEnumerable<PlayRoom> rooms)
-{
-    Play.Log(rooms.Count());
-}
-```
-
-如果还想继续查询更多，只要继续调用 `Play.FetchRoomList()` 即可，如果想从头重新开始查询（从当前时间最新的房间开始），只要传入一个 reset 参数即可：
-
-```cs
-Play.FetchRoomList(reset:true);
-``` 
-
-即使掉线了，只要重连回来，SDK 都会记录查询的索引标记，可以继续调用 `Play.FetchRoomList()` 来获取更多的房间。 -->
-
-
-注意：房间的变化频率较快，所以本地 SDK 并没有做缓存，调用加入之后，需要监听加入的回调来判断是否真正加入成功，详细请看下一章节[加入房间](#加入房间)。
-
-
-## 加入房间
-
-### 根据 Name 加入
+##### 基础用法
 
 ```cs
 public class SampleJoinRoom : PlayMonoBehaviour
@@ -362,8 +373,19 @@ public class SampleJoinRoom : PlayMonoBehaviour
 
 加入成功则会回调 OnJoinedRoom，加入失败则会回调 OnJoinRoomFailed。
 
+##### 适用场景
 
-### 随机加入
+1. 与好友一起游戏 - 用户自己输入了一个房间名，并且创建成功，然后通过聊天工具告诉了好友，然后好友通过房间名直接加入进来
+  ```cs
+  var roomName = "get_from_qq";
+  Play.JoinRoom(roomName);
+  ```
+
+#### 随机加入
+
+##### 基础用法
+
+随机加入任何一个开放的有空位的房间：
 
 ```cs
 Play.JoinRandomRoom();
@@ -373,8 +395,13 @@ Play.JoinRandomRoom();
 
 如果随机加入失败，可以选择[创建房间](#创建房间)
 
+##### 适用场景
 
-### 根据条件随机加入
+1. 快速加入已有房间（不创建新的房间）
+
+#### 根据条件随机加入
+
+##### 基础用法
 
 配合前面的[设置房间的自定义属性](#设置房间的自定义属性)的代码：
 
@@ -388,9 +415,10 @@ var randomLobbyMatchKeys = new Hashtable
 Play.JoinRandomRoom(randomLobbyMatchKeys);
 ```
 
-## 快速加入
+### 快速进入 
 
-快速加入解决的需求是：优先随机加入，如果没有符合条件的直接创建，很多棋牌游戏里面的「快速开始」对应的就是这个功能：
+#### 基础用法 
+快速计入解决的需求是：优先随机加入，如果没有符合条件的直接创建，很多棋牌游戏里面的「快速开始」对应的就是这个功能：
 
 1. 优先去加入一个缺人的房间
 2. 如果所有房间都满员，则会主动创建一个房间并且加入进去，等待其他玩家加入
@@ -401,8 +429,64 @@ Play.JoinRandomRoom(randomLobbyMatchKeys);
 Play.JoinOrCreate();
 ```
 
+或者指定一些 key-value 的自定义属性进行匹配，例如，我要加入天梯 1000 分的房间，如果没有现成的房间，请帮我创建一个：
+
+```cs
+var joinOrRandomMatchAttributes = new Hashtable
+{
+    { "rankPoints", 1000 }
+};
+var roomConfig = PlayRoom.PlayRoomConfig.Default;
+
+roomConfig.CustomRoomProperties = joinOrRandomMatchAttributes;
+
+roomConfig.LobbyMatchKeys = new string[] { "rankPoints" };
+
+Play.JoinOrCreate(roomConfig);
+```
+
 如果加入成功则会回调 `OnJoinedRoom`，如果是创建成功，则会先调用 `OnCreatedRoom` 然后再调用 `OnJoinedRoom`。
 
+#### 适用场景
+
+1. 登录之后，点击「快速匹配排位赛」，如果有房间就加入，没有就创建
+
+
+
+## 开始游戏
+
+<!-- ## 获取房间列表
+
+### 一次性拉取 20 个房间
+
+20 是 SDK 默认设置的数量，可以通过修改 limit 参数来修改这一数值。
+
+```cs
+[PlayEvent]
+public override void OnAuthenticated()
+{
+    Play.FetchRoomList();
+    // 或者一次性查询 30 个 room
+    // Play.FetchRoomList(30);
+}
+
+[PlayEvent]
+public override void OnFetchedRoomList(IEnumerable<PlayRoom> rooms)
+{
+    Play.Log(rooms.Count());
+}
+```
+
+如果还想继续查询更多，只要继续调用 `Play.FetchRoomList()` 即可，如果想从头重新开始查询（从当前时间最新的房间开始），只要传入一个 reset 参数即可：
+
+```cs
+Play.FetchRoomList(reset:true);
+``` 
+
+即使掉线了，只要重连回来，SDK 都会记录查询的索引标记，可以继续调用 `Play.FetchRoomList()` 来获取更多的房间。 
+
+
+注意：房间的变化频率较快，所以本地 SDK 并没有做缓存，调用加入之后，需要监听加入的回调来判断是否真正加入成功，详细请看下一章节[加入房间](#加入房间)。-->
 
 ## MasterClient
 
@@ -490,7 +574,6 @@ public override void OnJoinedRoom()
 上述代码的含义是：如果当前 level 是 1000 那么就修改为 level 值为 1200，否则就不修改。
 
 
-
 ### 收到房间属性被修改的通知
 
 
@@ -549,9 +632,11 @@ Play.Player.CustomProperties = cards;
 上述操作也会触发 `OnPlayerCustomPropertiesChanged`
 
 
-## 远程调用函数 - RPC 
+## 远程调用函数 - RPC
 
 RPC 是提供给开发者自定义消息的一种方式，开发者可以通过定义 RPC ，发送 RPC 消息来实现多端的通信。
+
+注意，当前玩家必须处于一个房间内才可以发送 RPC 游戏，否则 RPC 消息不会触发。
 
 ### 定义 RPC 方法
 
@@ -608,7 +693,9 @@ public override void OnLeftRoom()
 }
 ```
 
-## 内置属性
+## 内置的属性访问器
+
+通过 SDK 开放的属性访问器，可以快捷的读取如下信息：
 
 ### 当前加入的房间
 
