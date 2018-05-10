@@ -415,30 +415,31 @@ var randomLobbyMatchKeys = new Hashtable
 Play.JoinRandomRoom(randomLobbyMatchKeys);
 ```
 
-### 快速进入 
+### 加入或者创建
 
 #### 基础用法 
-快速计入解决的需求是：优先随机加入，如果没有符合条件的直接创建，很多棋牌游戏里面的「快速开始」对应的就是这个功能：
 
-1. 优先去加入一个缺人的房间
-2. 如果所有房间都满员，则会主动创建一个房间并且加入进去，等待其他玩家加入
+快速计入解决的需求是：优先检测传入的 room name 对应的房间是否存在，如果存在就直接加入，如果不存在，就直接创建：
+
 
 对应的实例代码如下：
 
 ```cs
-Play.JoinOrCreate();
+var roomName = "i-want-this-name";
+Play.JoinOrCreate(roomName);
 ```
 
-或者指定一些 key-value 的自定义属性进行匹配，例如，我要加入天梯 1000 分的房间，如果没有现成的房间，请帮我创建一个：
+或者指定一些 key-value 的自定义属性，例如，我要加入一个指定名字的房间，如果没有不存在，请帮我创建这个房间并且把我指定的自定义属性也赋值给房间：
 
 ```cs
-var joinOrRandomMatchAttributes = new Hashtable
+var createWithAttributes = new Hashtable
 {
     { "rankPoints", 1000 }
 };
+
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
 
-roomConfig.CustomRoomProperties = joinOrRandomMatchAttributes;
+roomConfig.CustomRoomProperties = createWithAttributes;
 
 roomConfig.LobbyMatchKeys = new string[] { "rankPoints" };
 
@@ -449,8 +450,7 @@ Play.JoinOrCreate(roomConfig);
 
 #### 适用场景
 
-1. 登录之后，点击「快速匹配排位赛」，如果有房间就加入，没有就创建
-
+1. 两人（或者多人）约定了一个房间名，但是这些人进入游戏的时间不一样，因此所有人都调用 `JoinOrCreate` 并且传入一样的名字，则 SDK 会确保这些人一定会加入到一个相同的房间内。
 
 
 ## 开始游戏
@@ -606,7 +606,6 @@ public override void OnNewPlayerJoinedRoom(Player player)
 ```
 
 在玩家加入房间之后，初始化 TA 的自定义属性。
-
 
 ### 收到玩家的属性被修改的通知
 
