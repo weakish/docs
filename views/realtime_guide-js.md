@@ -1524,7 +1524,15 @@ messageIterator.next().then(function(result) {
 }).catch(console.error.bind(console));
 ```
 
+### 根据消息类型查询
 
+下面的代码将演示如何查询某一种消息类型的聊天记录：
+
+```
+conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
+  console.log(messages);
+}).catch(console.error);
+```
 ### 客户端聊天记录缓存
 
 JavaScript SDK 没有客户端聊天记录缓存机制。

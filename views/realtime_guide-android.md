@@ -1754,6 +1754,18 @@ conversationQuery.whereGreaterThan("attr.level", 5);
 ```
 {% endblock %}
 
+{% block im_history_messageType_code %}
+
+```java
+int msgType = .AVIMMessageType.TEXT_MESSAGE_TYPE;
+conversation.queryMessagesByType(msgType, limit, new AVIMMessagesQueryCallback() {
+@Override
+public void done(List<AVIMMessage> messages, AVIMException e){
+}
+});
+```
+{% endblock %}
+
 {% block disable_im_cache %}
 
 ```java

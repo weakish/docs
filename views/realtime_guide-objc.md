@@ -1765,6 +1765,34 @@ AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
 ```
 {% endblock %}
 
+{% block im_history_messageType_code %}
+
+```objc
+- (void)tomQueryMediaMessagesWithLimit {
+    // Tom 创建了一个 client，用自己的名字作为 clientId
+    AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+    // Tom 打开 client
+    [client openWithCallback:^(BOOL succeeded, NSError *error) {
+        if (!error) {
+            // Tom 创建查询会话的 query
+            AVIMConversationQuery *query = [client conversationQuery];
+            // Tom 获取 id 为 2f08e882f2a11ef07902eeb510d4223b 的会话
+            [query getConversationById:@"2f08e882f2a11ef07902eeb510d4223b" callback:^(AVIMConversation *conversation, NSError *error) {
+                if (!error) {
+                    // 查询对话中最新的 10 条图片消息
+                    [conversation queryMediaMessagesFromServerWithType:kAVIMMessageMediaTypeImage limit:10 fromMessageId:nil fromTimestamp:0 callback:^(NSArray *messages, NSError *error) {
+                        if (!error) {
+                            NSLog(@"查询成功！");
+                        }
+                    }];
+                }
+            }];
+        }
+    }];
+}
+```
+{% endblock %}
+
 {% block disable_im_cache %}
 ```objc
 - (void)tomQueryMessagesWithLimitAndIgnoreCache {
