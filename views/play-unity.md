@@ -26,6 +26,11 @@ Play 解决了如下几种游戏场景的服务端需求（包括但不限于）
 
 > 针对有强联网需求的网络游戏，提供了一整套的客户端 SDK 解决方案，不再需要自建服务端，省去了大多数的开发和运维成本。
 
+## 内测申请
+
+Play 正在内测中，如果您没有内测资格，请[查看并申请内测](https://blog.leancloud.cn/6177/)。
+
+
 ## 必备的基础知识
 
 Play 是基于 C# 开发运行在 Unity 的 Mono .NET 下的 SDK，因此开发者需要掌握如下基础知识：
@@ -245,13 +250,13 @@ Play.CreateRoom(roomConfig,"max4-room");
 
 * 游戏本身有严格的人数要求，比如三国杀区分 1v1 两人局/五人局/3v3 六人局和标准八人局
   下面示例将会创建一个 3v3 六人局的三国杀房间：
-  ```cs
-  var roomConfig = PlayRoom.PlayRoomConfig.Default;
+```cs
+var roomConfig = PlayRoom.PlayRoomConfig.Default;
 
-  roomConfig.MaxPlayerCount = 6;
-  // 房间名随机即可，因为 room name 没有必要一定要显示出来
-  Play.CreateRoom(roomConfig);
-  ```
+roomConfig.MaxPlayerCount = 6;
+// 房间名随机即可，因为 room name 没有必要一定要显示出来
+Play.CreateRoom(roomConfig);
+```
 
 ### 设置房间的自定义属性
 
