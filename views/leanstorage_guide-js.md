@@ -1221,8 +1221,8 @@ file.save({
   user.setPassword('cat!@#123');
   // 设置邮箱
   user.setEmail('tom@leancloud.cn');
-  user.signUp().then(function (loginedUser) {
-      console.log(loginedUser);
+  user.signUp().then(function (loggedInUser) {
+      console.log(loggedInUser);
   }, function (error) {
   });
 ```
@@ -1282,8 +1282,8 @@ file.save({
 {% block code_user_logIn_with_username_and_password %}
 
 ```js
-  AV.User.logIn('Tom', 'cat!@#123').then(function (loginedUser) {
-    console.log(loginedUser);
+  AV.User.logIn('Tom', 'cat!@#123').then(function (loggedInUser) {
+    console.log(loggedInUser);
   }, function (error) {
   });
 ```
@@ -1293,10 +1293,10 @@ file.save({
 {% block code_user_logIn_with_mobilephonenumber_and_password %}
 
 ```js
-  AV.User.logInWithMobilePhone('13577778888', 'cat!@#123').then(function (loginedUser) {
-      console.log(loginedUser);
-  }, (function (error) {
-  }));
+  AV.User.logInWithMobilePhone('13577778888', 'cat!@#123').then(function (loggedInUser) {
+      console.log(loggedInUser);
+  }, function (error) {
+  });
 ```
 {% endblock %}
 
@@ -1323,10 +1323,10 @@ AV.User.requestLoginSmsCode('13577778888').then(function (success) {
 {% block code_get_user_properties %}
 
 ```js
-  AV.User.logIn('Tom', 'cat!@#123').then(function (loginedUser) {
-    console.log(loginedUser);
-    var username = loginedUser.getUsername();
-    var email = loginedUser.getEmail();
+  AV.User.logIn('Tom', 'cat!@#123').then(function (loggedInUser) {
+    console.log(loggedInUser);
+    var username = loggedInUser.getUsername();
+    var email = loggedInUser.getEmail();
     // 请注意，密码不会明文存储在云端，因此密码只能重置，不能查看
   }, function (error) {
   });
@@ -1336,9 +1336,9 @@ AV.User.requestLoginSmsCode('13577778888').then(function (success) {
 {% block code_set_user_custom_properties %}
 
 ```js
-  AV.User.logIn('Tom', 'cat!@#123').then(function (loginedUser) {
-    loginedUser.set('age', 25);
-    loginedUser.save();
+  AV.User.logIn('Tom', 'cat!@#123').then(function (loggedInUser) {
+    loggedInUser.set('age', 25);
+    loggedInUser.save();
   }, function (error) {
     // 异常处理
     console.error(error);
@@ -1349,14 +1349,14 @@ AV.User.requestLoginSmsCode('13577778888').then(function (success) {
 {% block code_update_user_custom_properties %}
 
 ```js
-  AV.User.logIn('Tom', 'cat!@#123').then(function (loginedUser) {
+  AV.User.logIn('Tom', 'cat!@#123').then(function (loggedInUser) {
     // 25
-    console.log(loginedUser.get('age'));
-    loginedUser.set('age', 18);
-    return loginedUser.save();
-  }).then(function(loginedUser) {
+    console.log(loggedInUser.get('age'));
+    loggedInUser.set('age', 18);
+    return loggedInUser.save();
+  }).then(function(loggedInUser) {
     // 18
-    console.log(loginedUser.get('age'));
+    console.log(loggedInUser.get('age'));
   }).catch(function(error) {
     // 异常处理
     console.error(error);
@@ -1704,3 +1704,5 @@ AV.User.signUpOrlogInWithAuthData({
 ```
 {% endblock %}
 {% block anonymous_user_save %}{%  endblock %}
+
+{% block text_using_async_methods %}{% endblock %}

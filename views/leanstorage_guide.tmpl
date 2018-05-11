@@ -861,10 +861,6 @@ CQL 是 {{productName}} 独创的使用类似 SQL 语法来实现云端查询功
 
 {% block text_send_sms_code_for_loginOrSignup %}
 
-{% if node=='qcloud' %}
-<div class="callout callout-danger">注意：TAB 暂时未开放短信功能，所以所有与短信相关的 API 操作（如使用手机号进行注册）暂时不能调用。</div>
-{% endif %}
-
 {% if node != 'qcloud' and node != 'us' %}
 #### 手机号码注册
 
@@ -920,10 +916,6 @@ CQL 是 {{productName}} 独创的使用类似 SQL 语法来实现云端查询功
 
 我们提供了多种登录方式，以满足不同场景的应用。
 
-{% if node=='qcloud' %}
-<div class="callout callout-danger">注意：TAB 暂时未开放短信功能，所以所有与短信相关的 API 操作（如使用手机号和验证码进行登录）暂时不能调用。</div>
-{% endif %}
-
 #### 用户名和密码登录
 
 {% block code_user_logIn_with_username_and_password %}{% endblock %}
@@ -953,7 +945,7 @@ CQL 是 {{productName}} 独创的使用类似 SQL 语法来实现云端查询功
 
 {{ sms.fixedVerificationCode("####") }}
 
-#### 单点登录 
+#### 单设备登录
 
 如果想实现在当前设备 A 上登录后，强制令之前在其他设备上的登录失效，可以按照以下方案来实现：
 {# 2017-09-20 hide method 1
@@ -1053,10 +1045,6 @@ CQL 是 {{productName}} 独创的使用类似 SQL 语法来实现云端查询功
 
 {% if node != 'qcloud' and node != 'us' %}
 #### 手机号码重置密码
-
-{% if node=='qcloud' %}
-<div class="callout callout-danger">注意：TAB 暂时未开放短信功能，所以所有与短信相关的 API 操作暂时不能调用。</div>
-{% endif %}
 
 与使用 [邮箱重置密码](#邮箱重置密码) 类似，「手机号码重置密码」使用下面的方法来获取短信验证码：
 
