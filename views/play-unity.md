@@ -45,7 +45,7 @@ Play 是基于 C# 开发运行在 Unity 的 Mono .NET 下的 SDK，因此开发�
 
 ### 下载获取动态链接库
 
-安装及初始化请参考：[Play 入门教程](play-quick-start.html)
+请阅读[安装和初始化](play-quick-start.html#安装和初始化)
 
 ### 打开客户端日志
 
