@@ -222,7 +222,7 @@ def on_login(user):
 {% endblock %}
 
 {% block errorCodeExample %}
-错误响应码允许自定义。云引擎抛出的  `LeanCloudError`（数据存储 API 会抛出此异常）会直接将错误码和原因返回给客户端。若想自定义错误码，可以自行构造 `LeanEngineError`，将 `code` 与 `error` 传入。否则 `code` 为 1， `message` 为错误对象的字符串形式。
+错误响应码允许自定义，但是必须遵守 [HTTP 状态码](https://zh.wikipedia.org/zh-hans/HTTP状态码) 的格式，比如 4xx。云引擎抛出的  `LeanCloudError`（数据存储 API 会抛出此异常）会直接将错误码和原因返回给客户端。若想自定义错误码，可以自行构造 `LeanEngineError`，将 `code` 与 `error` 传入。否则 `code` 为 1， `message` 为错误对象的字符串形式。
 
 ```python
 @engine.define
