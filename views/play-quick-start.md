@@ -1,41 +1,37 @@
 # Play 入门教程
 
-Hi, 亲爱的开发者，欢迎使用 LeanCloud Play。本教程将模拟一个比较大小的场景，向你讲解 Play SDK 的核心使用方法。
+欢迎使用 LeanCloud Play。本教程将模拟一个比较玩家点数大小的场景来讲解 Play SDK 的核心使用方法。
 
-## 内测申请
+Play 尚未正式发布，内测正在进行中。
 
-Play 正在内测中，如果您没有内测资格，请[查看并申请内测](https://blog.leancloud.cn/6177/)。
+<button class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
 
-## 你将学到什么
+## 教程大纲
 
-* 如何在 Unity 中安装 SDK，并初始化
+* 如何在 Unity 中安装 SDK 并初始化
 * 连接至 Play 服务器
 * 如何创建 / 加入房间
 * 如何通过 CustomPlayerProperties 同步玩家属性
 * 如何通过 RPC 通知玩家消息
 
-## 如何学习
+我们推荐通过以下方法来学习：
 
-1. 下载 [demo 工程](https://github.com/leancloud/Play-SDK-dotNET)，通过 Unity 打开 demo 工程，浏览 demo 代码，并运行观察日志输出。
-2. 创建一个新的 Unity 工程，安装好 SDK 后，替换你申请的 App ID 和 App Key，根据 demo 代码尝试修改并运行，观察变化，来全面深入地理解 Play。
+1. 下载 [demo 工程](https://github.com/leancloud/Play-SDK-dotNET)，通过 Unity 打开 demo 工程，浏览和运行 demo 代码，观察日志输出。
+2. 创建一个新的 Unity 工程，安装好 SDK 后，替换你申请的 App ID 和 App Key，根据 demo 代码尝试修改并运行，观察变化。
 
-## 主要步骤
+## 安装和初始化
 
-### 安装和初始化
+下载 [Play-SDK-dotNET](https://github.com/leancloud/Play-SDK-dotNET/releases)，将 dll 拖拽至 Unity 工程的 Plugins 目录，如图：
 
-下载 SDK，将 dll 拖拽至 Unity 工程的 Plugins 目录，如图：
-
-首先需要访问：[Play-SDK-dotNET](https://github.com/leancloud/Play-SDK-dotNET/releases) 来获取最新版本的 SDK。
-
-下载之后导入到 Unity 的 Assets/Plugins 文件里，如下图：
+下载之后导入到 Unity 的 `Assets/Plugins` 文件里，如下图：
 
 ![import-play-sdk](images/import-play-sdk.png)
 
-然后将 LeanCloud.Play.dll 里面的  PlayInitializeBehaviour 挂在到 Main Camera（或者其他 Game Object）上，如下图：
+然后将 `LeanCloud.Play.dll` 里面的 `PlayInitializeBehaviour` 挂载到 Main Camera（或者其他 Game Object）上，如下图：
 
 ![import-play-sdk](images/link-play-init-script.png)
 
-### 连接至 Play 服务器
+## 连接至 Play 服务器
 
 在连接 Play 服务器之前请先设置用户唯一 ID，这里使用随机数作为简单示例。
 
@@ -51,9 +47,9 @@ void Start ()
 }
 ``` 
 
-### 如何创建 / 加入房间
+## 创建或加入房间
 
-在连接到 Play 服务器并认证成功后，Play SDK 会回调 OnAuthenticated() 接口，我们在此接口中「加入或创建某个房间」。
+在连接到 Play 服务器并认证成功后，Play SDK 会回调 `OnAuthenticated()` 接口，我们在此接口中「加入或创建某个房间」。
 
 ```cs
 // 连接成功回调接口
@@ -66,9 +62,9 @@ public override void OnAuthenticated ()
 }
 ```
 
-### 如何通过 CustomPlayerProperties 同步玩家属性
+## 通过 CustomPlayerProperties 同步玩家属性
 
-当有别的玩家加入到房间时，Play SDK 会回调 OnNewPlayerJoinedRoom (Player player) 接口，我们在此接口中生成随机点数，并进行点数比对。
+当有别的玩家加入到房间时，Play SDK 会回调 `OnNewPlayerJoinedRoom (Player player)` 接口，我们在此接口中生成随机点数，并进行点数比对。
 
 ```cs
 // 其他玩家加入回调接口
@@ -109,7 +105,7 @@ public override void OnPlayerCustomPropertiesChanged (Player player, Hashtable u
 }
 ```
 
-### 如何通过 RPC 通知玩家消息
+### 通过 RPC 通知玩家消息
 
 在判断出胜利者之后，通过 RPC 机制通知玩家。
 
