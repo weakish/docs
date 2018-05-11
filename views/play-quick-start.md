@@ -25,13 +25,15 @@ Play 正在内测中，如果您没有内测资格，请[查看并申请内测](
 
 下载 SDK，将 dll 拖拽至 Unity 工程的 Plugins 目录，如图：
 
-![安装 dll](images/unity/quick-start-1.png)
+首先需要访问：[Play-SDK-dotNET](https://github.com/leancloud/Play-SDK-dotNET/releases) 来获取最新版本的 SDK。
 
-（注意：安装的 dll 和 Unity 编译环境的 .Net 版本要保持一致）
+下载之后导入到 Unity 的 Assets/Plugins 文件里，如下图：
 
-在第一个场景中新建一个 GameObject，并添加 PlayInitializeBehaviour.cs 脚本，输入你申请的 App ID 和 App Key，如图：
+![import-play-sdk](images/import-play-sdk.png)
 
-![初始化 Play](images/unity/quick-start-2.png)
+然后将 LeanCloud.Play.dll 里面的  PlayInitializeBehaviour 挂在到 Main Camera（或者其他 Game Object）上，如下图：
+
+![import-play-sdk](images/link-play-init-script.png)
 
 ### 连接至 Play 服务器
 

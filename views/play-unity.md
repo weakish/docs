@@ -45,17 +45,7 @@ Play 是基于 C# 开发运行在 Unity 的 Mono .NET 下的 SDK，因此开发�
 
 ### 下载获取动态链接库
 
-首先需要访问：[Play-SDK-dotNET](https://github.com/leancloud/Play-SDK-dotNET/releases) 来获取最新版本的 SDK。
-
-下载之后导入到 Unity 的 Assets 文件里，如下图：
-
-![import-play-sdk](images/import-play-sdk.png)
-
-然后将 LeanCloud.Play.dll 里面的  PlayInitializeBehaviour 挂在到 Main Camera（或者其他 Game Object）上，如下图：
-
-
-![import-play-sdk](images/link-play-init-script.png)
-
+安装及初始化请参考：[Play 入门教程](play-quick-start.html)
 
 ### 打开客户端日志
 
