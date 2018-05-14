@@ -2,22 +2,12 @@
 
 欢迎使用 LeanCloud Play。本教程将模拟一个比较玩家点数大小的场景来讲解 Play SDK 的核心使用方法。
 
-Play 尚未正式发布，内测正在进行中。
-
-<button class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
-
-## 教程大纲
-
-* 如何在 Unity 中安装 SDK 并初始化
-* 连接至 Play 服务器
-* 如何创建 / 加入房间
-* 如何通过 CustomPlayerProperties 同步玩家属性
-* 如何通过 RPC 通知玩家消息
+Play 尚未正式发布，内测正在进行中。<button class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
 
 我们推荐通过以下方法来学习：
 
 1. 下载 [demo 工程](https://github.com/leancloud/Play-SDK-dotNET)，通过 Unity 打开 demo 工程，浏览和运行 demo 代码，观察日志输出。
-2. 创建一个新的 Unity 工程，安装好 SDK 后，替换你申请的 App ID 和 App Key，根据 demo 代码尝试修改并运行，观察变化。
+1. 创建一个新的 Unity 工程，安装好 SDK 后，替换你申请的 App ID 和 App Key，根据 demo 代码尝试修改并运行，观察变化。
 
 ## 安装和初始化
 
