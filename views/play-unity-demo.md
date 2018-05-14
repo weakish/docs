@@ -2,22 +2,20 @@
 
 本文是基于 Play SDK for Unity（C#）制作的简化版在线对战类游戏「炸金花」，目的在于让用户迅速了解如何使用 Play。
 
-## 内测申请
-
-Play 正在内测中，如果您没有内测资格，请[查看并申请内测](https://blog.leancloud.cn/6177/)。
+Play 尚未正式发布，内测正在进行中。<button class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
 
 ## Demo
 
-这个 Demo 是基于 Unity 引擎实时对战 SDK「Play」开发的，从中你可以了解：
+这个 Demo 是基于 Unity 引擎实时对战 SDK「LeanCloud Play」开发的，从中你可以了解：
 
 * 连接游戏大厅
-* 创建 / 加入房间
-* 获取房间玩家变化（加入，离开）
-* 通过「房间属性」控制及存储房间数据，例如 房间的总金币等
-* 通过「玩家属性」控制和存储房间内玩家的数据和状态，例如 玩家的金币数，玩家的闲置，准备，游戏状态
-* 通过 RPC 接口完成远程调用操作，例如 玩家选择跟牌，棋牌等操作
+* 创建或加入房间
+* 获取房间玩家变化（加入、离开）
+* 通过「房间属性」控制及存储房间数据，例如：房间的总金币等。
+* 通过「玩家属性」控制和存储房间内玩家的数据和状态，例如：玩家的金币数、玩家的闲置、准备、游戏状态。
+* 通过 RPC 接口完成远程调用操作，例如：玩家选择跟牌、棋牌等操作。
 
-[请点击此处查看该工程的全部代码](https://github.com/leancloud/Play-SDK-dotNET)
+[点击此处](https://github.com/leancloud/Play-SDK-dotNET) 查看该工程的全部代码。
 
 开发环境及版本：
 
@@ -28,30 +26,29 @@ Play 正在内测中，如果您没有内测资格，请[查看并申请内测](
 ## Demo 流程
 
 * 玩家输入 UserID 后连接至 Play 云。
-* 选择创建 / 加入房间。
+* 选择创建或加入房间。
 * 普通玩家加入房间之后可以选择「准备状态」。
 * 当房间总玩家数不少于 2 人，并且其他玩家处于「准备状态」时，房主可以开始游戏。
 * 开始游戏后，房主给每个玩家发 3 张牌，然后从房主开始，选择操作。
-* 玩家可以选择「跟牌」，「弃牌」，「比牌」操作，依次从房主开始到每个人执行选择。（每次跟牌需要花费 100 金币）
+* 玩家可以选择「跟牌」、「弃牌」、「比牌」操作，依次从房主开始到每个人执行选择。（每次跟牌需要花费 100 金币）
 * 循环上步至其他玩家选择「弃牌」或「比牌」之后，得到最后的胜出者。
 
 ## 代码分析
 
 ### 连接
 
-通过输入用户的 UserID 连接至 Play，此处的 UserID 由开发者提供，可以是用户名，昵称等，或任意字段的组合。
-UserID 最好是字母和数字的组合。
+通过输入用户的 UserID 连接至 Play，此处的 UserID 由开发者提供，可以是用户名，昵称等，或任意字段的组合。UserID 最好是字母和数字的组合。
 
 ![连接](images/unity/playdemo-1.png)
 
-**注意：请保证 UserID 唯一**
+**注意：请保证 UserID 唯一。**
 
 ```cs
 Play.UserID = userId;
 Play.Connect("0.0.1");
 ```
 
-在连接成功后会回调至 OnAuthenticated() 接口，在 Demo 中会跳转至「房间场景」。
+在连接成功后会回调至 `OnAuthenticated()` 接口，在 Demo 中会跳转至「房间场景」。
 
 ```cs
 [PlayEvent]
@@ -66,7 +63,7 @@ public override void OnAuthenticated()
 
 ### 创建 / 加入房间
 
-用户可以通过 Play.CreateRoom(room) 创建房间
+用户可以通过 `Play.CreateRoom(room)` 创建房间。
 
 ![创建 / 加入房间](images/unity/playdemo-2.png)
 
@@ -76,15 +73,15 @@ roomConfig.MaxPlayerCount = 4;
 Play.CreateRoom(roomConfig, roomId);
 ```
 
-房间创建完后，SDK 会依次回调 OnCreatingRoom() 和 OnCreatedRoom() 或 OnCreateRoomFailed(int errorCode, string reason)。如果房间创建成功，玩家会自动加入到房间，所以还会回调 OnJoinedRoom()。
+房间创建完后，SDK 会依次回调 `OnCreatingRoom()` 和 `OnCreatedRoom()` 或 `OnCreateRoomFailed(int errorCode, string reason)`。如果房间创建成功，玩家会自动加入到房间，所以还会回调 `OnJoinedRoom()`。
 
-通过 Play.JoinRoom(roomId) 加入房间。
+通过 `Play.JoinRoom(roomId)` 加入房间。
 
 ```cs
 Play.JoinRoom(roomId); // roomId 为房间 Id
 ```
 
-调用加入房间后，SDK 会依次调用 OnJoiningRoom() 和 OnJoinedRoom() 或 OnJoinRoomFailed(int errorCode, string reason)。如果加入失败，会在参数中给出失败原因。
+调用加入房间后，SDK 会依次调用 `OnJoiningRoom()` 和 `OnJoinedRoom()` 或 `OnJoinRoomFailed(int errorCode, string reason)`。如果加入失败，会在参数中给出失败原因。
 
 Demo 在加入房间成功后，会设置默认状态为 IDLE，并跳转至「战斗场景」。
 
@@ -106,9 +103,10 @@ public override void OnJoinedRoom()
 #### 同步准备状态
 
 Demo 中「房主」和「普通玩家」的操作是不一样的，默认当「所有玩家」都准备完成后，「房主」才可以开始游戏。
-（房主是指创建房间的玩家，普通玩家指除了房主之外加入房间的玩家）
 
-这时，需要同步普通玩家的状态，这里需要用到 SDK 的「玩家属性」的功能。通过设置「玩家属性」，SDK 会将「变更的属性」自动同步给房间内的所有玩家（包括自己）。
+> 房主是指创建房间的玩家，普通玩家指除了房主之外加入房间的玩家。
+
+这时，需要同步普通玩家的状态，这里需要用到 SDK 的「玩家属性」的功能。通过设置「玩家属性」，SDK 会将**变更的属性**自动同步给房间内的所有玩家（包括自己）。
 
 ![同步准备状态](images/unity/playdemo-3.png)
 
@@ -121,7 +119,7 @@ Play.Player.CustomProperties = prop;
 
 #### 接收属性同步
 
-当玩家变更了属性之后，SDK 会自动同步给房间内的所有玩家，通过 **OnPlayerCustomPropertiesChanged(LeanCloud.Player player, Hashtable updatedProperties)** 接口。
+当玩家变更了属性之后，SDK 会通过 `OnPlayerCustomPropertiesChanged(LeanCloud.Player player, Hashtable updatedProperties)` 接口自动同步给房间内的所有玩家。
 
 以「同步准备状态」为例，Demo 会在接收到玩家属性变更回调后，设置变更玩家的 UI 显示。如果是房主，则判断当前「已经准备的玩家数量」，如果所有玩家都已准备完成，则可以「开始游戏」，代码如下：
 
@@ -177,7 +175,8 @@ void onPlayerStatusPropertiesChanged(LeanCloud.Player player, Hashtable updatedP
 
 ![用户操作示例](images/unity/playdemo-4.png)
 
-其中最重要的是给每个玩家随机发 3 张牌，这里我们需要将 3 张牌的数据存放至「玩家属性」中。而牌的类型是我们自定义的，为了兼容这种模式，需要将牌的对象数据序列化成 json 字符串后设置。当获得后，再反序列化为「牌的对象」。
+其中最重要的是给每个玩家随机发 3 张牌，这里我们需要将 3 张牌的数据存放至「玩家属性」中。而牌的类型是我们自定义的，为了兼容这种模式，需要将牌的对象数据序列化成 JSON 字符串后设置。当获得后，再反序列化为「牌的对象」。
+
 注：我们这里用到了 JSON .NET 第三方库，这里也可以选用其他的序列化方式，只要符合 CustomProperties 的类型即可。
 
 发牌代码：
@@ -231,10 +230,11 @@ void onPlayerPokerPropertiesChanged(LeanCloud.Player player, Hashtable updatedPr
 
 ### 玩家操作
 
-包括 跟牌，弃牌，比牌操作
-跟牌是指继续下注
-弃牌是指放弃游戏
-比牌是指和其他玩家比较牌大小，确定胜出者
+玩家操作包括：
+
+- 跟牌：继续下注
+- 弃牌：放弃游戏
+- 比牌：和其他玩家比较牌大小，确定胜出者。
 
 #### 跟牌
 
@@ -242,8 +242,8 @@ void onPlayerPokerPropertiesChanged(LeanCloud.Player player, Hashtable updatedPr
 
 在 Demo 中，如果玩家选择「跟牌」，会执行三步逻辑：
 
-* 扣除这个玩家的金币（Demo 中固定是 100金币）
-* 将扣除的金币加入到房间的「总的下注金币池」，这里用到了「房间属性」（同理「玩家属性」处理 OnPlayerCustomPropertiesChanged）
+* 扣除这个玩家的金币（Demo 中固定是 100 金币）
+* 将扣除的金币加入到房间的「总的下注金币池」，这里用到了「房间属性」。同理「玩家属性」处理 `OnPlayerCustomPropertiesChanged`。
 * 通知下一个玩家做出选择
 
 玩家选择跟牌代码：
@@ -252,8 +252,7 @@ void onPlayerPokerPropertiesChanged(LeanCloud.Player player, Hashtable updatedPr
 Play.RPC("rpcFollow", PlayRPCTargets.MasterClient, Play.Player.ActorID);
 ```
 
-这里 RPC 的发送对象时 PlayRPCTargets.MasterClient，也就是「房主」。由房主做出逻辑运算后，继续游戏。
-Play.Player.ActorID 是当前选择跟牌的用户 ID。
+这里 RPC 的发送对象时 `PlayRPCTargets.MasterClient`，也就是「房主」。由房主做出逻辑运算后，继续游戏。`Play.Player.ActorID` 是当前选择跟牌的用户 ID。
 
 接收跟牌 RPC 回调代码：
 
@@ -350,7 +349,7 @@ public void rpcDiscard(int playerId)
 
 #### 比牌
 
-这里的「比牌」操作做了简化，直接在当前所有参与游戏的玩家列表中，计算手牌的总分，并按分数排序，「第一个玩家」即为胜出者。
+这里的「比牌」操作做了简化，直接在当前所有参与游戏的玩家列表中，计算手牌的总分，并按分数排序，「第一个玩家」即为胜出者，
 
 并通知房间内所有的玩家：胜出者。所有玩家根据当前胜出者是否为「自己」，做出 UI 展示。
 
