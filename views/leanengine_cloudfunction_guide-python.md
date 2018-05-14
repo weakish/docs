@@ -537,3 +537,27 @@ def _conversationUpdate(**params):
 leancloud.use_master_key(True)
 ```
 {% endblock %}
+
+{% block cloudFuncTimeout %}
+
+### 云函数超时
+
+云函数超时时间为 15 秒，如果超过阈值，SDK 将强制向客户端返回 HTTP status code 为 503 的响应，body 为 `The request timed out on the server.`。
+
+#### 超时的处理方案
+
+我们建议将代码中的任务转化为异步队列处理，以优化运行时间，避免云函数或定时任务发生超时。
+
+Python 运行环境使用了 gevent 作为 event loop，所以你可以根据情况自己 gevent.spawn 一个 Greenlet 来处理异步逻辑。例如：
+
+```python
+def handle(req):
+    data = do_some_stuff()
+    
+    @gevent.spawn
+    def stuff_should_be_executed_asynchronously():
+        resp = requests.get('http://time.consuming.api.com/foo', data=data)
+        do_more_stuff(resp.json)
+
+    return # 上面的函数会异步地执行，这里会直接返回
+```
