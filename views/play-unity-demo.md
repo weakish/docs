@@ -59,7 +59,7 @@ public override void OnAuthenticated()
 }
 ```
 
-注意：所有 Play SDK 回调的方法都要注意命名，并且需要添加 [PlayEvent] 属性。
+注意：所有 Play SDK 回调的方法都要注意命名，并且需要添加 `[PlayEvent]` 属性。
 
 ### 创建 / 加入房间
 
