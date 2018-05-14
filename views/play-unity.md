@@ -34,7 +34,6 @@ Play 尚未正式发布，内测正在进行中。<button class="btn btn-sm btn-
 Play 是基于 C# 开发运行在 Unity 的 Mono .NET 下的 SDK，因此开发者需要掌握如下基础知识：
 
 - C# 的编程基础知识，特别是 Attribute、Event 等概念。
-- WebSocket 是什么？如何使用 WebSocket 实现服务端和客户端的互相通信？
 - 帧同步和状态同步的两种网游类型分别是如何实现的？
 
 以上问题答案请开发者自行学习掌握。
@@ -87,7 +86,7 @@ namespace PlayDocSample
             Play.ToggleLog(true);
             // 设置 UserID
             Play.UserID = "Mario";
-            // 声明游戏版本，不同的游戏版本的玩家是不会匹配到同一个房间
+            // 声明游戏版本，不同版本的玩家是不会匹配到同一个房间
             Play.Connect("0.0.1");
         }
 
@@ -108,7 +107,15 @@ namespace PlayDocSample
 
 ## 房间匹配
 
+注意，在游戏当中都有 Lobby(游戏大厅)的概念，而房间都会属于一个 Lobby，当前 Play 默认一个应用下所有的房间都处在同一个 Lobby 下，这个就是全局的大厅（在之后的迭代版本中会根据用户的需求逐渐开放用户自定义的游戏大厅，敬请期待）。
+
 ### 创建房间 PlayRoom
+
+创建房间是游戏开始的前提，只有同在一个房间内的玩家才可以一起玩游戏。
+
+房间的名称是全局唯一的标识，这个标识可以由开发者自己指定也可以由 SDK 内部随机生成，并且在创建房间的同时指定一些配置项，比如房间最大玩家数量之类的。
+
+下面通过几个小节来介绍创建房间的方式以及如何设置各种配置项：
 
 #### 指定房间名
 
@@ -194,8 +201,10 @@ Play.CreateRoom();
 
 这个功能的解决的需求是：只允许一些特定的 ID 玩家可以加入到房间或者当前玩家开好房间，等待一些特定的朋友来加入。示例代码如下：
 
+下面是 `Play.CreateRoom(string roomName = null, IEnumerable<string> expectedUsers = null)` 的两种重载的实例代码：
+
 ```cs
-// 指定 bill 和 steve
+// 指定 bill 和 steve 才可以加入这个房间
 Play.CreateRoom(expectedUsers: new string[] { "bill", "steve" });
 
 // 或者顺便设置一下 Room Name
@@ -211,7 +220,7 @@ Play.CreateRoom("RichMen", new string[] { "bill", "steve" });
 目前 Play 所有的房间最多允许 **10** 人同时在一个房间进行游戏对战，有一些游戏甚至需要设置房间最多人数要更少，比如斗地主只允许 3 个人加入，一旦人满了，其他的人是不可以加入的，因此在创建房间的时候可以设置房间的 MaxPlayerCount：
 
 ```cs
-var roomConfig = PlayRoom.PlayRoomConfig.Default;
+var roomConfig = PlayRoom.RoomConfig.Default;
 
 roomConfig.MaxPlayerCount = 4;
 
@@ -224,7 +233,7 @@ Play.CreateRoom(roomConfig,"max4-room");
 **适用场景**：游戏本身有严格的人数要求，比如三国杀区分 1v1 两人局、五人局、3v3 六人局和标准八人局。下面示例将会创建一个 3v3 六人局的三国杀房间：
 
 ```cs
-var roomConfig = PlayRoom.PlayRoomConfig.Default;
+var roomConfig = PlayRoom.RoomConfig.Default;
 
 roomConfig.MaxPlayerCount = 6;
 // 房间名随机即可，因为 room name 没有必要一定要显示出来
@@ -236,7 +245,7 @@ Play.CreateRoom(roomConfig);
 房间的自定义属性指的是一些 key-value 的键值对，在创建成功之后，云端也会保留一份拷贝（注意这里不是持久化存储，当该房间失效之后所有的自定义属性都会被销毁）。
 
 ```cs
-var roomConfig = PlayRoom.PlayRoomConfig.Default;
+var roomConfig = PlayRoom.RoomConfig.Default;
 
 roomConfig.CustomRoomProperties = new Hashtable()
 {
@@ -256,7 +265,7 @@ Play.CreateRoom(roomConfig);
 创建一个房间后，不希望其他人家加入，比如有一些定时副本，玩家创建好房间之后，等到副本开始之后，再允许其他玩家加入：
 
 ```cs
-var roomConfig = PlayRoom.PlayRoomConfig.Default;
+var roomConfig = PlayRoom.RoomConfig.Default;
 
 roomConfig.IsOpen = false;
 
@@ -269,7 +278,7 @@ Play.CreateRoom(roomConfig);
 创建一个房间的时候选择不可见，这个房间就不会被其他人匹配到（其他人调用 `JoinRandomRoom` 的时候不会参与匹配）：
 
 ```cs
-var roomConfig = PlayRoom.PlayRoomConfig.Default;
+var roomConfig = PlayRoom.RoomConfig.Default;
 
 roomConfig.IsVisible = false;
 
@@ -310,6 +319,7 @@ public class SampleJoinRoom : PlayMonoBehaviour
         Play.UserID = "Mario";
         // 声明游戏版本，不同游戏版本的玩家会被分配在不同的隔离区域中
         Play.Connect("0.0.1");
+        // 如果鉴权成功则会触发 OnAuthenticated 回调
     }
 
 
@@ -380,7 +390,10 @@ Play.JoinRandomRoom(randomLobbyMatchKeys);
 
 加入成功则会回调 `OnJoinedRoom`，加入失败则会回调 `OnJoinRoomFailed`。
 
-注意，不可见的房间是不会参与随机房间的匹配的。
+注意，根据条件随机加入有如下店址：
+
+1. 不可见的房间是不会参与随机房间的匹配
+2. 目前只支持条件想等的匹配，比如我们不支持 rankPoints 小于 3000 的这种匹配
 
 ### 加入或者创建
 
@@ -399,7 +412,7 @@ var createWithAttributes = new Hashtable
     { "rankPoints", 1000 }
 };
 
-var roomConfig = PlayRoom.PlayRoomConfig.Default;
+var roomConfig = PlayRoom.RoomConfig.Default;
 
 roomConfig.CustomRoomProperties = createWithAttributes;
 
@@ -478,12 +491,12 @@ public override void OnMasterClientSwitched(Player masterPlayer)
 - string
 - 数字类型，像 byte、int、float、double 等基础类型都支持。
 - 字典类型 Dictionary
-- List 类型，如梦 List<int>、List<string> 等。
+- List 类型，如 List<int>、List<string> 等。
 
 未来会支持更多类型，包括 Hashtable 或者是自定义类型。
 
 ```cs
-var roomConfig = PlayRoom.PlayRoomConfig.Default;
+var roomConfig = PlayRoom.RoomConfig.Default;
 roomConfig.CustomRoomProperties = new Hashtable()
 {
     { "vip", ture },
@@ -594,7 +607,7 @@ Play.Player.CustomProperties = cards;
 
 RPC 是提供给开发者自定义消息的一种方式，开发者可以通过定义 RPC ，发送 RPC 消息来实现多端的通信。
 
-注意，当前玩家必须处于一个房间内才可以发送 RPC 游戏，否则 RPC 消息不会触发。
+注意，当前玩家必须处于一个房间内才可以发送 RPC 消息，否则 RPC 消息不会触发。
 
 另外，SDK 内置的回调都会有 `[PlayEvent]`，而开发者自定义的 RPC 回调则必须有 `[PlayRPC]` 修饰符。
 
@@ -630,7 +643,7 @@ Play.RPC("OnSomebodySayHello", PlayRPCTargets.All, "hello");
 Play.RPC("OnSomebodySayHello", PlayRPCTargets.Others, "hello");
 ```
 
-该消息希望被缓存，当前在线的玩家实时接收，并且后来加入的玩家在加入房间之后，也能收到:
+该消息是需要被缓存的，当前在线的玩家实时接收，并且后来加入的玩家在加入房间之后，也能收到:
 
 ```cs
 Play.RPC("OnSomebodySayHello", PlayRPCTargets.OthersBuffered, "hello");
@@ -668,7 +681,7 @@ var room = Play.Room;
 ```cs
 var players = Play.Players;
 
-// 获取通过 room 来获取
+// 通过 room 来获取
 var playersInRoom = Play.Room.Players;
 
 // 以上两行语句获取的列表是一样的
@@ -706,6 +719,7 @@ SDK 内置了断线重连的机制，但是 SDK 重连的逻辑如下：
 1. 发现连接断开（网络异常或者其他原因导致 WebSocket 失效），SDK 会触发 `OnDisconnected` 回调。
 2. 尝试重新打开 WebSocket 连接，但是并没有重新加入到原来的房间。
 3. SDK 提供了重新加入房间的接口（参照随后的示例代码），发生掉线之后，开发者需要根据自身的游戏行为来判断是否要主动重新加入到原来的房间，比如某些竞速类的游戏掉线了就可能会被踢出房间。
+4. 调用 `Play.RejoinRoom()` 之后可以通过监听 `OnRejoinRoomFailed` 来判断房间是否失效或者是其他什么原因导致重新加入失败的。
 
 ```cs
 [PlayEvent]
