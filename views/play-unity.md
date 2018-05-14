@@ -22,30 +22,26 @@ Play 解决了如下几种游戏场景的服务端需求（包括但不限于）
 - 卡牌棋牌桌游
 - 战棋
 
-因此，Play 提供的服务简而言之就是
-
-> 针对有强联网需求的网络游戏，提供了一整套的客户端 SDK 解决方案，不再需要自建服务端，省去了大多数的开发和运维成本。
+> Play 为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。
 
 ## 内测申请
 
-Play 正在内测中，如果您没有内测资格，请[查看并申请内测](https://blog.leancloud.cn/6177/)。
+Play 尚未正式发布，内测正在进行中。<button class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
 
 
 ## 必备的基础知识
 
 Play 是基于 C# 开发运行在 Unity 的 Mono .NET 下的 SDK，因此开发者需要掌握如下基础知识：
 
-- C# 的编程基础知识，重点是：Attribute，Event 等概念。
+- C# 的编程基础知识，特别是 Attribute、Event 等概念。
 - WebSocket 是什么？如何使用 WebSocket 实现服务端和客户端的互相通信？
 - 帧同步和状态同步的两种网游类型分别是如何实现的？
 
 以上问题答案请开发者自行学习掌握。
 
-## SDK 的下载和导入以及初始化
+## SDK 导入和初始化
 
-### 下载获取动态链接库
-
-请阅读[安装和初始化](play-quick-start.html#安装和初始化)
+请阅读 [安装和初始化](play-quick-start.html#安装和初始化)，获取动态链接库。
 
 ### 打开客户端日志
 
@@ -60,11 +56,11 @@ Play.ToggleLog();
 
 Play 目前只需要客户端设置一个 UserID 就可以直接连接云端，这个 UserID 拥有如下限制：
 
-- 不支持中文和特殊字符（例如，！@#￥%……&*（）等，可以是下划线 _)
+- 不支持中文和特殊字符（包括 `，！@#￥%……&*（）` 等），但可以是下划线 `_`。
 - 长度不能超过 64 字符
 - 一个应用内全局唯一
 
-案例：使用 hjiang 作为 UserID 连接云端服务器，成功之后服务端会回调 `OnAuthenticated`：
+下面我们使用 Mario 作为 UserID 连接云端服务器，成功之后服务端会回调 `OnAuthenticated`：
 
 ```cs
 using LeanCloud;
@@ -90,7 +86,7 @@ namespace PlayDocSample
             // 打开调试日志
             Play.ToggleLog(true);
             // 设置 UserID
-            Play.UserID = "hjiang";
+            Play.UserID = "Mario";
             // 声明游戏版本，不同的游戏版本的玩家是不会匹配到同一个房间
             Play.Connect("0.0.1");
         }
@@ -107,16 +103,15 @@ namespace PlayDocSample
 
 ### 重要的步骤
 
-在上述的实例中可以看见，代码中声明了一个 `ConnectSample` 类，它继承自 `PlayMonoBehaviour` ，并且在一定会有一个无参的构造函数，并且调用了父类的 `base()` 构造函数，最后要为所有的事件回调加上 `[PlayEvent]` 属性标记，这些都是**必须的**，之后的实例代码都会如此做，开发者的代码也需要遵守这一约定，少了一项，事件回调就不会生效。
+在上面的例子中可以看见，代码声明了一个 `ConnectSample` 类，它继承自 `PlayMonoBehaviour`，并要包含一个无参的构造函数，且构造函数需要调用父类的构造函数 `base()`，最后要为所有的事件回调加上 `[PlayEvent]` 属性标记，这些都是**必须的**。后面的示例代码都会如此，开发者的代码也需要遵守这一约定，少了一项，事件回调就不会生效。
 
 
 ## 房间匹配
 
-### 创建房间(PlayRoom)
+### 创建房间 PlayRoom
 
 #### 指定房间名
 
-##### 基础用法
 ```cs
 using LeanCloud;
 
@@ -126,7 +121,7 @@ namespace TestUnit.NetFx46.Docs
     public class SampleCreateRoom : PlayMonoBehaviour
     {
         /// <summary>
-        /// 并且一定要定无参数的构造函数，而且一定要调用父类的构造函数
+        /// 一定要有无参数的构造函数，而且一定要调用父类的构造函数
         /// </summary>
         public SampleCreateRoom() : base()
         {
@@ -138,7 +133,7 @@ namespace TestUnit.NetFx46.Docs
             // 打开调试日志
             Play.ToggleLog(true);
             // 设置 UserID
-            Play.UserID = "hjiang";
+            Play.UserID = "Mario";
             // 声明游戏版本，不同游戏版本的玩家会被分配在不同的隔离区域中
             Play.Connect("0.0.1");
         }
@@ -178,52 +173,42 @@ namespace TestUnit.NetFx46.Docs
 
 ```
 
-注：因为创建房间的逻辑和顺序都一致，因此本小节之后介绍创建房间时，为了更好的阅读体验和强调重点，不再给出每一种回调的实例代码，请参照上述代码即可。
+注：因为创建房间的逻辑和顺序都一致，因此本小节之后介绍创建房间时，为了突出重点及更好的阅读体验，我们将不再给出每一种回调的实例代码，请参照上述代码即可。
 
+**适用场景**：根据用户输入名称创建房间。
 
-##### 适用场景  
-
-* 根据用户输入名称创建房间
-  ```cs
-  var roomName = inputLable.text;
-  Play.CreateRoom(roomName);
-  ```
+```cs
+var roomName = inputLable.text;
+Play.CreateRoom(roomName);
+```
 
 #### 随机房间名
 
-##### 基础用法
-如果不传入任何参数创建房间，**客户端会随机生成一个名称**，这个不用开发者担心，算法是经过测试，名字重复的概率约等于 GUID 重复的概率，所以几乎不可能。
+如果不传入任何参数创建房间，**客户端会随机生成一个名称**。这个不用开发者担心，算法是经过测试，名字重复的概率约等于 GUID 重复的概率，所以几乎不可能。
 
 ```cs
 Play.CreateRoom();
 ```
 
-#### 指定玩家 ID 
+#### 指定玩家 ID
 
-##### 基础用法
-
-这个功能的解决的需求是：只允许一些特定的 ID 玩家可以加入到房间或者当前玩家开好房间，等待一些特定的朋友来加入。实例代码如下：
+这个功能的解决的需求是：只允许一些特定的 ID 玩家可以加入到房间或者当前玩家开好房间，等待一些特定的朋友来加入。示例代码如下：
 
 ```cs
 // 指定 bill 和 steve
 Play.CreateRoom(expectedUsers: new string[] { "bill", "steve" });
 
-// 或者一起顺便设置一下 Room Name
+// 或者顺便设置一下 Room Name
 Play.CreateRoom("RichMen", new string[] { "bill", "steve" });
 ```
 
-注意，这种方式创建成功之后，被指定的玩家（例如上述代码中的 steve）也还需要调用一次 `JoinRoom("RichMen")` 主动加入到这个房间，`Play.CreateRoom(new string[] { "bill", "steve" });` 只是表示 bill 和 steve 已经把房间位置给「占位」了，但是等到他们自己上线之后，还需要主动加入才能真正进入房间。
+注意，这种方式创建成功之后，被指定的玩家（例如上述代码中的 steve）也还需要调用一次 `JoinRoom("RichMen")` 主动加入到这个房间。`Play.CreateRoom(new string[] { "bill", "steve" });` 只是表示 bill 和 steve 已经把房间位置给「占位」了，但是等到他们自己上线之后，还需要主动加入才能真正进入房间。
 
-##### 适用场景
-
-* 好友组局一起玩游戏
-  代码参照基础用法里面的示例。
+**适用场景**：好友组局一起玩游戏（代码参照基础用法里面的示例）。
 
 #### 限制玩家人数
 
-##### 基础用法
-
-目前 Play 所有的房间最多允许 **10** 人同时在一个房间进行游戏对战，有一些游戏甚至需要设置房间最多只有更少的人，比如斗地主只允许 3 个人加入，一旦人满了，其他的人是不可以加入的，因此在创建房间的时候可以设置房间的 MaxPlayerCount：
+目前 Play 所有的房间最多允许 **10** 人同时在一个房间进行游戏对战，有一些游戏甚至需要设置房间最多人数要更少，比如斗地主只允许 3 个人加入，一旦人满了，其他的人是不可以加入的，因此在创建房间的时候可以设置房间的 MaxPlayerCount：
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -236,10 +221,8 @@ Play.CreateRoom(roomConfig);
 Play.CreateRoom(roomConfig,"max4-room");
 ```
 
-##### 适用场景
+**适用场景**：游戏本身有严格的人数要求，比如三国杀区分 1v1 两人局、五人局、3v3 六人局和标准八人局。下面示例将会创建一个 3v3 六人局的三国杀房间：
 
-* 游戏本身有严格的人数要求，比如三国杀区分 1v1 两人局/五人局/3v3 六人局和标准八人局
-  下面示例将会创建一个 3v3 六人局的三国杀房间：
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
 
@@ -250,7 +233,7 @@ Play.CreateRoom(roomConfig);
 
 ### 设置房间的自定义属性
 
-房间的自定义属性指的是一些 key-value 的键值对，在创建成功之后，云端也会保留一份拷贝(注意这里不是持久化存储，当该房间失效之后所有的自定义属性都会被销毁)
+房间的自定义属性指的是一些 key-value 的键值对，在创建成功之后，云端也会保留一份拷贝（注意这里不是持久化存储，当该房间失效之后所有的自定义属性都会被销毁）。
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -265,12 +248,12 @@ roomConfig.LobbyMatchKeys = new string[] { "rankPoints" };
 Play.CreateRoom(roomConfig);
 ```
 
-此处需要配合 [#根据条件随机加入](根据条件随机加入)来理解 LobbyMatchKeys 的作用。
+此处需要配合 [根据条件随机加入](#根据条件随机加入) 来理解 `LobbyMatchKeys` 的作用。
 
 
 ### 是否开放房间允许别人加入
 
-创建一个房间，然后不希望其他人家加入，比如有一些定时副本，玩家创建好房间之后，等到副本开始之后，再允许其他玩家加入：
+创建一个房间后，不希望其他人家加入，比如有一些定时副本，玩家创建好房间之后，等到副本开始之后，再允许其他玩家加入：
 
 ```cs
 var roomConfig = PlayRoom.PlayRoomConfig.Default;
@@ -308,8 +291,6 @@ Play.CreateRoom(roomConfig);
 
 #### 根据 Name 加入
 
-##### 基础用法
-
 ```cs
 public class SampleJoinRoom : PlayMonoBehaviour
 {
@@ -326,7 +307,7 @@ public class SampleJoinRoom : PlayMonoBehaviour
         // 打开调试日志
         Play.ToggleLog(true);
         // 设置 UserID
-        Play.UserID = "hjiang";
+        Play.UserID = "Mario";
         // 声明游戏版本，不同游戏版本的玩家会被分配在不同的隔离区域中
         Play.Connect("0.0.1");
     }
@@ -360,17 +341,14 @@ public class SampleJoinRoom : PlayMonoBehaviour
 
 加入成功则会回调 `OnJoinedRoom`，加入失败则会回调 `OnJoinRoomFailed`。
 
-##### 适用场景
+**适用场景**：与好友一起游戏。用户自己输入了一个房间名，并且创建成功，然后通过聊天工具告诉了好友，然后好友通过房间名直接加入进来。
 
-* 与好友一起游戏 - 用户自己输入了一个房间名，并且创建成功，然后通过聊天工具告诉了好友，然后好友通过房间名直接加入进来
-  ```cs
-  var roomName = "get_from_qq";
-  Play.JoinRoom(roomName);
-  ```
+```cs
+var roomName = "get_from_qq";
+Play.JoinRoom(roomName);
+```
 
 #### 随机加入
-
-##### 基础用法
 
 随机加入任何一个开放的有空位的房间：
 
@@ -380,17 +358,13 @@ Play.JoinRandomRoom();
 
 除非是所有可用的房间都满员了，才会出现随机加入失败的情况，一般情况下都会成功。
 
-如果随机加入失败，会触发 `OnJoinedRoomFailed` 回调，可以选择在这个回调里面继续[创建房间](#创建房间)。
+如果随机加入失败，会触发 `OnJoinedRoomFailed` 回调，可以选择在这个回调里面继续 [创建房间](#创建房间)。
 
 注意，不可见的房间是不会参与随机房间的匹配的。
 
-##### 适用场景
-
-* 快速加入已有房间（不创建新的房间）
+**适用场景**：快速加入已有房间（不创建新的房间）
 
 #### 根据条件随机加入
-
-##### 基础用法
 
 配合前面的[设置房间的自定义属性](#设置房间的自定义属性)的代码：
 
@@ -410,19 +384,14 @@ Play.JoinRandomRoom(randomLobbyMatchKeys);
 
 ### 加入或者创建
 
-#### 基础用法 
-
 解决的需求是：优先检测传入的 room name 对应的房间是否存在，如果存在就直接加入，如果不存在，就直接创建：
-
-
-对应的实例代码如下：
 
 ```cs
 var roomName = "i-want-this-name";
 Play.JoinOrCreate(roomName);
 ```
 
-或者指定一些 key-value 的自定义属性，例如，我要加入一个指定名字的房间，如果没有不存在，请帮我创建这个房间并且把我指定的自定义属性也赋值给房间：
+或者指定一些 key-value 的自定义属性，例如，我要加入一个指定名字的房间，如果不存在，请帮我创建这个房间并且把我指定的自定义属性也赋值给房间：
 
 ```cs
 var createWithAttributes = new Hashtable
@@ -441,10 +410,7 @@ Play.JoinOrCreate(roomConfig);
 
 如果加入成功则会回调 `OnJoinedRoom`，如果是创建成功，则会先调用 `OnCreatedRoom` 然后再调用 `OnJoinedRoom`。
 
-#### 适用场景
-
-* 两人（或者多人）约定了一个房间名，但是这些人进入游戏的时间不一样，因此所有人都调用 `JoinOrCreate` 并且传入一样的名字，则 SDK 会确保这些人一定会加入到一个相同的房间内。
-
+**适用场景**：两人（或者多人）约定了一个房间名，但是这些人进入游戏的时间不一样，因此所有人都调用 `JoinOrCreate` 并且传入一样的名字，则 SDK 会确保这些人一定会加入到一个相同的房间内。
 
 ## 开始游戏
 
@@ -479,15 +445,16 @@ Play.FetchRoomList(reset:true);
 即使掉线了，只要重连回来，SDK 都会记录查询的索引标记，可以继续调用 `Play.FetchRoomList()` 来获取更多的房间。 
 
 
-注意：房间的变化频率较快，所以本地 SDK 并没有做缓存，调用加入之后，需要监听加入的回调来判断是否真正加入成功，详细请看下一章节[加入房间](#加入房间)。-->
+注意：房间的变化频率较快，所以本地 SDK 并没有做缓存，调用加入之后，需要监听加入的回调来判断是否真正加入成功，详细请看 [加入房间](#加入房间)。
+-->
 
 ## MasterClient
 
-结合前面两大章节，我们需要明确一点，在无服务端进行网游对战的时候，通常都会有一个主机的概念（参照魔兽争霸局域网游戏里面的创建房间的 Host），因此 Play 提供了一个 MasterClient 的概念，MasterClient 指的就是房间 Host 玩家，它可能由以下几种玩家承担：
+结合前面的章节，我们需要明确一点，在无服务端进行网游对战的时候，通常都会有一个主机的概念（参照魔兽争霸局域网游戏里面的创建房间的 Host），因此 Play 提供了一个 MasterClient 的概念，指的就是房间 Host 玩家，它可能由以下几种玩家承担：
 
-1. 房间最初的创建者，在他加入之后，自动成为第一任 MasterClient
-2. A 创建了房间，随后 B 和 C 加入，然后因为 A 的网络异常，TA 掉线了，这个时候服务端会从现有的 B 和 C 里面挑选一个座位新任的 MasterClient，并且会下发 `OnMasterClientSwitched` 的事件回调通知
-3. 前面条件 2 在 A 回来之后，A 也不会重新成为 MasterClient
+1. 房间最初的创建者，在他加入之后，自动成为第一任 MasterClient。
+2. A 创建了房间，随后 B 和 C 加入，然后因为 A 的网络异常，TA 掉线了，这个时候服务端会从现有的 B 和 C 里面挑选一个作为新任的 MasterClient，并且会下发 `OnMasterClientSwitched` 的事件回调通知
+3. 在 A 回来之后，A 也不会重新成为 MasterClient。
 
 如下代码演示如何监听 MasterClient 产生变化的事件回调：
 
@@ -505,13 +472,13 @@ public override void OnMasterClientSwitched(Player masterPlayer)
 
 ### 初始化房间属性
 
-[设置房间的自定义属性](#设置房间的自定义属性)小节里面的代码就是初始化房间属性的代码，这里要详细描述一下自定义属性支持的类型：
+[设置房间的自定义属性](#设置房间的自定义属性) 小节里面的代码就是初始化房间属性的代码，这里要详细描述一下自定义属性支持的类型：
 
 - bool
 - string
-- 数字类型(byte,int,float,double等基础类型都支持)
+- 数字类型，像 byte、int、float、double 等基础类型都支持。
 - 字典类型 Dictionary
-- List 类型(List<int>,List<string>等)
+- List 类型，如梦 List<int>、List<string> 等。
 
 未来会支持更多类型，包括 Hashtable 或者是自定义类型。
 
@@ -542,10 +509,9 @@ public override void OnJoinedRoom()
 }
 ```
 
-### CAS(check and save) 修改模式
-为了原子化操作属性，也是为了防止冲突，Play 也支持 CAS 的模式修改属性：
+### CAS 原子修改模式
 
-实例代码如下：
+为了原子化操作属性，也是为了防止冲突，Play 也支持以 CAS (check and save) 模式修改属性：
 
 ```cs
 [PlayEvent]
@@ -580,9 +546,9 @@ public override void OnRoomCustomPropertiesUpdated(Hashtable updatedProperties)
 }
 ```
 
-## 玩家(Player)的自定义属性
+## 玩家的自定义属性
 
-玩家的自定义属性与房间的自定义属性无本质差别，对外暴露的接口都是一个 Hashtable，操作也几近类似，只是事件回调不一样。
+玩家（Player）的自定义属性与房间的自定义属性无本质差别，对外暴露的接口都是一个 Hashtable，操作也几近类似，只是事件回调不一样。
 
 ### 初始化玩家属性
 
@@ -621,10 +587,10 @@ cards.Add("cards", new string[] { "1", "2", "3" });
 Play.Player.CustomProperties = cards;
 ```
 
-上述操作也会触发 `OnPlayerCustomPropertiesChanged`
+上述操作也会触发 `OnPlayerCustomPropertiesChanged`。
 
 
-## 远程调用函数 - RPC
+## RPC 远程调用函数 
 
 RPC 是提供给开发者自定义消息的一种方式，开发者可以通过定义 RPC ，发送 RPC 消息来实现多端的通信。
 
@@ -689,7 +655,7 @@ public override void OnLeftRoom()
 
 ## 内置的属性访问器
 
-通过 SDK 开放的属性访问器，可以快捷的读取如下信息：
+通过 SDK 开放的属性访问器，可以快捷地读取如下信息：
 
 ### 当前加入的房间
 
@@ -737,11 +703,9 @@ var gameVersion = Play.GameVersion;
 
 SDK 内置了断线重连的机制，但是 SDK 重连的逻辑如下：
 
-1. 发现连接断开（网络异常或者其他原因导致 websocket 失效），SDK 会触发 `OnDisconnected` 回调
-2. 尝试重新打开 websocket 连接，但是并没有重新加入到原来的房间
-3. SDK 提供了重新加入房间的接口（参照随后的实例代码），发生掉线之后，开发者需要根据自身的游戏行为来判断是否要主动重新加入到原来的房间(比如某些竞速类的游戏掉线了就可能会被剔除房间)
-
-实例代码如下：
+1. 发现连接断开（网络异常或者其他原因导致 WebSocket 失效），SDK 会触发 `OnDisconnected` 回调。
+2. 尝试重新打开 WebSocket 连接，但是并没有重新加入到原来的房间。
+3. SDK 提供了重新加入房间的接口（参照随后的示例代码），发生掉线之后，开发者需要根据自身的游戏行为来判断是否要主动重新加入到原来的房间，比如某些竞速类的游戏掉线了就可能会被踢出房间。
 
 ```cs
 [PlayEvent]
