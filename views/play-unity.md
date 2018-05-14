@@ -206,10 +206,10 @@ Play.CreateRoom();
 
 ```cs
 // 指定 bill 和 steve
-Play.CreateRoom(new string[] { "bill", "steve" });
+Play.CreateRoom(expectedUsers: new string[] { "bill", "steve" });
 
 // 或者一起顺便设置一下 Room Name
-Play.CreateRoom(new string[] { "bill", "steve" },"RichMen");
+Play.CreateRoom("RichMen", new string[] { "bill", "steve" });
 ```
 
 注意，这种方式创建成功之后，被指定的玩家（例如上述代码中的 steve）也还需要调用一次 `JoinRoom("RichMen")` 主动加入到这个房间，`Play.CreateRoom(new string[] { "bill", "steve" });` 只是表示 bill 和 steve 已经把房间位置给「占位」了，但是等到他们自己上线之后，还需要主动加入才能真正进入房间。
