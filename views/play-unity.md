@@ -88,6 +88,7 @@ namespace PlayDocSample
             Play.UserID = "Mario";
             // 声明游戏版本，不同版本的玩家是不会匹配到同一个房间
             Play.Connect("0.0.1");
+            // 如果成功则会回调 OnAuthenticated
         }
 
 
