@@ -273,6 +273,12 @@ roomConfig.IsOpen = false;
 Play.CreateRoom(roomConfig);
 ```
 
+如果在某一个时刻，希望重新打开房间，允许其他人加入，只需要将这个属性设置成 true 即可：
+
+```cs
+Play.Room.IsOpen = true;
+```
+
 ### 房间是否可见
 
 创建一个房间的时候选择不可见，这个房间就不会被其他人匹配到（其他人调用 `JoinRandomRoom` 的时候不会参与匹配）：
