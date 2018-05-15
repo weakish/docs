@@ -47,7 +47,7 @@ Play.CreateRoom();
 #### 和好友一起玩
 只要好友都知道房间的名字，就可以同时加入某个房间。如果房间不可见，不知道房间名字的人无法加入。如果房间设置为可见，则会有其他玩家匹配进来。
 ```cs
-var roomConfig = PlayRoom.PlayRoomConfig.Default;
+var roomConfig = PlayRoom.RoomConfig.Default;
 // 房间设置不可见，即不允许朋友之外的人加入。
 roomConfig.IsVisible = false;
 Play.JoinOrCreateRoom(roomConfig, nameEveryFriendKnows);
