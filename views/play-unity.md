@@ -399,7 +399,7 @@ Play.JoinRandomRoom(randomLobbyMatchKeys);
 注意，根据条件随机加入有如下店址：
 
 1. 不可见的房间是不会参与随机房间的匹配
-2. 目前只支持条件想等的匹配，比如我们不支持 rankPoints 小于 3000 的这种匹配
+2. 目前只支持条件相等的匹配，比如我们不支持 rankPoints 小于 3000 的这种匹配
 
 ### 加入或者创建
 
