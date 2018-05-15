@@ -144,6 +144,7 @@ namespace TestUnit.NetFx46.Docs
             Play.UserID = "Mario";
             // 声明游戏版本，不同游戏版本的玩家会被分配在不同的隔离区域中
             Play.Connect("0.0.1");
+            // 如果成功则会回调 OnAuthenticated
         }
 
 
