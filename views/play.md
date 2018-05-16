@@ -67,15 +67,11 @@ Play 中使用 MasterClient 在客户端担任运算主机的概念。 游戏中
 
 具体发消息流程如下：
 1. Player A 使用 `Play.RPC` 接口指定调用 `rpcFollow` 方法，通知 MasterClient 自己跟牌完成。
-
-```cs
+    ```cs
 Play.RPC("rpcFollow", PlayRPCTargets.MasterClient, Play.Player.ActorID);
-
-```
-
+    ```
 2. MasterClient 中的 `rpcFollow` 会触发。MasterClient 在 `rpcFollow` 中计算出下一位操作的用户是 PlayerB，然后使用`Play.RPC` 接口指定调用 `rpcNext` 方法，通知所有玩家当前需要 PlayerB 操作。
-
-```cs
+    ```cs
 // 提前定义的名为 rpcFollow 方法，此时这个方法被自动触发。
 [PlayRPC]
 public void rpcFollow(int playerId) 
@@ -85,11 +81,9 @@ public void rpcFollow(int playerId)
   // 通知所有玩家下一步需要 PlayerB 操作。
   Play.RPC("rpcNext", PlayRPCTargets.All, PlayerBId);
 }
-```
-
+    ```
 3. 所有玩家的 `rpcNext` 方法被触发。
-
-```cs
+    ```cs
 // 提前定义的名为 rpcNext 方法，此时这个方法被自动触发。
 [PlayRPC]
 public void rpcNext(int playerId) 
@@ -97,7 +91,7 @@ public void rpcNext(int playerId)
   // 告诉所有用户当前需要 playerId 操作。
   Debug.Log("Next Player: " + playerId);
 }
-```
+    ```
 
 更详细的用法及介绍，请参考 [masterClient](play-unity.html#MasterClient) 及 [远程调用函数 - RPC](play-unity.html#远程调用函数-RPC)
 
