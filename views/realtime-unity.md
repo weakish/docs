@@ -33,11 +33,9 @@ LeanCloud 实时消息是基于 WebSocket 和私有通讯协议实现的一套�
 下载之后解压，把里面包含的所有的 Dll 文件（除去 `UnityEngine.dll`）都引入到 Unity 的 `Assets/LeanCloud` 文件夹（在 `Assets` 下面新建一个 `LeanCloud` 文件夹用来存放 LeanCloud SDK）下即可。
 
 ### 初始化
-初始化**必须**在 Unity Editor 上将 `AVInitializeBehaviour`(在 LeanCloud.Core 命名空间下) 以及 `AVRealtimeBehavior`(在 LeanCloud.Realtime 命名空间下) 挂载在某一个 GameObject 下，如下图：
+初始化**必须**在某个 GameObject 上挂载 `AVRealtimeBehavior`(在 LeanCloud.Realtime 命名空间下)，如下图：
 
-![AVInitializeBehaviour&AVRealtimeBehavior](https://dn-lhzo7z96.qbox.me/1497505703771)
-
-![mount](https://dn-lhzo7z96.qbox.me/1497505560763)
+![AVRealtimeBehavior](images/unity/avrealtimeinitializebehaviour.png)
 
 ### 打开调试日志
 ```cs
