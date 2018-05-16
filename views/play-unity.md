@@ -26,7 +26,7 @@ Play 解决了如下几种游戏场景的服务端需求（包括但不限于）
 
 ## 内测申请
 
-Play 尚未正式发布，内测正在进行中。<button class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
+Play 尚未正式发布，内测正在进行中。<a class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
 
 
 ## 必备的基础知识

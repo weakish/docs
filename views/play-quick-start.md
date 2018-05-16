@@ -2,7 +2,7 @@
 
 欢迎使用 LeanCloud Play。本教程将模拟一个比较玩家点数大小的场景来讲解 Play SDK 的核心使用方法。
 
-Play 尚未正式发布，内测正在进行中。<button class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
+Play 尚未正式发布，内测正在进行中。<a class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
 
 我们推荐通过以下方法来学习：
 
