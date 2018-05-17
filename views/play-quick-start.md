@@ -11,7 +11,7 @@ Play 尚未正式发布，内测正在进行中。<a class="btn btn-sm btn-defau
 
 ## 安装和初始化
 
-下载 [Play-SDK-dotNET](https://github.com/leancloud/Play-SDK-dotNET/releases)，将 dll 拖拽至 Unity 工程的 Plugins 目录，如图：
+Play 客户端 SDK 是开源的，源码地址请访问：[Play-SDK-dotNET](https://github.com/leancloud/Play-SDK-dotNET)， 下载请访问 [Play-SDK-dotNET@Release](https://github.com/leancloud/Play-SDK-dotNET/releases)。
 
 下载之后导入到 Unity 的 `Assets/Plugins` 文件里，如下图：
 
