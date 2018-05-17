@@ -30,27 +30,132 @@ Play.Connect("0.0.1");
 ```
 
 ### 玩家匹配
-#### 随机加入房间
+#### 随机匹配
+单人玩游戏时，最常见的场景是随机匹配其他玩家迅速开始。具体实现步骤如下：
+
+1、调用 `JoinRandomRoom` 开始匹配。
 
 ```cs
-// 随机加入
 Play.JoinRandomRoom();
 ```
 
-如果所有的房间都满员了，会出现随机加入失败的情况，这样 `OnJoinRoomFailed` 方法会被触发，此时可以创建房间等待其他人加入：
+2、在顺利情况下，会进入某个有空位的房间开始游戏。
 
 ```cs
-// 创建房间，随机匹配创建房间时不需要传入房间名称
-Play.CreateRoom();
+[PlayEvent]
+public override void OnJoinedRoom()
+{
+  Play.Log("OnJoinedRoom");
+}
+```
+
+
+3、如果没有空房间，就会加入失败。此时在失败触发的回调中建立一个房间等待其他人加入，建立房间时：
+* 不需要关心房间名称。
+* 默认一个房间内最大人数是 10，可以通过设置 MaxPlayerCount 来限制最大人数。
+
+```cs
+// 加入失败时，这个回调会被触发
+[PlayEvent]
+public override void OnJoinRoomFailed(int errorCode, string reason)
+{
+  var roomConfig = PlayRoom.RoomConfig.Default;
+  // 设置最大人数，当房间满员时，服务端不会再匹配新的用户进来。
+  roomConfig.MaxPlayerCount = 4;
+  // 创建房间
+  Play.CreateRoom(roomConfig);
+}
+
+```
+
+#### 自定义房间匹配规则
+
+有的时候我们希望将水平差不多的用户匹配到一起。例如当前玩家 5 级，他只能和 0-10 级的玩家匹配，10 以上的玩家无法被匹配到。这个场景可以通过给房间设置属性来实现，具体实现逻辑如下：
+
+1、确定匹配属性，例如 0-10 级是 level-1，10 以上是 level-2。
+
+```cs
+int matchLevel = 0;
+if (level < 10) {
+  matchLevel = 1;
+} else
+  matchLevel = 2;
+}
+```
+
+2、根据匹配属性加入房间
+
+```cs
+Hashtable matchProp = new Hashtable();
+matchProp.Add("matchLevel", matchLevel);
+Play.JoinRandomRoom(matchProp);
+```
+
+3、如果随机加入房间失败，则创建具有匹配属性的房间等待其他同水平的人加入。
+
+```cs
+[PlayEvent]
+public void OnRandomJoinRoomFailed() {
+  PlayRoom.RoomConfig config = new PlayRoom.RoomConfig() {
+    CustomRoomProperties = matchProp
+    LobbyMatchKeys = new string[] { "matchLevel" }
+  };
+  Play.CreateRoom(config);
+}
 ```
 
 #### 和好友一起玩
-只要好友都知道房间的名字，就可以同时加入某个房间。如果房间不可见，不知道房间名字的人无法加入。如果房间设置为可见，则会有其他玩家匹配进来。
+
+假设 PlayerA 希望能和好基友 PlayerB 一起玩游戏，这时又分以下两种情况：
+
+* 只是两个人一起玩，不允许陌生人加入
+* 好友和陌生人一起玩
+
+##### 不允许陌生人加入
+1、PlayerA 创建房间，设置房间不可见，这样其他人就不会被随机匹配到 PlayerA 创建的房间中。
+
 ```cs
-var roomConfig = PlayRoom.RoomConfig.Default;
-// 房间设置不可见，即不允许朋友之外的人加入。
-roomConfig.IsVisible = false;
-Play.JoinOrCreateRoom(roomConfig, nameEveryFriendKnows);
+PlayRoom.RoomConfig config = new PlayRoom.RoomConfig() {
+  IsVisible = false,
+};
+Play.CreateRoom(config, roomName);
+```
+
+2、PlayerA 通过某种通信方式（例如 [LeanCloud 实时通信](realtime_v2.html)）将房间名称告诉 PlayerB。
+
+
+3、PlayerB 根据房间名称加入到房间中。
+
+```cs
+Play.JoinRoom(roomName);
+```
+
+##### 好友和陌生人一起玩
+PlayerA 通过某种通信方式（例如 [LeanCloud 实时通信](realtime_v2.html)）邀请 PlayerB，PlayerB 接受邀请。
+
+1、PlayerA 和 PlayerB 一起组队进入某个房间
+
+```cs
+Play.JoinRandomRoom(expectedUsers: new string[] { "playerA", "playerB" });
+```
+
+2、如果有足够空位的房间，加入成功。
+
+```cs
+[PlayEvent]
+public override void OnJoinedRoom()
+{
+  Play.Log("OnJoinedRoom");
+}
+```
+
+3、如果没有合适的房间则创建并加入房间： 
+
+```cs
+[PlayEvent]
+public void OnRandomJoinRoomFailed() {
+  Play.JoinOrCreate(expectedUsers: new string[] { "playerA", "playerB" });
+}
 ```
 
 更多匹配接口请参考文档 [房间匹配](play-unity.html#房间匹配)。
@@ -66,12 +171,16 @@ Play 中使用 MasterClient 在客户端担任运算主机的概念。 游戏中
 
 
 具体发消息流程如下：
-1. Player A 使用 `Play.RPC` 接口指定调用 `rpcFollow` 方法，通知 MasterClient 自己跟牌完成。
-    ```cs
+
+1、Player A 使用 `Play.RPC` 接口指定调用 `rpcFollow` 方法，通知 MasterClient 自己跟牌完成。
+
+```cs
 Play.RPC("rpcFollow", PlayRPCTargets.MasterClient, Play.Player.ActorID);
-    ```
-2. MasterClient 中的 `rpcFollow` 会触发。MasterClient 在 `rpcFollow` 中计算出下一位操作的用户是 PlayerB，然后使用`Play.RPC` 接口指定调用 `rpcNext` 方法，通知所有玩家当前需要 PlayerB 操作。
-    ```cs
+```
+
+2、 MasterClient 中的 `rpcFollow` 会触发。MasterClient 在 `rpcFollow` 中计算出下一位操作的用户是 PlayerB，然后使用`Play.RPC` 接口指定调用 `rpcNext` 方法，通知所有玩家当前需要 PlayerB 操作。
+
+```cs
 // 提前定义的名为 rpcFollow 方法，此时这个方法被自动触发。
 [PlayRPC]
 public void rpcFollow(int playerId) 
@@ -81,9 +190,11 @@ public void rpcFollow(int playerId)
   // 通知所有玩家下一步需要 PlayerB 操作。
   Play.RPC("rpcNext", PlayRPCTargets.All, PlayerBId);
 }
-    ```
-3. 所有玩家的 `rpcNext` 方法被触发。
-    ```cs
+```
+
+3、所有玩家的 `rpcNext` 方法被触发。
+
+```cs
 // 提前定义的名为 rpcNext 方法，此时这个方法被自动触发。
 [PlayRPC]
 public void rpcNext(int playerId) 
@@ -91,7 +202,7 @@ public void rpcNext(int playerId)
   // 告诉所有用户当前需要 playerId 操作。
   Debug.Log("Next Player: " + playerId);
 }
-    ```
+```
 
 更详细的用法及介绍，请参考 [masterClient](play-unity.html#MasterClient) 及 [远程调用函数 - RPC](play-unity.html#远程调用函数-RPC)
 
