@@ -16,7 +16,7 @@ Key|Value|含义|来源
 部分管理性质的接口需要使用 master key。
 
 ## 相关概念
- 
+
 `_Conversation` 表 包含一些内置的关键字段定义了对话的属性、成员等，单聊/群聊、聊天室、服务号均在此表中，可以在 [实时通信概览 - 对话](./realtime_v2.html#对话（Conversation）) 中了解。
 
 ## 新特性
@@ -49,7 +49,7 @@ curl -X GET \
 
 参数 | 约束 | 说明
 ---|---|---
-skip | 可选 | 
+skip | 可选 |
 limit | 可选 | 与 skip 联合使用实现分页
 where | 可选 | 参考 [数据存储 - 查询](rest_api.html#查询)。
 
@@ -115,7 +115,7 @@ timestamp | 必填 | 消息的时间戳
 
 返回：
 ```
-{"result": {}} 
+{"result": {}}
 ```
 
 ### 删除广播消息
