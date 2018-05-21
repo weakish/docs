@@ -71,15 +71,6 @@ namespace PlayDocSample
     /// </summary>
     public class SampleConnect : PlayMonoBehaviour
     {
-
-        /// <summary>
-        /// 并且一定要定无参数的构造函数，而且一定要调用父类的构造函数
-        /// </summary>
-        public SampleConnect() : base()
-        {
-
-        }
-
         void start()
         {
             // 打开调试日志
@@ -91,20 +82,34 @@ namespace PlayDocSample
             // 如果成功则会回调 OnAuthenticated
         }
 
-
         [PlayEvent]
         public override void OnAuthenticated()
         {
             Play.Log("OnAuthenticated");
         }
+
+        protected override void Awake()
+        {
+            base.Awake();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+        }
     }
 }
 ```
 
-### 重要的步骤
+### 重要的注意事项
 
-在上面的例子中可以看见，代码声明了一个 `ConnectSample` 类，它继承自 `PlayMonoBehaviour`，并要包含一个无参的构造函数，且构造函数需要调用父类的构造函数 `base()`，最后要为所有的事件回调加上 `[PlayEvent]` 属性标记，这些都是**必须的**。后面的示例代码都会如此，开发者的代码也需要遵守这一约定，少了一项，事件回调就不会生效。
+在上面的例子中可以看见，代码声明了一个 `ConnectSample` 类，它继承自 `PlayMonoBehaviour`，所有的事件回调都加上了 `[PlayEvent]` 属性标记，这些都是**必须的**。后面的示例代码都会如此，开发者的代码也需要遵守这一约定，少了一项，事件回调就不会生效。
 
+因此任何一个使用 Play 进行游戏开发的 `PlayMonoBehaviour` 子类必须满足如下条件：
+
+1. 继承自 `PlayMonoBehaviour`
+2. 事件回调必须带有 `[PlayEvent]` 标记
+3. 尤其重要的是，**如果需要 new（重写）或者 override（覆盖）`Awake` 和 `OnDestroy` 方法的时候，必须调用父类的方法 `base.Awake()` 或者 `base.OnDestroy`**。
 
 ## 房间匹配
 
@@ -128,14 +133,6 @@ namespace TestUnit.NetFx46.Docs
 
     public class SampleCreateRoom : PlayMonoBehaviour
     {
-        /// <summary>
-        /// 一定要有无参数的构造函数，而且一定要调用父类的构造函数
-        /// </summary>
-        public SampleCreateRoom() : base()
-        {
-
-        }
-
         void start()
         {
             // 打开调试日志
@@ -242,6 +239,19 @@ roomConfig.MaxPlayerCount = 6;
 Play.CreateRoom(roomConfig);
 ```
 
+#### 玩家掉线之后被保留的时间
+
+默认情况下，玩家在掉线之后，会**立即离开房间**，可以通过设置这个保留时间，来避免玩家一掉线就默认被踢出房间，比如如下代码指定玩家掉线之后的保留时间是 10 分钟：
+
+```cs
+var roomConfig = PlayRoom.RoomConfig.Default;
+// 单位是秒
+roomConfig.PlayerTimeToKeep = 600;// 设置成 600 秒，也就是 10 分钟
+
+Play.CreateRoom(roomConfig);
+```
+最高只允许设置成 30 分钟，也就是 1800 秒。
+
 ### 设置房间的自定义属性
 
 房间的自定义属性指的是一些 key-value 的键值对，在创建成功之后，云端也会保留一份拷贝（注意这里不是持久化存储，当该房间失效之后所有的自定义属性都会被销毁）。
@@ -312,14 +322,6 @@ Play.CreateRoom(roomConfig);
 ```cs
 public class SampleJoinRoom : PlayMonoBehaviour
 {
-    /// <summary>
-    /// 并且一定要定无参数的构造函数，而且一定要调用父类的构造函数
-    /// </summary>
-    public SampleJoinRoom() : base()
-    {
-
-    }
-
     void start()
     {
         // 打开调试日志
