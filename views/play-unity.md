@@ -751,16 +751,15 @@ var gameVersion = Play.GameVersion;
 
 断线之后，SDK 没有做**自动的断线重连**，假设游戏允许玩家掉线之后重连，并且加入原来的房间，需要如下做：
 
-1. 发现连接断开（网络异常或者其他原因导致链接断开），SDK 会触发 `OnDisconnected` 回调。
+1. 发现连接断开（网络异常或者其他原因导致连接断开），SDK 会触发 `OnDisconnected` 回调。
 2. 尝试调用 `Play.Connect()` 重新打开连接。
 3. 在 `OnAuthenticated` 回调里面调用 `Play.RejoinRoom()` 重新加入原来的房间。
 4. 然后通过监听 `OnJoinedRoom` 来重新回到房间。
-5. 并且配合监听 `OnJoinRoomFailed` 来判断房间是否失效或者是其他什么原因导致重新加入失败的。
+5. 并且配合监听 `OnJoinRoomFailed` 来判断房间是否失效或者是其他什么原因导致重新加入失败。
 
+假设房间内已有 A、B、C 三名玩家，然后此时忽然 B 掉线了，此时如果创建房间的时候指定了 [玩家掉线之后被保留的时间](#玩家掉线之后被保留的时间)，就会出现如下两种情况：
 
-假设房间内已有 A、B、C 三名玩家，然后此时忽然 B 掉线了，此时配合前文介绍的[玩家掉线之后被保留的时间](#玩家掉线之后被保留的时间)，当创建房间的时候指定了这个值，就会出现如下两种情况：
-
-1. 如果设置了类似 `roomConfig.PlayerTimeToKeep = 600` 这样的有效值，那么 B 玩家在掉线时，会产生如下情景：
+1、如果设置了类似 `roomConfig.PlayerTimeToKeep = 600` 这样的有效值，那么 B 玩家在掉线时，会产生如下情景：
 
     A 和 C 将会得到如下通知：
 
@@ -804,7 +803,7 @@ var gameVersion = Play.GameVersion;
     }
     ```
 
-2. 如果没有设置 `roomConfig.PlayerTimeToKeep` 那么 B 一旦掉线，A 和 C 会直接收到如下回调：
+2、如果没有设置 `roomConfig.PlayerTimeToKeep` 那么 B 一旦掉线，A 和 C 会直接收到如下回调：
 
     ```cs
     [PlayEvent]
