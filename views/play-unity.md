@@ -756,6 +756,9 @@ var gameVersion = Play.GameVersion;
 3. 在 `OnAuthenticated` 回调里面调用 `Play.RejoinRoom()` 重新加入原来的房间。
 4. 然后通过监听 `OnJoinedRoom` 来重新回到房间。
 5. 并且配合监听 `OnJoinRoomFailed` 来判断房间是否失效或者是其他什么原因导致重新加入失败的。
+6. 如果当前用户成功回到房间，触发如下通知：
+   - `OnPlayerCustomPropertiesChanged` 来告知当前用户上次掉线之前最新的 Player 上的自定义属性
+   - `OnRoomCustomPropertiesUpdated` 来告知当前用户上次掉线之前最新的 Room 上的自定义属性
 
 
 假设房间内已有 A、B、C 三名玩家，然后此时忽然 B 掉线了，此时配合前文介绍的[玩家掉线之后被保留的时间](#玩家掉线之后被保留的时间)，当创建房间的时候指定了这个值，就会出现如下两种情况：
