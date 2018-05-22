@@ -1240,6 +1240,42 @@ update | 保存一个已经存在并且被修改的对象
 总之，LeanCloud 的 ACL 的鉴权逻辑是先验证 Class 级别的 ACL 是否允许通过，紧接着就会针对访问的对象自身的 ACL 进行鉴权。
 换言之，偏向于静态设置的应用可以通过创建 Class 时候的选择来实现，而有动态需求的应用尽量在创建对象的时候设置 ACL。
 
+## 获取对象的 ACL 值
+
+查询数据时，SDK 默认不会返回对象的 ACL 值。如果想在获取对象的同时返回对象的 ACL 值，需要同时满足下面两个条件：
+
+1. 进入 [控制台 > 存储 > 设置 > 其他](/dashboard/storage.html?appid={{appid}}#/storage/conf)，勾选「查询时返回值包括 ACL」才可以在查询结果中获取到 ACL 的数据。
+2. 客户端查询对象时需要指定 `includeACL`。
+
+代码如下：
+
+```objc
+AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
+query.includeACL = YES;
+[query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        
+}];
+```
+```java
+AVQuery<AVObject> query = new AVQuery<>("Todo");
+query.includeACL(true);
+query.findInBackground(new FindCallback<AVObject>() {
+     @Override
+     public void done(List<AVObject> list, AVException e) {
+                
+     }
+});
+```
+```js
+var query = new AV.Query('Todo');
+query.includeACL(true);
+query.find().then(function(todos) {
+  // 查询结果
+}).catch(function(error){
+  // 异常处理
+})
+```
+
 ## 超级权限
 
 ACL 可以满足常见的需求，但是 `_User` 表比较特殊，它会忽略 ACL 的设置，表现为：任何用户都无法修改其他用户的属性，比如当前登录的用户是 A，而他想通过请求去修改 B 用户的用户名，密码或者其他自定义属性，是不会生效的。
