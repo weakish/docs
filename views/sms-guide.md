@@ -272,7 +272,7 @@ AVSMS.requestSMSCodeInBackground("188xxxxxxxx", option, new RequestMobileCodeCal
 });
 ```
 ```js
-AV.Cloud. requestSmsCode({
+AV.Cloud.requestSmsCode({
   mobilePhoneNumber: 'xxxxxxxxx',
   smsType: 'voice'
 }).then(function() {
