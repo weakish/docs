@@ -246,11 +246,11 @@ Play.CreateRoom(roomConfig);
 ```cs
 var roomConfig = PlayRoom.RoomConfig.Default;
 // 单位是秒
-roomConfig.PlayerTimeToKeep = 600;// 设置成 600 秒，也就是 10 分钟
+roomConfig.PlayerTimeToKeep = 30;// 设置成 30 秒
 
 Play.CreateRoom(roomConfig);
 ```
-最高只允许设置成 30 分钟，也就是 1800 秒。
+最高只允许设置成 1 分钟，也就是 60 秒。
 
 ### 设置房间的自定义属性
 
@@ -749,7 +749,7 @@ var gameVersion = Play.GameVersion;
 
 ## 断线重连
 
-断线之后，SDK 没有做**自动的断线重连**，假设游戏允许玩家掉线之后重连，并且加入原来的房间，需要如下做：
+断线之后，SDK 没有做**自动的断线重连**，假设游戏允许玩家掉线之后重连，并且加入原来的房间，需要掉线的玩家进行如下操作：
 
 1. 发现连接断开（网络异常或者其他原因导致连接断开），SDK 会触发 `OnDisconnected` 回调。
 2. 尝试调用 `Play.Connect()` 重新打开连接。
@@ -762,7 +762,7 @@ var gameVersion = Play.GameVersion;
 
 假设房间内已有 A、B、C 三名玩家，然后此时忽然 B 掉线了，此时如果创建房间的时候指定了 [玩家掉线之后被保留的时间](#玩家掉线之后被保留的时间)，就会出现如下两种情况：
 
-1、如果设置了类似 `roomConfig.PlayerTimeToKeep = 600` 这样的有效值，那么 B 玩家在掉线时，会产生如下情景：
+1. 如果设置了类似 `roomConfig.PlayerTimeToKeep = 30` 这样的有效值，那么 B 玩家在掉线时，会产生如下情景：
 
     A 和 C 将会得到如下通知：
 
@@ -770,8 +770,8 @@ var gameVersion = Play.GameVersion;
     [PlayEvent]
     public override void OnPlayerActivityChanged(Player player)
     {
-        // player.IsInactive 此时应该为 true
-        Play.Log("OnPlayerActivityChanged", player.UserID, player.IsInactive);
+       // player.IsInactive 此时应该为 true
+       Play.Log("OnPlayerActivityChanged", player.UserID, player.IsInactive);
     }
     ```
 
@@ -781,7 +781,7 @@ var gameVersion = Play.GameVersion;
     [PlayEvent]
     public override void OnDisconnected()
     {
-        Play.Log("OnDisconnected");
+       Play.Log("OnDisconnected");
     }
     ```
 
@@ -806,7 +806,7 @@ var gameVersion = Play.GameVersion;
     }
     ```
 
-2、如果没有设置 `roomConfig.PlayerTimeToKeep` 那么 B 一旦掉线，A 和 C 会直接收到如下回调：
+2. 如果没有设置 `roomConfig.PlayerTimeToKeep` 那么 B 一旦掉线，A 和 C 会直接收到如下回调：
 
     ```cs
     [PlayEvent]
@@ -825,3 +825,7 @@ var gameVersion = Play.GameVersion;
         Play.Log("OnDisconnected");
     }
     ```
+
+注意，`roomConfig.PlayerTimeToKeep` 的设置与否最大的区别在于：
+
+**如果设置了，A 和 C 端会在收到 B 的`OnPlayerLeftRoom` 的通知前，收到一个 B 的 `OnPlayerActivityChanged` 回调**
