@@ -246,11 +246,11 @@ Play.CreateRoom(roomConfig);
 ```cs
 var roomConfig = PlayRoom.RoomConfig.Default;
 // 单位是秒
-roomConfig.PlayerTimeToKeep = 600;// 设置成 600 秒，也就是 10 分钟
+roomConfig.PlayerTimeToKeep = 30;// 设置成 30 秒
 
 Play.CreateRoom(roomConfig);
 ```
-最高只允许设置成 30 分钟，也就是 1800 秒。
+最高只允许设置成 1 分钟，也就是 60 秒。
 
 ### 设置房间的自定义属性
 
@@ -749,31 +749,83 @@ var gameVersion = Play.GameVersion;
 
 ## 断线重连
 
-SDK 内置了断线重连的机制，但是 SDK 重连的逻辑如下：
+断线之后，SDK 没有做**自动的断线重连**，假设游戏允许玩家掉线之后重连，并且加入原来的房间，需要掉线的玩家进行如下操作：
 
-1. 发现连接断开（网络异常或者其他原因导致 WebSocket 失效），SDK 会触发 `OnDisconnected` 回调。
-2. 尝试重新打开 WebSocket 连接，但是并没有重新加入到原来的房间。
-3. SDK 提供了重新加入房间的接口（参照随后的示例代码），发生掉线之后，开发者需要根据自身的游戏行为来判断是否要主动重新加入到原来的房间，比如某些竞速类的游戏掉线了就可能会被踢出房间。
-4. 调用 `Play.RejoinRoom()` 之后可以通过监听 `OnRejoinRoomFailed` 来判断房间是否失效或者是其他什么原因导致重新加入失败的。
+1. 发现连接断开（网络异常或者其他原因导致连接断开），SDK 会触发 `OnDisconnected` 回调。
+2. 尝试调用 `Play.Connect()` 重新打开连接。
+3. 在 `OnAuthenticated` 回调里面调用 `Play.RejoinRoom()` 重新加入原来的房间。
+4. 然后通过监听 `OnJoinedRoom` 来重新回到房间。
+5. 配合监听 `OnJoinRoomFailed` 来判断房间是否失效或者是其他什么原因导致重新加入失败。
+6. 如果当前用户成功回到房间，触发如下通知：
+   - `OnPlayerCustomPropertiesChanged` 来告知当前用户上次掉线之前最新的 Player 上的自定义属性
+   - `OnRoomCustomPropertiesUpdated` 来告知当前用户上次掉线之前最新的 Room 上的自定义属性
 
-假设房间内已有 A、B、C 三名玩家，然后此时忽然 B 掉线了，在 B 这一端会收到如下的事件通知：
+假设房间内已有 A、B、C 三名玩家，然后此时忽然 B 掉线了，此时如果创建房间的时候指定了 [玩家掉线之后被保留的时间](#玩家掉线之后被保留的时间)，就会出现如下两种情况：
 
-```cs
-[PlayEvent]
-public override void OnDisconnected()
-{
-    Play.Log("OnDisconnected");
-    // 如果是网络问题并且你的游戏允许断线之后玩家再次加入 Room 继续游戏，可以调用 Rejoin 接口
-    Play.RejoinRoom();//从 SDK 中的 Play.Room 读取房间信息
-}
-```
+1. 如果设置了类似 `roomConfig.PlayerTimeToKeep = 30` 这样的有效值，那么 B 玩家在掉线时，会产生如下情景：
 
-而在 A 和 C 端会收到如下的事件通知：
+    A 和 C 将会得到如下通知：
 
-```cs
-[PlayEvent]
-public override void OnPlayerDisconnectedRoom(Player player)
-{
-    Play.Log("someone disconnect from room with user id:", player.UserID);
-}
-```
+    ```cs
+    [PlayEvent]
+    public override void OnPlayerActivityChanged(Player player)
+    {
+       // player.IsInactive 此时应该为 true
+       Play.Log("OnPlayerActivityChanged", player.UserID, player.IsInactive);
+    }
+    ```
+
+    B 会得到如下通知：
+
+    ```cs
+    [PlayEvent]
+    public override void OnDisconnected()
+    {
+       Play.Log("OnDisconnected");
+    }
+    ```
+
+    如果 B 在有效期之内调用了 `Play.RejoinRoom()` 并且成功回到了房间，那么 A 和 C 将会再次收到 `OnPlayerActivityChanged` 的回调：
+
+    ```cs
+    [PlayEvent]
+    public override void OnPlayerActivityChanged(Player player)
+    {
+        // player.IsInactive 此时应该为 false
+        Play.Log("OnPlayerActivityChanged", player.UserID, player.IsInactive);
+    }
+    ```
+    
+    然后如果 B 在超过了有效期之后，仍然**没有**调用 `Play.RejoinRoom()` 回到房间，那么 A 和 C 还会再次收到如下回调：
+
+    ```cs
+    [PlayEvent]
+    public override void OnPlayerLeftRoom(Player player)
+    {
+        Play.Log("OnPlayerLeftRoom",player.UserID);
+    }
+    ```
+
+2. 如果没有设置 `roomConfig.PlayerTimeToKeep` 那么 B 一旦掉线，A 和 C 会直接收到如下回调：
+
+    ```cs
+    [PlayEvent]
+    public override void OnPlayerLeftRoom(Player player)
+    {
+        Play.Log("OnPlayerLeftRoom",player.UserID);
+    }
+    ```
+
+    B 会收到如下回调：
+
+    ```cs
+    [PlayEvent]
+    public override void OnDisconnected()
+    {
+        Play.Log("OnDisconnected");
+    }
+    ```
+
+注意，`roomConfig.PlayerTimeToKeep` 的设置与否最大的区别在于：
+
+**如果设置了，A 和 C 端会在收到 B 的`OnPlayerLeftRoom` 的通知前，收到一个 B 的 `OnPlayerActivityChanged` 回调**
