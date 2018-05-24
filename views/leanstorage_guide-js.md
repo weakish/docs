@@ -270,7 +270,7 @@ AV.Object.register(Todo);
     // title: "工程师周会"
     // updatedAt: "2017-03-08T11:25:07.804Z"
 
-  }).catch(error) {
+  }).catch(function (error) {
     // 异常处理
     console.error(error);
   });
