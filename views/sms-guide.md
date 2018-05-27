@@ -832,7 +832,7 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","New_Series",null,"sign_BuyBuyBuy","�
 {# 被 https://blog.leancloud.cn/4818/ 引用，修改标题时注意更新博客链接 #}
 ### 服务覆盖区域和价格
 
-以下金额为每条短信的价格，以人民币计费。列表中未包含的国家或区域，请在论坛或工单中提问确认。
+<a id="sms-worldwide-regions"></a>以下金额为每条短信的价格，以人民币计费。列表中未包含的国家或区域，请在论坛或工单中提问确认。
 
 <script src="custom/js/lib/jquery.dataTables.min.js"></script>
 
