@@ -52,15 +52,15 @@ var AV = require('leancloud-storage/live-query');
 
 ```html
 <!-- 存储服务 -->
-<script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js"></script>
 <!-- 实时消息服务 -->
-<script src="//unpkg.com/leancloud-realtime@^4.0.0-beta"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-realtime@{{jsimsdkversion}}/dist/realtime.browser.min.js"></script>
 ```
 
 如果需要使用存储服务的 [LiveQuery][livequery] 功能，需要按如下做法引入存储 SDK：
 
 ```html
-<script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-live-query-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-live-query-min.js"></script>
 ```
 
 通过这种方式引入的 SDK 可以通过全局变量 `AV` 获得引用：

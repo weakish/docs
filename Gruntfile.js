@@ -28,6 +28,7 @@ module.exports = function(grunt) {
 
     pkg: grunt.file.readJSON('package.json'),
     JSSDKVersion: undefined,
+    JSIMSDKVersion: undefined,
     clean: {
       html: {
         files: [{
@@ -258,6 +259,7 @@ module.exports = function(grunt) {
         options:{
           data:{
             jssdkversion: '<%= JSSDKVersion %>',
+            jsimsdkversion: '<%= JSIMSDKVersion %>',
             node: grunt.option('theme'),
             appid: '{{appid}}',
             appkey: '{{appkey}}',
@@ -308,11 +310,16 @@ module.exports = function(grunt) {
   grunt.registerTask('ensureSDKVersion', function() {
     var done = this.async();
     if (grunt.config.get('JSSDKVersion')) return done();
-    axios.get('https://registry.yarnpkg.com/leancloud-storage/latest').then(function(response){
-      grunt.log.oklns(response.data.version);
-      grunt.config.set('JSSDKVersion', response.data.version);
-      done();
-    });
+    Promise.all([
+      axios.get('https://registry.yarnpkg.com/leancloud-storage/latest').then(function(response){
+        grunt.log.oklns('leancloud-storage: ' + response.data.version);
+        grunt.config.set('JSSDKVersion', response.data.version);
+      }),
+      axios.get('https://registry.yarnpkg.com/leancloud-realtime/latest').then(function(response){
+        grunt.log.oklns('leancloud-realtime: ' + response.data.version);
+        grunt.config.set('JSIMSDKVersion', response.data.version);
+      })
+    ]).then(done);
   });
 
 grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置首页内容分类导航、中文 ID 变为数字', function() {
