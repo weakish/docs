@@ -509,7 +509,7 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 ##### 获取 HMS SDK 和 HMS Agent SDK
 华为 HMS 推送 SDK 分为两部分，一个是 HMS SDK，一个是 HMS Agent SDK，两者需要主版本号一致才能正常使用（当前 LeanCloud 混合推送基于 v2.6.0 这一主版本），具体可以参见 [华为 SDK 获取](http://developer.huawei.com/consumer/cn/service/hms/catalog/HuaweiJointOperation.html?page=hmssdk_jointOper_sdkdownload)。
 
-HMS SDK 可以直接通过 jar 包加入，HMS Agent SDK 则需要下载解压之后把源码完全拷贝进入工程（也可以将 https://github.com/leancloud/android-sdk-all/hmsagent 作为 module 直接加入工程）。
+HMS SDK 可以直接通过 jar 包加入，HMS Agent SDK 则需要下载解压之后把源码完全拷贝进入工程（也可以将 https://github.com/leancloud/android-sdk-all/tree/master/hmsagent 作为 module 直接加入工程）。
 
 > 注意：华为 HMS 推送不能与老的 HwPush 共存，如果切换到 HMS 推送，则需要将原来的 HwPush SDK 全部删除干净才行。
 
