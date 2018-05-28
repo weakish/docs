@@ -62,11 +62,14 @@
 
 ```nunjucks
 {% raw %}{{ docs.alert("callout-danger 类型的提示。用于突出强调或警告。") }}{% endraw %}
+
+{% raw %}{{ docs.warning("callout-warning 类型的提示。用于引起注意。") }}{% endraw %}
 ```
 效果：
 
 {{ docs.alert("callout-danger 类型的提示。用于突出强调或警告。") }}
 
+{{ docs.warning("callout-warning 类型的提示。用于引起注意。") }}
 
 ### `alerts()`
 

@@ -576,10 +576,10 @@ if (!error) {
 
 {% block code_download_file %}
 ```objc
-    [file downloadWithProgress:^(NSInteger percentDone) {
-        //下载的进度数据，percentDone 介于 0 和 100。
-    } completionHandler:^(NSData *data, NSError *error) {
-        // data 就是文件的数据流
+    [file downloadWithProgress:^(NSInteger number) {
+        //下载的进度数据，number 介于 0 和 100。
+    } completionHandler:^(NSURL * _Nullable filePath, NSError * _Nullable error) {
+        // filePath 是文件下载到本地的地址
     }];
 ```
 {% endblock %}

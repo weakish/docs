@@ -37,7 +37,7 @@ curl -X GET \
 
 参数 | 约束 | 说明
 ---|---|---
-skip | 可选 | 
+skip | 可选 |
 limit | 可选 | 与 skip 联合使用实现分页
 where | 可选 | 参考 [数据存储 - 查询](rest_api.html#查询)。
 
@@ -136,7 +136,7 @@ curl -X GET \
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
-  -H "Content-Type: application/json" \ 
+  -H "Content-Type: application/json" \
   -d '{"client_ids": ["Tom", "Jerry"]}' \
   https://{{host}}/1.2/rtm/conversations/{conv_id}/mutes
 ```
@@ -211,8 +211,7 @@ priority | 可选 | 定义消息优先级，可选值为 high、normal、low，�
 
 返回说明：
 
-默认情况下发送消息 API 使用异步的方式，调用后返回消息 id 和接收消息的服务器时间戳，例如 
-`{"msg-id":"qNkRkFWOeSqP65S9fDyHJw", "timestamp":1495431811151}`。
+默认情况下发送消息 API 使用异步的方式，调用后返回消息 id 和接收消息的服务器时间戳，例如 `{"msg-id":"qNkRkFWOeSqP65S9fDyHJw", "timestamp":1495431811151}`。
 
 ### 查询历史消息
 
@@ -357,7 +356,7 @@ timestamp | 必填 | 消息的时间戳
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  -H "Content-Type: application/json" \ 
+  -H "Content-Type: application/json" \
   -d '{"client_id": "some-client-id", "ttl": 50}' \
   https://{{host}}/1.2/rtm/conversations/{conv_id}/temporary-silenceds
 ```
@@ -444,7 +443,7 @@ info-id | 该记录对应的 objectId
 curl -X PUT \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  -H "Content-Type: application/json" \ 
+  -H "Content-Type: application/json" \
   -d '{"clientId": "client", "role": "role"}' \
   https://{{host}}/1.2/rtm/conversations/{conv_id}/member-infos/{info-id}
 ```
@@ -476,7 +475,7 @@ curl -X GET \
 
 参数 | 说明
 --- | ---
-skip | 
+skip |
 limit | 与 skip 联合使用实现分页
 role | 本次查询只希望包含该角色
 
@@ -494,7 +493,7 @@ role | 本次查询只希望包含该角色
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  -H "Content-Type: application/json" \ 
+  -H "Content-Type: application/json" \
   -d '{"client_ids": ["client1", "client2"]}' \
   https://{{host}}/1.2/rtm/conversations/{conv_id}/permanent-silenceds
 ```
@@ -533,7 +532,8 @@ curl -X DELETE \
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  -d '{"client_ids": ["client1", "client2"]}' \
+  -G \
+  --data-urlencode 'limit=20' \
   https://{{host}}/1.2/rtm/conversations/{conv_id}/permanent-silenceds
 ```
 
@@ -561,7 +561,7 @@ next | 可选 | 第一次查询时返回，后面的查询带着这个参数，�
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  -H "Content-Type: application/json" \ 
+  -H "Content-Type: application/json" \
   -d '{"client_ids": ["client1", "client2"]}' \
   https://{{host}}/1.2/rtm/conversations/{conv_id}/blacklists
 ```

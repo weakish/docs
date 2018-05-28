@@ -206,6 +206,9 @@ body {
 
   p {
     margin-bottom: 1.5em;
+    + ul {
+      margin-top: -16px;
+    }
   }
 
   pre {
@@ -213,6 +216,11 @@ body {
     // fix inline comment indicator not showing in overflowed container
     overflow: visible;
   }
+
+  li > pre {
+    margin-top: 18px;
+  }
+
 
   sup {
     font-size: 0.83em;
@@ -306,6 +314,11 @@ body {
 
     a {
         font-weight: inherit;
+    }
+    &-warning {
+      background-color: #fffbdd;
+      border-color: rgba(27,31,35,0.15);
+      color: #735c0f;
     }
   }
 

@@ -602,12 +602,12 @@ curl -X POST \
 
 参数 |约束| 说明
 --- |---|---
-`_lctype` | |富媒体消息的类型<br/><br/><pre>文本消息 -1<br/>图像　　 -2<br/>音频　　 -3<br/>视频　　 -4<br/>地理位置 -5<br/>通用文件 -6</pre>
-`_lctext` | |富媒体消息的文　字说明
+`_lctype` | |富媒体消息的类型<table><thead><tr><th>消息</th><th>类型</th></tr></thead><tbody><tr><td>文本消息</td><td>-1</td></tr><tr><td>图像消息</td><td>-2</td></tr><tr><td>音频消息</td><td>-3</td></tr><tr><td>视频消息</td><td>-4</td></tr><tr><td>位置消息</td><td>-5</td></tr><tr><td>文件消息</td><td>-6</td></tr></tbody></table>以上类型均使用负数，所有正数留给自定义扩展类型使用，0 作为「没有类型」被保留起来。
+`_lctext` | |富媒体消息的文字说明
 `_lcattrs` | |JSON 字符串，用来给开发者存储自定义属性。
-`_lcfile` | |如果是包含了文件（图像，音频，视频，通用文件）的消息 ，<br/>`_lcfile` 就包含了它的文件实体的相关信息。
+`_lcfile` | |如果是包含了文件（图像、音频、视频、通用文件）的消息 ，<br/>`_lcfile` 就包含了它的文件实体的相关信息。
 `url` | |文件在上传之后的物理地址
-`objId` |可选 |文件对应的在 _File 表里面的 objectId
+`objId` |可选 |文件对应的在 `_File` 表里面的 objectId
 `metaData` | 可选|文件的元数据
 
 **以上参数针对所有富媒体消息都有效**。

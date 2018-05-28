@@ -2,11 +2,9 @@
 {% import "views/_im.njk" as im %}
 # 实时通信开发指南 &middot; JavaScript 
 
-{{ docs.note("本文介绍 JavaScript 实时通讯 SDK Version 3 的使用，Version 2 的文档请参考[《JavaScript 实时通信开发指南 Version 2》](./js_realtime.html)。") }}
-
 ## 简介
 
-实时通信服务可以让你一行后端代码都不用写，就能做出一个功能完备的实时聊天应用，或是一个实时对战类的游戏。所有聊天记录都保存在云端，离线消息会通过消息推送来及时送达，推送消息文本可以灵活进行定制。
+实时通信服务可以让你一行后端代码都不用写，就能做出一个功能完备的实时聊天应用。所有聊天记录都保存在云端，离线消息会通过消息推送来及时送达，推送消息文本可以灵活进行定制。
 
 >在继续阅读本文档之前，请先阅读[《实时通信开发指南》](./realtime_v2.html)，了解一下实时通信的基本概念和模型。
 
@@ -14,15 +12,17 @@
 
 JavaScript 实时通信 SDK 支持如下运行时：
 
-- 浏览器/WebView
-  - IE 10+ / Edge
-  - Chrome 31+
-  - Firefox latest
-  - iOS 8.0+
-  - Android 4.4+
-- Node.js 0.12+
-- React Native 0.26+
-- 微信小程序开发者工具 latest（参见 [在微信小程序中使用 LeanCloud](weapp.html)）
+* 浏览器 / WebView
+  * IE 10+
+  * Edge latest
+  * Chrome 45+
+  * Firefox latest
+  * iOS 9.3+
+  * Android 4.4+
+* Node.js 4.0+
+* 微信小程序/小游戏 latest（参见 [在微信小程序中使用 LeanCloud](weapp.html)）
+* React Native 0.26+
+* Electron latest
 
 ### 文档贡献
 我们欢迎和鼓励大家对本文档的不足提出修改建议。请访问我们的 [Github 文档仓库](https://github.com/leancloud/docs) 来提交 Pull Request。
@@ -33,34 +33,13 @@ JavaScript 实时通信 SDK 支持如下运行时：
 
 ## 安装和初始化
 ### 安装
-建议使用 npm 安装 SDK，在终端运行以下命令：
-```bash
-npm install leancloud-realtime --save
-```
-
-### 引用
-SDK 暴露（export）了以下成员：[SDK API 文档](https://leancloud.github.io/js-realtime-sdk/docs/module-leancloud-realtime.html)。
-
-如果是在浏览器中使用，需要加载以下 script：
-```html
-<script src="./node_modules/leancloud-realtime/dist/realtime.browser.js"></script>
-```
-在浏览器中直接加载时，SDK 暴露的所有的成员都挂载在 `AV` 命名空间下:
-```javascript
-var Realtime = AV.Realtime;
-var TextMessage = AV.TextMessage;
-```
-
-如果是在 Node.js 或其他支持 CommonJS 模块规范的环境中使用，需要按以下方法进行 require：
-```javascript
-var Realtime = require('leancloud-realtime').Realtime;
-var TextMessage = require('leancloud-realtime').TextMessage;
-```
+请阅读 [JavaScript 安装指南](sdk_setup-js.html)。
 
 ### 初始化
-按照上面的方式拿到 `Realtime` 类后，可以按照下面用法初始化一个 `realtime` 实例，在下面的文档中如果出现了未定义的 `realtime` 指的均是这个实例。
+按照上面的安装指南中指定的方式拿到 `Realtime` 类后，可以按照下面用法初始化一个 `realtime` 实例，在下面的文档中如果出现了未定义的 `realtime` 指的均是这个实例。
 
 ```javascript
+var { Realtime } = require('leancloud-realtime');
 var realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
@@ -101,9 +80,8 @@ var imageMessage = new AV.ImageMessage(file);
 如果是在 Node.js 或其他支持 CommonJS 模块规范的环境中使用，需要按以下方法进行引用与初始化：
 ```javascript
 var AV = require('leancloud-storage');
-var Realtime = require('leancloud-realtime').Realtime;
-var TypedMessagesPlugin = require('leancloud-realtime-plugin-typed-messages').TypedMessagesPlugin;
-var ImageMessage = require('leancloud-realtime-plugin-typed-messages').ImageMessage;
+var { Realtime } = require('leancloud-realtime');
+var { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
 
 // 初始化存储 SDK
 AV.init({
@@ -133,6 +111,7 @@ var imageMessage = new ImageMessage(file);
 Tom 想给 Jerry 发一条消息，实现代码如下：
 
 ```javascript
+var { TextMessage } = require('leancloud-realtime');
 // Tom 用自己的名字作为 clientId，获取 IMClient 对象实例
 realtime.createIMClient('Tom').then(function(tom) {
   // 创建与Jerry之间的对话
@@ -142,12 +121,10 @@ realtime.createIMClient('Tom').then(function(tom) {
   });
 }).then(function(conversation) {
   // 发送消息
-  return conversation.send(new AV.TextMessage('耗子，起床！'));
+  return conversation.send(new TextMessage('耗子，起床！'));
 }).then(function(message) {
   console.log('Tom & Jerry', '发送成功！');
 }).catch(console.error);
-
-// https://jsplay.avosapps.com/fuq/embed?js,console
 ```
 
 {{ im.clientOpenClose({open: "realtime.createIMClient()", close: "IMClient.close()"}) }}
@@ -169,14 +146,13 @@ realtime.createIMClient('Tom').then(function(tom) {
 要让 Jerry 收到 Tom 的消息，需要这样写：
 
 ```javascript
+var { Event } = require('leancloud-realtime');
 // Jerry 登录
 realtime.createIMClient('Jerry').then(function(jerry) {
-  jerry.on('message', function(message, conversation) {
+  jerry.on(Event.MESSAGE, function(message, conversation) {
     console.log('Message received: ' + message.text);
   });
 }).catch(console.error);
-
-// https://jsplay.avosapps.com/nuh/embed?js,console
 ```
 
 
@@ -194,6 +170,7 @@ Tom 想建立一个群，把自己好朋友都拉进这个群，然后给他们�
 3. 发送消息
 
 ```javascript
+var { TextMessage } = require('leancloud-realtime');
 // Tom 用自己的名字作为 clientId，获取 Client 对象实例
 realtime.createIMClient('Tom').then(function(tom) {
   // 创建与 Jerry,Bob,Harry,William 之间的对话
@@ -203,36 +180,33 @@ realtime.createIMClient('Tom').then(function(tom) {
   })
 }).then(function(conversation) {
   // 发送消息
-  return conversation.send(new AV.TextMessage('你们在哪儿？'));
+  return conversation.send(new TextMessage('你们在哪儿？'));
 }).then(function(message) {
   console.log('发送成功！');
 }).catch(console.error);
-
-// https://jsplay.avosapps.com/vep/embed?js,console
 ```
 ### 接收消息
 
 群聊的接收消息与单聊的接收消息在代码写法上是一致的。
 
 ```javascript
+var { Event, TextMessage } = require('leancloud-realtime');
 
 // Bob 登录
 realtime.createIMClient('Bob').then(function(bob) {
-  bob.on('message', function(message, conversation) {
+  bob.on(Event.MESSAGE, function(message, conversation) {
     console.log('[Bob] received a message from [' + message.from + ']: ' + message.text);
     // 收到消息之后一般的做法是做 UI 展现，示例代码在此处做消息回复，仅为了演示收到消息之后的操作，仅供参考。
-    conversation.send(new AV.TextMessage('Tom，我在 Jerry 家，你跟 Harry 什么时候过来？还有 William 和你在一起么？'));
+    conversation.send(new TextMessage('@Tom，我在 Jerry 家，你跟 Harry 什么时候过来？还有 William 和你在一起么？'));
   });
 }).catch(console.error);
 
 // William 登录
 realtime.createIMClient('William').then(function(william) {
-  william.on('message', function(message, conversation) {
+  william.on(Event.MESSAGE, function(message, conversation) {
     console.log('[William] received a message from [' + message.from + ']: ' + message.text);
   });
 }).catch(console.error);
-
-// https://jsplay.avosapps.com/coz/embed?js,console
 ```
 
 以上由 Tom 和 Bob 发送的消息，William 在上线时都会收到。
@@ -269,6 +243,7 @@ realtime.createIMClient('Tom').then(function(tom) {
 
 {% block open_long_connection_with_AVUser %}
 ```javascript
+var AV = require('leancloud-storage');
 // 以 AVUser 的用户名和密码登录实时通信服务
 AV.User.logIn('username', 'password').then(function(user) {
   return realtime.createIMClient(user);
@@ -309,19 +284,19 @@ AV.User.logIn('username', 'password').then(function(user) {
 
 ```javascript
 /* html: <input type="file" id="photoFileUpload"> */
+var AV = require('leancloud-storage');
+var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
 
 var fileUploadControl = $('#photoFileUpload')[0];
 var file = new AV.File('avatar.jpg', fileUploadControl.files[0]);
 file.save().then(function() {
-  var message = new AV.ImageMessage(file);
+  var message = new ImageMessage(file);
   message.setText('发自我的小米');
   message.setAttributes({ location: '旧金山' });
   return conversation.send(message);
 }).then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
-
-// http://jsplay.avosapps.com/vug/embed?html,js,console,output
 ```
 
 
@@ -329,16 +304,17 @@ file.save().then(function() {
 
 
 ```javascript
+var AV = require('leancloud-storage');
+var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+
 var file = new AV.File.withURL('萌妹子', 'http://pic2.zhimg.com/6c10e6053c739ed0ce676a0aff15cf1c.gif');
 file.save().then(function() {
-  var message = new AV.ImageMessage(file);
+  var message = new ImageMessage(file);
   message.setText('萌妹子一枚');
   return conversation.send(message);
 }).then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
-
-// http://jsplay.avosapps.com/poj/embed?js,console
 ```
 
 
@@ -355,8 +331,11 @@ file.save().then(function() {
 先使用存储 SDK 的 `AV.GeoPoint` 类 [构造出一个地理位置对象](leanstorage_guide-js.html#地理位置)，然后把它当做参数构造一个 `LocationMessage` 的实例，最后通过 `Conversation#send` 方法即可发送这条消息。
 
 ```javascript
+var AV = require('leancloud-storage');
+var { LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
+
 var location = new AV.GeoPoint(31.3753285,120.9664658);
-var message = new AV.LocationMessage(location);
+var message = new LocationMessage(location);
 message.setText('新开的蛋糕店！耗子咱们有福了…');
 conversation.send(message).then(function() {
   console.log('发送成功');
@@ -368,39 +347,41 @@ conversation.send(message).then(function() {
 
 #### 接收富媒体消息
 
-实时通信 SDK 提供的所有富媒体消息类都是从 TypedMessage 派生出来的。发送的时候可以直接调用 `conversation.send()` 函数。在接收端，SDK 会在 IMClient 实例上派发 `message` 事件，接收端处理富媒体消息的示例代码如下：
+实时通信 SDK 提供的所有富媒体消息类都是从 TypedMessage 派生出来的。发送的时候可以直接调用 `conversation.send()` 函数。在接收端，SDK 会在 IMClient 实例上派发 `MESSAGE` 事件，接收端处理富媒体消息的示例代码如下：
 
 ```javascript
 // 在初始化 Realtime 时，需加载 TypedMessagesPlugin
 // var realtime = new Realtime({
 //   appId: appId,
-//   plugins: [AV.TypedMessagesPlugin,]
+//   plugins: [TypedMessagesPlugin]
 // });
+var { Event, TextMessage } = require('leancloud-realtime');
+var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
 // 注册 message 事件的 handler
-client.on('message', function messageEventHandler(message, conversation) {
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   // 请按自己需求改写
   var file;
   switch (message.type) {
-    case AV.TextMessage.TYPE:
+    case TextMessage.TYPE:
       console.log('收到文本消息， text: ' + message.getText() + ', msgId: ' + message.id);
       break;
-    case AV.FileMessage.TYPE:
+    case FileMessage.TYPE:
       file = message.getFile(); // file 是 AV.File 实例
       console.log('收到文件消息，url: ' + file.url() + ', size: ' + file.metaData('size'));
       break;
-    case AV.ImageMessage.TYPE:
+    case ImageMessage.TYPE:
       file = message.getFile();
       console.log('收到图片消息，url: ' + file.url() + ', width: ' + file.metaData('width'));
       break;
-    case AV.AudioMessage.TYPE:
+    case AudioMessage.TYPE:
       file = message.getFile();
       console.log('收到音频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
       break;
-    case AV.VideoMessage.TYPE:
+    case VideoMessage.TYPE:
       file = message.getFile();
       console.log('收到视频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
       break;
-    case AV.LocationMessage.TYPE:
+    case LocationMessage.TYPE:
       var location = message.getLocation();
       console.log('收到位置消息，latitude: ' + location.latitude + ', longitude: ' + location.longitude);
       break;
@@ -412,9 +393,10 @@ client.on('message', function messageEventHandler(message, conversation) {
 // http://jsplay.avosapps.com/fux/embed?js,console
 ```
 
-同时，对应的 conversation 上也会派发 `message` 事件：
+同时，对应的 conversation 上也会派发 `MESSAGE` 事件：
 ```javascript
-conversation.on('message', function messageEventHandler(message) {
+var { Event } = require('leancloud-realtime');
+conversation.on(Event.MESSAGE, function messageEventHandler(message) {
   // your logic
 });
 ```
@@ -435,6 +417,7 @@ conversation.on('message', function messageEventHandler(message) {
 消息等级在发送接口的参数中设置。以下代码演示了如何发送一个高等级的消息：
 
 ```js
+var { Realtime, TextMessage, MessagePriority } = require('leancloud-realtime');
 var realtime = new Realtime({ appId: '{{appId}}', region: 'cn' });
 realtime.createIMClient('host').then(function (host) {
     return host.createConversation({
@@ -444,7 +427,7 @@ realtime.createIMClient('host').then(function (host) {
     });
 }).then(function (conversation) {
     console.log(conversation.id);
-    return conversation.send(new AV.TextMessage('现在比分是 0:0，下半场中国队肯定要做出人员调整'), { priority: AV.MessagePriority.HIGH });
+    return conversation.send(new TextMessage('现在比分是 0:0，下半场中国队肯定要做出人员调整'), { priority: MessagePriority.HIGH });
 }).then(function (message) {
     console.log(message);
 }).catch(console.error);
@@ -483,8 +466,6 @@ realtime.createIMClient('tom').then(function(tom) {
 }).then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
-
-// http://jsplay.avosapps.com/cew/embed?js,console,output
 ```
 
 
@@ -496,12 +477,12 @@ realtime.createIMClient('tom').then(function(tom) {
 // operation-message.js 同发送
 
 // app.js
-
+var { Event } = require('leancloud-realtime');
 // 首先需要注册自定义消息类型
 realtime.register(OperationMessage);
 realtime.createIMClient('bob').then(function(bob) {
-  // 注册 message 事件的 handler
-  client.on('message', function messageEventHandler(message, conversation) {
+  // 注册 MESSAGE 事件的 handler
+  client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
     switch (message.type) {
       case OperationMessage.TYPE:
         console.log(message.from + ' is ' + message.op);
@@ -512,8 +493,6 @@ realtime.createIMClient('bob').then(function(bob) {
     }
   });
 });
-
-// http://jsplay.avosapps.com/cew/embed?js,console,output
 ```
 
 #### @ 成员提醒
@@ -524,7 +503,7 @@ realtime.createIMClient('bob').then(function(bob) {
 const message = new TextMessage(`@Tom`).setMentionList('Tom').mentionAll();
 ```
 
-或者也可以提醒所有人：
+或者也可以提醒所有人：
 
 ```js
 const message = new TextMessage(`@all`).mentionAll();
@@ -533,7 +512,7 @@ const message = new TextMessage(`@all`).mentionAll();
 消息的接收方，可以通过读取消息的提醒列表来获取哪些 client Id 被提醒了：
 
 ```js
-client.on('message', function messageEventHandler(message, conversation) {
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   var mentionList = receivedMessage.getMentionList();
 });
 ```
@@ -541,7 +520,7 @@ client.on('message', function messageEventHandler(message, conversation) {
 消息有一个标识位，用来标识是否提醒了当前对话的全体成员:
 
 ```js
-client.on('message', function messageEventHandler(message, conversation) {
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   var mentionedAll = receivedMessage.mentionedAll;
 });
 ```
@@ -549,7 +528,7 @@ client.on('message', function messageEventHandler(message, conversation) {
 消息另一个标识位用来标识当前用户是否被提醒，SDK 通过读取消息是否提醒了全体成员和当前 client id 是否在被提醒的列表里这两个条件计算出来当前用户是否被提醒：
 
 ```js
-client.on('message', function messageEventHandler(message, conversation) {
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   var mentioned = receivedMessage.mentioned;
 });
 ```
@@ -561,43 +540,49 @@ client.on('message', function messageEventHandler(message, conversation) {
 使用消息回执功能，需要在发送时标记消息「需要回执」：
 
 ```javascript
-var message = new AV.TextMessage('very important message');
+var message = new TextMessage('very important message');
 conversation.send(message, {
   receipt: true,
 });
 ```
 
+{{ docs.note("只有在发送时设置了「需要回执」的标记，云端才会发送回执，默认不发送回执。") }}
+
 ##### 送达回执
 
-送达回执只支持单聊。当消息的接收方收到消息后，服务端会通知消息的发送方「消息已送达」，发送方的 SDK 会更新 conversation 的 `lastDeliveredAt` 属性并在 conversation 上派发一个 `lastdeliveredatupdate` 事件：
+当对方收到消息之后，云端会向发送方发出一个回执通知，表明消息已经送达，但这并**不代表用户已读**。送达回执**仅支持单聊**。
+
+当收到送达回执时，发送方的 SDK 会更新 conversation 的 `lastDeliveredAt` 属性并在 conversation 上派发一个 `LAST_DELIVERED_AT_UPDATE` 事件：
 
 ```javascript
-conversation.on('lastdeliveredatupdate', function() {
+var { Event } = require('leancloud-realtime');
+conversation.on(Event.LAST_DELIVERED_AT_UPDATE, function() {
   console.log(conversation.lastDeliveredAt);
   // 在 UI 中将早于 lastDeliveredAt 的消息都标记为「已送达」
 });
 ```
 
-需要注意的是：
-
-> 只有在发送时设置了「需要回执」标记，云端才会发送回执，默认不发送回执。
-
 ##### 已读回执
 
-对于单聊，已读回执的处理与送达回执类似，当消息的接收方调用 `Conversation#read` 方法将对话标记为已读后，发送方的 SDK 会更新 conversation 的 `lastReadAt` 属性并在 conversation 上派发一个 `lastreadatupdate` 事件：
+已读回执的处理与送达回执类似，当消息的接收方调用 `Conversation#read` 方法将对话标记为已读后，云端会向发送方发出一个回执通知，表明消息已被阅读，已读回执目前**仅支持单聊**。
+
+当收到已读回执时，发送方的 SDK 会更新 conversation 的 `lastReadAt` 属性并在 conversation 上派发一个 `LAST_READ_AT_UPDATE` 事件：
 
 ```javascript
-conversation.on('lastreadatupdate', function() {
+var { Event } = require('leancloud-realtime');
+conversation.on(Event.LAST_READ_AT_UPDATE, function() {
   console.log(conversation.lastReadAt);
   // 在 UI 中将早于 lastReadAt 的消息都标记为「已读」
 });
 ```
 
 #### 自定义离线推送内容
+在使用 SDK 提供的 API 之前，请先阅读 [实时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
 
-发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
+正如 [实时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知) 小节里面介绍的，发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
 
 ```js
+var { Realtime, TextMessage } = require('leancloud-realtime');
 var realtime = new Realtime({ appId: '{{appId}}', region: 'cn' });
 realtime.createIMClient('Tom').then(function (host) {
     return host.createConversation({
@@ -607,7 +592,7 @@ realtime.createIMClient('Tom').then(function (host) {
     });
 }).then(function (conversation) {
     console.log(conversation.id);
-    return conversation.send(new AV.TextMessage('耗子，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！'), {
+    return conversation.send(new TextMessage('耗子，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！'), {
         pushData: {
             "alert": "您有一条未读的消息",
             "category": "消息",
@@ -621,26 +606,29 @@ realtime.createIMClient('Tom').then(function (host) {
 }).catch(console.error);
 ```
 
+这种方式被称为「附件方式」，这里有一点非常重要：如果你已在 [云引擎实时通信离线消息推送 Hook `_receiversOffline`](leanengine_cloudfunction_guide-node.html#_receiversOffline) 里面定义了云函数来修改离线消息的内容，云端会优先使用 Hook 函数返回的结果作为最后推送的内容。
+
 除此以外，还有其他方法来自定义离线推送内容，请参考 [实时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
 
 ### 未读消息
 
-未读消息有两种处理方式，未读消息数量通知与离线消息通知。
+未读消息有两种处理方式，未读消息数量通知（默认）与离线消息通知。
 
 #### 未读消息数更新通知
 
 未读消息数量通知是默认的未读消息处理方式：当客户端上线时，会收到其参与过的对话的未读消息数量的通知，然后由客户端负责主动拉取未读的消息，拉取方式可参考「[聊天记录](#聊天记录)」部分。
 
-SDK 会在 `Conversation` 上维护 `unreadMessagesCount` 字段，这个字段在变化时 `IMClient` 会派发 `unreadmessagescountupdate` 事件。这个字段会在下面这些情况下发生变化：
+SDK 会在 `Conversation` 上维护 `unreadMessagesCount` 字段，这个字段在变化时 `IMClient` 会派发 `UNREAD_MESSAGES_COUNT_UPDATE` 事件。这个字段会在下面这些情况下发生变化：
 
 - 登录时，服务端通知对话的未读消息数
 - 收到在线消息
 - 用户将对话标记为已读
 
-开发者应当监听 `unreadmessagescountupdate` 事件，在对话列表界面上更新这些对话的未读消息数量。
+开发者应当监听 `UNREAD_MESSAGES_COUNT_UPDATE` 事件，在对话列表界面上更新这些对话的未读消息数量。
 
 ```javascript
-client.on('unreadmessagescountupdate', function(conversations) {
+var { Event } = require('leancloud-realtime');
+client.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, function(conversations) {
   for(let conv of conversations) {
     console.log(conv.id, conv.name, conv.unreadMessagesCount);
   }
@@ -659,7 +647,8 @@ conversation.read().then(function(conversation) {
 }).catch(console.error.bind(console));
 
 // 当前聊天的对话收到了消息立即标记为已读
-currentConversation.on('message', function() {
+var { Event } = require('leancloud-realtime');
+currentConversation.on(Event.MESSAGE, function() {
   currentConversation.read().catch(console.error.bind(console));
 })
 ```
@@ -673,7 +662,7 @@ currentConversation.on('message', function() {
 要使用离线消息通知方式，需要在初始化 Realtime 时设置参数 `pushOfflineMessages` 为 `true`：
 
 ```javascript
-var realtime = new AV.Realtime({
+var realtime = new Realtime({
   appId: '{{appid}}',
   pushOfflineMessages: true,
 });
@@ -719,7 +708,8 @@ var realtime = new AV.Realtime({
 
 ```javascript
 // predefined: someAVFile, conversation
-var message = new AV.ImageMessage(someAVFile);
+var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+var message = new ImageMessage(someAVFile);
 message.setAttributes({
   location: '拉萨布达拉宫',
   title: '这蓝天……我彻底是醉了',
@@ -736,7 +726,8 @@ conversation.send(message).then(function() {
 
 ```javascript
 // predefined: client
-client.on('message', function(message) {
+var { Event } = require('leancloud-realtime');
+client.on(Event.MESSAGE, function(message) {
   console.log(message.getAttributes().location); // 拉萨布达拉宫
 });
 ```
@@ -815,7 +806,7 @@ conversation.send(message, { will: true }).then(function() {
 ```javascript
 conversation.recall(oldMessage).then(function(recalledMessage) {
   // 修改成功
-  // recalledMessage is an AV.RecalledMessage
+  // recalledMessage is an RecalledMessage
 }).catch(function(error) {
   // 异常处理
 });
@@ -824,7 +815,8 @@ conversation.recall(oldMessage).then(function(recalledMessage) {
 而对话的其他成员在消息被撤回后会收到一个通知：
 
 ```javascript
-conversation.on('messagerecall', function(recalledMessage) {
+var { Event } = require('leancloud-realtime');
+conversation.on(Event.MESSAGE_RECALL, function(recalledMessage) {
   // recalledMessage 为已撤回的消息
   // 在视图层可以通过消息的 id 找到原来的消息并用 recalledMessage 替换
 });
@@ -848,7 +840,8 @@ conversation.update(oldMessage, newMessage).then(function() {
 而对话的其他成员在消息被修改之后会收到一个通知：
 
 ```javascript
-conversation.on('messageupdate', function(newMessage) {
+var { Event } = require('leancloud-realtime');
+conversation.on(Event.MESSAGE_UPDATE, function(newMessage) {
   // newMessage 为修改后的的消息
   // 在视图层可以通过消息的 id 找到原来的消息并用 newMessage 替换
 });
@@ -860,7 +853,19 @@ conversation.on('messageupdate', function(newMessage) {
 
 ## 对话
 
-以上章节基本演示了实时通信 SDK 的核心概念「对话」，即 `Conversation`。我们将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `Conversation` 这个统一的概念进行操作，所以开发者需要强化理解的一个概念就是：**SDK 层面不区分单聊和群聊。**
+以上章节基本演示了实时通信 SDK 的核心概念「对话」，即 `Conversation`。我们将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `Conversation` 这个统一的概念进行操作，所以开发者需要强化理解的一个概念就是：
+>SDK 层面不区分单聊和群聊。
+
+### 对话类型的细分
+
+为了方便用户在一开始就明确自己的对话模型，我们针对 SDK 中对话的概念进行了二次封装：
+
+
+逻辑模型|通用描述|需求场景|详细文档
+--|--|--|--
+暂态对话|聊天室|体育直播、娱乐直播等|[聊天室开发指南](realtime-chatroom.html)
+系统对话|服务号、订阅号|系统通知、全员广播|[服务号开发指南](realtime-service-account.html)
+临时对话|-|在线客服、闪聊、阅后即焚|[临时对话开发指南](realtime-temporary-conversation.html)
 
 对话的管理包括「成员管理」和「属性管理」两个方面。
 
@@ -921,20 +926,21 @@ option 参数中所有其他的字段（如上面例子中的 `location`）都�
 成员变动之后，所有在线的对话成员，都会得到相应的通知。SDK 会在 client 上派发对应的事件：
 
 ```javascript
+var { Event } = require('leancloud-realtime');
 // 有用户被添加至某个对话
-jerry.on('membersjoined', function membersjoinedEventHandler(payload, conversation) {
+jerry.on(Event.MEMBERS_JOINED, function membersjoinedEventHandler(payload, conversation) {
   console.log(payload.members, payload.invitedBy, conversation.id);
 });
 // 有成员被从某个对话中移除
-jerry.on('membersleft', function membersleftEventHandler(payload, conversation) {
+jerry.on(Event.MEMBERS_LEFT, function membersleftEventHandler(payload, conversation) {
   console.log(payload.members, payload.kickedBy, conversation.id);
 });
 // 当前用户被添加至某个对话
-jerry.on('invited', function invitedEventHandler(payload, conversation) {
+jerry.on(Event.INVITED, function invitedEventHandler(payload, conversation) {
   console.log(payload.invitedBy, conversation.id);
 });
 // 当前用户被从某个对话中移除
-jerry.on('kicked', function kickedEventHandler(payload, conversation) {
+jerry.on(Event.KICKED, function kickedEventHandler(payload, conversation) {
   console.log(payload.kickedBy, conversation.id);
 });
 ```
@@ -943,19 +949,19 @@ jerry.on('kicked', function kickedEventHandler(payload, conversation) {
 
 ```javascript
 // 有用户被添加至某个对话
-conversation.on('membersjoined', function membersjoinedEventHandler(payload) {
+conversation.on(Event.MEMBERS_JOINED, function membersjoinedEventHandler(payload) {
   console.log(payload.members, payload.invitedBy);
 });
 // 有成员被从某个对话中移除
-conversation.on('membersleft', function membersleftEventHandler(payload) {
+conversation.on(Event.MEMBERS_LEFT, function membersleftEventHandler(payload) {
   console.log(payload.members, payload.kickedBy);
 });
 // 当前用户被添加至某个对话
-conversation.on('invited', function invitedEventHandler(payload) {
+conversation.on(Event.INVITED, function invitedEventHandler(payload) {
   console.log(payload.invitedBy);
 });
 // 当前用户被从某个对话中移除
-conversation.on('kicked', function kickedEventHandler(payload) {
+conversation.on(Event.KICKED, function kickedEventHandler(payload) {
   console.log(payload.kickedBy);
 });
 ```
@@ -998,7 +1004,7 @@ conversation.add(['Mary']).then(function(conversation) {
 
 | 邀请者             | 被邀请者                        | 其他人             |
 | --------------- | --------------------------- | --------------- |
-| `membersjoined` | `invited` 与 `membersjoined` | `membersjoined` |
+| `MEMBERS_JOINED` | `INVITED` 与 `MEMBERS_JOINED` | `MEMBERS_JOINED` |
 
 
 >注意：如果在进行邀请操作时，被邀请者不在线，那么通知消息并不会被离线缓存，所以等到 Ta 再次上线的时候将不会收到通知。
@@ -1044,7 +1050,7 @@ realtime.createIMClient('William').then(function(william) {
 
 | 操作者           | 被移除者     | 其他人           |
 | ------------- | -------- | ------------- |
-| `membersleft` | `kicked` | `membersleft` |
+| `MEMBERS_LEFT` | `KICKED` | `MEMBERS_LEFT` |
 
 
 >注意：如果在进行踢人操作时，被踢者不在线，那么通知消息并不会被离线缓存，所以等到 Ta 再次上线的时候将不会收到通知。
@@ -1073,7 +1079,7 @@ conversation.count().then(function(membersCount) {
 | `members`             | `m`              | 成员列表                      |
 | `creator`             | `c`              | 对话创建者                     |
 | `transient`           | `tr`             | 是否为聊天室（暂态对话）              |
-| `system`              | `sys`            | 是否为系统对话                   |
+| `system`              | `sys`            | 是否为服务号（系统对话）                   |
 | `mutedMembers`        | `mu`             | 静音该对话的成员                  |
 | `muted`               | N/A              | 当前用户是否静音该对话               |
 | `createdAt`           | `createdAt`      | 创建时间                      |
@@ -1195,7 +1201,7 @@ tom.getConversation(CONVERSATION_ID).then(function(conversation) {
 
 #### 对话列表
 
-用户登录进应用后，获取最近的 10 个对话（包含暂态对话，如聊天室）：
+用户登录进应用后，获取最近的 10 个对话（包含聊天室）：
 
 
 
@@ -1206,8 +1212,6 @@ tom.getQuery().containsMembers(['Tom']).find().then(function(conversations) {
     console.log(conversation.lastMessageAt.toString(), conversation.members);
   });
 }).catch(console.error.bind(console));
-
-// http://jsplay.avosapps.com/biy/embed?js,console
 ```
 
 
@@ -1220,13 +1224,12 @@ var query = tom.getQuery();
 query.limit(20).containsMembers(['Tom']).find().then(function(conversations) {
   console.log(conversations.length);
 }).catch(console.error.bind(console));
-
-// http://jsplay.avosapps.com/mej/embed?js,console
 ```
 
 
 #### 条件查询
 
+对话的条件查询需要注意的对话属性的存储结构，在 [对话的属性](#对话的属性管理) 这一节中我们介绍了对话的基本属性，这些属性都是 SDK 提供的默认属性，查询默认属性的方法如下：
 
 ```javascript
 // 查询对话名称为「LeanCloud 粉丝群」的对话
@@ -1334,10 +1337,10 @@ query.contains('keywords', '教育').lessThan('age', 18);
 ```javascript
 Promise.all([
   client.getQuery().containsMembers([client.id]).find(),
-  client.getQuery().equalTo('sys', true).find(),
-]).then(function(participatedConversations, systemConversations) {
+  client.getServiceConversationQuery().find(),
+]).then(function(participatedConversations, serviceConversations) {
   // participatedConversations 为自己参与过的对话
-  // systemConversations 为系统对话
+  // serviceConversations 为系统对话
 }).catch(function(error) {
   // handle error
 });
@@ -1412,29 +1415,32 @@ JavaScript SDK 会对按照对话 id 对对话进行内存字典缓存，但不�
 
 聊天室与普通对话或群聊不一样的地方具体体现为：
 
-* 无人数限制，而普通对话最多允许 500 人加入。
+* **无人数限制**（而普通对话最多允许 500 人加入）<br/>从实际经验来看，为避免过量消息刷屏而影响用户体验，我们建议每个聊天室的<u>上限人数控制在 **5000 人**左右</u>。开发者可以考虑从应用层面将大聊天室拆分成多个较小的聊天室。
 * 不支持查询成员列表，但可以通过相关 API 查询在线人数。
 * 不支持离线消息、离线推送通知、消息回执等功能。
 * 没有成员加入、成员离开的通知。
 * 一个用户一次登录只能加入一个聊天室，加入新的聊天室后会自动离开原来的聊天室。
 * 加入后半小时内断网重连会自动加入原聊天室，超过这个时间则需要重新加入。
 
+{% call docs.bubbleWrap() -%}
+我们在最新的 SDK 中为聊天室提供了内置的封装模型，请阅读 [实时通信 - 聊天室开发指南](realtime-chatroom.html)。
+{%- endcall %}
+
 ### 创建聊天室
 
 
-建立一个聊天室需要在 `IMClient#createConversation()` 时传入 `transient=true`。
+建立一个聊天室需要 `IMClient#createChatRoom()` 方法。
 
 
-比如喵星球正在直播选美比赛，主持人 Tom 创建了一个临时对话，与喵粉们进行互动：
+比如喵星球正在直播选美比赛，主持人 Tom 创建了一个聊天室，与喵粉们进行互动：
 
 
 
 ```javascript
-tom.createConversation({
+tom.createChatRoom({
   name: 'Hello Kitty PK 加菲猫',
-  transient: true,
-}).then(function(conversation) {
-  console.log('创建聊天室成功。id: ' + conversation.id);
+}).then(function(chatRoom) {
+  console.log('创建聊天室成功。id: ' + chatRoom.id);
 }).catch(console.error.bind(console));
 ```
 
@@ -1443,12 +1449,12 @@ tom.createConversation({
 
 ### 查询在线人数
 
- `Conversation.count()`  可以用来查询普通对话的成员总数，在聊天室中，它返回的就是实时在线的人数：
+ `ChatRoom#count()`  可以用来查询普通对话的成员总数，在聊天室中，它返回的就是实时在线的人数：
 
 
 
 ```javascript
-conversation.count().then(function(count) {
+chatRoom.count().then(function(count) {
   console.log('在线人数: ' + count);
 }).catch(console.error.bind(console));
 ```
@@ -1456,20 +1462,19 @@ conversation.count().then(function(count) {
 
 ### 查找聊天室
 
-开发者需要注意的是，通过 `IMClient#getQuery()` 这样得到的 `ConversationQuery` 实例默认是查询全部对话的，也就是说，如果想查询指定的聊天室，需要限定 `tr` 字段的查询条件：
+开发者需要注意的是，通过 `IMClient#getQuery()` 这样得到的 `ConversationQuery` 实例默认是查询全部对话的，也就是说，如果想查询指定的聊天室，需要使用 `IMClient#getChatRoomQuery()`：
 
 比如查询主题包含「奔跑吧，兄弟」的聊天室：
 
 
 
 ```javascript
-var query = tom.getQuery();
+var query = tom.getChatRoomQuery();
 query
   .equalTo('topic', '奔跑吧，兄弟')
-  .equalTo('tr', true)
   .find()
-  .then(function(conversations) {
-    console.log(conversations[0].id);
+  .then(function(chatRooms) {
+    console.log(chatRooms[0].id);
   })
   .catch(console.error.bind(console));
 ```
@@ -1524,7 +1529,15 @@ messageIterator.next().then(function(result) {
 }).catch(console.error.bind(console));
 ```
 
+### 根据消息类型查询
 
+下面的代码将演示如何查询某一种消息类型的聊天记录：
+
+```
+conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
+  console.log(messages);
+}).catch(console.error);
+```
 ### 客户端聊天记录缓存
 
 JavaScript SDK 没有客户端聊天记录缓存机制。
@@ -1537,55 +1550,57 @@ JavaScript SDK 没有客户端聊天记录缓存机制。
 
 当网络连接出现中断、恢复等状态变化时，SDK 会在 Realtime 实例上派发以下事件：
 
-* `disconnect`：与服务端连接断开，此时聊天服务不可用。
-* `offline`：网络不可用。
-* `online`：网络恢复。
-* `schedule`：计划在一段时间后尝试重连，此时聊天服务仍不可用。
-* `retry`：正在重连。
-* `reconnect`：与服务端连接恢复，此时聊天服务可用。
+* `DISCONNECT`：与服务端连接断开，此时聊天服务不可用。
+* `OFFLINE`：网络不可用。
+* `ONLINE`：网络恢复。
+* `SCHEDULE`：计划在一段时间后尝试重连，此时聊天服务仍不可用。
+* `RETRY`：正在重连。
+* `RECONNECT`：与服务端连接恢复，此时聊天服务可用。
 
 ```javascript
-realtime.on('disconnect', function() {
+var { Event } = require('leancloud-realtime');
+
+realtime.on(Event.DISCONNECT, function() {
   console.log('服务器连接已断开');
 });
-realtime.on('offline', function() {
+realtime.on(Event.OFFLINE, function() {
   console.log('离线（网络连接已断开）');
 });
-realtime.on('online', function() {
+realtime.on(Event.ONLINE, function() {
   console.log('已恢复在线');
 });
-realtime.on('schedule', function(attempt, delay) {
+realtime.on(Event.SCHEDULE, function(attempt, delay) {
   console.log(delay + 'ms 后进行第' + (attempt + 1) + '次重连');
 });
-realtime.on('retry', function(attempt) {
+realtime.on(Event.RETRY, function(attempt) {
   console.log('正在进行第' + (attempt + 1) + '次重连');
 });
-realtime.on('reconnect', function() {
+realtime.on(Event.RECONNECT, function() {
   console.log('与服务端连接恢复');
 });
 ```
 
 
 
-在 `schedule` 与 `retry` 事件之间，开发者可以调用 `Realtime#retry` 方法手动进行重连。
+在 `SCHEDULE` 与 `RETRY` 事件之间，开发者可以调用 `Realtime#retry` 方法手动进行重连。
 
-在浏览器中，SDK 会通过 Network Information API 感知到网络的变化自动进入离线状态，在进入离线状态时会派发 `offline` 事件，在恢复在线时会派发 `online` 事件。在其他环境中可以通过调用 `Realtime#pause` 与 `Realtime#resume` 方法来手动进入或离开离线状态，可以实现实时通信在 App 被切到后台挂起、切回前台恢复等功能。
+在浏览器中，SDK 会通过 Network Information API 感知到网络的变化自动进入离线状态，在进入离线状态时会派发 `OFFLINE` 事件，在恢复在线时会派发 `ONLINE` 事件。在其他环境中可以通过调用 `Realtime#pause` 与 `Realtime#resume` 方法来手动进入或离开离线状态，可以实现实时通信在 App 被切到后台挂起、切回前台恢复等功能。
 
-在断线重连的过程中，SDK 也会在所有的 IMClient 实例上派发同名的事件。Realtime 与 IMClient 上的同名事件是先后同步派发的，唯一的例外是 `reconnect` 事件。在网络连接恢复，Realtime 上派发了 `reconnect` 事件之后，IMClient 会尝试重新登录，成功后再派发 `reconnect` 事件。所以，Realtime 的 `reconnect` 事件意味着 Realtime 实例的 API 能够正常使用了，IMClient 的 `reconnect` 事件意味着 IMClient 实例的 API 能够正常使用了。
+在断线重连的过程中，SDK 也会在所有的 IMClient 实例上派发同名的事件。Realtime 与 IMClient 上的同名事件是先后同步派发的，唯一的例外是 `RECONNECT` 事件。在网络连接恢复，Realtime 上派发了 `RECONNECT` 事件之后，IMClient 会尝试重新登录，成功后再派发 `RECONNECT` 事件。所以，Realtime 的 `RECONNECT` 事件意味着 Realtime 实例的 API 能够正常使用了，IMClient 的 `RECONNECT` 事件意味着 IMClient 实例的 API 能够正常使用了。
 
 下面显示的是一次典型的断线重连过程中 SDK 派发的事件：
 
 |时间线|事件派发者|事件|说明|
 |:---:|:---:|:---|:---|
-|网络断开|Realtime,IMClient|`disconnect`|服务端连接断开|
-||Realtime,IMClient|`offline`|离线|
-|网络恢复|Realtime,IMClient|`online`|恢复在线|
-||Realtime,IMClient|`schedule` (attempt=0, delay=1000)|计划 1s 后重连|
-|+1s|Realtime,IMClient|`retry` (attempt=0)|尝试第一次重连|
-|+0.2s</br>重连失败|Realtime,IMClient|`schedule` (attempt=1, delay=2000)|计划 2s 后进行第二次重连|
-|+1.5s</br>调用 `realtime.retry()`|Realtime,IMClient|`retry` (attempt=0)|在 2s 内，手动进行重试，重连次数重置|
-|+0.2s|Realtime|`reconnect`|服务端连接恢复，此时可以创建新的客户端了|
-|+0.2s|IMClient|`reconnect`|客户端重新登录上线，此时该客户端可以收发消息了|
+|网络断开|Realtime,IMClient|`DISCONNECT`|服务端连接断开|
+||Realtime,IMClient|`OFFLINE`|离线|
+|网络恢复|Realtime,IMClient|`ONLINE`|恢复在线|
+||Realtime,IMClient|`SCHEDULE` (attempt=0, delay=1000)|计划 1s 后重连|
+|+1s|Realtime,IMClient|`RETRY` (attempt=0)|尝试第一次重连|
+|+0.2s</br>重连失败|Realtime,IMClient|`SCHEDULE` (attempt=1, delay=2000)|计划 2s 后进行第二次重连|
+|+1.5s</br>调用 `realtime.retry()`|Realtime,IMClient|`RETRY` (attempt=0)|在 2s 内，手动进行重试，重连次数重置|
+|+0.2s|Realtime|`RECONNECT`|服务端连接恢复，此时可以创建新的客户端了|
+|+0.2s|IMClient|`RECONNECT`|客户端重新登录上线，此时该客户端可以收发消息了|
 
 
 ## 退出登录
@@ -1611,11 +1626,7 @@ tom.close().then(function() {
 
 为了满足开发者对权限和认证的要求，我们设计了操作签名的机制。签名启用后，所有的用户登录、对话创建/加入、邀请成员、踢出成员等登录都需要验证签名，这样开发者就对消息具有了完全的掌控。
 
-{% if node=='qcloud' %}
-我们强烈推荐启用登录签名，具体步骤是 `控制台 > 设置 > 应用选项`，勾选 **聊天、推送** 下的 **聊天服务，启用登录认证**。
-{% else %}
-我们强烈推荐启用登录签名，具体步骤是 [控制台 > 设置 > 应用选项](/app.html?appid={{appid}}#/permission)，勾选 **聊天、推送** 下的 **聊天服务，启用登录认证**。
-{% endif %}
+我们强烈推荐启用登录签名，具体步骤是进入 [控制台 > 消息 > 实时消息 > 设置 > 实时消息选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf)，勾选 **登录启用签名认证**。
 
 客户端这边究竟该如何使用呢？我们只需要实现 signature 工厂方法，然后作为参数实例化 IMClient 即可
 
@@ -1690,8 +1701,11 @@ realtime.createIMClient('Tom', {
 ```
 
 
-> 需要强调的是：开发者切勿在客户端直接使用 MasterKey 进行签名操作，因为 MaterKey 一旦泄露，会造成应用的数据处于高危状态，后果不容小视。因此，强烈建议开发者将签名的具体代码托管在安全性高稳定性好的服务器上（例如 LeanCloud 云引擎）。
+{{ docs.alert("需要强调的是：开发者切勿在客户端直接使用 MasterKey 进行签名操作，因为 MaterKey 一旦泄露，应用的数据将处于高危状态，后果不容小视。因此，强烈建议开发者将签名的具体代码托管在安全性高稳定性好的云端服务器上（例如 LeanCloud 云引擎）。") }}
 
+为了帮助开发者理解云端签名的算法，我们开源了一个用 Node.js + 云引擎实现签名的云端，供开发者学习和使用：[LeanCloud 实时通信云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode)。
+
+{{ im.signature("### 测试签名") }}
 
 ### 单点登录
 
@@ -1716,15 +1730,11 @@ realtime.createIMClient('Tom', {
 
 假设开发者想实现 QQ 这样的功能，那么需要在登录到服务器的时候，也就是打开与服务器长连接的时候，标记一下这个链接是从什么类型的客户端登录到服务器的：
 
-
-
 ```javascript
-realtime.createIMClient('Tom', undefined, 'Web').then(function(tom) {
+realtime.createIMClient('Tom', { tag: 'Web' }).then(function(tom) {
   console.log('Tom 登录');
 });
 ```
-
-
 
 上述代码可以理解为 LeanCloud 版 QQ 的登录，而另一个带有同样 Tag 的客户端打开连接，则较早前登录系统的客户端会被强制下线。
 
@@ -1732,15 +1742,14 @@ realtime.createIMClient('Tom', undefined, 'Web').then(function(tom) {
 
 我们可以看到上述代码中，登录的 Tag 是 `Web`。当存在与其相同的 Tag 登录的客户端，较早前登录的设备会被服务端强行下线，而且他会收到被服务端下线的通知：
 
-
-
-```javascriptjava
-tom.on('conflict', function() {
+```javascript
+var { Event } = require('leancloud-realtime');
+tom.on(Event.CONFLICT, function() {
   // 弹出提示，告知当前用户的 Client Id 在其他设备上登陆了
 });
 ```
 
-如上述代码中，当前用户被服务端强行下线时，SDK 会在 client 上派发 `conflict` 事件，客户端在做展现的时候也可以做出类似于 QQ 一样友好的通知。
+如上述代码中，当前用户被服务端强行下线时，SDK 会在 client 上派发 `CONFLICT` 事件，客户端在做展现的时候也可以做出类似于 QQ 一样友好的通知。
 
 ## 插件
 
@@ -1824,8 +1833,16 @@ var EnsureFileIdPlugin = {
 - package 名称以 `leancloud-realtime-plugin-` 为前缀；
 - 插件对象需要有 `name` 字段，用于在日志中显示异常的插件名称，建议与 package 名称相同。
 
-## 从 v2 迁移
-如果你的应用正在使用 JavaScript SDK version 2 并希望升级到 version 3，请参考 [《JavaScript 实时通信 SDK v3 迁移指南》](./realtime_js-v3-migration-guide.html)。
+## SDK 升级指南
+将 JavaScript SDK version 2 升级到 version 3，请参考《[JavaScript 实时通信 SDK v3 迁移指南](./realtime_js-v3-migration-guide.html)》。
+
+将 JavaScript SDK version 3 升级到 version 4，请参考《[JavaScript 实时通信 SDK v4 升级检查清单](https://github.com/leancloud/js-realtime-sdk/wiki/v4.0-upgrade-checklist)》。
+
+## 实时通信云引擎 Hook
+一些应用因其特殊的业务逻辑需要在消息发送时或者消息接收时插入一定的逻辑，因此我们也提供了[实时通信云引擎 Hook](realtime_v2.html#云引擎_Hook)。
+
+## 实时通信 REST API
+有些应用需要在用户登录之前就提前创建一些对话或者是针对对话进行操作，因此可以通过[实时通信 REST API](realtime_rest_api.html)来实现。
 
 
 ## 常见问题
@@ -1842,7 +1859,3 @@ var EnsureFileIdPlugin = {
 **我自己没有服务器，如何实现签名的功能？**
 
 答：LeanCloud 云引擎提供了托管 Python 和 Node.js 运行的方式，开发者可以所以用这两种语言按照签名的算法实现签名，完全可以支持开发者的自定义权限控制。
-
-## 问题排查
-
-1. 客户端连接被关闭有许多原因，请参考 [服务器端错误码说明](realtime_v2.html#服务器端错误码说明)。

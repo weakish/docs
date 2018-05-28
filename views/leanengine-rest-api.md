@@ -65,13 +65,7 @@ curl -X POST \
 }
 ```
 
-**注意：`POST /1.1/call/:name` 需要你在云引擎中使用最新版的 SDK，Node.js 需要 0.2 版本以上的云引擎**
-
-### 非主要组的云函数访问
-
-如果在云引擎的 [组管理](leanengine_plan.html#组管理) 中创建了扩展分组，要调用这些非主要组上的云函数时，需要将 <code><mark>{{host}}</mark></code> 替换为该分组所使用的二级域名，例如 `http[s]://<分组二级域名>.leanapp.cn/1.1/functions/<函数名称>`。
-
-{{ docs.alert(leanengine.cloudFuncLimitationOnNonPrimaryGroup()) }}
+**注意：`POST /1.1/call/:name` 需要你在云引擎中使用最新版的 SDK，Node.js 需要 0.2 版本以上的云引擎**。
 
 你还可以阅读以下云引擎开发指南来获取更多的信息。
 

@@ -5,6 +5,14 @@
   {%- endif %}
 {% endmacro %}
 
+{% macro warning(content) -%}
+  {{ callout(paragraph(content),"warning") | safe }}  
+{%- endmacro %}
+
+{% macro warningWrap() -%}
+  {{ callout(paragraph(caller()),"warning") | safe }}  
+{%- endmacro %}
+
 {% macro alert(content) -%}
   {{ callout(paragraph(content),"danger") | safe }}  
 {%- endmacro %}

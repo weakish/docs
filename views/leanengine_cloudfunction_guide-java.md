@@ -376,3 +376,16 @@ EngineRequestContext 则可以获取额外的一些 metaData 信息
 JavaRequestSignImplementation.instance().setUseMasterKey(true);
 ```
 {% endblock %}
+
+{% block code_hook_message_sent %}
+
+```java
+  @IMHook(type = IMHookType.messageSent)
+  public static Map<String, Object> onMessageSent(Map<String, Object> params) {
+    System.out.println(params);
+    Map<String, Object> result = new HashMap<String, Object>();
+    // ...
+    return result;
+  }
+```
+{% endblock %}

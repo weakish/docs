@@ -50,7 +50,7 @@ conv_id | 可选 | 对话 ID，若不传此参数，查询 client 在所有对�
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  -H "Content-Type: application/json" \ 
+  -H "Content-Type: application/json" \
   -d '{"reason": "why"}' \
   https://{{host}}/1.2/rtm/clients/{client_id}/kick
 ```
@@ -119,7 +119,7 @@ curl -X GET \
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  -H "Content-Type: application/json" \ 
+  -H "Content-Type: application/json" \
   -d '{"conv_id": ""}' \
   https://{{host}}/1.2/rtm/clients/{client_id}/blacklists
 ```
@@ -140,7 +140,7 @@ conv_id | 必选 | 拉黑的 群聊/聊天室/服务号 ID
 curl -X DELETE \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  -H "Content-Type: application/json" \ 
+  -H "Content-Type: application/json" \
   -d '{"conv_id": ""}' \
   https://{{host}}/1.2/rtm/clients/{client_id}/blacklists
 ```
@@ -180,7 +180,7 @@ next | 可选 | 第一次查询时返回，后面的查询带着这个参数，�
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
-  -G \ 
+  -G \
   --data-urlencode 'session_token=some-token' \
   https://{{host}}/1.2/rtm/clients/sign
 ```

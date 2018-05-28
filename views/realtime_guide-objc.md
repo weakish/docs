@@ -1765,6 +1765,34 @@ AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
 ```
 {% endblock %}
 
+{% block im_history_messageType_code %}
+
+```objc
+- (void)tomQueryMediaMessagesWithLimit {
+    // Tom 创建了一个 client，用自己的名字作为 clientId
+    AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+    // Tom 打开 client
+    [client openWithCallback:^(BOOL succeeded, NSError *error) {
+        if (!error) {
+            // Tom 创建查询会话的 query
+            AVIMConversationQuery *query = [client conversationQuery];
+            // Tom 获取 id 为 2f08e882f2a11ef07902eeb510d4223b 的会话
+            [query getConversationById:@"2f08e882f2a11ef07902eeb510d4223b" callback:^(AVIMConversation *conversation, NSError *error) {
+                if (!error) {
+                    // 查询对话中最新的 10 条图片消息
+                    [conversation queryMediaMessagesFromServerWithType:kAVIMMessageMediaTypeImage limit:10 fromMessageId:nil fromTimestamp:0 callback:^(NSArray *messages, NSError *error) {
+                        if (!error) {
+                            NSLog(@"查询成功！");
+                        }
+                    }];
+                }
+            }];
+        }
+    }];
+}
+```
+{% endblock %}
+
 {% block disable_im_cache %}
 ```objc
 - (void)tomQueryMessagesWithLimitAndIgnoreCache {
@@ -1837,16 +1865,13 @@ imClient.signatureDataSource = signatureDelegate;
  对一个操作进行签名. 注意:本调用会在后台线程被执行
  @param clientId - 操作发起人的 id
  @param conversationId － 操作所属对话的 id
- @param action － 操作的种类，主要有：
-                "join": 表示操作发起人要加入对话
-                "invite": 表示邀请其他人加入对话
-                "kick": 表示从对话中踢出部分人
+ @param action － @see AVIMSignatureAction
  @param clientIds － 操作目标的 id 列表
  @return 一个 AVIMSignature 签名对象.
  */
 - (AVIMSignature *)signatureWithClientId:(NSString *)clientId
                           conversationId:(NSString *)conversationId
-                                  action:(NSString *)action
+                                  action:(AVIMSignatureAction)action
                        actionOnClientIds:(NSArray *)clientIds;
 ```
 

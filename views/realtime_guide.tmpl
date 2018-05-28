@@ -616,14 +616,14 @@ SDK 会在 Conversation 上维护 `unreadMessagesCount` 字段，这个字段在
 
 ### 对话类型的细分
 
-为了方便用户在一开始就明确自己的对话模型，我们针对 SDK 中对话的概念进行了二次封装：
+为了方便用户在一开始就明确自己的对话模型，我们针对 SDK 中对话的概念进行了二次封装：
 
 
 逻辑模型|通用描述|需求场景|详细文档
 --|--|--|--
-暂态对话|聊天室|体育直播，娱乐直播等|[聊天室开发指南](realtime-chatroom.html)
-系统对话|服务号，订阅号|系统通知，全员广播|[服务号开发指南](realtime-service-account.html)
-临时对话|-|在线客服，闪聊，阅后即焚|[临时对话开发指南](realtime-temporary-conversation.html)
+暂态对话|聊天室|体育直播、娱乐直播等|[聊天室开发指南](realtime-chatroom.html)
+系统对话|服务号、订阅号|系统通知、全员广播|[服务号开发指南](realtime-service-account.html)
+临时对话|-|在线客服、闪聊、阅后即焚|[临时对话开发指南](realtime-temporary-conversation.html)
 
 {% block conversation_specialnote %}{% endblock %}
 
@@ -825,7 +825,7 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 
 #### 对话列表
 
-用户登录进应用后，获取最近的 10 个对话（包含暂态对话，如聊天室）：
+用户登录进应用后，获取最近的 10 个对话（包含聊天室）：
 
 {% block conversation_getList %}
 
@@ -1056,7 +1056,7 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 
 {% block chatroom_intro %}{% endblock %}
 
-比如喵星球正在直播选美比赛，主持人 Tom 创建了一个临时对话，与喵粉们进行互动：
+比如喵星球正在直播选美比赛，主持人 Tom 创建了一个聊天室，与喵粉们进行互动：
 
 {% block chatroom_new %}
 ```
@@ -1137,6 +1137,12 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 - 再根据上一步的第 10 条消息的 msgId，timestamp 和 limit 获取第二页的数据
 ```
 {% endblock %}
+
+### 根据消息类型查询
+
+下面的代码将演示如何查询某一种消息类型的聊天记录：
+
+{% block im_history_messageType_code %}{% endblock %}
 
 {% block text_im_history_cache %}
 ### 客户端聊天记录缓存

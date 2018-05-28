@@ -12,10 +12,10 @@
 ### 安装与引用 SDK
 
 #### npm
-如果你的 Web 应用使用了 webpack 等前端打包工具，我们推荐使用 npm 的包管理工具安装 SDK：
+如果你的 Web 应用使用了 webpack 等前端打包工具，我们推荐使用包管理工具 npm 安装 SDK：
 
 ```bash
-# 存储服务（包括推送和统计）
+# 存储服务（包括推送）
 $ npm install leancloud-storage --save
 # 实时消息服务
 $ npm install leancloud-realtime --save
@@ -24,7 +24,7 @@ $ npm install leancloud-realtime --save
 如果因为网络原因无法通过官方的 npm 站点下载，推荐通过 taobao 镜像来下载，操作步骤如下：
 
 ```bash
-# 存储服务（包括推送和统计）
+# 存储服务（包括推送）
 $ npm install leancloud-storage --save --registry=https://registry.npm.taobao.org
 # 实时消息服务
 $ npm install leancloud-realtime --save --registry=https://registry.npm.taobao.org
@@ -52,15 +52,15 @@ var AV = require('leancloud-storage/live-query');
 
 ```html
 <!-- 存储服务 -->
-<script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js"></script>
 <!-- 实时消息服务 -->
-<script src="//unpkg.com/leancloud-realtime@^4.0.0-beta"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-realtime@{{jsimsdkversion}}/dist/realtime.browser.min.js"></script>
 ```
 
 如果需要使用存储服务的 [LiveQuery][livequery] 功能，需要按如下做法引入存储 SDK：
 
 ```html
-<script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-live-query-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-live-query-min.js"></script>
 ```
 
 通过这种方式引入的 SDK 可以通过全局变量 `AV` 获得引用：
@@ -125,6 +125,10 @@ set DEBUG=leancloud*,LC* lean up
 
 如果使用 [WePY](https://tencent.github.io/wepy/) 来开发小程序，可以直接通过 npm 安装和引用 SDK，具体操作步骤请参考 [npm](#npm)。
 
+### mpvue
+
+如果使用 [mpvue](http://mpvue.com/) 来开发小程序，可以直接通过 npm 安装和引用 SDK，具体操作步骤请参考 [npm](#npm)。
+
 ## 微信小游戏
 
 微信小游戏手动导入 SDK 的步骤与微信小程序一致，请参考 [微信小程序 · 手动导入文件](#手动导入文件)。
@@ -140,8 +144,9 @@ CocosCreator 支持直接通过 npm 安装与引用 SDK，具体操作步骤请�
 如果你的 CocosCreator 项目需要发布为微信小程序，需要在构建发布到小程序之前修改 SDK 的引用路径：
 
 ```diff
-  // 存储服务 SDK 无需修改
-  // var AV = require('leancloud-storage');
+  // 存储服务 SDK  路径变更为
+- var AV = require('leancloud-storage');
++ var AV = require('leancloud-storage/dist/av-weapp-min.js');
   
   // 带 LiveQuery 功能的存储 SDK 路径变更为
 - var AV = require('leancloud-storage/live-query');
