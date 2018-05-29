@@ -2,7 +2,7 @@
 
 欢迎使用 LeanCloud Play。本教程将模拟一个比较玩家点数大小的场景来讲解 Play SDK 的核心使用方法。
 
-Play 正在公测试用中，最大免费使用 100 CCU，如果您需要更高额度，请联系 support@leancloud.rocks
+Play 正在公测试用中，所有应用均可试用。最大免费使用 100 CCU，如果您需要更高额度，请联系 support@leancloud.rocks
 
 我们推荐通过以下方法来学习：
 

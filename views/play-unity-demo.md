@@ -2,7 +2,7 @@
 
 本文是基于 Play SDK for Unity（C#）制作的简化版在线对战类游戏「炸金花」，目的在于让用户迅速了解如何使用 Play。
 
-Play 正在公测试用中，最大免费使用 100 CCU，如果您需要更高额度，请联系 support@leancloud.rocks
+Play 正在公测试用中，所有应用均可试用。最大免费使用 100 CCU，如果您需要更高额度，请联系 support@leancloud.rocks
 
 ## Demo
 

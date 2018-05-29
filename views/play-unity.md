@@ -26,7 +26,7 @@ Play 解决了如下几种游戏场景的服务端需求（包括但不限于）
 
 ## 公测试用
 
-Play 正在公测试用中，最大免费使用 100 CCU，如果您需要更高额度，请联系 support@leancloud.rocks
+Play 正在公测试用中，所有应用均可试用。最大免费使用 100 CCU，如果您需要更高额度，请联系 support@leancloud.rocks
 
 
 ## 必备的基础知识
