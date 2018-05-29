@@ -24,9 +24,9 @@ Play 解决了如下几种游戏场景的服务端需求（包括但不限于）
 
 > Play 为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。
 
-## 内测申请
+## 公测试用
 
-Play 尚未正式发布，内测正在进行中。<a class="btn btn-sm btn-default" href="https://blog.leancloud.cn/6177/">申请内测</a>
+Play 正在公测试用中，最大免费使用 100 CCU，如果您需要更高额度，请联系 support@leancloud.rocks
 
 
 ## 必备的基础知识
