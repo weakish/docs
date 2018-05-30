@@ -1,4 +1,5 @@
 {% import "views/_parts.html" as include %}
+{% import "views/_leanengine.njk" as LE %}
 
 {{ include.setService('engine') }}
 
@@ -692,9 +693,7 @@ Cron 表达式的基本语法为：
 
 {% block masterKeyInitLegacy %}{% endblock %}
 
-### 定时器数量
-
-生产环境和预备环境的定时器数量都限制在 5 个以内，也就是说你总共最多可以创建 10 个定时器。
+{{ LE.numberOfTimers() }}
 
 ### 超时
 

@@ -1,3 +1,4 @@
+{% import "views/_leanengine.njk" as LE %}
 {% import "views/_helper.njk" as docs %}
 {% set quartz_docs_link = '[Quartz 文档（英文）](http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger)' %}
 {% set errorMessage_shortCircuited = 'timerAction short-circuited and no fallback available' %}
@@ -418,9 +419,7 @@ Cron 表达式的基本语法为：
 <code style="white-space:nowrap;">0 30 10-13 ? * WED,FRI</code>|每周三和每周五的 10:30、11:30、12:30、13:30 执行。
 `0 0/30 8-9 5,20 * ?`| 每个月的 5 号和 20 号的 8 点和 10 点之间每隔 30 分钟执行一次，也就是 8:00、8:30、9:00 和 9:30。
 
-### 定时器数量
-
-生产环境和预备环境的定时器数量都限制在 5 个以内，也就是说你总共最多可以创建 10 个定时器。
+{{ LE.numberOfTimers() }}
 
 ### 错误信息
 
