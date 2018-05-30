@@ -1,3 +1,9 @@
+{% macro numberOfTimers(heading = "### 定时器数量") -%}
+{{ heading }}
+
+生产环境和预备环境的定时器数量都限制在 6 个以内，也就是说你总共最多可以创建 12 个定时器。
+{%- endmacro %}
+
 {% macro cloudFuncLimitationOnNonPrimaryGroup() -%}
 调用非主要组上的云函数不会触发 hook 函数，同时，非主要组也不支持通过 SDK 来调用云函数。
 {%- endmacro %}
