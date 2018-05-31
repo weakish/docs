@@ -346,6 +346,10 @@
 - 信息 - `The user cannot be altered by a client without the session.`
 - 含义 - 用户没有登录，无法修改用户信息。
 
+## 413
+
+* 信息 - `Payload Too Large.`
+* 含义 - 请求实体过大，一般是用户发送的请求总字节数远远超过被调用接口限制的请求总字节数。具体限制大小需要在被调用接口的说明文档中查看。
 
 ## 429
 
