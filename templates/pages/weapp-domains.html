@@ -87,7 +87,7 @@ title: 小程序域名白名单配置
             <td ng-bind="domains.upload"></td>
           </tr>
           <tr>
-            <th><strong>downloadFile 域名</strong><small class="help-block mb-0">仅在使用 <code>wx.downloadFile</code> 时需要配置</small></th>
+            <th><strong>downloadFile 域名</strong><small class="help-block mb-0">仅在使用 <code>wx.downloadFile</code> 时需要配置</small><small class="help-block text-warning mb-0">需要先 <a href="/dashboard/storage.html?appid={{appid}}#/storage/conf" target="_blank">绑定文件自定义域名</a><super>*<s/super></small></th>
             <td ng-bind="domains.download"></td>
           </tr>
           {% if node === 'us' %}
@@ -109,7 +109,8 @@ title: 小程序域名白名单配置
             </tr>
           {% endfor %}
         </table>
-        <div class="callout callout-danger">目前微信限制每月只能修改 5 次域名白名单。</div>
+
+        <div class="callout callout-info">* 我们提供的 downloadFile 域名是 LeanCloud 平台上的所有应用共享的，这个域名有可能会被微信识别为违规域名而被封禁。因此在使用该功能前，请先绑定您自己的文件域名来避免风险。</div>
       </div>
     </div>
   </div>

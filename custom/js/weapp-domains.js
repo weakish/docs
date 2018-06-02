@@ -26,12 +26,11 @@ angular.module('app').controller('WeappDomainsCtrl', [
             } else if (currentApp.push_group === 'q0'){
               var suffix = currentApp.app_id.slice(0, 8).toLowerCase();
               $scope.extraRequestDomains = [
-                'tab.leancloud.cn',
                 suffix + '.api.lncldapi.com',
                 suffix + '.engine.lncldapi.com',
                 suffix + '.rtm.lncldapi.com'
               ];
-              $scope.requestDomainsLength = 7;
+              $scope.requestDomainsLength = 6;
             } else {
               $scope.extraRequestDomains = [];
               $scope.requestDomainsLength = 3;
