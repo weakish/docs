@@ -13,12 +13,35 @@
 点击完成后，我们在控制台看到一个已经创建好的排行榜。
 
 ## SDK 安装
-接下来我们在客户端调用相关接口来更新用户的分数。在客户端接入排行榜需要安装存储 SDK 模块，请参考 [JavaScript SDK 安装指南](sdk_setup-js.html)
+接下来我们在客户端调用相关接口来更新用户的分数。在客户端接入排行榜需要安装存储 SDK 模块，在这篇文档中，为了简单，我们使用 CDN 的方式引入存储 SDK。在同一目录下，创建两个文件 `index.html` 和 `leaderboard-quick-start.js`。
+
+`index.html` 中的代码如下：
+```html
+<html>
+  <head>
+    <title>LeanCloud Leaderboard Quick Start Demo</title>
+  </head>
+  <body>
+    <!-- 引入存储 SDK -->
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js"></script>
+  </body>
+</html>
+```
+
+接下来在 `leaderboard-quick-start.js` 中初始化应用：
+```javascript
+AV.init({
+  appId: '{{appid}}',
+  appKey: '{{appkey}}'
+});
+```
+
+注：其他 SDK 安装方式，请参考 [JavaScript SDK 安装指南](sdk_setup-js.html)
 
 ## 更新成绩
-这里在客户端模拟注册两个玩家 A 和 B 并更新自己的成绩。首先使用以下代码注册玩家 A 并更新排行榜中的成绩：
+这里在客户端模拟注册两个玩家 A 和 B 并更新自己的成绩。首先运行以下代码注册玩家 A 并更新排行榜中的成绩：
 
-```js
+```javascript
 // 注册时输入玩家 A 的用户名及密码
 AV.User.signUp('playerA', 'passwordA')
 .then(function(user) {
