@@ -53,4 +53,4 @@ leaderboard.getResults({
 ```
 
 ## 使用指南
-更详细的使用方式，请参考[ JavaScript 排行榜开发指南](leaderboard_guide-js.html)
+更详细的使用方式，请参考[ JavaScript 排行榜开发指南](leaderboard-guide-js.html)
