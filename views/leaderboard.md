@@ -9,7 +9,7 @@
 * **获取当前玩家的排名：**即使当前玩家没有名列前茅，也可以获取他在排行中的具体名次，以此了解到当前玩家和前排玩家的差距。
 * **获取当前玩家附近排名的玩家：**例如为当前玩家寻找水平相当的对手或好友。
 * **数据重置：**支持自动定期重置或手动重置数据，比如在一个赛季结束之时或在指定小时、天、周、月后自动重置排行榜，或是在应用测试阶段、应用数据出现误差的情况下进行手动重置。
-* **简便的数据更新模式：**玩家多次更新分数时，保留最好的成绩。
+* **简便的数据更新模式：**提供两种分数更新模式，better 模式会保留玩家的最好成绩，last 会保留玩家的最新成绩。
 
 ## 功能详解
 
@@ -63,4 +63,4 @@ versionChangeInterval 代表数据重置周期，有以下选项：
 ## 开始使用
 * [快速入门](leaderboard-quick-start.html)：展示了如何快速接入排行榜功能。
 * [Demo](https://leancloud.github.io/javascript-sdk/demo/leaderboard/)及[源码](https://github.com/leancloud/javascript-sdk/blob/master/demo/leaderboard/)：通过一个 Demo 来展示排行榜功能。
-* [JavaScript 排行榜开发指南](leaderboard_guide-js.html)：对如何开发排行榜进行了详细介绍。
+* [JavaScript 排行榜开发指南](leaderboard-guide-js.html)：对如何开发排行榜进行了详细介绍。
