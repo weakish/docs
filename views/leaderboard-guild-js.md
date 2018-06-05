@@ -21,6 +21,7 @@ SDK 提供了对排行榜、成绩与用户的抽象。在开始之前，请确�
 |`version`|`number`|版本|
 |`nextResetAt`|`Date`|计划下次重置时间|
 |`createdAt`|`Date`|创建时间|
+
 ### Statistic
 
 排行榜是对用户的成绩进行排名的结果。SDK 提供了一个 `Statistic` 类来表示成绩。`Statistic` 实例有以下属性：
@@ -36,7 +37,7 @@ SDK 提供了对排行榜、成绩与用户的抽象。在开始之前，请确�
 
 |属性|类型|说明|
 |:--:|:--:|--|
-|`position`|`number`|排名，从 0 开始|
+|`rank`|`number`|排名，从 0 开始|
 |`user`|`AV.User`|拥有该成绩的用户|
 |`value`|`number`|该用户的成绩|
 |`includedStatistics`|`Statistic[]`|该用户的其他成绩|
@@ -102,6 +103,7 @@ SDK 提供了两种获取排行榜结果的 API：
 获取排行榜结果最常见的使用场景是获取排名前 N 的用户成绩。
 
 ```js
+var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.getResults({
   limit: 10,
   skip: 0,
@@ -128,6 +130,7 @@ leaderboard.getResults({
 |2|D.Va|19|3140|
 
 ```js
+var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.getResults({
   limit: 10,
   selectUserKeys: ['username', 'age'],
@@ -145,6 +148,7 @@ leaderboard.getResults({
 |2|D.Va|3140|31|
 
 ```js
+var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.getResults({
   limit: 10,
   includeStatistics: ['kills'],
@@ -159,9 +163,6 @@ leaderboard.getResults({
 
 |排名|Username|Score↓|
 |:--:|--|:--:|
-|0|Genji|3458|
-|1|Lúcio|3252|
-|2|D.Va|3140|
 |…|||
 |24|Bastion|716|
 |25 (You)|Widowmaker|698|
@@ -169,6 +170,7 @@ leaderboard.getResults({
 |…||||
 
 ```js
+var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.getResultsAroundUser(AV.User.current(), {
   limit: 3,
 }).then(function(rankings) {
@@ -186,6 +188,9 @@ leaderboard.getResultsAroundUser(AV.User.current(), {
 
 各参数的适用场景与用法与上文 `Leaderboard#getResults` 的参数类似，不再详述。
 
+#### 获取当前用户的排名
+
+如果仅需要获取当前用户的排名，使用 [获取指定用户附近的排名](#获取指定用户附近的排名) 中的 `Leaderboard#getResultsAroundUser` 方法并指定limit 为 1 时即可。
 
 ## 管理排行榜
 
@@ -204,15 +209,26 @@ AV.Leaderboard.createLeaderboard({
 }).catch(console.error);
 ```
 
-除了名字与成绩排序方式，你还可以指定排行榜的自动重置周期与成绩更新策略，详见《[创建排行榜 API 文档](https://leancloud.github.io/javascript-sdk/docs/AV.Leaderboard.html#.createLeaderboard)》。
+你可以指定以下参数：
+
+|参数|类型|是否可选|默认值|说明|
+|:--:|:--:|:--:|:--:|--|
+|`statisticName`|`string`|||所排名的成绩名字|
+|`order`|[`AV.LeaderboardOrder`](https://leancloud.github.io/javascript-sdk/docs/AV.html#.LeaderboardOrder)|||排序|
+|`updateStrategy`|[`AV.LeaderboardUpdateStrategy`](https://leancloud.github.io/javascript-sdk/docs/AV.html#.LeaderboardUpdateStrategy)|可选|`AV.LeaderboardUpdateStrategy.BETTER`|成绩更新策略|
+|`versionChangeInterval`|[`AV.LeaderboardVersionChangeInterval`](https://leancloud.github.io/javascript-sdk/docs/AV.html#.LeaderboardVersionChangeInterval)|可选|`AV.LeaderboardVersionChangeInterval.WEEK`|自动重置周期|
+
+
+详见《[创建排行榜 API 文档](https://leancloud.github.io/javascript-sdk/docs/AV.Leaderboard.html#.createLeaderboard)》。
 
 {{ docs.note("创建排行榜接口需要使用 masterKey。") }}
 
 ### 手动重置排行榜
 
-排行榜在创建之后会按照自动重置周期的设置自动定期重置，重置后该排行榜中所有用户的成绩都会被清空，你可以在控制台的历史版本中找到历史版本的归档。你也可以随时调用重置排行榜的接口进行手动重置。
+排行榜在创建之后会按照自动重置周期的设置自动定期重置，重置后该排行榜中所有用户的成绩都会被清空，你可以在控制台的历史版本中找到历史版本的归档。你也可以随时调用重置排行榜的接口手动进行重置。
 
 ```js
+var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.reset({ useMasterKey: true })
   .then(function(leaderboard) {
     // 重置成功
@@ -223,9 +239,12 @@ leaderboard.reset({ useMasterKey: true })
 
 ### 修改排行榜属性
 
-排行榜创建后，名字与成绩排序方式不可修改，自动重置周期与成绩更新策略可以通过调用以下 API 修改：
+排行榜创建后，名字与成绩排序方式不可修改。
+
+自动重置周期可以通过调用以下 API 修改：
 
 ```js
+var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.updateVersionChangeInterval(
   AV.LeaderboardVersionChangeInterval.MONTH,
   { useMasterKey: true }
@@ -234,7 +253,10 @@ leaderboard.updateVersionChangeInterval(
 }).catch(console.error);
 ```
 
+成绩更新策略可以通过调用以下 API 修改：
+
 ```js
+var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.updateUpdateStrategy(
   AV.LeaderboardUpdateStrategy.LAST,
   { useMasterKey: true }
@@ -248,10 +270,12 @@ leaderboard.updateUpdateStrategy(
 ### 删除排行榜
 
 ```js
+var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.destroy({ useMasterKey: true })
   .then(function() {
     // 删除成功
   }).catch(console.error);
 ```
 
+{{ docs.alert("删除排行榜会删除该排行榜的所有数据，包括当前数据及所有历史版本归档。")}}
 {{ docs.note("删除排行榜接口需要使用 masterKey。") }}
