@@ -2,6 +2,9 @@
 
 # 排行榜开发指南 · JavaScript
 
+## Demo
+您可以通过查看 [Demo](https://leancloud.github.io/javascript-sdk/demo/leaderboard/) 感受排行榜功能。
+
 ## 安装 SDK
 排行榜是存储 SDK 中的一个模块，要在 JavaScript 运行环境中使用排行榜功能，需要安装存储 SDK，请参考《[ JavaScript SDK 安装指南](sdk_setup-js.html)》。
 
