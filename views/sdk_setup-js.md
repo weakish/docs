@@ -5,9 +5,15 @@
 
 本指南按照应用的适用平台来介绍各自的安装与集成方式。
 
+|[<img src="images/platforms/html5.svg" width="120"/>](#web)|[<img src="images/platforms/node-js.svg"  width="120"/>](#node)|[<img src="images/platforms/weapp.svg"  width="120"/>](#weapp)|[<img src="images/platforms/weapp-game.svg"  width="120"/>](#weapp-game)|[<img src="images/platforms/cocos.png"  width="120"/>](#cocoscreator)|[<img src="images/platforms/laya.png"  width="120"/>](#layaair)|[<img src="images/platforms/egret.png"  width="120"/>](#egret)|[<img src="images/platforms/react-native.svg"  width="120"/>](#react-native)|[<img src="images/platforms/electron.svg"  width="120"/>](#electron)|
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+|Web|Node.js|微信小程序|微信小游戏|CocosCreator|LayaAir|Egret|React Native|Electron|
+
+
+<a id="web" name="web"></a>
 ## Web
 
-适用于运行在浏览器或应用内的 HTML5 平台上的应用。
+适用于运行在浏览器、WebView 或其他应用内 HTML 平台上的应用。
 
 ### 安装与引用 SDK
 
@@ -83,6 +89,7 @@ var { Realtime, TextMessage } = AV;
 localStorage.setItem('debug', 'leancloud*,LC*');
 ```
 
+<a id="node" name="node"></a>
 ## Node.js
 
 JavaScript SDK 也可以运行在 Node.js 运行环境中。如果希望在云引擎中访问我们的存储服务，请参照 [云引擎快速入门](leanengine_quickstart.html)，使用模板项目中提供的 `leanengine` 包接入存储服务。
@@ -105,6 +112,7 @@ set DEBUG=leancloud*,LC* lean up
 ```
 
 
+<a id="weapp" name="weapp"></a>
 ## 微信小程序
 
 ### 手动导入文件
@@ -129,12 +137,14 @@ set DEBUG=leancloud*,LC* lean up
 
 如果使用 [mpvue](http://mpvue.com/) 来开发小程序，可以直接通过 npm 安装和引用 SDK，具体操作步骤请参考 [npm](#npm)。
 
+<a id="weapp-game" name="weapp-game"></a>
 ## 微信小游戏
 
 微信小游戏手动导入 SDK 的步骤与微信小程序一致，请参考 [微信小程序 · 手动导入文件](#手动导入文件)。
 
 如果使用游戏引擎提供的开发工具开发微信小游戏，请参照对应的游戏引擎章节。
 
+<a id="cocoscreator" name="cocoscreator"></a>
 ## CocosCreator
 
 CocosCreator 支持直接通过 npm 安装与引用 SDK，具体操作步骤请参考 [npm](#npm)。
@@ -161,6 +171,7 @@ CocosCreator 支持直接通过 npm 安装与引用 SDK，具体操作步骤请�
 
 在改动之后，CocosCreator 的控制台可能会出现 load script error，但不影响构建发布小程序，并且构建产出在小程序开发工具中运行也不会有异常。
 
+<a id="layaair" name="layaair"></a>
 ## LayaAir
 
 根据你创建的项目类型与需要使用的服务，下载对应的 SDK 文件，移动到 `bin/libs/` 目录：
@@ -215,6 +226,7 @@ var { Realtime, TextMessage } = AV;
 
 你可以在 [这个示例项目](https://github.com/leancloud/laya-sdk-setup-sample/commit/533194407f127d412d4fa7e6c049ebe55bac4cbc) 中看到完整的改动。
 
+<a id="egret" name="egret"></a>
 ## Egret（白鹭引擎）
 
 首先前往 <https://github.com/leancloud/egret-sdk>，下载对应的 SDK 目录（leancloud-storage），将其放置于你的 Egret 游戏项目同级目录下：
@@ -273,11 +285,50 @@ AV.init('appId', 'appKey');
 
 {{ docs.note("目前在 Egret 平台上，我们只提供存储服务的 SDK（不含 LiveQuery 功能）。") }} 
 
+<a id="react-native" name="react-native"></a>
 ## React Native
 
 React Native 直接通过 npm 安装与引用 SDK，具体操作步骤请参考 [#npm](#npm)。
 
 [livequery]: livequery-guide.html
+
+<a id="electron" name="electron"></a>
+## Electron
+
+Electron 使用包管理工具 npm 管理依赖，你可以通过以下命令安装 SDK：
+
+```bash
+# 存储服务（包括推送）
+$ npm install leancloud-storage --save
+# 实时消息服务
+$ npm install leancloud-realtime --save
+```
+
+### 作为浏览器脚本引入
+
+在 index.html 中可以通过 script 标签引入 SDK：
+
+```html
+<!-- 存储服务 -->
+<script src="./node_modules/leancloud-storage/dist/av-min.js"></script>
+<!-- 实时消息服务 -->
+<script src="./node_modules/leancloud-realtime/dist/realtime.browser.min.js"></script>
+```
+
+如果需要使用存储服务的 [LiveQuery][livequery] 功能，需要按如下路径引入存储 SDK：
+
+```html
+<script src="./node_modules/leancloud-storage/dist/av-live-query-min.js"></script>
+```
+
+### 作为 Node.js 模块引入
+
+我们推荐使用 `script` 标签引入 SDK，该方式能满足绝大部分的需求。但是如果有以下的需求，SDK 也支持通过 `require('leancloud-storage')` 方法作为 Node.js 模块引入。
+
+- 需要在 main process 中使用 SDK
+- 需要使用 Node.js 的 `Buffer` 或 `Stream` 构造 `AV.File`
+
+{{ docs.note("通过 Node.js `require` 方法引入的 SDK 与通过浏览器 `script` 标签引入的 SDK 是两个不同的 SDK，需要各自分别初始化，并且不能混用。") }}
 
 ## 初始化
 
