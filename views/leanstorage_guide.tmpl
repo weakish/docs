@@ -67,6 +67,8 @@ INSERT INTO Todo (title, content) VALUES ('工程师周会', '每周工程师会
 
 `{{baseObjectName}}` 是 {{productName}} 对复杂对象的封装，每个 `{{baseObjectName}}` 包含若干属性值对，也称键值对（key-value）。属性的值是与 JSON 格式兼容的数据。通过 REST API 保存对象需要将对象的数据通过 JSON 来编码。这个数据是无模式化的（Schema Free），这意味着你不需要提前标注每个对象上有哪些 key，你只需要随意设置 key-value 对就可以，云端会保存它。
 
+{% block text_object_extra %}{% endblock %}
+
 ### 数据类型
 `{{baseObjectName}}` 支持以下数据类型：
 

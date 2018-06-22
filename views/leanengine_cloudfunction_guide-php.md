@@ -196,7 +196,7 @@ Cloud::afterDelete("Album", function($album, $user) {
     try {
         // 删除相关的 photos
         $photos = $query->find();
-        Object::destroyAll($photos);
+        LeanObject::destroyAll($photos);
     } catch (CloudException $ex) {
         throw new FunctionError("删除关联 photos 失败: {$ex->getMessage()}");
     }
@@ -419,17 +419,17 @@ Cloud::define('_conversationUpdate', function($params, $user) {
 {% block hookDeadLoop %}
 #### 防止死循环调用
 
-在实际使用中有这样一种场景：在 `Post` 类的 `{{hook_after_update}}` Hook 函数中，对传入的 `Post` 对象做了修改并且保存，而这个保存动作又会再次触发 `{{hook_after_update}}`，由此形成死循环。针对这种情况，我们为所有 Hook 函数传入的 `Object` 对象做了处理，以阻止死循环调用的产生。
+在实际使用中有这样一种场景：在 `Post` 类的 `{{hook_after_update}}` Hook 函数中，对传入的 `Post` 对象做了修改并且保存，而这个保存动作又会再次触发 `{{hook_after_update}}`，由此形成死循环。针对这种情况，我们为所有 Hook 函数传入的 `LeanObject` 对象做了处理，以阻止死循环调用的产生。
 
 不过请注意，以下情况还需要开发者自行处理：
 
-- 对传入的 `Object` 对象进行 `fetch` 操作。
-- 重新构造传入的 `Object` 对象，如使用 `Object::create()` 方法。
+- 对传入的 `LeanObject` 对象进行 `fetch` 操作。
+- 重新构造传入的 `LeanObject` 对象，如使用 `LeanObject::create()` 方法。
 
 对于使用上述方式产生的对象，请根据需要自行调用以下 API：
 
-- `Object->disableBeforeHook()` 或
-- `Object->disableAfterHook()`
+- `LeanObject->disableBeforeHook()` 或
+- `LeanObject->disableAfterHook()`
 
 这样，对象的保存或删除动作就不会再次触发相关的 Hook 函数。
 
@@ -448,7 +448,7 @@ Cloud::afterUpdate("Post", function($post, $user) {
 
     // 如果是其他方式构建对象，则需要在新构建的对象上调用相关的 disable 方法
     // 来确保不会再次触发 Hook 函数
-    $post = Object::create("Post", $post->getObjectId());
+    $post = LeanObject::create("Post", $post->getObjectId());
     $post->disableAfterHook();
     $post->save();
 });

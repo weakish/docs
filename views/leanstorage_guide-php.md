@@ -6,7 +6,7 @@
 {% set platform_name = "PHP" %}
 {% set segment_code = platform_name | lower %}
 {% set sdk_name = platform_name + " SDK" %}
-{% set baseObjectName ="Object" %}
+{% set baseObjectName ="LeanObject" %}
 {% set objectIdName ="objectId" %}
 {% set updatedAtName ="updatedAt" %}
 {% set createdAtName ="createdAt" %}
@@ -36,22 +36,26 @@
 
 {# --Start--主模板留空的代码段落，子模板根据自身实际功能给予实现 #}
 
+{% block text_object_extra %}
+{{ docs.note("在 PHP SDK 0.4 - 0.8 之间的版本中，表示对象的类名为 `Object` 而不是 `LeanObject`，详见 [Object 更名为 LeanObject](#Object_更名为_LeanObject)。") }}
+{% endblock %}
+
 {% block code_create_todo_object %}
 ```php
 // "Todo" 对应的就是控制台中的 Class Name
-$todo = new Object("Todo");
+$todo = new LeanObject("Todo");
 
 // 或者
-$todo = Object::create("Todo");
+$todo = LeanObject::create("Todo");
 ```
 {% endblock %}
 
 {% block code_quick_save_a_todo %}
 
 ```php
-use LeanCloud\Object;
+use LeanCloud\LeanObject;
 
-$todo = new Object("Todo");
+$todo = new LeanObject("Todo");
 $todo->set("title", "工程师周会");
 $todo->set("content", "每周工程师会议，周一下午2点");
 try {
@@ -93,7 +97,7 @@ try {
 {% block code_quick_save_a_todo_with_location %}
 
 ```php
-$todo = new Object("Todo");
+$todo = new LeanObject("Todo");
 $todo->set("title", "工程师周会");
 $todo->set("content", "每周工程师会议，周一下午2点");
 $todo->set("location", "会议室"); // 只要添加这一行代码，服务端就会自动添加这个字段
@@ -110,7 +114,7 @@ try {
 {% block code_save_todo_folder %}
 
 ```php
-$todoFolder = new Object("TodoFolder"); // 构建对象
+$todoFolder = new LeanObject("TodoFolder"); // 构建对象
 $todoFolder->set("name", "工作");           // 设置名称
 $todoFolder->set("priority", 1);            // 设置优先级
 
@@ -126,7 +130,7 @@ try {
 {% block code_save_callback_get_objectId %}
 
 ```php
-$todo = new Object("Todo");
+$todo = new LeanObject("Todo");
 $todo->set("title", "工程师周会");
 $todo->set("content", "每周工程师会议，周一下午2点");
 $todo->set("location", "会议室"); // 只要添加这一行代码，服务端就会自动添加这个字段
@@ -171,8 +175,8 @@ $todo  = $query->get("558e20cbe4b060308e3eb36c");
 
 {% block code_fetch_todo_by_objectId %}
 ```php
-// 假如已知了 objectId 可以用如下的方式构建一个 Object
-$todo = Object::create("Todo", "5656e37660b2febec4b35ed7");
+// 假如已知了 objectId 可以用如下的方式构建一个 LeanObject
+$todo = LeanObject::create("Todo", "5656e37660b2febec4b35ed7");
 // 然后调用刷新的方法，将数据提取到对象
 $todo->fetch();
 ```
@@ -203,7 +207,7 @@ Query::doCloudquery("update TodoFolder set name='家庭' where objectId='558e20c
 {% block code_update_todo_location %}
 
 ```php
-$todo = new Object("Todo");
+$todo = new LeanObject("Todo");
 $todo->set("title", "工程师周会");
 $todo->set("content", "每周工程师会议，周一下午2点");
 $todo->set("location", "会议室");
@@ -221,7 +225,7 @@ try {
 
 ```php
 // 参数依次为 className、objectId
-$todo = Object::create("Todo", "558e20cbe4b060308e3eb36c");
+$todo = LeanObject::create("Todo", "558e20cbe4b060308e3eb36c");
 
 // 修改 content
 $todo->set("content","每周工程师会议，本周改为周三下午3点半。");
@@ -234,7 +238,7 @@ $todo->save();
 {% block code_atomic_operation_increment %}
 
 ```php
-$theTodo = Object::create("Todo", "564d7031e4b057f4f3006ad1");
+$theTodo = LeanObject::create("Todo", "564d7031e4b057f4f3006ad1");
 $theTodo->set("views", 0); //初始值为 0
 
 $theTodo->increment("views", 5); // 原子增加查看的次数
@@ -264,7 +268,7 @@ $reminder1 = new \DateTime("2015-11-11 07:10:00");
 $reminder2 = new \DateTime("2015-11-11 07:20:00");
 $reminder3 = new \DateTime("2015-11-11 07:30:00");
 
-$todo = new Object("Todo");
+$todo = new LeanObject("Todo");
 $todo->addUniqueIn("reminders", $reminder1);
 $todo->addUniqueIn("reminders", $reminder2);
 $todo->addUniqueIn("reminders", $reminder3);
@@ -276,13 +280,13 @@ $todo->addUniqueIn("reminders", $reminder3);
 
 ```php
 // 批量创建、更新
-Object::saveAll()
+LeanObject::saveAll()
 
 // 批量删除
-Object::destroyAll()
+LeanObject::destroyAll()
 
 // 批量获取
-Object::fetchAll()
+LeanObject::fetchAll()
 ```
 {% endblock %}
 
@@ -296,7 +300,7 @@ forEach ($todos as $todo) {
     $todo->set("status", 1);
 }
 try {
-    Object::saveAll($todos);
+    LeanObject::saveAll($todos);
     // 保存成功
 } catch (CloudException $ex) {
     // 保存失败
@@ -316,21 +320,21 @@ $todo->destroy();
 {% block code_relation_todoFolder_one_to_many_todo %}
 
 ```php
-$todoFolder = new Object("TodoFolder"); // 构建对象
+$todoFolder = new LeanObject("TodoFolder"); // 构建对象
 $todoFolder->set("name", "工作");
 $todoFolder->set("priority", 1);
 
-$todo1 = new Object("Todo");
+$todo1 = new LeanObject("Todo");
 $todo1->set("title", "工程师周会");
 $todo1->set("content", "每周工程师会议，周一下午2点");
 $todo1->set("location", "会议室");
 
-$todo2 = new Object("Todo");
+$todo2 = new LeanObject("Todo");
 $todo2->set("title", "维护文档");
 $todo2->set("content", "每天 16：00 到 18：00 定期维护文档");
 $todo2->set("location", "当前工位");
 
-$todo3 = new Object("Todo");
+$todo3 = new LeanObject("Todo");
 $todo3->set("title", "发布 SDK");
 $todo3->set("content", "每周一下午 15：00");
 $todo3->set("location", "SA 工位");
@@ -348,12 +352,12 @@ $todoFolder->save();
 {% block code_pointer_comment_one_to_many_todoFolder %}
 
 ```php
-$comment = new Object("Comment"); // 构建 Comment 对象
+$comment = new LeanObject("Comment"); // 构建 Comment 对象
 $comment->set("likes", 1); // 如果点了赞就是 1，而点了不喜欢则为 -1，没有做任何操作就是默认的 0
 $comment->set("content", "这个太赞了！楼主，我也要这些游戏，咱们团购么？"); // 留言的内容
 
 // 假设已知了被分享的该 TodoFolder 的 objectId 是 5590cdfde4b00f7adb5860c8
-$comment->set("targetTodoFolder", Object::create("TodoFolder", "5590cdfde4b00f7adb5860c8"));
+$comment->set("targetTodoFolder", LeanObject::create("TodoFolder", "5590cdfde4b00f7adb5860c8"));
 // 以上代码的执行结果就会在 comment 对象上有一个名为 targetTodoFolder 属性，它是一个 Pointer 类型，指向 objectId 为 5590cdfde4b00f7adb5860c8 的 TodoFolder
 ```
 
@@ -367,7 +371,7 @@ $string     = $number . " 年度音乐排行";
 $date       = new \DateTime();
 $bytesArray = Bytes::createFromBase64Data(base64_encode("Hello world!"));
 
-$testObject = new Object("DataTypes");
+$testObject = new LeanObject("DataTypes");
 
 $testObject->set("testBoolean", $bool);
 $testObject->set("testInteger", $number);
@@ -381,7 +385,7 @@ $testObject->set("testAssociativeArray",
 $testObject->save();
 ```
 
-此外，Array 和 Associative Array 支持嵌套，这样在一个 `Object` 中就可以使用它们来储存更多的结构化数据。
+此外，Array 和 Associative Array 支持嵌套，这样在一个 `LeanObject` 中就可以使用它们来储存更多的结构化数据。
 {% endblock %}
 
 {% block code_create_geoPoint %}
@@ -619,14 +623,14 @@ $query->startsWith("content", "早餐");
 
 ```php
 $query = new Query("Comment");
-$query->equalTo("targetTodoFolder", Object::create("TodoFolder", "5590cdfde4b00f7adb5860c8"));
+$query->equalTo("targetTodoFolder", LeanObject::create("TodoFolder", "5590cdfde4b00f7adb5860c8"));
 ```
 {% endblock %}
 
 {% block code_create_tag_object %}
 
 ```php
-$tag = new Object("Tag"); // 构建对象
+$tag = new LeanObject("Tag"); // 构建对象
 $tag->set("name", "今日必做"); // 设置名称
 $tag->save();
 ```
@@ -635,16 +639,16 @@ $tag->save();
 {% block code_create_family_with_tag %}
 
 ```php
-$tag1 = new Object("Tag"); // 构建对象
+$tag1 = new LeanObject("Tag"); // 构建对象
 $tag1->set("name", "今日必做"); // 设置 Tag 名称
 
-$tag2 = new Object("Tag"); // 构建对象
+$tag2 = new LeanObject("Tag"); // 构建对象
 $tag2->set("name", "老婆吩咐"); // 设置 Tag 名称
 
-$tag3 = new Object("Tag"); // 构建对象
+$tag3 = new LeanObject("Tag"); // 构建对象
 $tag3->set("name", "十分重要"); // 设置 Tag 名称
 
-$todoFolder = new Object("TodoFolder"); // 构建对象
+$todoFolder = new LeanObject("TodoFolder"); // 构建对象
 $todoFolder->set("name", "家庭"); // 设置 Todo 名称
 $todoFolder->set("priority", 1); // 设置优先级
 
@@ -660,7 +664,7 @@ $todoFolder->save(); // 保存到云端
 {% block code_query_tag_for_todoFolder %}
 
 ```php
-$todoFolder = Object::create("TodoFolder", "5661047dddb299ad5f460166");
+$todoFolder = LeanObject::create("TodoFolder", "5661047dddb299ad5f460166");
 $relation   = $todoFolder->getRelation("tags");
 $query      = $relation->getQuery();
 // 结果将包含当前 todoFolder 的所有 Tag 对象
@@ -671,7 +675,7 @@ $query->find();
 {% block code_query_todoFolder_with_tag %}
 
 ```php
-$tag = Object::create("Tag", "5661031a60b204d55d3b7b89");
+$tag = LeanObject::create("Tag", "5661031a60b204d55d3b7b89");
 $query = new Query("TodoFolder");
 $query->equalTo("tags", $tag);
 // 结果是所有包含当前 tag 的 TodoFolder 对象
@@ -794,7 +798,7 @@ $query->addDescend("createdAt");
 ```php
 // 存储一个带有图片的 Todo 到 LeanCloud 云端
 $aTodoAttachmentImage = File::createWithUrl("test.jpg", "http://www.zgjm.org/uploads/allimg/150812/1_150812103912_1.jpg");
-$todo = new Object("Todo");
+$todo = new LeanObject("Todo");
 $todo->set("images", $aTodoAttachmentImage);
 $todo->set("content", "记得买过年回家的火车票！！！");
 $todo->save();
@@ -1038,10 +1042,10 @@ $userQuery = new Query("_User");
 
 {% block text_subclass %}
 ## 子类化
-LeanCloud 希望设计成能让人尽快上手并使用。你可以通过 `Object#get` 方法访问所有的数据。但是在很多现有成熟的代码中，子类化能带来更多优点，诸如简洁、可扩展性以及 IDE 提供的代码自动完成的支持等等。子类化不是必须的，你可以将下列代码转化：
+LeanCloud 希望设计成能让人尽快上手并使用。你可以通过 `LeanObject#get` 方法访问所有的数据。但是在很多现有成熟的代码中，子类化能带来更多优点，诸如简洁、可扩展性以及 IDE 提供的代码自动完成的支持等等。子类化不是必须的，你可以将下列代码转化：
 
 ```
-$student = new Object("Student");
+$student = new LeanObject("Student");
 $student->set("name", "小明");
 $student->save();
 ```
@@ -1060,18 +1064,18 @@ $student->save();
 
 要实现子类化，需要下面几个步骤：
 
-1. 首先声明一个子类继承自 `Object`；
+1. 首先声明一个子类继承自 `LeanObject`；
 2. 子类中声明静态字段 `protected static $className`，对应云端的数据表名；
 3. 建议不要重载构造函数 `__construct()`，如果一定需要构造，请确保其接受 2 个参数 `$className` 和 `$objectId`；
-4. 将子类注册到 `Object`，如 `Student::registerClass();`。
+4. 将子类注册到 `LeanObject`，如 `Student::registerClass();`。
 
 下面是实现 `Student` 子类化的例子:
 
 ```php
 // Student.php
-use LeanCloud\Object;
+use LeanCloud\LeanObject;
 
-class Student extends Object {
+class Student extends LeanObject {
     protected static $className = "Student";
 }
 Student::registerClass();
@@ -1079,15 +1083,15 @@ Student::registerClass();
 
 ### 访问器、修改器和方法
 
-添加方法到 Object 的子类有助于封装类的逻辑。你可以将所有跟子类有关的逻辑放到一个地方，而不是分成多个类来分别处理商业逻辑和存储/转换逻辑。
+添加方法到 LeanObject 的子类有助于封装类的逻辑。你可以将所有跟子类有关的逻辑放到一个地方，而不是分成多个类来分别处理商业逻辑和存储/转换逻辑。
 
-你可以很容易地添加访问器和修改器到你的 Object 子类。像平常那样声明字段的`getter` 和 `setter` 方法，但是通过 Object 的 `get` 和 `set` 方法来实现它们。下面是这个例子为 `Student` 类创建了一个 `content` 的字段：
+你可以很容易地添加访问器和修改器到你的 LeanObject 子类。像平常那样声明字段的`getter` 和 `setter` 方法，但是通过 LeanObject 的 `get` 和 `set` 方法来实现它们。下面是这个例子为 `Student` 类创建了一个 `content` 的字段：
 
 ```php
 // Student.php
-use LeanCloud\Object;
+use LeanCloud\LeanObject;
 
-class Student extends Object {
+class Student extends LeanObject {
     protected static $className = "Student";
 
     public function setContent($value) {
@@ -1122,17 +1126,17 @@ public function takeAccusation() {
 
 ### 初始化子类
 
-你可以使用你自定义的构造函数来创建你的子类对象。`Object` 已定义了默认的构造函数，如果需要重载构造函数，请注意其需要接收 2 个参数：`$className` 和 `$objectId`。这个构造函数将会被 SDK 使用来创建子类的对象。
+你可以使用你自定义的构造函数来创建你的子类对象。`LeanObject` 已定义了默认的构造函数，如果需要重载构造函数，请注意其需要接收 2 个参数：`$className` 和 `$objectId`。这个构造函数将会被 SDK 使用来创建子类的对象。
 
-要创建一个到现有对象的引用，可以使用 `Object::create("Student", "abc123")`:
+要创建一个到现有对象的引用，可以使用 `LeanObject::create("Student", "abc123")`:
 
 ```php
-$student = Object::create("Student", "573a8459df0eea005e6b711c");
+$student = LeanObject::create("Student", "573a8459df0eea005e6b711c");
 ```
 
 ### 查询子类
 
-你可以通过 `Object#getQuery()` 方法获取特定的子类的查询对象。下面的例子就查询了用户发表的所有微博列表：
+你可以通过 `LeanObject#getQuery()` 方法获取特定的子类的查询对象。下面的例子就查询了用户发表的所有微博列表：
 
 ```php
 $query = $post->getQuery();
@@ -1160,4 +1164,12 @@ $query->find();
 ```
 暂不支持
 ```
+{% endblock %}
+
+{% block object_extra %}
+
+### Object 更名为 LeanObject
+PHP 7.2 将 `object` 规定为保留关键字，不允许用作类名，因此我们在 PHP SDK 0.8 版本中将 `Object` 类更名为 `LeanObject` 以兼容 PHP 7.2。
+
+当 SDK 运行在 PHP 7.2 以下版本时，会为 `LeanObject` 创建一个别名，继续支持之前使用 `Object` 类的代码，这两个名字实际上指向同一个类，两个类名也可以混用。将来我们会废弃在 PHP 7.2 以下版本中对 `Object` 的支持，建议开发者尽早将代码中的 `Object` 改为 `LeanObject`。
 {% endblock %}

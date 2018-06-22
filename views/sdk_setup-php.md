@@ -50,12 +50,12 @@ Client::useRegion(Region::CN_E1);
 require 'vendor/autoload.php';
 
 use \LeanCloud\Client;
-use \LeanCloud\Object;
+use \LeanCloud\LeanObject;
 // 参数依次为 AppId, AppKey, MasterKey
 Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
 Client::setServerUrl("https://{{host}}");
 
-$testObject = new Object("TestObject");
+$testObject = new LeanObject("TestObject");
 $testObject->set("words", "Hello World!");
 try {
     $testObject->save();
