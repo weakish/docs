@@ -11,6 +11,13 @@ LeanCloud 云端提供的统一的访问云函数的接口，所有的客户端 
 
 我们推荐使用 [Postman](http://www.getpostman.com/) 来调试 REST API，我们的社区中有一篇 [使用 Postman 调试 REST API 教程](https://forum.leancloud.cn/t/postman-rest-api/8638)。
 
+## 预备环境和生产环境
+
+在客户端 SDK 调用云函数时，可以通过 REST API 的特殊的 HTTP 头 `X-LC-Prod` 来区分调用的环境。
+
+* `X-LC-Prod: 0` 表示调用预备环境
+* `X-LC-Prod: 1` 表示调用生产环境
+
 ## 云函数
 
 云函数可以通过 REST API 来使用，比如调用一个叫 hello 的云函数：
