@@ -139,6 +139,12 @@ from leancloud import cloudfunc
 
 cloudfunc.run('averageStars', movie='夏洛特烦恼')
 ```
+```cs
+var result = await AVCloud.CallFunctionAsync("averageStars",new Dictionary<string,object>()
+{
+  { "movie", "夏洛特烦恼" }
+});
+```
 ### 通过 REST API 调用云函数
 
 请查看我们的 [云引擎 REST API 使用指南](leanengine-rest-api.html)。
