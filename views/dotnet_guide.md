@@ -595,7 +595,7 @@ AVCloud.VerifySmsCode ("18688888888","012345")
 ```
 var user = AVUser.CurrentUser;
 ```
-如果调用了登出借口，那么当前用户就会被清除，并置为`null`：
+如果调用了登出接口，那么当前用户就会被清除，并置为`null`：
 ```
 AVUser.LogOut();
 var user = AVUser.CurrentUser;	//如此做就会抛出异常，因为登出之后，CurrentUser已经为空。
