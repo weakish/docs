@@ -174,7 +174,7 @@ leaderboard.getResults({
 
 ```js
 var leaderboard = AV.Leaderboard.createWithoutData('score');
-leaderboard.getResultsAroundUser(AV.User.current(), {
+leaderboard.getResultsAroundUser({
   limit: 3,
 }).then(function(rankings) {
   // rankings 为当前用户附近的 3 条排名结果
