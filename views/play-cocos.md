@@ -4,15 +4,14 @@
 
 Play 是一个基于 JavaScript 编写的 Cocos Creator 的插件，它具备如下几项主要的功能（包括但不限于）：
 
-- 使用 UserID 建立与服务端的通信
+- 与服务端建立长连接
 - 获取房间列表
 - 创建房间
 - 加入房间
-- 随机加入房间
-- 根据匹配条件加入房间
-- 设置房间属性
-- 获取房间玩家（Player）列表
-- 修改玩家的属性
+- 随机加入（符合条件的）房间
+- 获取房间玩家
+- 获取，设置，同步房间的属性
+- 获取，设置，同步玩家的属性
 - 发送和接收`自定义事件`
 - 离开房间
 
@@ -20,35 +19,59 @@ Play 是一个基于 JavaScript 编写的 Cocos Creator 的插件，它具备如
 
 
 
-## SDK 导入和初始化
+## SDK 导入
 
-请阅读 [安装和初始化](play-cocos-quick-start.html#安装)，获取 js 库文件。
+请阅读 [安装](play-cocos-quick-start.html#安装)，获取 js 库文件。
 
 
 
-## 设置 userId
+## 初始化
 
-Play 目前只需要客户端设置一个 `UserID` 就可以直接连接云端，这个 `UserID` 拥有如下限制：
+首先 Play SDK 在内部实例化了一个 `Play` 类型的对象 `play`，我们只需要引入并使用即可。（后文中的 `play` 都是指这个对象。）
 
-- 不支持中文和特殊字符（包括 `，！@#￥%……&*（）` 等），但可以是下划线 `_`
-- 长度不能超过 64 字符
-- 一个应用内全局唯一
+```javascript
+import {
+  play,
+  PlayOptions,
+  Region,
+} from '../play';
+```
+
+接着我们需要实例化一个 PlayOptions 类型的对象，作为初始化 Play 的参数。
+
+```javascript
+const opts = new PlayOptions();
+// 设置 APP ID
+opts.appId = YOUR_APP_ID;
+// 设置 APP Key
+opts.appKey = YOUR_APP_KEY;
+// 设置节点地区
+// EAST_CN：华东节点
+// NORTH_CN：华北节点
+// US：美国节点
+opts.region = Region.EAST_CN;
+play.init(opts);
+```
+
+最后我们需要设置一个 `userId` 作为客户端的唯一标识连接至服务器。
 
 ```javascript
 play.userId = 'leancloud';
 ```
 
+注意：这个 `userId` 拥有如下限制：
+- 不支持中文和特殊字符（包括 `，！@#￥%……&*（）` 等），但可以是下划线 `_`
+- 长度不能超过 64 字符
+- 一个应用内全局唯一
+
 
 
 ## 连接
 
+建立连接
+
 ```javascript
-/**
-* 建立连接
-* @param {Object} opts （可选）连接选项
-* @param {string} opts.gameVersion （可选）游戏版本号，不同的游戏版本号将路由到不同的服务端，默认值为 0.0.1
-*/
-connect({ gameVersion = '0.0.1' } = {})
+play.connect({ gameVersion = '0.0.1' });
 ```
 
 - `gameVersion` 表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器，相当于给玩家按版本做隔离。如果没有类似需求，请忽略这个参数。
@@ -73,12 +96,19 @@ play.on(Event.CONNECT_FAILED, (error) => {
 
 ## 大厅
 
-在连接服务器成功之后，如果没有在 `PlayOptions` 中设置 `autoJoinLobby`（请参考：[PlayOptions](https://leancloud.github.io/Play-SDK-JS/doc/PlayOptions.html)），默认会自动加入到大厅中。
+在连接服务器成功之后，默认会自动加入到大厅中。
 
-开发者可以根据需要注册 `JOINED_LOBBY`（加入大厅成功）事件。
+如果在 `PlayOptions` 参数中设置 `autoJoinLobby = false`，则需要手动加入大厅。
+（更多关于 `PlayOptions`，请参考：[PlayOptions](https://leancloud.github.io/Play-SDK-JS/doc/PlayOptions.html)）
 
 ```javascript
-// 注册加入大厅事件
+play.joinLobby();
+```
+
+开发者可以根据需要注册 `JOINED_LOBBY`（成功加入大厅）事件。
+
+```javascript
+// 注册成功加入大厅事件
 play.on(Event.JOINED_LOBBY, () => {
 	// TODO 可以做跳转场景，房间列表展示的逻辑
 
@@ -87,22 +117,16 @@ play.on(Event.JOINED_LOBBY, () => {
 
 当玩家加入到大厅后，Play SDK 会自动同步当前大厅的房间列表，开发者可以根据房间列表显示 / 加入房间参与游戏。
 
-如果设置了 `autoJoinLobby = false`，则需要自行加入大厅和离开大厅。
+开发者可以根据下面的接口获取房间列表。
 
 ```javascript
-/**
-* 加入大厅，只有在 autoJoinLobby = false 时才需要调用
-*/
-joinLobby()
+play.lobbyRoomList;
 ```
 
 如果开发者需要手动离开大厅，可以调用下面的接口。
 
 ```javascript
-/**
-* 离开大厅
-*/
-leaveLobby()
+play.leaveLobby();
 ```
 
 当手动离开大厅后，可以通过注册 `LEFT_LOBBY`（离开大厅）事件，编写逻辑。
@@ -113,6 +137,8 @@ play.on(Event.LEFT_LOBBY, () => {
 
 });
 ```
+
+注意：当玩家进入房间时，也会离开大厅，并触发 `LEFT_LOBBY`（离开大厅）事件。
 
 
 
@@ -125,15 +151,30 @@ play.on(Event.LEFT_LOBBY, () => {
 
 ### 创建房间
 
+例如，我们可以创建这样一个房间。
+
 ```javascript
-/**
-* 创建房间
-* @param {string} roomName 房间名称，在整个游戏中保证唯一
-* @param {Object} opts （可选）创建房间选项
-* @param {RoomOptions} opts.roomOptions （可选）创建房间选项，默认值为 null
-* @param {Array.<string>} opts.expectedUserIds （可选）邀请好友 ID 数组，默认值为 null
-*/
-createRoom(roomName, { roomOptions = null, expectedUserIds = null } = {})
+const options = new RoomOptions();
+// 房间不可见
+options.visible = false;
+// 房间空后保留的时间，单位：秒
+options.emptyRoomTtl = 600;
+// 允许的最大玩家数量
+options.maxPlayerCount = 2;
+// 玩家离线后，保留玩家数据的时间，单位：秒
+options.playerTtl = 600;
+// 房间的自定义属性
+const props = {
+	title: 'room title',
+	level: 2,
+};
+options.customRoomProperties = props;
+// 用于做房间匹配的自定义属性键
+options.customRoomPropertiesKeysForLobby = ['level'];
+const expectedUserIds = ['world'];
+play.createRoom(roomName, { 
+	roomOptions: options, 
+	expectedUserIds: expectedUserIds });
 ```
 
 创建房间时需要指定`唯一的房间名称`（其他玩家可以通过房间名称加入到房间）。除此之外，还可以指定 `roomOptions` 和 `expectedUserIds`。
@@ -144,11 +185,11 @@ createRoom(roomName, { roomOptions = null, expectedUserIds = null } = {})
 
 - opened：房间是否打开。如果设置为 false，则不允许其他玩家加入。
 - visible：房间是否可见。如果设置为 false，则不会出现在大厅的房间列表中，但是其他玩家可以通过指定`房间名称`加入房间。
-- emptyRoomTtl：当房间中没有玩家时，房间保留的时间。默认为 0，即 房间中没有玩家时，立即销毁房间数据。
-- playerTtl：当玩家掉线时，保留玩家房间数据的时间。默认为 0，即 玩家掉线后，立即销毁玩家数据。
+- emptyRoomTtl：当房间中没有玩家时，房间保留的时间（单位：秒）。默认为 0，即 房间中没有玩家时，立即销毁房间数据。最大值为 1800，即 30 分钟。
+- playerTtl：当玩家掉线时，保留玩家在房间内的数据的时间（单位：秒）。默认为 0，即 玩家掉线后，立即销毁玩家数据。最大值为 300，即 5 分钟。
 - maxPlayerCount：房间允许的最大玩家数量。
 - customRoomProperties：房间的自定义属性。
-- customRoomPropertiesKeysForLobby：房间的自定义属性`键值`数组，将用于房间匹配。这里的键值数组应该属于 `customRoomProperties`。
+- customRoomPropertiesKeysForLobby：房间的自定义属性`键`数组，将用于房间匹配。这里的键数组应该属于 `customRoomProperties`。
 
 #### expectedUserIds
 
@@ -168,12 +209,12 @@ play.on(Event.CREATED_ROOM, () => {
 
 // 注册创建房间失败事件
 play.on(Event.CREATE_ROOM_FAILED, () => {
-	// TODO 可以跳转至房间场景
+	// TODO 可以提示用户创建失败
 
 });
 ```
 
-注意：当房主创建好房间后，还会立即回调 `JOINED_ROOM`（加入房间成功）事件。
+注意：当房主创建好房间后，会认为房主默认加入房间，所以也会回调 `JOINED_ROOM`（加入房间成功）事件。
 
 ### 加入房间
 
@@ -184,16 +225,12 @@ play.on(Event.CREATE_ROOM_FAILED, () => {
 通过指定`房间名称`加入房间，`expectedUserIds` 为可选参数，可用于玩家位置预留。
 
 ```javascript
-/**
-* 加入房间
-* @param {string} roomName 房间名称
-* @param {*} expectedUserIds （可选）邀请好友 ID 数组，默认值为 null
-*/
-joinRoom(roomName, { expectedUserIds = null } = {})
+const expectedUserIds = ['Tom', 'Jerry'];
+// 玩家在加入 'game' 房间，并为 Tom 和 Jerry 占位
+play.joinRoom('game', {
+	expectedUserIds: expectedUserIds
+});
 ```
-
-- `roomName` 是指唯一的房间名称。
-- `expectedUserIds` 是指特定的玩家 ID 数组
 
 当玩家请求加入房间后，将有可能接收到 `JOINED_ROOM`（加入房间成功）和 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
 
@@ -217,21 +254,7 @@ play.on(Event.JOIN_ROOM_FAILED, () => {
 这时我们可以通过调用下面的接口随机加入房间。
 
 ```javascript
-/**
-* 随机加入房间
-* @param {Object} opts （可选）随机加入房间选项
-* @param {Object} opts.matchProperties （可选）匹配属性，默认值为 null
-* @param {Array.<string>} opts.expectedUserIds （可选）邀请好友 ID 数组，默认值为 null
-*/
-joinRandomRoom({ matchProperties = null, expectedUserIds = null } = {})
-```
-
-- `matchProperties` 是 JavaScript 的 `Object` 类型，表示匹配属性（可以是多个）。
-- `expectedUserIds` 是指指定的玩家 ID 数组，同[加入房间](play-cocos.html#加入指定房间)。
-
-比如，我们可以创建一个`要求等级为 2 的房间`。
-
-```javascript
+// 我们可以创建一个名为 `level2Room 并且 要求加入等级为 2` 的房间。
 const options = new RoomOptions();
 const props = {
 	level: 2,
@@ -243,7 +266,7 @@ play.createRoom('level2Room', {
 });
 ```
 
-其他玩家通过设置`等级为 2 的房间`匹配属性，可能会随机加入到这个房间。
+其他玩家通过设置`等级为 2`匹配属性，可能会随机加入到这个房间。
 
 ```javascript
 // 设置匹配属性
@@ -263,18 +286,15 @@ play2.joinRandomRoom({
 这时，我们可以通过下面的接口实现。
 
 ```javascript
-/**
-* 随机加入或创建房间
-* @param {string} roomName 房间名称
-* @param {Object} opts （可选）创建房间选项
-* @param {RoomOptions} opts.roomOptions （可选）创建房间选项，默认值为 null
-* @param {Array.<string>} opts.expectedUserIds （可选）邀请好友 ID 数组，默认值为 null
-*/
 joinOrCreateRoom(roomName, { roomOptions = null, expectedUserIds = null } = {})
+// 例如，有 10 个玩家同时加入一个房间名称为 `room1` 的房间，如果不存在，则创建并加入
+play.joinOrCreateRoom('room1');
 ```
 
+其中
 - `roomOptions` 与[创建房间的接口参数 roomOptions](play-cocos.html#roomOptions)一致。
 - `expectedUserIds` 与[创建房间的接口参数 expectedUserIds](play-cocos.html#expectedUserIds)一致。
+更多关于 `joinOrCreateRoom`，请参考[ joinOrCreateRoom 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html)。
 
 当调用这个接口后，只有`第一个玩家`的请求会执行`创建房间`逻辑，而其他玩家的请求将会执行`加入房间`逻辑。
 所以，如果执行了创建房间逻辑，则会回调 `CREATED_ROOM`（创建房间成功）和 `CREATE_ROOM_FAILED`（创建房间失败）的事件；如果执行了加入房间逻辑，则会回调 `JOINED_ROOM`（加入房间成功）和 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
@@ -296,10 +316,7 @@ play.on(Event.NEW_PLAYER_JOINED_ROOM, (newPlayer) => {
 当玩家想要`主动`离开房间时，可以调用下面的接口。
 
 ```javascript
-/**
-* 离开房间
-*/
-leaveRoom() 
+play.leaveRoom();
 ```
 
 当玩家离开房间成功后，客户端会接收到 `LEFT_ROOM`（离开房间）事件。
@@ -333,11 +350,16 @@ Master Client 其实就是`承担运算逻辑的客户端`。
 2. 在游戏过程中，Master Client 可以指定其他玩家作为新的 Master Client。
 3. 当 Master Client 掉线后，服务器会指任新的玩家为 Master Client。但是当原 Master Client 恢复上线之后，也不会成为新的 Master Client。
 
+```javascript
+// 通过玩家的 Id 指定 Master Client
+play.setMaster(newMasterId);
+```
+
 当 Master Client 变化时，Play SDK 会通过 `MASTER_SWITCHED`（主机切换事件）通知客户端。所以，在开发时，只需要注册 `MASTER_SWITCHED` 事件即可。
 
 ```javascript
 // 注册主机切换事件
-play1.on(Event.MASTER_SWITCHED, (newMaster) => {
+play.on(Event.MASTER_SWITCHED, (newMaster) => {
 	// TODO 可以做主机切换的展示
 
 });
@@ -369,35 +391,29 @@ play1.on(Event.MASTER_SWITCHED, (newMaster) => {
 设置房间自定义属性
 
 ```javascript
-/**
-* 设置房间的自定义属性
-* @param {Object} properties 自定义属性
-* @param {Object} opts 设置选项
-* @param {Object} opts.expectedValues 期望属性，用于 CAS 检测
-*/
-setCustomProperties(properties, { expectedValues = null } = {})
-```
-
-- `properties` 自定义属性（增量或变化量）
-- `expectedValues` 期望属性，用于 CAS 判断，参考：[CAS](play-cocos.html#CAS)
-
-```javascript
+// 设置想要修改的自定义属性
 const props = {
-	title: 'room title',
 	gold: 1000,
 };
-play.room.setCustomProperties(props);
+// 设置用于 CAS 的属性
+const expectedProps = {
+	type: 0,
+};
+// 当房间的自定义属性 type = 0 时，设置 gold 属性为 1000
+play.room.setCustomProperties(props，{
+	expectedValues: expectedProps
+});
 ```
 
-注意：这个接口并不是直接设置`内存中的自定义属性`，而是发送修改自定义属性的消息，经过服务端的判断之后，再通知到`房间内的所有客户端`。
+注意：这个接口并不是直接设置`客户端中自定义属性的内存值`，而是发送修改自定义属性的消息，由服务端最终确定是否修改。
 
-即 当房间属性变化时，Play SDK 将通过 `ROOM_CUSTOM_PROPERTIES_CHANGED`（房间自定义属性）事件通知客户端。
+当房间属性变化时，Play SDK 将通过 `ROOM_CUSTOM_PROPERTIES_CHANGED`（房间自定义属性）事件通知客户端。
 
 ```javascript
 // 注册房间属性变化事件
 play.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (changedProperties) => {
 	const props = play.room.getCustomProperties();
-	const { title, gold } = props;
+	const { gold } = props;
 	// TODO 可以做属性变化的界面展示
 
 });
@@ -409,25 +425,10 @@ play.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (changedProperties) => {
 
 设置玩家自定义属性
 
-```javascript
-/**
-* 设置玩家的自定义属性
-* @param {Object} properties 自定义属性
-* @param {Object} opts 设置选项
-* @param {Object} opts.expectedValues 期望属性，用于 CAS 检测
-*/
-setCustomProperties(properties, { expectedValues = null } = {})
-```
-
-- `properties` 自定义属性（增量或变化量）
-- `expectedValues` 期望属性，用于 `CAS` 判断，参考：[CAS](play-cocos.html#CAS)
-
-玩家自定义属性与`房间自定义属性`基本一致。
-
-示例
+玩家自定义属性与[房间自定义属性](play-cocos.html#房间自定义属性)基本一致。
 
 ```javascript
-// 模拟扑克牌对象
+// 扑克牌对象
 const poker = {
 	// 花色
 	flower: 1,
@@ -439,6 +440,7 @@ const props = {
 	gold: 1000,
 	poker: poker,
 };
+// 请求设置玩家属性
 play.player.setCustomProperties(props);
 ```
 
@@ -459,13 +461,35 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
 
 CAS 全称 `Check And Swap`，`检测并替换`的意思。
 
-想象一种情景，当房间内有一个物品 A，物品 A 只能被一个玩家获得。假设当玩家 X 和玩家 Y 同时去获取时，如果没有 CAS，玩家 X 和 玩家 Y 获取物品 A 的请求会同时发往服务端，但服务端处理是有`先后顺序`的，则 物品 A 将会被`请求最后处理的玩家`获得。
-这显然是不合理的。
+假设这样一个场景，整个房间只有一把「屠龙刀」，这把屠龙刀只能被一个玩家获得。
+当前房间里有 A，B，C，D 四个玩家，当屠龙刀出现时，四个玩家都有可能点击获得。
+如果在极短的时间内，A，B，C，D 四个玩家同时点击获得，即 调用
 
-所以我们引入了 CAS 的概念，玩家 X 和 Y 在发送获取物品 A 的请求时，可以将`当前客户端中物品 A 当前的拥有者`作为 expectedValues 参数传给服务器，服务器根据判断`物品 A 的拥有者`参数是否过期，来确定是否覆盖新值。
+```javascript
+play.room.setCustomProperties({
+	tulong: X // X 分别表示当前的客户端
+});
+```
 
-在此例中，假设玩家 X 获得物品 A 的消息先到达服务器，玩家 Y 获得物品 A 的消息后到达服务器，玩家 X 传递的 expectedValues 中物品 A 的持有者为 null，则通过检测，将物品 A 的拥有者设置为玩家 X；此后又处理玩家 Y 获得物品 A 的消息，玩家 Y 传递的 expectedValues 中物品 A 的持有者为 null，但是此时服务器认为物品 A 的拥有者已经是玩家 X 了，所以检测失败。
-由于物品 A 是房间属性，所以当玩家 X 获得物品 A 处理完成后，服务端会将`物品 A 的拥有者为玩家 X`数据同步给房间内所有的玩家，当玩家 Y 接收同步后，判断物品 A 已经属于玩家 X 了，则不再发送`玩家 Y 获取物品 A`的请求。
+虽然是「同时点击获得」，但是在服务端处理也是按顺序的，假设处理顺序为 A，B，C，D。那么，这把屠龙刀将归玩家 D 所有。
+
+这显然是不合理的，因为可能玩家 D 的网速比较慢，所以消息最后才到达服务端。
+
+此时，就需要 CAS 参数了。通过调用
+
+```javascript
+const props = {
+	tulong: X // X 分别表示当前的客户端
+};
+const expectedValue = {
+	tulong: null // 屠龙刀当前拥有者
+};
+play.room.setCustomProperties(props, { expectedValue });
+```
+
+我们还假设处理顺序为 A，B，C，D。那么，当 A 处理时，`tulong = null`，所以 CAS 成功。当 A 处理完成后，房间的属性 `tulong = A ` 了，则 B，C，D 玩家的 CAS 将会失败。
+
+这样，最先处理的玩家「抢」到了这把屠龙刀，比较符合逻辑。
 
 
 
@@ -476,29 +500,18 @@ CAS 全称 `Check And Swap`，`检测并替换`的意思。
 
 ### 发送自定义事件
 
-```javascript
-/**
-* 发送自定义消息
-* @param {number|string} eventId 事件 ID
-* @param {Object} eventData 事件参数
-* @param {SendEventOptions} options 发送事件选项
-*/
-sendEvent(eventId, eventData, options) 
-```
-
-- `eventId` 事件 Id，用于事件分发处理（可以是数字或者字符串类型）
-- `eventData` 事件参数
-- `options` 事件发送选项，通常包括`接收者`
-
 我们可以通过`自定义事件`发送各种事件，比如 游戏开始，抓牌，释放 X 技能，游戏结束 等等。
 
 ```javascript
 const options = new SendEventOptions();
+// 设置事件的接收组为 Master
 options.receiverGroup = ReceiverGroup.MasterClient;
+// 设置技能 Id 和目标 Id
 const eventData = {
 	skillId: 123,
 	targetId: 2,
 };
+// 发送 eventId 为 skill 的事件
 play.sendEvent('skill', eventData, options);
 ```
 
@@ -518,6 +531,7 @@ play.on(Event.CUSTOM_EVENT, event => {
 	// 解构事件参数
 	const { eventId, eventData } = event;
 	if (eventId === 'skill') {
+		// 如果是 skill 事件，则 解构事件数据
 		const { skillId, targetId } = eventData;
 		// TODO 处理释放技能的表现
 
@@ -542,10 +556,7 @@ play.on(Event.DISCONNECTED, () => {
 开发者也可以通过下面的接口断开连接。
 
 ```javascript
-/**
-* 断开连接
-*/
-disconnect()
+play.disconnect();
 ```
 
 
@@ -570,8 +581,9 @@ play.createRoom(roomName, {
 ```javascript
 // 注册玩家掉线 / 上线事件
 play.on(Event.PLAYER_ACTIVITY_CHANGED, (player) => {
+	// 获得用户是否「活跃」状态
+  	cc.log(player.isInActive());
   	// TODO 根据玩家的在线状态可以做显示和逻辑处理
-
 });
 ```
 
@@ -580,10 +592,10 @@ play.on(Event.PLAYER_ACTIVITY_CHANGED, (player) => {
 不论是由于网络原因或者用户主动断开连接，都可以通过下面的接口重新连接至服务器。
 
 ```javascript
-/**
-* 重新连接
-*/
-reconnect() 
+play.on(Event.DISCONNECTED, () => {
+	// 重连
+	play.reconnect();
+});
 ```
 
 注意：这个接口只是重新连接至服务器，如果之前在`房间内游戏`，并不会直接回到房间。如需重连并回到断线前的房间，请参考 [重连并回到房间](play-cocos.html#重连并回到房间)
@@ -593,11 +605,18 @@ reconnect()
 当玩家连接至大厅以后，可以通过此接口`再次回到某房间`。
 
 ```javascript
-/**
-* 重新加入房间
-* @param {string} roomName 房间名称
-*/
-rejoinRoom(roomName)
+play.on(Event.DISCONNECTED, () => {
+	// 重连
+	play.reconnect();
+});
+
+play.on(Event.JOINED_LOBBY, () => {
+	// TODO 根据是否有缓存的之前的房间名，回到房间。
+
+	if (roomName) {
+		play.rejoinRoom(roomName);
+	}
+});
 ```
 
 如果房间存在并且玩家的 `ttl` 没到期，则其他玩家将会收到 `PLAYER_ACTIVITY_CHANGED` 事件。
@@ -605,6 +624,8 @@ rejoinRoom(roomName)
 ```javascript
 // 注册玩家在线状态变化事件
 play.on(Event.PLAYER_ACTIVITY_CHANGED, (player) => {
+	// 获得用户是否「活跃」状态
+  	cc.log(player.isInActive());
 	// TODO 根据玩家的在线状态可以做显示和逻辑处理
 
 });
@@ -612,11 +633,19 @@ play.on(Event.PLAYER_ACTIVITY_CHANGED, (player) => {
 
 ### 重连并回到房间
 
+例如，在断线后，重连并回到房间。
+
 ```javascript
-/**
-* 重新连接并回到房间
-*/
-reconnectAndRejoin()
+play.on(Event.DISCONNECTED, () => {
+	// 重连并回到房间
+	play.reconnectAndRejoin();
+});
+
+// 在加入房间后，更新数据和界面
+play.on(Event.JOINED_ROOM, () => {
+	// TODO 根据房间和玩家最新数据进行界面重构
+
+});
 ```
 
 这个接口相当于 `reconnect()` 和 `rejoin()` 的合并。通过这个接口，可以直接重新连接并回到`之前的房间`。
