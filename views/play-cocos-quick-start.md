@@ -55,9 +55,10 @@ play.connect();
 ```
 
 连接成功或失败，会通过 `CONNECTED` 或 `CONNECT_FAILED` 事件来通知客户端。如有需求，可以通过注册这些事件。
-这个 demo 通过注册 `JOINED_LOBBY` （加入到大厅）事件来执行后续逻辑。
 
 ## 创建或加入房间
+
+通过注册 `JOINED_LOBBY` （加入到大厅）事件来创建 / 加入房间。
 
 ```javascript
 play.on(Event.JOINED_LOBBY, () => {
@@ -68,14 +69,19 @@ play.on(Event.JOINED_LOBBY, () => {
 ```
 
 joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进入到相同的房间。
+更多`加入或房间接口`，请参考 [开发指南](play-cocos.html#创建房间)
 
 ## 通过 CustomPlayerProperties 同步玩家属性
+
+注册「新玩家加入房间」事件
+
+当有新玩家加入房间时，Master 为每个玩家分配一个分数。（这里没有做更复杂的算法，只是为 Master 分配了 10 分，其他玩家分配了 5 分）。
 
 ```javascript
 play.on(Event.NEW_PLAYER_JOINED_ROOM, (newPlayer) => {
   console.log(`new player: ${newPlayer.userId}`);
   if (play.player.isMaster()) {
-    // 获取房间玩家列表
+    // 获取房间内玩家列表
     const playerList = play.room.playerList;
     for (let i = 0; i < playerList.length; i++) {
       const player = playerList[i];
@@ -90,45 +96,49 @@ play.on(Event.NEW_PLAYER_JOINED_ROOM, (newPlayer) => {
         });
       }
     }
+    // 因为房主设置了 10 分，所以将房主 Id 作为事件参数通知给所有人
     const options = new SendEventOptions();
     play.sendEvent('win', { winnerId: play.room.masterId }, options);
   }
 });
 ```
 
-注册 `NEW_PLAYER_JOINED_ROOM` 事件，即 当有新玩家加入房间时，Master 为每个玩家分配一个分数。（这里没有做更复杂的算法，只是为 Master 分配了 10 分，其他玩家分配了 5 分）。
-
 注册「玩家属性变更」事件
+
+得到 Master「为每个玩家分配的分数」。
 
 ```javascript
 play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
   const { player } = data;
+  // 解构得到玩家的分数
   const { point } = player.getCustomProperties();
   console.log(`${player.userId}: ${point}`);
   if (player.isLocal()) {
+    // 判断如果玩家是自己，则做 UI 显示
     this.scoreLabel.string = `score:${point}`;
   }
 });
 ```
 
-这样，玩家就可以得到 Master「为每个玩家分配的分数」了。
-
 ## 通过「自定义事件」通信
+
+当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
 
 ```javascript
 var options = new SendEventOptions();
 play.sendEvent('win', { winnerId: play.room.masterId }, options);
 ```
 
-当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
-
 注册「自定义事件」
+
+根据判断胜利者是不是自己，做不同的 UI 显示。
 
 ```javascript
 play.on(Event.CUSTOM_EVENT, event => {
   // 解构事件参数
   const { eventId, eventData } = event;
   if (eventId === 'win') {
+    // 解构得到胜利者 Id
     const { winnerId } = eventData;
     console.log(`winnerId: ${winnerId}`);
     // 如果胜利者是自己，则显示胜利 UI；否则显示失败 UI
