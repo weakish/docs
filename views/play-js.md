@@ -149,12 +149,17 @@ options.customRoomProperties = props;
 // 用于做房间匹配的自定义属性键
 options.customRoomPropertiesKeysForLobby = ['level'];
 const expectedUserIds = ['world'];
-play.createRoom(roomName, { 
+play.createRoom({ 
+	roomName,
 	roomOptions: options, 
 	expectedUserIds: expectedUserIds });
 ```
 
-创建房间时需要指定`唯一的房间名称`（其他玩家可以通过房间名称加入到房间）。除此之外，还可以指定 `roomOptions` 和 `expectedUserIds`。
+创建房间时还可以指定 `roomName`，`roomOptions` 和 `expectedUserIds`，这些参数都是可选参数。
+
+#### roomName
+
+房间名称必须保证唯一，如果不设置，将有服务端返回唯一房间 Id。
 
 #### roomOptions
 
