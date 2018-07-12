@@ -57,6 +57,8 @@ play.init(opts);
 
 ## 连接
 
+### 设置 `userId`
+
 我们需要设置一个 `userId` 作为客户端的唯一标识连接至服务器。
 
 ```javascript
@@ -68,7 +70,7 @@ play.userId = 'leancloud';
 - 长度不能超过 64 字符
 - 一个应用内全局唯一
 
-建立连接
+### 建立连接
 
 ```javascript
 play.connect({ gameVersion = '0.0.1' });
@@ -117,6 +119,8 @@ play.on(Event.JOINED_LOBBY, () => {
 play.lobbyRoomList;
 ```
 
+更多关于 `LobbyRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/LobbyRoom.html)。
+
 
 
 ## 房间匹配
@@ -159,7 +163,7 @@ play.createRoom({
 
 #### roomName
 
-房间名称必须保证唯一，如果不设置，将有服务端返回唯一房间 Id。
+房间名称必须保证唯一；如果不设置，默认值为 null，则 由服务端生成唯一房间 Id 并返回。
 
 #### roomOptions
 
@@ -207,12 +211,11 @@ play.on(Event.CREATE_ROOM_FAILED, () => {
 通过指定`房间名称`加入房间，`expectedUserIds` 为可选参数，可用于玩家位置预留。
 
 ```javascript
-const expectedUserIds = ['Tom', 'Jerry'];
-// 玩家在加入 'game' 房间，并为 Tom 和 Jerry 占位
-play.joinRoom('game', {
-	expectedUserIds: expectedUserIds
-});
+// 玩家在加入 'game' 房间
+play.joinRoom('game');
 ```
+
+更多关于 `joinRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#joinRoom)。
 
 当玩家请求加入房间后，将有可能接收到 `JOINED_ROOM`（加入房间成功）和 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
 
@@ -233,6 +236,7 @@ play.on(Event.JOIN_ROOM_FAILED, () => {
 #### 随机加入房间
 
 有时候，我们不需要加入指定某个房间，而是随机加入`符合某些条件的房间`（甚至可以是没有条件），比如 快速开始，快速匹配 等。
+
 这时我们可以通过调用下面的接口随机加入房间。
 
 ```javascript
@@ -265,17 +269,15 @@ play2.joinRandomRoom({
 ### 加入或创建指定房间
 
 有时候，我们会有这样的需求，一些玩家同时加入到`某个房间`，而这个房间`可能并不存在`。
+
 这时，我们可以通过下面的接口实现。
 
 ```javascript
 // 例如，有 10 个玩家同时加入一个房间名称为 `room1` 的房间，如果不存在，则创建并加入
-play.joinOrCreateRoom('room1', { roomOptions = null, expectedUserIds = null });
+play.joinOrCreateRoom('room1');
 ```
 
-其中
-- `roomOptions` 可选参数，与[创建房间的接口参数 roomOptions](play-js.html#roomOptions)一致。
-- `expectedUserIds` 可选参数，与[创建房间的接口参数 expectedUserIds](play-js.html#expectedUserIds)一致。
-更多关于 `joinOrCreateRoom`，请参考[ joinOrCreateRoom 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html)。
+更多关于 `joinOrCreateRoom`，请参考[ API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#joinOrCreateRoom)。
 
 当调用这个接口后，只有`第一个玩家`的请求会执行`创建房间`逻辑，而其他玩家的请求将会执行`加入房间`逻辑。
 所以，如果执行了创建房间逻辑，则会回调 `CREATED_ROOM`（创建房间成功）和 `CREATE_ROOM_FAILED`（创建房间失败）的事件；如果执行了加入房间逻辑，则会回调 `JOINED_ROOM`（加入房间成功）和 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
@@ -441,37 +443,31 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
 
 ### CAS
 
-CAS 全称 `Check And Swap`，`检测并替换`的意思。
+CAS 全称 `Check And Swap`，`检测并更新`的意思。
 
-假设这样一个场景，整个房间只有一把「屠龙刀」，这把屠龙刀只能被一个玩家获得。
-当前房间里有 A，B，C，D 四个玩家，当屠龙刀出现时，四个玩家都有可能点击获得。
-如果在极短的时间内，A，B，C，D 四个玩家同时点击获得，即 调用
+当调用 setCustomProperties 时，服务器会接收所有客户端提交的值，这在某些情况下会比较奇怪。
 
-```javascript
-play.room.setCustomProperties({
-	tulong: X // X 分别表示当前的客户端
-});
-```
+比如，一个属性保存着这个房间的某件物品的持有者，即属性的 key 是物品，value 是持有者。
+任何客户端都可以在任何时候设置这个属性，如果多个客户端同时调用，`最后一个调用的客户端将会作为最终的值`，这样通常是不符合逻辑的。
+（一般认为应该属于第一个获得的人）。
 
-虽然是「同时点击获得」，但是在服务端处理也是按顺序的，假设处理顺序为 A，B，C，D。那么，这把屠龙刀将归玩家 D 所有。
+假设一个房间里有 10 名玩家，但是只有 1 把屠龙刀，屠龙刀只能被第一个「抢到」的人获得。
 
-这显然是不合理的，因为可能玩家 D 的网速比较慢，所以消息最后才到达服务端。
+setCustomProperties 有一个可选参数 `expectedValues` 可作为判断条件。
+服务器只会更新当前和 `expectedValues` 匹配的属性，使用过期的 `expectedValues` 的更新将会被忽略。
+这样，可以避免一些「并发问题」。
 
-此时，就需要 CAS 参数了。通过调用
+我们可以设置 expectedValues 中 tulong 值：
 
 ```javascript
 const props = {
 	tulong: X // X 分别表示当前的客户端
 };
-const expectedValue = {
+const expectedValues = {
 	tulong: null // 屠龙刀当前拥有者
 };
-play.room.setCustomProperties(props, { expectedValue });
+play.room.setCustomProperties(props, { expectedValues });
 ```
-
-我们还假设处理顺序为 A，B，C，D。那么，当 A 处理时，`tulong = null`，所以 CAS 成功。当 A 处理完成后，房间的属性 `tulong = A ` 了，则 B，C，D 玩家的 CAS 将会失败。
-
-这样，最先处理的玩家「抢」到了这把屠龙刀，比较符合逻辑。
 
 
 
@@ -488,6 +484,8 @@ play.room.setCustomProperties(props, { expectedValue });
 const options = new SendEventOptions();
 // 设置事件的接收组为 Master
 options.receiverGroup = ReceiverGroup.MasterClient;
+// 也可以指定接收者 Id
+// options.targetActorIds = [1];
 // 设置技能 Id 和目标 Id
 const eventData = {
 	skillId: 123,
@@ -553,8 +551,8 @@ play.disconnect();
 
 ```javascript
 const options = new RoomOptions();
-// 将 playerTtl 设置为 600 秒
-options.playerTtl = 600;
+// 将 playerTtl 设置为 300 秒
+options.playerTtl = 300;
 play.createRoom(roomName, {
 	roomOptions: options,
 });
