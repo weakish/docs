@@ -483,6 +483,8 @@ const expectedValues = {
 play.room.setCustomProperties(props, { expectedValues });
 ```
 
+这样，在「第一个玩家」获得屠龙刀之后，tulong 对应的值为「第一个玩家」，后续的请求（const expectedValues = {tulong: null}）将会失败。
+
 
 
 ## 自定义事件
