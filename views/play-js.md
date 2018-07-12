@@ -21,7 +21,7 @@ Play 是一个基于 JavaScript 编写的 Cocos Creator 的插件，它具备如
 
 ## SDK 导入
 
-请阅读 [安装](play-cocos-quick-start.html#安装)，获取 js 库文件。
+请阅读 [安装](play-js-quick-start.html#安装)，获取 js 库文件。
 
 
 
@@ -278,7 +278,7 @@ play2.joinRandomRoom({
 });
 ```
 
-与[加入指定房间](play-cocos.html#加入指定房间)一样，我们也有可能接收到 `JOINED_ROOM`（加入房间成功）和 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
+与[加入指定房间](play-js.html#加入指定房间)一样，我们也有可能接收到 `JOINED_ROOM`（加入房间成功）和 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
 
 ### 加入或创建指定房间
 
@@ -292,8 +292,8 @@ play.joinOrCreateRoom('room1');
 ```
 
 其中
-- `roomOptions` 与[创建房间的接口参数 roomOptions](play-cocos.html#roomOptions)一致。
-- `expectedUserIds` 与[创建房间的接口参数 expectedUserIds](play-cocos.html#expectedUserIds)一致。
+- `roomOptions` 与[创建房间的接口参数 roomOptions](play-js.html#roomOptions)一致。
+- `expectedUserIds` 与[创建房间的接口参数 expectedUserIds](play-js.html#expectedUserIds)一致。
 更多关于 `joinOrCreateRoom`，请参考[ joinOrCreateRoom 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html)。
 
 当调用这个接口后，只有`第一个玩家`的请求会执行`创建房间`逻辑，而其他玩家的请求将会执行`加入房间`逻辑。
@@ -338,6 +338,7 @@ play.on(Event.PLAYER_LEFT_ROOM, () => {
 
 });
 ```
+
 
 
 ## Master Client
@@ -425,7 +426,7 @@ play.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (changedProperties) => {
 
 设置玩家自定义属性
 
-玩家自定义属性与[房间自定义属性](play-cocos.html#房间自定义属性)基本一致。
+玩家自定义属性与[房间自定义属性](play-js.html#房间自定义属性)基本一致。
 
 ```javascript
 // 扑克牌对象
@@ -598,7 +599,7 @@ play.on(Event.DISCONNECTED, () => {
 });
 ```
 
-注意：这个接口只是重新连接至服务器，如果之前在`房间内游戏`，并不会直接回到房间。如需重连并回到断线前的房间，请参考 [重连并回到房间](play-cocos.html#重连并回到房间)
+注意：这个接口只是重新连接至服务器，如果之前在`房间内游戏`，并不会直接回到房间。如需重连并回到断线前的房间，请参考 [重连并回到房间](play-js.html#重连并回到房间)
 
 ### 回到房间
 

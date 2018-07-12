@@ -58,9 +58,10 @@ play.connect();
 
 ## 创建或加入房间
 
-通过注册 `JOINED_LOBBY` （加入到大厅）事件来创建 / 加入房间。
+默认情况下，在连接成功后，会自动加入大厅；在大厅中，玩家创建 / 加入指定房间。
 
 ```javascript
+// 注册加入大厅成功事件
 play.on(Event.JOINED_LOBBY, () => {
   console.log('on joined lobby');
   const roomName = 'cocos_creator_room';
@@ -69,15 +70,15 @@ play.on(Event.JOINED_LOBBY, () => {
 ```
 
 joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进入到相同的房间。
-更多`加入或房间接口`，请参考 [开发指南](play-cocos.html#创建房间)
+更多`加入或房间接口`，请参考 [开发指南](play-cocos.html#创建房间)。
 
 ## 通过 CustomPlayerProperties 同步玩家属性
 
-注册「新玩家加入房间」事件
-
-当有新玩家加入房间时，Master 为每个玩家分配一个分数。（这里没有做更复杂的算法，只是为 Master 分配了 10 分，其他玩家分配了 5 分）。
+当有新玩家加入房间时，Master 为每个玩家分配一个分数，这个分数通过「玩家自定义属性」同步给玩家。
+（这里没有做更复杂的算法，只是为 Master 分配了 10 分，其他玩家分配了 5 分）。
 
 ```javascript
+// 注册新玩家加入房间事件
 play.on(Event.NEW_PLAYER_JOINED_ROOM, (newPlayer) => {
   console.log(`new player: ${newPlayer.userId}`);
   if (play.player.isMaster()) {
@@ -96,18 +97,15 @@ play.on(Event.NEW_PLAYER_JOINED_ROOM, (newPlayer) => {
         });
       }
     }
-    // 因为房主设置了 10 分，所以将房主 Id 作为事件参数通知给所有人
-    const options = new SendEventOptions();
-    play.sendEvent('win', { winnerId: play.room.masterId }, options);
+    ...
   }
 });
 ```
 
-注册「玩家属性变更」事件
-
-得到 Master「为每个玩家分配的分数」。
+玩家得到分数后，显示自己的分数。
 
 ```javascript
+// 注册「玩家属性变更」事件
 play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
   const { player } = data;
   // 解构得到玩家的分数
@@ -125,15 +123,15 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
 当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
 
 ```javascript
+// SendEventOptions.receiverGroup 默认为 ReceiverGroup.All，即 发送给房间内所有玩家。
 var options = new SendEventOptions();
 play.sendEvent('win', { winnerId: play.room.masterId }, options);
 ```
 
-注册「自定义事件」
-
 根据判断胜利者是不是自己，做不同的 UI 显示。
 
 ```javascript
+// 注册自定义事件
 play.on(Event.CUSTOM_EVENT, event => {
   // 解构事件参数
   const { eventId, eventData } = event;
