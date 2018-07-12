@@ -273,8 +273,8 @@ play.joinOrCreateRoom('room1', { roomOptions = null, expectedUserIds = null });
 ```
 
 其中
-- `roomOptions` 与[创建房间的接口参数 roomOptions](play-js.html#roomOptions)一致。
-- `expectedUserIds` 与[创建房间的接口参数 expectedUserIds](play-js.html#expectedUserIds)一致。
+- `roomOptions` 可选参数，与[创建房间的接口参数 roomOptions](play-js.html#roomOptions)一致。
+- `expectedUserIds` 可选参数，与[创建房间的接口参数 expectedUserIds](play-js.html#expectedUserIds)一致。
 更多关于 `joinOrCreateRoom`，请参考[ joinOrCreateRoom 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html)。
 
 当调用这个接口后，只有`第一个玩家`的请求会执行`创建房间`逻辑，而其他玩家的请求将会执行`加入房间`逻辑。
