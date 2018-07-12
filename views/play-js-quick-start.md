@@ -58,7 +58,7 @@ play.connect();
 
 ## 创建或加入房间
 
-默认情况下，在连接成功后，会自动加入大厅；在大厅中，玩家创建 / 加入指定房间。
+默认情况下，在连接成功后，会自动加入大厅；玩家在大厅中，创建 / 加入指定房间。
 
 ```javascript
 // 注册加入大厅成功事件
@@ -70,7 +70,7 @@ play.on(Event.JOINED_LOBBY, () => {
 ```
 
 joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进入到相同的房间。
-更多`加入或房间接口`，请参考 [开发指南](play-cocos.html#创建房间)。
+更多`加入或房间接口`，请参考 [开发指南](play-js.html#创建房间)。
 
 ## 通过 CustomPlayerProperties 同步玩家属性
 

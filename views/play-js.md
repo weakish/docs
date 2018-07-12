@@ -53,7 +53,11 @@ opts.region = Region.EAST_CN;
 play.init(opts);
 ```
 
-最后我们需要设置一个 `userId` 作为客户端的唯一标识连接至服务器。
+
+
+## 连接
+
+我们需要设置一个 `userId` 作为客户端的唯一标识连接至服务器。
 
 ```javascript
 play.userId = 'leancloud';
@@ -63,10 +67,6 @@ play.userId = 'leancloud';
 - 不支持中文和特殊字符（包括 `，！@#￥%……&*（）` 等），但可以是下划线 `_`
 - 长度不能超过 64 字符
 - 一个应用内全局唯一
-
-
-
-## 连接
 
 建立连接
 
@@ -98,13 +98,6 @@ play.on(Event.CONNECT_FAILED, (error) => {
 
 在连接服务器成功之后，默认会自动加入到大厅中。
 
-如果在 `PlayOptions` 参数中设置 `autoJoinLobby = false`，则需要手动加入大厅。
-（更多关于 `PlayOptions`，请参考：[PlayOptions](https://leancloud.github.io/Play-SDK-JS/doc/PlayOptions.html)）
-
-```javascript
-play.joinLobby();
-```
-
 开发者可以根据需要注册 `JOINED_LOBBY`（成功加入大厅）事件。
 
 ```javascript
@@ -120,25 +113,9 @@ play.on(Event.JOINED_LOBBY, () => {
 开发者可以根据下面的接口获取房间列表。
 
 ```javascript
+// 返回 LobbyRoom[]
 play.lobbyRoomList;
 ```
-
-如果开发者需要手动离开大厅，可以调用下面的接口。
-
-```javascript
-play.leaveLobby();
-```
-
-当手动离开大厅后，可以通过注册 `LEFT_LOBBY`（离开大厅）事件，编写逻辑。
-
-```javascript
-// 注册离开大厅事件
-play.on(Event.LEFT_LOBBY, () => {
-
-});
-```
-
-注意：当玩家进入房间时，也会离开大厅，并触发 `LEFT_LOBBY`（离开大厅）事件。
 
 
 
@@ -286,9 +263,8 @@ play2.joinRandomRoom({
 这时，我们可以通过下面的接口实现。
 
 ```javascript
-joinOrCreateRoom(roomName, { roomOptions = null, expectedUserIds = null } = {})
 // 例如，有 10 个玩家同时加入一个房间名称为 `room1` 的房间，如果不存在，则创建并加入
-play.joinOrCreateRoom('room1');
+play.joinOrCreateRoom('room1', { roomOptions = null, expectedUserIds = null });
 ```
 
 其中
