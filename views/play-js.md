@@ -73,7 +73,7 @@ play.userId = 'leancloud';
 ### 建立连接
 
 ```javascript
-play.connect({ gameVersion = '0.0.1' });
+play.connect({ gameVersion: '0.0.1' });
 ```
 
 - `gameVersion` 表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器，相当于给玩家按版本做隔离。如果没有类似需求，请忽略这个参数。
@@ -184,6 +184,8 @@ play.createRoom({
 注意：这些`特定的玩家`并不会真的加入到房间里来，而只会在房间的`空位`上预留出位置，只允许`特定的玩家`加入。
 如果开发者要做`邀请加入`的功能，还需要通过其他途径（例如 IM，微信分享等）将`房间名称`发送给好友，好友再通过 `joinRoom(roomName)` 接口加入房间。
 
+更多关于 `createRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#createRoom)。
+
 当玩家请求创建房间后，将有可能接收到 `CREATED_ROOM`（房间创建成功）和 `CREATE_ROOM_FAILED`（房间创建失败）的事件。
 
 ```javascript
@@ -208,12 +210,24 @@ play.on(Event.CREATE_ROOM_FAILED, () => {
 
 #### 加入指定房间
 
-通过指定`房间名称`加入房间，`expectedUserIds` 为可选参数，可用于玩家位置预留。
+通过指定`房间名称`加入房间。
 
 ```javascript
 // 玩家在加入 'game' 房间
 play.joinRoom('game');
 ```
+
+在加入房间时，也可以为玩家占位。
+
+```javascript
+const expectedUserIds = ['hello', 'world'];
+// 玩家在加入 'game' 房间，并为 hello 和 world 玩家占位
+play.joinRoom('game', {
+	expectedUserIds
+});
+```
+
+注意：当占位不足时，会收到 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
 
 更多关于 `joinRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#joinRoom)。
 
@@ -484,7 +498,7 @@ play.room.setCustomProperties(props, { expectedValues });
 const options = new SendEventOptions();
 // 设置事件的接收组为 Master
 options.receiverGroup = ReceiverGroup.MasterClient;
-// 也可以指定接收者 Id
+// 也可以指定接收者 actorId
 // options.targetActorIds = [1];
 // 设置技能 Id 和目标 Id
 const eventData = {
@@ -497,7 +511,7 @@ play.sendEvent('skill', eventData, options);
 
 其中 `SendEventOptions` 是指事件发送参数，包括 `接收组` 和 `接收者 ID 数组`。
 - 接收组（ReceiverGroup）是接收事件的目标的枚举值，包括 Others（房间内除自己之外的所有人），All（房间内的所有人），MasterClient（主机）
-- 接收者 ID 数组是指接收事件的目标的具体值，即 玩家的 actorId 数组。
+- 接收者 ID 数组是指接收事件的目标的具体值，即 玩家的 actorId 数组。actorId 可以通过 player.actorId 获得。
 
 注意：如果同时设置`接收组`和`接收者 ID 数组`，则`接收者 ID 数组`将会覆盖`接收组`。
 
