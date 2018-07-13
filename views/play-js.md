@@ -135,7 +135,7 @@ play.lobbyRoomList;
 
 ## 房间匹配
 
-房间，是指产生玩家「战斗交互」的单位。比如斗地主的牌桌，MMO 的副本，微信游戏的 PVP 等，广义上都属于房间的范畴。
+房间，是指产生玩家「战斗交互」的单位。比如斗地主的牌桌，MMO 的副本，微信游戏的对战 等，广义上都属于房间的范畴。
 
 玩家之间的战斗交互都是在房间内完成的。
 所以，玩家「如何进入房间」就成了房间匹配的关键，下面我们将从「创建房间」，「加入房间」两方面来分析一下常用的「房间匹配」功能。
@@ -247,7 +247,7 @@ play.joinRoom('game', {
 
 更多关于 `joinRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#joinRoom)。
 
-当玩家请求加入房间后，将有可能接收到 `JOINED_ROOM`（加入房间成功）和 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
+当玩家请求加入房间后，将有可能接收到 `JOINED_ROOM`（加入房间成功）或 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
 
 ```javascript
 // 注册加入房间成功事件
@@ -356,8 +356,7 @@ play.on(Event.PLAYER_LEFT_ROOM, () => {
 
 ## Master Client
 
-为了不依赖于服务端，更快速的开发实时对战游戏，我们引入了 「Master Client」 的概念，即主机，在实时策略类游戏中很常见。
-Master Client 其实就是「承担运算逻辑的客户端」。
+为了不依赖于服务端，更快速的开发实时对战游戏，我们引入了 「Master Client」 的概念，即承担「逻辑运算功能」的特殊客户端。
 
 有以下几点需要注意：
 1. 默认房间的创建者为 Master Client。
@@ -654,62 +653,5 @@ play.on(Event.JOINED_ROOM, () => {
 
 这个接口相当于 `reconnect()` 和 `rejoin()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
 
-
-
-## 常用属性和接口
-
-### 当前加入的房间
-
-```javascript
-play.room
-```
-
-### 当前的玩家
-
-```javascript
-play.player
-```
-
-### 当前玩家的 UserId
-
-```javascript
-play.userId
-```
-
-### 房间的玩家列表
-
-```javascript
-room.playerList
-```
-
-### 根据 actorId 获取玩家对象
-
-```javascript
-room.getPlayer(actorId)
-```
-
-### 获取房间自定义属性
-
-```javascript
-room.getCustomProperties()
-```
-
-### 判断此玩家是不是主机
-
-```javascript
-player.isMaster()
-```
-
-### 判断此玩家是不是当前玩家
-
-```javascript
-player.isLocal()
-```
-
-### 获取玩家自定义属性
-
-```javascript
-player.getCustomProperties()
-```
 
 更多接口及详情，请参考：[API 接口](https://leancloud.github.io/Play-SDK-JS/doc/)
