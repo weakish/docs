@@ -15,7 +15,7 @@ Play 客户端 SDK 是开源的，源码地址请访问：[Play-SDK-JS](https://
 
 ## 初始化
 
-导入需要类和变量
+导入需要的类和变量
 
 ```javascript
 import {
@@ -26,7 +26,7 @@ import {
   SendEventOptions,
 } from '../play';
 ```
-其中 play 是全局变量，表示唯一客户端。
+其中 `play` 是 SDK 实例化并导出的 Play 的对象，并不是 Play 类。
 
 ```javascript
 const opts = new PlayOptions();
@@ -45,6 +45,8 @@ play.init(opts);
 ## 设置玩家 ID
 
 ```javascript
+// 这里使用随机数作为 userId
+const randId = parseInt(Math.random() * 1000000, 10);
 play.userId = randId.toString();
 ```
 
@@ -54,11 +56,11 @@ play.userId = randId.toString();
 play.connect();
 ```
 
-连接成功或失败，会通过 `CONNECTED` 或 `CONNECT_FAILED` 事件来通知客户端。如有需求，可以通过注册这些事件。
+连接完成后，会通过 `CONNECTED`（连接成功） 或 `CONNECT_FAILED`（连接失败） 事件来通知客户端。
 
 ## 创建或加入房间
 
-默认情况下，在连接成功后，会自动加入大厅；玩家在大厅中，创建 / 加入指定房间。
+默认情况下，Play SDK 会在连接成功后自动加入大厅；玩家在大厅中，创建 / 加入指定房间。
 
 ```javascript
 // 注册加入大厅成功事件
@@ -70,7 +72,7 @@ play.on(Event.JOINED_LOBBY, () => {
 ```
 
 joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进入到相同的房间。
-更多`加入或房间接口`，请参考 [开发指南](play-js.html#创建房间)。
+更多`joinOrCreateRoom`，请参考 [开发指南](play-js.html#创建房间)。
 
 ## 通过 CustomPlayerProperties 同步玩家属性
 
@@ -97,7 +99,7 @@ play.on(Event.NEW_PLAYER_JOINED_ROOM, (newPlayer) => {
         });
       }
     }
-    ...
+    // ...
   }
 });
 ```
@@ -123,9 +125,11 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
 当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
 
 ```javascript
-// SendEventOptions.receiverGroup 默认为 ReceiverGroup.All，即 发送给房间内所有玩家。
-var options = new SendEventOptions();
-play.sendEvent('win', { winnerId: play.room.masterId }, options);
+if (play.player.isMaster()) {
+  // SendEventOptions.receiverGroup 默认为 ReceiverGroup.All，即 发送给房间内所有玩家。
+  var options = new SendEventOptions();
+  play.sendEvent('win', { winnerId: play.room.masterId }, options);
+}
 ```
 
 根据判断胜利者是不是自己，做不同的 UI 显示。
