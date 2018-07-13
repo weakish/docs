@@ -9,8 +9,7 @@
 {% set storage_guide_url = "[.NET SDK](leanstorage_guide-java.html)" %}
 {% set cloud_func_file = "https://github.com/leancloud/leanengine-dotNET-sdk/blob/master/test/LeanCloud.Engine.AspNetDemo/LambdaSample.cs" %}
 {% set runFuncName = "AVCloud.CallFunctionAsync" %}
-{% set defineFuncName = "EngineFunction Attribute" %}
-{% set runFuncApiLink = "[AVCloud.CallFunctionAsync](/api-docs/java/com/avos/avoscloud/AVCloud.html#callFunction(java.lang.String,%20java.util.Map))" %}
+{% set defineFuncName = "EngineFunctionAttribute" %}
 {% set hook_before_save = "BeforeSave" %}
 {% set hook_after_save = "AfterSave" %}
 {% set hook_before_update = "BeforeUpdate" %}
@@ -67,6 +66,8 @@
 ```sh
 dotnet add package LeanCloud.Engine.Middleware.AspNetCore
 ```
+
+最后一步，将 `app/` 文件夹目录下面所有的内容: `web/` 和 `app.sln` 移到顶层目录下，比如您的代码仓库对应的本地文件夹叫做 `myProjects/`，然后删除 `app/` 文件夹，保证它的文件结构如 [https://github.com/leancloud/dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 一样。
 
 完成。
 
