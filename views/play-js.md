@@ -202,7 +202,7 @@ play.createRoom({
 
 更多关于 `createRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#createRoom)。
 
-当玩家请求创建房间后，将有可能接收到 `CREATED_ROOM`（房间创建成功）和 `CREATE_ROOM_FAILED`（房间创建失败）的事件。
+当玩家请求创建房间后，将有可能接收到 `CREATED_ROOM`（房间创建成功）或 `CREATE_ROOM_FAILED`（房间创建失败）事件。
 
 ```javascript
 // 注册创建房间成功事件
@@ -243,11 +243,11 @@ play.joinRoom('game', {
 });
 ```
 
-注意：当房间空位小于「用户加入时的占位数量」时，会收到 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
+注意：当房间空位小于「用户加入时的占位数量」时，会收到 `JOIN_ROOM_FAILED`（加入房间失败）事件。
 
 更多关于 `joinRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#joinRoom)。
 
-当玩家请求加入房间后，将有可能接收到 `JOINED_ROOM`（加入房间成功）或 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
+当玩家请求加入房间后，将有可能接收到 `JOINED_ROOM`（加入房间成功）或 `JOIN_ROOM_FAILED`（加入房间失败）事件。
 
 ```javascript
 // 注册加入房间成功事件
@@ -294,7 +294,7 @@ play2.joinRandomRoom({
 });
 ```
 
-与[加入指定房间](play-js.html#加入指定房间)一样，我们也有可能接收到 `JOINED_ROOM`（加入房间成功）和 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
+与[加入指定房间](play-js.html#加入指定房间)一样，我们也有可能接收到 `JOINED_ROOM`（加入房间成功）或 `JOIN_ROOM_FAILED`（加入房间失败）事件。
 
 ### 加入或创建指定房间
 
@@ -310,7 +310,7 @@ play.joinOrCreateRoom('room1');
 更多关于 `joinOrCreateRoom`，请参考[ API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#joinOrCreateRoom)。
 
 当调用这个接口后，只有「第一个调用这个接口的玩家的请求」会执行「创建房间」逻辑，而其他玩家的请求将会执行「加入房间」逻辑。
-所以，如果执行了创建房间逻辑，则会回调 `CREATED_ROOM`（创建房间成功）和 `CREATE_ROOM_FAILED`（创建房间失败）的事件；如果执行了加入房间逻辑，则会回调 `JOINED_ROOM`（加入房间成功）和 `JOIN_ROOM_FAILED`（加入房间失败）的事件。
+所以，如果执行了创建房间逻辑，则会回调 `CREATED_ROOM`（创建房间成功）或 `CREATE_ROOM_FAILED`（创建房间失败）事件；如果执行了加入房间逻辑，则会回调 `JOINED_ROOM`（加入房间成功）或 `JOIN_ROOM_FAILED`（加入房间失败）事件。
 
 ### 新玩家加入事件
 
