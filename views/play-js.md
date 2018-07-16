@@ -159,14 +159,14 @@ options.emptyRoomTtl = 600;
 // 允许的最大玩家数量
 options.maxPlayerCount = 2;
 // 玩家离线后，保留玩家数据的时间，单位：秒
-options.playerTtl = 600;
+options.playerTtl = 300;
 // 房间的自定义属性
 const props = {
 	title: 'room title',
 	level: 2,
 };
 options.customRoomProperties = props;
-// 用于做房间匹配的自定义属性键
+// 用于做房间匹配的自定义属性键，即房间匹配条件为 level = 2
 options.customRoomPropertiesKeysForLobby = ['level'];
 const expectedUserIds = ['world'];
 play.createRoom({ 
@@ -191,7 +191,7 @@ play.createRoom({
 - playerTtl：当玩家掉线时，保留玩家在房间内的数据的时间（单位：秒）。默认为 0，即 玩家掉线后，立即销毁玩家数据。最大值为 300，即 5 分钟。
 - maxPlayerCount：房间允许的最大玩家数量。
 - customRoomProperties：房间的自定义属性。
-- customRoomPropertiesKeysForLobby：房间的自定义属性「键」数组，将用于房间匹配。这里的键数组应该属于 `customRoomProperties`。
+- customRoomPropertiesKeysForLobby：房间的自定义属性 `customRoomProperties` 中「键」的数组，包含在 `customRoomPropertiesKeysForLobby` 中的属性将会出现在大厅的房间属性中（play.lobbyRoomList），而全部属性要在加入房间后的 room.getCustomProperties() 中查看。这些属性将会在匹配房间时用到。
 
 #### expectedUserIds
 
@@ -229,7 +229,7 @@ play.on(Event.CREATE_ROOM_FAILED, (error) => {
 通过指定「房间名称」加入房间。
 
 ```javascript
-// 玩家在加入 'game' 房间
+// 玩家在加入 'LiLeiRoom' 房间
 play.joinRoom('LiLeiRoom');
 ```
 
@@ -270,19 +270,10 @@ play.on(Event.JOIN_ROOM_FAILED, () => {
 这时我们可以通过调用 joinRandomRoom 方法随机加入房间。
 
 ```javascript
-// 我们可以创建一个名为 「要求加入等级为 2」 的房间。
-const options = new RoomOptions();
-const props = {
-	level: 2,
-};
-options.customRoomProperties = props;
-options.customRoomPropertiesKeysForLobby = ['level'];
-play.createRoom({
-	roomOptions: options
-});
+play2.joinRandomRoom();
 ```
 
-其他玩家通过设置「等级为 2」匹配属性，可能会随机加入到这个房间。
+也可以为随机加入设置「条件」，例如随机加入到 level = 2 的房间。
 
 ```javascript
 // 设置匹配属性
@@ -354,7 +345,25 @@ play.on(Event.PLAYER_LEFT_ROOM, () => {
 
 
 
-## Master Client
+## 设置房间属性
+
+### 设置房间是否开放
+
+房主可以设置房间是否开放，当房间关闭时，不允许其他玩家加入。
+
+```javascript
+play.setRoomOpened(opened);
+```
+
+### 设置房间是否可见
+
+房主可以设置房间是否可见，当房间不可见时，这个房间将不会出现在玩家的大厅房间列表中，「但是其他玩家可以通过指定 roomName 加入」。
+
+```javascript
+play.setRoomVisible(visible);
+```
+
+### Master Client
 
 为了不依赖于服务端，更快速的开发实时对战游戏，我们引入了 「Master Client」 的概念，即承担「逻辑运算功能」的特殊客户端。
 
@@ -375,8 +384,13 @@ play.setMaster(newMasterId);
 play.on(Event.MASTER_SWITCHED, (newMaster) => {
 	// TODO 可以做主机切换的展示
 
+	// 可以根据判断当前客户端是否是 Master，来确定是否执行逻辑处理。
+	if (play.player.isMaster()) {
+
+	}
 });
 ```
+
 
 
 ## 自定义属性及同步
@@ -512,7 +526,6 @@ options.receiverGroup = ReceiverGroup.MasterClient;
 // 设置技能 Id 和目标 Id
 const eventData = {
 	skillId: 123,
-	targetId: 2,
 };
 // 发送 eventId 为 skill 的事件
 play.sendEvent('skill', eventData, options);
