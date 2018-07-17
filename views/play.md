@@ -80,8 +80,8 @@ play.on(Event.JOIN_ROOM_FAILED, () => {
   options.playerTtl = 120;
   // 创建房间
   play.createRoom({ 
-    roomOptions: options, 
-    expectedUserIds: expectedUserIds});
+    roomOptions: options
+  });
 });
 
 ```
@@ -158,7 +158,7 @@ play.on(Event.JOIN_ROOM_FAILED, () => {
   // 从房间的自定义属性中选择匹配用的 key
   options.customRoomPropertiesKeysForLobby = ['level'];
   play.createRoom({
-    roomOptions: options});
+    roomOptions: options
   });
 });
 
@@ -225,7 +225,7 @@ PlayerA 通过某种通信方式（例如 [LeanCloud 实时通信](realtime_v2.h
 1、PlayerA 和 PlayerB 一起组队进入某个房间
 
 ```js
-play.joinRandomRoom(null, ["playerB"]);
+play.joinRandomRoom({expectedUserIds: ["playerB"]});
 ```
 
 ```cs
@@ -305,7 +305,9 @@ Play.Player.CustomProperties = prop;
 play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
   // MasterClient 才会执行这个运算
   if (play.player.isMaster()) {
-    // 检查是否所有玩家都准备好了，如果都准备好了就开始游戏
+    // 在自己写的方法中检查已经准备的玩家数量，可以通过 play.room.playerList 获取玩家列表。
+    const readyPlayerCount = getReadyPlayerCount();
+    // 如果都准备好了就开始游戏
     if (readyPlayersCount > 1 && readyPlayersCount == play.room.playerList.length()) 
     {
       // 设置房间不可见，避免其他玩家被匹配进来
@@ -324,7 +326,9 @@ public override void OnPlayerCustomPropertiesChanged(Player player, Hashtable up
   // MasterClient 才会执行这个运算
   if (Play.Player.IsMasterClient)
   {
-    // 检查是否所有玩家都准备好了，如果都准备好了就开始游戏
+    // 在自己写的方法中检查已经准备的玩家数量，可以通过 play.room.playerList 获取玩家列表。
+    var readyPlayerCount = getReadyPlayerCount();
+    // 如果都准备好了就开始游戏
     if (readyPlayersCount > 1 && readyPlayersCount == Play.Players.Count()) 
     {
       // 设置房间不可见，避免其他玩家被匹配进来
