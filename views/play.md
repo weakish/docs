@@ -17,8 +17,8 @@ Play 是专门针对多人在线对战游戏推出的后端服务。开发者不
 ## 游戏核心流程
 这里给出简单的示例代码使您更快地了解到整体流程，详细的开发指南请参考：
 
-* [Play 开发指南 · Unity（C#）](play-unity.html)
 * [Play 开发指南 · JavaScript](play-js.html)
+* [Play 开发指南 · Unity（C#）](play-unity.html)
 
 ### 连接服务器
 
