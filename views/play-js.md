@@ -352,7 +352,8 @@ play.on(Event.PLAYER_LEFT_ROOM, () => {
 房主可以设置房间是否开放，当房间关闭时，不允许其他玩家加入。
 
 ```javascript
-play.setRoomOpened(opened);
+// 设置房间关闭
+play.setRoomOpened(false);
 ```
 
 ### 设置房间是否可见
@@ -360,7 +361,8 @@ play.setRoomOpened(opened);
 房主可以设置房间是否可见，当房间不可见时，这个房间将不会出现在玩家的大厅房间列表中，「但是其他玩家可以通过指定 roomName 加入」。
 
 ```javascript
-play.setRoomVisible(visible);
+// 设置房间不可见
+play.setRoomVisible(false);
 ```
 
 ### Master Client
