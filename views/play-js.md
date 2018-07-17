@@ -430,7 +430,7 @@ play.room.setCustomProperties(props);
 
 注意：这个接口并不是直接设置「客户端中自定义属性的内存值」，而是发送修改自定义属性的消息，由服务端最终确定是否修改。
 
-当房间属性变化时，Play SDK 将派发 `ROOM_CUSTOM_PROPERTIES_CHANGED`（房间自定义属性）事件通知客户端。
+当房间属性变化时，Play SDK 将派发 `ROOM_CUSTOM_PROPERTIES_CHANGED`（房间自定义属性）事件通知所有玩家客户端（包括自己）。
 
 ```javascript
 // 注册房间属性变化事件
@@ -442,7 +442,7 @@ play.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (changedProperties) => {
 });
 ```
 
-请注意 `changedProperties` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `play.room.getCustomProperties()` 获得。
+注意：`changedProperties` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `play.room.getCustomProperties()` 获得。
 
 ### 玩家自定义属性
 
