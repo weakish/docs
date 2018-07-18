@@ -4,7 +4,7 @@
 
 我们推荐通过以下方法来学习：
 
-1. 下载 [QuickStart 工程](https://github.com/leancloud/Play-SDK-JS/tree/master/demo/QuickStart)，通过 Cocos Creator 打开 QuickStart 工程，浏览和运行 QuickStart 代码，观察日志输出。
+1. 下载 [QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)，通过 Cocos Creator 打开 QuickStart 工程，浏览和运行 QuickStart 代码，观察日志输出。
 2. 创建一个新的 Cocos Creator 工程，安装好 SDK 后，替换你申请的 App ID 和 App Key，根据 QuickStart 代码尝试修改并运行，观察变化。
 
 ## 安装
