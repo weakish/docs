@@ -402,7 +402,7 @@ public void follow(int playerId)
 ```js
 // Event.CUSTOM_EVENT 方法会被触发
 play.on(Event.CUSTOM_EVENT, event => {
-  const { eventId, eventData } = event;
+  const { eventId } = event;
   if (eventId === 'follow') {
     ......
   } else if (eventId === 'next') {
