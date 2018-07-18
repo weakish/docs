@@ -35,9 +35,9 @@ opts.appId = YOUR_APP_ID;
 // 设置 APP Key
 opts.appKey = YOUR_APP_KEY;
 // 设置节点地区
-// EAST_CN：华东节点
-// NORTH_CN：华北节点
-// US：美国节点
+// EastChina：华东节点
+// NorthChina：华北节点
+// NorthAmerica：美国节点
 opts.region = Region.EastChina;
 play.init(opts);
 ```
@@ -81,7 +81,7 @@ joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进
 
 ```javascript
 // 注册新玩家加入房间事件
-play.on(Event.NEW_PLAYER_ROOM_JOINED, (newPlayer) => {
+play.on(Event.PLAYER_ROOM_JOINED, (newPlayer) => {
   console.log(`new player: ${newPlayer.userId}`);
   if (play.player.isMaster()) {
     // 获取房间内玩家列表
