@@ -38,7 +38,7 @@ opts.appKey = YOUR_APP_KEY;
 // EAST_CN：华东节点
 // NORTH_CN：华北节点
 // US：美国节点
-opts.region = Region.EAST_CN;
+opts.region = Region.EastChina;
 play.init(opts);
 ```
 
@@ -64,7 +64,7 @@ play.connect();
 
 ```javascript
 // 注册加入大厅成功事件
-play.on(Event.JOINED_LOBBY, () => {
+play.on(Event.LOBBY_JOINED, () => {
   console.log('on joined lobby');
   const roomName = 'cocos_creator_room';
   play.joinOrCreateRoom(roomName);
@@ -81,7 +81,7 @@ joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进
 
 ```javascript
 // 注册新玩家加入房间事件
-play.on(Event.NEW_PLAYER_JOINED_ROOM, (newPlayer) => {
+play.on(Event.NEW_PLAYER_ROOM_JOINED, (newPlayer) => {
   console.log(`new player: ${newPlayer.userId}`);
   if (play.player.isMaster()) {
     // 获取房间内玩家列表
