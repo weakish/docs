@@ -365,21 +365,21 @@ play.setRoomOpened(false);
 play.setRoomVisible(false);
 ```
 
-### Master Client
+### MasterClient
 
-为了不依赖于服务端，更快速的开发实时对战游戏，我们引入了 「Master Client」 的概念，即承担「逻辑运算功能」的特殊客户端。
+为了不依赖于服务端，更快速的开发实时对战游戏，我们引入了 「MasterClient」 的概念，即承担「逻辑运算功能」的特殊客户端。
 
 有以下几点需要注意：
-1. 默认房间的创建者为 Master Client。
-2. 在游戏过程中，Master Client 可以指定其他玩家作为新的 Master Client。
-3. 当 Master Client 掉线后，服务器会指任一名新的玩家为 Master Client。即使当原 Master Client 恢复上线之后，也不会成为新的 Master Client。
+1. 默认房间的创建者为 MasterClient。
+2. 在游戏过程中，MasterClient 可以指定其他玩家作为新的 MasterClient。
+3. 当 MasterClient 掉线后，服务器会指任一名新的玩家为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。
 
 ```javascript
-// 通过玩家的 Id 指定 Master Client
+// 通过玩家的 Id 指定 MasterClient
 play.setMaster(newMasterId);
 ```
 
-当 Master Client 变化时，Play SDK 会派发 `MASTER_SWITCHED`（主机切换）事件通知客户端。
+当 MasterClient 变化时，Play SDK 会派发 `MASTER_SWITCHED`（主机切换）事件通知客户端。
 
 ```javascript
 // 注册主机切换事件
