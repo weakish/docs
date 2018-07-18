@@ -53,7 +53,7 @@ opts.appKey = YOUR_APP_KEY;
 // EAST_CN：华东节点
 // NORTH_CN：华北节点
 // US：美国节点
-opts.region = Region.EAST_CN;
+opts.region = Region.EastChina;
 play.init(opts);
 ```
 
@@ -110,11 +110,11 @@ play.on(Event.CONNECT_FAILED, (error) => {
 
 在连接服务器成功之后，会自动加入到大厅中。
 
-开发者可以根据需要注册 `JOINED_LOBBY`（成功加入大厅）事件。
+开发者可以根据需要注册 `LOBBY_JOINED`（成功加入大厅）事件。
 
 ```javascript
 // 注册成功加入大厅事件
-play.on(Event.JOINED_LOBBY, () => {
+play.on(Event.LOBBY_JOINED, () => {
 	// TODO 可以做跳转场景，房间列表展示的逻辑
 
 });
@@ -167,7 +167,7 @@ const props = {
 };
 options.customRoomProperties = props;
 // 用于做房间匹配的自定义属性键，即房间匹配条件为 level = 2
-options.customRoomPropertiesKeysForLobby = ['level'];
+options.customRoomPropertyKeysForLobby = ['level'];
 const expectedUserIds = ['world'];
 play.createRoom({ 
 	roomName,
@@ -191,7 +191,7 @@ play.createRoom({
 - playerTtl：当玩家掉线时，保留玩家在房间内的数据的时间（单位：秒）。默认为 0，即 玩家掉线后，立即销毁玩家数据。最大值为 300，即 5 分钟。
 - maxPlayerCount：房间允许的最大玩家数量。
 - customRoomProperties：房间的自定义属性。
-- customRoomPropertiesKeysForLobby：房间的自定义属性 `customRoomProperties` 中「键」的数组，包含在 `customRoomPropertiesKeysForLobby` 中的属性将会出现在大厅的房间属性中（play.lobbyRoomList），而全部属性要在加入房间后的 room.getCustomProperties() 中查看。这些属性将会在匹配房间时用到。
+- customRoomPropertyKeysForLobby：房间的自定义属性 `customRoomProperties` 中「键」的数组，包含在 `customRoomPropertyKeysForLobby` 中的属性将会出现在大厅的房间属性中（play.lobbyRoomList），而全部属性要在加入房间后的 room.getCustomProperties() 中查看。这些属性将会在匹配房间时用到。
 
 #### expectedUserIds
 
@@ -202,23 +202,23 @@ play.createRoom({
 
 更多关于 `createRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#createRoom)。
 
-当玩家请求创建房间后，将有可能接收到 `CREATED_ROOM`（房间创建成功）或 `CREATE_ROOM_FAILED`（房间创建失败）事件。
+当玩家请求创建房间后，将有可能接收到 `ROOM_CREATED`（房间创建成功）或 `ROOM_CREATE_FAILED`（房间创建失败）事件。
 
 ```javascript
 // 注册创建房间成功事件
-play.on(Event.CREATED_ROOM, () => {
+play.on(Event.ROOM_CREATED, () => {
 	// 房间创建成功
 
 });
 
 // 注册创建房间失败事件
-play.on(Event.CREATE_ROOM_FAILED, (error) => {
+play.on(Event.ROOM_CREATE_FAILED, (error) => {
 	// TODO 可以根据 error 提示用户创建失败
 
 });
 ```
 
-注意：当房主创建好房间后，会自动加入房间，所以也会收到 `JOINED_ROOM`（加入房间成功）事件。
+注意：当房主创建好房间后，会自动加入房间，所以也会收到 `ROOM_JOINED`（加入房间成功）事件。
 
 ### 加入房间
 
@@ -243,21 +243,21 @@ play.joinRoom('game', {
 });
 ```
 
-注意：当房间空位小于「用户加入时的占位数量」时，会收到 `JOIN_ROOM_FAILED`（加入房间失败）事件。
+注意：当房间空位小于「用户加入时的占位数量」时，会收到 `ROOM_JOIN_FAILED`（加入房间失败）事件。
 
 更多关于 `joinRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#joinRoom)。
 
-当玩家请求加入房间后，将有可能接收到 `JOINED_ROOM`（加入房间成功）或 `JOIN_ROOM_FAILED`（加入房间失败）事件。
+当玩家请求加入房间后，将有可能接收到 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
 
 ```javascript
 // 注册加入房间成功事件
-play.on(Event.JOINED_ROOM, () => {
+play.on(Event.ROOM_JOINED, () => {
 	// TODO 可以做跳转场景之类的操作
 
 });
 
 // 注册加入房间失败事件
-play.on(Event.JOIN_ROOM_FAILED, () => {
+play.on(Event.ROOM_JOIN_FAILED, () => {
 	// TODO 可以提示用户加入失败，请重新加入
 
 });
@@ -285,7 +285,7 @@ play2.joinRandomRoom({
 });
 ```
 
-与[加入指定房间](play-js.html#加入指定房间)一样，我们也有可能接收到 `JOINED_ROOM`（加入房间成功）或 `JOIN_ROOM_FAILED`（加入房间失败）事件。
+与[加入指定房间](play-js.html#加入指定房间)一样，我们也有可能接收到 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
 
 ### 加入或创建指定房间
 
@@ -301,15 +301,15 @@ play.joinOrCreateRoom('room1');
 更多关于 `joinOrCreateRoom`，请参考[ API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Play.html#joinOrCreateRoom)。
 
 当调用这个接口后，只有「第一个调用这个接口的玩家的请求」会执行「创建房间」逻辑，而其他玩家的请求将会执行「加入房间」逻辑。
-所以，如果执行了创建房间逻辑，则会回调 `CREATED_ROOM`（创建房间成功）或 `CREATE_ROOM_FAILED`（创建房间失败）事件；如果执行了加入房间逻辑，则会回调 `JOINED_ROOM`（加入房间成功）或 `JOIN_ROOM_FAILED`（加入房间失败）事件。
+所以，如果执行了创建房间逻辑，则会回调 `ROOM_CREATED`（创建房间成功）或 `ROOM_CREATE_FAILED`（创建房间失败）事件；如果执行了加入房间逻辑，则会回调 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
 
 ### 新玩家加入事件
 
-对于已经在房间的玩家，当有新玩家加入到房间时，会派发 `NEW_PLAYER_JOINED_ROOM`（新玩家加入）事件通知客户端，客户端可以通过新玩家的属性，做一些显示逻辑。
+对于已经在房间的玩家，当有新玩家加入到房间时，会派发 `NEW_PLAYER_ROOM_JOINED`（新玩家加入）事件通知客户端，客户端可以通过新玩家的属性，做一些显示逻辑。
 
 ```javascript
 // 注册新玩家加入事件
-play.on(Event.NEW_PLAYER_JOINED_ROOM, (newPlayer) => {
+play.on(Event.NEW_PLAYER_ROOM_JOINED, (newPlayer) => {
 	// TODO 新玩家加入逻辑
 
 });
@@ -323,21 +323,21 @@ play.on(Event.NEW_PLAYER_JOINED_ROOM, (newPlayer) => {
 play.leaveRoom();
 ```
 
-当玩家离开房间成功后，客户端会接收到 `LEFT_ROOM`（离开房间）事件。
+当玩家离开房间成功后，客户端会接收到 `ROOM_LEFT`（离开房间）事件。
 
 ```javascript
 // 注册离开房间事件
-play.on(Event.LEFT_ROOM, () => {
+play.on(Event.ROOM_LEFT, () => {
 	// TODO 可以执行跳转场景等逻辑
 
 });
 ```
 
-而房间里的其他玩家将会接收到 `PLAYER_LEFT_ROOM`（有玩家离开房间）事件。
+而房间里的其他玩家将会接收到 `PLAYER_ROOM_LEFT`（有玩家离开房间）事件。
 
 ```javascript
 // 注册有玩家离开房间事件
-play.on(Event.PLAYER_LEFT_ROOM, () => {
+play.on(Event.PLAYER_ROOM_LEFT, () => {
 	// TODO 可以执行玩家离开的销毁工作
 
 });
@@ -585,7 +585,7 @@ play.disconnect();
 
 针对这种情况，我们可以在创建房间时，通过 `RoomOptions.playerTtl` 来设置「玩家掉线后的保留时间」，即 玩家掉线后，并不将玩家数据「立即销毁」，而是通过 `PLAYER_ACTIVITY_CHANGED` 事件通知客户端。
 只要掉线玩家在 `playerTtl` 时间内重连并回到房间，则可以恢复游戏（玩家上线也是通过 `PLAYER_ACTIVITY_CHANGED` 事件通知）。
-如果超过 `playerTtl` 时间，则会销毁玩家数据，并认为其离开房间。其他玩家会收到 `PLAYER_LEFT_ROOM` （玩家离开房间）事件。
+如果超过 `playerTtl` 时间，则会销毁玩家数据，并认为其离开房间。其他玩家会收到 `PLAYER_ROOM_LEFT` （玩家离开房间）事件。
 
 ```javascript
 const options = new RoomOptions();
@@ -628,7 +628,7 @@ play.on(Event.DISCONNECTED, () => {
 	play.reconnect();
 });
 
-play.on(Event.JOINED_LOBBY, () => {
+play.on(Event.LOBBY_JOINED, () => {
 	// TODO 根据是否有缓存的之前的房间名，回到房间。
 
 	if (roomName) {
@@ -660,13 +660,39 @@ play.on(Event.DISCONNECTED, () => {
 });
 
 // 在加入房间后，更新数据和界面
-play.on(Event.JOINED_ROOM, () => {
+play.on(Event.ROOM_JOINED, () => {
 	// TODO 根据房间和玩家最新数据进行界面重构
 
 });
 ```
 
 这个接口相当于 `reconnect()` 和 `rejoin()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
+
+
+
+## 事件总览
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| CONNECTED | 无 | 连接成功                                  |
+| CONNECT_FAILED    | error  | 连接失败                                 |
+| DISCONNECTED   | 无   | 连接断开                           |
+| LOBBY_JOINED    | 无 | 加入大厅                         |
+| LOBBY_LEFT   | 无  | 离开大厅 |
+| LOBBY_ROOM_LIST_UPDATE | 无 | 大厅房间列表更新                                  |
+| ROOM_CREATED    | 无  | 创建房间                                 |
+| ROOM_CREATE_FAILED   | error   | 创建房间失败                           |
+| ROOM_JOINED    | 无 | 加入房间                         |
+| ROOM_JOIN_FAILED   | error  | 加入房间失败 |
+| NEW_PLAYER_ROOM_JOINED    | newPlayer | 新玩家加入房间                         |
+| PLAYER_ROOM_LEFT   | leftPlayer  | 玩家离开房间 |
+| PLAYER_ACTIVITY_CHANGED | player | 玩家在线状态变化                                  |
+| MASTER_SWITCHED    | player  | Master 更换                                 |
+| ROOM_LEFT   | 无   | 离开房间                           |
+| ROOM_CUSTOM_PROPERTIES_CHANGED    | changedProperties | 房间自定义属性变化                         |
+| PLAYER_CUSTOM_PROPERTIES_CHANGED   | data  | 玩家自定义属性变化 |
+| CUSTOM_EVENT   | event  | 玩家自定义事件 |
+| ERROR   | error  | 错误事件 |
 
 
 更多接口及详情，请参考：[API 接口](https://leancloud.github.io/Play-SDK-JS/doc/)
