@@ -6,8 +6,8 @@ Play 是专门针对多人在线对战游戏推出的后端服务。开发者不
 ## 核心功能
 - **玩家匹配**：随机或按指定条件将玩家匹配到一起玩游戏。Play 的匹配操作会将即将一起游戏的玩家匹配到同一个房间（Room）中。例如《第五人格》、《王者荣耀》、《吃鸡》等对战类手游，玩家只需点击「自由匹配」就可以迅速匹配到其他玩家，大家进入到同一个房间中准备开始游戏；玩家也可以自己新开房间邀请好友一起玩。
 - **多人在线对战**：客户端与服务端使用 WebSocket 通道进行实时双向通信，确保游戏内所有消息能够快速同步。
-- **游戏逻辑运算**：Play 提供了 [MasterClient](play-js.html#masterClient) 作为客户端主机控制游戏逻辑。游戏内的所有逻辑都交给 MasterClient 来判断运转，如果 MasterClient 意外掉线，Play 会自动将网络状态最好的客户端切换为 MasterClient，确保游戏顺畅进行；开发者也可以选择在服务端编写游戏逻辑（服务端游戏逻辑支持尚在开发中）。
-- **多平台支持**：完美适配 Unity 引擎，支持多个平台。
+- **游戏逻辑运算**：Play 提供了 [MasterClient](play-js.html#MasterClient) 作为客户端主机控制游戏逻辑。游戏内的所有逻辑都交给 MasterClient 来判断运转，如果 MasterClient 意外掉线，Play 会自动将网络状态最好的客户端切换为 MasterClient，确保游戏顺畅进行；开发者也可以选择在服务端编写游戏逻辑（服务端游戏逻辑支持尚在开发中）。
+- **多平台支持**：完美适配游戏引擎 Unity 及 CocosCreator，支持多个平台。
 
 ## 特性
 - 美国及国内节点同步支持，满足游戏向全球发行和推广的需求。
@@ -51,7 +51,7 @@ Play.JoinRandomRoom();
 2、在顺利情况下，会进入某个有空位的房间开始游戏。
 
 ```js
-play.on(Event.JOINED_ROOM, () => {
+play.on(Event.ROOM_JOINED, () => {
   console.log('OnJoinedRoom')
 });
 ```
@@ -72,7 +72,7 @@ public override void OnJoinedRoom()
 * 设置 [玩家掉线后的保留时间](play-unity.html#玩家掉线之后被保留的时间)，在有效时间内如果该玩家加回房间，房间内依然保留该玩家的自定义属性。
 
 ```js
-play.on(Event.JOIN_ROOM_FAILED, () => {
+play.on(Event.ROOM_JOIN_FAILED, () => {
   const options = new RoomOptions();
   // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
   options.maxPlayerCount = 4;
@@ -145,7 +145,7 @@ Play.JoinRandomRoom(matchProp);
 3、如果随机加入房间失败，则创建具有匹配属性的房间等待其他同水平的人加入。
 
 ```js
-play.on(Event.JOIN_ROOM_FAILED, () => {
+play.on(Event.ROOM_JOIN_FAILED, () => {
   const options = new RoomOptions();
   // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
   options.maxPlayerCount = 4;
@@ -235,7 +235,7 @@ Play.JoinRandomRoom(expectedUsers: new string[] {"playerB"});
 2、如果有足够空位的房间，加入成功。
 
 ```js
-play.on(Event.JOINED_ROOM, () => {
+play.on(Event.ROOM_JOINED, () => {
   console.log('OnJoinedRoom')
 });
 ```
@@ -251,7 +251,7 @@ public override void OnJoinedRoom()
 3、如果没有合适的房间则创建并加入房间： 
 
 ```js
-play.on(Event.JOIN_ROOM_FAILED, () => {
+play.on(Event.ROOM_JOIN_FAILED, () => {
   const expectedUserIds = ['playerB'];
   play.createRoom({  
     expectedUserIds: expectedUserIds
@@ -368,7 +368,7 @@ Play.RPC("follow", PlayRPCTargets.MasterClient, Play.Player.ActorID);
 ```js
 // Event.CUSTOM_EVENT 方法会被触发
 play.on(Event.CUSTOM_EVENT, event => {
-  const { eventId, eventData } = event;
+  const { eventId } = event;
   if (eventId === 'follow') {
     // follow 自定义事件
     // 判断下一步需要 PlayerB 操作
@@ -446,6 +446,6 @@ Play.LeaveRoom();
 * [Play 开发指南 · JavaScript](play-js.html)：对 Play 所有功能及接口的详细介绍。
 
 ### Unity(C#)
-* [快速入门](play-quick-start.html)：快速接入 Play 并运行一个小 Demo
-* [Play SDK for Unity(C#) 开发指南](play-unity.html)：对 Play 所有功能及接口的详细介绍。
+* [快速入门](play-quick-start-unity.html)：快速接入 Play 并运行一个小 Demo
+* [Play 开发指南 · Unity（C#）](play-unity.html)：对 Play 所有功能及接口的详细介绍。
 * [实现小游戏「炸金花」](play-unity-demo.html)
