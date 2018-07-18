@@ -104,6 +104,13 @@ play.on(Event.CONNECT_FAILED, (error) => {
 });
 ```
 
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| CONNECTED | 无 | 连接成功                                  |
+| CONNECT_FAILED    | error  | 连接失败                                 |
+
 
 
 ## 大厅
@@ -130,6 +137,14 @@ play.lobbyRoomList;
 ```
 
 更多关于 `LobbyRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/LobbyRoom.html)。
+
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| LOBBY_JOINED    | 无 | 加入大厅                         |
+| LOBBY_LEFT   | 无  | 离开大厅 |
+| LOBBY_ROOM_LIST_UPDATE | 无 | 大厅房间列表更新                                  |
 
 
 
@@ -343,6 +358,19 @@ play.on(Event.PLAYER_ROOM_LEFT, () => {
 });
 ```
 
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| ROOM_CREATED    | 无  | 创建房间                                 |
+| ROOM_CREATE_FAILED   | error   | 创建房间失败                           |
+| ROOM_JOINED    | 无 | 加入房间                         |
+| ROOM_JOIN_FAILED   | error  | 加入房间失败 |
+| NEW_PLAYER_ROOM_JOINED    | newPlayer | 新玩家加入房间                         |
+| PLAYER_ROOM_LEFT   | leftPlayer  | 玩家离开房间 |
+| MASTER_SWITCHED    | player  | Master 更换                                 |
+| ROOM_LEFT   | 无   | 离开房间                           |
+
 
 
 ## 设置房间属性
@@ -392,6 +420,12 @@ play.on(Event.MASTER_SWITCHED, (newMaster) => {
 	}
 });
 ```
+
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| MASTER_SWITCHED    | player  | Master 更换                                 |
 
 
 
@@ -509,6 +543,14 @@ play.room.setCustomProperties(props, { expectedValues });
 
 这样，在「第一个玩家」获得屠龙刀之后，tulong 对应的值为「第一个玩家」，后续的请求（const expectedValues = {tulong: null}）将会失败。
 
+# 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| ROOM_CUSTOM_PROPERTIES_CHANGED    | changedProperties | 房间自定义属性变化                         |
+| PLAYER_CUSTOM_PROPERTIES_CHANGED   | data  | 玩家自定义属性变化 |
+
+
 
 ## 自定义事件
 
@@ -556,6 +598,12 @@ play.on(Event.CUSTOM_EVENT, event => {
 	}
 });
 ```
+
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| CUSTOM_EVENT   | event  | 玩家自定义事件 |
 
 
 
@@ -668,31 +716,12 @@ play.on(Event.ROOM_JOINED, () => {
 
 这个接口相当于 `reconnect()` 和 `rejoin()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
 
-
-
-## 事件总览
+### 相关事件
 
 | 事件   | 参数     | 描述                                       |
 | ------------------------------------ | ------------------ | ---------------------------------------- |
-| CONNECTED | 无 | 连接成功                                  |
-| CONNECT_FAILED    | error  | 连接失败                                 |
 | DISCONNECTED   | 无   | 连接断开                           |
-| LOBBY_JOINED    | 无 | 加入大厅                         |
-| LOBBY_LEFT   | 无  | 离开大厅 |
-| LOBBY_ROOM_LIST_UPDATE | 无 | 大厅房间列表更新                                  |
-| ROOM_CREATED    | 无  | 创建房间                                 |
-| ROOM_CREATE_FAILED   | error   | 创建房间失败                           |
-| ROOM_JOINED    | 无 | 加入房间                         |
-| ROOM_JOIN_FAILED   | error  | 加入房间失败 |
-| NEW_PLAYER_ROOM_JOINED    | newPlayer | 新玩家加入房间                         |
-| PLAYER_ROOM_LEFT   | leftPlayer  | 玩家离开房间 |
-| PLAYER_ACTIVITY_CHANGED | player | 玩家在线状态变化                                  |
-| MASTER_SWITCHED    | player  | Master 更换                                 |
-| ROOM_LEFT   | 无   | 离开房间                           |
-| ROOM_CUSTOM_PROPERTIES_CHANGED    | changedProperties | 房间自定义属性变化                         |
-| PLAYER_CUSTOM_PROPERTIES_CHANGED   | data  | 玩家自定义属性变化 |
-| CUSTOM_EVENT   | event  | 玩家自定义事件 |
-| ERROR   | error  | 错误事件 |
+
 
 
 更多接口及详情，请参考：[API 接口](https://leancloud.github.io/Play-SDK-JS/doc/)
