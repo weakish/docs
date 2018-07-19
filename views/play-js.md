@@ -50,9 +50,9 @@ opts.appId = YOUR_APP_ID;
 // 设置 APP Key
 opts.appKey = YOUR_APP_KEY;
 // 设置节点地区
-// EAST_CN：华东节点
-// NORTH_CN：华北节点
-// US：美国节点
+// EastChina：华东节点
+// NorthChina：华北节点
+// NorthAmerica：美国节点
 opts.region = Region.EastChina;
 play.init(opts);
 ```
@@ -144,7 +144,7 @@ play.lobbyRoomList;
 | ------------------------------------ | ------------------ | ---------------------------------------- |
 | LOBBY_JOINED    | 无 | 加入大厅                         |
 | LOBBY_LEFT   | 无  | 离开大厅 |
-| LOBBY_ROOM_LIST_UPDATE | 无 | 大厅房间列表更新                                  |
+| LOBBY_ROOM_LIST_UPDATED | 无 | 大厅房间列表更新                                  |
 
 
 
@@ -320,11 +320,11 @@ play.joinOrCreateRoom('room1');
 
 ### 新玩家加入事件
 
-对于已经在房间的玩家，当有新玩家加入到房间时，会派发 `NEW_PLAYER_ROOM_JOINED`（新玩家加入）事件通知客户端，客户端可以通过新玩家的属性，做一些显示逻辑。
+对于已经在房间的玩家，当有新玩家加入到房间时，会派发 `PLAYER_ROOM_JOINED`（新玩家加入）事件通知客户端，客户端可以通过新玩家的属性，做一些显示逻辑。
 
 ```javascript
 // 注册新玩家加入事件
-play.on(Event.NEW_PLAYER_ROOM_JOINED, (newPlayer) => {
+play.on(Event.PLAYER_ROOM_JOINED, (newPlayer) => {
 	// TODO 新玩家加入逻辑
 
 });
@@ -366,7 +366,7 @@ play.on(Event.PLAYER_ROOM_LEFT, () => {
 | ROOM_CREATE_FAILED   | error   | 创建房间失败                           |
 | ROOM_JOINED    | 无 | 加入房间                         |
 | ROOM_JOIN_FAILED   | error  | 加入房间失败 |
-| NEW_PLAYER_ROOM_JOINED    | newPlayer | 新玩家加入房间                         |
+| PLAYER_ROOM_JOINED    | newPlayer | 新玩家加入房间                         |
 | PLAYER_ROOM_LEFT   | leftPlayer  | 玩家离开房间 |
 | MASTER_SWITCHED    | player  | Master 更换                                 |
 | ROOM_LEFT   | 无   | 离开房间                           |
