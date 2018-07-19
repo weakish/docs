@@ -559,7 +559,7 @@ curl -X POST \
 -H "X-LC-Key: {{appkey}}"        \
 -H "Content-Type: application/json" \
 -d '{
-      "cql":"select * from _Installation where installationId='xxxxxxxxxxxxx'",
+      "cql":"select * from _Installation where installationId=\"xxxxxxxxxxxxx\"",
       "data": {
         "alert": "LeanCloud 向您问好！"
       }
