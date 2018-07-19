@@ -1696,13 +1696,36 @@ todo.fetch({
 
 {% block anonymous_user_login %}
 ```js
-AV.User.signUpOrlogInWithAuthData({
-    id: '随机 UUID 全部小写的 hex 数字'
-  }, 
-  'anonymous'
-)
+AV.User.loginAnonymously().then(user => {
+  // 匿名登录成功，user 即为当前登录的匿名用户
+}).catch(function(error) {
+  // 异常处理
+  console.error(error);
+});
 ```
 {% endblock %}
-{% block anonymous_user_save %}{%  endblock %}
+{% block setup_username_and_password_for_anonymous_user %}
+```js
+const currentUser = AV.User.current();
+user.setUsername('username')；
+user.setPassword('password');
+user.signUp().then(user => {
+  // user 已转化为普通用户
+}).catch(function(error) {
+  // 异常处理
+  console.error(error);
+});
+```
+{%  endblock %}
+{% block determine_a_user_is_anonymous %}
+```js
+const currentUser = AV.User.current();
+if (currentUser.isAnonymous()) {
+  // enableSignUpButton();
+} else {
+  // enableLogOutButton();
+}
+```
+{%  endblock %}
 
 {% block text_using_async_methods %}{% endblock %}

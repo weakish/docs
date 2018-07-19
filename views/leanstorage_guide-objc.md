@@ -1400,6 +1400,17 @@ user.email    = @"tom@leancloud.cn";
 ```
 {% endblock %}
 
+{% block determine_a_user_is_anonymous %}
+```objc
+AVUser *user = [AVUser currentUser];
+if ([AVAnonymousUtils isLinkedWithUser:user]) {
+     // [self enableSignUpButton];
+} else {
+    // [self enableLogOutButton];
+}
+```
+{%  endblock %}
+
 {% block text_subclass %}
 ## 子类化
 子类化推荐给进阶的开发者在进行代码重构的时候做参考。
