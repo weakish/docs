@@ -149,7 +149,7 @@ $redis->ping();
 
 从环境变量中获取链接字符串，然后再创建 redis client 实例即可。
 
-```
+```java
 String redisUrl = System.getenv("REDIS_URL_<实例名称>");
 Jedis jedis = new Jedis(redisUrl);
 jedis.set("foo", "bar");
@@ -164,74 +164,7 @@ String value = jedis.get("foo");
 dotnet add LeanCloud.Engine.Middleware.AspNetCore
 ```
 
-然后在 `Startup.cs` 文件内部添加如下代码:
-
-```cs
-// This method gets called by the runtime. Use this method to add services to the container.
-public void ConfigureServices(IServiceCollection services)
-{
-    services.AddMvc();
-
-    // 这里是在控制台创建实例时输入的名称：
-    var instanceName = "dev";
-    // 这里采用了依赖注入的方式
-    services.UseLeanCache(instanceName);
-}
-```
-
-紧接着在实际需要使用的时候如下读取依赖：
-
-```cs
-[Route("api/[controller]")]
-public class TodoController : Controller
-{
-    private readonly Func<string, LeanCache> _serviceAccessor;
-
-    public TodoController(Func<string, LeanCache> serviceAccessor)
-    {
-        // 读取在 services.UseLeanCache(instanceName); 时注入的 LeanCache 实例
-        _serviceAccessor = serviceAccessor;
-        var instanceName = "dev";
-        todoDb = GetConnectionMultiplexer(instanceName);
-    }
-
-    // 这里是获取 redis 连接
-    public IConnectionMultiplexer GetConnectionMultiplexer(string leancacheInstanceName)
-    {
-        return _serviceAccessor(leancacheInstanceName).GetConnection();
-    }
-
-    private IConnectionMultiplexer todoDb;
-    public IConnectionMultiplexer TodoDb
-    {
-        get => todoDb;
-    }
-
-    // GET api/todo/5
-    [HttpGet("{id}")]
-    public JsonResult Get(int id)
-    {
-        IDatabase db = TodoDb.GetDatabase();
-        var json = db.StringGet(id.ToString());
-        if (string.IsNullOrEmpty(json)) return Json("{}");
-        var todo = Todo.FromJson(json);
-        return Json(todo);
-    }
-
-    // POST api/todo
-    [HttpPost]
-    public JsonResult Post([FromBody]Todo todo)
-    {
-        IDatabase db = TodoDb.GetDatabase();
-        db.StringSet("1", todo.ToJson());
-
-        return Json(new { ID = 1 });
-    }
-}
-```
-关于 `IConnectionMultiplexer` 的用法和相关文档请参阅：[StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/)，这个库是 .NET Core 环境中比较推荐的 Redis Client。
-
-当然我们也提供了直接使用 [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) 里面构建的方式：
+直接使用 [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) 里面构建的方式：
 
 ```cs
 // 新建 LeanCache 实例
@@ -257,7 +190,12 @@ ConfigurationOptions config = new ConfigurationOptions
 };
 // 直接连接
 var conn = ConnectionMultiplexer.Connect(config);
+IDatabase db = conn.GetDatabase();
+var bar = db.StringGet("foo");
+db.StringSet("foo", "bar");
 ```
+
+关于 `IConnectionMultiplexer` 的用法和相关文档请参阅：[StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/)，这个库是 .NET Core 环境中比较推荐的 Redis Client。
 
 ### 在本地调试依赖 LeanCache 的应用
 
