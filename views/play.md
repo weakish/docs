@@ -7,7 +7,7 @@ Play 是专门针对多人在线对战游戏推出的后端服务。开发者不
 - **玩家匹配**：随机或按指定条件将玩家匹配到一起玩游戏。Play 的匹配操作会将即将一起游戏的玩家匹配到同一个房间（Room）中。例如《第五人格》、《王者荣耀》、《吃鸡》等对战类手游，玩家只需点击「自由匹配」就可以迅速匹配到其他玩家，大家进入到同一个房间中准备开始游戏；玩家也可以自己新开房间邀请好友一起玩。
 - **多人在线对战**：客户端与服务端使用 WebSocket 通道进行实时双向通信，确保游戏内所有消息能够快速同步。
 - **游戏逻辑运算**：Play 提供了 [MasterClient](play-js.html#MasterClient) 作为客户端主机控制游戏逻辑。游戏内的所有逻辑都交给 MasterClient 来判断运转，如果 MasterClient 意外掉线，Play 会自动将网络状态最好的客户端切换为 MasterClient，确保游戏顺畅进行；开发者也可以选择在服务端编写游戏逻辑（服务端游戏逻辑支持尚在开发中）。
-- **多平台支持**：完美适配游戏引擎 Unity 及 CocosCreator，支持多个平台。
+- **多平台支持**：完美适配游戏引擎 Unity 及 Cocos Creator，支持多个平台。
 
 ## 特性
 - 美国及国内节点同步支持，满足游戏向全球发行和推广的需求。
@@ -156,7 +156,7 @@ play.on(Event.ROOM_JOIN_FAILED, () => {
     level: matchLevel,
   };
   // 从房间的自定义属性中选择匹配用的 key
-  options.customRoomPropertiesKeysForLobby = ['level'];
+  options.customRoomPropertyKeysForLobby = ['level'];
   play.createRoom({
     roomOptions: options
   });
