@@ -510,7 +510,7 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
 
 ### CAS
 
-CAS 全称 「Check And Swap」，「检测并更新」的意思，用于避免一些「并发问题」。
+CAS 全称 「Compare And Swap」，「检测并更新」的意思，用于避免一些「并发问题」。
 
 当调用 setCustomProperties 时，服务器会接收所有客户端提交的值，这无法满足某些场景下的需求。
 
