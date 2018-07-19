@@ -229,7 +229,35 @@ public class TodoController : Controller
     }
 }
 ```
-关于 `IConnectionMultiplexer` 的用法和相关文档请参阅：[StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/)。这个库是 .NET Core 环境中比较推荐的 Redis Client。
+关于 `IConnectionMultiplexer` 的用法和相关文档请参阅：[StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/)，这个库是 .NET Core 环境中比较推荐的 Redis Client。
+
+当然我们也提供了直接使用 [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) 里面构建的方式：
+
+```cs
+// 新建 LeanCache 实例
+var leancache = new LeanCache("dev");
+// 获取 leancache 的配置
+var redisConfiguration = leancache.CurrentConfigurations;
+// 构建 StackExchange.Redis.ConfigurationOptions 
+ConfigurationOptions config = new ConfigurationOptions
+{
+    ServiceName = this.InstanceName,
+    ClientName = this.InstanceName,
+    EndPoints =
+        {
+            {
+                redisConfiguration.Host, redisConfiguration.Port
+            },
+        },
+    KeepAlive = 180,
+    DefaultVersion = new Version(2, 8, 8),
+    Password = redisConfiguration.Password,
+    AbortOnConnectFail = false,
+    ConnectRetry = 3,
+};
+// 直接连接
+var conn = ConnectionMultiplexer.Connect(config);
+```
 
 ### 在本地调试依赖 LeanCache 的应用
 

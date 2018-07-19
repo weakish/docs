@@ -59,7 +59,7 @@
 
 **以上文件命名是硬性规定**这一步是必须的，目的为了部署脚本的便捷和可控性，在可期的未来我们可以提供自定义的方式。
 
-然后为项目添加 [LeanCloud.Engine.Middleware.AspNetCore](https://www.nuget.org/packages/LeanCloud.Engine.Middleware.AspNetCore/) 的依赖可以通过 Visual Studio 提供的 GUI 界面进行操作：Add Packages... -> 输入 LeanCloud 关键字页面上会出现相关的列表 -> 选择 LeanCloud.Engine.Middleware.AspNetCore -> Add Package 即可。
+然后为项目添加 [LeanCloud.Engine.Middleware.AspNetCore](https://www.nuget.org/packages/LeanCloud.Engine.Middleware.AspNetCore/) 的依赖可以通过 Visual Studio 提供的 GUI 界面进行操作：Add Packages... -> 输入 LeanCloud 关键字页面上会出现相关的列表 -> 选择 LeanCloud.Engine.Middleware.AspNetCore -> Add Package 即可。
 
 或者直接在 /app/web 目录下执行
 
@@ -71,7 +71,7 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
 
 完成。
 
-### 示例项目
+### 示例项目
 
 [https://github.com/leancloud/dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started)就是可以在云引擎中运行的比较精简的示例项目，开发者直接在云引擎控制台中通过 git 部署就可以直接部署，开始体验。
 
@@ -98,7 +98,7 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
         {
             // 定义一个 Cloud 实例
             var cloud = new Cloud();
-            // 将云函数注册到 cloud 实例上
+            // 将云函数注册到 cloud 实例上
             cloud.UseFunction<StaticSampleService>();
             // 启动实例
             cloud.Start();
@@ -138,7 +138,7 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
         {
             // 定义一个 Cloud 实例
             var cloud = new Cloud();
-            // 将云函数注册到 cloud 实例上
+            // 将云函数注册到 cloud 实例上
             cloud.UseFunction<MovieService>(new MovieService(new string[] { "夏洛特烦恼", "功夫", "大话西游之月光宝盒" }));
             // 如果并不想传入任何校验参数也可以直接调用如下代码
             // cloud.UseFunction<MovieService>(); 
@@ -162,13 +162,14 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
             return 0;
         }
     }
+
     public class Program
     {
         public static void Main(string[] args)
         {
             // 定义一个 Cloud 实例
             var cloud = new Cloud();
-            // 将云函数注册到 cloud 实例上
+            // 将云函数注册到 cloud 实例上
             cloud.Define<string, double>("AverageStars", SampleServices.AverageStars);
             // 启动实例
             cloud.Start();
@@ -216,19 +217,6 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
             }
         }
     }
-
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            // 定义一个 Cloud 实例
-            var cloud = new Cloud();
-            // 将云函数注册到 cloud 实例上
-            cloud.UseFunction<UserService>();
-            // 启动实例
-            cloud.Start();
-        }
-    }
 ```
 {% endblock %}
 
@@ -250,6 +238,7 @@ var cloud = new Cloud().BeforeSave("Review", review =>
 {
     var comment = review.Get<string>("comment");
     if (comment.Length > 140) review["comment"] = comment.Substring(0, 137) + "...";
+    // 将该对象返回即可
     return Task.FromResult(comment);
 });
 ```
@@ -287,11 +276,12 @@ var cloud = new Cloud().AfterSave("_User", async user =>
 {% block beforeUpdateExample %}
 
 ```cs
-var cloud = new Cloud().BeforeUpdate("Review", (EngineObjectHookContext context) =>
+var cloud = new Cloud().BeforeUpdate("Review", (AVObject review) =>
 {
-    if (context.UpdatedKeys.Contains("comment"))
+    var updatedKeys = review.GetUpdatedKeys();
+    if (updatedKeys.Contains("comment"))
     {
-        var comment = context.TheObject.Get<string>("comment");
+        var comment = review.Get<string>("comment");
         if (comment.Length > 140) throw new EngineException(400, "comment 长度不得超过 140 字符");
     }
     return Task.FromResult(true);
@@ -378,7 +368,7 @@ var cloud = new Cloud().OnLogIn((AVUser user) =>
 
 {% block advancedClassHookInstancedMethod %}
 
-#### 自定义 Hook 函数的高级用法
+#### 自定义 Hook 函数的更多用法
 
 前面演示的是基础的使用委托来定义了一系列的 Hook，比如 `BeforeSave/BeforeUpdate` ，但是在开发的和迭代的过程中，可能某一个对象的各种 Hook 更应该定义在一个统一的类里面进行修改和调整，如果都使用委托可能对代码的组织结构上有一定的挑战和迭代难度，因此 SDK 中也提供了另一种方式来实现 Hook 的自定义，比如针对 Todo 的一系列的 Hook 可能都编写在同一个类里面，如下：
 
@@ -426,7 +416,7 @@ var cloud = new Cloud().OnLogIn((AVUser user) =>
 ```
 {% endblock %}
 
-{% block dotnetSpecific %}
+{% block debugLog %}
 
 ## 开发和调试技巧
 
