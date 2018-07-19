@@ -428,9 +428,9 @@ play.on(Event.MASTER_SWITCHED, (newMaster) => {
 为了满足开发者不同的游戏需求，Play SDK 允许开发者设置「自定义属性」。
 「自定义属性」接口参数定义为 JavaScript 的 `Object` 类型，支持的数据类型包括：
 
-- boolean
-- number
-- string
+- Boolean
+- Number
+- String
 - Object
 - Array
 
