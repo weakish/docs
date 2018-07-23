@@ -1366,7 +1366,7 @@ AVAnonymousUtils.logIn(new LogInCallback() {
 
 {% block setup_username_and_password_for_anonymous_user %}
 ```java
-AVUser currentUSer = AVUser.getCurrentUser();
+AVUser currentUser = AVUser.getCurrentUser();
 currentUser.setEmail("email");
 currentUser.setPassword("password");
 currentUser.setUsername("username");
@@ -1377,3 +1377,13 @@ currentUser.signUpInBackground(new SignUpCallback() {
 ```
 {% endblock %}
 
+{% block determine_a_user_is_anonymous %}
+```java
+AVUser currentUser = AVUser.getCurrentUser();
+if (AVAnonymousUtils.isLinked(currentUser)) {
+  // enableSignUpButton();
+} else {
+  // enableLogOutButton();
+}
+```
+{%  endblock %}

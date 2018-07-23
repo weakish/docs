@@ -68,6 +68,18 @@ AV.Leaderboard.updateStatistics(AV.User.current(), {
 
 {{ docs.note("更新成绩 API 需要用户登录，且用户只能更新自己的成绩。也可使用 masterKey 更新任意用户的成绩。") }}
 
+#### 强制更新成绩
+
+有些情况下，你会想要绕过排行榜的 [更新策略](leaderboard.html#更新策略) 强制更新用户的成绩（比如修改一个作弊用户的成绩），你可以使用 `overwrite` 参数实现这一需求：
+
+```js
+AV.Leaderboard.updateStatistics(AV.User.current(), { score: 0 }, {
+  overwrite: true,
+}).then(function(statistics) {
+  // score 会被强制更新为 0
+}).catch(console.error);
+```
+
 ### 查询成绩
 
 你可以通过 `getStatistics` 方法查询某用户的某些成绩：
@@ -123,6 +135,7 @@ leaderboard.getResults({
 |`skip`|`number`| 指定从某个位置开始获取，与 `limit` 一起可以实现翻页|
 |`selectUserKeys`|`string[]`|指定返回的 `Ranking` 中的 `user` 需要包含的属性|
 |`includeStatistics`|`string[]`|指定返回的 `Ranking` 中需要包含的其他成绩|
+|`version`|`number`|指定返回某个历史版本的成绩|
 
 默认情况下返回的排行榜结果中的 `user` 是一个只有 `id` 属性的 `AV.User` Pointer。如果想要想下面这个例子一样，在排行榜结果中显示用户名或者其他的用户属性（对应 `_User` 表中的属性），那么需要使用 `selectUserKeys` 选项。
 
@@ -160,9 +173,9 @@ leaderboard.getResults({
 }).catch(console.error);
 ```
 
-### 获取指定用户附近的排名
+### 获取当前用户附近的排名
 
-另一种常见的需求是获取指定用户（通常是当前登录用户）附近的排名：
+另一种常见的需求是获取当前登录用户附近的排名：
 
 |排名|Username|Score↓|
 |:--:|--|:--:|
@@ -188,12 +201,13 @@ leaderboard.getResultsAroundUser({
 |`limit`|`number`|限制返回的结果数量，当前用户会在结果的中间位置|
 |`selectUserKeys`|`string[]`|指定返回的 `Ranking` 中的 `user` 需要包含的属性|
 |`includeStatistics`|`string[]`|指定返回的 `Ranking` 中需要包含的其他成绩|
+|`version`|`number`|指定返回某个历史版本的成绩|
 
 各参数的适用场景与用法与上文 `Leaderboard#getResults` 的参数类似，不再详述。
 
 #### 获取当前用户的排名
 
-如果仅需要获取当前用户的排名，使用 [获取指定用户附近的排名](#获取指定用户附近的排名) 中的 `Leaderboard#getResultsAroundUser` 方法并指定limit 为 1 时即可。
+如果仅需要获取当前用户的排名，使用 [获取当前用户附近的排名](#获取指定用户附近的排名) 中的 `Leaderboard#getResultsAroundUser` 方法并指定 `limit` 为 1 时即可。
 
 ## 管理排行榜
 

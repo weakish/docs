@@ -1586,8 +1586,4 @@ if
 ```
 {% endblock %}
 
-{% block setup_username_and_password_for_anonymous_user %}
-```
-暂不支持
-```
-{% endblock %}
+{% block anonymous_user_save %}{% endblock %}
