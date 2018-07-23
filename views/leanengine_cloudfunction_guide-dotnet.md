@@ -73,8 +73,7 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
 
 ### 示例项目
 
-[https://github.com/leancloud/dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started)就是可以在云引擎中运行的比较精简的示例项目，开发者直接在云引擎控制台中通过 git 部署就可以直接部署，开始体验。
-
+[https://github.com/leancloud/dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 是一个简单的示例项目，开发者直接在云引擎控制台中通过 git 部署就可以直接部署，开始体验。
 
 {% endblock %}
 
@@ -112,40 +111,36 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
 另外，在 .NET 中间件中提供了其他更多的定义方式，适配各种变化的需求，如下代码：
 
 ```cs
-    // case 2. use instance methods
-    public class MovieService
+// case 2. use instance methods
+public class MovieService
+{
+    // 可以注入一些判断变量
+    public List<string> ValidMovieNames { get; set; }
+    public MovieService(string[] someMovieNames)
     {
-        // 可以注入一些判断变量
-        public List<string> ValidMovieNames { get; set; }
-        public MovieService(string[] someMovieNames)
-        {
-            ValidMovieNames = someMovieNames.ToList();
-        }
+        ValidMovieNames = someMovieNames.ToList();
+    }
 
-        [EngineFunction("AverageStars")]
-        public double AverageStars([EngineFunctionParameter("movieName")]string movieName)
-        {
-            // 如果要查询的电影并不在支持范围内，直接返回 0 分
-            if (!ValidMovieNames.Contains(movieName)) return 0;
-            if (movieName == "夏洛特烦恼")
-                return 3.8;
-            return 0;
-        }
-    }
-    public class Program
+    [EngineFunction("AverageStars")]
+    public double AverageStars([EngineFunctionParameter("movieName")]string movieName)
     {
-        public static void Main(string[] args)
-        {
-            // 定义一个 Cloud 实例
-            var cloud = new Cloud();
-            // 将云函数注册到 cloud 实例上
-            cloud.UseFunction<MovieService>(new MovieService(new string[] { "夏洛特烦恼", "功夫", "大话西游之月光宝盒" }));
-            // 如果并不想传入任何校验参数也可以直接调用如下代码
-            // cloud.UseFunction<MovieService>(); 
-            // 启动实例
-            cloud.Start();
-        }
+        // 如果要查询的电影并不在支持范围内，直接返回 0 分
+        if (!ValidMovieNames.Contains(movieName)) return 0;
+        if (movieName == "夏洛特烦恼")
+            return 3.8;
+        return 0;
     }
+}
+
+    // 定义一个 Cloud 实例
+    var cloud = new Cloud();
+    // 将云函数注册到 cloud 实例上
+    cloud.UseFunction<MovieService>(new MovieService(new string[] { "夏洛特烦恼", "功夫", "大话西游之月光宝盒" }));
+    // 如果并不想传入任何校验参数也可以直接调用如下代码
+    // cloud.UseFunction<MovieService>(); 
+    // 启动实例
+    cloud.Start();
+}
 ```
 `MovieService` 是一个自定义的类，包含一个实例方法，并且这个实例方法可以通过类的构造函数来传入一些判断所需要的变量（依赖注入），这样可以应对一些变化的需求。
 
@@ -162,19 +157,8 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
             return 0;
         }
     }
-
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            // 定义一个 Cloud 实例
-            var cloud = new Cloud();
-            // 将云函数注册到 cloud 实例上
-            cloud.Define<string, double>("AverageStars", SampleServices.AverageStars);
-            // 启动实例
-            cloud.Start();
-        }
-    }
+    // 然后注册
+    cloud.Define<string, double>("AverageStars", SampleServices.AverageStars);
 ```
 
 {% endblock %}
@@ -198,7 +182,7 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
 
 {% block errorCodeExample %}
 
-错误响应码允许自定义。可以在云函数中间 throw EngineException 来指定 code 和 error 消息,如果是普通的 Exception，code 值则是默认的1 。
+错误响应码允许自定义。可以在云函数中间 throw EngineException 来指定 code 和 error 消息,如果是普通的 Exception, code 值则是默认的 1 。
 
 ```cs
     public class UserService
@@ -234,7 +218,7 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
 {% block beforeSaveExample %}
 
 ```cs
-var cloud = new Cloud().BeforeSave("Review", review =>
+cloud.BeforeSave("Review", review =>
 {
     var comment = review.Get<string>("comment");
     if (comment.Length > 140) review["comment"] = comment.Substring(0, 137) + "...";
@@ -248,7 +232,7 @@ var cloud = new Cloud().BeforeSave("Review", review =>
 {% block afterSaveExample %}
 
 ```cs
-var cloud = new Cloud().AfterSave("Review", review =>
+cloud.AfterSave("Review", review =>
 {
     var post = review.Get<AVObject>("post");
     await post.FetchAsync();
@@ -262,7 +246,7 @@ var cloud = new Cloud().AfterSave("Review", review =>
 {% block afterSaveExample2 %}
 
 ```cs
-var cloud = new Cloud().AfterSave("_User", async user =>
+cloud.AfterSave("_User", async user =>
 {
     if (user is AVUser avUser)
     {
@@ -276,7 +260,7 @@ var cloud = new Cloud().AfterSave("_User", async user =>
 {% block beforeUpdateExample %}
 
 ```cs
-var cloud = new Cloud().BeforeUpdate("Review", (AVObject review) =>
+cloud.BeforeUpdate("Review", (AVObject review) =>
 {
     var updatedKeys = review.GetUpdatedKeys();
     if (updatedKeys.Contains("comment"))
@@ -292,7 +276,7 @@ var cloud = new Cloud().BeforeUpdate("Review", (AVObject review) =>
 {% block afterUpdateExample %}
 
 ```cs
-var cloud = new Cloud().BeforeUpdate.AfterSave("Article", article =>
+cloud.BeforeUpdate.AfterSave("Article", article =>
 {
     Console.WriteLine(article.ObjectId);
     return Task.FromResult(true);
@@ -303,7 +287,7 @@ var cloud = new Cloud().BeforeUpdate.AfterSave("Article", article =>
 {% block beforeDeleteExample %}
 
 ```cs
-var cloud = new Cloud().BeforeDelete("Album", async album =>
+cloud.BeforeDelete("Album", async album =>
 {
     AVQuery<AVObject> query = new AVQuery<AVObject>("Photo");
     query.WhereEqualTo("album", album);
@@ -323,7 +307,7 @@ var cloud = new Cloud().BeforeDelete("Album", async album =>
 {% block afterDeleteExample %}
 
 ```cs
-var cloud = new Cloud().AfterDelete("Album", async album =>
+cloud.AfterDelete("Album", async album =>
 {
     AVQuery<AVObject> query = new AVQuery<AVObject>("Photo");
     query.WhereEqualTo("album", album);
@@ -339,7 +323,7 @@ var cloud = new Cloud().AfterDelete("Album", async album =>
 {% block onVerifiedExample %}
 
 ```cs
-var cloud = new Cloud().OnVerifiedSMS((AVUser user) =>
+cloud.OnVerifiedSMS((AVUser user) =>
 {
     Console.WriteLine("user verified by sms.");
     return Task.FromResult(true);
@@ -350,7 +334,7 @@ var cloud = new Cloud().OnVerifiedSMS((AVUser user) =>
 {% block onLoginExample %}
 
 ```cs
-var cloud = new Cloud().OnLogIn((AVUser user) =>
+cloud.OnLogIn((AVUser user) =>
 {
     Console.WriteLine("user logged in.");
     return Task.FromResult(true);
@@ -423,7 +407,17 @@ var cloud = new Cloud().OnLogIn((AVUser user) =>
 ### 打开日志
 
 ```cs
+// 启动日志
 Cloud cloud = new Cloud().UseLog();
+```
+
+结合前面的实例代码可以如下写：
+
+```cs
+// 创建一个 Cloud 实例
+Cloud cloud = new Cloud().UseHookClass<TodoHook>().UseLog();
+// 启动实例
+cloud.Start();
 ```
 
 打开日志之后，所有的 Hook 调用都会以日志的方式打印在云引擎的应用日志当中，它大致的样子如下：

@@ -191,8 +191,8 @@ ConfigurationOptions config = new ConfigurationOptions
 // 直接连接
 var conn = ConnectionMultiplexer.Connect(config);
 IDatabase db = conn.GetDatabase();
-var bar = db.StringGet("foo");
 db.StringSet("foo", "bar");
+var bar = db.StringGet("foo");
 ```
 
 关于 `IConnectionMultiplexer` 的用法和相关文档请参阅：[StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/)，这个库是 .NET Core 环境中比较推荐的 Redis Client。
