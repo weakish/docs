@@ -73,11 +73,12 @@ public override void OnJoinedRoom()
 
 ```js
 play.on(Event.ROOM_JOIN_FAILED, () => {
-  const options = new RoomOptions();
-  // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
-  options.maxPlayerCount = 4;
-  // 设置玩家掉线后的保留时间为 120 秒
-  options.playerTtl = 120;
+  const options = {
+    // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+    maxPlayerCount: 4,
+    // 设置玩家掉线后的保留时间为 120 秒
+    playerTtl: 120, 
+  };
   // 创建房间
   play.createRoom({ 
     roomOptions: options
@@ -146,17 +147,21 @@ Play.JoinRandomRoom(matchProp);
 
 ```js
 play.on(Event.ROOM_JOIN_FAILED, () => {
-  const options = new RoomOptions();
-  // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
-  options.maxPlayerCount = 4;
-  // 设置玩家掉线后的保留时间为 120 秒
-  options.playerTtl = 120;
-  // 房间的自定义属性
   const props = {
     level: matchLevel,
   };
-  // 从房间的自定义属性中选择匹配用的 key
-  options.customRoomPropertyKeysForLobby = ['level'];
+  
+  const options = {
+    // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+    maxPlayerCount: 4,
+    // 设置玩家掉线后的保留时间为 120 秒
+    playerTtl: 120,
+    // 房间的自定义属性
+    customRoomProperties: props,
+    // 从房间的自定义属性中选择匹配用的 key
+    customRoomPropertyKeysForLobby: ['level'],
+  }
+  
   play.createRoom({
     roomOptions: options
   });
@@ -191,9 +196,10 @@ public void OnRandomJoinRoomFailed() {
 1、PlayerA 创建房间，设置房间不可见，这样其他人就不会被随机匹配到 PlayerA 创建的房间中。
 
 ```js
-const options = new RoomOptions();
-// 房间不可见
-options.visible = false;
+const options = {
+  // 房间不可见
+  visible: false,
+};
 play.createRoom({ 
 	roomOptions: options, 
 });
@@ -349,8 +355,9 @@ public override void OnPlayerCustomPropertiesChanged(Player player, Hashtable up
 
 ```js
 // 设置事件的接收组为 Master
-const options = new SendEventOptions();
-options.receiverGroup = ReceiverGroup.MasterClient;
+const options = {
+	receiverGroup: ReceiverGroup.MasterClient,
+};
 
 // 设置要发送的信息
 const eventData = {
@@ -375,8 +382,9 @@ play.on(Event.CUSTOM_EVENT, event => {
     int PlayerBId = getNextPlayerId();
     
     // 通知所有玩家下一步需要 PlayerB 操作。
-    const options = new SendEventOptions();
-    options.receiverGroup = ReceiverGroup.All;
+    const options = {
+      receiverGroup: ReceiverGroup.All,
+    };
     const eventData = {
 	  actorId: PlayerBId,
     };
