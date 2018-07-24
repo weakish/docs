@@ -32,8 +32,6 @@ Play 是一款基于 JavaScript 编写的实时对战类游戏 SDK，它具备�
 import {
   // SDK 实例化的 play 对象
   play,
-  // 初始化 Play 参数
-  PlayOptions,
   // 连接节点区域
   Region,
   // Play SDK 事件常量
@@ -41,20 +39,20 @@ import {
 } from '../play';
 ```
 
-接着我们需要实例化一个 PlayOptions 类型的对象，作为初始化 Play 的参数。
+接着我们需要实例化一个对象作为初始化 Play 的参数。
 
 ```javascript
-const opts = new PlayOptions();
-// 设置 APP ID
-opts.appId = YOUR_APP_ID;
-// 设置 APP Key
-opts.appKey = YOUR_APP_KEY;
-// 设置节点地区
-// EastChina：华东节点
-// NorthChina：华北节点
-// NorthAmerica：美国节点
-opts.region = Region.EastChina;
-play.init(opts);
+play.init({
+	// 设置 APP ID
+	appId: YOUR_APP_ID,
+	// 设置 APP Key
+	appKey: YOUR_APP_KEY,
+	// 设置节点地区
+	// EastChina：华东节点
+	// NorthChina：华北节点
+	// NorthAmerica：美国节点
+	region: Region.EastChina
+});
 ```
 
 
@@ -166,23 +164,24 @@ play.createRoom();
 也可以创建一个包含参数的房间。
 
 ```javascript
-const options = new RoomOptions();
-// 房间不可见
-options.visible = false;
-// 房间空后保留的时间，单位：秒
-options.emptyRoomTtl = 600;
-// 允许的最大玩家数量
-options.maxPlayerCount = 2;
-// 玩家离线后，保留玩家数据的时间，单位：秒
-options.playerTtl = 300;
 // 房间的自定义属性
 const props = {
 	title: 'room title',
 	level: 2,
 };
-options.customRoomProperties = props;
-// 用于做房间匹配的自定义属性键，即房间匹配条件为 level = 2
-options.customRoomPropertyKeysForLobby = ['level'];
+const options = {
+	// 房间不可见
+	visible: false,
+	// 房间空后保留的时间，单位：秒
+	emptyRoomTtl: 600,
+	// 允许的最大玩家数量
+	maxPlayerCount: 2,
+	// 玩家离线后，保留玩家数据的时间，单位：秒
+	playerTtl: 300,
+	customRoomProperties: props,
+	// 用于做房间匹配的自定义属性键，即房间匹配条件为 level = 2
+	customRoomPropertyKeysForLobby: ['level']
+};
 const expectedUserIds = ['world'];
 play.createRoom({ 
 	roomName,
@@ -556,12 +555,13 @@ play.room.setCustomProperties(props, { expectedValues });
 我们可以通过「自定义事件」发送各种事件，比如游戏开始，抓牌，释放 X 技能，游戏结束 等等。
 
 ```javascript
-const options = new SendEventOptions();
-// 设置事件的接收组为 Master
-options.receiverGroup = ReceiverGroup.MasterClient;
-// 也可以指定接收者 actorId
-// options.targetActorIds = [1];
-// 设置技能 Id 和目标 Id
+const options = {
+	// 设置事件的接收组为 Master
+	receiverGroup: ReceiverGroup.MasterClient,
+	// 也可以指定接收者 actorId
+	// options.targetActorIds: [1],
+};
+// 设置技能 Id
 const eventData = {
 	skillId: 123,
 };
@@ -569,7 +569,7 @@ const eventData = {
 play.sendEvent('skill', eventData, options);
 ```
 
-其中 `SendEventOptions` 是指事件发送参数，包括 「接收组」 和 「接收者 ID 数组」。
+其中 `options` 是指事件发送参数，包括 「接收组」 和 「接收者 ID 数组」。
 - 接收组（ReceiverGroup）是接收事件的目标的枚举值，包括 Others（房间内除自己之外的所有人），All（房间内的所有人），MasterClient（主机）
 - 接收者 ID 数组是指接收事件的目标的具体值，即 玩家的 actorId 数组。actorId 可以通过 player.actorId 获得。
 
@@ -619,14 +619,15 @@ play.disconnect();
 
 有时候，由于网路不稳定，可能导致玩家掉线，而我们希望能保留掉线玩家的数据，并在一段时间内等待掉线的玩家恢复上线。
 
-针对这种情况，我们可以在创建房间时，通过 `RoomOptions.playerTtl` 来设置「玩家掉线后的保留时间」，即 玩家掉线后，并不将玩家数据「立即销毁」，而是通过 `PLAYER_ACTIVITY_CHANGED` 事件通知客户端。
+针对这种情况，我们可以在创建房间时，通过 `playerTtl` 来设置「玩家掉线后的保留时间」，即 玩家掉线后，并不将玩家数据「立即销毁」，而是通过 `PLAYER_ACTIVITY_CHANGED` 事件通知客户端。
 只要掉线玩家在 `playerTtl` 时间内重连并回到房间，则可以恢复游戏（玩家上线也是通过 `PLAYER_ACTIVITY_CHANGED` 事件通知）。
 如果超过 `playerTtl` 时间，则会销毁玩家数据，并认为其离开房间。其他玩家会收到 `PLAYER_ROOM_LEFT` （玩家离开房间）事件。
 
 ```javascript
-const options = new RoomOptions();
-// 将 playerTtl 设置为 300 秒
-options.playerTtl = 300;
+const options = {
+	// 将 playerTtl 设置为 300 秒
+	playerTtl: 300,
+};
 play.createRoom({
 	roomOptions: options,
 });
