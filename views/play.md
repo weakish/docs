@@ -73,11 +73,12 @@ public override void OnJoinedRoom()
 
 ```js
 play.on(Event.ROOM_JOIN_FAILED, () => {
-  const options = new RoomOptions();
-  // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
-  options.maxPlayerCount = 4;
-  // 设置玩家掉线后的保留时间为 120 秒
-  options.playerTtl = 120;
+  const options = {
+    // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+    maxPlayerCount: 4,
+    // 设置玩家掉线后的保留时间为 120 秒
+    playerTtl: 120, 
+  };
   // 创建房间
   play.createRoom({ 
     roomOptions: options
@@ -146,17 +147,21 @@ Play.JoinRandomRoom(matchProp);
 
 ```js
 play.on(Event.ROOM_JOIN_FAILED, () => {
-  const options = new RoomOptions();
-  // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
-  options.maxPlayerCount = 4;
-  // 设置玩家掉线后的保留时间为 120 秒
-  options.playerTtl = 120;
-  // 房间的自定义属性
   const props = {
     level: matchLevel,
   };
-  // 从房间的自定义属性中选择匹配用的 key
-  options.customRoomPropertyKeysForLobby = ['level'];
+  
+  const options = {
+    // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+    maxPlayerCount: 4,
+    // 设置玩家掉线后的保留时间为 120 秒
+    playerTtl: 120,
+    // 房间的自定义属性
+    customRoomProperties: props,
+    // 从房间的自定义属性中选择匹配用的 key
+    customRoomPropertyKeysForLobby: ['level'],
+  }
+  
   play.createRoom({
     roomOptions: options
   });
@@ -191,9 +196,10 @@ public void OnRandomJoinRoomFailed() {
 1、PlayerA 创建房间，设置房间不可见，这样其他人就不会被随机匹配到 PlayerA 创建的房间中。
 
 ```js
-const options = new RoomOptions();
-// 房间不可见
-options.visible = false;
+const options = {
+  // 房间不可见
+  visible: false,
+};
 play.createRoom({ 
 	roomOptions: options, 
 });
@@ -349,8 +355,9 @@ public override void OnPlayerCustomPropertiesChanged(Player player, Hashtable up
 
 ```js
 // 设置事件的接收组为 Master
-const options = new SendEventOptions();
-options.receiverGroup = ReceiverGroup.MasterClient;
+const options = {
+	receiverGroup: ReceiverGroup.MasterClient,
+};
 
 // 设置要发送的信息
 const eventData = {
@@ -375,8 +382,9 @@ play.on(Event.CUSTOM_EVENT, event => {
     int PlayerBId = getNextPlayerId();
     
     // 通知所有玩家下一步需要 PlayerB 操作。
-    const options = new SendEventOptions();
-    options.receiverGroup = ReceiverGroup.All;
+    const options = {
+      receiverGroup: ReceiverGroup.All,
+    };
     const eventData = {
 	  actorId: PlayerBId,
     };
@@ -402,7 +410,7 @@ public void follow(int playerId)
 ```js
 // Event.CUSTOM_EVENT 方法会被触发
 play.on(Event.CUSTOM_EVENT, event => {
-  const { eventId } = event;
+  const { eventId, eventData } = event;
   if (eventId === 'follow') {
     ......
   } else if (eventId === 'next') {
@@ -449,3 +457,16 @@ Play.LeaveRoom();
 * [快速入门](play-quick-start-unity.html)：快速接入 Play 并运行一个小 Demo
 * [Play 开发指南 · Unity（C#）](play-unity.html)：对 Play 所有功能及接口的详细介绍。
 * [实现小游戏「炸金花」](play-unity-demo.html)
+
+## 价格及试用
+
+Play 的核心计费单位为 CCU，即同时在线人数。
+
+Play 目前正在公测中，所有应用免费使用 100 CCU/天，如果您需要更高额度，请联系 support@leancloud.rocks。
+
+未来收费方案如下：
+
+- 开发版：免费 20 个 CCU/天（自然天，0:00 ~ 24:00）
+- 商用版：500 CCU/天，中国节点 18 元人民币/天，美国节点 3 美元/天。最高可支持 5000 CCU/天，超过这一上限需要使用企业版。
+
+> 在正式收费之时，以上价格和标准可能会发生调整和变动，届时均以公布价格为准。

@@ -20,25 +20,24 @@ Play 客户端 SDK 是开源的，源码地址请访问：[Play-SDK-JS](https://
 ```javascript
 import {
   play,
-  PlayOptions,
   Region,
   Event,
-  SendEventOptions,
 } from '../play';
 ```
 其中 `play` 是 SDK 实例化并导出的 Play 的对象，并不是 Play 类。
 
 ```javascript
-const opts = new PlayOptions();
-// 设置 APP ID
-opts.appId = YOUR_APP_ID;
-// 设置 APP Key
-opts.appKey = YOUR_APP_KEY;
-// 设置节点地区
-// EastChina：华东节点
-// NorthChina：华北节点
-// NorthAmerica：美国节点
-opts.region = Region.EastChina;
+const opts = {
+  // 设置 APP ID
+  appId: YOUR_APP_ID,
+  // 设置 APP Key
+  appKey: YOUR_APP_KEY,
+  // 设置节点地区
+  // EastChina：华东节点
+  // NorthChina：华北节点
+  // NorthAmerica：美国节点
+  region: Region.EastChina,
+}
 play.init(opts);
 ```
 
@@ -126,9 +125,9 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
 
 ```javascript
 if (play.player.isMaster()) {
-  // SendEventOptions.receiverGroup 默认为 ReceiverGroup.All，即 发送给房间内所有玩家。
-  var options = new SendEventOptions();
-  play.sendEvent('win', { winnerId: play.room.masterId }, options);
+  play.sendEvent('win', 
+    { winnerId: play.room.masterId }, 
+    { receiverGroup: ReceiverGroup.All });
 }
 ```
 

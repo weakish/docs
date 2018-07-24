@@ -20,7 +20,7 @@ LeanCloud 开发者文档
 
 - `fork` 这个项目
 - `npm install` 安装相关依赖
-- 执行 `grunt server` 可以本地预览
+- 执行 `grunt serve` 可以本地预览
 - 修改 `/views` 目录中的文档
   - `/views` 中是模板文件，会被编译为 `/md` 目录中对应的文档文件。
   - 模板支持嵌套，如 `/views` 中 `a.md` 是可以被嵌套在 `a.tmpl` 中，方法参见下文 [一套模板多份渲染]（#一套模板多份渲染）。
@@ -92,7 +92,7 @@ $ npm install
 本地启动一个 HTTP Server，然后打开浏览器访问 <http://localhost:3000> 即可
 
 ```bash
-$ grunt server
+$ grunt serve
 ```
 
 ## 版本更新
@@ -180,7 +180,7 @@ $ grunt server
 * 你会看到模板文件被读取，其中所有 `{% block <blockName> %}<content>{% endblock %}` 部分的下面都会有一些按钮。这些按钮表示该「模板」拥有的不同「渲染」，也就是对应的 `views/<tmplName>-<impl>.md` 文件，文件名的 `impl` 部分是按钮的名称。
 * 点击对应的按钮，即可看到「渲染」文件中对应 `block` 的内容已经读取到一个文本域中，如果为空，表明该「渲染」文件未渲染该 block，或者内容为空。
 * 在文本域中写入需要的内容，然后点击保存，编写的内容就会保存到对应的「渲染」文件的 block 中。
-* 最后建议打开「渲染」文件确认下内容，没问题即可通过 `grunt server` 查看效果。当然整个过程打开 `grunt server` 也是没问题的，它会发现「渲染」文件变动后重新加载。
+* 最后建议打开「渲染」文件确认下内容，没问题即可通过 `grunt serve` 查看效果。当然整个过程打开 `grunt serve` 也是没问题的，它会发现「渲染」文件变动后重新加载。
 
 有问题请与 <wchen@leancloud.rocks> 联系。
 
