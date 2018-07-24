@@ -410,7 +410,7 @@ public void follow(int playerId)
 ```js
 // Event.CUSTOM_EVENT 方法会被触发
 play.on(Event.CUSTOM_EVENT, event => {
-  const { eventId } = event;
+  const { eventId, eventData } = event;
   if (eventId === 'follow') {
     ......
   } else if (eventId === 'next') {
@@ -457,3 +457,16 @@ Play.LeaveRoom();
 * [快速入门](play-quick-start-unity.html)：快速接入 Play 并运行一个小 Demo
 * [Play 开发指南 · Unity（C#）](play-unity.html)：对 Play 所有功能及接口的详细介绍。
 * [实现小游戏「炸金花」](play-unity-demo.html)
+
+## 价格及试用
+
+Play 的核心计费单位为 CCU，即同时在线人数。
+
+Play 目前正在公测中，所有应用免费使用 100 CCU/天，如果您需要更高额度，请联系 support@leancloud.rocks。
+
+未来收费方案如下：
+
+- 开发版：免费 20 个 CCU/天（自然天，0:00 ~ 24:00）
+- 商用版：500 CCU/天，中国节点 18 元人民币/天，美国节点 3 美元/天。最高可支持 5000 CCU/天，超过这一上限需要使用企业版。
+
+> 在正式收费之时，以上价格和标准可能会发生调整和变动，届时均以公布价格为准。
