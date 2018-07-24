@@ -571,6 +571,14 @@ play.on(Event.CUSTOM_EVENT, event => {
 });
 ```
 
+`event` 参数
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| eventId    | Number/String | 事件 Id，用于表示事件                         |
+| eventData   | Object  | 事件参数 |
+| senderId   | Number  | 事件发送者 |
+
 ## 断开连接
 
 当游戏过程中，由于网络原因可能会断开连接，此时 Play SDK 会向客户端派发 `DISCONNECTED`（断开连接）事件，开发者可以根据需要注册并处理。
@@ -611,7 +619,7 @@ play.createRoom({
 // 注册玩家掉线 / 上线事件
 play.on(Event.PLAYER_ACTIVITY_CHANGED, (player) => {
 	// 获得用户是否「活跃」状态
-  	cc.log(player.isInActive());
+  	cc.log(player.isActive());
   	// TODO 根据玩家的在线状态可以做显示和逻辑处理
 });
 ```
@@ -654,7 +662,7 @@ play.on(Event.LOBBY_JOINED, () => {
 // 注册玩家在线状态变化事件
 play.on(Event.PLAYER_ACTIVITY_CHANGED, (player) => {
 	// 获得用户是否「活跃」状态
-  	cc.log(player.isInActive());
+  	cc.log(player.isActive());
 	// TODO 根据玩家的在线状态可以做显示和逻辑处理
 
 });
