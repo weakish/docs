@@ -37,10 +37,16 @@
   包含了实现云函数，Class Hook 的基础组件，它不依赖任何通讯协议，它只提供了自定义云函数和 Class Hook 的注册，绑定，响应，执行的逻辑，它是个核心库。
 
 - [LeanCloud.Engine.Middleware.AspNetCore](https://www.nuget.org/packages/LeanCloud.Engine.Middleware.AspNetCore/)
-  它提供了通讯层用来帮助 [LeanCloud.Engine](https://www.nuget.org/packages/LeanCloud.Engine/) 与 LeanCloud 其他服务模块的通讯能力（比如存储服务和实时通信服务），它基于微软的 ASP.NET Core 来实现，它只是一种实现，如果有能力或者有兴趣的开发者实际上可以自己实现一个 Middleware。
+  它提供了通讯层来帮助 [LeanCloud.Engine](https://www.nuget.org/packages/LeanCloud.Engine/) 与 LeanCloud 其他服务模块（比如存储服务和实时通信服务）进行内网的通讯，它基于微软的 ASP.NET Core 来实现，它只是一种实现，如果有能力或者有兴趣的开发者实际上可以自己实现一个 Middleware。
 
 
 因此在任何一个 .NET Core 的项目都可以在安装 [LeanCloud.Engine.Middleware.AspNetCore](https://www.nuget.org/packages/LeanCloud.Engine.Middleware.AspNetCore/) 之后，部署到云引擎中，这样就可以让开发者在服务端用.NET Core 来构建自己的服务端业务逻辑了。
+
+### 示例项目
+
+[https://github.com/leancloud/dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 是一个简单的示例项目，开发者直接在云引擎控制台中通过 git 部署就可以直接部署，开始体验。
+
+或者也可以从 IDE 的新建项目开始：
 
 ### 新建项目
 
@@ -70,10 +76,6 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
 最后一步，将 `app/` 文件夹目录下面所有的内容: `web/` 和 `app.sln` 移到顶层目录下，比如您的代码仓库对应的本地文件夹叫做 `myProjects/`，然后删除 `app/` 文件夹，保证它的文件结构如 [https://github.com/leancloud/dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 一样。
 
 完成。
-
-### 示例项目
-
-[https://github.com/leancloud/dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 是一个简单的示例项目，开发者直接在云引擎控制台中通过 git 部署就可以直接部署，开始体验。
 
 {% endblock %}
 
@@ -222,8 +224,6 @@ cloud.BeforeSave("Review", review =>
 {
     var comment = review.Get<string>("comment");
     if (comment.Length > 140) review["comment"] = comment.Substring(0, 137) + "...";
-    // 将该对象返回即可
-    return Task.FromResult(comment);
 });
 ```
 
@@ -268,7 +268,6 @@ cloud.BeforeUpdate("Review", (AVObject review) =>
         var comment = review.Get<string>("comment");
         if (comment.Length > 140) throw new EngineException(400, "comment 长度不得超过 140 字符");
     }
-    return Task.FromResult(true);
 });
 ```
 {% endblock %}
@@ -279,7 +278,6 @@ cloud.BeforeUpdate("Review", (AVObject review) =>
 cloud.BeforeUpdate.AfterSave("Article", article =>
 {
     Console.WriteLine(article.ObjectId);
-    return Task.FromResult(true);
 });
 ```
 {% endblock %}
@@ -326,7 +324,6 @@ cloud.AfterDelete("Album", async album =>
 cloud.OnVerifiedSMS((AVUser user) =>
 {
     Console.WriteLine("user verified by sms.");
-    return Task.FromResult(true);
 });
 ```
 {% endblock %}
@@ -337,7 +334,6 @@ cloud.OnVerifiedSMS((AVUser user) =>
 cloud.OnLogIn((AVUser user) =>
 {
     Console.WriteLine("user logged in.");
-    return Task.FromResult(true);
 });
 ```
 {% endblock %}
@@ -366,7 +362,6 @@ cloud.OnLogIn((AVUser user) =>
             // reset value for title
             if (title.Length > 20) todo["title"] = title.Substring(0, 20);
             // returning any value will be ok.
-            return Task.FromResult(todo);
         }
 
         [EngineObjectHook("Todo", EngineHookType.AfterSave)]
@@ -383,7 +378,6 @@ cloud.OnLogIn((AVUser user) =>
             {
                 return CheckTitle(context.TheObject);
             }
-            return Task.FromResult(true);
         }
     }
 
