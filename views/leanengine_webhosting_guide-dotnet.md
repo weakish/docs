@@ -8,18 +8,19 @@
 {% set leanengine_middleware = '[LeanEngine dotNET SDK](https://github.com/leancloud/leanengine-dotNET-sdk/)' %}
 
 
-## 示例网站
+{% block generalFeature %}{% endblock %}
 
-- [aspnetcore-getting-started](https://github.com/leancloud/aspnetcore-getting-started) 是一个比较精简的 ASP.NET MVC Core 网站项目。 
+{% block getting_started %}
 
-## 组件选择
+将示例代码 [aspnetcore-getting-started](https://github.com/leancloud/aspnetcore-getting-started) 克隆到本地：
 
-### 结构化数据存储
+```sh
+git clone git@github.com:leancloud/aspnetcore-getting-started.git
+```
 
-本文档示例使用了 LeanCloud 自带的存储服务（[开发指南](dotnet_guide.html)），开发者也可以根据项目需要自由接入其他云存储服务。
+{% endblock %}
 
-
-### Redis 
+{% block leancache %}
 在追求高效访问和快速存取的服务端项目里面，云引擎也内置了 Redis 的服务，详细可以查看文档:[LeanCache](leancache_guide.html)。
 
 如下示例将演示如何使用依赖注入框架来使用 [LeanCache](leancache_guide.html)：
@@ -89,3 +90,6 @@ public class TodoController : Controller
     }
 }
 ```
+
+```
+{% endblock %}

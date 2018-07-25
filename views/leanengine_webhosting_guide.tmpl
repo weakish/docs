@@ -1,9 +1,12 @@
 {% set var_app_domain = '{应用的域名}' %}
 {% import "views/_helper.njk" as docs %}
+
 {% raw %}<script>$(window).load(function() {$('.do-expand-all').click();})</script>{% endraw %}
 # 网站托管开发指南 &middot; {{platformName}}
 
 网站托管是云引擎的一个子模块，允许你用 {{platformName}} 开发一个 Web 程序，提供云函数和 Hook，还可以提供静态文件的托管和自定义的路由、绑定你自己的域名。你可以用它为你的移动应用提供一个介绍和下载页、开发一个管理员控制台或完整的网站，或者运行一些必须在服务器端运行的自定义逻辑。
+
+## 前言
 
 如果你还不知道如何创建云引擎项目，本地调试并部署到云端，可以先阅读一下 [云引擎快速入门](leanengine_quickstart.html)。其他相关文档包括：
 
@@ -19,40 +22,113 @@
 - [Python](leanengine_webhosting_guide-python.html)
 - [PHP](leanengine_webhosting_guide-php.html)
 - [Java](leanengine_webhosting_guide-java.html)
+- [.NET](leanengine_webhosting_guide-dotnet.html)
+
+
+> 在开始之前，强烈建议先阅读[云引擎快速入门](leanengine_quickstart.html), 在那里可以快速的部署并且在线预览一个网站项目。
+
+## 从示例项目开始
+
+{% block getting_started %}{% endblock %}
+
+### 本地运行和调试
+
+在确保所有的依赖都正确安装之后，在项目根目录，用我们的命令行工具来启动本地调试了：
+
+```sh
+lean up
+```
+
+更多有关命令行工具和本地调试的内容请看 [命令行工具使用指南](leanengine_cli.html)。
+
+### 发布到线上
+
+在你的项目根目录运行：
+
+```sh
+lean deploy
+```
+
+如果成功，你的项目已经在线上部署了，接下来通过设置域名就可以通过浏览器访问线上的地址了：
+
+### 设置域名
+
+你可以在 [云引擎 > 设置](/cloud.html?appid={{appid}}#/conf) 的「Web 主机域名」部分，填写一个自定义的二级域名，例如你设置了 `myapp`，那么你就可以通过我们的二级域名来访问你的网站了：
+
+- `http://myapp.leanapp.cn`（中国区）
+- `http://myapp.avosapps.us`（美国区）
+
+<div class="callout callout-info">DNS 可能需要等待几个小时后才能生效。</div>
+
+如果你的应用在 30 天内无访问且没有购买标准实例，二级域名有可能会被回收。
 
 {% block runtime_description %}{% endblock %}
-
-## 项目骨架
 
 {% block project_constraint %}{% endblock %}
 
 {% block custom_runtime %}{% endblock %}
 
-## 本地运行和调试
-
 {% block project_start %}{% endblock %}
-
-## Web 框架
 
 {% block supported_frameworks%}{% endblock %}
 
-## LeanCloud SDK
-
 {% block use_leanstorage %}{% endblock %}
 
-## 健康监测
+{% block generalFeature %}
 
-你的应用在启动时，云引擎的管理程序会每秒去检查你的应用是否启动成功，如果 **30 秒** 仍未启动成功，即认为启动失败；在之后应用正常运行的过程中，也会有定期的「健康监测」，以确保你的应用正常运行，如果健康监测失败，云引擎管理程序会自动重启你的应用。
+## 用户状态管理
 
-健康检查的 URL 包括你的应用首页（`/`）和 {{platformName}} SDK 负责处理的 `/__engine/1/ping`，只要 **两者之一** 返回了 HTTP 200 的响应，就视作成功。因此请确保你的程序使用了 {{platformName}} SDK，或你的应用 **首页能够正常地返回 HTTP 200** 响应。
+{% block cookie_session %}{% endblock %}
 
-除此之外，为了支持云引擎的云函数和 Hook 功能，管理程序会使用 `/1.1/functions/_ops/metadatas` 这个 URL 和 {{platformName}} SDK 交互，请确保将这个 URL 交给 {{platformName}} SDK 处理，或 **返回一个 HTTP 404 表示不使用云函数** 和 Hook 相关的功能。
+## 常见的网站功能
+
+### 发送 HTTP 请求
+
+{% block http_client %}{% endblock %}
+
+### 获取客户端 IP
+
+如果你想获取客户端的 IP，可以直接从用户请求的 HTTP 头的 `x-real-ip` 字段获取，示例代码如下：
+
+{% block code_get_client_ip_address %}{% endblock %}
+
+### 文件上传
+托管在 {{productName}} 的网站项目可以直接使用内置的 LeanCloud {{sdk_name}} SDK 的 API 文件相关的接口直接处理文件的上传。
+
+假设前端 HTML 代码如下：
+
+```html
+<form enctype="multipart/form-data" method="post" action="/upload">
+  <input type="file" name="iconImage">
+  <input type="submit" name="submit" value="submit">
+</form>
+```
+
+{% block upload_file_special_middleware %}{% endblock %}
+
+接下来定义文件上传的处理函数，构建一个 Form 对象，并将 req 作为参数进行解析，会将请求中的文件保存到临时文件目录，并构造 files 对象：
+
+{% block code_upload_file_sdk_function %}{% endblock %}
+
+### Session
+{% block custom_session %}
+{{platformName}} 暂不支持。
+{% endblock %}
+
+### CSRF Token
+如果你的云引擎应用使用 Cookie 作为鉴权方式的话（例如使用 SDK 的 CookieSession 中间件），那就有受到 [CSRF](https://github.com/pillarjs/understanding-csrf) 攻击的风险，将会允许其他站点伪造带有正确 Cookie 的恶意请求。
+
+业界通常使用 CSRF Token 来防御 CSRF 统计，你需要传递给客户端一个随机字符串（即 CSRF Token，可通过 Cookie 传递），客户端在每个有副作用的请求中都要将 CSRF 包含在请求正文或 Header 中，服务器端需要校验这个 CSRF Token 是否正确。
+
+{% block csrf_token %}{% endblock %}
+
+{% endblock %}
 
 {% block ping %}
 关于如何加载 {{platformName}} SDK，见下面的 [Web 框架](#Web_框架) 和 [LeanCloud SDK](#LeanCloud_SDK) 小节。
 {% endblock %}
 
-## 部署
+## 部署与发布
 
 ### 命令行部署
 
@@ -104,64 +180,6 @@ git push -u origin master
 
 客户端 SDK 都有类似于 `setProduction` 的方法，比如 [JavaScript SDK API 的 AV.setProduction(production)](https://leancloud.github.io/javascript-sdk/docs/AV.html#.setProduction)，其中 `production` 设置为 `0` 则该 SDK 将请求预备环境；设置为 `1` 将请求生产环境，默认为 `1`。
 
-### 设置域名
-
-你可以在 [云引擎 > 设置](/cloud.html?appid={{appid}}#/conf) 的「Web 主机域名」部分，填写一个自定义的二级域名，例如你设置了 `myapp`，那么你就可以通过我们的二级域名来访问你的网站了：
-
-- `http://myapp.leanapp.cn`（中国区）
-- `http://myapp.avosapps.us`（美国区）
-
-<div class="callout callout-info">DNS 可能需要等待几个小时后才能生效。</div>
-
-如果你的应用在 30 天内无访问且没有购买标准实例，二级域名有可能会被回收。
-
-## 用户状态管理
-
-{% block cookie_session %}{% endblock %}
-
-## 实现常见功能
-
-### 发送 HTTP 请求
-
-{% block http_client %}{% endblock %}
-
-### 获取客户端 IP
-
-如果你想获取客户端的 IP，可以直接从用户请求的 HTTP 头的 `x-real-ip` 字段获取，示例代码如下：
-
-{% block code_get_client_ip_address %}{% endblock %}
-
-### 文件上传
-托管在 {{productName}} 的网站项目可以直接使用内置的 LeanCloud {{sdk_name}} SDK 的 API 文件相关的接口直接处理文件的上传。
-
-假设前端 HTML 代码如下：
-
-```html
-<form enctype="multipart/form-data" method="post" action="/upload">
-  <input type="file" name="iconImage">
-  <input type="submit" name="submit" value="submit">
-</form>
-```
-
-{% block upload_file_special_middleware %}{% endblock %}
-
-接下来定义文件上传的处理函数，构建一个 Form 对象，并将 req 作为参数进行解析，会将请求中的文件保存到临时文件目录，并构造 files 对象：
-
-{% block code_upload_file_sdk_function %}{% endblock %}
-
-### Session
-
-{% block custom_session %}
-{{platformName}} 暂不支持。
-{% endblock %}
-
-### CSRF Token
-如果你的云引擎应用使用 Cookie 作为鉴权方式的话（例如使用 SDK 的 CookieSession 中间件），那就有受到 [CSRF](https://github.com/pillarjs/understanding-csrf) 攻击的风险，将会允许其他站点伪造带有正确 Cookie 的恶意请求。
-
-业界通常使用 CSRF Token 来防御 CSRF 统计，你需要传递给客户端一个随机字符串（即 CSRF Token，可通过 Cookie 传递），客户端在每个有副作用的请求中都要将 CSRF 包含在请求正文或 Header 中，服务器端需要校验这个 CSRF Token 是否正确。
-
-{% block csrf_token %}{% endblock %}
-
 ### LeanCache
 
 {% block leancache %}{% endblock %}
@@ -179,12 +197,14 @@ git push -u origin master
 部署并发布到生产环境之后，访问你的 {{productName}} 网站二级域名都会强制通过 HTTPS 访问。
 
 {% block extra_examples %}{% endblock %}
+ 
+## 云端环境
 
-## 线上环境
+### 系统级依赖 
 
-### 系统依赖
+系统级依赖指的是运行时操作系统上的默认会被安装的一些模块，与开发语言无关。
 
-`leanengine.yaml` 的 systemDependencies 部分中可以指定系统依赖，类似：
+通过添加 `leanengine.yaml` 文件的 systemDependencies 部分中可以指定需要的系统依赖，类似：
 
 ```yaml
 systemDependencies:
@@ -264,7 +284,9 @@ systemDependencies:
 
 {% block section_timezone %}{% endblock %}
 
-## 备案和自定义域名
+## 网站运维相关
+
+### 备案和自定义域名
 
 如果需要绑定自己的域名，进入 [应用控制台 > 账号设置 > 域名绑定](/settings.html#/setting/domainbind)，按照步骤填写资料即可。
 
@@ -274,7 +296,7 @@ systemDependencies:
 
 <div class="callout callout-info">备案之前要求云引擎已经部署，并且网站内容和备案申请的内容一致。仅使用云引擎托管静态文件、未使用其他 LeanCloud 服务的企业用户，需要自行完成域名备案工作。</div>
 
-## 出入口 IP 地址
+### 出入口 IP 地址
 
 如果开发者希望在第三方服务平台（如微信开放平台）上配置 IP 白名单而需要获取云引擎的入口或出口 IP 地址，请进入 [控制台 > 云引擎 > 设置 > 出入口 IP](/dashboard/cloud.html?appid={{appid}}#/conf) 来自助查询。
 

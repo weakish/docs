@@ -33,28 +33,27 @@ $app->get('/time', function($req, $res) {
 部署到云端后，你可以通过 `http://{{var_app_domain}}.leanapp.cn/time` 来访问该 API。你的 iOS 或者 Android 的程序就可以构建一个 HTTP 请求获取服务端时间了。当然还是建议使用各 SDK 内置的获取服务器时间的 API，这里的例子只是演示。
 {% endblock %}
 
-{% block project_constraint %}
+{% block getting_started %}
+
+将示例代码 [slim-getting-started](https://github.com/leancloud/slim-getting-started) 克隆到本地：
+
+```sh
+git clone git@github.com:leancloud/slim-getting-started.git
+```
+
+### 示例项目解析
+
 你的项目需要遵循一定格式才会被云引擎识别并运行。
 
 {{fullName}} 项目必须有 `$PROJECT_DIR/public/index.php` 文件，该文件为整个项目的启动文件。
-{% endblock %}
 
-{% block project_start %}
 使用 composer 安装第三方依赖：
 
 ```sh
 composer install
 ```
-
-接下来便可以在项目目录，用我们的命令行工具来启动本地调试了：
-
-```sh
-lean up
-```
-
-更多有关命令行工具和本地调试的内容请参考 [命令行工具使用指南](leanengine_cli.html)。
-
 {% endblock %}
+
 
 {% block ping %}
 {{leanengine_middleware}} 内置了该 URL 的处理，只需要将中间件添加到请求的处理链路中即可：
