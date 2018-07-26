@@ -80,7 +80,8 @@ joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进
 
 ```javascript
 // 注册新玩家加入房间事件
-play.on(Event.PLAYER_ROOM_JOINED, (newPlayer) => {
+play.on(Event.PLAYER_ROOM_JOINED, (data) => {
+  const { newPlayer } = data;
   console.log(`new player: ${newPlayer.userId}`);
   if (play.player.isMaster()) {
     // 获取房间内玩家列表

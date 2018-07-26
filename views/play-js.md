@@ -308,7 +308,8 @@ play.joinOrCreateRoom('room1');
 
 ```javascript
 // 注册新玩家加入事件
-play.on(Event.PLAYER_ROOM_JOINED, (newPlayer) => {
+play.on(Event.PLAYER_ROOM_JOINED, (data) => {
+	const { newPlayer } = data;
 	// TODO 新玩家加入逻辑
 
 });
@@ -336,7 +337,8 @@ play.on(Event.ROOM_LEFT, () => {
 
 ```javascript
 // 注册有玩家离开房间事件
-play.on(Event.PLAYER_ROOM_LEFT, () => {
+play.on(Event.PLAYER_ROOM_LEFT, (data) => {
+	const { leftPlayer } = data;
 	// TODO 可以执行玩家离开的销毁工作
 
 });
@@ -350,9 +352,9 @@ play.on(Event.PLAYER_ROOM_LEFT, () => {
 | ROOM_CREATE_FAILED   | error   | 创建房间失败                           |
 | ROOM_JOINED    | 无 | 加入房间                         |
 | ROOM_JOIN_FAILED   | error  | 加入房间失败 |
-| PLAYER_ROOM_JOINED    | newPlayer | 新玩家加入房间                         |
-| PLAYER_ROOM_LEFT   | leftPlayer  | 玩家离开房间 |
-| MASTER_SWITCHED    | player  | Master 更换                                 |
+| PLAYER_ROOM_JOINED    | { newPlayer } | 新玩家加入房间                         |
+| PLAYER_ROOM_LEFT   | { leftPlayer }  | 玩家离开房间 |
+| MASTER_SWITCHED    | { player }  | Master 更换                                 |
 | ROOM_LEFT   | 无   | 离开房间                           |
 
 
@@ -395,7 +397,8 @@ play.setMaster(newMasterId);
 
 ```javascript
 // 注册主机切换事件
-play.on(Event.MASTER_SWITCHED, (newMaster) => {
+play.on(Event.MASTER_SWITCHED, (data) => {
+	const { newMaster } = data;
 	// TODO 可以做主机切换的展示
 
 	// 可以根据判断当前客户端是否是 Master，来确定是否执行逻辑处理。
@@ -441,7 +444,7 @@ play.room.setCustomProperties(props);
 
 ```javascript
 // 注册房间属性变化事件
-play.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (changedProperties) => {
+play.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (data) => {
 	const props = play.room.getCustomProperties();
 	const { gold } = props;
 	// TODO 可以做属性变化的界面展示
@@ -518,8 +521,8 @@ play.room.setCustomProperties(props, { expectedValues });
 
 | 事件   | 参数     | 描述                                       |
 | ------------------------------------ | ------------------ | ---------------------------------------- |
-| ROOM_CUSTOM_PROPERTIES_CHANGED    | changedProperties | 房间自定义属性变化                         |
-| PLAYER_CUSTOM_PROPERTIES_CHANGED   | data  | 玩家自定义属性变化 |
+| ROOM_CUSTOM_PROPERTIES_CHANGED    | { changedProps } | 房间自定义属性变化                         |
+| PLAYER_CUSTOM_PROPERTIES_CHANGED   | { player, changedProps }  | 玩家自定义属性变化 |
 
 
 
@@ -617,7 +620,8 @@ play.createRoom({
 
 ```javascript
 // 注册玩家掉线 / 上线事件
-play.on(Event.PLAYER_ACTIVITY_CHANGED, (player) => {
+play.on(Event.PLAYER_ACTIVITY_CHANGED, (data) => {
+	const { player } = data;
 	// 获得用户是否「活跃」状态
   	cc.log(player.isActive());
   	// TODO 根据玩家的在线状态可以做显示和逻辑处理
@@ -660,7 +664,8 @@ play.on(Event.LOBBY_JOINED, () => {
 
 ```javascript
 // 注册玩家在线状态变化事件
-play.on(Event.PLAYER_ACTIVITY_CHANGED, (player) => {
+play.on(Event.PLAYER_ACTIVITY_CHANGED, (data) => {
+	const { player } = data;
 	// 获得用户是否「活跃」状态
   	cc.log(player.isActive());
 	// TODO 根据玩家的在线状态可以做显示和逻辑处理
