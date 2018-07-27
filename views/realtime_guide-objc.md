@@ -735,8 +735,8 @@ option.pushData = @{@"alert" : @"您有一条未读消息", @"sound" : @"message
  @param name - 对话名称。
  @param clientIds - 聊天参与者（发起人除外）的 clientId 列表。
  @param attributes - 对话的自定义属性。
- @param options － 可选参数，可以使用或 “|” 操作表示多个选项
- @param callback － 对话建立之后的回调
+ @param options － 可选参数。
+ @param callback － 对话建立之后的回调。
  @return None.
  */
 - (void)createConversationWithName:(NSString *)name
@@ -754,9 +754,9 @@ option.pushData = @{@"alert" : @"您有一条未读消息", @"sound" : @"message
 * **options** － 对话选项：
     1. `AVIMConversationOptionTransient`：聊天室，具体可以参见[创建聊天室](#创建聊天室)；
     2. `AVIMConversationOptionNone`：普通对话；
-    3. `AVIMConversationOptionUnique`：根据成员（clientIds）创建原子对话。如果没有这个选项，服务端会为相同的 clientIds 创建新的对话。clientIds 即 \_Conversation 表的 **m** 字段。
+    3. `AVIMConversationOptionTemporary`：临时对话；
+    4. `AVIMConversationOptionUnique`：根据成员（clientIds）创建原子对话。如果没有这个选项，服务端会为相同的 clientIds 创建新的对话。clientIds 即 `_Conversation` 表的 **m** 字段。
 
-  其中，`AVIMConversationOptionNone` 和 `AVIMConversationOptionUnique` 可以使用 `|` 来组合使用，其他选项则不允许。
 * **callback** － 结果回调，在操作结束之后调用，通知开发者成功与否。
   {% endblock %}
 
