@@ -2687,8 +2687,8 @@ curl -X POST \
 
 ```
 curl -X GET \
--H "X-LC-Id:{{appID}}" \
--H "X-LC-Key:{{appKey}}" \
+-H "X-LC-Id:{{appid}}" \
+-H "X-LC-Key:{{appkey}}" \
 -H "Content-Type: application/json" \
 https://{{host}}/1.1/feedback
 ```
@@ -2697,8 +2697,8 @@ https://{{host}}/1.1/feedback
 
 ```
 curl -X GET \
--H "X-LC-Id:{{appID}}" \
--H "X-LC-Key:{{appKey}}" \
+-H "X-LC-Id:{{appid}}" \
+-H "X-LC-Key:{{appkey}}" \
 -H "Content-Type: application/json" \
 https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
@@ -2709,8 +2709,8 @@ https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
 
 ```
 curl -X POST \
--H "X-LC-Id:{{appID}}" \
--H "X-LC-Key:{{appKey}}"\
+-H "X-LC-Id:{{appid}}" \
+-H "X-LC-Key:{{appkey}}"\
  -H "Content-Type: application/json" \
 -d '{"type":"dev","content":"感谢您的反馈！我们正在修复您所述的问题，修复后再通知您。", "attachment":"{{url}}"}' \ 
 https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
@@ -2720,8 +2720,8 @@ https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
 
 ```
 curl -X POST \
--H "X-LC-Id:{{appID}}" \
--H "X-LC-Key:{{appKey}}"\
+-H "X-LC-Id:{{appid}}" \
+-H "X-LC-Key:{{appkey}}"\
  -H "Content-Type: application/json" \
 -d '{"type":"user","content":"我刚才又试了下，现在没问题了！耶~", "attachment":"{{url}}"}' \ 
 https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
