@@ -1,4 +1,4 @@
-# Play JS 入门教程
+# Play 入门教程 · JavaScript
 
 欢迎使用 LeanCloud Play。本教程将通过在 Cocos Creator 环境下模拟一个比较玩家分数大小的场景，来讲解 Play SDK 的核心使用方法。
 
@@ -21,7 +21,7 @@ Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://gi
 
 ### Node.js 安装
 
-终端进入项目根目录，执行 `npm install @leancloud/play --save` 命令。
+`npm install @leancloud/play --save`。
 
 
 
