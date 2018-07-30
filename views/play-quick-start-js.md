@@ -1,11 +1,7 @@
 # Play 入门教程 · JavaScript
 
-欢迎使用 LeanCloud Play。本教程将通过在 Cocos Creator 环境下模拟一个比较玩家分数大小的场景，来讲解 Play SDK 的核心使用方法。
+欢迎使用 LeanCloud Play。本教程将通过模拟一个比较玩家分数大小的场景，来讲解 Play SDK 的核心使用方法。
 
-我们推荐通过以下方法来学习：
-
-1. 下载 [QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)，通过 Cocos Creator 打开 QuickStart 工程，浏览和运行 QuickStart 代码，观察日志输出。
-2. 创建一个新的 Cocos Creator 工程，安装好 SDK 后，替换你申请的 App ID 和 App Key，根据 QuickStart 代码尝试修改并运行，观察变化。
 
 ## 安装
 
@@ -24,7 +20,6 @@ Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://gi
 ```
 npm install @leancloud/play --save。
 ```
-
 
 
 ## 初始化
@@ -55,6 +50,7 @@ const opts = {
 play.init(opts);
 ```
 
+
 ## 设置玩家 ID
 
 ```javascript
@@ -63,6 +59,7 @@ const randId = parseInt(Math.random() * 1000000, 10);
 play.userId = randId.toString();
 ```
 
+
 ## 连接至 Play 服务器
 
 ```javascript
@@ -70,6 +67,7 @@ play.connect();
 ```
 
 连接完成后，会通过 `CONNECTED`（连接成功） 或 `CONNECT_FAILED`（连接失败） 事件来通知客户端。
+
 
 ## 创建或加入房间
 
@@ -86,6 +84,7 @@ play.on(Event.LOBBY_JOINED, () => {
 
 joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进入到相同的房间。
 更多`joinOrCreateRoom`，请参考 [开发指南](play-js.html#创建房间)。
+
 
 ## 通过 CustomPlayerProperties 同步玩家属性
 
@@ -134,6 +133,7 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
 });
 ```
 
+
 ## 通过「自定义事件」通信
 
 当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
@@ -169,3 +169,8 @@ play.on(Event.CUSTOM_EVENT, event => {
 ```
 
 
+## 最后
+
+我们通过 Cocos Creator 完成了这个 Demo，大家可以下载并运行。
+
+[QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)。
