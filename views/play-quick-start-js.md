@@ -9,17 +9,15 @@
 
 ## 安装
 
-Play 客户端 SDK 是开源的，源码地址请访问：[Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。
-也可以直接下载 Release 版本，[下载地址](https://github.com/leancloud/Play-SDK-JS/releases)。
+Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本]((https://github.com/leancloud/Play-SDK-JS/releases)。
 
-### Cocos Creator 安装（包括 Cocos Creator 导出的微信小游戏）
+### Cocos Creator
 
-下载 play.js 并拖拽至 Cocos Creator 项目中即可。
-注意：不要选择「插件方式」。
+也适用于 Cocos Creator 导出的微信小游戏。下载 `play.js` 并拖拽至 Cocos Creator 项目中即可。**注意不要选择「插件方式」**。
 
-### 微信小程序安装
+### 微信小程序
 
-下载 play-weapp.js 并拖拽至小程序工程目录下即可。
+下载 `play-weapp.js` 并拖拽至微信小程序的工程目录下即可。
 
 ### Node.js 安装
 
