@@ -21,7 +21,9 @@ Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://gi
 
 ### Node.js 安装
 
-`npm install @leancloud/play --save`。
+```
+npm install @leancloud/play --save。
+```
 
 
 
