@@ -169,8 +169,8 @@ play.on(Event.CUSTOM_EVENT, event => {
 ```
 
 
-## 最后
+## Demo
 
-我们通过 Cocos Creator 完成了这个 Demo，大家可以下载并运行。
+我们通过 Cocos Creator 完成了这个 Demo，供大家运行参考。
 
 [QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)。
