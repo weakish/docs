@@ -174,3 +174,23 @@ play.on(Event.CUSTOM_EVENT, event => {
 我们通过 Cocos Creator 完成了这个 Demo，供大家运行参考。
 
 [QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)。
+
+
+## 构建注意事项
+
+SDK 使用了基于 WebSocket 的 wss 进行安全通信，但是 android 平台需要设置 CA 证书，所以在 Cocos Creator 构建 android 工程时，需要添加如下代码：
+
+```js
+const { setAdapters } = Play;
+if (cc.sys.platform === cc.sys.ANDROID) {
+  const caPath = cc.url.raw('resources/cacert.pem');
+  setAdapters({
+    WebSocket: (url) => new WebSocket(url, null, caPath)
+  });
+}
+```
+
+
+
+
+
