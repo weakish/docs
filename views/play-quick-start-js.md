@@ -178,15 +178,19 @@ play.on(Event.CUSTOM_EVENT, event => {
 
 ## 构建注意事项
 
-SDK 使用了基于 WebSocket 的 wss 进行安全通信，但是 android 平台需要设置 CA 证书，所以在 Cocos Creator 构建 android 工程时，需要添加如下代码：
+您可以通过 Cocos Creator 构建出其支持的工程，目前 SDK 支持的平台包括：Mac，Web，微信小游戏，iOS，android。
+
+但是，Play SDK 使用了基于 WebSocket 的 wss 进行安全通信，但是 android 平台需要设置 CA 证书，所以在 Cocos Creator 构建 android 工程时，需要在初始化 play 之前添加如下代码：
 
 ```js
-const { setAdapters } = Play;
-if (cc.sys.platform === cc.sys.ANDROID) {
-  const caPath = cc.url.raw('resources/cacert.pem');
-  setAdapters({
-    WebSocket: (url) => new WebSocket(url, null, caPath)
-  });
+onLoad() {
+  const { setAdapters } = Play;
+  if (cc.sys.platform === cc.sys.ANDROID) {
+    const caPath = cc.url.raw('resources/cacert.pem');
+    setAdapters({
+      WebSocket: (url) => new WebSocket(url, null, caPath)
+    });
+  }
 }
 ```
 
