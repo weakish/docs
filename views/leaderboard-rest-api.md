@@ -329,7 +329,7 @@ curl -X GET \
 | maxResultsCount | 可选   | 最大返回数量，默认为 20 |
 | includeUser | 可选   |  返回用户在 _User 表的其他字段，支持多个字段，用英文逗号`,`隔开 |
 | includeStatistics | 可选   |  返回该用户在其他排行榜中的成绩，如果传入了不存在的排行榜名称，将会返回错误 |
-| version | 可选   | 返回指定 version 的排行结果，默认返回当前版本的数据。可查询的历史版本请参考[历史数据]()|
+| version | 可选   | 返回指定 version 的排行结果，默认返回当前版本的数据。可查询的历史版本请参考[历史数据](leaderboard.html#历史数据)|
 
 
 返回 JSON 对象：
@@ -384,7 +384,7 @@ curl -X GET \
 | maxResultsCount | 可选   | 最大返回数量，默认为 20 |
 | includeUser | 可选   |  返回用户在 _User 表的其他字段，支持多个字段，用英文逗号`,`隔开 |
 | includeStatistics | 可选   |  返回该用户在其他排行榜中的成绩，支持用英文逗号`,`隔开传入多个值，如果传入了不存在的排行榜名称，将会返回错误 |
-| version | 可选   | 返回指定 version 的排行结果。默认返回当前版本的数据。可查询的历史版本请参考[历史数据]() |
+| version | 可选   | 返回指定 version 的排行结果。默认返回当前版本的数据。可查询的历史版本请参考[历史数据](leaderboard.html#历史数据) |
 
 返回：
 
