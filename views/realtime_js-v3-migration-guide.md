@@ -1,4 +1,4 @@
-# JavaScript 实时通信 SDK v3 迁移指南
+# JavaScript 即时通信 SDK v3 迁移指南
 
 本文介绍了 JavaScript Realtime SDK version 2 API 在 version 3 中对应的用法。
 
@@ -42,7 +42,7 @@ v2 | v3 | v3 说明
 
 ## 事件
 v2 中所有的事件都在 `RealtimeObject` 上派发，v3 中与对话相关的事件会同时在 `Conversation` 上派发。
-断线重连机制已重新设计，请参考 [《JavaScript 实时通信开发指南》- 网络状态响应](./realtime_guide-js.html#网络状态响应)。
+断线重连机制已重新设计，请参考 [《JavaScript 即时通信开发指南》- 网络状态响应](./realtime_guide-js.html#网络状态响应)。
 
 v2 | v3 | v3 说明
 ---|---|---
@@ -50,6 +50,6 @@ v2 | v3 | v3 说明
 `open`|`reconnect`|原断线重连成功时派发的 `open` 事件由 `reconnect` 事件代替。
 `close`|无|原主动断开连接时派发的 `close` 事件已被移除，请使用 `IMClient.close` 返回的 Promise 的成功回调代替。
 `close`|`disconnect`|原断线时派发的 `close` 事件由 `disconnect` 事件代替。
-`reuse`|`schedule`<br/>`retry`|请参考 [《JavaScript 实时通信开发指南》- 网络状态响应](./realtime_guide-js.html#网络状态响应)。
+`reuse`|`schedule`<br/>`retry`|请参考 [《JavaScript 即时通信开发指南》- 网络状态响应](./realtime_guide-js.html#网络状态响应)。
 `create`|无|请使用 `IMClient#createConversation` 返回的 Promise 的成功回调代替。
 `invited`<br/>`membersjoined`<br/>`kicked`<br/>`membersleft`<br/>`message`<br/>`receipt`|`invited`<br/><code class='text-nowrap'><u>member</u>joined</code><br/>`kicked`<br/><code class='text-nowrap'><u>member</u>left</code><br/>`message`<br/>`receipt`|这些事件会同时在 `Conversation` 上派发。**请额外注意 `members` 改为 `member`**，与其他 SDK 保持统一。

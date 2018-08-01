@@ -487,7 +487,7 @@ Pointer 只是个描述并没有具象的类与之对应，它与 `{{relationObj
 
 在启用文件 HTTPS 域名之后，之前已保存在 `_File` 表中的文件的 URL 会自动被转换为以 HTTPS 开头。如果取消 HTTPS 域名，已经改为 HTTPS 域名的文件不会变回到 HTTP。
 
-<a id="rtm-http-urls" name="rtm-http-urls"></a>LeanCloud 实时通信组件也使用 `AVFile` 来保存消息的图片、音频等文件，并且把文件的地址写入到了消息内容中。当文件 HTTPS 域名被开启后，之前历史消息中的文件地址不会像 `_File` 表那样被自动转换，而依然保持 HTTP。
+<a id="rtm-http-urls" name="rtm-http-urls"></a>LeanCloud 即时通信组件也使用 `AVFile` 来保存消息的图片、音频等文件，并且把文件的地址写入到了消息内容中。当文件 HTTPS 域名被开启后，之前历史消息中的文件地址不会像 `_File` 表那样被自动转换，而依然保持 HTTP。
 
 {% block text_http_access_for_ios9andup %}{% endblock %}
 

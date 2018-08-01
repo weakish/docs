@@ -55,7 +55,7 @@
 
 ![emoji](images/emoji-mm.png)
 
-[表情云™](http://www.biaoqingmm.com/) 为 LeanCloud 实时通讯 SDK 开发了相兼容的「表情 mm SDK」，所有接入 LeanCloud 的用户均可轻松接入表情云服务，在一分钟内拥有一个免费、海量、正版的表情商店。
+[表情云™](http://www.biaoqingmm.com/) 为 LeanCloud 即时通信 SDK 开发了相兼容的「表情 mm SDK」，所有接入 LeanCloud 的用户均可轻松接入表情云服务，在一分钟内拥有一个免费、海量、正版的表情商店。
 
 <div class="row">
   <div class="col-sm-6">

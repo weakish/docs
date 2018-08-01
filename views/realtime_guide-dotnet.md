@@ -5,7 +5,7 @@
 {% set sdk_name = platform_name + " SDK" %}
 
 {% block supportedRuntime %}
-目前我们的 .NET 实时通信支持如下运行时：
+目前我们的 .NET 即时通信支持如下运行时：
 
 * Windows Phone Silverlight （8.0 & 8.1）
 * Windows Desktop .NET Framework 4.5+
@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block setup_init %}
-为了支持实时聊天， 实时通信 SDK 依赖于几个开源的 WebSocket 的库，推荐开发者从 [Nuget](https://www.nuget.org/packages/LeanCloud/) 上下载我们的 SDK。
+为了支持即时通信， 即时通信 SDK 依赖于几个开源的 WebSocket 的库，推荐开发者从 [Nuget](https://www.nuget.org/packages/LeanCloud/) 上下载我们的 SDK。
 
 导入 SDK 之后，在应用入口函数中添加如下代码：
 
@@ -314,7 +314,7 @@ public async void SendVideoMessageAsync()
 {% block commonFileMessage_intro %}
 #### 通用文件消息
 
-开发者可以用它来发送带附件的消息或离线文件。对于此类消息，实时通信 SDK 内部会先把文件上传到 LeanCloud 文件存储服务器（自带 CDN 功能），然后把文件元数据（url、文件大小等）放在消息包内发送到实时通信云端。
+开发者可以用它来发送带附件的消息或离线文件。对于此类消息，即时通信 SDK 内部会先把文件上传到 LeanCloud 文件存储服务器（自带 CDN 功能），然后把文件元数据（url、文件大小等）放在消息包内发送到即时通信云端。
 
 Tom 要发送一份 .doc 文件给 Jerry，可以用下面这种方法：
 
@@ -518,7 +518,7 @@ AVIMClient.Status != Online
  |`AVIMVideoMessage`|视频消息|实例类
  |`AVIMFileMessage`|通用文件消息类|实例类
 
-实时通信 SDK 在封装时对消息做了明确的分层，开发者需要根据自己的需求去使用。
+即时通信 SDK 在封装时对消息做了明确的分层，开发者需要根据自己的需求去使用。
 {% endblock %}
 
 {% block message_Properties_intro %}
@@ -534,7 +534,7 @@ ServerTimestamp|long|消息发送的时间。消息发送成功之后，由 Lean
 MessageStatus|AVIMMessageStatus 枚举|消息状态，有五种取值：<br/><br/>`AVIMMessageStatusNone`（未知）<br/>`AVIMMessageStatusSending`（发送中）<br/>`AVIMMessageStatusSent`（发送成功）<br/>`AVIMMessageStatusDelivered`（被接收）<br/>`AVIMMessageStatusFailed`（失败）
 MessageIOType|AVIMMessageIOType 枚举|消息传输方向，有两种取值：<br/><br/>`AVIMMessageIOTypeIn`（发给当前用户）<br/>`AVIMMessageIOTypeOut`（由当前用户发出）
 
-我们为每一种富媒体消息定义了一个消息类型，实时通信 SDK 自身使用的类型是负数（如下面列表所示），所有正数留给开发者自定义扩展类型使用，0 作为「没有类型」被保留起来。
+我们为每一种富媒体消息定义了一个消息类型，即时通信 SDK 自身使用的类型是负数（如下面列表所示），所有正数留给开发者自定义扩展类型使用，0 作为「没有类型」被保留起来。
 
 消息 | 类型
 --- | ---

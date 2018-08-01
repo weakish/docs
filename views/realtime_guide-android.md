@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block oneOnOneChat_sent %}
-{{ docs.alert("启用实时通信一定要正确配置 `AndroidManifest.xml`，请仔细阅读 [Android SDK 初始化配置](sdk_setup-android.html#初始化)。") }}
+{{ docs.alert("启用即时通信一定要正确配置 `AndroidManifest.xml`，请仔细阅读 [Android SDK 初始化配置](sdk_setup-android.html#初始化)。") }}
 
 ```java
   public void sendMessageToJerryFromTom() {
@@ -649,7 +649,7 @@ AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, msgHandler);
 
 SDK 内部在接收消息时的处理逻辑是这样的：
 
-* 当收到新消息时，实时通信 SDK 会先解析消息的类型，然后找到开发者为这一类型所注册的处理响应 handler chain，再逐一调用这些 handler 的 onMessage 函数
+* 当收到新消息时，即时通信 SDK 会先解析消息的类型，然后找到开发者为这一类型所注册的处理响应 handler chain，再逐一调用这些 handler 的 onMessage 函数
 * 如果没有找到专门处理这一类型消息的 handler，就会转交给 defaultHandler 处理。
 
 这样一来，在开发者为 `AVIMTypedMessage`（及其子类） 指定了专门的 handler，也指定了全局的 defaultHandler 了的时候，如果发送端发送的是通用的 AVIMMessage 消息，那么接受端就是 `AVIMMessageManager.registerDefaultMessageHandler()` 中指定的 handler 被调用；如果发送的是 AVIMTypedMessage（及其子类）的消息，那么接受端就是 `AVIMMessageManager.registerMessageHandler()` 中指定的 handler 被调用。
@@ -810,7 +810,7 @@ onUnreadMessagesCountUpdated(AVIMClient client, AVIMConversation conversation) {
 | receiptTimestamp | long                 | 消息被对方接收到的时间。消息被接收之后，由 LeanCloud 云端赋予的全局的时间戳。 |
 | {{ messageStatusAnchor }}           | AVIMMessageStatus 枚举 | 消息状态，有五种取值：<br/><br/>`AVIMMessageStatusNone`（未知）<br/>`AVIMMessageStatusSending`（发送中）<br/>`AVIMMessageStatusSent`（发送成功）<br/>`AVIMMessageStatusReceipt`（被接收）<br/>`AVIMMessageStatusFailed`（失败） |
 | ioType           | AVIMMessageIOType 枚举 | 消息传输方向，有两种取值：<br/><br/>`AVIMMessageIOTypeIn`（发给当前用户）<br/>`AVIMMessageIOTypeOut`（由当前用户发出） |
-我们为每一种富媒体消息定义了一个消息类型，实时通信 SDK 自身使用的类型是负数（如下面列表所示），所有正数留给开发者自定义扩展类型使用，0 作为「没有类型」被保留起来。
+我们为每一种富媒体消息定义了一个消息类型，即时通信 SDK 自身使用的类型是负数（如下面列表所示），所有正数留给开发者自定义扩展类型使用，0 作为「没有类型」被保留起来。
 
 | 消息   | 类型   |
 | ---- | ---- |
@@ -2329,7 +2329,7 @@ tom.open(new AVIMClientCallback(){
 {% block conversation_security %}
 客户端这边究竟该如何使用呢？我们只需要实现 SignatureFactory 接口，然后在用户登录之前，把这个接口的实例赋值给 AVIMClient 即可（`AVIMClient.setSignatureFactory(factory)`）。
 
-设定了 signatureFactory 之后，对于需要鉴权的操作，实时通信 SDK 与服务器端通讯的时候都会带上应用自己生成的 Signature 信息，LeanCloud 云端会使用 app 的 masterKey 来验证信息的有效性，保证聊天渠道的安全。
+设定了 signatureFactory 之后，对于需要鉴权的操作，即时通信 SDK 与服务器端通讯的时候都会带上应用自己生成的 Signature 信息，LeanCloud 云端会使用 app 的 masterKey 来验证信息的有效性，保证聊天渠道的安全。
 
 对于 SignatureFactory 接口，我们只需要实现这两个函数即可：
 
@@ -2515,13 +2515,13 @@ client.open(openOption, new AVIMClientCallback() {
 {% block client_auto_open %}
 ### 自动登录
 
-如果开发者希望控制 App 重新启动后是否由 SDK 自动登录实时通讯，这可通过如下接口实现：
+如果开发者希望控制 App 重新启动后是否由 SDK 自动登录即时通信，这可通过如下接口实现：
 
 ```
 AVIMClient.setAutoOpen(false);
 ```
 
-如果为 true，SDK 会在 App 重新启动后进行实时通讯的自动重连，如果为 false，则 App 重新启动后不会做自动重连操作，默认值为 true。
+如果为 true，SDK 会在 App 重新启动后进行即时通信的自动重连，如果为 false，则 App 重新启动后不会做自动重连操作，默认值为 true。
 
 注意：此设置并不影响在 App 生命周期内因网络获取等问题造成的重连。
 {% endblock %}

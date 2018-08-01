@@ -1,14 +1,14 @@
 {% import "views/_helper.njk" as docs %}
 {% import "views/_im.md" as imPartial %}
 
-# 实时通信开发指南 · Unity（C#）
+# 即时通信开发指南 · Unity（C#）
 
 ## 准备工作
 
 ### 开发工具
 
 <dl><dt>Unity 5.3.x 以上的版本</dt>
-<dd>这个是因为在 Unity 5.3 之后，官方使用 UnityWebRequest 取代了原有的 WWW 类作为 HTTP 请求的客户端，因此 LeanCloud SDK 在实时通信上是使用了 UnityWebRequest 来获取云端分配的 WebSocket 链接地址。</dd>
+<dd>这个是因为在 Unity 5.3 之后，官方使用 UnityWebRequest 取代了原有的 WWW 类作为 HTTP 请求的客户端，因此 LeanCloud SDK 在即时通信上是使用了 UnityWebRequest 来获取云端分配的 WebSocket 链接地址。</dd>
 <dt>Visual Studio 2015 以上的版本</dt>
 <dd>微软针对 Unity 有一个工具包可以让 Unity 和 Visual Studio 联调，详细请看[使用 Visual Studio Tools for Unity](https://msdn.microsoft.com/zh-cn/library/dn940020.aspx)，因此建议用户在 Windows 上开发 Unity 的体验会更好，当然在 Mac OS 以及其他操作系统上开发也没有任何问题。</dd>
 
@@ -17,9 +17,9 @@ Unity 支持 Mono 使用 .NET 语言来实现跨平台开发的解决方案，�
 
 LeanCloud Unity SDK 在很多重要的功能点上都采用了微软提供的[基于任务的异步模式 (TAP)](https://msdn.microsoft.com/zh-cn/library/hh873175.aspx)，所以如果你具备 .NET Framework 4.5 的开发经验，或对 .NET Framework 4.5 的 新 API 有所了解，将有助于快速上手。
 
-### LeanCloud 实时通信概览
+### LeanCloud 即时通信概览
 
-在继续阅读本文档之前，请先阅读[《实时通信概览》](realtime_v2.html)，了解一下实时通信的基本概念和模型。
+在继续阅读本文档之前，请先阅读[《即时通信概览》](realtime_v2.html)，了解一下即时通信的基本概念和模型。
 
 ### WebSocket 协议
 LeanCloud 实时消息是基于 WebSocket 和私有通讯协议实现的一套聊天系统，因此开发者最好提前了解一下 WebSocket 协议的相关内容。推荐没有接触过的开发者可以阅读《[WebSocket 是什么原理？为什么可以实现持久连接？- Ovear 的回答](http://zhihu.com/question/20215561/answer/40316953)》。
@@ -657,7 +657,7 @@ private void Liubei_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 
 ## 聊天记录
 
-首先我们需要十分谨慎地对待聊天记录。我们要明确一个重要的设定：Unity 目前没有针对聊天记录做本地缓存，根据一般的游戏场景需求，每一次登录，一般情况下，除了一些极少数的游戏提供了可以搜索私聊的聊天记录之外，允许玩家大量搜索聊天记录或者展现聊天记录的需求很少，加之将 Unity 操作 sqlite 的能力集成在 SDK 这一层并不是很方便，因此 LeanCloud Unity 实时通讯 SDK 没有实现缓存功能。
+首先我们需要十分谨慎地对待聊天记录。我们要明确一个重要的设定：Unity 目前没有针对聊天记录做本地缓存，根据一般的游戏场景需求，每一次登录，一般情况下，除了一些极少数的游戏提供了可以搜索私聊的聊天记录之外，允许玩家大量搜索聊天记录或者展现聊天记录的需求很少，加之将 Unity 操作 sqlite 的能力集成在 SDK 这一层并不是很方便，因此 LeanCloud Unity 即时通信 SDK 没有实现缓存功能。
 
 我们提供了实时获取聊天记录的功能，但是因为这个功能很消耗服务端的性能，因此我们建议开发者可以自行实现本地缓存的功能（假设有需求的情况下），另外我们需要声明：我们暂时不限制用户应用中聊天记录的保存时间和条数。未来如有变化我们会提前通知用户，开发者可以随时通过 REST API 将聊天记录同步到自己的服务器上。
 
@@ -699,7 +699,7 @@ public void QueryMessageHistory()
 
 ## 聊天记录（进阶）
 
-除了实时通信，LeanCloud 还提供了更灵活的获取聊天记录的机制。例如：
+除了即时通信，LeanCloud 还提供了更灵活的获取聊天记录的机制。例如：
 
 - 当我们处于离线状态时，也有可能收到好友发来的消息，称为「离线消息」。
 - 当我们希望追踪消息的状态（消息是否已读），称为「未读消息」。

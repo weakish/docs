@@ -1,10 +1,10 @@
-# 实时通信开发指南 &middot; .NET 
+# 即时通信开发指南 &middot; .NET 
 
 ## 简介
 
-在阅读本开发指南之前，请先阅读下[《实时通信开发指南》](./realtime_v2.html)，了解实时通信的基本概念和模型。
+在阅读本开发指南之前，请先阅读下[《即时通信开发指南》](./realtime_v2.html)，了解即时通信的基本概念和模型。
 
-目前我们的 .NET 实时通信支持如下运行时：
+目前我们的 .NET 即时通信支持如下运行时：
 
 * Windows Phone Silverlight （8.0 & 8.1）
 * Windows Desktop .NET Framework 4.5+
@@ -19,7 +19,7 @@
 文档中涉及的语法以及接口均对所有运行时有效。
 
 ## 安装
-为了支持实时聊天，LeanCloud SDK for .NET 依赖于几个开源的 WebSocket 的库，所以推荐开发者从 [Nuget](https://www.nuget.org/packages/AVOSCloud.Phone/1.3.0-beta) 上下载我们的 SDK。
+为了支持即时通信，LeanCloud SDK for .NET 依赖于几个开源的 WebSocket 的库，所以推荐开发者从 [Nuget](https://www.nuget.org/packages/AVOSCloud.Phone/1.3.0-beta) 上下载我们的 SDK。
 
 ## 初始化
 导入 SDK 之后，在应用入口函数中添加如下代码：
@@ -36,7 +36,7 @@
 ## 单聊
 
 ###  发送消息
-此场景类似于微信的私聊，微博的私信以及 QQ 单聊的场景，我们建立了一个统一的概念来描述聊天的各种场景：对话 — AVIMConversation，在[《实时通信开发指南》](./realtime_v2.html)里面有详细的介绍。
+此场景类似于微信的私聊，微博的私信以及 QQ 单聊的场景，我们建立了一个统一的概念来描述聊天的各种场景：对话 — AVIMConversation，在[《即时通信开发指南》](./realtime_v2.html)里面有详细的介绍。
 
 Tom 想发送一条消息给 Jerry，下面的代码将帮助他实现这一功能：
 
@@ -458,7 +458,7 @@ OnTextMessageReceived > OnTypedMessageReceived > OnMessageReceived
 * `AVIMVideoMessage` 视频消息，四级实例类
 * `AVIMFileMessage` 通用文件消息类，四级实例类
 
-结合图例，实时通信 SDK 在封装的时候，做了明确的分层，开发者需要根据自己的需求去使用。
+结合图例，即时通信 SDK 在封装的时候，做了明确的分层，开发者需要根据自己的需求去使用。
 
 ### 消息的自定义属性
 有些场景下需要开发者在发送消息的时候附带一下自己业务逻辑需求的自定义属性，比如消息发送的设备名称，或者图像消息的拍摄地点，或者视频消息的来源等等，如果业务需要，开发者都可以通过 `AVIMMessage.Attributes` 实现这一需求。
@@ -493,7 +493,7 @@ client.OnMessageReceieved += (s, e) =>
 所有消息都支持这一属性。
 
 ## 对话的管理
-以上 三个章节基本演示了实时聊天 SDK 的核心概念——AVIMConversation ，LeanCloud 将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `AVIMConversation`这个统一的概念进行操作。
+以上 三个章节基本演示了即时通信 SDK 的核心概念——AVIMConversation ，LeanCloud 将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `AVIMConversation`这个统一的概念进行操作。
 
 所以，开发者需要强化理解的一个概念就是：**SDK 层面是不再区分单聊以及群聊。**
 
@@ -1016,7 +1016,7 @@ con.QueryHistory(DateTime.Now.AddDays(-1), 0, "UserA").Wait();
 
 
 ## 签名与安全
-在继续阅读本文档之前，请确保您已经对 [实时通信服务开发指南—权限和认证](./realtime_v2.html#权限和认证) 有了一定的了解。
+在继续阅读本文档之前，请确保您已经对 [即时通信服务开发指南—权限和认证](./realtime_v2.html#权限和认证) 有了一定的了解。
 ### 实现签名工厂
 `AVIMClient` 有一个属性：
 

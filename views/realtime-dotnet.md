@@ -1,13 +1,13 @@
 {% import "views/_im.md" as imPartial %}
 
-# 实时通信开发指南 · .NET
+# 即时通信开发指南 · .NET
 
 ## 简介
 
-在阅读本开发指南之前，请先阅读下[《实时通信开发指南》](./realtime_v2.html)，了解实时通信的基本概念和模型。
+在阅读本开发指南之前，请先阅读下[《即时通信开发指南》](./realtime_v2.html)，了解即时通信的基本概念和模型。
 
 ### 使用场景
-LeanCloud 实时通信服务的目标是在开发者没有任何服务端开发经验以及不需要自己拥有服务器的情况下实现如下应用场景：
+LeanCloud 即时通信服务的目标是在开发者没有任何服务端开发经验以及不需要自己拥有服务器的情况下实现如下应用场景：
 
 - 类陌陌，类微信的社交聊天应用或者匿名聊天应用
 - 类似于 Slack 的协同办公聊天工具
@@ -18,13 +18,13 @@ LeanCloud 实时通信服务的目标是在开发者没有任何服务端开发�
 
 ### 导入 SDK
 
-- [iOS SDK 安装指南 - 实时通信模块](sdk_setup-objc.html)
-- [Android SDK 安装指南 - 实时通信模块](sdk_setup-android.html)
-- [JavaScript SDK 安装指南 - 实时通信模块](sdk_setup-js.html)
-- [C# SDK 安装指南 - 实时通信模块](sdk_setup-dotnet.html#_NET_Framework)
-- [Unity SDK 安装指南 - 实时通信模块](sdk_setup-dotnet.html#Mono_for_Unity)
+- [iOS SDK 安装指南 - 即时通信模块](sdk_setup-objc.html)
+- [Android SDK 安装指南 - 即时通信模块](sdk_setup-android.html)
+- [JavaScript SDK 安装指南 - 即时通信模块](sdk_setup-js.html)
+- [C# SDK 安装指南 - 即时通信模块](sdk_setup-dotnet.html#_NET_Framework)
+- [Unity SDK 安装指南 - 即时通信模块](sdk_setup-dotnet.html#Mono_for_Unity)
 
-### 初始化实时通信服务
+### 初始化即时通信服务
 
 ```cs
 // 初始化当前平台的 WebSocket 类库
@@ -39,7 +39,7 @@ AVRealtime.WebSocketLog(Console.WriteLine);
 
 ## 场景分类
 
-LeanCloud 实时通信服务有如下几个特点：
+LeanCloud 即时通信服务有如下几个特点：
 
 - 不侵入开发者的用户系统
 - 自主研发的可拓展的聊天协议
@@ -53,7 +53,7 @@ LeanCloud 实时通信服务有如下几个特点：
 
 #### 私聊
 
-开始之前，一定要强调的是私聊中如何实现两个人成为好友，以及成为好友之后才可以开始聊天这一鉴权过程**并不是** LeanCloud 实时通信提供的服务内容，它属于开发者自主掌控的鉴权逻辑，这一章节可以在[安全与鉴权](#安全与鉴权)中阅读解决方案。
+开始之前，一定要强调的是私聊中如何实现两个人成为好友，以及成为好友之后才可以开始聊天这一鉴权过程**并不是** LeanCloud 即时通信提供的服务内容，它属于开发者自主掌控的鉴权逻辑，这一章节可以在[安全与鉴权](#安全与鉴权)中阅读解决方案。
 
 首先我们假设系统中存在两个用户，Tom 和 Jerry，以下我们演示 Tom 分别登录到聊天服务器：
 
@@ -69,7 +69,7 @@ Console.WriteLine(clientId + " connected.");
 ```
 
 ##### 建立私聊对话
-在 LeanCloud 实时通信中把所有聊天的载体定义为一个「对话」，这个可以参照微信的私聊加入另外一个人之后就会变成一个新的 3 人的对话去理解，私聊和群聊的最大区别就是人数等于 2 的就是私聊，大于 2 的就是群聊。
+在 LeanCloud 即时通信中把所有聊天的载体定义为一个「对话」，这个可以参照微信的私聊加入另外一个人之后就会变成一个新的 3 人的对话去理解，私聊和群聊的最大区别就是人数等于 2 的就是私聊，大于 2 的就是群聊。
 
 ```cs
 conversation = await client.CreateConversationAsync("Jerry", name: "Tom 和 Jerry 的私聊对话");

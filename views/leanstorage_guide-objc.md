@@ -612,7 +612,7 @@ if (!error) {
 
 从 iOS 9 开始，Apple 默认屏蔽 HTTP 访问，只支持 HTTPS 访问。LeanCloud 除了文件的 `getData` 之外的 API 都支持通过 HTTPS 访问。
 
-如果你仍然需要 HTTP 访问，例如实时通信消息中[仍然有使用 HTTP 域名的文件](#rtm-http-urls)，你可以**为项目配置访问策略来允许 HTTP 访问**，从而解决这个问题。方法如下：
+如果你仍然需要 HTTP 访问，例如即时通信消息中[仍然有使用 HTTP 域名的文件](#rtm-http-urls)，你可以**为项目配置访问策略来允许 HTTP 访问**，从而解决这个问题。方法如下：
 
 在项目中额外配置一下该接口的访问策略。选择项目的  `Info.plist`，右击以 Source Code 的方式打开。在 plist -> dict 节点中加入以下文本：
 

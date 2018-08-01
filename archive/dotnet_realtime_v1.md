@@ -1,14 +1,14 @@
-# Windows Phone 8.0 实时通信
+# Windows Phone 8.0 即时通信
 
 ## 简介
 
-在阅读本开发指南之前，请先阅读下[《实时通信开发指南》](./realtime.html)，了解实时通信的基本概念和模型。
+在阅读本开发指南之前，请先阅读下[《即时通信开发指南》](./realtime.html)，了解即时通信的基本概念和模型。
 
 
 ## 安装
-为了支持实时聊天，我们依赖于一个开源的第三方的 WebSocket 的库，所以推荐开发者从[Nuget](https://www.nuget.org/packages/AVOSCloud.Phone/1.2.3.4-beta)上下载我们的 SDK。
+为了支持即时通信，我们依赖于一个开源的第三方的 WebSocket 的库，所以推荐开发者从[Nuget](https://www.nuget.org/packages/AVOSCloud.Phone/1.2.3.4-beta)上下载我们的 SDK。
 
-为了更方便开发者阅读和理解 SDK 里面的各种抽象概念，我们先从一个应用场景来简单地剖析实时聊天组件在 Windows Phone 8.0 SDK 中如何使用。
+为了更方便开发者阅读和理解 SDK 里面的各种抽象概念，我们先从一个应用场景来简单地剖析即时通信组件在 Windows Phone 8.0 SDK 中如何使用。
 
 ## 单聊
 ### 场景设定
@@ -103,7 +103,7 @@ public class SampleAVSessionListener : IAVSessionListener
 ## 基于事件的回调
 基于事件的回调（EAP） 是 .NET 程序员熟悉的一种处理异步以及被动响应操作的常用方式，为此我们在聊天组件里面添加了一些被动响应的事件类型来响应消息的接收，群组人员变动等操作。
 
-实时通信是架构在长连接上的一种 Client——Server——Client 的模式，所以我们提供了一套 C# 程序员比较熟悉的基于事件的回调方式来处理实时通信里面的相关操作，如果配合 Lambda 表达式，代码会显得优雅一点。
+即时通信是架构在长连接上的一种 Client——Server——Client 的模式，所以我们提供了一套 C# 程序员比较熟悉的基于事件的回调方式来处理即时通信里面的相关操作，如果配合 Lambda 表达式，代码会显得优雅一点。
 
 如发送消息可以有如下写法：
 
@@ -359,7 +359,7 @@ public class SampleSignatureFactory : ISignatureFactory
 
 签名是认证的一种方式，这种方式有助于开发者去自由掌控自己的系统又不会付出过多的代码做一些跟业务逻辑本身无关的事情，LeanCloud 一直致力于减少应用开发者在服务端的工作量，并且希望开发者能够对应用开发的整体流程有着自己独到的把控，这样的应用才是高质量的。
 
-## 目前 Windows Phone 8 SDK 所支持的实时通信的功能组件
+## 目前 Windows Phone 8 SDK 所支持的即时通信的功能组件
 
 目前尚在公测版，已经支持的功能组件是：
 

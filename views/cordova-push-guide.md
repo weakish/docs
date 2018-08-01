@@ -13,9 +13,9 @@ Cordova 本质上是一个 Web 项目，它的开发语言目前还是主流的 
 
 - [LeanCloud JavaScript SDK 安装指南](sdk_setup-js.html)
 - [LeanCloud JavaScript SDK 数据存储开发指南][storage]
-- [LeanCloud JavaScript SDK 实时通信开发指南][im]
+- [LeanCloud JavaScript SDK 即时通信开发指南][im]
 
-我们的 [数据存储][storage] 以及 [实时通信][im] 模块的安装包都已经包含了 TypeScript 的定义文件，因此支持使用 ionic2+ 进行开发，不会出现编译报错的问题。
+我们的 [数据存储][storage] 以及 [即时通信][im] 模块的安装包都已经包含了 TypeScript 的定义文件，因此支持使用 ionic2+ 进行开发，不会出现编译报错的问题。
 
 ## LeanCloud 推送插件
 消息推送是 LeanCloud 提供的一项针对移动设备的云端服务。
@@ -24,8 +24,8 @@ Cordova 本质上是一个 Web 项目，它的开发语言目前还是主流的 
 前往插件的仓库地址 <https://github.com/leancloud/cordova-plugin-leancloud> 查看安装以及初始化的说明。
 
 
-### 推送插件与实时通信离线消息的关联
-假如项目中还引入了 LeanCloud 实时通信功能，一定会遇到客户端下线之后的离线消息与推送设备的对应的问题，类似于 QQ 的离线消息推送——某一个用户在一台安卓设备上登录了自己微信，而后又换到一台苹果手机上登录，服务端需要明确知道该用户最后一次登录的是哪台设备，这样才能准确地将消息推送到目标设备。因此使用 [JavaScript 实时通信][im] 的开发者需要在登录到实时通信服务器之后做一次关联操作即可，代码如下：
+### 推送插件与即时通信离线消息的关联
+假如项目中还引入了 LeanCloud 即时通信功能，一定会遇到客户端下线之后的离线消息与推送设备的对应的问题，类似于 QQ 的离线消息推送——某一个用户在一台安卓设备上登录了自己微信，而后又换到一台苹果手机上登录，服务端需要明确知道该用户最后一次登录的是哪台设备，这样才能准确地将消息推送到目标设备。因此使用 [JavaScript 即时通信][im] 的开发者需要在登录到即时通信服务器之后做一次关联操作即可，代码如下：
 
 
 ```js
@@ -40,7 +40,7 @@ window.LeanPush.subscribe(clientId, function(success){
 
 注意：上述代码需要确保 [LeanCloud_推送插件](#LeanCloud_推送插件) 已成功安装并进行了初始化。
 
-同理，如果使用了 JavaScript 实时通信的 [单点登录]({{ imJSLink }}#单点登录)，就需要在 [处理登录冲突]({{ imJSLink }}#处理登录冲突) 时对当前设备的 Installation 解绑：
+同理，如果使用了 JavaScript 即时通信的 [单点登录]({{ imJSLink }}#单点登录)，就需要在 [处理登录冲突]({{ imJSLink }}#处理登录冲突) 时对当前设备的 Installation 解绑：
 
 ```js
 tom.on('conflict', function() {

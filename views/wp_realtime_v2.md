@@ -1,13 +1,13 @@
-# Windows Phone 实时通信服务开发指南
+# Windows Phone 即时通信服务开发指南
 
 ## 简介
 
-在阅读本开发指南之前，请先阅读下[《实时通信开发指南》](./realtime_v2.html)，了解实时通信的基本概念和模型。
+在阅读本开发指南之前，请先阅读下[《即时通信开发指南》](./realtime_v2.html)，了解即时通信的基本概念和模型。
 
-目前我们的实时通信服务仅支持 Windows Phone Silverlight 运行时，支持微软新一代的全平台统一运行时的 LeanCloud SDK for Windows Runtime 会尽快发布，本文档所提及的概念以及示例代码都兼容以上提及的 2 个运行时。
+目前我们的即时通信服务仅支持 Windows Phone Silverlight 运行时，支持微软新一代的全平台统一运行时的 LeanCloud SDK for Windows Runtime 会尽快发布，本文档所提及的概念以及示例代码都兼容以上提及的 2 个运行时。
 
 ## 安装
-为了支持实时聊天，LeanCloud SDK for Windows Phone Silverlight 依赖于一个开源的第三方的 WebSocket 的[库](https://www.nuget.org/packages/WebSocket4Net/)，所以推荐开发者从 [Nuget](https://www.nuget.org/packages/AVOSCloud.Phone/1.3.0-beta) 上下载我们的 SDK。
+为了支持即时通信，LeanCloud SDK for Windows Phone Silverlight 依赖于一个开源的第三方的 WebSocket 的[库](https://www.nuget.org/packages/WebSocket4Net/)，所以推荐开发者从 [Nuget](https://www.nuget.org/packages/AVOSCloud.Phone/1.3.0-beta) 上下载我们的 SDK。
 
 ## 初始化
 导入 SDK 之后，在 `App.xaml` 的构造函数中添加如下代码：
@@ -25,7 +25,7 @@ public App()
 ## 单聊
 
 ###  发送消息
-此场景类似于微信的私聊，微博的私信以及 QQ 单聊的场景，我们建立了一个统一的概念来描述聊天的各种场景：对话 — AVIMConversation，在[《实时通信开发指南》](./realtime_v2.html)里面有详细的介绍。
+此场景类似于微信的私聊，微博的私信以及 QQ 单聊的场景，我们建立了一个统一的概念来描述聊天的各种场景：对话 — AVIMConversation，在[《即时通信开发指南》](./realtime_v2.html)里面有详细的介绍。
 
 Tom 想发送一条消息给 Jerry，下面的代码将帮助他实现这一功能：
 
@@ -543,7 +543,7 @@ OnTextMessageReceived > OnTypedMessageReceived > OnMessageReceived
 * `AVIMVideoMessage` 视频消息，四级实例类
 * `AVIMFileMessage` 通用文件消息类，四级实例类
 
-结合图例，实时通信 SDK 在封装的时候，做了明确的分层，开发者需要根据自己的需求去使用。
+结合图例，即时通信 SDK 在封装的时候，做了明确的分层，开发者需要根据自己的需求去使用。
 
 ### 消息的自定义属性
 有些场景下需要开发者在发送消息的时候附带一下自己业务逻辑需求的自定义属性，比如消息发送的设备名称，或者图像消息的拍摄地点，或者视频消息的来源等等，如果业务需要，开发者都可以通过 `AVIMMessage.Attributes` 实现这一需求。
@@ -578,7 +578,7 @@ client.OnMessageReceieved += (s, e) =>
 所有消息都支持这一属性。
 
 ## 对话的管理
-以上 三个章节基本演示了实时聊天 SDK 的核心概念——AVIMConversation ，LeanCloud 将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `AVIMConversation`这个统一的概念进行操作。
+以上 三个章节基本演示了即时通信 SDK 的核心概念——AVIMConversation ，LeanCloud 将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `AVIMConversation`这个统一的概念进行操作。
 
 所以，开发者需要强化理解的一个概念就是：**SDK 层面是不再区分单聊以及群聊。**
 
@@ -1097,7 +1097,7 @@ con.QueryHistory(DateTime.Now, 0, "UserA").Wait();
 与查询类似，它提供了  limit 和 skip 操作，可以帮助开发者实现翻页等功能。
 
 ## 签名与安全
-在继续阅读本文档之前，请确保您已经对 [实时通信服务开发指南—权限和认证](realtime_v2.html#权限和认证) 有了一定的了解。
+在继续阅读本文档之前，请确保您已经对 [即时通信服务开发指南—权限和认证](realtime_v2.html#权限和认证) 有了一定的了解。
 ### 实现签名工厂
 `AVIMClient` 有一个属性：
 
