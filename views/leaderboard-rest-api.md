@@ -6,7 +6,8 @@
 
 阅读此文档前请确保已经阅读了[排行榜总览](leaderboard.html)，了解排行榜的核心概念及功能。
 
-## 请求格式
+## 请求
+### 请求格式
 对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
 
 请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，参数如下表：
@@ -17,6 +18,13 @@ Key|Value|含义|来源
 `X-LC-Key`| {{appkey}}|当前应用的 App Key |可在控制台->设置页面查看
 
 部分管理性质的接口需要使用master key。
+
+### 请求 url 中的变量
+
+本文档中请求 url 中需要的填充的变量有：
+
+* statisticName：排行榜名称。
+* uid：user 的 objectId。
 
 ## 排行榜操作
 
@@ -52,8 +60,8 @@ curl -X POST \
   "updateStrategy": "better",
   "version": 0,
   "versionChangeInterval": "day",
-  "expiredAt": {"__type": "Date", "iso": "2018-05-01T02:00:00.000Z"},
-  "activatedAt": {"__type": "Date", "iso": "2018-05-01T01:00:00.000Z"},
+  "expiredAt": {"__type": "Date", "iso": "2018-05-02T16:00:00.000Z"},
+  "activatedAt": {"__type": "Date", "iso": "2018-05-01T16:00:00.000Z"},
   "createdAt": "2018-04-28T05:46:58.579Z",
   "updatedAt": "2018-05-01T01:00:00.000Z" 
 }
@@ -67,7 +75,7 @@ curl -X POST \
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  https://{{host}}/1.1/leaderboard/leaderboards/{{statisticName}}
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>
 ```
 
 返回的 JSON 对象包含该排行榜的所有信息：
@@ -80,8 +88,8 @@ curl -X GET \
   "updateStrategy": "better",
   "version": 5,
   "versionChangeInterval": "day",
-  "expiredAt": {"__type": "Date", "iso": "2018-05-01T02:00:00.000Z"},
-  "activatedAt": {"__type": "Date", "iso": "2018-05-01T01:00:00.000Z"},
+  "expiredAt": {"__type": "Date", "iso": "2018-05-02T16:00:00.000Z"},
+  "activatedAt": {"__type": "Date", "iso": "2018-05-01T16:00:00.000Z"},
   "createdAt": "2018-04-28T05:46:58.579Z",
   "updatedAt": "2018-05-01T01:00:00.000Z" 
 }
@@ -98,7 +106,7 @@ curl -X PUT \
   -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
   -d '{"versionChangeInterval": "day"}' \
-  https://{{host}}/1.1/leaderboard/leaderboards/{{statisticName}}
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>
 ```
 返回的 JSON 对象包含更新的属性信息，及 updatedAt 字段。
 
@@ -118,7 +126,7 @@ curl -X PUT \
 curl -X PUT \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  https://{{host}}/1.1/leaderboard/leaderboards/{{statisticName}}/incrementVersion
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>/incrementVersion
 ```
 
 返回的 JSON 会显示重置后的当前版本号，下一次过期时间`expiredAt`，当前版本的开始时间`activatedAt`：
@@ -142,7 +150,7 @@ curl -X GET \
   -H "X-LC-Key: {{masterkey}},master" \
   -G \
   --data-urlencode 'limit=10' \
-  https://{{host}}/1.1/leaderboard/leaderboards/{{statisticName}}/archives
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>/archives
 ```
 返回的对象会按照 `createdAt` 降序排列。其中 `file_key` 是文件的名称，`url` 是文件的下载地址，status 包含以下状态：
 
@@ -162,7 +170,7 @@ curl -X GET \
       "url": "https://lc-paas-files.cn-n1.lcfile.com/yK5s6YJztAwEYiWs.csv",
       "file_key": "yK5s6YJztAwEYiWs.csv",
       "activatedAt": {"__type": "Date", "iso": "2018-05-28T06:11:49.572Z"},
-      "deactivatedAt": {"__type": "Date", "iso": "2018-05-28T06:11:49.951Z"},
+      "deactivatedAt": {"__type": "Date", "iso": "2018-05-30T06:11:49.951Z"},
       "createdAt": "2018-05-01T16:00.00.000Z",
       "updatedAt": "2018-05-28T06:11:50.129Z",
     }
@@ -172,13 +180,15 @@ curl -X GET \
 
 #### 删除排行榜
 
-删除时只需要指定排行榜的名称 statisticName
+**这个接口将删除排行榜的所有数据**，包括当前版本的数据及所有归档文件，删除后无法恢复，请谨慎操作。
+
+删除时只需要指定排行榜的名称 statisticName。
 
 ```sh
 curl -X DELETE \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  https://{{host}}/1.1/leaderboard/leaderboards/{{statisticName}}
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>
 ```
 
 返回空 JSON 对象：
@@ -191,11 +201,9 @@ curl -X DELETE \
 #### 更新成绩
 更新成绩遵循排行榜的 updateStrategy 属性，具体行为请参考[更新策略](leaderboard.html#更新策略)。
 
-客户端在更新用户成绩时，需要用户先登录，拿到用户的 `sessionToken` 及 `objectId`，将 `sessionToken` 作为 `X-LC-Session` 的值，将 objectId 作为请求 URL 中的 `uid`。
+在这个接口中可以一次更新多个排行榜的成绩。
 
-如果您使用服务端masterKey 超级权限，可以不传入 `X-LC-Session` 更新用户分数。
-
-您可以选择一次更新多个排行榜的成绩，例如客户端更新成绩：
+客户端在更新用户成绩时，需要用户先登录，拿到用户的 `sessionToken`，将 `sessionToken` 作为 `X-LC-Session` 的值例如：
 
 ```sh
 curl -X POST \
@@ -204,7 +212,18 @@ curl -X POST \
   -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
   -H "Content-Type: application/json" \
   -d '[{"statisticName": "wins", "statisticValue": 5}, {"statisticName": "world","statisticValue": 91}]' \
-  https://{{host}}/1.1/leaderboard/users/{uid}/statistics
+  https://{{host}}/1.1/leaderboard/users/self/statistics
+```
+
+如果您使用服务端masterKey 超级权限，可以不传入 `X-LC-Session` 更新用户分数，但是要在 url 中指定 `uid` 。例如：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '[{"statisticName": "wins", "statisticValue": 5}, {"statisticName": "world","statisticValue": 91}]' \
+  https://{{host}}/1.1/leaderboard/users/<uid>/statistics
 ```
 
 
@@ -238,9 +257,8 @@ curl -X POST \
   -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
   -d '[{"statisticName": "wins", "statisticValue": 10}]' \
-  -G \
   --data-urlencode 'overwrite=1' \
-  https://{{host}}/1.1/leaderboard/users/{uid}/statistics
+  https://{{host}}/1.1/leaderboard/users/<uid>/statistics
 ```
 
 返回的数据是当前服务端使用的分数：
@@ -251,23 +269,30 @@ curl -X POST \
 
 
 #### 查询某个用户的成绩
-客户端在查询用户成绩时，需要用户先登录，拿到用户的 `sessionToken` 及 `objectId`，将 `sessionToken` 作为 `X-LC-Session` 的值，将 objectId 作为请求 URL 中的 `uid`。
 
-如果您使用服务端masterKey 超级权限，可以不传入 `X-LC-Session` 查询用户分数。
+您可以在请求 url 中指定多个 `statistics` 来获得多个排行榜中的成绩，排行榜名称用英文逗号 `,` 隔开，如果不指定将会返回该用户参与的所有排行榜中的成绩。如果您需要获得用户的其他信息，例如 `username`，可以在请求 url 中指定 `includeUser` 来获取。
 
-您可以在请求 url 中指定多个 `statistics` 来获得多个排行榜中的成绩，排行榜名称用英文逗号 `,` 隔开，如果不指定将会返回该用户参与的所有排行榜中的成绩。
-
-如果您需要获得用户的其他信息，例如 username，可以在请求 url 中指定 `includeUser` 来获取。
+客户端在查询用户成绩时，需要用户先登录，拿到用户的 `sessionToken`，将 `sessionToken` 作为 `X-LC-Session` 的值，例如：
 
 ```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
   -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
-  -G \
   --data-urlencode 'statistics=wins,world' \
   --data-urlencode 'includeUser=username,avatar_url' \
-  https://{{host}}/1.1/leaderboard/users/{uid}/statistics
+  https://{{host}}/1.1/leaderboard/users/self/statistics
+```
+
+如果您使用服务端masterKey 超级权限，可以不传入 `X-LC-Session` 查询用户分数，但是要在请求 url 中指定 `uid`。例如：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  --data-urlencode 'statistics=wins,world' \
+  --data-urlencode 'includeUser=username,avatar_url' \
+  https://{{host}}/1.1/leaderboard/users/<uid>/statistics
 ```
 
 返回值是查询到的所有成绩结果：
@@ -320,7 +345,7 @@ curl -X GET \
   --data-urlencode 'includeUser=username,avatar_url' \
   --data-urlencode 'includeStatistics=wins' \
   --data-urlencode 'version=1' \
-  https://{{host}}/1.1/leaderboard/leaderboards/{{statisticName}}/ranks
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>/ranks
 ```
 
 | 参数        | 约束   | 说明                                   |
@@ -361,22 +386,20 @@ curl -X GET \
 }
 ```
 
-#### 获取当前用户及附近的排名
-这个接口需要用户先登录，拿到用户的 `sessionToken` 及 `objectId`，将 `sessionToken` 作为 `X-LC-Session` 的值，将 objectId 作为请求 URL 中的 `uid`。
-
+#### 获取用户及附近的排名
+在请求 url 中指定排行榜名称 `statisticName` 及 uid 就可以获取该用户及其附近的排名。
 
 ```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
-  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
   -G \
   --data-urlencode 'startPosition=0' \
   --data-urlencode 'maxResultsCount=20' \
   --data-urlencode 'includeUser=username,avatar_url' \
   --data-urlencode 'includeStatistics=wins' \
   --data-urlencode 'version=1' \
-  https://{{host}}/1.1/leaderboard/leaderboards/{statisticName}/ranks/{uid}
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>/ranks/<uid>
 ```
 | 参数        | 约束   | 说明                                   |
 | --------- | ---- | ---------------------------------------- |
