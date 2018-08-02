@@ -54,16 +54,22 @@ curl -X POST \
 
 ```json
 {
-  "objectId": "5b0b97cf06f4fd0abc0abe35",
+  "objectId": "5b62c15a9f54540062427acc",
   "statisticName": "world",
+  "versionChangeInterval": "month",
   "order": "descending",
   "updateStrategy": "better",
   "version": 0,
-  "versionChangeInterval": "month",
-  "expiredAt": {"__type": "Date", "iso": "2018-05-02T16:00:00.000Z"},
-  "activatedAt": {"__type": "Date", "iso": "2018-05-01T16:00:00.000Z"},
-  "createdAt": "2018-04-28T05:46:58.579Z",
-  "updatedAt": "2018-05-01T01:00:00.000Z" 
+  "createdAt": "2018-08-02T08:31:22.294Z",
+  "updatedAt": "2018-08-02T08:31:22.294Z",
+  "expiredAt": {
+    "__type": "Date",
+    "iso": "2018-08-31T16:00:00.000Z"
+  },
+  "activatedAt": {
+    "__type": "Date",
+    "iso": "2018-08-02T08:31:22.290Z"
+  }
 }
 ```
 
