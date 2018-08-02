@@ -59,7 +59,7 @@ curl -X POST \
   "order": "descending",
   "updateStrategy": "better",
   "version": 0,
-  "versionChangeInterval": "day",
+  "versionChangeInterval": "month",
   "expiredAt": {"__type": "Date", "iso": "2018-05-02T16:00:00.000Z"},
   "activatedAt": {"__type": "Date", "iso": "2018-05-01T16:00:00.000Z"},
   "createdAt": "2018-04-28T05:46:58.579Z",
@@ -209,7 +209,7 @@ curl -X DELETE \
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
-  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  -H "X-LC-Session: <sessionToken>" \
   -H "Content-Type: application/json" \
   -d '[{"statisticName": "wins", "statisticValue": 5}, {"statisticName": "world","statisticValue": 91}]' \
   https://{{host}}/1.1/leaderboard/users/self/statistics
@@ -247,9 +247,9 @@ curl -X POST \
 ```
 
 #### 强制更新成绩
-使用这个接口可以无视更新策略，强制更新用户的成绩。例如您发现某个用户存在作弊行为时，可能需要用到这个接口。
+使用这个接口会无视更新策略 better 及 sum，强制使用 last 策略更新用户的成绩。例如您发现某个用户存在作弊行为时，可能需要用到这个接口。
 
-使用上方更新成绩的方法，并使用服务端masterKey 超级权限，设置 `overwrite = 1` 就可以达到目的。
+使用服务端 masterKey 超级权限，在 url 中设置 `overwrite = 1` 就可以达到目的。
 
 ```sh
 curl -X POST \
@@ -257,8 +257,7 @@ curl -X POST \
   -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
   -d '[{"statisticName": "wins", "statisticValue": 10}]' \
-  --data-urlencode 'overwrite=1' \
-  https://{{host}}/1.1/leaderboard/users/<uid>/statistics
+  https://{{host}}/1.1/leaderboard/users/<uid>/statistics?overwrite=1
 ```
 
 返回的数据是当前服务端使用的分数：
@@ -268,17 +267,17 @@ curl -X POST \
 ```
 
 
-#### 查询某个用户的成绩
+#### 查询当前用户的成绩
 
 您可以在请求 url 中指定多个 `statistics` 来获得多个排行榜中的成绩，排行榜名称用英文逗号 `,` 隔开，如果不指定将会返回该用户参与的所有排行榜中的成绩。如果您需要获得用户的其他信息，例如 `username`，可以在请求 url 中指定 `includeUser` 来获取。
 
-客户端在查询用户成绩时，需要用户先登录，拿到用户的 `sessionToken`，将 `sessionToken` 作为 `X-LC-Session` 的值，例如：
+客户端在查询当前用户成绩时，需要用户先登录，拿到用户的 `sessionToken`，将 `sessionToken` 作为 `X-LC-Session` 的值，例如：
 
 ```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
-  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  -H "X-LC-Session: <sessionToken>" \
   --data-urlencode 'statistics=wins,world' \
   --data-urlencode 'includeUser=username,avatar_url' \
   https://{{host}}/1.1/leaderboard/users/self/statistics
