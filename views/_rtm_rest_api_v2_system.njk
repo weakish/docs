@@ -11,7 +11,7 @@ curl -X POST \
   https://{{host}}/1.2/rtm/service-conversations
 ```
 
-对话的字段可参考实时通信总览里面的 [对话](realtime_v2.html#对话（Conversation）)。
+对话的字段可参考即时通信总览里面的 [对话](realtime_v2.html#对话（Conversation）)。
 
 返回
 ```
@@ -106,10 +106,11 @@ curl -X DELETE \
 
 ### 遍历查询订阅者
 
+该接口要求使用 master key。
 ```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
   https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers
 ```
 
@@ -129,10 +130,11 @@ client_id | 可选 | 查询起始订阅者 client id，不填则从订阅者列�
 
 ### 查询订阅者数
 
+该接口要求使用 master key。
 ```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
   https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers/count
 ```
 

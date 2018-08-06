@@ -4,7 +4,7 @@
 
 > 如果需要了解 iOS 版本请点击: [ChatKit 使用指南 &middot; iOS](chatkit-ios.html)
 
-[ChatKit](https://github.com/leancloud/LeanCloudChatKit-Android) 是一个免费且开源的 UI 聊天组件，由 LeanCloud 官方推出，底层聊天服务基于 LeanCloud 的 IM 实时通信服务 LeanMessage 而开发。它的最大特点是把聊天常用的一些功能配合 UI 一起提供给开发者，帮助开发者快速集成 IM 服务，轻松实现聊天功能。
+[ChatKit](https://github.com/leancloud/LeanCloudChatKit-Android) 是一个免费且开源的 UI 聊天组件，由 LeanCloud 官方推出，底层聊天服务基于 LeanCloud 的 IM 即时通信服务 LeanMessage 而开发。它的最大特点是把聊天常用的一些功能配合 UI 一起提供给开发者，帮助开发者快速集成 IM 服务，轻松实现聊天功能。
 
 ChatKit 开源且提供完全自由的授权协议，开发者可以对其进行任意修改、扩展和二次封装，但是 LeanCloud 并不对 ChatKit 的二次开发提供技术支持。
 
@@ -23,7 +23,7 @@ git clone git@github.com:leancloud/LeanCloudChatKit-Android.git
 「ChatKit-Android」Project 包含两个模块：
 
 - **leancloudchatkit**<br/>
-  是一个封装了 LeanCloud 实时通讯的 UI lib，其目的是让开发者更快速地接入 LeanCloud 实时通讯的功能。
+  是一个封装了 LeanCloud 即时通信的 UI lib，其目的是让开发者更快速地接入 LeanCloud 即时通信的功能。
 - **chatkitapplication**<br/>
   为 Demo 项目，它是一个简单的示例项目，用来指导开发者如何使用 leancloudchatkit。
 
@@ -197,7 +197,7 @@ public class CustomUserProvider implements LCChatProfileProvider {
     LCIMProfileCache.getInstance().cacheUser(user);
 ```
 
-**四、打开实时通讯，并且跳转到聊天页面**
+**四、打开即时通信，并且跳转到聊天页面**
 
 我们支持通过两种方式来打开聊天界面：
 
@@ -256,9 +256,9 @@ LCChatKit.getInstance().open("Tom", new AVIMClientCallback() {
 <dt>`public void init(Context context, String appId, String appKey)`</dt>
 <dd>此函数用于初始化 ChatKit 的相关设置，此函数要在 Application 的 `onCreate` 中调用，否则可能会引起异常。</dd>
 <dt>`public void setProfileProvider(LCChatProfileProvider profileProvider)`</dt>
-<dd>此函数用于设置用户体系，因为 LeanCloud 实时通讯功能已经实现了完全剥离用户体系的功能，这里接入已有的用户体系会很方便。</dd>
+<dd>此函数用于设置用户体系，因为 LeanCloud 即时通信功能已经实现了完全剥离用户体系的功能，这里接入已有的用户体系会很方便。</dd>
 <dt>`public void open(final String userId, final AVIMClientCallback callback)`</dt>
-<dd>此函数用于开始实时通讯，open 成功后可以执行自己的逻辑，或者跳转到聊天页面。</dd>
+<dd>此函数用于开始即时通信，open 成功后可以执行自己的逻辑，或者跳转到聊天页面。</dd>
 </dl>
 
 ### 对话列表界面

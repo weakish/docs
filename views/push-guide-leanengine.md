@@ -109,7 +109,7 @@ AV.Push.send({
 
 > **LeanCloud SDK 内部是如何使用 Channel 的？**
 >
->[LeanCloud 实时通信 SDK](realtime_v2.html) 便是通过 Channel 来实现聊天消息的离线推送，具体逻辑为——每个用户都会去订阅以自己名字命名的频道。这样当服务端发现某一个用户下线了，由于该用户的 ID 已知，所以只要向这个频道推送这条离线消息即可。感兴趣的开发者可以研究一下开源的 [iOS SDK](https://github.com/leancloud/objc-sdk) 源代码，就能发现上述的机制。
+>[LeanCloud 即时通信 SDK](realtime_v2.html) 便是通过 Channel 来实现聊天消息的离线推送，具体逻辑为——每个用户都会去订阅以自己名字命名的频道。这样当服务端发现某一个用户下线了，由于该用户的 ID 已知，所以只要向这个频道推送这条离线消息即可。感兴趣的开发者可以研究一下开源的 [iOS SDK](https://github.com/leancloud/objc-sdk) 源代码，就能发现上述的机制。
 
 ### 动态查询-Query
 

@@ -16,7 +16,7 @@
 
 一个对话（包括普通、暂态、系统对话）如果 **1 年内**没有通过 SDK 或者 REST API 发送过新的消息，或者它在 `_Conversation` 表中的任意字段没有被更新过，即被视为**不活跃对话**，云端会自动将其删除。（查询对话的消息记录并不会更新 `_Conversation` 表，所以只查询不发送消息的对话仍会被视为不活跃对话。）
 
-不活跃的对话被删除后，当客户端再次通过 SDK 或 REST API 对其进行查询或发送消息时，会遇到 
+不活跃的对话被删除后，当客户端再次通过 SDK 或 REST API 对其发送消息时，会遇到 
 `4401 INVALID_MESSAGING_TARGET` 错误，表示该对话已经不存在了。同时，与该对话相关的消息历史也无法获取。
 
 反之，活跃的对话会一直保存在云端。
@@ -28,7 +28,7 @@
 {% macro clientOpenClose(methods={}) -%}
   {% if methods | length  %}
   {% call noteWrap() -%}
-`{{methods.open}}` 这个方法表示开始连接 LeanCloud 云端服务器（即启动实时通信服务），**它在整个使用周期内只需要调用一次**。用户退出实时通信服务（断开 LeanCloud 云端服务器连接）时需要在 IMClient 对象上调用 `{{methods.close}}`。
+`{{methods.open}}` 这个方法表示开始连接 LeanCloud 云端服务器（即启动即时通信服务），**它在整个使用周期内只需要调用一次**。用户退出即时通信服务（断开 LeanCloud 云端服务器连接）时需要在 IMClient 对象上调用 `{{methods.close}}`。
 
 这两个方法是成对使用的，在聊天过程中只需要调用一次，**无需多次调用**。
     {%- endcall %}
@@ -72,12 +72,12 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
   {
     code: "4100",
     message: "APP_NOT_AVAILABLE",
-    desc: "应用不存在或应用禁用了实时通信服务。"
+    desc: "应用不存在或应用禁用了即时通信服务。"
   },
   {
     code: "4101",
     message: "DUPLICATED_LOGIN",
-    desc: "同一个设备重复登录推送服务。该错误码与实时通信服务无关。"
+    desc: "同一个设备重复登录推送服务。该错误码与即时通信服务无关。"
   },
   {
     code: "4102",
@@ -278,7 +278,7 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
 
   - 信息 - <code>{{ item.message if item.message else "(无)" | escape }}</code>
   - 含义 - {{ item.desc | escape }}
-  - 模块 - 实时通信 IM
+  - 模块 - 即时通信 IM
   {% endfor %}
 {% endif %}
 {% endmacro %}

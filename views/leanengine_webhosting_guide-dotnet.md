@@ -12,7 +12,7 @@
 
 {% block getting_started %}
 
-将示例代码 [aspnetcore-getting-started](https://github.com/leancloud/aspnetcore-getting-started) 克隆到本地：
+将示例项目 [aspnetcore-getting-started](https://github.com/leancloud/aspnetcore-getting-started) 克隆到本地：
 
 ```sh
 git clone git@github.com:leancloud/aspnetcore-getting-started.git
@@ -20,6 +20,27 @@ git clone git@github.com:leancloud/aspnetcore-getting-started.git
 
 {% endblock %}
 
+{% block project_constraint %}
+
+为了更为简洁的支持 .Net Core 的 Web 项目，云引擎要求您的源代码目录如下：
+
+```
+├── app.sln  
+├── web
+    ├── StartUp.cs
+    ├── Program.cs
+    └── web.csproj
+    └── wwwroot
+        ├── site.css
+        └── main.js
+└── README.md
+```
+
+示例项目 [aspnetcore-getting-started](https://github.com/leancloud/aspnetcore-getting-started) 是推荐的模板。
+
+其中根目录必须拥有一个 `app.sln` 解决方案文件 和一个 `web/` 文件夹，这是必须的（这一硬性规定会将在未来取消，取消之后开发者自定义自己的项目结构）。
+
+{% endblock %}
 {% block leancache %}
 在追求高效访问和快速存取的服务端项目里面，云引擎也内置了 Redis 的服务，详细可以查看文档:[LeanCache](leancache_guide.html)。
 
@@ -91,5 +112,35 @@ public class TodoController : Controller
 }
 ```
 
+{% endblock %}
+
+{% block https_redirect %}
+
+在 `StartUp.cs` 文件中添加如下代码：
+
+```cs
+ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+ {
+     // 所有请求强制 Https 跳转
+     app.UseHttpsRedirect();
+ }
 ```
+{% endblock %}
+
+
+{% block use_leanstorage %}
+
+## 在云引擎中使用数据存储服务
+
+[数据存储服务](storage_overview.html) 是 LeanCloud 提供的结构化数据存储服务，在网站开发中如果遇到需要存储一些持久化数据的时候，可以使用存储服务来保存数据，例如用户的邮箱，头像
+等。
+
+在项目中安装如下依赖：
+
+```sh
+> dotnet add package LeanCloud.Storage
+```
+
+然后就可以在项目中直接使用云存储服务，详细文档请参阅：[数据存储开发指南 · .NET](dotnet_guide.html)
+
 {% endblock %}

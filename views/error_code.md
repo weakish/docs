@@ -12,7 +12,7 @@
 
 * 信息 - `(无)`
 * 含义 - WebSocket 正常关闭，可能发生在服务器重启，或本地网络异常的情况。SDK 会自动重连，无需人工干预。
-* 模块 - 实时通信 IM
+* 模块 - 即时通信 IM
 
 ## 1
 * 信息 - `Internal server error. No information available.`

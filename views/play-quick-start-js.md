@@ -1,17 +1,26 @@
-# Play Cocos 入门教程
+# Play 入门教程 · JavaScript
 
-欢迎使用 LeanCloud Play。本教程将通过在 Cocos Creator 环境下模拟一个比较玩家分数大小的场景，来讲解 Play SDK 的核心使用方法。
+欢迎使用 LeanCloud Play。本教程将通过模拟一个比较玩家分数大小的场景，来讲解 Play SDK 的核心使用方法。
 
-我们推荐通过以下方法来学习：
-
-1. 下载 [QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)，通过 Cocos Creator 打开 QuickStart 工程，浏览和运行 QuickStart 代码，观察日志输出。
-2. 创建一个新的 Cocos Creator 工程，安装好 SDK 后，替换你申请的 App ID 和 App Key，根据 QuickStart 代码尝试修改并运行，观察变化。
 
 ## 安装
 
-Play 客户端 SDK 是开源的，源码地址请访问：[Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。
-也可以直接下载 Release 版本，[下载地址](https://github.com/leancloud/Play-SDK-JS/releases)。
-将下载的 Play.js 拖拽至 Cocos Creator 项目中即可。
+Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本]((https://github.com/leancloud/Play-SDK-JS/releases)。
+
+### Cocos Creator
+
+也适用于 Cocos Creator 导出的微信小游戏。下载 `play.js` 并拖拽至 Cocos Creator 项目中即可。**注意不要选择「插件方式」**。
+
+### 微信小程序
+
+下载 `play-weapp.js` 并拖拽至微信小程序的工程目录下即可。
+
+### Node.js 安装
+
+```
+npm install @leancloud/play --save。
+```
+
 
 ## 初始化
 
@@ -41,6 +50,7 @@ const opts = {
 play.init(opts);
 ```
 
+
 ## 设置玩家 ID
 
 ```javascript
@@ -49,6 +59,7 @@ const randId = parseInt(Math.random() * 1000000, 10);
 play.userId = randId.toString();
 ```
 
+
 ## 连接至 Play 服务器
 
 ```javascript
@@ -56,6 +67,7 @@ play.connect();
 ```
 
 连接完成后，会通过 `CONNECTED`（连接成功） 或 `CONNECT_FAILED`（连接失败） 事件来通知客户端。
+
 
 ## 创建或加入房间
 
@@ -73,6 +85,7 @@ play.on(Event.LOBBY_JOINED, () => {
 joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进入到相同的房间。
 更多`joinOrCreateRoom`，请参考 [开发指南](play-js.html#创建房间)。
 
+
 ## 通过 CustomPlayerProperties 同步玩家属性
 
 当有新玩家加入房间时，Master 为每个玩家分配一个分数，这个分数通过「玩家自定义属性」同步给玩家。
@@ -80,7 +93,8 @@ joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进
 
 ```javascript
 // 注册新玩家加入房间事件
-play.on(Event.PLAYER_ROOM_JOINED, (newPlayer) => {
+play.on(Event.PLAYER_ROOM_JOINED, (data) => {
+  const { newPlayer } = data;
   console.log(`new player: ${newPlayer.userId}`);
   if (play.player.isMaster()) {
     // 获取房间内玩家列表
@@ -119,6 +133,7 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
 });
 ```
 
+
 ## 通过「自定义事件」通信
 
 当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
@@ -152,5 +167,36 @@ play.on(Event.CUSTOM_EVENT, event => {
   }
 });
 ```
+
+
+## Demo
+
+我们通过 Cocos Creator 完成了这个 Demo，供大家运行参考。
+
+[QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)。
+
+
+## 构建注意事项
+
+您可以通过 Cocos Creator 构建出其支持的工程，目前 SDK 支持的平台包括：Mac，Web，微信小游戏，iOS，android。
+
+其中仅在构建 Android 工程时需要做一点额外的配置，需要在初始化 play 之前添加如下代码：
+
+```js
+onLoad() {
+  const { setAdapters } = Play;
+  if (cc.sys.platform === cc.sys.ANDROID) {
+    const caPath = cc.url.raw('resources/cacert.pem');
+    setAdapters({
+      WebSocket: (url) => new WebSocket(url, null, caPath)
+    });
+  }
+}
+```
+
+这样做的原因是 Play SDK 使用了基于 WebSocket 的 wss 进行安全通信，需要通过以上代码适配 android 平台的 CA 证书机制。
+
+
+
 
 

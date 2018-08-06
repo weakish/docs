@@ -1,6 +1,5 @@
 {# 指定继承模板 #}
 {% extends "./leanengine_webhosting_guide.tmpl" %}
-{% import "views/_webhosting.njk" as webhosting %}
 {% set productName = '云引擎' %}
 {% set platformName = 'Node.js' %}
 {% set fullName = productName + ' ' + platformName %}

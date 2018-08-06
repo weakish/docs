@@ -4,7 +4,7 @@
 
 ## 开始之前
 
-请确保您已熟练的掌握了实时通信里面关于对话，消息，权限等必要的知识，如果您还不了解这些概念，请一定阅读我们的主文档：[《实时通信服务总览》](./realtime_v2.html)，了解一下实时通信的基本概念和模型以及我们的实时通信 SDK 开发指南：
+请确保您已熟练的掌握了即时通信里面关于对话，消息，权限等必要的知识，如果您还不了解这些概念，请一定阅读我们的主文档：[《即时通信服务总览》](./realtime_v2.html)，了解一下即时通信的基本概念和模型以及我们的即时通信 SDK 开发指南：
 
 - [iOS - Objective-C](realtime_guide-objc.html)
 - [Android - Java](realtime_guide-android.html)
@@ -71,7 +71,7 @@ websocket<={"uid":"_6jfc+4KT7KtkEgw8lJnAA","t":1490929028400,"i":-65533,"cmd":"a
 {"msg":{"_lctype":-1,"_lctext":"兄弟们，睡什么睡，起来嗨！"}}
 ```
 
-一条文本消息由两个字段组成：类型和文本内容。在 LeanCloud 实时通讯私有协议里面，带有下划线 `_lc` 是受保护字段，SDK 都会主动识别这个字段的含义。
+一条文本消息由两个字段组成：类型和文本内容。在 LeanCloud 即时通信私有协议里面，带有下划线 `_lc` 是受保护字段，SDK 都会主动识别这个字段的含义。
 
 因此要实现一个表情消息，开发者可以自定义使用 `AVIMTypedMessageTypeIntAttribute` 标注一个 `AVIMTypedMessage` 的子类，SDK 在发送消息的时候会自动的在消息体内部把它的值转化为 `_lctype` 的值，比如设置成 2：
 
@@ -338,10 +338,10 @@ private void AVIMClient_OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 {% macro signature() %}
 ## 鉴权与签名
-实时通讯系统中往往会存在一定的管理需求，例如游戏中 GM 会禁言某一些不良行为的玩家，或者说不允许某一个玩家加入到某个频道。LeanCloud 实时通讯采用签名鉴权的方式，请开发者务必详细了解 [权限和认证](realtime_v2.html#权限和认证)。而在 SDK 中，开发者需要通过实现 `ISignatureFactory` 接口，并且在初始化的时候指定给 `AVRealtime`：
+即时通信系统中往往会存在一定的管理需求，例如游戏中 GM 会禁言某一些不良行为的玩家，或者说不允许某一个玩家加入到某个频道。LeanCloud 即时通信采用签名鉴权的方式，请开发者务必详细了解 [权限和认证](realtime_v2.html#权限和认证)。而在 SDK 中，开发者需要通过实现 `ISignatureFactory` 接口，并且在初始化的时候指定给 `AVRealtime`：
 
 ### 云引擎签名实例
-为了配合如下代码的运行，首先开发者需要部署 [LeanCloud 实时通信云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode) 到你应用的云引擎中。
+为了配合如下代码的运行，首先开发者需要部署 [LeanCloud 即时通信云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode) 到你应用的云引擎中。
 
 ```cs
 public class LeanEngineSignatureFactory : ISignatureFactory

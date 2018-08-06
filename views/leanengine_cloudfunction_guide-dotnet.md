@@ -73,9 +73,22 @@
 dotnet add package LeanCloud.Engine.Middleware.AspNetCore
 ```
 
-最后一步，将 `app/` 文件夹目录下面所有的内容: `web/` 和 `app.sln` 移到顶层目录下，比如您的代码仓库对应的本地文件夹叫做 `myProjects/`，然后删除 `app/` 文件夹，保证它的文件结构如 [https://github.com/leancloud/dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 一样。
+最后一步，将 `app/` 文件夹目录下面所有的内容: `web/` 和 `app.sln` 移到顶层目录下，比如您的代码仓库对应的本地文件夹叫做 `myProjects/`，然后删除 `app/` 文件夹，保证它的文件结构如 [dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 一样。
 
 完成。
+
+只要您的项目满足如下目录结构都会被云引擎正确的识别为 .Net Core 项目：
+
+```
+├── app.sln  
+├── web
+    ├── MyHookFunctions.cs
+    ├── Program.cs
+    └── web.csproj
+└── README.md
+```
+
+示例项目 [dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 是推荐的模板。
 
 {% endblock %}
 

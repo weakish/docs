@@ -1,6 +1,6 @@
 {% import "views/_im.md" as imPartial %}
 
-# 实时通信 - 聊天室开发指南
+# 即时通信 - 聊天室开发指南
 
 {{ imPartial.gettingStarted() }}
 

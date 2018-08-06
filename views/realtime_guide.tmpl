@@ -1,11 +1,11 @@
 {% import "views/_helper.njk" as docs %}
 {% import "views/_im.njk" as im %}
 {% set messageStatusAnchor = '<a id="message-status" name="message-status" escape-hash>status</a>'  %}
-#  实时通信开发指南 &middot; {{platform_name}}
+#  即时通信开发指南 &middot; {{platform_name}}
 
-实时通信服务可以让你一行后端代码都不用写，就能做出一个功能完备的实时聊天应用，或是一个实时对战类的游戏。所有聊天记录都保存在云端，离线消息会通过消息推送来及时送达，推送消息文本可以灵活进行定制。
+即时通信服务可以让你一行后端代码都不用写，就能做出一个功能完备的即时通信应用，或是一个实时对战类的游戏。所有聊天记录都保存在云端，离线消息会通过消息推送来及时送达，推送消息文本可以灵活进行定制。
 
-在继续阅读本文档之前，请先阅读[《实时通信开发指南》](./realtime_v2.html)，了解一下实时通信的基本概念和模型。
+在继续阅读本文档之前，请先阅读[《即时通信开发指南》](./realtime_v2.html)，了解一下即时通信的基本概念和模型。
 
 {% block supportedRuntime %}{% endblock %}
 
@@ -23,7 +23,7 @@
 
 ## 单聊
 
-我们先从最简单的环节入手。此场景类似于微信的私聊、微博的私信和 QQ 单聊。我们创建了 `AVIMConversation`（对话）这个统一的概念来描述聊天的各种场景，《[实时通信开发指南](./realtime_v2.html)》也有相关介绍。
+我们先从最简单的环节入手。此场景类似于微信的私聊、微博的私信和 QQ 单聊。我们创建了 `AVIMConversation`（对话）这个统一的概念来描述聊天的各种场景，《[即时通信开发指南](./realtime_v2.html)》也有相关介绍。
 
 ### 发送消息
 
@@ -102,14 +102,14 @@ Tom 想建立一个群，把自己好朋友都拉进这个群，然后给他们�
 
 为直观起见，我们使用了 Tom、Jerry 等字符串作为 clientId 登录聊天系统。LeanCloud 云端只要求 clientId 在应用内唯一、不超过 64 个字符的字符串即可，具体用什么数据由应用层决定。
 
-实时通信 SDK 在内部会为每一个 clientId 创建唯一的 `AVIMClient` 实例，也就是说多次使用相同的 clientId 创建出来的实例还是同一个。因此，如果要支持同一个客户端内多账号登录，只要使用不同的 clientId 来创建多个实例即可。我们的 SDK 也支持多账户同时登录。
+即时通信 SDK 在内部会为每一个 clientId 创建唯一的 `AVIMClient` 实例，也就是说多次使用相同的 clientId 创建出来的实例还是同一个。因此，如果要支持同一个客户端内多账号登录，只要使用不同的 clientId 来创建多个实例即可。我们的 SDK 也支持多账户同时登录。
 
 
 ## 登录
 
 ### 使用唯一字符串 ID 登录
 
-登录到 LeanCloud 实时通信服务代码在 [之前](#单聊) 已经演示过，核心的代码如下:
+登录到 LeanCloud 即时通信服务代码在 [之前](#单聊) 已经演示过，核心的代码如下:
 
 {% block open_long_connection_with_clientId %}
 ```
@@ -122,7 +122,7 @@ Tom 想建立一个群，把自己好朋友都拉进这个群，然后给他们�
 
 ### 使用 `_User` 对象登录
 
-通过使用 `_User` 表，开发者能直接利用云端内置的用户鉴权系统而省掉登录签名操作，更方便地将存储和实时通信这两个模块结合起来使用。示例代码如下：
+通过使用 `_User` 表，开发者能直接利用云端内置的用户鉴权系统而省掉登录签名操作，更方便地将存储和即时通信这两个模块结合起来使用。示例代码如下：
 
 {% block open_long_connection_with_AVUser %}
 ```
@@ -131,7 +131,7 @@ Tom 想建立一个群，把自己好朋友都拉进这个群，然后给他们�
 ```
 {% endblock %}
 
-使用以上任意一种方式登录到实时通信系统之后，其他功能的用法就没有任何区别了。
+使用以上任意一种方式登录到即时通信系统之后，其他功能的用法就没有任何区别了。
 
 ## 消息
 
@@ -443,15 +443,15 @@ Tom 想建立一个群，把自己好朋友都拉进这个群，然后给他们�
 {% block message_read_ack %}{% endblock %}
 
 #### 自定义离线推送内容
-在使用 SDK 提供的 API 之前，请先阅读 [实时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
+在使用 SDK 提供的 API 之前，请先阅读 [即时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
 
-正如 [实时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知) 小节里面介绍的，发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
+正如 [即时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知) 小节里面介绍的，发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
 
 {% block message_push_data %}{% endblock %}
 
-这种方式被称为「附件方式」，这里有一点非常重要：如果您在 [云引擎实时通信离线消息推送 Hook](leanengine_cloudfunction_guide-node.html#_receiversOffline)里面定义了云函数来修改离线消息的内容，云端会优先使用 Hook 函数返回的结果作为最后推送的内容
+这种方式被称为「附件方式」，这里有一点非常重要：如果您在 [云引擎即时通信离线消息推送 Hook](leanengine_cloudfunction_guide-node.html#_receiversOffline)里面定义了云函数来修改离线消息的内容，云端会优先使用 Hook 函数返回的结果作为最后推送的内容
 
-除此以外，还有其他方法来自定义离线推送内容，请参考 [实时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
+除此以外，还有其他方法来自定义离线推送内容，请参考 [即时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
 
 ### 未读消息
 
@@ -483,7 +483,7 @@ SDK 会在 Conversation 上维护 `unreadMessagesCount` 字段，这个字段在
 离线消息推送通知是 SDK 默认的未读消息处理方式。不管是单聊还是群聊，当用户 A 发出消息后，如果目标对话的部分用户当前不在线，LeanCloud 云端可以提供离线推送的方式将消息提醒发送至客户端。{% block offlineMessage %}{% endblock %}
 
 {%  if segment_code !== 'android' %}
-我们也提供多种自定义推送通知的方式，操作方法请参考 [实时通信概览 · 离线推送通知](realtime_v2.html#离线推送通知)。
+我们也提供多种自定义推送通知的方式，操作方法请参考 [即时通信概览 · 离线推送通知](realtime_v2.html#离线推送通知)。
 {% endif %}
 
 ### 消息类详解
@@ -611,7 +611,7 @@ SDK 会在 Conversation 上维护 `unreadMessagesCount` 字段，这个字段在
 
 ## 对话
 
-以上章节基本演示了实时通信 SDK 的核心概念「对话」，即 `AVIMConversation`。我们将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `AVIMConversation` 这个统一的概念进行操作，所以开发者需要强化理解的一个概念就是：
+以上章节基本演示了即时通信 SDK 的核心概念「对话」，即 `AVIMConversation`。我们将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `AVIMConversation` 这个统一的概念进行操作，所以开发者需要强化理解的一个概念就是：
 >SDK 层面不区分单聊和群聊。
 
 ### 对话类型的细分
@@ -1049,7 +1049,7 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 * 加入后半小时内断网重连会自动加入原聊天室，超过这个时间则需要重新加入。
 
 {% call docs.bubbleWrap() -%}
-关于聊天室我们在最新的 SDK 中提供了内置的封装模型，请阅读[实时通信 - 聊天室开发指南](realtime-chatroom.html)。
+关于聊天室我们在最新的 SDK 中提供了内置的封装模型，请阅读[即时通信 - 聊天室开发指南](realtime-chatroom.html)。
 {%- endcall %}
 
 ### 创建聊天室
@@ -1182,7 +1182,7 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 
 ## 安全与签名
 
-在继续阅读下文之前，请确保你已经对 [实时通信服务开发指南 &middot; 权限和认证](realtime_v2.html#权限和认证) 有了充分的了解。
+在继续阅读下文之前，请确保你已经对 [即时通信服务开发指南 &middot; 权限和认证](realtime_v2.html#权限和认证) 有了充分的了解。
 
 ### 实现签名工厂
 
@@ -1194,7 +1194,7 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 
 {{ docs.alert("需要强调的是：开发者切勿在客户端直接使用 MasterKey 进行签名操作，因为 MaterKey 一旦泄露，会造成应用的数据处于高危状态，后果不容小视。因此，强烈建议开发者将签名的具体代码托管在安全性高稳定性好的云端服务器上（例如 LeanCloud 云引擎）。") }}
 
-为了帮助开发者理解云端签名的算法，我们开源了一个用 Node.js + 云引擎实现签名的云端，供开发者学习和使用：[LeanCloud 实时通信云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode)。
+为了帮助开发者理解云端签名的算法，我们开源了一个用 Node.js + 云引擎实现签名的云端，供开发者学习和使用：[LeanCloud 即时通信云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode)。
 
 {{ im.signature("### 测试签名") }}
 
@@ -1239,11 +1239,11 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 
 {% block client_auto_open %}{% endblock %}
 
-## 实时通信云引擎 Hook
-一些应用因其特殊的业务逻辑需要在消息发送时或者消息接收时插入一定的逻辑，因此我们也提供了[实时通信云引擎 Hook](realtime_v2.html#云引擎_Hook)。
+## 即时通信云引擎 Hook
+一些应用因其特殊的业务逻辑需要在消息发送时或者消息接收时插入一定的逻辑，因此我们也提供了[即时通信云引擎 Hook](realtime_v2.html#云引擎_Hook)。
 
-## 实时通信 REST API
-有些应用需要在用户登录之前就提前创建一些对话或者是针对对话进行操作，因此可以通过[实时通信 REST API](realtime_rest_api.html)来实现。
+## 即时通信 REST API
+有些应用需要在用户登录之前就提前创建一些对话或者是针对对话进行操作，因此可以通过[即时通信 REST API](realtime_rest_api.html)来实现。
 
 ## 常见问题
 

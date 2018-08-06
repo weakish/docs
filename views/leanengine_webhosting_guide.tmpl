@@ -6,8 +6,6 @@
 
 网站托管是云引擎的一个子模块，允许你用 {{platformName}} 开发一个 Web 程序，提供云函数和 Hook，还可以提供静态文件的托管和自定义的路由、绑定你自己的域名。你可以用它为你的移动应用提供一个介绍和下载页、开发一个管理员控制台或完整的网站，或者运行一些必须在服务器端运行的自定义逻辑。
 
-## 前言
-
 如果你还不知道如何创建云引擎项目，本地调试并部署到云端，可以先阅读一下 [云引擎快速入门](leanengine_quickstart.html)。其他相关文档包括：
 
  - [云引擎服务概览](leanengine_overview.html)（全部功能的概述）
@@ -41,7 +39,7 @@ lean up
 
 更多有关命令行工具和本地调试的内容请看 [命令行工具使用指南](leanengine_cli.html)。
 
-### 发布到线上
+### 部署到云端
 
 在你的项目根目录运行：
 
@@ -49,7 +47,7 @@ lean up
 lean deploy
 ```
 
-如果成功，你的项目已经在线上部署了，接下来通过设置域名就可以通过浏览器访问线上的地址了：
+如果成功，你的项目已经部署到云端了，接下来设置自定义域名，然后在浏览器输入这个自定义域名就可以直接访问网站了：
 
 ### 设置域名
 
@@ -152,7 +150,7 @@ lean deploy --no-cache
 
 ### Git 部署
 
-除此之外，还可以使用 git 仓库部署。你需要将项目提交到一个 git 仓库，我们并不提供源码的版本管理功能，而是借助于 git 这个优秀的分布式版本管理工具。我们推荐你使用 [GitHub](https://github.com/)、[Coding](https://coding.net/) 或者 [OSChina](http://git.oschina.net/) 这样第三方的源码托管网站，也可以使用你自己搭建的 git 仓库（比如 [Gitlab](http://gitlab.org/)）。
+除此之外，还可以使用 git 仓库部署。你需要将项目提交到一个 git 仓库，我们并不提供源码的版本管理功能，而是借助于 git 这个优秀的分布式版本管理工具。我们推荐你使用 [GitHub](https://github.com/)、[Coding](https://coding.net/) 或者 [码云](https://gitee.com/) 这样第三方的源码托管网站，也可以使用你自己搭建的 git 仓库（比如 [Gitlab](http://gitlab.org/)）。
 
 你需要先在这些平台上创建一个项目（如果已有代码，请不需要选择「Initialize this repository with a README」），在网站的个人设置中填写本地机器的 SSH 公钥（以 GitHub 为例，在 Settings => SSH and GPG keys 中点击 New SSH key），然后在项目目录执行：
 
@@ -202,9 +200,7 @@ git push -u origin master
 
 ### 系统级依赖 
 
-系统级依赖指的是运行时操作系统上的默认会被安装的一些模块，与开发语言无关。
-
-通过添加 `leanengine.yaml` 文件的 systemDependencies 部分中可以指定需要的系统依赖，类似：
+系统级依赖指的是运行时操作系统上的一些常见的功能模块，例如 [ffmpeg](https://www.ffmpeg.org/), 当前项目如果需要使用的话，只要通过添加 `leanengine.yaml` 文件的 systemDependencies 部分中可以指定需要的系统依赖，类似：
 
 ```yaml
 systemDependencies:
@@ -218,7 +214,7 @@ systemDependencies:
 - `fonts-wqy` 文泉驿点阵宋体、文泉驿微米黑，通常和 phantomjs 配合来显示中文。
 - `phantomjs` 一个无 UI 的 WebKit 浏览器
 
-注意添加系统依赖将会拖慢部署速度，因此请不要添加未用到的依赖。
+注意**系统级依赖的功能模块不会默认添加**，添加系统依赖将会拖慢部署速度，因此请不要添加未用到的依赖。
 
 ### 环境变量
 

@@ -162,7 +162,7 @@ https:
 - **禁止从客户端进行消息推送**<br/>
   是否禁止从客户端推送消息。禁止后只能通过 [控制台 > 消息 > 推送 > 在线发送](/dashboard/messaging.html?appid={{appid}}#/message/push/create) 或带着 **master key** 调用 [推送消息 API ](push_guide.html#推送消息) 来推送消息。
 
-如果想彻底关闭一个应用的数据存储、短信发送、消息推送和聊天（实时通信）功能，请进入 [控制台 > 设置 > 安全中心](/app.html?appid={{appid}}#/security) 来进行相应设置。
+如果想彻底关闭一个应用的数据存储、短信发送、消息推送和聊天（即时通信）功能，请进入 [控制台 > 设置 > 安全中心](/app.html?appid={{appid}}#/security) 来进行相应设置。
 
 ### 自动备份
 

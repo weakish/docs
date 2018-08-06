@@ -28,7 +28,6 @@
 - [Python](leanengine_cloudfunction_guide-python.html)
 - [PHP](leanengine_cloudfunction_guide-php.html)
 - [Java](leanengine_cloudfunction_guide-java.html)
-- [.NET](leanengine_cloudfunction_guide-dotnet.html)
 
 {% block initialize %}
 {% endblock %}
@@ -139,12 +138,6 @@ Cloud::run("averageStars", $params);
 from leancloud import cloudfunc
 
 cloudfunc.run('averageStars', movie='夏洛特烦恼')
-```
-```cs
-var result = await AVCloud.CallFunctionAsync("averageStars",new Dictionary<string,object>()
-{
-  { "movie", "夏洛特烦恼" }
-});
 ```
 ### 通过 REST API 调用云函数
 
@@ -281,9 +274,6 @@ Hook 函数本质上是云函数，但它有固定的名称，定义之后会**�
 
 {% block afterDeleteExample %}{% endblock %}
 
-{% block advancedClassHookInstancedMethod %}
-{% endblock %}
-
 ### {{hook_on_verified}}
 
 当用户通过邮箱或者短信验证时，对该用户执行特定操作。比如：
@@ -298,10 +288,9 @@ Hook 函数本质上是云函数，但它有固定的名称，定义之后会**�
 
 {% block onLoginExample %}{% endblock %}
 
-{% block realtime_hook %}
-### 实时通信 Hook 函数
+### 即时通信 Hook 函数
 
-请阅读 [实时通信概览 &middot; 云引擎 Hook](realtime_v2.html#云引擎_Hook) 来了解以下函数的相关参数和用法。
+请阅读 [即时通信概览 &middot; 云引擎 Hook](realtime_v2.html#云引擎_Hook) 来了解以下函数的相关参数和用法。
 
 #### {{hook_message_received}}
 在消息达到服务器、群组成员已解析完成、发送给收件人之前触发。例如，提前过滤掉聊天内容中的一些广告类的关键词：
@@ -343,11 +332,7 @@ Hook 函数本质上是云函数，但它有固定的名称，定义之后会**�
 
 {% block code_hook_conversation_update %}{% endblock %}
 
-{% endblock %}
 {% block hookDeadLoop %}
-{% endblock %}
-
-{% block debugLog %}
 {% endblock %}
 
 ### Hook 函数错误响应码
