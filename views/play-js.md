@@ -105,14 +105,28 @@ play.on(Event.CONNECT_FAILED, (error) => {
 
 ## 大厅
 
-在连接服务器成功之后，会自动加入到大厅中。
+我们鼓励您「不要」将玩家加入大厅，因为在大厅中，SDK 会拉取并同步一个很长的房间列表，由玩家选择一个房间进行游戏。这种方式不仅对玩家体验不友好，同时来会带来很大的带宽压力。
 
-开发者可以根据需要注册 `LOBBY_JOINED`（成功加入大厅）事件。
+我们推荐您像现在的绝大部分手游一样，直接通过[房间匹配](#房间匹配) 方法，快速匹配开始游戏。
+
+因此 SDK 默认情况下 autoJoinLobby 为 false，不需要加入大厅。
+
+如果您有特殊的游戏场景需要获取房间列表，可以调用以下方法
+
+```javascript
+play.autoJoinLobby = true;
+```
+
+或手动加入
+
+```javascript
+play.joinLobby();
+```
 
 ```javascript
 // 注册成功加入大厅事件
 play.on(Event.LOBBY_JOINED, () => {
-	// TODO 可以做跳转场景，房间列表展示的逻辑
+	// TODO 可以做房间列表展示的逻辑
 
 });
 ```
@@ -651,7 +665,7 @@ play.on(Event.DISCONNECTED, () => {
 	play.reconnect();
 });
 
-play.on(Event.LOBBY_JOINED, () => {
+play.on(Event.CONNECTED, () => {
 	// TODO 根据是否有缓存的之前的房间名，回到房间。
 
 	if (roomName) {
