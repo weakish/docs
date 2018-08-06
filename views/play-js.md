@@ -105,7 +105,9 @@ play.on(Event.CONNECT_FAILED, (error) => {
 
 ## 大厅
 
-默认情况下 autoJoinLobby 为 false，并且不需要加入大厅。
+我们不鼓励用户加入大厅，因为客户端会获取到一个很长的房间列表，而玩家只会随机选择一个房间进行游戏。但这个冗长的房间列表会带来很大的带宽压力。
+
+所以，默认情况下 autoJoinLobby 为 false，并且不需要加入大厅。
 
 如果开发者需要获得「房间列表」，可以将 autoJoinLobby 设置为 true 或者手动加入大厅 play.joinLobby()。
 
