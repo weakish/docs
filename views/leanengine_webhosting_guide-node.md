@@ -262,7 +262,7 @@ app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 
 * **fetchUser**：**是否自动 fetch 当前登录的 AV.User 对象。默认为 false。**
   如果设置为 true，每个 HTTP 请求都将发起一次 LeanCloud API 调用来 fetch 用户对象。如果设置为 false，默认只可以访问 `req.currentUser` 的 `id`（`_User` 表记录的 ObjectId）和 `sessionToken` 属性，你可以在需要时再手动 fetch 整个用户。
 * **name**：Cookie 的名字，默认为 `avos.sess`。
-* **maxAge**：设置 Cookie 的过期时间。
+* **maxAge**：设置 Cookie 的过期时间。单位毫秒。
 
 在 Node SDK 1.x 之后我们不再允许通过 `AV.User.current()` 获取登录用户的信息（详见 [升级到云引擎 Node.js SDK 1.0](leanengine-node-sdk-upgrade-1.html#废弃_currentUser)），而是需要你：
 

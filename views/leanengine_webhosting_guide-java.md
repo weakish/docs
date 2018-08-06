@@ -301,12 +301,13 @@ public class UploadServlet extends HttpServlet {
 
 ```java
 // 加载 cookieSession 以支持 AV.User 的会话状态
-LeanEngine.addSessionCookie(new EngineSessionCookie(3600000,true));
+LeanEngine.addSessionCookie(new EngineSessionCookie("my secret", 3600, true));
 ```
 
 `EngineSessionCookie` 的构造函数参数包括：
 
-* **maxAge**：设置 Cookie 的过期时间。
+* **secret**：一个只保存在服务端的字符串，可以设置为任意值。但每次修改之后，所有已有的 cookie 都会失效，也就是所有用户的登录 session 都将过期。
+* **maxAge**：设置 Cookie 的过期时间。单位秒。
 * **fetchUser**：**是否自动 fetch 当前登录的 AV.User 对象。默认为 false。**
   如果设置为 true，每个 HTTP 请求都将发起一次 LeanCloud API 调用来 fetch 用户对象。如果设置为 false，默认只可以访问 `AVUser.getCurrentUser()` 的 `id`（`_User` 表记录的 ObjectId）和 `sessionToken` 属性，你可以在需要时再手动 fetch 整个用户。
 
@@ -321,20 +322,17 @@ LeanEngine.addSessionCookie(new EngineSessionCookie(3600000,true));
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
 
-
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
       IOException {
     req.getRequestDispatcher("/login.jsp").forward(req, resp);
   }
 
-
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
-      IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String username = req.getParameter("username");
     String passwd = req.getParameter("password");
     try {
       AVUser.logIn(username, passwd);
-      req.getRequestDispatcher("/profile").forward(req, resp);
+      resp.sendRedirect("/profile");
     } catch (AVException e) {
       resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       resp.setContentType("application/json; charset=UTF-8");
@@ -345,20 +343,28 @@ public class LoginServlet extends HttpServlet {
       e.printStackTrace();
     }
   }
+
 }
 ```
 #### 登出
 ``` java
 @WebServlet(name = "LogoutServlet", urlPatterns = {"/logout"})
 public class LogoutServlet extends HttpServlet {
+
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
+      IOException {
+    doPost(req, resp);
+  }
+
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
       IOException {
     AVUser user = AVUser.getCurrentUser();
     if (user != null) {
       user.logOut();
     }
-    req.getRequestDispatcher("/profile").forward(req, resp);
+    resp.sendRedirect("/profile");
   }
+
 }
 ```
 
@@ -370,17 +376,15 @@ public class ProfileServlet extends HttpServlet {
 
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
       IOException {
-    if (AVUser.getCurrentUser() == null) {
-      req.getRequestDispatcher("/login").forward(req, resp);
-    } else {
-      resp.setContentType("application/json; charset=UTF-8");
-      JSONObject result = new JSONObject();
+    resp.setContentType("application/json; charset=UTF-8");
+    JSONObject result = new JSONObject();
+    if (AVUser.getCurrentUser() != null) {
       result.put("currentUser", AVUser.getCurrentUser());
-      resp.getWriter().write(result.toJSONString());
     }
+    resp.getWriter().write(result.toJSONString());
   }
-}
 
+}
 ```
 
 一个简单的登录页面（`login.jsp`）可以是这样：
@@ -394,7 +398,7 @@ public class ProfileServlet extends HttpServlet {
         <input name="username"></input>
         <label>Password</label>
         <input name="password" type="password"></input>
-        <input class="button" type="submit" value="登录">
+        <input class="button" type="submit" value="Login">
       </form>
     </body>
   </html>
