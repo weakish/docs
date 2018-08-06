@@ -75,7 +75,7 @@ play.connect();
 
 ```javascript
 // 注册加入大厅成功事件
-play.on(Event.LOBBY_JOINED, () => {
+play.on(Event.CONNECTED, () => {
   console.log('on joined lobby');
   const roomName = 'cocos_creator_room';
   play.joinOrCreateRoom(roomName);

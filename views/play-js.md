@@ -105,14 +105,14 @@ play.on(Event.CONNECT_FAILED, (error) => {
 
 ## 大厅
 
-在连接服务器成功之后，会自动加入到大厅中。
+默认情况下 autoJoinLobby 为 false，并且不需要加入大厅。
 
-开发者可以根据需要注册 `LOBBY_JOINED`（成功加入大厅）事件。
+如果开发者需要获得「房间列表」，可以将 autoJoinLobby 设置为 true 或者手动加入大厅 play.joinLobby()。
 
 ```javascript
 // 注册成功加入大厅事件
 play.on(Event.LOBBY_JOINED, () => {
-	// TODO 可以做跳转场景，房间列表展示的逻辑
+	// TODO 可以做房间列表展示的逻辑
 
 });
 ```
@@ -651,7 +651,7 @@ play.on(Event.DISCONNECTED, () => {
 	play.reconnect();
 });
 
-play.on(Event.LOBBY_JOINED, () => {
+play.on(Event.CONNECTED, () => {
 	// TODO 根据是否有缓存的之前的房间名，回到房间。
 
 	if (roomName) {
