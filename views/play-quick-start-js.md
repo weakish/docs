@@ -74,8 +74,8 @@ play.connect();
 默认情况下，Play SDK 会在连接成功后自动加入大厅；玩家在大厅中，创建 / 加入指定房间。
 
 ```javascript
-// 注册加入大厅成功事件
-play.on(Event.LOBBY_JOINED, () => {
+// 注册连接成功事件
+play.on(Event.CONNECTED, () => {
   console.log('on joined lobby');
   const roomName = 'cocos_creator_room';
   play.joinOrCreateRoom(roomName);
