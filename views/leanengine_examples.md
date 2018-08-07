@@ -55,8 +55,8 @@ LeanCache 的示例位于 [leanengine-nodejs-demos](https://github.com/leancloud
 
 <a href="webhosting_weixin.html" class="btn btn-default">阅读</a>
 
-## 即时通信云引擎签名 Demo
+## 即时通讯云引擎签名 Demo
 
-LeanCloud 即时通信服务采用 [签名方式](realtime_v2.html#权限和认证) 与用户系统对接。当客户端进行与权限、认证相关的操作时，客户端需要首先向用户系统发起请求获得一个签名，再把签名发送到 LeanCloud 即时通信服务，从而帮助 LeanCloud 确认请求是否有效，其机制与 OAuth 1.0 类似。本 Demo 仅仅演示签名，并不包含实际业务逻辑，在实际应用中你需要根据业务做相应的检查。
+LeanCloud 即时通讯服务采用 [签名方式](realtime_v2.html#权限和认证) 与用户系统对接。当客户端进行与权限、认证相关的操作时，客户端需要首先向用户系统发起请求获得一个签名，再把签名发送到 LeanCloud 即时通讯服务，从而帮助 LeanCloud 确认请求是否有效，其机制与 OAuth 1.0 类似。本 Demo 仅仅演示签名，并不包含实际业务逻辑，在实际应用中你需要根据业务做相应的检查。
 
 <a href="https://github.com/leancloud/realtime-messaging-signature-cloudcode" class="btn btn-default">阅读</a>

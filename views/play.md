@@ -212,7 +212,7 @@ PlayRoom.RoomConfig config = new PlayRoom.RoomConfig() {
 Play.CreateRoom(config, roomName);
 ```
 
-2、PlayerA 通过某种通信方式（例如 [LeanCloud 即时通信](realtime_v2.html)）将房间名称告诉 PlayerB。
+2、PlayerA 通过某种通信方式（例如 [LeanCloud 即时通讯](realtime_v2.html)）将房间名称告诉 PlayerB。
 
 
 3、PlayerB 根据房间名称加入到房间中。
@@ -226,7 +226,7 @@ Play.JoinRoom(roomName);
 ```
 
 ##### 好友和陌生人一起玩
-PlayerA 通过某种通信方式（例如 [LeanCloud 即时通信](realtime_v2.html)）邀请 PlayerB，PlayerB 接受邀请。
+PlayerA 通过某种通信方式（例如 [LeanCloud 即时通讯](realtime_v2.html)）邀请 PlayerB，PlayerB 接受邀请。
 
 1、PlayerA 和 PlayerB 一起组队进入某个房间
 

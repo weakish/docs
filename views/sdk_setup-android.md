@@ -74,7 +74,7 @@ dependencies {
     // LeanCloud 基础包
     compile ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
 
-    // 推送与即时通信需要的包
+    // 推送与即时通讯需要的包
     compile ('cn.leancloud.android:avoscloud-push:{{ version.leancloud }}@aar'){transitive = true}
 
     // LeanCloud 统计包
@@ -106,14 +106,14 @@ Eclipse 用户首先 [下载 SDK](sdk_down.html)，然后按照 [手动安装步
 
 ```
 ├── avoscloud-feedback-{{ version.leancloud }}.zip     // LeanCloud 用户反馈模块
-├── avoscloud-push-{{ version.leancloud }}.jar         // LeanCloud 推送模块和即时通信模块
+├── avoscloud-push-{{ version.leancloud }}.jar         // LeanCloud 推送模块和即时通讯模块
 ├── avoscloud-sdk-{{ version.leancloud }}.jar          // LeanCloud 基本存储模块
 ├── avoscloud-search-{{ version.leancloud }}.zip       // LeanCloud 应用内搜索模块
 ├── avoscloud-sns-{{ version.leancloud }}.zip          // LeanCloud SNS 模块
 ├── avoscloud-statistics-{{ version.leancloud }}.jar   // LeanCloud 统计模块
 ├── fastjson-{{ version.fastjson }}.jar                         // LeanCloud 基本存储模块
-├── Java-WebSocket-1.3.2-leancloud.jar          // LeanCloud 推送模块和即时通信模块
-├── protobuf-java-3.4.0.jar                     // LeanCloud 推送模块和即时通信模块
+├── Java-WebSocket-1.3.2-leancloud.jar          // LeanCloud 推送模块和即时通讯模块
+├── protobuf-java-3.4.0.jar                     // LeanCloud 推送模块和即时通讯模块
 ├── okhttp-{{ version.okhttp }}.jar                            // LeanCloud 基本存储模块
 ├── okio-{{ version.okio }}.jar                             // LeanCloud 基本存储模块
 ├── qq.sdk.1.6.1.jar                            // LeanCloud SNS 模块
@@ -127,7 +127,7 @@ Eclipse 用户首先 [下载 SDK](sdk_down.html)，然后按照 [手动安装步
 * `okio-{{ version.okio }}.jar`
 * `fastjson-{{ version.fastjson }}.jar`
 
-##### LeanCloud 推送模块和即时通信模块
+##### LeanCloud 推送模块和即时通讯模块
 
 * LeanCloud 基础存储模块
 * `avospush-{{ version.leancloud }}.jar`
@@ -194,8 +194,8 @@ public class MyLeanCloudApp extends Application {
   ...
   android:name=".MyLeanCloudApp" >
 
-  <!-- 即时通信模块、推送（均需要加入以下声明） START -->
-  <!-- 即时通信模块、推送都要使用 PushService -->
+  <!-- 即时通讯模块、推送（均需要加入以下声明） START -->
+  <!-- 即时通讯模块、推送都要使用 PushService -->
   <service android:name="com.avos.avoscloud.PushService"/>
   <receiver android:name="com.avos.avoscloud.AVBroadcastReceiver">
     <intent-filter>
@@ -204,7 +204,7 @@ public class MyLeanCloudApp extends Application {
       <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
     </intent-filter>
   </receiver>
-  <!-- 即时通信模块、推送 END -->
+  <!-- 即时通讯模块、推送 END -->
 
   <!-- 反馈组件（需要加入以下声明）START -->
   <activity
@@ -286,6 +286,6 @@ dependencies {
 
 ```
 
-第二种情况则是由在 v3.13.+ 以后 Android SDK 引入了 Google ProtoBuf 来提高即时通信模块的传输效率，随之而来的是类和方法数量的激增,超过了 Android 上存在着方法总数不能超过 65k 的上限而导致的。这个时候我们可以采用 Google 提出的[解决方案](http://developer.android.com/intl/zh-cn/tools/building/multidex.html#about)来解决这个问题。
+第二种情况则是由在 v3.13.+ 以后 Android SDK 引入了 Google ProtoBuf 来提高即时通讯模块的传输效率，随之而来的是类和方法数量的激增,超过了 Android 上存在着方法总数不能超过 65k 的上限而导致的。这个时候我们可以采用 Google 提出的[解决方案](http://developer.android.com/intl/zh-cn/tools/building/multidex.html#about)来解决这个问题。
 
 {% endblock%}

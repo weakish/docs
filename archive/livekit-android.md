@@ -4,7 +4,7 @@
 
 > 如果需要了解 iOS 版本请点击: [LiveKit 使用指南 &middot; iOS](livekit-ios.html)
 
-[LiveKit]({{git_link}}) 是由 LeanCloud 官方推出的基于 LeanCloud 即时通信与七牛直播服务的 UI 套件，它包含直播、文字聊天、弹幕、送礼物等界面。
+[LiveKit]({{git_link}}) 是由 LeanCloud 官方推出的基于 LeanCloud 即时通讯与七牛直播服务的 UI 套件，它包含直播、文字聊天、弹幕、送礼物等界面。
 
 针对直播服务，LeanCloud 只按照 [聊天的费用标准](/pricing) 收费，而直播相关的内容，LeanCloud 并不参与收费，其产生的费用请在七牛账户中查询。
 
@@ -192,7 +192,7 @@ public class LCLKAppProvider implements LCLiveKitProvider {
 }
 ```
 
-### 打开即时通信
+### 打开即时通讯
 
 ```
 LCLiveKit.getInstance().open(clientId, new AVIMClientCallback() {
@@ -272,14 +272,14 @@ startActivity(intent);
 <dt>`public void setProfileProvider(LCLiveKitProvider profileProvider)`</dt>
 <dd>此函数用于设置用户体系与直播流地址。</dd>
 <dt>`public void open(final String userId, final AVIMClientCallback callback)`</dt>
-<dd>此函数用于开始即时通信，open 成功后可以执行自己的逻辑，或者跳转到直播等页面。</dd>
+<dd>此函数用于开始即时通讯，open 成功后可以执行自己的逻辑，或者跳转到直播等页面。</dd>
 </dl>
 
 ### 直播录制页面
 
 `LCLKRecordActivity` 为直播录制的页面，主要包含两个 Fragment：
 
-- `LCLKIMFragment` 负责其中的即时通信部分，包含聊天、弹幕、礼物等。
+- `LCLKIMFragment` 负责其中的即时通讯部分，包含聊天、弹幕、礼物等。
 - `LCLKRecordFragment` 负责直播的展示与推流等。
 
 参数 `LCLKConstants.LIVE_ID`，可以参考 [LiveId](#LiveId)。`LCLKRecordActivity` 在录制时会通过 [`fetchRecordStream`](#fetchRecordStream) 来获取推流地址。
@@ -288,7 +288,7 @@ startActivity(intent);
 
 `LCLKPlayActivity` 为直播的播放页面，同样包含两个 Fragment:
 
-- `LCLKIMFragment` 负责其中的即时通信部分，包含聊天、弹幕、礼物等。
+- `LCLKIMFragment` 负责其中的即时通讯部分，包含聊天、弹幕、礼物等。
 - `LCLKPlayFragment` 负责直播的播放。
 
 参数 `LCLKConstants.LIVE_ID`，可以参考 [LiveId](#LiveId)。`LCLKPlayActivity` 在播放时会通过 [`fetchPlayStream`](#fetchPlayStream) 来获取推流地址。

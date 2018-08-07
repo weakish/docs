@@ -41,7 +41,7 @@ PM> Install-Package LeanCloud
 
 请前往 [Unity Storage][unity-storage] 以及 [Unity Realtime][unity-im] 下载最新版本的 zip 包，解压之后导入到你的 Unity 项目中。
 
-{{ docs.note("[Unity Storage][unity-storage] 和 [Unity Realtime][unity-im] 本质上只相差一个 DLL 文件：`LeanCloud.Realtime.dll`，因此如果你不需要使用即时通信模块，可以只下载 [Unity Storage][unity-storage]。") }}
+{{ docs.note("[Unity Storage][unity-storage] 和 [Unity Realtime][unity-im] 本质上只相差一个 DLL 文件：`LeanCloud.Realtime.dll`，因此如果你不需要使用即时通讯模块，可以只下载 [Unity Storage][unity-storage]。") }}
 
 ### 依赖详解
 
@@ -52,23 +52,23 @@ PM> Install-Package LeanCloud
 `AssemblyLister.dll`|LeanCloud 依赖检测模块，它负责检查相关依赖是否正确加载|是
 `LeanCloud.Core.dll`|核心库，里面包含了 AVObject 和 AVUser 等所有内置类型的定义和序列化相关操作的功能|是
 `LeanCloud.Storage.dll`|存储库，里面包含本地缓存以及 HTTP 请求发送的实现|是
-`LeanCloud.Realtime.dll`|即时通信库，里面包含了即时通信协议的实现以及相关接口|否
+`LeanCloud.Realtime.dll`|即时通讯库，里面包含了即时通讯协议的实现以及相关接口|否
 `LeanCloud.LiveQuery.dll`|LiveQuery 库，里面包含实时数据同步的实现和相关接口|否
 `LeanCloud.Analytics.dll`|数据统计库，里面包含了实现数据统计分析的实现和相关接口|否
 
-如果你的项目不需要使用即时通信，就可以删除对 `LeanCloud.Realtime.dll` 的依赖，或者在引入的时候在 nuget 里面执行如下指令，则 IDE 只会加载核心和存储模块，并不会导入即时通信模块：
+如果你的项目不需要使用即时通讯，就可以删除对 `LeanCloud.Realtime.dll` 的依赖，或者在引入的时候在 nuget 里面执行如下指令，则 IDE 只会加载核心和存储模块，并不会导入即时通讯模块：
 
 ```sh
 PM> Install-Package LeanCloud.Storage
 ```
 
-另外我们也提供了指定安装即时通信模块的 nuget 包：
+另外我们也提供了指定安装即时通讯模块的 nuget 包：
 
 ```sh
 PM> Install-Package LeanCloud.Realtime
 ```
 
-如果希望使用实时数据同步功能（[LiveQuery](livequery-guide.html)），请执行如下 nuget 命令行来自动安装所有必要的依赖（例如即时通信模块）：
+如果希望使用实时数据同步功能（[LiveQuery](livequery-guide.html)），请执行如下 nuget 命令行来自动安装所有必要的依赖（例如即时通讯模块）：
 
 ```sh
 Install-Package LeanCloud.LiveQuery
@@ -97,7 +97,7 @@ AVClient.Initialize("此处填写应用的 appId", "此处填写应用的 appKey
 var realtime = new AVRealtime("此处填写应用的 appId", "此处填写应用的 appKey");
 ```
 
-如果使用了即时通信初始化的代码，就不需要再次调用 `AVClient.Initialize`，因为在聊天初始化的时候会调用它。
+如果使用了即时通讯初始化的代码，就不需要再次调用 `AVClient.Initialize`，因为在聊天初始化的时候会调用它。
 
 #### 私有部署
 
@@ -112,7 +112,7 @@ PushServer|推送服务的私有部署地址|https://abc-push.xyz.com
 StatsServer|统计服务的私有部署地址|https://abc-stats.xyz.com
 EngineServer|云引擎（云函数）私有部署地址|https://engine-stats.xyz.com
 
-与即时通信相关的私有部署配置 `AVRealtime.Configuration` 包含了如下属性：
+与即时通讯相关的私有部署配置 `AVRealtime.Configuration` 包含了如下属性：
 
 属性名|含义|示例
 --|--|--
@@ -123,10 +123,10 @@ RealtimeServer|最终的 WebSocket 地址|wss://abc-wss.xyz.com
 
 ##### 私有部署示例
 
-假设购买了数据存储和即时通信的私有部署，在私有部署的相关配置手册上我们会给出最终生产环境的地址，例如：
+假设购买了数据存储和即时通讯的私有部署，在私有部署的相关配置手册上我们会给出最终生产环境的地址，例如：
 
 - 数据存储地址 (Api Server)：https://abc-api.xyz.com
-- 即时通信地址云端路由地址为 (RTM Router)：https://abc-rtmrouter.xyz.com
+- 即时通讯地址云端路由地址为 (RTM Router)：https://abc-rtmrouter.xyz.com
 
 在 SDK 初始化时需要进行如下设置：
 
@@ -139,7 +139,7 @@ AVClient.Initialize(new AVClient.Configuration
     ApiServer = new Uri("https://abc-api.xyz.com") // 告知 SDK 所有的数据存储服务请求都发往这个地址
 });
 ```
-即时通信服务：
+即时通讯服务：
 
 ```cs
 var realtime = new AVRealtime(new AVRealtime.Configuration
@@ -150,12 +150,12 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
 });
 ```
 
-也存在一种可能性，私有部署中根据用户需求只部署了一台 WebSocket 服务器作为即时通信服务器。假如配置手册上给出的内容如下：
+也存在一种可能性，私有部署中根据用户需求只部署了一台 WebSocket 服务器作为即时通讯服务器。假如配置手册上给出的内容如下：
 
 - 数据存储地址(Api Server)：https://abc-api.xyz.com
-- 即时通信地址(RTM Router): wss://abc-wss.xyz.com
+- 即时通讯地址(RTM Router): wss://abc-wss.xyz.com
 
-在配置即时通信的时候需要做如下修改：
+在配置即时通讯的时候需要做如下修改：
 
 ```cs
 var realtime = new AVRealtime(new AVRealtime.Configuration
@@ -172,13 +172,13 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
 
 ![AVInitializeBehaviour](images/unity/avinitializebehaviour.png)
 
-假设还需要使用即时通信，请在任意一个 `MonoBehaviour` 启动的时候调用如下代码：
+假设还需要使用即时通讯，请在任意一个 `MonoBehaviour` 启动的时候调用如下代码：
 
 ```cs
 var realtime = new AVRealtime("此处填写应用的 appId", "此处填写应用的 appKey");
 ```
 
-{{ docs.alert("在 Unity 中使用即时通信，一定先要先初始化存储模块，然后初始化即时通信模块，**这两步都必须做。**") }}
+{{ docs.alert("在 Unity 中使用即时通讯，一定先要先初始化存储模块，然后初始化即时通讯模块，**这两步都必须做。**") }}
 
 [unity-storage]: https://releases.leanapp.cn/#/leancloud/unity-sdk/releases
 [unity-im]: https://releases.leanapp.cn/#/leancloud/realtime-SDK-dotNET/releases

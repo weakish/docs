@@ -1,16 +1,16 @@
 {% import "views/_helper.njk" as docs %}
 {% import "views/_im.njk" as im %}
-# 即时通信开发指南 &middot; JavaScript 
+# 即时通讯开发指南 &middot; JavaScript 
 
 ## 简介
 
-即时通信服务可以让你一行后端代码都不用写，就能做出一个功能完备的即时通信应用。所有聊天记录都保存在云端，离线消息会通过消息推送来及时送达，推送消息文本可以灵活进行定制。
+即时通讯服务可以让你一行后端代码都不用写，就能做出一个功能完备的即时通讯应用。所有聊天记录都保存在云端，离线消息会通过消息推送来及时送达，推送消息文本可以灵活进行定制。
 
->在继续阅读本文档之前，请先阅读[《即时通信开发指南》](./realtime_v2.html)，了解一下即时通信的基本概念和模型。
+>在继续阅读本文档之前，请先阅读[《即时通讯开发指南》](./realtime_v2.html)，了解一下即时通讯的基本概念和模型。
 
 ### 兼容性
 
-JavaScript 即时通信 SDK 支持如下运行时：
+JavaScript 即时通讯 SDK 支持如下运行时：
 
 * 浏览器 / WebView
   * IE 10+
@@ -66,7 +66,7 @@ AV.init({
   appId: '{{appid}}', 
   appKey:'{{appkey}}',
 });
-// 初始化即时通信 SDK
+// 初始化即时通讯 SDK
 var Realtime = AV.Realtime;
 var realtime = new Realtime({
   appId: '{{appid}}',
@@ -88,7 +88,7 @@ AV.init({
   appId: '{{appid}}', 
   appKey:'{{appkey}}',
 });
-// 初始化即时通信 SDK
+// 初始化即时通讯 SDK
 var realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
@@ -102,7 +102,7 @@ var imageMessage = new ImageMessage(file);
 
 ## 单聊
 
-我们先从最简单的环节入手。此场景类似于微信的私聊、微博的私信和 QQ 单聊。我们创建了一个统一的概念来描述聊天的各种场景：Conversation（对话），在[《即时通信开发指南》](./realtime_v2.html) 里也有相关的详细介绍。
+我们先从最简单的环节入手。此场景类似于微信的私聊、微博的私信和 QQ 单聊。我们创建了一个统一的概念来描述聊天的各种场景：Conversation（对话），在[《即时通讯开发指南》](./realtime_v2.html) 里也有相关的详细介绍。
 
 ### 发送消息
 
@@ -217,13 +217,13 @@ realtime.createIMClient('William').then(function(william) {
 
 为直观起见，我们使用了 Tom、Jerry 等字符串作为 clientId 登录聊天系统。LeanCloud 云端只要求 clientId 在应用内唯一、不超过 64 个字符的字符串即可，具体用什么数据由应用层决定。
 
-即时通信 SDK 在内部会为每一个 clientId 创建唯一的 `Client` 实例，也就是说多次使用相同的 clientId 创建出来的实例还是同一个。因此，如果要支持同一个客户端内多账号登录，只要使用不同的 clientId 来创建多个实例即可。我们的 SDK 也支持多账户同时登录。
+即时通讯 SDK 在内部会为每一个 clientId 创建唯一的 `Client` 实例，也就是说多次使用相同的 clientId 创建出来的实例还是同一个。因此，如果要支持同一个客户端内多账号登录，只要使用不同的 clientId 来创建多个实例即可。我们的 SDK 也支持多账户同时登录。
 
 ## 登录
 
 ### 使用唯一字符串 ID 登录
 
-登录到 LeanCloud 即时通信服务代码在 [之前](#单聊) 已经演示过，核心的代码如下:
+登录到 LeanCloud 即时通讯服务代码在 [之前](#单聊) 已经演示过，核心的代码如下:
 
 {% block open_long_connection_with_clientId %}
 ```javascript
@@ -239,19 +239,19 @@ realtime.createIMClient('Tom').then(function(tom) {
 
 ### 使用 `_User` 对象登录
 
-通过使用 `_User` 表，开发者能直接利用云端内置的用户鉴权系统而省掉登录签名操作，更方便地将存储和即时通信这两个模块结合起来使用。示例代码如下：
+通过使用 `_User` 表，开发者能直接利用云端内置的用户鉴权系统而省掉登录签名操作，更方便地将存储和即时通讯这两个模块结合起来使用。示例代码如下：
 
 {% block open_long_connection_with_AVUser %}
 ```javascript
 var AV = require('leancloud-storage');
-// 以 AVUser 的用户名和密码登录即时通信服务
+// 以 AVUser 的用户名和密码登录即时通讯服务
 AV.User.logIn('username', 'password').then(function(user) {
   return realtime.createIMClient(user);
 }).catch(console.error.bind(console));
 ```
 {% endblock %}
 
-使用以上任意一种方式登录到即时通信系统之后，其他功能的用法就没有任何区别了。
+使用以上任意一种方式登录到即时通讯系统之后，其他功能的用法就没有任何区别了。
 
 ## 消息
 
@@ -347,7 +347,7 @@ conversation.send(message).then(function() {
 
 #### 接收富媒体消息
 
-即时通信 SDK 提供的所有富媒体消息类都是从 TypedMessage 派生出来的。发送的时候可以直接调用 `conversation.send()` 函数。在接收端，SDK 会在 IMClient 实例上派发 `MESSAGE` 事件，接收端处理富媒体消息的示例代码如下：
+即时通讯 SDK 提供的所有富媒体消息类都是从 TypedMessage 派生出来的。发送的时候可以直接调用 `conversation.send()` 函数。在接收端，SDK 会在 IMClient 实例上派发 `MESSAGE` 事件，接收端处理富媒体消息的示例代码如下：
 
 ```javascript
 // 在初始化 Realtime 时，需加载 TypedMessagesPlugin
@@ -577,9 +577,9 @@ conversation.on(Event.LAST_READ_AT_UPDATE, function() {
 ```
 
 #### 自定义离线推送内容
-在使用 SDK 提供的 API 之前，请先阅读 [即时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
+在使用 SDK 提供的 API 之前，请先阅读 [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
 
-正如 [即时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知) 小节里面介绍的，发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
+正如 [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知) 小节里面介绍的，发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
 
 ```js
 var { Realtime, TextMessage } = require('leancloud-realtime');
@@ -606,9 +606,9 @@ realtime.createIMClient('Tom').then(function (host) {
 }).catch(console.error);
 ```
 
-这种方式被称为「附件方式」，这里有一点非常重要：如果你已在 [云引擎即时通信离线消息推送 Hook `_receiversOffline`](leanengine_cloudfunction_guide-node.html#_receiversOffline) 里面定义了云函数来修改离线消息的内容，云端会优先使用 Hook 函数返回的结果作为最后推送的内容。
+这种方式被称为「附件方式」，这里有一点非常重要：如果你已在 [云引擎即时通讯离线消息推送 Hook `_receiversOffline`](leanengine_cloudfunction_guide-node.html#_receiversOffline) 里面定义了云函数来修改离线消息的内容，云端会优先使用 Hook 函数返回的结果作为最后推送的内容。
 
-除此以外，还有其他方法来自定义离线推送内容，请参考 [即时通信概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
+除此以外，还有其他方法来自定义离线推送内容，请参考 [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
 
 ### 未读消息
 
@@ -685,7 +685,7 @@ var realtime = new Realtime({
 | deliveredAt | Date   | 消息送达时间                                   |
 | status      | Symbol | 消息状态，其值为枚举 [`MessageStatus`](https://leancloud.github.io/js-realtime-sdk/docs/module-leancloud-realtime.html#.MessageStatus) 的成员之一：<br/><br/>`MessageStatus.NONE`（未知）<br/>`MessageStatus.SENDING`（发送中）<br/>`MessageStatus.SENT`（发送成功）<br/>`MessageStatus.DELIVERED`（已送达）<br/>`MessageStatus.FAILED`（失败） |
 
-我们为每一种富媒体消息定义了一个消息类型，即时通信 SDK 自身使用的类型是负数（如下面列表所示），所有正数留给开发者自定义扩展类型使用，0 作为「没有类型」被保留起来。
+我们为每一种富媒体消息定义了一个消息类型，即时通讯 SDK 自身使用的类型是负数（如下面列表所示），所有正数留给开发者自定义扩展类型使用，0 作为「没有类型」被保留起来。
 
 | 消息   | 类型   |
 | ---- | ---- |
@@ -853,7 +853,7 @@ conversation.on(Event.MESSAGE_UPDATE, function(newMessage) {
 
 ## 对话
 
-以上章节基本演示了即时通信 SDK 的核心概念「对话」，即 `Conversation`。我们将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `Conversation` 这个统一的概念进行操作，所以开发者需要强化理解的一个概念就是：
+以上章节基本演示了即时通讯 SDK 的核心概念「对话」，即 `Conversation`。我们将单聊和群聊（包括聊天室）的消息发送和接收都依托于 `Conversation` 这个统一的概念进行操作，所以开发者需要强化理解的一个概念就是：
 >SDK 层面不区分单聊和群聊。
 
 ### 对话类型的细分
@@ -1423,7 +1423,7 @@ JavaScript SDK 会对按照对话 id 对对话进行内存字典缓存，但不�
 * 加入后半小时内断网重连会自动加入原聊天室，超过这个时间则需要重新加入。
 
 {% call docs.bubbleWrap() -%}
-我们在最新的 SDK 中为聊天室提供了内置的封装模型，请阅读 [即时通信 - 聊天室开发指南](realtime-chatroom.html)。
+我们在最新的 SDK 中为聊天室提供了内置的封装模型，请阅读 [即时通讯 - 聊天室开发指南](realtime-chatroom.html)。
 {%- endcall %}
 
 ### 创建聊天室
@@ -1584,7 +1584,7 @@ realtime.on(Event.RECONNECT, function() {
 
 在 `SCHEDULE` 与 `RETRY` 事件之间，开发者可以调用 `Realtime#retry` 方法手动进行重连。
 
-在浏览器中，SDK 会通过 Network Information API 感知到网络的变化自动进入离线状态，在进入离线状态时会派发 `OFFLINE` 事件，在恢复在线时会派发 `ONLINE` 事件。在其他环境中可以通过调用 `Realtime#pause` 与 `Realtime#resume` 方法来手动进入或离开离线状态，可以实现即时通信在 App 被切到后台挂起、切回前台恢复等功能。
+在浏览器中，SDK 会通过 Network Information API 感知到网络的变化自动进入离线状态，在进入离线状态时会派发 `OFFLINE` 事件，在恢复在线时会派发 `ONLINE` 事件。在其他环境中可以通过调用 `Realtime#pause` 与 `Realtime#resume` 方法来手动进入或离开离线状态，可以实现即时通讯在 App 被切到后台挂起、切回前台恢复等功能。
 
 在断线重连的过程中，SDK 也会在所有的 IMClient 实例上派发同名的事件。Realtime 与 IMClient 上的同名事件是先后同步派发的，唯一的例外是 `RECONNECT` 事件。在网络连接恢复，Realtime 上派发了 `RECONNECT` 事件之后，IMClient 会尝试重新登录，成功后再派发 `RECONNECT` 事件。所以，Realtime 的 `RECONNECT` 事件意味着 Realtime 实例的 API 能够正常使用了，IMClient 的 `RECONNECT` 事件意味着 IMClient 实例的 API 能够正常使用了。
 
@@ -1620,7 +1620,7 @@ tom.close().then(function() {
 
 ## 安全与签名
 
-在继续阅读下文之前，请确保你已经对 [即时通信服务开发指南 &middot; 权限和认证](realtime_v2.html#权限和认证) 有了充分的了解。
+在继续阅读下文之前，请确保你已经对 [即时通讯服务开发指南 &middot; 权限和认证](realtime_v2.html#权限和认证) 有了充分的了解。
 
 ### 实现签名工厂
 
@@ -1630,7 +1630,7 @@ tom.close().then(function() {
 
 客户端这边究竟该如何使用呢？我们只需要实现 signature 工厂方法，然后作为参数实例化 IMClient 即可
 
-设定了 signature 工厂方法后，对于需要鉴权的操作，即时通信 SDK 与服务器端通讯的时候都会带上应用自己生成的 Signature 信息，LeanCloud 云端会使用 app 的 masterKey 来验证信息的有效性，保证聊天渠道的安全。
+设定了 signature 工厂方法后，对于需要鉴权的操作，即时通讯 SDK 与服务器端通讯的时候都会带上应用自己生成的 Signature 信息，LeanCloud 云端会使用 app 的 masterKey 来验证信息的有效性，保证聊天渠道的安全。
 
 对于不同的操作，我们需要实现两个不同的 signature 工厂方法：`signatureFactory` 与 `conversationSignatureFactory`。
 
@@ -1703,7 +1703,7 @@ realtime.createIMClient('Tom', {
 
 {{ docs.alert("需要强调的是：开发者切勿在客户端直接使用 MasterKey 进行签名操作，因为 MaterKey 一旦泄露，应用的数据将处于高危状态，后果不容小视。因此，强烈建议开发者将签名的具体代码托管在安全性高稳定性好的云端服务器上（例如 LeanCloud 云引擎）。") }}
 
-为了帮助开发者理解云端签名的算法，我们开源了一个用 Node.js + 云引擎实现签名的云端，供开发者学习和使用：[LeanCloud 即时通信云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode)。
+为了帮助开发者理解云端签名的算法，我们开源了一个用 Node.js + 云引擎实现签名的云端，供开发者学习和使用：[LeanCloud 即时通讯云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode)。
 
 {{ im.signature("### 测试签名") }}
 
@@ -1834,15 +1834,15 @@ var EnsureFileIdPlugin = {
 - 插件对象需要有 `name` 字段，用于在日志中显示异常的插件名称，建议与 package 名称相同。
 
 ## SDK 升级指南
-将 JavaScript SDK version 2 升级到 version 3，请参考《[JavaScript 即时通信 SDK v3 迁移指南](./realtime_js-v3-migration-guide.html)》。
+将 JavaScript SDK version 2 升级到 version 3，请参考《[JavaScript 即时通讯 SDK v3 迁移指南](./realtime_js-v3-migration-guide.html)》。
 
-将 JavaScript SDK version 3 升级到 version 4，请参考《[JavaScript 即时通信 SDK v4 升级检查清单](https://github.com/leancloud/js-realtime-sdk/wiki/v4.0-upgrade-checklist)》。
+将 JavaScript SDK version 3 升级到 version 4，请参考《[JavaScript 即时通讯 SDK v4 升级检查清单](https://github.com/leancloud/js-realtime-sdk/wiki/v4.0-upgrade-checklist)》。
 
-## 即时通信云引擎 Hook
-一些应用因其特殊的业务逻辑需要在消息发送时或者消息接收时插入一定的逻辑，因此我们也提供了[即时通信云引擎 Hook](realtime_v2.html#云引擎_Hook)。
+## 即时通讯云引擎 Hook
+一些应用因其特殊的业务逻辑需要在消息发送时或者消息接收时插入一定的逻辑，因此我们也提供了[即时通讯云引擎 Hook](realtime_v2.html#云引擎_Hook)。
 
-## 即时通信 REST API
-有些应用需要在用户登录之前就提前创建一些对话或者是针对对话进行操作，因此可以通过[即时通信 REST API](realtime_rest_api.html)来实现。
+## 即时通讯 REST API
+有些应用需要在用户登录之前就提前创建一些对话或者是针对对话进行操作，因此可以通过[即时通讯 REST API](realtime_rest_api.html)来实现。
 
 
 ## 常见问题

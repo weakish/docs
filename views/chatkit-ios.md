@@ -3,7 +3,7 @@
 
 > 如果需要了解 Android 版本请点击: [ChatKit 使用指南 &middot; Android](chatkit-android.html)
 
-[ChatKit](https://github.com/leancloud/ChatKit-OC) 是一个免费且开源的 UI 聊天组件，由 LeanCloud 官方推出，底层聊天服务基于 LeanCloud 的 IM 即时通信服务 LeanMessage 而开发，支持 iOS 7+。它的最大特点是把聊天常用的一些功能配合 UI 一起提供给开发者，帮助开发者快速集成 IM 服务，轻松实现聊天功能。
+[ChatKit](https://github.com/leancloud/ChatKit-OC) 是一个免费且开源的 UI 聊天组件，由 LeanCloud 官方推出，底层聊天服务基于 LeanCloud 的 IM 即时通讯服务 LeanMessage 而开发，支持 iOS 7+。它的最大特点是把聊天常用的一些功能配合 UI 一起提供给开发者，帮助开发者快速集成 IM 服务，轻松实现聊天功能。
 
 ChatKit 开源且提供完全自由的授权协议，开发者可以对其进行任意修改、扩展和二次封装，但是 LeanCloud 并不对 ChatKit 的二次开发提供技术支持。
 
@@ -26,8 +26,8 @@ git clone --depth=1 https://github.com/leancloud/ChatKit-OC
 而聊天页面的实现难点则在于：
 
 - 消息种类繁多，要有比较好的用户体验，界面以及异步处理方面有大量的开发工作；
-- 音视频消息的录制和发送，需要对系统以及 LeanCloud 即时通信 API 比较熟悉；
-- 推、拉展示本对话中的最新消息，需要对 LeanCloud 即时通信接口比较熟悉；
+- 音视频消息的录制和发送，需要对系统以及 LeanCloud 即时通讯 API 比较熟悉；
+- 推、拉展示本对话中的最新消息，需要对 LeanCloud 即时通讯接口比较熟悉；
 
 我们在 ChatKit 中重点完成了这两个页面的开发，大家可以看看效果：
 <div class="row">
@@ -129,7 +129,7 @@ git clone --depth=1 https://github.com/leancloud/ChatKit-OC
  
 ## 使用方法
 
-按照下面的流程，可以快速接入 ChatKit，体验即时通信服务。
+按照下面的流程，可以快速接入 ChatKit，体验即时通讯服务。
 
 ### CocoaPods 导入
 

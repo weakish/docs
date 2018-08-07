@@ -1,9 +1,9 @@
-# iOS 即时通信服务（v2）
+# iOS 即时通讯服务（v2）
 
 系统依赖库
 -------------
 > 开始之前
-> 在看下面的内容之前，我们假设您已经看过我们的[即时通信开发指南](./realtime_v2.html)，了解了基本的概念和模型。
+> 在看下面的内容之前，我们假设您已经看过我们的[即时通讯开发指南](./realtime_v2.html)，了解了基本的概念和模型。
 
 LeanCloud IM SDK 被包含在 `AVOSCloudIM.framework` 中，它依赖于 `AVOSCloud.framework` 这一核心库。在使用之前，请首先确保你也添加了如下依赖库：
 
@@ -136,7 +136,7 @@ imClient.delegate = self;
 * name － 表示对话名字，可以指定任意有意义的名字，也可不填
 * clientIds － 表示对话初始成员，可不填。如果填写了初始成员，则 LeanCloud 云端会直接给这些成员发出邀请，省掉再专门发一次邀请请求。
 * attributes － 表示额外属性，Dictionary，支持任意的 key/value，可不填。
-* options － 表示对话类型，一般情况下设为 `AVIMConversationOptionNone` 即可，表示普通对话。LeanCloud 即时通信服务还支持另一种对话类型——聊天室，这时候需要在创建对话的时候，将 options 指定为 `AVIMConversationOptionTransient`，具体可以参见[后文](#创建聊天室)
+* options － 表示对话类型，一般情况下设为 `AVIMConversationOptionNone` 即可，表示普通对话。LeanCloud 即时通讯服务还支持另一种对话类型——聊天室，这时候需要在创建对话的时候，将 options 指定为 `AVIMConversationOptionTransient`，具体可以参见[后文](#创建聊天室)
 * callback - 结果回调，在操作结束之后调用，通知开发者成功与否
 
 接下来我们看看实际如何创建一个对话。假定我们要跟「Bob」这个用户进行聊天，我们先创建一个对话，代码如下：
@@ -170,7 +170,7 @@ NSArray *clientIds = [[NSArray alloc] initWithObjects:@"Tom", @"Bob", nil];
 
 > 新的「对话」数据在控制台怎么查看？
 
-如你所见，我们创建一个对话的时候，指定了成员（Tom 和 Bob）和一个额外的属性（{type: 0}）。这些数据保存到云端后，你在 **控制台** > **存储** > **数据** 里面会看到，**_Conversation**<!--2015-08-28 Da Li:不要去掉前面的加粗显示，否则段尾超链接不会正常显示。--> 表中增加了一条记录，新记录的 `m` 属性值为 `["Tom", "Bob"]`，`attr` 属性值为 `{"type":0}`。如你所料，`m` 属性就是对应着成员列表，`attr` 属性就是用户增加的额外属性值（以对象的形式存储）。具体的表结构与属性的对应关系请参考 [即时通信概览 - 对话（Conversation）](realtime_v2.html#对话_Conversation_)。
+如你所见，我们创建一个对话的时候，指定了成员（Tom 和 Bob）和一个额外的属性（{type: 0}）。这些数据保存到云端后，你在 **控制台** > **存储** > **数据** 里面会看到，**_Conversation**<!--2015-08-28 Da Li:不要去掉前面的加粗显示，否则段尾超链接不会正常显示。--> 表中增加了一条记录，新记录的 `m` 属性值为 `["Tom", "Bob"]`，`attr` 属性值为 `{"type":0}`。如你所料，`m` 属性就是对应着成员列表，`attr` 属性就是用户增加的额外属性值（以对象的形式存储）。具体的表结构与属性的对应关系请参考 [即时通讯概览 - 对话（Conversation）](realtime_v2.html#对话_Conversation_)。
 
 **提示: **每次调用 `createConversationWithName:` 方法，即使采用相同的 clientId 也会生成一个新的对话。为避免重复创建对话，可以先使用 `AVIMConversationQuery` 来查询一下对话是否存在。
 
@@ -301,7 +301,7 @@ SDK 默认的接收机制是：当客户端上线时，离线消息会自动通�
 
 ### 退出登录
 
-在 app 退出的时候，或者切换用户的时候，我们需要断开与 LeanCloud 即时通信服务的长连接，这时候需要调用 `[AVIMClient closeWithCallback:]` 函数。一般情况下，这个函数都会关闭连接并立刻返回，这时候 Leancloud 即时通信服务端就会认为当前用户已经下线。
+在 app 退出的时候，或者切换用户的时候，我们需要断开与 LeanCloud 即时通讯服务的长连接，这时候需要调用 `[AVIMClient closeWithCallback:]` 函数。一般情况下，这个函数都会关闭连接并立刻返回，这时候 Leancloud 即时通讯服务端就会认为当前用户已经下线。
 
 客户端事件代理（AVIMClientDelegate）
 ------------
@@ -900,7 +900,7 @@ NSArray* userIds = @[@"Chad"];
 
 ### 获取历史消息 ###
 
-LeanCloud 即时通信服务会将普通的对话消息自动保存在云端，之后开发者可以通过 AVIMConversation 来获取该对话的所有历史消息。获取历史消息的 API 有两个：
+LeanCloud 即时通讯服务会将普通的对话消息自动保存在云端，之后开发者可以通过 AVIMConversation 来获取该对话的所有历史消息。获取历史消息的 API 有两个：
 
 第一个 API 用于获取该会话中最近的 limit 条历史消息，通常在第一次进入会话时调用。
 
@@ -1107,7 +1107,7 @@ if (![clients containsObject:currentUserId]) {
 -------------
 为了满足开发者对权限和认证的要求，LeanCloud 还设计了操作签名的机制。我们可以在 LeanCloud 应用控制台中的「设置」->「应用选项」->「聊天推送」下面勾选「聊天服务签名认证」来启用签名（强烈推荐这样做）。启用后，所有的用户登录、对话创建/加入、邀请成员、踢出成员等操作都需要验证签名，这样开发者就可以对消息进行充分的控制。
 
-关于签名，我们假设你已经了解了[即时通信总览中的详细说明](./realtime_v2.html#权限和认证)。
+关于签名，我们假设你已经了解了[即时通讯总览中的详细说明](./realtime_v2.html#权限和认证)。
 
 客户端这边究竟该如何使用呢？我们只需要实现 AVIMSignatureDataSource 协议接口，然后在用户登录之前，把这个接口赋值给 AVIMClient.signatureDataSource 即可。示例代码如下：
 

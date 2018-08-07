@@ -1,4 +1,4 @@
-# JavaScript 即时通信开发指南（version 2）
+# JavaScript 即时通讯开发指南（version 2）
 
 ## 版本状态
 
@@ -21,17 +21,17 @@
 * v3 不兼容 v2 的 API
 * v3 停止了对 IE10 及以下版本的支持。如果需要支持这些运行环境请使用 v2。
 
-v3 的详细使用文档请参考[《JavaScript 即时通信开发指南》](./realtime_guide-js.html)。
+v3 的详细使用文档请参考[《JavaScript 即时通讯开发指南》](./realtime_guide-js.html)。
 
-从 v2 升级到 v3，请参考 [《JavaScript 即时通信 SDK v3 迁移指南》](./realtime_js-v3-migration-guide.html)。
+从 v2 升级到 v3，请参考 [《JavaScript 即时通讯 SDK v3 迁移指南》](./realtime_js-v3-migration-guide.html)。
 
 ## 简介
 
-感谢你使用 JavaScript 即时通信 SDK，LeanCloud 的即时通信服务每天处理请求数超过百万级，安全可靠，是你的明智之选。
+感谢你使用 JavaScript 即时通讯 SDK，LeanCloud 的即时通讯服务每天处理请求数超过百万级，安全可靠，是你的明智之选。
 
-你可以通过使用我们提供的 SDK，一行后端代码都不用写，就可以做一个功能完备的即时通信应用、也可以做一个实时对战类的游戏，总之一切与即时通信相关的业务都可以使用 LeanCloud 提供的即时通信服务。
+你可以通过使用我们提供的 SDK，一行后端代码都不用写，就可以做一个功能完备的即时通讯应用、也可以做一个实时对战类的游戏，总之一切与即时通讯相关的业务都可以使用 LeanCloud 提供的即时通讯服务。
 
-你还可以通过即时通信 SDK 配合「[云引擎](leanengine_overview.html)」简单的实现之前可能需要很多人才能完成的即时通信相关需求的开发，并且如果你达到我们的收费额度，也会以极低的成本支付你的使用费用，成本远远小于同等规模自建即时通信服务。
+你还可以通过即时通讯 SDK 配合「[云引擎](leanengine_overview.html)」简单的实现之前可能需要很多人才能完成的即时通讯相关需求的开发，并且如果你达到我们的收费额度，也会以极低的成本支付你的使用费用，成本远远小于同等规模自建即时通讯服务。
 
 本 SDK 实现轻量、高效、无依赖，支持浏览器与 node 运行环境。其中浏览器支持涵盖了移动终端的浏览器及各种 WebView，包括微信、PhoneGap、Cordova 的 WebView，同时 SDK 通过插件方式提供兼容 IE8 与 IE9 的方案。具体请看下面「[兼容方案](#兼容方案)」部分的说明。
 
@@ -51,13 +51,13 @@ SDK 仓库地址：[https://github.com/leancloud/js-realtime-sdk](https://github
 
 ## 概念
 
-在你开始使用之前，首先来了解一下即时通信 SDK 的基本结构。即时通信在 SDK 里面分为两个层次：
+在你开始使用之前，首先来了解一下即时通讯 SDK 的基本结构。即时通讯在 SDK 里面分为两个层次：
 
-* 一层是底层即时通信基础模块，负责与服务器匹配和授权，建立基础的连接和底层控制。这个层次只会派发一些基础的事件出来，你可以通过 SDK 监听这些事件。这个层面 SDK 会保证底层连接的稳定，包括断开重试，心跳连接等策略；
+* 一层是底层即时通讯基础模块，负责与服务器匹配和授权，建立基础的连接和底层控制。这个层次只会派发一些基础的事件出来，你可以通过 SDK 监听这些事件。这个层面 SDK 会保证底层连接的稳定，包括断开重试，心跳连接等策略；
 
 * 另一层是业务逻辑层，用户可以使用 SDK 建立不同的 Conversation（对话）。一个 Conversation 就是一个独立的通信单元，但 Conversation 间一般是无法通信的。当然你可以自己在业务逻辑层，通过派发自定义事件的方式来封装其他自定义的逻辑。当创建一个新 Conversation 之后，对应的服务器端就会自动生成这个 Conversation，除非你自行删除，否则该 Conversation 一直存在。但是用户如果没有连接，该房间不会占用服务器资源，只是存储的一个数据条目；
 
-如果想了解即时通信的整体概念，请阅读「[即时通信开发指南](realtime_v2.html)」。另外，我们也提供「[即时通信 REST API](realtime_rest_api.html)」。
+如果想了解即时通讯的整体概念，请阅读「[即时通讯开发指南](realtime_v2.html)」。另外，我们也提供「[即时通讯 REST API](realtime_rest_api.html)」。
 
 ### 特别说明
 
@@ -109,7 +109,7 @@ WEB_SOCKET_SWF_LOCATION = "../../plugin/web-socket-js/WebSocketMain.swf";
 <![endif]-->
 <!-- 引入插件部分结束 -->
 
-<!-- 引入 LeanCloud 即时通信 SDK -->
+<!-- 引入 LeanCloud 即时通讯 SDK -->
 <script src="../../dist/AV.realtime.js"></script>
 ```
 
@@ -148,12 +148,12 @@ realtime.config({
 ```javascript
 // 最简的示例代码，请换成自己的 appId，可以通过浏览器多个标签模拟多用户通信
 var appId = '{{appid}}';
-// clientId 就是即时通信中的唯一用户 id
+// clientId 就是即时通讯中的唯一用户 id
 var clientId = 'LeanCloud01';
 var realtimeObj;
 var conversationObj;
 
-// 创建即时通信实例（支持单页多实例）
+// 创建即时通讯实例（支持单页多实例）
 realtimeObj = AV.realtime({
     appId: appId,
     clientId: clientId,
@@ -168,9 +168,9 @@ realtimeObj = AV.realtime({
 // 当前 SDK 版本
 console.log('当前 SDK 版本是 ' + AV.realtime.version);
 
-// 即时通信服务连接成功
+// 即时通讯服务连接成功
 realtimeObj.on('open', function() {
-    console.log('即时通信服务建立成功！');
+    console.log('即时通讯服务建立成功！');
 
     // 创建一个聊天室，conv 是 conversation 的缩写，也可以用 room 方法替换
     conversationObj = realtimeObj.conv({
@@ -193,7 +193,7 @@ realtimeObj.on('open', function() {
 
 // 当聊天断开时触发
 realtimeObj.on('close', function() {
-    console.log('即时通信服务被断开！');
+    console.log('即时通讯服务被断开！');
 });
 
 // 接收断线或者网络状况不佳的事件（断网可测试）
@@ -277,7 +277,7 @@ message 事件回调函数传入参数中的 cid 字段，即是该 Conversation
 
 ### Web 安全域名
 
-如果是纯前端使用 JavaScript SDK，请务必配置 **Web 安全域名**，防止其他人盗用你的服务器资源。即时通信的安全域名设置会有三分钟的延迟，所以设置完毕后，请耐心等待下。配置方式：进入对应的 App，然后选择 **设置** > **安全中心** > **Web 安全域名**。
+如果是纯前端使用 JavaScript SDK，请务必配置 **Web 安全域名**，防止其他人盗用你的服务器资源。即时通讯的安全域名设置会有三分钟的延迟，所以设置完毕后，请耐心等待下。配置方式：进入对应的 App，然后选择 **设置** > **安全中心** > **Web 安全域名**。
 
 详细请看[《数据和安全 - Web 安全域名》](data_security.html#Web_应用安全设置)。
 
@@ -285,13 +285,13 @@ message 事件回调函数传入参数中的 cid 字段，即是该 Conversation
 
 为了满足开发者对权限和认证的需求，我们设计了签名的概念。
 
-详细请看《[即时通信开发指南 - 权限和认证](realtime_v2.html#权限和认证)》。
+详细请看《[即时通讯开发指南 - 权限和认证](realtime_v2.html#权限和认证)》。
 
 另外，在 [Demo1](https://github.com/leancloud/js-realtime-sdk/tree/master/demo) 中，我们也增加了一个实际的例子。
 
 ### 防御 XSS
 
-Web 端实现任何可以将用户输入直接输出到界面上的应用，都要注意防止产生 XSS（跨站脚本攻击）。即时通信 SDK 为了保证数据上的纯净性及功能的纯净，没有在 SDK 层面做 HTML 字符的转义。所以当你实现一个 Web 产品时，一定要对用户的输出做字符串 HTML 转义。当然现在的很多 Web 端框架已经自带防御 XSS 的功能，比如 jQuery、Angular、React 等。
+Web 端实现任何可以将用户输入直接输出到界面上的应用，都要注意防止产生 XSS（跨站脚本攻击）。即时通讯 SDK 为了保证数据上的纯净性及功能的纯净，没有在 SDK 层面做 HTML 字符的转义。所以当你实现一个 Web 产品时，一定要对用户的输出做字符串 HTML 转义。当然现在的很多 Web 端框架已经自带防御 XSS 的功能，比如 jQuery、Angular、React 等。
 
 注意：不仅要对内容，如果界面上会显示 clientId，也要做 HTML 过滤。
 
@@ -327,7 +327,7 @@ tool.encodeHTML = function(string) {
 
 ## 与 iOS、Android 等客户端通信
 
-JavaScript 即时通信 SDK 可以与其他客户端通信。当你不仅仅只是基于 Web 来实现一个即时通信程序，也想通过使用 LeanCloud 提供的其他类型（iOS、Android、Windows Phone等）的 SDK 实现多端互通，就需要在发送数据时使用媒体类型配置项，具体要到 [roomObject.send](#RoomObject_send) 方法中详细了解。
+JavaScript 即时通讯 SDK 可以与其他客户端通信。当你不仅仅只是基于 Web 来实现一个即时通讯程序，也想通过使用 LeanCloud 提供的其他类型（iOS、Android、Windows Phone等）的 SDK 实现多端互通，就需要在发送数据时使用媒体类型配置项，具体要到 [roomObject.send](#RoomObject_send) 方法中详细了解。
 
 Web 端本身无论处理什么类型的数据，浏览器都可以自动解析并渲染，比如图片，只需要一个 img 标签。但是其他终端就不行，比如 iOS，所以你需要告知其他终端你发送的是什么类型的消息，这样其他客户端接收到之后会有相应的渲染处理方式，详情请看相应 SDK 的文档。目前支持：
 
@@ -400,7 +400,7 @@ roomObj.send({
 
 ## 暂态对话
 
-标准的 Conversation（对话） 每个最多只能支持 500 个 client，假如想要创建一个有非常大量的用户的聊天室，可以使用方法来创建一个「暂态对话」（或者也叫聊天室）。但是这种方式创建的 Conversation 不支持消息回执等方法，具体请到「[即时通信服务开发指南](realtime_v2.html)」中了解。
+标准的 Conversation（对话） 每个最多只能支持 500 个 client，假如想要创建一个有非常大量的用户的聊天室，可以使用方法来创建一个「暂态对话」（或者也叫聊天室）。但是这种方式创建的 Conversation 不支持消息回执等方法，具体请到「[即时通讯服务开发指南](realtime_v2.html)」中了解。
 
 具体如何创建，请看下面实例化一个 Conversation 的方法 [RealtimeObject.conv](#RealtimeObject_conv)。
 
@@ -412,7 +412,7 @@ LeanCloud JavaScript 相关 SDK 都会使用「AV」作为命名空间。
 
 ### AV.realtime
 
-这是创建即时通信对象的方法，会启动即时通信的连接。自动调用 open 方法，内部与服务器匹配，并建立 WebSocket 连接。内部会自动维持与服务器的链接稳定，控制心跳数据包的频率，超时检测等，如果发生中断可以通过监听对应的事件来给用户界面上的变化提示。
+这是创建即时通讯对象的方法，会启动即时通讯的连接。自动调用 open 方法，内部与服务器匹配，并建立 WebSocket 连接。内部会自动维持与服务器的链接稳定，控制心跳数据包的频率，超时检测等，如果发生中断可以通过监听对应的事件来给用户界面上的变化提示。
 
 另外，此方法支持多实例，也就是说，你可以在一个页面中，创建多个 RealtimeObject 来实现聊天。
 
@@ -425,9 +425,9 @@ AV.realtime(options, callback)
 
 参数|类型|约束|默认|说明
 ---|---|---|---|---
-**options**|Object|必须||配置即时通信服务所需的必要参数。其中包括：
+**options**|Object|必须||配置即时通讯服务所需的必要参数。其中包括：
 &nbsp;&nbsp;&nbsp;&nbsp; appId|String|必须||应用的 appId，在 **控制台** > **设置** > **基本信息** 中可以查看。
-&nbsp;&nbsp;&nbsp;&nbsp; authFun|Function|||可以传入权限认证的方法，每次当建立连接的时候就会去服务器请求认证，<br/>或者许可之后才能建立连接，详细阅读 [即时通信概览 &middot; 权限和认证](realtime_v2.html#权限和认证)，<br/>也可以参考 [Demo](https://github.com/leancloud/js-realtime-sdk/blob/master/demo/demo1/test.js#L248) 中的示例。
+&nbsp;&nbsp;&nbsp;&nbsp; authFun|Function|||可以传入权限认证的方法，每次当建立连接的时候就会去服务器请求认证，<br/>或者许可之后才能建立连接，详细阅读 [即时通讯概览 &middot; 权限和认证](realtime_v2.html#权限和认证)，<br/>也可以参考 [Demo](https://github.com/leancloud/js-realtime-sdk/blob/master/demo/demo1/test.js#L248) 中的示例。
 &nbsp;&nbsp;&nbsp;&nbsp; clientId|String|必须||当前客户端的唯一 id，用来标示当前客户端。
 &nbsp;&nbsp;&nbsp;&nbsp; secure|Boolean||true|是否关闭 WebSocket 的安全链接，即由 wss 协议转为 ws 协议，关闭 SSL 保护。<br/>默认开启 true，false 为关闭。
 &nbsp;&nbsp;&nbsp;&nbsp; region|String||cn|选择服务部署的节点，{% if node != 'qcloud' %}如果是美国节点，则设置为 `us`，如果是国内节点，则设置为 `cn`。{% else %}目前仅支持 `cn` 即中国节点。{% endif %}
@@ -436,7 +436,7 @@ AV.realtime(options, callback)
 
 #### 返回
 
-```Object``` 返回 RealtimeObject（即时通信对象），其中有后续调用的方法，支持链式调用。
+```Object``` 返回 RealtimeObject（即时通讯对象），其中有后续调用的方法，支持链式调用。
 
 #### 示例
 
@@ -490,7 +490,7 @@ console.log('当前版本是：' + AV.realtime.version);
 
 ### RealtimeObject.open
 
-该方法一般情况下，你不需要调用，SDK 会自动启动与服务的连接。该方法可以启动即时通信的连接，与服务器匹配建立 websocket 连接。
+该方法一般情况下，你不需要调用，SDK 会自动启动与服务的连接。该方法可以启动即时通讯的连接，与服务器匹配建立 websocket 连接。
 
 ```javascript
 RealtimeObject.open(callback)
@@ -531,7 +531,7 @@ realtimeObject.on('open', function() {
 
 ### RealtimeObject.close
 
-关闭即时通信的连接，并且内部会关闭 websocket 连接。该方法没有回调，因为调用会立刻关闭 WebSocket。
+关闭即时通讯的连接，并且内部会关闭 websocket 连接。该方法没有回调，因为调用会立刻关闭 WebSocket。
 
 ```javascript
 RealtimeObject.close()
@@ -737,7 +737,7 @@ realtimeObject.emit('LeanCloud123', {
 
 ### RealtimeObject.conv
 
-创建一个 Conversation（对话），即时通信的最小单元。conv 和 room 方法实现的是同样的方法，为了保持概念上的统一，详见「[特别说明](#特别说明)」。
+创建一个 Conversation（对话），即时通讯的最小单元。conv 和 room 方法实现的是同样的方法，为了保持概念上的统一，详见「[特别说明](#特别说明)」。
 
 ```javascript
 RealtimeObject.conv(options, callback)
@@ -751,8 +751,8 @@ RealtimeObject.conv(options, callback)
 &nbsp;&nbsp;&nbsp;&nbsp; attr|Object|可选|自定义的数据信息，如 title、image、xxx 等。
 &nbsp;&nbsp;&nbsp;&nbsp; members|Array|可选|创建 conversation 时可以直接加入成员的 clientId，<br/>如 `['LeanCloud1', 'LeanCloud2']`。
 &nbsp;&nbsp;&nbsp;&nbsp; name|String|可选|Conversation 的名字
-&nbsp;&nbsp;&nbsp;&nbsp; unique|Boolean|可选|是否原子创建对话，针对相同成员多次原子创建对话会返回同一个会话。请参考 [即时通信服务概览](realtime_v2.html#普通对话_Normal_Conversation_) 中 `unique` 选项相关说明。
-&nbsp;&nbsp;&nbsp;&nbsp; transient|Boolean|可选|是否为暂态的 conversation，暂态的 conversation 可以<br/>支持大量用户（超过 500 人）同时在此聊天，但是不支持消息回执。<br/>**普通聊天每个 conversation 最多只能支持 500 人，<br/>如果预计单个 conversation 会超过这个数字，那请开启这个选项。**<br/>具体可以查看文档「[即时通信服务开发指南](realtime_v2.html)」。
+&nbsp;&nbsp;&nbsp;&nbsp; unique|Boolean|可选|是否原子创建对话，针对相同成员多次原子创建对话会返回同一个会话。请参考 [即时通讯服务概览](realtime_v2.html#普通对话_Normal_Conversation_) 中 `unique` 选项相关说明。
+&nbsp;&nbsp;&nbsp;&nbsp; transient|Boolean|可选|是否为暂态的 conversation，暂态的 conversation 可以<br/>支持大量用户（超过 500 人）同时在此聊天，但是不支持消息回执。<br/>**普通聊天每个 conversation 最多只能支持 500 人，<br/>如果预计单个 conversation 会超过这个数字，那请开启这个选项。**<br/>具体可以查看文档「[即时通讯服务开发指南](realtime_v2.html)」。
 **callback**|Function|可选|创建成功后的回调函数，此时也会在 RealtimeObject <br/>内部派发一个 create 事件，可以通过 `RealtimeObject.on()` 方法来监听。
 
 #### 返回
@@ -846,7 +846,7 @@ realtimeObject.conv(convId, function(obj) {
 
 ### RealtimeObject.room
 
-创建一个 Room（房间），即时通信的最小单元。room 方法就是 conv 方法的一个别名，为了保持概念的统一，详见「[特别说明](#特别说明)」，使用方式和 [conv](#RealtimeObject_conv) 完全相同。
+创建一个 Room（房间），即时通讯的最小单元。room 方法就是 conv 方法的一个别名，为了保持概念的统一，详见「[特别说明](#特别说明)」，使用方式和 [conv](#RealtimeObject_conv) 完全相同。
 
 ```javascript
 RealtimeObject.room(options, callback)
@@ -960,7 +960,7 @@ var realtimeObject = AV.realtime({
    clientId: clientId
 });
 
-// 当即时通信建立成功之后
+// 当即时通讯建立成功之后
 realtimeObject.on('open', function() {
    // 查询当前用户所在的组
    realtimeObject.query(function(data) {
@@ -971,7 +971,7 @@ realtimeObject.on('open', function() {
 
 ### RealtimeObject.query
 
-查询即时通信表中的数据。
+查询即时通讯表中的数据。
 
 ```
 RealtimeObject.query(options, callback)
@@ -1006,7 +1006,7 @@ var realtimeObject = AV.realtime({
    clientId: clientId
 });
 
-// 当即时通信建立成功之后
+// 当即时通讯建立成功之后
 realtimeObject.on('open', function() {
    // 各种条件查询
    realtimeObject.query({
@@ -1697,7 +1697,7 @@ room.receive(function(data) {
 
 ### RoomObject.receipt
 
-如果你通过 RoomObject.send 方法发送了需要有回执功能的信息，那么通过 RoomObject.receipt 可以接收当前这个房间中的所有这类回执信息；回执表示从即时通信服务本身，对方的客户端已经收到该信息。
+如果你通过 RoomObject.send 方法发送了需要有回执功能的信息，那么通过 RoomObject.receipt 可以接收当前这个房间中的所有这类回执信息；回执表示从即时通讯服务本身，对方的客户端已经收到该信息。
 
 ```javascript
 RoomObject.receipt(callback)

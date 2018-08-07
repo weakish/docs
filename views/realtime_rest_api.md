@@ -1,6 +1,6 @@
 {% import "views/_im.njk" as im %}
 {% import "views/_helper.njk" as docs %}
-# 即时通信 REST API 使用指南 v1
+# 即时通讯 REST API 使用指南 v1
 
 ## 请求格式
 对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
@@ -14,11 +14,11 @@ Key|Value|含义|来源
 
 ## 对话数据操作
 
-你可以通过 REST API 对对话（相应的聊天室、群组或单聊等）进行操作，例如提前创建聊天室，关联聊天室到其他数据实体。LeanCloud 即时通信系统采用透明的设计，对话数据在 LeanCloud 系统中是普通的数据表，表名为 `_Conversation`，你可以直接调用 [数据存储相关的 API 进行数据操作](./rest_api.html#对象-1)。`_Conversation` 表 包含一些内置的关键字段定义了对话的属性、成员等，你可以在 [即时通信概览 - 对话](./realtime_v2.html#对话_Conversation_) 了解。
+你可以通过 REST API 对对话（相应的聊天室、群组或单聊等）进行操作，例如提前创建聊天室，关联聊天室到其他数据实体。LeanCloud 即时通讯系统采用透明的设计，对话数据在 LeanCloud 系统中是普通的数据表，表名为 `_Conversation`，你可以直接调用 [数据存储相关的 API 进行数据操作](./rest_api.html#对象-1)。`_Conversation` 表 包含一些内置的关键字段定义了对话的属性、成员等，你可以在 [即时通讯概览 - 对话](./realtime_v2.html#对话_Conversation_) 了解。
 
 ### 创建一个对话
 
-创建一个对话即在 `_Conversation` 表中创建一条记录。对于没有使用过即时通信服务的新用户， `_Conversation` 表会在第一条记录创建后出现。
+创建一个对话即在 `_Conversation` 表中创建一条记录。对于没有使用过即时通讯服务的新用户， `_Conversation` 表会在第一条记录创建后出现。
 
 ```sh
 curl -X POST \
@@ -29,7 +29,7 @@ curl -X POST \
   https://{{host}}/1.1/classes/_Conversation
 ```
 
-上面的例子会创建一个最简单的对话，包括两个 client ID 为 BillGates 和 SteveJobs 的初始成员。对话创建成功会返回 objectId，即即时通信中的对话 ID，客户端就可以通过这个 ID 发送消息了。
+上面的例子会创建一个最简单的对话，包括两个 client ID 为 BillGates 和 SteveJobs 的初始成员。对话创建成功会返回 objectId，即即时通讯中的对话 ID，客户端就可以通过这个 ID 发送消息了。
 
 常见的聊天室的场景，需要通过 REST API 预先创建聊天室，并把对话 ID 与应用内的某个对象关联（如视频、比赛等）。创建聊天室只需要包含一个 **tr** 参数，设置为 true 即可。
 
@@ -266,7 +266,7 @@ to_peers | 可选 | 当撤回的是系统对话单独发给用户的消息时，
 
 ## 未收取消息数
 
-获取即时通信中某个 Client ID 的未收取的消息数：
+获取即时通讯中某个 Client ID 的未收取的消息数：
 
 ```sh
 curl -X GET \
@@ -585,7 +585,7 @@ limit | 可选 | 数字 | 返回条数限制，默认是 50 条
 
 富媒体消息的参数格式相对于普通文本来说，仅仅是将 message 参数换成了一个 JSON **字符串**。
 
-<div class="callout callout-info">由于 LeanCloud 即时通信中所有的消息都是文本，所以这里发送 JSON 结构时**需要首先序列化成字符串**。</div>
+<div class="callout callout-info">由于 LeanCloud 即时通讯中所有的消息都是文本，所以这里发送 JSON 结构时**需要首先序列化成字符串**。</div>
 
 #### 文本消息
 

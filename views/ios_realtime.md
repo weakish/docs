@@ -1,11 +1,11 @@
-# iOS 即时通信服务
+# iOS 即时通讯服务
 
 ## 简介
 
-在阅读本开发指南之前，请先阅读下[《即时通信开发指南》](./realtime.html)，了解即时通信的基本概念和模型。
+在阅读本开发指南之前，请先阅读下[《即时通讯开发指南》](./realtime.html)，了解即时通讯的基本概念和模型。
 
 
-与 Android 不同，iOS 并没有提供类似于 `service` 这样的组件。当应用进入后台，聊天组件将会关闭连接，session 进入 `paused` 状态。而当应用转入前台，聊天组件将会重新建立连接，session 进入 `resume` 状态。你可以实现 `AVSessionDelegate`相关方法，以完成即时通信应用的开发。
+与 Android 不同，iOS 并没有提供类似于 `service` 这样的组件。当应用进入后台，聊天组件将会关闭连接，session 进入 `paused` 状态。而当应用转入前台，聊天组件将会重新建立连接，session 进入 `resume` 状态。你可以实现 `AVSessionDelegate`相关方法，以完成即时通讯应用的开发。
 
 **注意** 请首先确保你添加了如下依赖库
 
@@ -187,7 +187,7 @@ watch 和 unwatch 的结果在 callback 中处理。
  *  发送消息
  *  @param message 消息对象
  *  @param transient 设置为 YES, 当且仅当某个 peer 在线才会收到该条消息，且该条消息既不会存为离线消息，也不会通过消息推送系统发出去.
- *         如果设置为 NO, 则该条消息会设法通过各种途径发到 peer 客户端，比如即时通信、推送、离线消息等。
+ *         如果设置为 NO, 则该条消息会设法通过各种途径发到 peer 客户端，比如即时通讯、推送、离线消息等。
  */
 - (void)sendMessage:(AVMessage *)message transient:(BOOL)transient;
 
@@ -216,7 +216,7 @@ iOS SDK从v2.6.1开始提供聊天室功能。客户端对一个聊天室对象�
 `AVGroupDelegate` 协议用来实现接收到服务器反馈的聊天组消息后的回调处理
 
 ### 创建或加入一个聊天室
-由于整个即时通信功能都是建立在Session的基础上，所以您要加入一个聊天室也需要建立在一个已经打开的Session上。
+由于整个即时通讯功能都是建立在Session的基础上，所以您要加入一个聊天室也需要建立在一个已经打开的Session上。
 当您已经打开一个Session以后，可以通过一下操作来加入一个Group
 
 ```objc

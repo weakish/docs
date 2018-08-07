@@ -223,7 +223,7 @@ self.session.delegate = self;
 
 ## IM 系统配置
 
-IM 即时通信的配置需要参考 [ChatKit-OC](https://github.com/leancloud/ChatKit-OC) 。IM 代码位置已标注在 [项目结构](#项目结构) 中。
+IM 即时通讯的配置需要参考 [ChatKit-OC](https://github.com/leancloud/ChatKit-OC) 。IM 代码位置已标注在 [项目结构](#项目结构) 中。
 
 可供参考的开源项目：
  1. 直播演示部分：[520Linkee](https://github.com/GrayJIAXU/520Linkee)   

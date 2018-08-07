@@ -228,9 +228,9 @@ SDK 所有的云引擎相关的 API 都能正常使用，详细的用法请参�
 
 使用云引擎实现小程序支付的方案参见 [支付](#支付)。
 
-## 即时通信
+## 即时通讯
 
-要使用 LeanCloud 的聊天、实时消息功能，需要使用 LeanCloud 即时通信 SDK。
+要使用 LeanCloud 的聊天、实时消息功能，需要使用 LeanCloud 即时通讯 SDK。
 
 ### 安装与初始化
 请参阅《[JavaScript SDK 安装指南](sdk_setup-js.html)》中对应平台的说明。
@@ -247,13 +247,13 @@ const realtime = new Realtime({
 
 需要特别注意的是，由于小程序限制了同时只能有一个 WebSocket 连接，因此推荐的用法是初始化 Realtime 一次，挂载到全局的 App 实例上，然后在所有需要的时候都使用这个 realtime 实例。
 
-即时通信 SDK 的详细用法请参考 [即时通信开发指南](realtime_guide-js.html)。
+即时通讯 SDK 的详细用法请参考 [即时通讯开发指南](realtime_guide-js.html)。
 
 ### 富媒体消息
-要在小程序中使用即时通信 SDK 的富媒体消息插件，有一些额外的约束：
+要在小程序中使用即时通讯 SDK 的富媒体消息插件，有一些额外的约束：
 
 1. 安装存储 SDK 至 `libs` 目录，并将文件重命名为 `leancloud-storage.js`。
-2. 安装即时通信 SDK 至 `libs` 目录，并将文件重命名为 `leancloud-realtime.js`。
+2. 安装即时通讯 SDK 至 `libs` 目录，并将文件重命名为 `leancloud-realtime.js`。
 3. 下载 [`leancloud-realtime-plugin-typed-messages.js`](https://unpkg.com/leancloud-realtime-plugin-typed-messages@^3.0.0)，移动到 `libs` 目录。必须保证<u>三个文件在同一目录中</u>。
 4. 在 `app.js` 中<u>依次加载</u> `leancloud-storage.js`、`leancloud-realtime.js` 和 `leancloud-realtime-plugin-typed-messages.js`。
   ```javascript
@@ -269,7 +269,7 @@ const realtime = new Realtime({
     appId: '{{appid}}',
     appKey: '{{appkey}}',
   });
-  // 初始化即时通信 SDK
+  // 初始化即时通讯 SDK
   const realtime = new Realtime({
     appId: '{{appid}}',
     appKey: '{{appkey}}',
@@ -277,7 +277,7 @@ const realtime = new Realtime({
   });
   ```
 
-富媒体消息的用法请参考 [即时通信开发指南 - 富媒体消息](realtime_guide-js.html#富媒体消息)。
+富媒体消息的用法请参考 [即时通讯开发指南 - 富媒体消息](realtime_guide-js.html#富媒体消息)。
 
 ## 支付
 
