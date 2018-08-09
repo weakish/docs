@@ -336,6 +336,47 @@ curl -X GET \
 }
 ```
 
+#### 删除成绩
+
+如果用户不再希望出现在榜单中，可以使用该接口删除用户的成绩，以及在榜单中的排名（仅限当前版本）。
+
+可以使用登录用户的 sessionToken ，来删除该用户的成绩：
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  -H "Content-Type: application/json" \
+  -d '[{"statisticName": "wins"}, {"statisticName": "world"}]' \
+  https://{{host}}/1.1/leaderboard/users/self/statistics
+```
+
+也可以通过 master key 来删除任何用户的成绩：
+
+```
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '[{"statisticName": "wins"}, {"statisticName": "world"}]' \
+  https://{{host}}/1.1/leaderboard/users/self/statistics
+```
+
+
+返回结果如下：
+
+```
+{
+  "results": [
+    {},
+    {}
+  ]
+}
+```
+
+
 ### 获取排行榜结果
 #### 获取指定区间的排名
 您可以使用这个接口来获取 Top 排名。
