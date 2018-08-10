@@ -5,7 +5,7 @@
 
 ## 安装
 
-Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本]((https://github.com/leancloud/Play-SDK-JS/releases)。
+Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。
 
 支持原生导入平台：微信小程序
 
