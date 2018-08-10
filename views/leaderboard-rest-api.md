@@ -338,9 +338,9 @@ curl -X GET \
 
 #### 删除成绩
 
-如果用户不再希望出现在榜单中，可以使用该接口删除用户的成绩，以及在榜单中的排名（仅限当前版本）。
+如果用户不再希望出现在榜单中，可以使用该接口删除用户的成绩以及在榜单中的排名（仅限当前版本）。
 
-可以使用登录用户的 sessionToken ，来删除该用户的成绩：
+可以使用登录用户的 sessionToken 来删除该用户的成绩：
 
 ```sh
 curl -X DELETE \
@@ -361,7 +361,7 @@ curl -X DELETE \
   -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
   -d '[{"statisticName": "wins"}, {"statisticName": "world"}]' \
-  https://{{host}}/1.1/leaderboard/users/self/statistics
+  https://{{host}}/1.1/leaderboard/users/<uid>/statistics
 ```
 
 
