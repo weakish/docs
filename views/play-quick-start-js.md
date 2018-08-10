@@ -7,9 +7,13 @@
 
 Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本]((https://github.com/leancloud/Play-SDK-JS/releases)。
 
+支持原生导入平台：微信小程序
+
+支持 CocosCreator 导出以下平台的项目：Mac、Web、微信小游戏、Facebook Instant Game、iOS、Android。
+
 ### Cocos Creator
 
-也适用于 Cocos Creator 导出的微信小游戏。下载 `play.js` 并拖拽至 Cocos Creator 项目中即可。**注意不要选择「插件方式」**。
+下载 `play.js` 并拖拽至 Cocos Creator 项目中即可。**注意不要选择「插件方式」**。
 
 ### 微信小程序
 
@@ -66,12 +70,12 @@ play.userId = randId.toString();
 play.connect();
 ```
 
-连接完成后，会通过 `CONNECTED`（连接成功） 或 `CONNECT_FAILED`（连接失败） 事件来通知客户端。
+连接完成后，会通过 `CONNECTED`（连接成功）或 `CONNECT_FAILED`（连接失败）事件来通知客户端。
 
 
 ## 创建或加入房间
 
-默认情况下，Play SDK 会在连接成功后自动加入大厅；玩家在大厅中，创建 / 加入指定房间。
+默认情况下 Play SDK 会在连接成功后自动加入大厅；玩家在大厅中，创建 / 加入指定房间。
 
 ```javascript
 // 注册连接成功事件
@@ -82,8 +86,7 @@ play.on(Event.CONNECTED, () => {
 });
 ```
 
-joinOrCreateRoom 通过相同的 roomName，保证两个客户端玩家可以进入到相同的房间。
-更多`joinOrCreateRoom`，请参考 [开发指南](play-js.html#创建房间)。
+`joinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](play-js.html#创建房间) 获取更多关于 `joinOrCreateRoom` 的用法。
 
 
 ## 通过 CustomPlayerProperties 同步玩家属性
@@ -178,9 +181,9 @@ play.on(Event.CUSTOM_EVENT, event => {
 
 ## 构建注意事项
 
-您可以通过 Cocos Creator 构建出其支持的工程，目前 SDK 支持的平台包括：Mac，Web，微信小游戏，iOS，android。
+你可以通过 Cocos Creator 构建出其支持的工程.
 
-其中仅在构建 Android 工程时需要做一点额外的配置，需要在初始化 play 之前添加如下代码：
+其中仅在构建 Android 工程时需要做一点额外的配置，需要在初始化 `play` 之前添加如下代码：
 
 ```js
 onLoad() {
@@ -194,7 +197,7 @@ onLoad() {
 }
 ```
 
-这样做的原因是 Play SDK 使用了基于 WebSocket 的 wss 进行安全通信，需要通过以上代码适配 android 平台的 CA 证书机制。
+这样做的原因是 Play SDK 使用了基于 WebSocket 的 wss 进行安全通信，需要通过以上代码适配 Android 平台的 CA 证书机制。
 
 
 
