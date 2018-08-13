@@ -500,7 +500,7 @@ AV.Cloud.define('_receiversOffline', function(request, response) {
 
     var pushMessage = JSON.stringify(json);
 
-    response.success({"pushMessage": pushMessage});
+    return {"pushMessage": pushMessage};
 })
 ```
 
