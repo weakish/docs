@@ -12,17 +12,36 @@ Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://gi
 支持 CocosCreator 导出以下平台的项目：Mac、Web、微信小游戏、Facebook Instant Game、iOS、Android。
 
 ### Cocos Creator
+#### 安装与引用 SDK
 
 下载 `play.js` 并拖拽至 Cocos Creator 项目中即可。**注意不要选择「插件方式」**。
+
+#### 开启调试日志
+如果您通过浏览器调试，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到浏览器的 console 中。请打开浏览器的控制台，运行以下命令：
+```
+localStorage.debug = 'Play:*'
+```
 
 ### 微信小程序
 
 下载 `play-weapp.js` 并拖拽至微信小程序的工程目录下即可。
 
 ### Node.js 安装
-
+#### 安装与引用 SDK
 ```
 npm install @leancloud/play --save。
+```
+#### 开启调试日志
+在 Node.js 平台中打开调试日志，需要设置环境变量 DEBUG 为 `Play:*`。
+
+你可以在启动某个命令之前设置环境变量。下面以本地启动云引擎调试的命令（lean up）为例：
+
+
+```
+# Unix
+DEBUG='Play:*' lean up
+# Windows cmd
+set DEBUG=Play:* lean up
 ```
 
 
