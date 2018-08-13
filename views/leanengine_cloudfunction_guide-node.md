@@ -2,7 +2,7 @@
 
 {% set platformName = "Node.js" %}
 {% set runtimeName = "node" %}
-{% set gettingStartedName = "dotNET-getting-started" %}
+{% set gettingStartedName = "node-js-getting-started" %}
 {% set productName = "LeanEngine" %}
 {% set storageName = "LeanStorage" %}
 {% set leanengine_middleware = "[LeanEngine Node.js SDK](https://github.com/leancloud/leanengine-node-sdk)" %}
