@@ -14,9 +14,20 @@
 git clone git@github.com:leancloud/node-js-getting-started.git
 ```
 
-### 示例项目解析
+在根目录执行如下命令安装依赖：
 
-进入示例项目的根目录我们看到有一个 `package.json` 文件，注意：**所有 Node.js 的项目必须包含`package.json` 才会正确地被云引擎识别为 Node.js 项目**。
+```sh
+npm install
+```
+{% endblock %}
+
+{% block custom_runtime %}
+{% endblock %}
+
+{% block project_constraint %}
+## 项目骨架
+
+以示例项目为例，在根目录我们看到有一个 `package.json` 文件，注意：**所有 Node.js 的项目必须包含`package.json` 才会正确地被云引擎识别为 Node.js 项目**。
 
 <div class="callout callout-info">因为一些历史遗留问题，请确保你的项目中 **没有** 名为 `cloud/main.js` 的文件。</div>
 
@@ -57,22 +68,11 @@ Node.js 的 `package.json` 中可以指定 [很多选项](https://docs.npmjs.com
 - 如果你的应用目录中含有 `yarn.lock`，那么会使用 `yarn install` 代替 `npm install` 来安装依赖（需要 Node.js 4.8 以上）。
 
 <div class="callout callout-info">注意 `package-lock.json` 和 `yarn.lock` 中包含了下载依赖的 URL，因此如果你生成 lock 文件时使用了 npmjs.org 的源，那么在中国节点的部署可能会变慢；反之如果生成时使用了 cnpmjs.org 的源，那么在美国节点的部署可能会变慢。如果不希望使用 `package-lock.json` 和 `yarn.lock`，请将它们加入 `.gitignore`（Git 部署时）或 `.leanengineignore`（命令行工具部署时）。</div>
-
-回到示例项目，在根目录执行如下命令安装依赖：
-
-```sh
-npm install
-```
-
-{% endblock %}
-
-{% block custom_runtime %}
 {% endblock %}
 
 {% block supported_frameworks %}
 
 至此，你已经部署了一个可以从外网访问的站点到云引擎，接下来会介绍更多功能和技术点，帮助你开发出一个满足你需求的网站。
-
 
 ## 接入 Web 框架
 

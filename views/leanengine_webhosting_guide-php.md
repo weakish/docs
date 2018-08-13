@@ -41,17 +41,20 @@ $app->get('/time', function($req, $res) {
 git clone git@github.com:leancloud/slim-getting-started.git
 ```
 
-### 示例项目解析
-
-你的项目需要遵循一定格式才会被云引擎识别并运行。
-
-{{fullName}} 项目必须有 `$PROJECT_DIR/public/index.php` 文件，该文件为整个项目的启动文件。
-
 使用 composer 安装第三方依赖：
 
 ```sh
 composer install
 ```
+{% endblock %}
+
+{% block project_constraint %}
+
+## 项目骨架
+
+你的项目需要遵循一定格式才会被云引擎识别并运行。
+
+{{fullName}} 项目必须有 `$PROJECT_DIR/public/index.php` 文件，该文件为整个项目的启动文件。
 {% endblock %}
 
 

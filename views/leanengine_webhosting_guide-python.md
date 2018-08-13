@@ -16,14 +16,6 @@
 git clone git@github.com:leancloud/python-getting-started.git
 ```
 
-### 示例项目解析
-
-参照示例项目，你的项目需要遵循一定格式才会被云引擎识别并运行。
-
-{{fullName}} 使用 WSGI 规范来运行项目，项目根目录下必须有 `wsgi.py` 与 `requirements.txt` 文件，可选文件 `.python-version`、`runtime.txt`。云引擎运行时会首先加载 `wsgi.py` 这个模块，并将此模块的全局变量 `application` 做为 WSGI 函数进行调用。因此请保证 `wsgi.py` 文件中包含一个 `application` 的全局变量／函数／类，并且符合 WSGI 规范。
-
-更多关于 **WSGI 函数** 的内容，请参考 [WSGI 接口](http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432012393132788f71e0edad4676a3f76ac7776f3a16000) 或者 [PEP333](https://www.python.org/dev/peps/pep-0333/)。
-
 在本地运行 LeanEngine Python 应用，首先需要这几个依赖：
 
 - **python**：请确保本地安装的 Python 版本与线上使用的相同，以免不同版本之间的兼容性导致问题。推荐使用 [pyenv](https://github.com/pyenv/pyenv) 来管理本地 Python 版本。
@@ -40,6 +32,17 @@ pip install -r requirements.txt
 
 {% endblock %}
 
+{% block project_constraint %}
+
+## 项目骨架
+
+参照示例项目，你的项目需要遵循一定格式才会被云引擎识别并运行。
+
+{{fullName}} 使用 WSGI 规范来运行项目，项目根目录下必须有 `wsgi.py` 与 `requirements.txt` 文件，可选文件 `.python-version`、`runtime.txt`。云引擎运行时会首先加载 `wsgi.py` 这个模块，并将此模块的全局变量 `application` 做为 WSGI 函数进行调用。因此请保证 `wsgi.py` 文件中包含一个 `application` 的全局变量／函数／类，并且符合 WSGI 规范。
+
+更多关于 **WSGI 函数** 的内容，请参考 [WSGI 接口](http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432012393132788f71e0edad4676a3f76ac7776f3a16000) 或者 [PEP333](https://www.python.org/dev/peps/pep-0333/)。
+
+{% endblock %}
 {% block custom_runtime %}
 ### 添加第三方依赖模块
 

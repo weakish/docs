@@ -16,7 +16,11 @@
 git clone git@github.com:leancloud/java-war-getting-started.git
 ```
 
-### 示例项目解析
+{% endblock %}
+
+{% block project_constraint %}
+
+## 项目骨架
 
 参照示例项目，你的项目需要遵循一定格式才会被云引擎识别并运行。
 
@@ -29,7 +33,6 @@ git clone git@github.com:leancloud/java-war-getting-started.git
 
 * [java-war-getting-started](https://github.com/leancloud/java-war-getting-started): 使用 Servlet，集成 LeanEngine Java SDK 的一个简单项目，打包成 WAR 文件。
 * [spring-boot-getting-started](https://github.com/leancloud/spring-boot-getting-started): 使用 [Spring boot](https://projects.spring.io/spring-boot/) 做为项目框架，集成 LeanEngine Java SDK 的一个简单的项目，打包成 JAR 文件。
-
 {% endblock %}
 
 {% block runtime_description %}
