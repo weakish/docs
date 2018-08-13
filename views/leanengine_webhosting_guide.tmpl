@@ -23,8 +23,6 @@
 - [.NET](leanengine_webhosting_guide-dotnet.html)
 
 
-> 在开始之前，强烈建议先阅读[云引擎快速入门](leanengine_quickstart.html), 在那里可以快速的部署并且在线预览一个网站项目。
-
 ## 从示例项目开始
 
 {% block getting_started %}{% endblock %}
@@ -78,7 +76,7 @@ lean deploy
 
 {% block cookie_session %}{% endblock %}
 
-## 常见的网站功能
+## 实现常见的网站功能
 
 ### 发送 HTTP 请求
 
@@ -125,6 +123,24 @@ lean deploy
 {% block ping %}
 关于如何加载 {{platformName}} SDK，见下面的 [Web 框架](#Web_框架) 和 [LeanCloud SDK](#LeanCloud_SDK) 小节。
 {% endblock %}
+
+### LeanCache
+
+{% block leancache %}{% endblock %}
+
+关于 LeanCache 的更多使用方法请看 [LeanCache 使用指南](leancache_guide.html)。
+
+### 重定向到 HTTPS
+
+为了安全性，我们可能会为网站加上 HTTPS 加密传输。我们的 {{productName}} 支持网站托管，同样会有这样的需求。
+
+因此我们在 {{productName}} 中提供了一个新的 middleware 来强制让你的 `{{var_app_domain}}.leanapp.cn` 的网站通过 https 访问，你只要这样：
+
+{% block https_redirect %}{% endblock %}
+
+部署并发布到生产环境之后，访问你的 {{productName}} 网站二级域名都会强制通过 HTTPS 访问。
+
+{% block extra_examples %}{% endblock %}
 
 ## 部署与发布
 
@@ -177,24 +193,6 @@ git push -u origin master
 {% block get_env %}{% endblock %}
 
 客户端 SDK 都有类似于 `setProduction` 的方法，比如 [JavaScript SDK API 的 AV.setProduction(production)](https://leancloud.github.io/javascript-sdk/docs/AV.html#.setProduction)，其中 `production` 设置为 `0` 则该 SDK 将请求预备环境；设置为 `1` 将请求生产环境，默认为 `1`。
-
-### LeanCache
-
-{% block leancache %}{% endblock %}
-
-关于 LeanCache 的更多使用方法请看 [LeanCache 使用指南](leancache_guide.html)。
-
-### 重定向到 HTTPS
-
-为了安全性，我们可能会为网站加上 HTTPS 加密传输。我们的 {{productName}} 支持网站托管，同样会有这样的需求。
-
-因此我们在 {{productName}} 中提供了一个新的 middleware 来强制让你的 `{{var_app_domain}}.leanapp.cn` 的网站通过 https 访问，你只要这样：
-
-{% block https_redirect %}{% endblock %}
-
-部署并发布到生产环境之后，访问你的 {{productName}} 网站二级域名都会强制通过 HTTPS 访问。
-
-{% block extra_examples %}{% endblock %}
  
 ## 云端环境
 
@@ -280,9 +278,15 @@ systemDependencies:
 
 {% block section_timezone %}{% endblock %}
 
-## 网站运维相关
+### 出入口 IP 地址
 
-### 备案和自定义域名
+如果开发者希望在第三方服务平台（如微信开放平台）上配置 IP 白名单而需要获取云引擎的入口或出口 IP 地址，请进入 [控制台 > 云引擎 > 设置 > 出入口 IP](/dashboard/cloud.html?appid={{appid}}#/conf) 来自助查询。
+
+我们会尽可能减少出入口 IP 的变化频率，但 IP 突然变换的可能性仍然存在。因此在遇到与出入口 IP 相关的问题，我们建议先进入控制台来核实一下 IP 列表是否有变化。
+
+## 备案和自定义域名
+
+在前面介绍过的[设置域名](#设置域名)指的是设置一个二级域名，严格来说，它不被建议直接用于生产环境，出于安全考虑和法律法规的规定，在部署到生产环境之前，您应该绑定自己的注册的并已经备案过的域名。
 
 如果需要绑定自己的域名，进入 [应用控制台 > 账号设置 > 域名绑定](/settings.html#/setting/domainbind)，按照步骤填写资料即可。
 
@@ -292,8 +296,4 @@ systemDependencies:
 
 <div class="callout callout-info">备案之前要求云引擎已经部署，并且网站内容和备案申请的内容一致。仅使用云引擎托管静态文件、未使用其他 LeanCloud 服务的企业用户，需要自行完成域名备案工作。</div>
 
-### 出入口 IP 地址
 
-如果开发者希望在第三方服务平台（如微信开放平台）上配置 IP 白名单而需要获取云引擎的入口或出口 IP 地址，请进入 [控制台 > 云引擎 > 设置 > 出入口 IP](/dashboard/cloud.html?appid={{appid}}#/conf) 来自助查询。
-
-我们会尽可能减少出入口 IP 的变化频率，但 IP 突然变换的可能性仍然存在。因此在遇到与出入口 IP 相关的问题，我们建议先进入控制台来核实一下 IP 列表是否有变化。

@@ -7,7 +7,7 @@
 {% set storageName = "LeanStorage" %}
 {% set leanengine_middleware = "[LeanEngine dotNET SDK](https://github.com/leancloud/leanengine-dotNET-sdk/)" %}
 {% set storage_guide_url = "[.NET SDK](leanstorage_guide-java.html)" %}
-{% set cloud_func_file = "https://github.com/leancloud/leanengine-dotNET-sdk/blob/master/test/LeanCloud.Engine.AspNetDemo/LambdaSample.cs" %}
+{% set cloud_func_file = "https://github.com/leancloud/leanengine-dotNET-sdk/blob/master/test/LeanCloud.Engine.AspNetDemo/HelloSample.cs" %}
 {% set runFuncName = "AVCloud.CallFunctionAsync" %}
 {% set defineFuncName = "EngineFunctionAttribute" %}
 {% set hook_before_save = "BeforeSave" %}
@@ -67,7 +67,7 @@
 
 然后为项目添加 [LeanCloud.Engine.Middleware.AspNetCore](https://www.nuget.org/packages/LeanCloud.Engine.Middleware.AspNetCore/) 的依赖可以通过 Visual Studio 提供的 GUI 界面进行操作：Add Packages... -> 输入 LeanCloud 关键字页面上会出现相关的列表 -> 选择 LeanCloud.Engine.Middleware.AspNetCore -> Add Package 即可。
 
-或者直接在 /app/web 目录下执行
+或者直接在 `app/web` 目录下执行
 
 ```sh
 dotnet add package LeanCloud.Engine.Middleware.AspNetCore
@@ -366,7 +366,7 @@ cloud.OnLogIn((AVUser user) =>
 
 {% block advancedClassHookInstancedMethod %}
 
-#### 自定义 Hook 函数的更多用法
+#### 自定义 Hook 函数的更多写法
 
 前面演示的是基础的使用委托来定义了一系列的 Hook，比如 `BeforeSave/BeforeUpdate` ，但是在开发的和迭代的过程中，可能某一个对象的各种 Hook 更应该定义在一个统一的类里面进行修改和调整，如果都使用委托可能对代码的组织结构上有一定的挑战和迭代难度，因此 SDK 中也提供了另一种方式来实现 Hook 的自定义，比如针对 Todo 的一系列的 Hook 可能都编写在同一个类里面，如下：
 
