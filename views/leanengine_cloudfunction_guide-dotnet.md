@@ -105,7 +105,12 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
             return 0;
         }
     }
+```
 
+而在程序启动的入口函数中添加如下代码来启用刚才编写的云函数：
+
+
+```cs
     public class Program
     {
         public static void Main(string[] args)
@@ -435,4 +440,10 @@ POST http://e1-api.leancloud.cn/1/functions/Todo/beforeUpdate  {"Connection":["c
 
 以上是从控制台日志当中拷贝出来内容，只有开启了日志才会打印到控制台。
 
+{% endblock %}
+
+{% block useMasterKey %}
+```cs
+AVClient.UseMasterKey = true;
+```
 {% endblock %}

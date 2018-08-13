@@ -8,7 +8,7 @@
 
 {% block getting_started %}
 
-将示例代码 [node-js-getting-started](https://github.com/leancloud/aspnetcore-getting-started) 克隆到本地：
+将示例代码 [node-js-getting-started](https://github.com/leancloud/node-js-getting-started) 克隆到本地：
 
 ```sh
 git clone git@github.com:leancloud/node-js-getting-started.git
