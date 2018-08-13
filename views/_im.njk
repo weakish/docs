@@ -28,7 +28,7 @@
 {% macro clientOpenClose(methods={}) -%}
   {% if methods | length  %}
   {% call noteWrap() -%}
-`{{methods.open}}` 这个方法表示开始连接 LeanCloud 云端服务器（即启动即时通信服务），**它在整个使用周期内只需要调用一次**。用户退出即时通信服务（断开 LeanCloud 云端服务器连接）时需要在 IMClient 对象上调用 `{{methods.close}}`。
+`{{methods.open}}` 这个方法表示开始连接 LeanCloud 云端服务器（即启动即时通讯服务），**它在整个使用周期内只需要调用一次**。用户退出即时通讯服务（断开 LeanCloud 云端服务器连接）时需要在 IMClient 对象上调用 `{{methods.close}}`。
 
 这两个方法是成对使用的，在聊天过程中只需要调用一次，**无需多次调用**。
     {%- endcall %}
@@ -72,12 +72,12 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
   {
     code: "4100",
     message: "APP_NOT_AVAILABLE",
-    desc: "应用不存在或应用禁用了即时通信服务。"
+    desc: "应用不存在或应用禁用了即时通讯服务。"
   },
   {
     code: "4101",
     message: "DUPLICATED_LOGIN",
-    desc: "同一个设备重复登录推送服务。该错误码与即时通信服务无关。"
+    desc: "同一个设备重复登录推送服务。该错误码与即时通讯服务无关。"
   },
   {
     code: "4102",
@@ -278,7 +278,7 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
 
   - 信息 - <code>{{ item.message if item.message else "(无)" | escape }}</code>
   - 含义 - {{ item.desc | escape }}
-  - 模块 - 即时通信 IM
+  - 模块 - 即时通讯 IM
   {% endfor %}
 {% endif %}
 {% endmacro %}

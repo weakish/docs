@@ -390,7 +390,7 @@ REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 
   </tbody>
 </table>
 
-### 即时通信
+### 即时通讯
 
 <table>
   <thead>
@@ -2735,9 +2735,9 @@ https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
 请参考 [短信服务 REST API 详解](rest_sms_api.html)。
 {% endif %}
 
-## 即时通信 API
+## 即时通讯 API
 
-请参考 [即时通信 REST API](./realtime_rest_api.html)。
+请参考 [即时通讯 REST API](./realtime_rest_api.html)。
 
 ## 统计数据 API
 

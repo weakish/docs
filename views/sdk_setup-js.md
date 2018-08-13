@@ -196,7 +196,7 @@ set DEBUG=leancloud*,LC* lean up
 	<!--jsfile--Custom-->
 +  	<!--LeanCloud 存储 SDK-->
 +  	<script src="libs/leancloud-storage-live-query-weapp.min.js"></script>
-+  	<!--LeanCloud 即时通信 SDK-->
++  	<!--LeanCloud 即时通讯 SDK-->
 +  	<script src="libs/leancloud-realtime-weapp.min.js"></script>
 	<!--jsfile--Custom-->
 	<!--IDE 生成的 UI 文件-->
@@ -218,7 +218,7 @@ var { Realtime, TextMessage } = AV;
 如果你创建的是 TypeScript 项目，或者希望得到 IDE 的自动提示能力，还需要下载 TypeScript 定义文件移动至 `libs` 目录。
 
 - 存储服务：[storage.d.ts](https://cdn.jsdelivr.net/npm/leancloud-storage@3.7.2/storage.d.ts)
-- 即时通信服务：[realtime.d.ts](https://cdn.jsdelivr.net/gh/leancloud/js-realtime-sdk@ea3b7087809a9d76c237f9cf4548e06a94e2c33d/realtime.d.ts)
+- 即时通讯服务：[realtime.d.ts](https://cdn.jsdelivr.net/gh/leancloud/js-realtime-sdk@ea3b7087809a9d76c237f9cf4548e06a94e2c33d/realtime.d.ts)
 
 {{ docs.note("如果同时使用两个 SDK，因为 namespace 冲突的问题，需要下载 [leancloud-all.d.ts](https://cdn.jsdelivr.net/combine/npm/leancloud-storage@3.7.2/storage.d.ts,gh/leancloud/js-realtime-sdk@ea3b7087809a9d76c237f9cf4548e06a94e2c33d/realtime.d.ts)，然后手动删除最后一行 `export as namespace AV;`。") }}
 

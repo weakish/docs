@@ -1,12 +1,12 @@
-# Android 即时通信服务
+# Android 即时通讯服务
 
 ## 简介
 
-在阅读本开发指南之前，请先阅读下[《即时通信开发指南》](./realtime.html)，了解即时通信的基本概念和模型。
+在阅读本开发指南之前，请先阅读下[《即时通讯开发指南》](./realtime.html)，了解即时通讯的基本概念和模型。
 
 ##初始化
 
-和其他的LeanCloud服务一样，即时通信系统的初始化也是在Application的onCreate方法中进行的：
+和其他的LeanCloud服务一样，即时通讯系统的初始化也是在Application的onCreate方法中进行的：
 
 ```java
 public class MyApplication extends Application{
@@ -31,9 +31,9 @@ public class MyApplication extends Application{
 
 ##登录
 
-以一个最简单的聊天系统的原型来分析实现 Android 的即时通信，这样的一个聊天系统最主要的有两个模块：用户系统，对话的发送接收。
+以一个最简单的聊天系统的原型来分析实现 Android 的即时通讯，这样的一个聊天系统最主要的有两个模块：用户系统，对话的发送接收。
 在每一个用户系统中间，用户一定有一个唯一表示的符号来标识他们与别人的区别，比如：userId、email、手机号码或者我们提供的 AVUser 的 objectId；同时这个符号也需要能够通过某种方式（登录）而正确获取。
-由于考虑到很多开发者在接入即时通信系统时，可能已经有现成的用户系统，所以我们在设计即时通信模块的时候，并没有强制将用户系统的登录状态与即时通信的登录状态绑定到一起，而是通过一种更为开放的方式去控制即时通信的登录状态。当一个用户需要登录即时通信模块的时候，我们需要:
+由于考虑到很多开发者在接入即时通讯系统时，可能已经有现成的用户系统，所以我们在设计即时通讯模块的时候，并没有强制将用户系统的登录状态与即时通讯的登录状态绑定到一起，而是通过一种更为开放的方式去控制即时通讯的登录状态。当一个用户需要登录即时通讯模块的时候，我们需要:
 
 ```java
 AVUser.logInInBackground("用户名","password",new LogInCallback<AVUser>(){
@@ -50,7 +50,7 @@ AVUser.logInInBackground("用户名","password",new LogInCallback<AVUser>(){
 });
 ```
 
-这样你就向服务器发起了一个即时通信的登录请求。但是至今为止还不能发送消息，因为即时通信的所有请求都是异步的，只有当你接收到异步请求对应的成功回调时，你才能进行下一步操作。
+这样你就向服务器发起了一个即时通讯的登录请求。但是至今为止还不能发送消息，因为即时通讯的所有请求都是异步的，只有当你接收到异步请求对应的成功回调时，你才能进行下一步操作。
 要接收异步请求对应的回调，你需要实现继承 AVMessageReceiver 的自定义 Receiver，并且注册到AndroidManifest.xml。
 
 ```java
@@ -58,7 +58,7 @@ public class ChatDemoMessageReceiver extends AVMessageReceiver{
   ...实现抽象方法,比如：
   @Override
   public void onSessionOpen(Context context, Session session) {
-    System.out.println("用户成功登录上即时通信服务器了");
+    System.out.println("用户成功登录上即时通讯服务器了");
   }
 }
 ```
@@ -76,7 +76,7 @@ public class ChatDemoMessageReceiver extends AVMessageReceiver{
 至此，就完成了用户的登录环节。
 不管你接下来的操作是单聊还是群聊，你都需要实现之前的所有步骤才能进行下一步的操作。
 
-`AVMessageReceiver` 中还有很多其他回调方法来接收其他操作的异步通知，如发送消息、接收消息等，我们将在下面的章节中介绍，它是即时通信的核心 API 之一。
+`AVMessageReceiver` 中还有很多其他回调方法来接收其他操作的异步通知，如发送消息、接收消息等，我们将在下面的章节中介绍，它是即时通讯的核心 API 之一。
 
 ##单聊
 
@@ -84,7 +84,7 @@ public class ChatDemoMessageReceiver extends AVMessageReceiver{
 
 ###添加好友
 
-正如上文提到了，开启了签名认证的即时通信系统在发送消息前需要保证发送的对象是被 watch 过的。对于已有的好友列表，你可以如上文提到的方法，在登录即时通信系统的时候放在参数中间；对于新的好友，你可以通过如下代码进行添加：
+正如上文提到了，开启了签名认证的即时通讯系统在发送消息前需要保证发送的对象是被 watch 过的。对于已有的好友列表，你可以如上文提到的方法，在登录即时通讯系统的时候放在参数中间；对于新的好友，你可以通过如下代码进行添加：
 
 ```java
 Session session = SessionManager.getInstance(selfId);
@@ -126,7 +126,7 @@ msg.setToPeerIds(Arrays.asList(friendId));
 session.sendMessage(msg);
 ```
 
-正如上文提到的，即时通信中所有的操作都是异步操作，发送消息也是一样，针对于消息发送的结果，我们需要在之前提到的Receiver中实现对应的方法 `onMessageSent` 或者 `onMessageFailure`：
+正如上文提到的，即时通讯中所有的操作都是异步操作，发送消息也是一样，针对于消息发送的结果，我们需要在之前提到的Receiver中实现对应的方法 `onMessageSent` 或者 `onMessageFailure`：
 
 ```java
 public class ChatDemoMessageReceiver extends AVMessageReceiver{
@@ -196,7 +196,7 @@ public class ChatDemoMessageReceiver extends AVMessageReceiver{
 
 #### 多媒体消息
 
-即时通信系统已经不在是多年以前的聊天室，用户往往会通过更多更丰富的多媒体内容来进行有效的交互，比如：图片，短视频，语音，地理位置等等。开发者可以通过将AVMessage中的message当做一个相对复杂的数据结构的形势来实现这样的消息内容。比如我们使用 JSON 数据作为消息内容传输
+即时通讯系统已经不在是多年以前的聊天室，用户往往会通过更多更丰富的多媒体内容来进行有效的交互，比如：图片，短视频，语音，地理位置等等。开发者可以通过将AVMessage中的message当做一个相对复杂的数据结构的形势来实现这样的消息内容。比如我们使用 JSON 数据作为消息内容传输
 
 ```java
 //示范一个简单的带图片的消息{"type":"file","content":"https://leancloud.cn/images/static/partner-iw.png"}
@@ -210,7 +210,7 @@ AVMessage msg = new AVMessage(JSON.toJSONString(params));
 
 ### 接收消息
 
-一个客户端在即时通信系统中间不仅仅会扮演简单的发送者的概念，同时也会需要扮演接收者的角色。和之前的所有回调一样，消息的接收也是通过继承的Receiver来接收的：
+一个客户端在即时通讯系统中间不仅仅会扮演简单的发送者的概念，同时也会需要扮演接收者的角色。和之前的所有回调一样，消息的接收也是通过继承的Receiver来接收的：
 
 ```java
 public class ChatDemoMessageReceiver extends AVMessageReceiver{
@@ -317,7 +317,7 @@ public class DemoGroupMessageReceiver extends AVGroupMessageReceiver{
 
 ### 群成员管理
 
-与单聊不同的是，群的概念是集成在 LeanCloud 中的，所以从用户的标识符到群组间的关系都被维护在LeanCloud中。相应的群组成员管理的功能也都可以在LeanCloud的即时通信系统进行操作。
+与单聊不同的是，群的概念是集成在 LeanCloud 中的，所以从用户的标识符到群组间的关系都被维护在LeanCloud中。相应的群组成员管理的功能也都可以在LeanCloud的即时通讯系统进行操作。
 
 #### 查询群成员
 不管用户是需要邀请更多用户进入群组还是想要剔除部分用户，都需要知道当前群组内已经有哪些用户了。开发者可以通过下面的代码来实现群组内成员列表的查询：
@@ -413,11 +413,11 @@ public class DemoGroupMessageReceiver extends AVGroupMessageReceiver{
 ```
 
 ##　权限管理
-在LeanCloud中间的权限管理与传统的 token 机制略有不同，我们通过签名服务来实现即时通信过程中间部分操作的权限管理。
+在LeanCloud中间的权限管理与传统的 token 机制略有不同，我们通过签名服务来实现即时通讯过程中间部分操作的权限管理。
 在阅读下面的代码前，你可能需要先了解一下有关权限管理的基本概念：[权限和认证](./realtime.html#权限和认证)。
 
-在即时通信系统中间，很多操作是需要有权限控制才能操作成功的,比如：单聊的添加好友，群组的邀请、剔除操作等，都需要做一定权限认证。
-客户端传一些参数给自有用户系统或者云引擎（统称权限管理服务器），权限管理服务器端根据一定的逻辑判断操作是否合法，如果该操作是合法的，则返回一个正确的签名；如果是非法的，就返回一个错误的签名。之后在即时通信的过程中就会将返回的签名带在通信的请求中，LeanCloud的即时通信服务器会比对自己算出来的签名与客户端传递过来的签名是否一致来获知该操作是否合法。
+在即时通讯系统中间，很多操作是需要有权限控制才能操作成功的,比如：单聊的添加好友，群组的邀请、剔除操作等，都需要做一定权限认证。
+客户端传一些参数给自有用户系统或者云引擎（统称权限管理服务器），权限管理服务器端根据一定的逻辑判断操作是否合法，如果该操作是合法的，则返回一个正确的签名；如果是非法的，就返回一个错误的签名。之后在即时通讯的过程中就会将返回的签名带在通信的请求中，LeanCloud的即时通讯服务器会比对自己算出来的签名与客户端传递过来的签名是否一致来获知该操作是否合法。
 
 完成一个简单的权限管理认证系统，你需要以下几个步骤（下面以LeanCloud的云引擎服务作为权限认证服务器为例）：
 

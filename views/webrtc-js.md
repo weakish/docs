@@ -1,7 +1,7 @@
-# JavaScript 即时通信 WebRTC 插件使用指南
+# JavaScript 即时通讯 WebRTC 插件使用指南
 
 ## 简介
-JavaScript 即时通信 WebRTC 插件能帮助你实现 Web 端点对点实时音视频通话功能。基于 LeanCloud 即时通信服务与 WebRTC 标准，支持最多 4 人之间的实时音视频通话（目前仅支持 Web 端之间的通话）。
+JavaScript 即时通讯 WebRTC 插件能帮助你实现 Web 端点对点实时音视频通话功能。基于 LeanCloud 即时通讯服务与 WebRTC 标准，支持最多 4 人之间的实时音视频通话（目前仅支持 Web 端之间的通话）。
 
 ## 兼容性
 WebRTC 插件基于 WebRTC 实现。WebRTC 是一组开放的 API，用于实现实时音视频通话并且已成为 W3C 标准草案。目前主流浏览器对 WebRTC 标准的支持情况如下：
@@ -40,7 +40,7 @@ npm install webrtc-adapter leancloud-realtime leancloud-realtime-plugin-webrtc -
 <script src="./node_modules/leancloud-realtime-plugin-webrtc/dist/webrtc.min.js"></script>
 ```
 
-并在初始化即时通信 SDK 时指定使用 WebRTC 插件：
+并在初始化即时通讯 SDK 时指定使用 WebRTC 插件：
 ```javascript
 var Realtime = AV.Realtime;
 // 如果作为 CommonJS 模块加载： var WebRTCPlugin = require('leancloud-realtime-plugin-webrtc').WebRTCPlugin;
@@ -52,7 +52,7 @@ var realtime = new Realtime({
 });
 ```
 
-其中 webrtc-adapter 的作用是抹平不同浏览器对 WebRTC API 实现上的差异。详细的信息请参考 [https://github.com/webrtc/adapter]()。JavaScript 即时通信 SDK 的详细说明请参考 [JavaScript 即时通信开发指南](realtime_guide-js.html)。
+其中 webrtc-adapter 的作用是抹平不同浏览器对 WebRTC API 实现上的差异。详细的信息请参考 [https://github.com/webrtc/adapter]()。JavaScript 即时通讯 SDK 的详细说明请参考 [JavaScript 即时通讯开发指南](realtime_guide-js.html)。
 
 ## 登录
 初始化后，可以通过 `Realtime#createWebRTCClient` 来创建一个视频通话客户端。一个页面上可以创建多个客户端实例，实现多个用户同时登录。
@@ -63,7 +63,7 @@ realtime.createWebRTCClient('Tom').then(function(tom) {
 });
 ```
 
-WebRTC 客户端是通过「单点登录」模式连接即时通信服务的，这意味着对于同一个 ID，同一时间仅会有一个客户端处于登录状态。后登录的客户端会将较早登录的客户端「踢下线」，被踢下线的客户端会派发 `conflict` 事件。
+WebRTC 客户端是通过「单点登录」模式连接即时通讯服务的，这意味着对于同一个 ID，同一时间仅会有一个客户端处于登录状态。后登录的客户端会将较早登录的客户端「踢下线」，被踢下线的客户端会派发 `conflict` 事件。
 
 ```javascriptjava
 tom.on('conflict', function() {
@@ -72,7 +72,7 @@ tom.on('conflict', function() {
 ```
 
 ### 签名
-与 IM 客户端一样，WebRTC 客户端支持通过签名对登录进行鉴权。具体的签名方法请参考 [JavaScript 即时通信开发指南 - 安全与签名](realtime_guide-js.html#安全与签名)
+与 IM 客户端一样，WebRTC 客户端支持通过签名对登录进行鉴权。具体的签名方法请参考 [JavaScript 即时通讯开发指南 - 安全与签名](realtime_guide-js.html#安全与签名)
 
 ## 获取本地流媒体
 在开始拨打电话之前，需要先得到摄像头的流媒体（[MediaStream](https://developer.mozilla.org/zh-CN/docs/Web/API/MediaStream)），可以通过 `navigator.mediaDevices.getUserMedia` 方法来获取：
@@ -227,7 +227,7 @@ incomingCall.on('close', function() {});
 
 SDK 只提供一对一的「通话」抽象，多人通话是通过多人之间分别一对一通话实现的。由于 WebRTC 是点对点的通讯方式，不存在中心节点，所以 n 个人之间的通话每个客户端都需要与另外 n-1 个客户端建立连接，由于客户端性能与带宽的限制，我们推荐将多人对话的人数控制在 4 个以下。
 
-具体来说，Tom 可以使用即时通信 SDK 创建一个聊天室，并监听聊天室的 `memberjoined` 事件，当 Jerry 加入聊天室时，聊天室中所有成员自动「呼叫」Jerry，Jerry 自动「接通」呼入的所有通话，即可实现聊天室形式的多人通话。
+具体来说，Tom 可以使用即时通讯 SDK 创建一个聊天室，并监听聊天室的 `memberjoined` 事件，当 Jerry 加入聊天室时，聊天室中所有成员自动「呼叫」Jerry，Jerry 自动「接通」呼入的所有通话，即可实现聊天室形式的多人通话。
 
 <!-- LeanCloud 同时也提供了一对多的「直播」模型，请参考 LiveKit 文档。  -->
 

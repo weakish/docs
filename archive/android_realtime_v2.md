@@ -1,8 +1,8 @@
-# Android 即时通信服务
+# Android 即时通讯服务
 
 ## 简介
 
-在阅读本开发指南之前，请先阅读下[《即时通信开发指南》](./realtime_v2.html)，了解即时通信的基本概念和模型。
+在阅读本开发指南之前，请先阅读下[《即时通讯开发指南》](./realtime_v2.html)，了解即时通讯的基本概念和模型。
 
 
 ## 文档贡献
@@ -30,7 +30,7 @@ Github 仓库地址：[https://github.com/leancloud/docs](https://github.com/lea
 
 ###初始化
 
-和 LeanCloud 其他服务一样，即时通信服务的初始化也是在 Application 的 `onCreate` 方法中进行的：
+和 LeanCloud 其他服务一样，即时通讯服务的初始化也是在 Application 的 `onCreate` 方法中进行的：
 
 ```
 public class MyApplication extends Application{
@@ -304,7 +304,7 @@ imClient.open(new IMClientCallback(){
 
 ### 退出登录
 
-在 app 退出的时候，或者切换用户的时候，我们需要断开与 LeanCloud 即时通信服务的长连接，这时候需要调用 `AVIMClient.close(final AVIMClientCallback callback)` 函数。一般情况下，这个函数都会关闭连接并立刻返回，这时候 Leancloud 即时通信服务端就会认为当前用户已经下线。
+在 app 退出的时候，或者切换用户的时候，我们需要断开与 LeanCloud 即时通讯服务的长连接，这时候需要调用 `AVIMClient.close(final AVIMClientCallback callback)` 函数。一般情况下，这个函数都会关闭连接并立刻返回，这时候 Leancloud 即时通讯服务端就会认为当前用户已经下线。
 
 
 几个主要的回调接口
@@ -511,7 +511,7 @@ conversation.sendMessage(message, new AVIMConversationCallback() {
 ```
 
 ### 文件消息（AVIMFileMessage）
-AVIMTypedMessage 子类，用来发送带附件的消息，开发者可以用它来发送「离线文件」。对于此类消息，LeanCloud IM SDK 内部会先把文件上传到 LeanCloud 文件存储服务器（自带 CDN 功能），然后把文件元数据（url，文件大小等等）放在消息包内发送到 LeanCloud 即时通信服务端。其构造函数声明为：
+AVIMTypedMessage 子类，用来发送带附件的消息，开发者可以用它来发送「离线文件」。对于此类消息，LeanCloud IM SDK 内部会先把文件上传到 LeanCloud 文件存储服务器（自带 CDN 功能），然后把文件元数据（url，文件大小等等）放在消息包内发送到 LeanCloud 即时通讯服务端。其构造函数声明为：
 
 ```
 // 传入本地文件路径，构造消息对象
@@ -1228,7 +1228,7 @@ conversation.getMemberCount(new AVIMConversationMemberCountCallback(){
 -------------
 为了满足开发者对权限和认证的要求，LeanCloud 还设计了操作签名的机制。我们可以在 LeanCloud 应用控制台中的「设置」->「应用选项」->「聊天推送」下面勾选「聊天服务签名认证」来启用签名（强烈推荐这样做）。启用后，所有的用户登录、对话创建/加入、邀请成员、踢出成员等操作都需要验证签名，这样开发者就可以对消息进行充分的控制。
 
-关于签名，我们假设你已经了解了[即时通信总览中的详细说明](./realtime_v2.html#权限和认证)。
+关于签名，我们假设你已经了解了[即时通讯总览中的详细说明](./realtime_v2.html#权限和认证)。
 
 客户端这边究竟该如何使用呢？我们只需要实现 SignatureFactory 接口，然后在用户登录之前，把这个接口的实例赋值给 AVIMClient 即可（`AVIMClient.setSignatureFactory(factory)`）。
 

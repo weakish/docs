@@ -564,7 +564,7 @@ typedef NS_ENUM(NSInteger, YourCustomMessageType) {
 | {{ messageStatusAnchor }}             | AVIMMessageStatus 枚举 | 消息状态，有五种取值：<br/><br/>`AVIMMessageStatusNone`（未知）<br/>`AVIMMessageStatusSending`（发送中）<br/>`AVIMMessageStatusSent`（发送成功）<br/>`AVIMMessageStatusDelivered`（被接收）<br/>`AVIMMessageStatusFailed`（失败） |
 | ioType             | AVIMMessageIOType 枚举 | 消息传输方向，有两种取值：<br/><br/>`AVIMMessageIOTypeIn`（发给当前用户）<br/>`AVIMMessageIOTypeOut`（由当前用户发出） |
 
-我们为每一种富媒体消息定义了一个消息类型，即时通信 SDK 自身使用的类型是负数（如下面列表所示），所有正数留给开发者自定义扩展类型使用，0 作为「没有类型」被保留起来。
+我们为每一种富媒体消息定义了一个消息类型，即时通讯 SDK 自身使用的类型是负数（如下面列表所示），所有正数留给开发者自定义扩展类型使用，0 作为「没有类型」被保留起来。
 
 | 消息   | 类型   |
 | ---- | ---- |
@@ -1829,7 +1829,7 @@ AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
 {% endblock %}
 
 {% block logout %}
-在 app 退出的时候，或者切换用户的时候，我们需要断开与 LeanCloud 即时通信服务的长连接，这时候需要调用 `[AVIMClient closeWithCallback:]` 函数。一般情况下，这个函数都会关闭连接并立刻返回，这时即时通信服务端就会认为当前用户已经下线。
+在 app 退出的时候，或者切换用户的时候，我们需要断开与 LeanCloud 即时通讯服务的长连接，这时候需要调用 `[AVIMClient closeWithCallback:]` 函数。一般情况下，这个函数都会关闭连接并立刻返回，这时即时通讯服务端就会认为当前用户已经下线。
 {% endblock %}
 
 {% block communicate_with_otherSDK %}{% endblock %}
@@ -1856,7 +1856,7 @@ imClient.signatureDataSource = signatureDelegate;
 }];
 ```
 
-设定了 signatureDataSource 之后，对于需要鉴权的操作，即时通信 SDK 与服务器端通讯的时候都会带上应用自己生成的 Signature 信息，LeanCloud 云端会使用 app 的 masterKey 来验证信息的有效性，保证聊天渠道的安全。
+设定了 signatureDataSource 之后，对于需要鉴权的操作，即时通讯 SDK 与服务器端通讯的时候都会带上应用自己生成的 Signature 信息，LeanCloud 云端会使用 app 的 masterKey 来验证信息的有效性，保证聊天渠道的安全。
 
 对于 AVIMSignatureDataSource 接口，我们只需要实现这一个函数即可：
 
@@ -1895,7 +1895,7 @@ imClient.signatureDataSource = signatureDelegate;
 * nonce：随机字符串 nonce
 * error：签名错误信息
 
-在启用签名功能的情况下，即时通信 SDK 在进行一些重要操作前，都会首先请求 `AVIMSignatureDataSource` 接口，获取签名信息 `AVIMSignature`，然后把操作信息和第三方签名一起发给 LeanCloud 云端，由云端根据签名的结果来对操作进行处理。 
+在启用签名功能的情况下，即时通讯 SDK 在进行一些重要操作前，都会首先请求 `AVIMSignatureDataSource` 接口，获取签名信息 `AVIMSignature`，然后把操作信息和第三方签名一起发给 LeanCloud 云端，由云端根据签名的结果来对操作进行处理。 
 
 用户登录是通过调用 `AVIMClient` 对象中以「open」开头的方法来实现的，以下是其中一个方法：
 
@@ -2047,7 +2047,7 @@ option.force = YES;
 {% block platform_specific_faq %}
 <a id="duplicate_message_notification" name="duplicate_message_notification"></a>**为何离线消息重复推送了两次？**
 
-大部分原因是这种情况造成的：成员 A 和成员 B 同在一个对话中。A 调用了 `openWithCallback` 登录即时通信，在没有调用 `closeWithCallback` 退出登录的情况下，B 使用同一个设备也调用了 `openWithCallback` 登录了即时通信。此时应用退出到后台，其他同在这个对话中的成员向这个对话发送了消息，服务器会给不在线的 A 和 B 发送消息推送，这个设备就会收到两条消息推送。解决方案是确保 B 登录时 A 已经调用 `closeWithCallback` 成功地退出了登录。
+大部分原因是这种情况造成的：成员 A 和成员 B 同在一个对话中。A 调用了 `openWithCallback` 登录即时通讯，在没有调用 `closeWithCallback` 退出登录的情况下，B 使用同一个设备也调用了 `openWithCallback` 登录了即时通讯。此时应用退出到后台，其他同在这个对话中的成员向这个对话发送了消息，服务器会给不在线的 A 和 B 发送消息推送，这个设备就会收到两条消息推送。解决方案是确保 B 登录时 A 已经调用 `closeWithCallback` 成功地退出了登录。
 {% endblock %}
 
 

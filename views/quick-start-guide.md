@@ -4,7 +4,7 @@
 
 * [SDK 安装指南](start.html)
 <li><a href="leanstorage_guide-objc.html">Objective-C 数据存储指南</a></li>
-<li><a href="realtime_guide-objc.html">iOS 即时通信指南</a></li>
+<li><a href="realtime_guide-objc.html">iOS 即时通讯指南</a></li>
 <li><a href="ios_statistics.html">iOS 统计 SDK 开发指南</a></li>
 <li><a href="ios_push_cert.html">iOS 推送证书设置指南</a></li>
 <li><a href="/api-docs/iOS/index.html" target="_blank">iOS SDK API</a></li>
@@ -13,7 +13,7 @@
 
 * [SDK 安装指南](start.html)
 <li><a href="leanstorage_guide-android.html">Android 数据存储指南</a></li>
-<li><a href="realtime_guide-android.html">Android 即时通信指南</a></li>
+<li><a href="realtime_guide-android.html">Android 即时通讯指南</a></li>
 <li><a href="android_statistics.html">Android 统计 SDK 开发指南</a></li>
 <li><a href="/api-docs/android/index.html" target="_blank">Android SDK API</a></li>
 
@@ -23,14 +23,14 @@
 <li><a href="unity_guide.html">Unity3D 数据存储指南</a></li>
 <li><a href="analytics-guide.html">Unity3D 统计 SDK 指南</a></li>
 <li><a href="dotnet_guide.html">.NET 数据存储指南</a></li>
-<li><a href="realtime_guide-dotnet.html">Windows Phone 8.0 即时通信指南</a></li>
+<li><a href="realtime_guide-dotnet.html">Windows Phone 8.0 即时通讯指南</a></li>
 <li><a href="/api-docs/wp/Help/index.html">.NET SDK API</a>
 
 ## 你是 JavaScript 前端开发者？
 
 * [SDK 安装指南](start.html)
 <li><a href="leanstorage_guide-js.html">JavaScript 数据存储指南</a></li>
-<li><a href="https://github.com/leancloud/realtime-messaging-jssdk">JavaScript 即时通信 SDK</a></li>
+<li><a href="https://github.com/leancloud/realtime-messaging-jssdk">JavaScript 即时通讯 SDK</a></li>
 <li><a href="https://leancloud.github.io/javascript-sdk/docs/" target="_blank">JavaScript SDK API</a></li>
 
 ## 你是后端逻辑开发者？
@@ -63,10 +63,10 @@
 ## 你要实现聊天功能？
 
 <ul>
-<li><a href="realtime_guide-objc.html">iOS 即时通信指南</a></li>
-<li><a href="realtime_guide-android.html">Android 即时通信指南</a></li>
-<li><a href="https://github.com/leancloud/realtime-messaging-jssdk">JavaScript 即时通信 SDK</a></li>
-<li><a href="realtime_guide-dotnet.html">Windows Phone 8.0 即时通信指南</a></li>
+<li><a href="realtime_guide-objc.html">iOS 即时通讯指南</a></li>
+<li><a href="realtime_guide-android.html">Android 即时通讯指南</a></li>
+<li><a href="https://github.com/leancloud/realtime-messaging-jssdk">JavaScript 即时通讯 SDK</a></li>
+<li><a href="realtime_guide-dotnet.html">Windows Phone 8.0 即时通讯指南</a></li>
 </ul>
 
 ## 你要实现统计功能？

@@ -34,16 +34,16 @@ HTML5 Video is required for this demo. 您的浏览器不支持播放 HTML5 视�
 进入 [控制台 > 存储 > 设置 > 其他](/dashboard/storage.html?appid={{appid}}#/storage/conf)，勾选 「启用 LiveQuery」才可以在 SDK 中创建和使用，否则会报错。
 
 ```objc
-// LiveQuery 需要依赖即时通信模块，接入该模块的方法请参考安装指南：
+// LiveQuery 需要依赖即时通讯模块，接入该模块的方法请参考安装指南：
 // https://leancloud.cn/docs/sdk_setup-objc.html
 // 请在 Podfile 中添加 pod 'AVOSCloudLiveQuery'，并执行 pod install 来集成。
 [AVOSCloud setApplicationId:@"{{appid}}"
                   clientKey:@"{{appkey}}"];
 ```
 ```java
-// LiveQuery 需要依赖即时通信模块，所以需要在 AndroidManifest.xml 文件里面配置如下内容：
- <!-- 即时通信模块、推送、LiveQuery（均需要加入以下声明） START -->
-  <!-- 即时通信模块、推送都要使用 PushService -->
+// LiveQuery 需要依赖即时通讯模块，所以需要在 AndroidManifest.xml 文件里面配置如下内容：
+ <!-- 即时通讯模块、推送、LiveQuery（均需要加入以下声明） START -->
+  <!-- 即时通讯模块、推送都要使用 PushService -->
   <service android:name="com.avos.avoscloud.PushService"/>
   <receiver android:name="com.avos.avoscloud.AVBroadcastReceiver">
     <intent-filter>
@@ -52,7 +52,7 @@ HTML5 Video is required for this demo. 您的浏览器不支持播放 HTML5 视�
       <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
     </intent-filter>
   </receiver>
-  <!-- 即时通信模块、推送 END -->
+  <!-- 即时通讯模块、推送 END -->
 
 // 然后再调用初始化接口
 AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
@@ -68,7 +68,7 @@ AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
 {{ parts.debugLiveQuery(true) }}
 ```
 ```cs
-// LiveQuery 需要依赖即时通信模块，接入该模块的方法请参考安装指南： 
+// LiveQuery 需要依赖即时通讯模块，接入该模块的方法请参考安装指南： 
 // C# SDK 安装指南：https://leancloud.cn/docs/sdk_setup-dotnet.html#_NET_Framework
 // Unity SDK 安装指南：https://leancloud.cn/docs/sdk_setup-dotnet.html#Mono_for_Unity
  
@@ -81,12 +81,12 @@ AVClient.HttpLog(Console.WriteLine);
 ```
 
 {#
-请确保安装 SDK 的时候已经引入了即时通信服务的相关模块，详细请查询对应文档：
+请确保安装 SDK 的时候已经引入了即时通讯服务的相关模块，详细请查询对应文档：
 
-- [iOS SDK 安装指南 - 即时通信模块](sdk_setup-objc.html)
-- [Android SDK 安装指南 - 即时通信模块](sdk_setup-android.html)
-- [C# SDK 安装指南 - 即时通信模块](sdk_setup-dotnet.html#_NET_Framework)
-- [Unity SDK 安装指南 - 即时通信模块](sdk_setup-dotnet.html#Mono_for_Unity)
+- [iOS SDK 安装指南 - 即时通讯模块](sdk_setup-objc.html)
+- [Android SDK 安装指南 - 即时通讯模块](sdk_setup-android.html)
+- [C# SDK 安装指南 - 即时通讯模块](sdk_setup-dotnet.html#_NET_Framework)
+- [Unity SDK 安装指南 - 即时通讯模块](sdk_setup-dotnet.html#Mono_for_Unity)
 #}
 
 ## 构建查询
@@ -614,7 +614,7 @@ livequery.OnLiveQueryReceived += (sender, e) =>
 
 - 开发者对 LiveQuery 的用法容易产生哪些误解？
 
-  因为 LiveQuery 的实时性，很多用户会陷入一个误区，试着用 LiveQuery 来实现一个简单的聊天功能。我们不建议这样做，因为使用 LiveQuery 构建聊天服务会承担额外的存储成本，产生的费用会增加，并且后期维护的难度非常大（聊天记录，对话维护之类的代码会很混乱），并且 LeanCloud 已经提供了即时通信的服务。LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱离设计初衷容易造成前端的模块混乱。
+  因为 LiveQuery 的实时性，很多用户会陷入一个误区，试着用 LiveQuery 来实现一个简单的聊天功能。我们不建议这样做，因为使用 LiveQuery 构建聊天服务会承担额外的存储成本，产生的费用会增加，并且后期维护的难度非常大（聊天记录，对话维护之类的代码会很混乱），并且 LeanCloud 已经提供了即时通讯的服务。LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱离设计初衷容易造成前端的模块混乱。
 
 
 

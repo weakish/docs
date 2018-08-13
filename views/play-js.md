@@ -2,7 +2,7 @@
 
 ## 前言
 
-Play 是一款基于 JavaScript 编写的实时对战类游戏 SDK，它 为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。Play 提供的主要功能如下：
+Play 是一款基于 JavaScript 编写的实时对战类游戏 SDK，它为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。Play 提供的主要功能如下：
 
 - 获取房间列表
 - 创建房间
@@ -61,7 +61,7 @@ play.userId = 'leancloud';
 
 需要注意，这个 `userId` 有如下限制：
 - 只允许英文、数字与下划线。
-- 长度不能超过 64 字符
+- 长度不能超过 32 字符
 - 一个应用内全局唯一
 
 ### 建立连接
@@ -211,6 +211,7 @@ play.createRoom({
 - `maxPlayerCount`：房间允许的最大玩家数量。
 - `customRoomProperties`：房间的自定义属性。
 - `customRoomPropertyKeysForLobby`：房间的自定义属性 `customRoomProperties` 中「键」的数组，包含在 `customRoomPropertyKeysForLobby` 中的属性将会出现在大厅的房间属性中（`play.lobbyRoomList`），而全部属性要在加入房间后的 `room.getCustomProperties()` 中查看。这些属性将会在匹配房间时用到。
+- `flag`：创建房间标志位，包括是否固定 Master、只允许 Master 设置房间属性、只允许 Master 设置 Master。请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/global.html#CreateRoomFlag)。
 
 #### expectedUserIds
 
