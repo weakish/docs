@@ -287,7 +287,7 @@ play.on(Event.ROOM_JOIN_FAILED, () => {
 有时候，我们不需要加入指定某个房间，而是随机加入「符合某些条件的房间」（甚至可以是没有条件），比如快速开始、快速匹配等，这时我们可以通过调用 `joinRandomRoom` 方法随机加入房间。
 
 ```javascript
-play2.joinRandomRoom();
+play.joinRandomRoom();
 ```
 
 也可以为随机加入设置「条件」，例如随机加入到 level = 2 的房间。
@@ -297,7 +297,7 @@ play2.joinRandomRoom();
 const matchProps = {
 	level: 2,
 };
-play2.joinRandomRoom({
+play.joinRandomRoom({
 	matchProperties: matchProps,
 });
 ```
