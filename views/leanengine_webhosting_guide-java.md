@@ -8,19 +8,21 @@
 {% set leanengine_middleware = "[LeanEngine Java SDK](https://github.com/leancloud/leanengine-java-sdk)" %}
 {% set leanengine_java_sdk_latest_version = '0.1.11' %}
 
+{% block getting_started %}
 
-{% block runtime_description %}
-Java 运行环境对内存的使用较多，所以建议：
+将示例代码 [java-war-getting-started](https://github.com/leancloud/java-war-getting-started) 克隆到本地：
 
-* 以 [示例项目](https://github.com/leancloud/java-war-getting-started) 起步的应用，建议使用 512 MB 或以上规格的实例。
-* 使用 [Spring Boot](https://projects.spring.io/spring-boot/) 的应用，建议使用 1 GB 或以上规格的实例。
-* 本地启动并模拟完成主要业务流程操作，待应用充分初始化后，根据 Java 进程内存占用量选择相应的实例规格，需要注意保留一定的余量用以应对请求高峰。
+```sh
+git clone https://github.com:leancloud/java-war-getting-started.git
+```
 
-<div class="callout callout-danger">如果云引擎 [实例规格](leanengine_plan.html#选择实例规格) **选择不当**，可能造成应用启动时因为内存溢出（OOM）导致部署失败，或运行期内存溢出导致应用频繁重启。</div>
 {% endblock %}
 
 {% block project_constraint %}
-你的项目需要遵循一定格式才会被云引擎识别并运行。
+
+## 项目骨架
+
+参照示例项目，你的项目需要遵循一定格式才会被云引擎识别并运行。
 
 云引擎 Java 运行环境使用 Maven 进行构建，所以 {{fullName}} 项目必须有 `$PROJECT_DIR/pom.xml` 文件，该文件为整个项目的配置文件。构建完成后云引擎会尝试到 `$PROJECT_DIR/target` 目录下寻找可以使用的包：
 
@@ -31,7 +33,16 @@ Java 运行环境对内存的使用较多，所以建议：
 
 * [java-war-getting-started](https://github.com/leancloud/java-war-getting-started): 使用 Servlet，集成 LeanEngine Java SDK 的一个简单项目，打包成 WAR 文件。
 * [spring-boot-getting-started](https://github.com/leancloud/spring-boot-getting-started): 使用 [Spring boot](https://projects.spring.io/spring-boot/) 做为项目框架，集成 LeanEngine Java SDK 的一个简单的项目，打包成 JAR 文件。
+{% endblock %}
 
+{% block runtime_description %}
+Java 运行环境对内存的使用较多，所以建议：
+
+* 以 [示例项目](https://github.com/leancloud/java-war-getting-started) 起步的应用，建议使用 512 MB 或以上规格的实例。
+* 使用 [Spring Boot](https://projects.spring.io/spring-boot/) 的应用，建议使用 1 GB 或以上规格的实例。
+* 本地启动并模拟完成主要业务流程操作，待应用充分初始化后，根据 Java 进程内存占用量选择相应的实例规格，需要注意保留一定的余量用以应对请求高峰。
+
+<div class="callout callout-danger">如果云引擎 [实例规格](leanengine_plan.html#选择实例规格) **选择不当**，可能造成应用启动时因为内存溢出（OOM）导致部署失败，或运行期内存溢出导致应用频繁重启。</div>
 {% endblock %}
 
 {% block project_start %}
@@ -168,6 +179,8 @@ Java 云引擎只支持 1.8 运行环境和 war 包运行
 {% endblock %}
 
 {% block use_leanstorage %}
+
+## 使用数据存储服务
 
 云引擎使用 {{leanengine_middleware}} 来代替 [Java 存储 SDK](https://github.com/leancloud/java-sdk) 。前者依赖了后者，并增加了云函数和 Hook 函数的支持，因此开发者可以直接使用 [LeanCloud 的存储服务](leanstorage_guide-java.html) 来存储自己的数据。
 

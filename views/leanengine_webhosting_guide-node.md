@@ -1,18 +1,37 @@
 {# 指定继承模板 #}
 {% extends "./leanengine_webhosting_guide.tmpl" %}
-
 {% set productName = '云引擎' %}
 {% set platformName = 'Node.js' %}
 {% set fullName = productName + ' ' + platformName %}
 {% set sdk_name = 'JavaScript' %}
 {% set leanengine_middleware = '[LeanEngine Node.js SDK](https://github.com/leancloud/leanengine-node-sdk)' %}
 
+{% block getting_started %}
+
+将示例代码 [node-js-getting-started](https://github.com/leancloud/node-js-getting-started) 克隆到本地：
+
+```sh
+git clone https://github.com:leancloud/node-js-getting-started.git
+```
+
+在根目录执行如下命令安装依赖：
+
+```sh
+npm install
+```
+{% endblock %}
+
+{% block custom_runtime %}
+{% endblock %}
+
 {% block project_constraint %}
-你的项目根目录项目 **必须** 有一个 `package.json` 文件，才会正确地被云引擎识别为 Node.js 项目。
+## 项目骨架
+
+以示例项目为例，在根目录我们看到有一个 `package.json` 文件，注意：**所有 Node.js 的项目必须包含`package.json` 才会正确地被云引擎识别为 Node.js 项目**。
 
 <div class="callout callout-info">因为一些历史遗留问题，请确保你的项目中 **没有** 名为 `cloud/main.js` 的文件。</div>
 
-### package.json
+#### package.json
 
 Node.js 的 `package.json` 中可以指定 [很多选项](https://docs.npmjs.com/files/package.json)，它通常看起来是这样：
 
@@ -49,35 +68,27 @@ Node.js 的 `package.json` 中可以指定 [很多选项](https://docs.npmjs.com
 - 如果你的应用目录中含有 `yarn.lock`，那么会使用 `yarn install` 代替 `npm install` 来安装依赖（需要 Node.js 4.8 以上）。
 
 <div class="callout callout-info">注意 `package-lock.json` 和 `yarn.lock` 中包含了下载依赖的 URL，因此如果你生成 lock 文件时使用了 npmjs.org 的源，那么在中国节点的部署可能会变慢；反之如果生成时使用了 cnpmjs.org 的源，那么在美国节点的部署可能会变慢。如果不希望使用 `package-lock.json` 和 `yarn.lock`，请将它们加入 `.gitignore`（Git 部署时）或 `.leanengineignore`（命令行工具部署时）。</div>
-
-{% endblock %}
-
-{% block project_start %}
-在你首次启动应用之前需要先安装依赖：
-
-```sh
-npm install
-```
-
-然后便可以在项目根目录，用我们的命令行工具来启动本地调试了：
-
-```sh
-lean up
-```
-
-更多有关命令行工具和本地调试的内容请看 [命令行工具使用指南](leanengine_cli.html)。
-
-{% endblock %}
-
-{% block custom_runtime %}
 {% endblock %}
 
 {% block supported_frameworks %}
-Node SDK 为 [express](http://expressjs.com/) 和 [koa](http://koajs.com/) 提供了集成支持，如果你使用这两个框架，只需通过下面的方式加载 Node SDK 提供的中间件即可。
 
-你可以在你的项目根目录运行 `npm install --save leanengine leancloud-storage` 来安装 Node SDK。
+至此，你已经部署了一个可以从外网访问的站点到云引擎，接下来会介绍更多功能和技术点，帮助你开发出一个满足你需求的网站。
 
-### Express
+## 接入 Web 框架
+
+细心的开发者已经发现在示例项目中的 `package.json` 中引用了一个流行的 Node Web 框架 [express](http://expressjs.com/)。
+
+Node SDK 为 [express](http://expressjs.com/) 和 [koa](http://koajs.com/) 提供了集成支持。
+
+如果你已经有了现成的项目使用的是这两个框架，只需通过下面的方式加载 Node SDK 提供的中间件到当前项目中即可：
+
+```sh
+npm install --save leanengine leancloud-storage
+```
+
+引用和配置的代码如下：
+
+#### Express
 
 ```js
 var express = require('express');
@@ -121,7 +132,7 @@ app.get('/todos', function(req, res) {
 
 更多最佳实践请参考我们的 [项目模板](https://github.com/leancloud/node-js-getting-started) 和 [云引擎项目示例](leanengine_examples.html)。
 
-### Koa
+#### Koa
 
 ```js
 var koa = require('koa');
@@ -155,7 +166,7 @@ app.use(function *(next) {
 
 使用 Koa 时建议按照前面 [package.json](#package_json) 一节将 Node.js 的版本设置为 `4.x` 以上。
 
-### 其他 Web 框架
+#### 其他 Web 框架
 
 你也可以使用其他的 Web 框架进行开发，但你需要自行去实现 [健康监测](#健康监测) 中提到的逻辑。下面是一个使用 Node.js 内建的 [http](https://nodejs.org/api/http.html) 实现的最简示例，可供参考：
 
@@ -173,9 +184,11 @@ require('http').createServer(function(req, res) {
 
 你需要将 Web 服务监听在 `0.0.0.0` 上（Node.js 和 express 的默认行为）而不是 `127.0.0.1`。
 
-### 路由超时设置
+#### 路由超时设置
 
-通过以上框架实现的自定义路由，默认超时为 15 秒，该值可以在 `app.js` 中进行调整：
+因为 Node.js 的异步调用容易因运行时错误或编码疏忽中断，为了减少在这种情况下对服务器内存的占用，也为了客户端能够更早地收到错误提示，所以需要添加这个设置，一旦发生超时，服务端会返回一个 HTTP 错误码给客户端。
+
+使用框架实现的自定义路由的时候，请求默认的超时时间为 15 秒，该值可以在 `app.js` 中进行调整：
 
 ```js
 // 设置默认超时时间
@@ -184,6 +197,11 @@ app.use(timeout('15s'));
 {% endblock %}
 
 {% block use_leanstorage %}
+
+## 使用数据存储服务
+
+[数据存储服务](storage_overview.html) 是 LeanCloud 提供的结构化数据存储服务，在网站开发中如果遇到需要存储一些持久化数据的时候，可以使用存储服务来保存数据，例如用户的邮箱，头像等。
+
 云引擎中的 Node SDK（leanengine）提供了服务器端需要的云函数和 Hook 相关支持，同时需要 JavaScript SDK（leancloud-storage）作为 peerDependency 一同安装，在升级 Node SDK 也请记得升级 JavaScript SDK：
 
 ```bash
@@ -222,10 +240,33 @@ Node SDK 的历史版本：
 * `2.x`：提供了对 Promise 风格的云函数、Hook 写法的支持，移除了一些被启用的特性（AV.Cloud.httpRequest），不再支持 Backbone 风格的回调函数
 * `3.x`：**推荐使用** 的版本，指定 JavaScript SDK 为 peerDependency（允许自定义 JS SDK 的版本），升级 JS SDK 到 3.x
 
+
+在示例项目中的 `routes/todo.js` 中可以看见如下代码：
+
+```js
+var router = require('express').Router();
+var AV = require('leanengine');
+
+···
+
+// 新增 Todo 项目
+router.post('/', function(req, res, next) {
+  var content = req.body.content;
+  var todo = new Todo();
+  todo.set('content', content);
+  todo.save().then(function(todo) {
+    res.redirect('/todos');
+  }).catch(next);
+});
+```
+
+这里演示的就是向数据存储服务存储一个 Todo 对象。更多用法请参考：[数据存储开发指南 · JavaScript](leanstorage_guide-js.html)
+
 {% endblock %}
 
 {% block get_env %}
-```nodejs
+
+```js
 var NODE_ENV = process.env.NODE_ENV || 'development';
 if (NODE_ENV === 'development') {
   // 当前环境为「开发环境」，是由命令行工具启动的
@@ -243,13 +284,13 @@ if (NODE_ENV === 'development') {
 ### 在服务器端管理
 如果你的页面主要是由服务器端渲染（例如使用 ejs、pug），在前端不需要使用 JavaScript SDK 进行数据操作，那么建议你使用我们提供的一个 `CookieSession` 中间件，在 Cookie 中维护用户状态：
 
-```nodejs
+```js
 app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser: true }));
 ```
 
 Koa 需要添加一个 `framework: 'koa'` 的参数：
 
-```nodejs
+```js
 app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 3600000, fetchUser: true }));
 ```
 
@@ -272,7 +313,7 @@ app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 
 
 你可以这样简单地实现一个具有登录功能的站点：
 
-```nodejs
+```js
 // 处理登录请求（可能来自登录界面中的表单）
 app.post('/login', function(req, res) {
   AV.User.logIn(req.body.username, req.body.password).then(function(user) {
@@ -355,7 +396,7 @@ npm install request --save
 
 代码示例：
 
-```nodejs
+```js
 var request = require('request');
 
 request({
@@ -453,14 +494,14 @@ client.on('error', function(err) {
 {% block https_redirect %}
 Express:
 
-```nodejs
+```js
 app.enable('trust proxy');
 app.use(AV.Cloud.HttpsRedirect());
 ```
 
 Koa:
 
-```nodejs
+```js
 app.proxy = true;
 app.use(AV.Cloud.HttpsRedirect({framework: 'koa'}));
 ```
@@ -471,7 +512,7 @@ app.use(AV.Cloud.HttpsRedirect({framework: 'koa'}));
 
 因为 Node.js 本身的单线程模型，无法充分利用多个 CPU 核心，所以如果你使用了 2CPU 或以上的实例，需要自行使用 Node.js 的 [cluster](https://nodejs.org/api/cluster.html) 配置多进程运行，创建一个 `server-cluster.js`：
 
-```nodejs
+```js
 var cluster = require('cluster');
 
 var workers = process.env.LEANCLOUD_AVAILABLE_CPUS || 1;

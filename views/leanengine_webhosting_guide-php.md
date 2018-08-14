@@ -33,28 +33,30 @@ $app->get('/time', function($req, $res) {
 部署到云端后，你可以通过 `http://{{var_app_domain}}.leanapp.cn/time` 来访问该 API。你的 iOS 或者 Android 的程序就可以构建一个 HTTP 请求获取服务端时间了。当然还是建议使用各 SDK 内置的获取服务器时间的 API，这里的例子只是演示。
 {% endblock %}
 
-{% block project_constraint %}
-你的项目需要遵循一定格式才会被云引擎识别并运行。
+{% block getting_started %}
 
-{{fullName}} 项目必须有 `$PROJECT_DIR/public/index.php` 文件，该文件为整个项目的启动文件。
-{% endblock %}
+将示例代码 [slim-getting-started](https://github.com/leancloud/slim-getting-started) 克隆到本地：
 
-{% block project_start %}
+```sh
+git clone https://github.com:leancloud/slim-getting-started.git
+```
+
 使用 composer 安装第三方依赖：
 
 ```sh
 composer install
 ```
-
-接下来便可以在项目目录，用我们的命令行工具来启动本地调试了：
-
-```sh
-lean up
-```
-
-更多有关命令行工具和本地调试的内容请参考 [命令行工具使用指南](leanengine_cli.html)。
-
 {% endblock %}
+
+{% block project_constraint %}
+
+## 项目骨架
+
+你的项目需要遵循一定格式才会被云引擎识别并运行。
+
+{{fullName}} 项目必须有 `$PROJECT_DIR/public/index.php` 文件，该文件为整个项目的启动文件。
+{% endblock %}
+
 
 {% block ping %}
 {{leanengine_middleware}} 内置了该 URL 的处理，只需要将中间件添加到请求的处理链路中即可：
@@ -108,6 +110,9 @@ $app->get('/', function($req, $res) {
 {% endblock %}
 
 {% block use_leanstorage %}
+
+## 使用数据存储服务
+
 云引擎使用 {{leanengine_middleware}} ，实际包含了存储 SDK，可以直接使用相关接口来存储数据。请参考 [PHP 存储文档](leanstorage_guide-php.html)。
 
 如果使用项目框架作为基础开发，{{leanengine_middleware}} 默认提供了支持 [Slim 框架](http://www.slimframework.com)的中间件，可以根据示例程序的方式直接使用。
