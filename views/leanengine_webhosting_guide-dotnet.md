@@ -8,14 +8,12 @@
 {% set leanengine_middleware = '[LeanEngine dotNET SDK](https://github.com/leancloud/leanengine-dotNET-sdk/)' %}
 
 
-{% block generalFeature %}{% endblock %}
-
 {% block getting_started %}
 
 将示例项目 [aspnetcore-getting-started](https://github.com/leancloud/aspnetcore-getting-started) 克隆到本地：
 
 ```sh
-git clone git@github.com:leancloud/aspnetcore-getting-started.git
+git clone https://github.com:leancloud/aspnetcore-getting-started.git
 ```
 
 {% endblock %}
@@ -41,6 +39,14 @@ git clone git@github.com:leancloud/aspnetcore-getting-started.git
 其中根目录必须拥有一个 `app.sln` 解决方案文件 和一个 `web/` 文件夹，这是必须的（这一硬性规定会将在未来取消，取消之后开发者自定义自己的项目结构）。
 
 {% endblock %}
+
+
+{% block generalFeature %}
+
+## 实现常见的网站功能
+
+{% endblock %}
+
 {% block leancache %}
 在追求高效访问和快速存取的服务端项目里面，云引擎也内置了 Redis 的服务，详细可以查看文档:[LeanCache](leancache_guide.html)。
 
@@ -130,7 +136,7 @@ public class TodoController : Controller
 
 {% block use_leanstorage %}
 
-## 在云引擎中使用数据存储服务
+## 使用数据存储服务
 
 [数据存储服务](storage_overview.html) 是 LeanCloud 提供的结构化数据存储服务，在网站开发中如果遇到需要存储一些持久化数据的时候，可以使用存储服务来保存数据，例如用户的邮箱，头像
 等。

@@ -13,7 +13,7 @@
 将示例代码 [java-war-getting-started](https://github.com/leancloud/java-war-getting-started) 克隆到本地：
 
 ```sh
-git clone git@github.com:leancloud/java-war-getting-started.git
+git clone https://github.com:leancloud/java-war-getting-started.git
 ```
 
 {% endblock %}
@@ -179,6 +179,8 @@ Java 云引擎只支持 1.8 运行环境和 war 包运行
 {% endblock %}
 
 {% block use_leanstorage %}
+
+## 使用数据存储服务
 
 云引擎使用 {{leanengine_middleware}} 来代替 [Java 存储 SDK](https://github.com/leancloud/java-sdk) 。前者依赖了后者，并增加了云函数和 Hook 函数的支持，因此开发者可以直接使用 [LeanCloud 的存储服务](leanstorage_guide-java.html) 来存储自己的数据。
 

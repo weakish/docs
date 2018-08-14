@@ -54,14 +54,14 @@
 
 使用 Visual Studio 新建项目：
 
-![leanengine-dotnet-vs-create-app-1.jpg](images/leanengine-dotnet-vs-create-app-1.jpg)
+![leanengine-dotnet-vs-create-app-1.jpg](images/leanengine-dotnet-vs-create-app-1.png)
 
 选择 -> .NET Core 2.0 ，然后下一步输入
  
 - **Project Name ： web** 
 - **Solution Name ： app**
 
-![leanengine-dotnet-vs-create-app-2.jpg](images/leanengine-dotnet-vs-create-app-2.jpg)
+![leanengine-dotnet-vs-create-app-2.jpg](images/leanengine-dotnet-vs-create-app-2.png)
 
 **以上文件命名是硬性规定**这一步是必须的，目的为了部署脚本的便捷和可控性，在可期的未来我们可以提供自定义的方式。
 
@@ -95,34 +95,34 @@ dotnet add package LeanCloud.Engine.Middleware.AspNetCore
 {% block cloudFuncExample %}
 
 ```cs
-    public class StaticSampleService
+public class StaticSampleService
+{
+    [EngineFunction("AverageStars")]
+    public static double AverageStars([EngineFunctionParameter("movieName")]string movieName)
     {
-        [EngineFunction("AverageStars")]
-        public static double AverageStars([EngineFunctionParameter("movieName")]string movieName)
-        {
-            if (movieName == "夏洛特烦恼")
-                return 3.8;
-            return 0;
-        }
+        if (movieName == "夏洛特烦恼")
+            return 3.8;
+        return 0;
     }
+}
 ```
 
 而在程序启动的入口函数中添加如下代码来启用刚才编写的云函数：
 
 
 ```cs
-    public class Program
+public class Program
+{
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            // 定义一个 Cloud 实例
-            var cloud = new Cloud();
-            // 将云函数注册到 cloud 实例上
-            cloud.UseFunction<StaticSampleService>();
-            // 启动实例
-            cloud.Start();
-        }
+        // 定义一个 Cloud 实例
+        var cloud = new Cloud();
+        // 将云函数注册到 cloud 实例上
+        cloud.UseFunction<StaticSampleService>();
+        // 启动实例
+        cloud.Start();
     }
+}
 ```
 
 ### 更多云函数定义方式
@@ -152,33 +152,32 @@ public class MovieService
     }
 }
 
-    // 定义一个 Cloud 实例
-    var cloud = new Cloud();
-    // 将云函数注册到 cloud 实例上
-    cloud.UseFunction<MovieService>(new MovieService(new string[] { "夏洛特烦恼", "功夫", "大话西游之月光宝盒" }));
-    // 如果并不想传入任何校验参数也可以直接调用如下代码
-    // cloud.UseFunction<MovieService>(); 
-    // 启动实例
-    cloud.Start();
-}
+// 定义一个 Cloud 实例
+var cloud = new Cloud();
+// 将云函数注册到 cloud 实例上
+cloud.UseFunction<MovieService>(new MovieService(new string[] { "夏洛特烦恼", "功夫", "大话西游之月光宝盒" }));
+// 如果并不想传入任何校验参数也可以直接调用如下代码
+// cloud.UseFunction<MovieService>(); 
+// 启动实例
+cloud.Start();
 ```
 `MovieService` 是一个自定义的类，包含一个实例方法，并且这个实例方法可以通过类的构造函数来传入一些判断所需要的变量（依赖注入），这样可以应对一些变化的需求。
 
 #### 2. 直接使用委托
 
 ```cs
-    // case 3. use Cloud.Define
-    public class SampleServices
+// case 3. use Cloud.Define
+public class SampleServices
+{
+    public static double AverageStars(string movieName)
     {
-        public static double AverageStars(string movieName)
-        {
-            if (movieName == "夏洛特烦恼")
-                return 3.8;
-            return 0;
-        }
+        if (movieName == "夏洛特烦恼")
+            return 3.8;
+        return 0;
     }
-    // 然后注册
-    cloud.Define<string, double>("AverageStars", SampleServices.AverageStars);
+}
+// 然后注册
+cloud.Define<string, double>("AverageStars", SampleServices.AverageStars);
 ```
 
 {% endblock %}
@@ -192,11 +191,14 @@ public class MovieService
 
 {% block runFuncExample %}
 ```cs
-    await AVCloud.CallFunctionAsync<double>("AverageStars", new Dictionary<string, object>()
-    {
-        { "movieName", "夏洛特烦恼" }
-    });
+await AVCloud.CallFunctionAsync<double>("AverageStars", new Dictionary<string, object>()
+{
+    { "movieName", "夏洛特烦恼" }
+});
 ```
+
+另外需要注意的是，*不推荐*在云引擎中直接调用 `AVCloud.CallFunctionAsync`, 因为 `AVCloud.CallFunctionAsync` 是从客户端发起的远程调用，会重新走一遍外网再回到云引擎，如果需要在本地调用，推荐直接在云引擎中使用 `Cloud.CallFunctionAsync`，它会直接从本地进行调用，性能更好。
+
 {% endblock %}
 
 
@@ -205,32 +207,32 @@ public class MovieService
 错误响应码允许自定义。可以在云函数中间 throw EngineException 来指定 code 和 error 消息,如果是普通的 Exception, code 值则是默认的 1 。
 
 ```cs
-    public class UserService
+public class UserService
+{
+    [EngineFunction("Me")]
+    public async AVUser GetCurrentUser()
     {
-        [EngineFunction("Me")]
-        public async AVUser GetCurrentUser()
+        AVUser u = await AVUser.GetCurrentAsync()
+        if (u == null) 
         {
-            AVUser u = await AVUser.GetCurrentAsync()
-            if (u == null) 
-            {
-                throw new EngineException(211, "Could not find user");
-            } 
-            else 
-            {
-                return u;
-            }
+            throw new EngineException(211, "Could not find user");
+        } 
+        else 
+        {
+            return u;
         }
     }
+}
 ```
 {% endblock %}
 
 {% block errorCodeExample2 %}
 
 ```cs
-  [EngineFunction("AverageStars")]
-  public static Void CustomErrorCode(){
-    throw new EngineException(123,"custom error message");
-  }
+[EngineFunction("AverageStars")]
+public static Void CustomErrorCode(){
+throw new EngineException(123,"custom error message");
+}
 ```
 {% endblock %}
 

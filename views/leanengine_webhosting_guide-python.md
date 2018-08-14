@@ -13,7 +13,7 @@
 将示例代码 [leancloud/python-getting-started](https://github.com/leancloud/python-getting-started) 克隆到本地：
 
 ```sh
-git clone git@github.com:leancloud/python-getting-started.git
+git clone https://github.com:leancloud/python-getting-started.git
 ```
 
 在本地运行 LeanEngine Python 应用，首先需要这几个依赖：
@@ -94,6 +94,9 @@ Python 云引擎每次在重新构建时，都会去执行 `pip install -r requi
 为了避免这种情况的发生，建议在 `requirements.txt` 中明确指定全部第三方依赖的版本。使用 `pip freeze` 命令，可以查看当前 `pip` 安装的第三方模块的版本。如果使用 `virtualenv` 来进行开发，并且当前 `virtualenv` 只包含当前项目的依赖的话，可以考虑将 `pip freeze` 的所有内容都写到 `requirements.txt` 中。
 
 {% block use_leanstorage %}
+
+## 使用数据存储服务
+
 在云引擎中你可以使用 LeanCloud 提供的 [数据存储](storage_overview.html) 作为应用的后端数据库，以及使用其他 LeanCloud 提供的功能。 LeanCloud Python SDK 可以让你更加方便地使用这些功能。
 
 ### 安装

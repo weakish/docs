@@ -38,7 +38,7 @@ $app->get('/time', function($req, $res) {
 将示例代码 [slim-getting-started](https://github.com/leancloud/slim-getting-started) 克隆到本地：
 
 ```sh
-git clone git@github.com:leancloud/slim-getting-started.git
+git clone https://github.com:leancloud/slim-getting-started.git
 ```
 
 使用 composer 安装第三方依赖：
@@ -110,6 +110,9 @@ $app->get('/', function($req, $res) {
 {% endblock %}
 
 {% block use_leanstorage %}
+
+## 使用数据存储服务
+
 云引擎使用 {{leanengine_middleware}} ，实际包含了存储 SDK，可以直接使用相关接口来存储数据。请参考 [PHP 存储文档](leanstorage_guide-php.html)。
 
 如果使用项目框架作为基础开发，{{leanengine_middleware}} 默认提供了支持 [Slim 框架](http://www.slimframework.com)的中间件，可以根据示例程序的方式直接使用。
