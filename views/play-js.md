@@ -330,6 +330,8 @@ play.on(Event.PLAYER_ROOM_JOINED, (data) => {
 });
 ```
 
+可以通过 `play.room.playerList` 获取房间内的所有玩家。
+
 ### 离开房间
 
 当玩家想要「主动」离开房间时，可以调用下面的接口。
