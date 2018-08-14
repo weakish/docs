@@ -543,6 +543,10 @@ if (cluster.isMaster) {
 
 {% endblock %}
 
+{% block depentencyCache %}
+例如 node 项目连续两次部署，`package.json` 并没有修改，那么就会直接使用已经缓存的依赖。
+{% endblock %}
+
 {% block code_calling_custom_variables %}
 ```nodejs
 // 在云引擎 Node.js 环境中使用自定义的环境变量

@@ -164,12 +164,14 @@ String value = jedis.get("foo");
 dotnet add LeanCloud.Engine.Middleware.AspNetCore
 ```
 
-直接使用 [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) 里面构建的方式：
+直接使用 [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) 里面构建的方式。
+
+假设在控制台创建了一个名字叫做 `dev` 云缓存实例，如下代码将演示如何连接这个实例，并且存储、读取数据： 
 
 ```cs
-// 新建 LeanCache 实例
+// 获取 dev 实例
 var leancache = new LeanCache("dev");
-// 获取 leancache 的配置
+// 获取 dev 的配置
 var redisConfiguration = leancache.CurrentConfigurations;
 // 构建 StackExchange.Redis.ConfigurationOptions 
 ConfigurationOptions config = new ConfigurationOptions
