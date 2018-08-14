@@ -52,6 +52,8 @@ git clone https://github.com/leancloud/aspnetcore-getting-started.git
 
 如下示例将演示如何使用依赖注入框架来使用 [LeanCache](leancache_guide.html)：
 
+首先在控制台创建了一个名字叫做 `dev` 云缓存实例。
+
 在 `Startup.cs` 文件内部添加如下代码:
 
 ```cs
@@ -61,7 +63,7 @@ public void ConfigureServices(IServiceCollection services)
     services.AddMvc();
 
     // 这里是在控制台创建实例时输入的名称：
-    var instanceName = "dev";
+    var instanceName = "<实例名称>";//假设创建的实例叫做 dev ，在此处将 <实例名称> 替换成 dev 即可
     // 这里采用了依赖注入的方式
     services.UseLeanCache(instanceName);
 }
@@ -79,7 +81,8 @@ public class TodoController : Controller
     {
         // 读取在 services.UseLeanCache(instanceName); 时注入的 LeanCache 实例
         _serviceAccessor = serviceAccessor;
-        var instanceName = "dev";
+        // 这里是在控制台创建实例时输入的名称：
+        var instanceName = "<实例名称>";//假设创建的实例叫做 dev ，在此处将 <实例名称> 替换成 dev 即可
         todoDb = GetConnectionMultiplexer(instanceName);
     }
 
