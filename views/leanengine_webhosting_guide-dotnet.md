@@ -13,7 +13,7 @@
 将示例项目 [aspnetcore-getting-started](https://github.com/leancloud/aspnetcore-getting-started) 克隆到本地：
 
 ```sh
-git clone https://github.com:leancloud/aspnetcore-getting-started.git
+git clone https://github.com/leancloud/aspnetcore-getting-started.git
 ```
 
 {% endblock %}

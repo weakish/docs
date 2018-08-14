@@ -13,7 +13,7 @@
 将示例代码 [leancloud/python-getting-started](https://github.com/leancloud/python-getting-started) 克隆到本地：
 
 ```sh
-git clone https://github.com:leancloud/python-getting-started.git
+git clone https://github.com/leancloud/python-getting-started.git
 ```
 
 在本地运行 LeanEngine Python 应用，首先需要这几个依赖：
