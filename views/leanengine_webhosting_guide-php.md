@@ -38,7 +38,7 @@ $app->get('/time', function($req, $res) {
 将示例代码 [slim-getting-started](https://github.com/leancloud/slim-getting-started) 克隆到本地：
 
 ```sh
-git clone https://github.com:leancloud/slim-getting-started.git
+git clone https://github.com/leancloud/slim-getting-started.git
 ```
 
 使用 composer 安装第三方依赖：

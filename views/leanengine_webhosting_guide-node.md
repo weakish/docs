@@ -11,7 +11,7 @@
 将示例代码 [node-js-getting-started](https://github.com/leancloud/node-js-getting-started) 克隆到本地：
 
 ```sh
-git clone https://github.com:leancloud/node-js-getting-started.git
+git clone https://github.com/leancloud/node-js-getting-started.git
 ```
 
 在根目录执行如下命令安装依赖：

@@ -13,7 +13,7 @@
 将示例代码 [java-war-getting-started](https://github.com/leancloud/java-war-getting-started) 克隆到本地：
 
 ```sh
-git clone https://github.com:leancloud/java-war-getting-started.git
+git clone https://github.com/leancloud/java-war-getting-started.git
 ```
 
 {% endblock %}
