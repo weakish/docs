@@ -7,7 +7,7 @@
 {% set storageName = "LeanStorage" %}
 {% set leanengine_middleware = "[LeanEngine dotNET SDK](https://github.com/leancloud/leanengine-dotNET-sdk/)" %}
 {% set storage_guide_url = "[.NET SDK](leanstorage_guide-java.html)" %}
-{% set cloud_func_file = "https://github.com/leancloud/leanengine-dotNET-sdk/blob/master/test/LeanCloud.Engine.AspNetDemo/HelloSample.cs" %}
+{% set cloud_func_file = "https://github.com/leancloud/dotNET-getting-started/blob/master/web/HelloSample.cs" %}
 {% set runFuncName = "AVCloud.CallFunctionAsync" %}
 {% set defineFuncName = "EngineFunctionAttribute" %}
 {% set hook_before_save = "BeforeSave" %}
@@ -187,6 +187,8 @@ cloud.Define<string, double>("AverageStars", SampleServices.AverageStars);
 
 正如前面的实例代码一样，在定义云函数时使用 `EngineFunctionParameter` 来进行参数的绑定，如果使用的是[直接使用委托](#直接使用委托)，那么传入的参数只要按照顺序即可。
 
+此处要注意，如果函数本身是异步的(返回值是 `Task` 或者 `Task<T>`)，在真正执行的时候也是会等待异步结果，然后再返回给客户端的，另外，如果在执行过程中产生了异常，请参考[云函数错误响应码](#云函数错误响应码)。
+
 {% endblock %}
 
 {% block runFuncExample %}
@@ -364,6 +366,23 @@ cloud.OnLogIn((AVUser user) =>
 
 > 云引擎 .NET SDK 暂时不支持实时通信相关的 Hook，正在开发中，敬请期待。 
 
+{% endblock %}
+
+{% block errorCodeExampleForHooks %}
+
+```cs
+cloud.BeforeSave("Review", (AVObject review) =>
+{
+    var updatedKeys = review.GetUpdatedKeys();
+    if (updatedKeys.Contains("comment"))
+    {
+        var comment = review.Get<string>("comment");
+        // code 可以自定义为任意数字
+        // message 可以自定义为任何字符串
+        if (comment.Length > 140) throw new EngineException(123, "comment 长度不得超过 140 字符");
+    }
+});
+```
 {% endblock %}
 
 {% block advancedClassHookInstancedMethod %}
