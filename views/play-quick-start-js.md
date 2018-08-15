@@ -63,10 +63,10 @@ const opts = {
   // 设置 APP Key
   appKey: YOUR_APP_KEY,
   // 设置节点地区
-  // EastChina：华东节点
-  // NorthChina：华北节点
-  // NorthAmerica：美国节点
-  region: Region.EastChina,
+  // Region.EastChina：华东节点
+  // Region.NorthChina：华北节点
+  // Region.NorthAmerica：美国节点
+  region: YOUR_APP_REGION,
 }
 play.init(opts);
 ```
