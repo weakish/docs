@@ -30,6 +30,10 @@ import {
   Region,
   // Play SDK 事件常量
   Event,
+  // 事件接收组
+  ReceiverGroup,
+  // 创建房间标志
+  CreateRoomFlag,
 } from '../play';
 ```
 
@@ -708,5 +712,19 @@ play.on(Event.ROOM_JOINED, () => {
 ```
 
 这个接口相当于 `reconnect()` 和 `rejoin()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
+
+
+
+## 错误处理
+
+在游戏过程中，可能会触发一些错误事件，开发者可以通过注册「错误事件」来处理。
+
+```javascript
+play.on(Event.Error, (err) => {
+	const { code, detail } = err;
+	// TODO 处理错误事件
+
+});
+```
 
 更多接口及详情，请参考 [API 接口](https://leancloud.github.io/Play-SDK-JS/doc/)。
