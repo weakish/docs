@@ -63,7 +63,9 @@ AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
 
 // 如果在浏览器中使用 script 标签的方式，需要引入 av-live-query-min.js：
 // 推荐使用 CDN：
-<script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-live-query-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-live-query-min.js"></script>
+
+更多环境下的安装方式，请参考 [JavaScript SDK 安装文档](sdk_setup-js.html)。
 
 {{ parts.debugLiveQuery(true) }}
 ```
@@ -142,7 +144,7 @@ doingQuery.findInBackground(new FindCallback<AVObject>() {
 });
 ```
 ```js
-doingQuery.find(function(doingList) {
+doingQuery.find().then(function(doingList) {
   // 展示 doingList
 });
 ```
@@ -447,7 +449,7 @@ liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
 });
 ```
 ```js
-liveQuery.on('update', function(updatedDoingItem, updatedKeys) {
+liveQuery.on('enter', function(updatedDoingItem, updatedKeys) {
   // 将 doingList 中对应的 doingItem 替换成 updatedDoingItem
 });
 ```
