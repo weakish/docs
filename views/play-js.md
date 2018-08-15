@@ -400,7 +400,7 @@ play.setRoomOpened(false);
 play.setRoomVisible(false);
 ```
 
-### MasterClient
+## MasterClient
 
 为了不依赖于服务端而更快速地开发实时对战游戏，我们引入了 **MasterClient** 的概念，即承担「逻辑运算功能」的特殊客户端。
 
