@@ -60,6 +60,22 @@ LeanCloud 云端对客户端发过来的每一个请求都要进行了用户身�
     
     [post saveInBackground];
 ```
+```swift
+    let post = AVObject(className: "Post")
+    post["title"] = "大家好，我是新人"
+
+    let acl = AVACL()
+
+    acl.setPublicReadAccess(true)
+
+    if let currentUser = AVUser.current() {
+        acl.setWriteAccess(true, for: currentUser)
+    }
+
+    post.acl = acl
+
+    post.save()
+```
 ```java
   AVObject post=new AVObject("Post");
   post.put("title","大家好，我是新人");
@@ -159,6 +175,40 @@ post.save()
             NSLog(@"error");
         }
     }];
+```
+```swift
+    let query = AVUser.query()
+
+    query.whereKey("objectId", equalTo: "55f1572460b2ce30e8b7afde")
+
+    query.findObjectsInBackground { objects, error in
+        if let error = error {
+            print(error)
+        } else {
+            let post = AVObject(className: "Post")
+
+            post["title"] = "这是我的第二条发言，谢谢大家！"
+            post["content"] = "我最近喜欢看足球和篮球了。"
+
+            let acl = AVACL()
+
+            // Anyone can read this post.
+            acl.setPublicReadAccess(true)
+
+            // Current user and another user can manage this post.
+            if let currentUser = AVUser.current() {
+                acl.setWriteAccess(true, for: currentUser)
+            }
+
+            if let anotherUser = objects?.first as? AVUser {
+                acl.setWriteAccess(true, for: anotherUser)
+            }
+
+            post.acl = acl
+
+            post.save()
+        }
+    }
 ```
 ```java
   AVQuery<AVUser> query = AVUser.getQuery();
@@ -336,6 +386,23 @@ post.save()
     [[administratorRole users] addObject: [AVUser currentUser]];
     [administratorRole saveInBackground];
 ```
+```swift
+let roleACL = AVACL()
+
+    roleACL.setPublicReadAccess(true)
+
+    if let currentUser = AVUser.current() {
+        roleACL.setWriteAccess(true, for: currentUser)
+    }
+
+    let administratorRole = AVRole(name: "Administrator", acl: roleACL)
+
+    if let currentUser = AVUser.current() {
+        administratorRole.users().add(currentUser)
+    }
+
+    administratorRole.save()
+```
 ```java
   // 新建一个针对角色本身的 ACL
   AVACL roleACL=new AVACL();
@@ -415,6 +482,32 @@ administrator_role.save()  # 保存
             [post saveInBackground];
         }];
     }];
+```
+```swift
+    let roleQuery = AVRole.query()
+    let post = AVObject(className: "Post")
+
+    post["title"] = "夏天吃什么夜宵比较爽？"
+    post["content"] = "求推荐啊！"
+
+    roleQuery.getObjectInBackground(withId: "55fc0eb700b039e44440016c") { object, error in
+        guard let administratorRole = object as? AVRole else {
+            return
+        }
+        let acl = AVACL()
+
+        acl.setPublicReadAccess(true)
+
+        acl.setWriteAccess(true, for: administratorRole)
+
+        if let currentUser = AVUser.current() {
+            acl.setWriteAccess(true, for: currentUser)
+        }
+
+        post.acl = acl
+
+        post.save()
+    }
 ```
 ```java
   // 新建一个帖子对象
@@ -538,6 +631,34 @@ post.save()
         }
     }];
 ```
+```swift
+    let roleQuery = AVRole.query()
+
+    roleQuery.whereKey("name", equalTo: "Administrator")
+
+    roleQuery.findObjectsInBackground { (objects, error) in
+        guard let currentUser = AVUser.current() else {
+            return
+        }
+
+        if let administrator = objects?.first as? AVRole {
+            roleQuery.whereKey("users", equalTo: currentUser)
+
+            roleQuery.findObjectsInBackground { objects, error in
+                if let _ = objects?.first as? AVRole {
+                    print("Current user is already an administrator.")
+                } else {
+                    administrator.users().add(currentUser)
+                    administrator.save()
+                }
+            }
+        } else {
+            let administrator = AVRole(name: "Administrator")
+            administrator.users().add(currentUser)
+            administrator.save()
+        }
+    }
+```
 ```java
   final AVQuery<AVRole> roleQuery =new AVQuery<AVRole>("_Role");
   roleQuery.whereEqualTo("name","Administrator");
@@ -644,6 +765,30 @@ else:
         }
     }];
 ```
+```swift
+    let roleQuery = AVRole.query()
+
+    roleQuery.whereKey("name", equalTo: "Moderator")
+
+    roleQuery.findObjectsInBackground { (objects, error) in
+        guard
+            let currentUser = AVUser.current(),
+            let moderatorRole = objects?.first as? AVRole
+        else {
+            return
+        }
+
+        roleQuery.whereKey("users", equalTo: currentUser)
+
+        roleQuery.findObjectsInBackground { (objects, error) in
+            guard let _ = objects?.first else {
+                return
+            }
+            moderatorRole.users().remove(currentUser)
+            moderatorRole.save()
+        }
+    }
+```
 ```java
   final AVQuery<AVRole> roleQuery=new AVQuery<AVRole>("_Role");
   roleQuery.whereEqualTo("name","Moderator");
@@ -742,6 +887,23 @@ else:
         }];
     }];
 ```
+```swift
+    let roleQuery = AVRole.query()
+
+    roleQuery.whereKey("name", equalTo: "Administrator")
+
+    roleQuery.findObjectsInBackground { (roles, error) in
+        guard let administrator = roles?.first as? AVRole else {
+            return
+        }
+
+        let userQuery = administrator.users().query()
+
+        userQuery.findObjectsInBackground { (users, error) in
+            // users 就是拥有该角色权限的所有用户了。
+        }
+    }
+```
 ```java
   AVQuery<AVRole> roleQuery=new AVQuery<AVRole>("_Role");
   roleQuery.whereEqualTo("name", "Administrator");
@@ -815,6 +977,23 @@ else:
         // avRoles 就是一个 AVRole 的数组，这些 AVRole 就是当前用户所在拥有的角色
     }];
 ```
+```swift
+    guard let user = AVUser.current() else {
+        return
+    }
+
+    user.getRolesInBackground { (roles, error) in
+        // avRoles 就是一个 AVRole 的数组，这些 AVRole 就是当前用户所在拥有的角色
+    }
+
+    // 第二种是通过构建 AVQuery
+    let roleQuery = AVRole.query()
+
+    roleQuery.whereKey("users", equalTo: user)
+    roleQuery.findObjectsInBackground { (roles, error) in
+        // avRoles 就是一个 AVRole 的数组，这些 AVRole 就是当前用户所在拥有的角色
+    }
+```
 ```java
   // 第一种方式是通过 AVUser 内置的接口：
   user.getRolesInBackground(new FindCallback<AVRole>() {
@@ -874,6 +1053,15 @@ role_query_list = role_query.find()  # 返回当前用户的角色列表
         // objects 就是拥有 moderatorRole 角色的所有用户了。
     }];
 ```
+```swift
+    let moderatorRole = <#An AVRole#>   //根据 id 查询或者根据 name 查询出一个实例
+    let userRelation = moderatorRole.users()
+    let userQuery = userRelation.query()
+
+    userQuery.findObjectsInBackground { (objects, error) in
+        // objects 就是拥有 moderatorRole 角色的所有用户了。
+    }
+```
 ```java
   AVRole moderatorRole= new AVRole("Moderator"); //根据 id 查询或者根据 name 查询出一个实例
   AVRelation<AVUser> userRelation= moderatorRole.getUsers();
@@ -927,6 +1115,13 @@ user_list = user_relation.query.find()  # 根据 relation 查找所包含的用�
     /**
      * 以上用同步方法是为了保证在调用 [[moderator roles] addObject:administratorRole] 之前 administratorRole 和 moderator 都已保存在服务端
      **/
+```
+```swift
+    let administratorRole: AVRole = <#An AVRole#>    // 从服务端查询出 Administrator 角色实例
+    let moderatorRole: AVRole = <#An AVRole#>    //从服务端查询出 Moderator 角色实例
+
+    moderatorRole.roles().add(administratorRole)
+    moderatorRole.save()
 ```
 ```java
   AVRole administratorRole = // 从服务端查询 Administrator 实例
@@ -1017,6 +1212,47 @@ moderator_role.save()
         [mobilePost saveInBackground];
         [digitalPost saveInBackground];
     }];
+```
+```swift
+    let photographicRole: AVRole = <#An Role#>
+    let mobileRole: AVRole = <#An Role#>
+    let digitalRole: AVRole = <#An Role#>
+
+    digitalRole.roles().add(photographicRole)
+    digitalRole.roles().add(mobileRole)
+
+    digitalRole.saveInBackground { (succeeded, error) in
+        guard succeeded else {
+            return
+        }
+
+        let photographicPost = AVObject(className: "Post")
+        let photographicACL = AVACL()
+
+        photographicACL.setPublicReadAccess(true)
+        photographicACL.setWriteAccess(true, for: photographicRole)
+        photographicPost.acl = photographicACL
+
+        let mobilePost = AVObject(className: "Post")
+        let mobileACL = AVACL()
+
+        mobileACL.setPublicReadAccess(true)
+        mobileACL.setWriteAccess(true, for: mobileRole)
+        mobilePost.acl = mobileACL
+
+        let digitalPost = AVObject(className: "Post")
+        let digitalACL = AVACL()
+
+        digitalACL.setPublicReadAccess(true)
+        digitalACL.setWriteAccess(true, for: digitalRole)
+        digitalPost.acl = digitalACL
+
+        AVObject.saveAll([
+            photographicPost,
+            mobilePost,
+            digitalPost]
+        )
+    }
 ```
 ```java
     // 新建 3个角色实例
@@ -1255,6 +1491,13 @@ query.includeACL = YES;
 [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         
 }];
+```
+```swift
+    let query = AVQuery(className: "Todo")
+
+    query.includeACL = true
+    query.findObjectsInBackground { (objects, error) in
+    }
 ```
 ```java
 AVQuery<AVObject> query = new AVQuery<>("Todo");
