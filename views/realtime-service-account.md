@@ -23,10 +23,41 @@
 客户端可以通过在查询对话列时，传入 sys = ture 的参数来获取系统对话列表，为之后的订阅操作做准备：
 
 ```objc
+AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+[client openWithCallback:^(BOOL success, NSError *error) {
+    if (success) {
+        AVIMConversationQuery *query = client.conversationQuery;
+        [query whereKey:@"sys" equalTo:@(true)];
+        [query findConversationsWithCallback:^(NSArray<AVIMConversation *> * _Nullable conversations, NSError * _Nullable error) {
+            if (conversations && conversations.count > 0) {
+                // handle it
+            }
+        }];
+    }
+}];
 ```
 ```java
+ AVIMClient avimClient = AVIMClient.getInstance("Tom");
+        avimClient.open(new AVIMClientCallback() {
+            @Override
+            public void done(AVIMClient avimClient, AVIMException e) {
+                AVIMConversationsQuery avimConversationsQuery = avimClient.getConversationsQuery();
+                avimConversationsQuery.whereEqualTo("sys",true);
+                avimConversationsQuery.findInBackground(new AVIMConversationQueryCallback() {
+                    @Override
+                    public void done(List<AVIMConversation> list, AVIMException e) {
+                        if (e == null){
+
+                        }else {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
 ```
 ```js
+// 待补充
 ```
 
 
@@ -59,14 +90,36 @@ AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
 }];
 ```
 ```java
-AVIMServiceConversation sc = imClient.getServiceConversation("convId");
-sc.subscribe(new AVIMConversationCallback() {
-  @Override
-  public void done(AVIMException e) {
-  }
+AVIMClient avimClient = AVIMClient.getInstance("Tom");
+avimClient.open(new AVIMClientCallback() {
+    @Override
+    public void done(AVIMClient avimClient, AVIMException e) {
+        AVIMConversationsQuery avimConversationsQuery = avimClient.getServiceConversationQuery();
+        avimConversationsQuery.whereEqualTo("objectId", "Service Conversation ID");
+        avimConversationsQuery.findInBackground(new AVIMConversationQueryCallback() {
+            @Override
+            public void done(List<AVIMConversation> list, AVIMException e) {
+                if (list.get(0) instanceof AVIMServiceConversation) {
+                    ((AVIMServiceConversation) list.get(0)).subscribe(new AVIMConversationCallback() {
+                        @Override
+                        public void done(AVIMException e) {
+                            if (e == null) {
+
+                            } else {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 });
 ```
 ```js
+// 待补充
 ```
 
 ## 接收消息
@@ -113,6 +166,7 @@ sc.unsubscribe(new AVIMConversationCallback() {
 });
 ```
 ```js
+// 待补充
 ```
 
 ## FAQ
@@ -123,7 +177,7 @@ A: 完全可以，我们封装这个对象的原因就是要解决这种需求�
 
 Q: 服务号有订阅人数上限么？
 
-A: 最高支持 5000 个人。
+A: 无上限。
 
 Q: 服务号可以创建多少个？
 

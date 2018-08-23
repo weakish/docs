@@ -57,6 +57,7 @@ public void done(AVIMException ex) {
 });
 ```
 ```js
+// 待补充
 ```
 
 ## 查询聊天室
@@ -93,6 +94,7 @@ public void done(List<AVIMConversation> conversations, AVIMException e) {
 });
 ```
 ```js
+// 待补充
 ```
 
 ## 加入聊天室
@@ -146,6 +148,7 @@ AVIMChatRoom room = (AVIMChatRoom) LCChatKit.getInstance().getClient().getChatRo
       });
 ```
 ```js
+// 待补充
 ```
 
 
