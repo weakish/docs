@@ -353,7 +353,8 @@ Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
 - 直播中的弹幕聊天室
 - 游戏 GM 在线群发通知
 
-关于上述的几种场景对应的实现，请参阅[进阶功能#通讯模式](realtime-guide-intermediate.html#通讯模式)
+
+关于上述的几种场景对应的实现，请参阅[进阶功能#通讯模式](realtime-guide-intermediate.html#通讯模式)
 
 ## 消息
 
