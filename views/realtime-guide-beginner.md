@@ -165,19 +165,19 @@ jerry.on(Event.MESSAGE, function(message, conversation) {
 而当 Tom 创建了对话之后，Jerry 会这一端会立即触发 `Event.INVITED`，此时客户端可以做出一些 UI 展示，引导用户加载聊天的界面，紧接着 Tom 发送了消息，则会触发 Jerry `Event.MESSAGE`，这个时候就可以直接在聊天界面的消息列表里面渲染这条消息了。
 
 
-## 聊天模式
-
-即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景我们可能会有如下几种典型的通讯模式：
-
-- 一对一的单聊(前一章节已做介绍)
-- 多对多的群组聊天
-- 系统管理员的在线通知，也就是现在普遍被使用的服务号，公众号等
-
-在 LeanCloud 即时通讯的内部，我们将上述场景统一称为「对话」，下面我们从最简单的一对一私聊开始完整地学习创建对话/互发消息/离开对话：
-
-### 多人群聊
+## 多人群聊
 
 多人群聊与单聊十分接近，只是在现有的对话上继续加入新的成员就可以实现多人群聊了：
+
+### 1.创建多人群聊对话
+
+多人群聊的对话可以通过如下两种方式实现：
+
+1. **向一对一单聊对话中添加更多成员，将其转化成一个群聊**
+2. **重新创建一个对话，并在创建的时候指定至少为 2 的成员数量**
+
+
+首先我们实现第一种方式： **向一对一单聊对话中添加更多成员，将其转化成一个群聊**，将其转化成一个群聊。
 
 Tom 的代码做如下修改：
 
@@ -188,12 +188,12 @@ realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
   // 创建与Jerry之间的对话
   return tom.createConversation({
-    members: ['Jerry'],
+    members: ['Jerry','Mary'],
     name: 'Tom & Jerry',
   });
 }).then(function(conversation) {
   // 发送消息
-  return conversation.send(new TextMessage('耗子，起床！'));
+  return conversation.send(new TextMessage('Jerry，起床了！'));
 }).then(function(message) {
   console.log('Tom & Jerry', '发送成功！');
   return conversation.add(['Mary']);
@@ -230,7 +230,43 @@ realtime.createIMClient('Jerry').then(function(jerry) {
 
 ![rtm-member-add-seq](images/rtm-member-add-seq.svg)
 
-### 成员变更
+而 Mary 如果在另一台设备上登录了，Ta 可以参照[一对一单聊](#一对一单聊)中 Jerry 的做法监听 `Event.INVITED` 事件，就可以自己被邀请到了一个对话当中。
+
+而**重新创建一个对话，并在创建的时候指定至少为 2 的成员数量**的方式如下：
+
+```js
+var { TextMessage } = require('leancloud-realtime');
+// Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
+realtime.createIMClient('Tom').then(function(tom) {
+  // 成功登录
+  // 创建与 Jerry,Mary 的多人群聊
+  return tom.createConversation({
+    // 创建的时候直接指定 Jerry 和 Mary 一起加入多人群聊，当然根据需求可以添加更多成员
+    members: ['Jerry','Mary'],
+    // 对话名称
+    name: 'Group channel',
+  });
+}).catch(console.error);
+```
+
+### 2.群发消息
+
+之前也介绍过，我们再次重申一下对话的含义：
+
+> 群聊和单聊一样，对话就是才是聊天通讯的核心，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
+
+Tom 向群聊对话发送了消息：
+
+
+```js
+conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对话'));
+```
+
+而 Jerry 和 Mary 都会触发 `Event.MESSAGE` 事件，来接收群聊消息。
+
+
+### 3.成员变更
+
 刚才的代码演示的是添加新成员，而对应的删除成员的代码如下：
 
 Tom 又把 Mary 踢出对话了:
@@ -266,6 +302,14 @@ realtime.createIMClient('William').then(function(william) {
 
 ![rtm-join-conv-seq](images/rtm-join-conv-seq.svg)
 
+其他人则通过订阅 `MEMBERS_JOINED` 来接收 William 加入对话的通知:
+
+```js
+  jerry.on(Event.MEMBERS_JOINED, function membersjoinedEventHandler(payload, conversation) {
+      console.log(payload.members, payload.invitedBy, conversation.id);
+  });
+```
+
 Jerry 不想继续呆在这个对话里面了，他选择退出对话:
 
 ```js
@@ -274,9 +318,42 @@ conversation.quit().then(function(conversation) {
   // 退出成功 ['William', 'Tom']
 }).catch(console.error.bind(console));
 ```
+
 执行了这段代码之后会触发如下流程：
 
 ![rtm-leave-conv-seq](images/rtm-leave-conv-seq.svg)
+
+而其他人需要通过订阅 `MEMBERS_LEFT` 来接收 Jerry 离开对话的事件通知:
+
+```js
+  mary.on(Event.MEMBERS_LEFT, function membersLeftEventHandler(payload, conversation) {
+      console.log(payload.members, payload.invitedBy, conversation.id);
+  });
+```
+
+### 成员变更的事件通知总结
+
+前面的时序图和代码针对成员变更的操作做了逐步的分析和阐述，为了确保开发者能够准确的使用事件通知，如下表格做了一个统一的归类和划分:
+
+假设 Tom 和 Jerry 已经在对话内了：
+
+操作|Tom|Jerry|Mary|William
+--|--|--|--
+Tom 添加 Mary|`MEMBERS_JOINED`|`MEMBERS_JOINED`|`INVITED`|/
+Tom 剔除 Mary|`MEMBERS_LEFT`|`MEMBERS_LEFT`|`KICKED`|/
+William 加入|`MEMBERS_JOINED`|`MEMBERS_JOINED`|/|`MEMBERS_JOINED`
+Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
+
+
+### 其他聊天模式
+
+即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外,即时通讯也支持如下中流星的通讯模式：
+
+- 服务号，公众号等
+- 直播中的弹幕聊天室
+- 游戏 GM 在线群发通知
+
+关于上述的几种场景对应的实现，请参阅[进阶功能#通讯模式](realtime-guide-intermediate.html#通讯模式)
 
 ## 消息
 
@@ -312,7 +389,7 @@ file.save().then(function() {
 }).catch(console.error.bind(console));
 ```
 
-更多消息类型请点击[进阶功能#消息类型](realtime-guide-intermediate.html)
+更多消息类型请点击[进阶功能#消息类型](realtime-guide-intermediate.html#消息类型)
 
 ## 消息记录
 
