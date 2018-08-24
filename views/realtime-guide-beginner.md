@@ -3,12 +3,21 @@
 
 # 即时通讯开发指南 &middot; 基础入门
 
-## 即时通讯要解决的需求
+## 应用场景和需求
+
+针对如下应用场景，即时通讯都有对应的解决方案：
 
 - 社交应用需要接入聊天功能
 - 游戏需要接入聊天频道
 - 直播应用要接入聊天室弹幕服务
-- 系统广播消息在线通知
+- 系统广播消息在线通知，游戏 GM 在线全服广播
+
+而上述只是一些比较经典和流行的场景，即时通讯不局限于上述用法和场景，我们提供的易用性支持开发者可以拓展更多的场景和模式。
+
+即时通讯要解决的核心需求就是:
+
+> 让你的应用/软件/网站/小程序/游戏拥有私聊/群聊/聊天室/系统消息等通讯能力
+
 
 即时通讯使得开发者可以在不编写服务端的代码的情况下，仅使用客户端 SDK 即可实现在线聊天/多人群组/私聊/消息群发等实时通讯的功能，如下时序图简单的介绍了一下即时通讯的业务流程：
 
@@ -28,33 +37,68 @@
 
 > 假设我们正在制作一个社交聊天的应用，第一步要实现一个用户向另一个用户发起聊天的功能
 
-### 1.建立连接
+首先我们需要介绍一下在即时通讯服务中的  `AVIMClient` 对象：
+
+> `AVIMClient` 对应实体的是一个用户，它表示一个用户以客户端的身份登录到整个即时通讯的系统。
+
+
+### 1.创建 AVIMClient
+
+在 iOS 和 Android SDK 中使用如下代码创建出一个 `AVIMClient`:
+
+```objc
+@property (nonatomic, strong) AVIMClient *client;
+// clientId 为 Tom
+self.client = [[AVIMClient alloc] initWithClientId:@"Tom"]
+```
+```java
+// clientId 为 Tom
+AVIMClient tom = AVIMClient.getInstance("Tom");
+```
+
+示例代码中 `clientId` 被设置为 Tom, 这里我们需要明确一下 `clientId` 的约束：
+
+1. 它必须为一个字符串
+2. 在一个应用内全局唯一
+3. 长度不能超过 128 个字符
+
+创建完毕之后，`AVIMClient` 的处于未初始化的状态，如果想收发消息我们需要让客户端与云端建立一个长连接。
+
+注： JavaScript 和 C#(Unity3D) SDK 不需要创建 AVIMClient，直接看下一章节[建立连接](#建立连接)
+
+### 2.建立连接
 
 建立连接的含义是：
 
-> 在客户端设置一个全局唯一字符串类型的 ID（例如 Tom），然后调用 SDK 的方法建立与服务端的长连接
+> `AVIMClient` 建立一个于云端的长连接，然后就可以开始收发消息了，并且可以监听事件。
+
 
 对应的 SDK 方法如下：
 
 ```js
 var AV = require('leancloud-storage');
-var { Realtime,TextMessage } = require('leancloud-realtime');
+var { Realtime } = require('leancloud-realtime');
 // Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
 }).catch(console.error);
 ```
 
-推荐使用的方式：在用户登录之后用当前的用户名当做 `clientId` 建立连接。
+注：JavaScript 和 C#(Unity3D) SDK 建立连接成功之后，会返回一个 `AVIMClient`。
 
-### 2.创建对话
+推荐使用的方式：在用户登录之后用当前的用户名当做 `clientId` 来创建 `AVIMClient` 并建立连接。
 
-对话是即时通讯抽象出来的概念，它是客户端之间互发消息的载体，可以理解为一个通道，所有在这个对话内的成员都可以在这个对话内收发消息。
+我们推荐在连接创建成功之后订阅[客户端事件与网络状态响应](#客户端事件与网络状态响应)，针对网络的异常情况作出应有的 UI 展示，以确保应用的健壮性。
 
-Tom 已经建立了连接，因此他需要一个对话来发送消息给 Jerry：
+### 3.创建对话 AVIMConversation
+
+对话(`AVIMConversation`) 是即时通讯抽象出来的概念，它是客户端之间互发消息的载体，可以理解为一个通道，所有在这个对话内的成员都可以在这个对话内收发消息:
+
+> 对话(`AVIMConversation`)对话是消息的载体，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
+
+Tom 已经建立了连接，因此他需要创建一个 `AVIMConversation` 来发送消息给 Jerry：
 
 ```js
-var { TextMessage } = require('leancloud-realtime');
 // om 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
@@ -81,8 +125,14 @@ return tom.createConversation({
 
 `createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 _Conversation 表内，可以打开控制台->存储查看数据。
 
+`createConversation` 的参数详解:
 
-### 3.发送消息
+1. `members` : 字符串数组，必要参数，对话的初始成员(clientId)列表，默认包含当前 clientId
+2. `name`: 字符串，可选参数，对话的名字，如果不传默认值为 null
+3. `unique`： bool 类型，可选参数，是否唯一对话，当其为 true 时，如果当前已经有相同成员的对话存在则返回该对话，否则会创建新的对话
+
+
+### 4.发送消息
 
 对话已经创建成功了，接下来 Tom 可以发出第一条消息了：
 
@@ -99,6 +149,7 @@ realtime.createIMClient('Tom').then(function(tom) {
     name: 'Tom & Jerry',
   });
 }).then(function(conversation) {
+  // 本章节关键代码：
   // 发送一条最简单的文本消息
   return conversation.send(new TextMessage('Jerry，起床了！'));
 }).then(function(message) {
@@ -109,13 +160,22 @@ realtime.createIMClient('Tom').then(function(tom) {
 再次比对前一章节代码，修改的关键片段如下:
 
 ```js
-  // 发送一条最简单的文本消息
-  return conversation.send(new TextMessage('Jerry，起床了！'));
+// 发送一条最简单的文本消息
+conversation.send(new TextMessage('Jerry，起床了！'));
 ```
 
-`conversation.send` 接口实现的功能就是向对话中发送一条消息，而 Jerry 只要在线他就会收到消息，至此 Jerry 还没有登场，那么他怎么接收消息呢？
+`conversation.send` 接口实现的功能就是向对话中发送一条消息，它的参数解释如下:
+
+1. `transient`: 是否作为暂态消息发送
+2. `receipt`:	bool,	可选参数，是否需要回执，仅在普通对话中有效
+3. `will`:	bool,	可选参数是否指定该消息作为「掉线消息」发送， 「掉线消息」会延迟到当前用户掉线后发送，常用来实现「下线通知」功能
+4. `priority`:枚举, 消息优先级，仅在暂态对话中有效
+5. `pushData`: 字典类型, 消息对应的离线推送内容，如果消息接收方不在线，会推送指定的内容。
+
+
+Jerry 只要在线他就会收到消息，至此 Jerry 还没有登场，那么他怎么接收消息呢？
 
-### 4.接收消息
+### 5.接收消息
 
 我们在另一个设备上启动应用，然后使用 Jerry 当做 `clientId` 建立连接:
 
@@ -164,6 +224,9 @@ jerry.on(Event.MESSAGE, function(message, conversation) {
 
 而当 Tom 创建了对话之后，Jerry 会这一端会立即触发 `Event.INVITED`，此时客户端可以做出一些 UI 展示，引导用户加载聊天的界面，紧接着 Tom 发送了消息，则会触发 Jerry `Event.MESSAGE`，这个时候就可以直接在聊天界面的消息列表里面渲染这条消息了。
 
+对应的时序图如下:
+
+![rtm-member-invite-seq](images/rtm-member-invite-seq.svg)
 
 ## 多人群聊
 
@@ -173,51 +236,29 @@ jerry.on(Event.MESSAGE, function(message, conversation) {
 
 多人群聊的对话可以通过如下两种方式实现：
 
-1. **向一对一单聊对话中添加更多成员，将其转化成一个群聊**
+1. **向现有对话中添加更多成员**
 2. **重新创建一个对话，并在创建的时候指定至少 2 名成员**
 
 
-首先我们实现第一种方式： **向一对一单聊对话中添加更多成员，将其转化成一个群聊**，将其转化成一个群聊。
+首先我们实现第一种方式： **向现有对话中添加更多成员**，将其转化成一个群聊。
 
 Tom 的代码做如下修改：
 
 ```js
-var { TextMessage } = require('leancloud-realtime');
-// Tom 用自己的名字作为 clientId，获取 IMClient 对象实例
-realtime.createIMClient('Tom').then(function(tom) {
-  // 成功登录
-  // 创建与Jerry之间的对话
-  return tom.createConversation({
-    members: ['Jerry','Mary'],
-    name: 'Tom & Jerry',
-  });
-}).then(function(conversation) {
-  // 发送消息
-  return conversation.send(new TextMessage('Jerry，起床了！'));
-}).then(function(message) {
-  console.log('Tom & Jerry', '发送成功！');
+tom.getConversation(CONVERSATION_ID).then(function(conversation) {
   return conversation.add(['Mary']);
-})then(function(conversation) {
-  console.log('Mary 添加成功', conversation.members);
-  // 添加成功 ['Bob', 'Harry', 'William', 'Tom', 'Mary']
+}).then(function(conversation) {
+  console.log('添加成功', conversation.members);
+  // 此时对话成员为: ['Mary', 'Tom', 'Jerry']
 }).catch(console.error.bind(console));
 ```
 
-而 Jerry 的代码需要做如下修改他就也能随时知道当前对话还有谁加进来了：
+而 Jerry 添加如下代码也能随时知道当前对话还有谁加进来了：
 
 ```js
 var { Event } = require('leancloud-realtime');
 // Jerry 登录
 realtime.createIMClient('Jerry').then(function(jerry) {
-    // 当前用户被添加至某个对话
-    jerry.on(Event.INVITED, function invitedEventHandler(payload, conversation) {
-        console.log(payload.invitedBy, conversation.id);
-    });
-
-    // 当前用户收到了某一条消息
-    jerry.on(Event.MESSAGE, function(message, conversation) {
-        console.log('Message received: ' + message.text);
-
     // 有用户被添加至某个对话
     jerry.on(Event.MEMBERS_JOINED, function membersjoinedEventHandler(payload, conversation) {
         console.log(payload.members, payload.invitedBy, conversation.id);
@@ -225,6 +266,12 @@ realtime.createIMClient('Jerry').then(function(jerry) {
   });
 }).catch(console.error);
 ```
+
+其中 payload 参数包含如下:
+
+1. `members`: 字符串数组, 被添加的用户 clientId 列表
+2. `invitedBy`	字符串, 邀请者 clientId
+
 
 如下时序图可以简单的概括上述流程：
 
@@ -235,7 +282,6 @@ realtime.createIMClient('Jerry').then(function(jerry) {
 而**重新创建一个对话，并在创建的时候指定至少为 2 的成员数量**的方式如下：
 
 ```js
-var { TextMessage } = require('leancloud-realtime');
 // Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
@@ -244,16 +290,14 @@ realtime.createIMClient('Tom').then(function(tom) {
     // 创建的时候直接指定 Jerry 和 Mary 一起加入多人群聊，当然根据需求可以添加更多成员
     members: ['Jerry','Mary'],
     // 对话名称
-    name: 'Group channel',
+    name: '一个群聊',
   });
 }).catch(console.error);
 ```
 
 ### 2.群发消息
 
-之前也介绍过，我们再次重申一下对话的含义：
-
-> 群聊和单聊一样，对话是聊天通讯的核心，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
+群聊和单聊一样，对话中的成员都会接收到对话内产生的消息。
 
 Tom 向群聊对话发送了消息：
 
@@ -265,7 +309,7 @@ conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对�
 而 Jerry 和 Mary 都会触发 `Event.MESSAGE` 事件，来接收群聊消息。
 
 
-### 3.成员变更
+### 将他人踢出对话
 
 刚才的代码演示的是添加新成员，而对应的删除成员的代码如下：
 
@@ -285,7 +329,9 @@ realtime.createIMClient('Tom').then(function(tom) {
 
 ![rtm-member-remove-seq](images/rtm-member-remove-seq.svg)
 
-紧接着 William 通过 conversation id 他自己主动加入对话：
+### 加入对话
+
+紧接着 William 通过 CONVERSATION_ID 他自己主动加入对话：
 
 ```js
 realtime.createIMClient('William').then(function(william) {
@@ -309,6 +355,7 @@ realtime.createIMClient('William').then(function(william) {
       console.log(payload.members, payload.invitedBy, conversation.id);
   });
 ```
+### 退出对话
 
 Jerry 不想继续呆在这个对话里面了，他选择退出对话:
 
@@ -347,11 +394,11 @@ Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
 
 ### 其他聊天模式
 
-即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外,即时通讯也支持如下中流星的通讯模式：
+即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外,即时通讯也支持但不限于如下中流行的通讯模式：
 
-- 服务号，公众号等
-- 直播中的弹幕聊天室
-- 游戏 GM 在线群发通知
+- 唯一聊天室
+- 开放聊天室，例如直播中的弹幕聊天室。
+- 服务号，例如公众号，游戏 GM 在线群发通知
 
 
 关于上述的几种场景对应的实现，请参阅[进阶功能#通讯模式](realtime-guide-intermediate.html#通讯模式)
@@ -400,11 +447,11 @@ query.limit(10).contains('name', 'NBA').find().then(function(conversations) {
 
 消息的类型有很多种，使用最多的就是文本消息，其次是图像消息，还有一些短语音/短视频消息，文本消息和其他消息类型有本质的区别:
 
-<div class="callout callout-info">文本消息发送的就是本身的内容，而其他多媒体消息，例如一张图片实际上发送的是一个指向图像的链接</div>
+<div class="callout callout-info">文本消息发送的就是本身的内容，而其他多媒体消息，例如一张图片实际上发送的是一个指向图像的链接，而图像本身的物理文件内容会被 SDK 持久化存储在云端文件存储服务中</div>
 
 ### 图像消息
 
-文本消息前面的示例代码已经有了，不做过多解释，我们从发送一张图片消息的生命周期的时序图来了解整个过程：
+我们从发送一张图片消息的生命周期的时序图来了解整个过程：
 
 ![rtm-image-message-send-seq](images/rtm-image-message-send-seq.svg)
 
