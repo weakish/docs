@@ -253,7 +253,7 @@ realtime.createIMClient('Tom').then(function(tom) {
 
 之前也介绍过，我们再次重申一下对话的含义：
 
-> 群聊和单聊一样，对话就是才是聊天通讯的核心，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
+> 群聊和单聊一样，对话是聊天通讯的核心，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
 
 Tom 向群聊对话发送了消息：
 
@@ -356,6 +356,46 @@ Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
 
 关于上述的几种场景对应的实现，请参阅[进阶功能#通讯模式](realtime-guide-intermediate.html#通讯模式)
 
+
+## 对话
+
+一个聊天应用在首页往往会展示当前用户加入的，最活跃的几个对话。
+
+### 获取对话列表
+
+```js
+tom.getQuery().containsMembers(['Tom']).find().then(function(conversations) {
+  // 默认按每个对话的最后更新日期（收到最后一条消息的时间）倒序排列
+  conversations.map(function(conversation) {
+    console.log(conversation.lastMessageAt.toString(), conversation.members);
+  });
+}).catch(console.error.bind(console));
+```
+
+上述代码默认返回最近活跃的 10 个对话，若要更改返回对话的数量，请设置 limit 值。
+
+```js
+var query = tom.getQuery();
+query.limit(20).containsMembers(['Tom']).find().then(function(conversations) {
+  console.log(conversations.length);
+}).catch(console.error.bind(console));
+```
+
+### 根据关键字查询
+
+在某些场景下，我们需要根据对话的一些特性来做查找，比如我要查找名字里包含 NBA 的对话:
+
+```js
+ar query = tom.getQuery();
+query.limit(10).contains('name', 'NBA').find().then(function(conversations) {
+  console.log(conversations.length);
+}).catch(console.error.bind(console));
+```
+
+### 更多查询方式
+
+关于上述的几种场景对应的实现，请参阅[进阶功能#对话的查询](realtime-guide-intermediate.html#对话的查询)
+
 ## 消息
 
 消息的类型有很多种，使用最多的就是文本消息，其次是图像消息，还有一些短语音/短视频消息，文本消息和其他消息类型有本质的区别:
@@ -389,6 +429,12 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
+
+### 多媒体消息
+
+与图像消息一样，多媒体消息消息本身的物理文件的内容会先试用 `AVFile` 存储在云端，然后发送云端链接到对话当中，而在接收方的客户端只要对链接做一些处理，根据消息的类型不同做不同的 UI 展现，例如语音消息可以做成一个小按钮，用户点击之后就播放语音，而视频消息则是一张视频截图，用户点击之后播放视频，诸如此类。
+
+### 其他类型消息
 
 更多消息类型请点击[进阶功能#消息类型](realtime-guide-intermediate.html#消息类型)
 
@@ -436,7 +482,23 @@ messageIterator.next().then(function(result) {
 }).catch(console.error.bind(console));
 ```
 
-### 按照消息类型拉取
+### 进入对话之后显示最近的聊天记录
+
+在客户端加载对话界面之后，第一个操作就是去加载最近的几条聊天记录（一般情况下都不会太多，比如我们设定为 10 条），那么如下的代码可以实现这个功能：
+
+假设我们有一个叫做 messageList 的控件，需要为它绑定消息列表,
+
+```js
+conversation.queryMessages({
+  limit: 10, // limit 取值范围 1~1000，默认 20
+}).then(function(messages) {
+  // 最新的十条消息，按时间增序排列
+  messageList.data = messages;
+  //sdk 已经为 messages 做好了排序，直接绑定即可
+}).catch(console.error.bind(console));
+```
+
+### 按照消息类型获取
 
 如下代码的功能是：获取所有的图像消息：
 
@@ -447,6 +509,10 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
 ```
 
 如要获取更多图像消息，可以效仿前一章节中使用 `conversation.createMessagesIterator` 接口生成迭代器来查询更多图像消息。
+
+### 更多的获取方式
+
+更多消息类型请点击[进阶功能#消息记录](realtime-guide-intermediate.html#消息记录)
 
 ## 客户端事件与网络状态响应
 
