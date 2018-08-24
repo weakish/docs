@@ -1,6 +1,6 @@
-# Play 入门教程 · Unity
+# 实时对战入门教程 · Unity
 
-欢迎使用 LeanCloud Play。本教程将模拟一个比较玩家点数大小的场景来讲解 Play SDK 的核心使用方法。
+欢迎使用 Play 实时对战。本教程将模拟一个比较玩家点数大小的场景来讲解 SDK 的核心使用方法。
 
 我们推荐通过以下方法来学习：
 
@@ -9,7 +9,7 @@
 
 ## 安装和初始化
 
-Play 客户端 SDK 是开源的，源码地址请访问：[Play-SDK-dotNET](https://github.com/leancloud/Play-SDK-dotNET)， 下载请访问 [Play-SDK-dotNET@Release](https://github.com/leancloud/Play-SDK-dotNET/releases)。
+实时对战客户端 SDK 是开源的，源码地址请访问：[Play-SDK-dotNET](https://github.com/leancloud/Play-SDK-dotNET)， 下载请访问 [Play-SDK-dotNET@Release](https://github.com/leancloud/Play-SDK-dotNET/releases)。
 
 下载之后导入到 Unity 的 `Assets/Plugins` 文件里，如下图：
 
@@ -19,9 +19,9 @@ Play 客户端 SDK 是开源的，源码地址请访问：[Play-SDK-dotNET](http
 
 ![import-play-sdk](images/link-play-init-script.png)
 
-## 连接至 Play 服务器
+## 连接至实时对战服务器
 
-在连接 Play 服务器之前请先设置用户唯一 ID，这里使用随机数作为简单示例。
+在连接服务器之前请先设置用户唯一 ID，这里使用随机数作为简单示例。
 
 ```cs
 void Start ()
@@ -37,7 +37,7 @@ void Start ()
 
 ## 创建或加入房间
 
-在连接到 Play 服务器并认证成功后，Play SDK 会回调 `OnAuthenticated()` 接口，我们在此接口中「加入或创建某个房间」。
+在连接服务器并认证成功后，实时对战 SDK 会回调 `OnAuthenticated()` 接口，我们在此接口中「加入或创建某个房间」。
 
 ```cs
 // 连接成功回调接口
@@ -52,7 +52,7 @@ public override void OnAuthenticated ()
 
 ## 通过 CustomPlayerProperties 同步玩家属性
 
-当有别的玩家加入到房间时，Play SDK 会回调 `OnNewPlayerJoinedRoom (Player player)` 接口，我们在此接口中生成随机点数，并进行点数比对。
+当有别的玩家加入到房间时，SDK 会回调 `OnNewPlayerJoinedRoom (Player player)` 接口，我们在此接口中生成随机点数，并进行点数比对。
 
 ```cs
 // 其他玩家加入回调接口

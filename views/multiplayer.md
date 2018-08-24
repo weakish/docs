@@ -1,12 +1,12 @@
-# Play 服务总览
+# 实时对战服务总览
 
-Play 是专门针对多人在线对战游戏推出的后端服务。开发者不需要自己搭建后端系统，利用 Play 云服务就可以轻松实现游戏内玩家匹配、在线对战消息同步等功能。
+实时对战是专门针对多人在线对战游戏推出的后端服务。开发者不需要自己搭建后端系统，利用云服务就可以轻松实现游戏内玩家匹配、在线对战消息同步等功能。
 
 
 ## 核心功能
-- **玩家匹配**：随机或按指定条件将玩家匹配到一起玩游戏。Play 的匹配操作会将即将一起游戏的玩家匹配到同一个房间（Room）中。例如《第五人格》、《王者荣耀》、《吃鸡》等对战类手游，玩家只需点击「自由匹配」就可以迅速匹配到其他玩家，大家进入到同一个房间中准备开始游戏；玩家也可以自己新开房间邀请好友一起玩。
+- **玩家匹配**：随机或按指定条件将玩家匹配到一起玩游戏。实时对战的匹配操作会将即将一起游戏的玩家匹配到同一个房间（Room）中。例如《第五人格》、《王者荣耀》、《吃鸡》等对战类手游，玩家只需点击「自由匹配」就可以迅速匹配到其他玩家，大家进入到同一个房间中准备开始游戏；玩家也可以自己新开房间邀请好友一起玩。
 - **多人在线对战**：客户端与服务端使用 WebSocket 通道进行实时双向通信，确保游戏内所有消息能够快速同步。
-- **游戏逻辑运算**：Play 提供了 [MasterClient](play-js.html#MasterClient) 作为客户端主机控制游戏逻辑。游戏内的所有逻辑都交给 MasterClient 来判断运转，如果 MasterClient 意外掉线，Play 会自动将网络状态最好的客户端切换为 MasterClient，确保游戏顺畅进行；开发者也可以选择在服务端编写游戏逻辑（服务端游戏逻辑支持尚在开发中）。
+- **游戏逻辑运算**：实时对战提供了 [MasterClient](multiplayer-js.html#MasterClient) 作为客户端主机控制游戏逻辑。游戏内的所有逻辑都交给 MasterClient 来判断运转，如果 MasterClient 意外掉线，实时对战会自动将网络状态最好的客户端切换为 MasterClient，确保游戏顺畅进行；开发者也可以选择在服务端编写游戏逻辑（服务端游戏逻辑支持尚在开发中）。
 - **多平台支持**：完美适配游戏引擎 Unity 及 Cocos Creator，支持多个平台。
 
 ## 特性
@@ -17,8 +17,8 @@ Play 是专门针对多人在线对战游戏推出的后端服务。开发者不
 ## 游戏核心流程
 这里给出简单的示例代码使您更快地了解到整体流程，详细的开发指南请参考：
 
-* [Play 开发指南 · JavaScript](play-js.html)
-* [Play 开发指南 · Unity（C#）](play-unity.html)
+* [实时对战开发指南 · JavaScript](multiplayer-js.html)
+* [实时对战开发指南 · Unity（C#）](multiplayer-unity.html)
 
 ### 连接服务器
 
@@ -69,7 +69,7 @@ public override void OnJoinedRoom()
 
 * 不需要关心房间名称。
 * 默认一个房间内最大人数是 10，可以通过设置 MaxPlayerCount 来限制最大人数。
-* 设置 [玩家掉线后的保留时间](play-unity.html#玩家掉线之后被保留的时间)，在有效时间内如果该玩家加回房间，房间内依然保留该玩家的自定义属性。
+* 设置 [玩家掉线后的保留时间](multiplayer-unity.html#玩家掉线之后被保留的时间)，在有效时间内如果该玩家加回房间，房间内依然保留该玩家的自定义属性。
 
 ```js
 play.on(Event.ROOM_JOIN_FAILED, () => {
@@ -273,15 +273,15 @@ public void OnRandomJoinRoomFailed() {
 }
 ```
 
-更多匹配接口请参考房间匹配文档：[JavaScript](play-js.html#房间匹配)、[Unity](play-unity.html#房间匹配)。
+更多匹配接口请参考房间匹配文档：[JavaScript](multiplayer-js.html#房间匹配)、[Unity](multiplayer-unity.html#房间匹配)。
 
 
 ### 游戏中
 
 #### 相关概念
 
-* **MasterClient**：Play 中使用 [MasterClient](play-js.html#MasterClient) 在客户端担任运算主机，由 MasterClient 来控制游戏逻辑，例如判定游戏开始还是结束、下一轮由谁操作、扣除玩家多少金币等等。
-* **自定义属性**：自定义属性又分为 [房间自定义属性](play-js.html#房间自定义属性) 和 [玩家自定义属性](play-js.html#玩家自定义属性)。我们建议将游戏数据加入到自定义属性中，例如房间的当前地图、下注总金币、每个人的手牌等数据，这样当 MasterClient 转移时新的 MasterClient 可以拿到当前游戏的最新数据继续进行运算。
+* **MasterClient**：实时对战中使用 [MasterClient](multiplayer-js.html#MasterClient) 在客户端担任运算主机，由 MasterClient 来控制游戏逻辑，例如判定游戏开始还是结束、下一轮由谁操作、扣除玩家多少金币等等。
+* **自定义属性**：自定义属性又分为 [房间自定义属性](multiplayer-js.html#房间自定义属性) 和 [玩家自定义属性](multiplayer-js.html#玩家自定义属性)。我们建议将游戏数据加入到自定义属性中，例如房间的当前地图、下注总金币、每个人的手牌等数据，这样当 MasterClient 转移时新的 MasterClient 可以拿到当前游戏的最新数据继续进行运算。
 
 #### 开始游戏
 
@@ -347,7 +347,7 @@ public override void OnPlayerCustomPropertiesChanged(Player player, Hashtable up
 ```
 
 #### 游戏中发送消息
-游戏中的大部分消息都发给 [MasterClient](play-js.html#MasterClient)，由 MasterClient 运算后再判定下一步操作。假设有这样一个场景：玩家 A 跟牌完成后，告诉 MasterClient 跟牌完成，MasterClient 收到消息后通知所有人当前需要下一个玩家 B 操作。
+游戏中的大部分消息都发给 [MasterClient](multiplayer-js.html#MasterClient)，由 MasterClient 运算后再判定下一步操作。假设有这样一个场景：玩家 A 跟牌完成后，告诉 MasterClient 跟牌完成，MasterClient 收到消息后通知所有人当前需要下一个玩家 B 操作。
 
 具体发消息流程如下：
 
@@ -432,11 +432,11 @@ public void rpcNext(int playerId)
 
 更详细的用法及介绍，请参考 ：
 
-* [JavaScript - 自定义事件](play-js.html#自定义事件)
-* [C# - 远程调用函数](play-unity.html#远程调用函数-RPC)。
+* [JavaScript - 自定义事件](multiplayer-js.html#自定义事件)
+* [C# - 远程调用函数](multiplayer-unity.html#远程调用函数-RPC)。
 
 #### 游戏中断线重连
-MasterClient 断线后会重新挑选其他成员成为新的 MasterClient，原来的 MasterClient 重连后会成为一名普通成员。具体请参考 [断线重连](play-js.html#断线重连)。
+MasterClient 断线后会重新挑选其他成员成为新的 MasterClient，原来的 MasterClient 重连后会成为一名普通成员。具体请参考 [断线重连](multiplayer-js.html#断线重连)。
 
 
 #### 退出房间
@@ -450,19 +450,19 @@ Play.LeaveRoom();
 
 ## 文档
 ### JavaScript
-* [快速入门](play-quick-start-js.html)：快速接入 Play 并运行一个小 Demo
-* [Play 开发指南 · JavaScript](play-js.html)：对 Play 所有功能及接口的详细介绍。
+* [快速入门](multiplayer-quick-start-js.html)：快速接入实时对战并运行一个小 Demo
+* [实时对战开发指南 · JavaScript](multiplayer-js.html)：对实时对战所有功能及接口的详细介绍。
 
 ### Unity(C#)
-* [快速入门](play-quick-start-unity.html)：快速接入 Play 并运行一个小 Demo
-* [Play 开发指南 · Unity（C#）](play-unity.html)：对 Play 所有功能及接口的详细介绍。
-* [实现小游戏「炸金花」](play-unity-demo.html)
+* [快速入门](multiplayer-quick-start-unity.html)：快速接入实时对战并运行一个小 Demo
+* [实时对战开发指南 · Unity（C#）](multiplayer-unity.html)：对实时对战所有功能及接口的详细介绍。
+* [实现小游戏「炸金花」](multiplayer-unity-demo.html)
 
 ## 价格及试用
 
-Play 的核心计费单位为 CCU，即同时在线人数。
+实时对战的核心计费单位为 CCU，即同时在线人数。
 
-Play 目前正在公测中，所有应用免费使用 100 CCU/天，如果您需要更高额度，请联系 support@leancloud.rocks。
+实时对战目前正在公测中，所有应用免费使用 100 CCU/天，如果您需要更高额度，请联系 support@leancloud.rocks。
 
 未来收费方案如下：
 
