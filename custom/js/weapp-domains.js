@@ -15,26 +15,19 @@ angular.module('app').controller('WeappDomainsCtrl', [
           console.log($rootScope.pageState.currentApp);
           if (currentApp) {
             // Magic: 通过 push_group 判断节点
-            if (currentApp.push_group === 'g0') {
-              var suffix = currentApp.app_id.slice(0, 8).toLowerCase();
-              $scope.extraRequestDomains = [
-                suffix + '.api.lncld.net',
-                suffix + '.engine.lncld.net',
-                suffix + '.rtm.lncld.net'
-              ];
-              $scope.requestDomainsLength = 6;
-            } else if (currentApp.push_group === 'q0'){
-              var suffix = currentApp.app_id.slice(0, 8).toLowerCase();
-              $scope.extraRequestDomains = [
-                suffix + '.api.lncldapi.com',
-                suffix + '.engine.lncldapi.com',
-                suffix + '.rtm.lncldapi.com'
-              ];
-              $scope.requestDomainsLength = 6;
-            } else {
-              $scope.extraRequestDomains = [];
-              $scope.requestDomainsLength = 3;
+            var doamins = {
+              'g0': 'lncld.net',
+              'q0': 'lncldapi.com',
+              'a0': 'lncldglobal.com'
             }
+            var domain = doamins[currentApp.push_group];
+            var suffix = currentApp.app_id.slice(0, 8).toLowerCase();
+            $scope.extraRequestDomains = [
+              suffix + '.api.' + domain,
+              suffix + '.engine.' + domain,
+              suffix + '.rtm.' + domain
+            ];
+            $scope.requestDomainsLength = 4;
 
             AV.applicationId = undefined;
             AV.applicationKey = undefined;
@@ -46,7 +39,9 @@ angular.module('app').controller('WeappDomainsCtrl', [
             var file = new AV.File('weapp-domains-generator-test-file.txt', {
               base64: 'ZmVlbCBmcmVlIHRvIGRlbGV0ZSB0aGlzIGZpbGUu',
             });
-            file._fileToken().then(function(uploadInfo) {
+            file._fileToken(undefined, {
+              useMasterKey: true
+            }).then(function(uploadInfo) {
               console.log(uploadInfo);
               var downloadDomain;
               var result = uploadInfo.url.match(/\:\/\/([^\/]*)/);

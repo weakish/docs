@@ -7,16 +7,15 @@
 {% set sdk_name = 'Python' %}
 {% set leanengine_middleware = '[LeanCloud Python SDK](https://github.com/leancloud/python-sdk)' %}
 
-{% block project_constraint %}
-你的项目需要遵循一定格式才会被云引擎识别并运行。
 
-{{fullName}} 使用 WSGI 规范来运行项目，项目根目录下必须有 `wsgi.py` 与 `requirements.txt` 文件，可选文件 `.python-version`、`runtime.txt`。云引擎运行时会首先加载 `wsgi.py` 这个模块，并将此模块的全局变量 `application` 做为 WSGI 函数进行调用。因此请保证 `wsgi.py` 文件中包含一个 `application` 的全局变量／函数／类，并且符合 WSGI 规范。
+{% block getting_started %}
 
-更多关于 **WSGI 函数** 的内容，请参考 [WSGI 接口](http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432012393132788f71e0edad4676a3f76ac7776f3a16000) 或者 [PEP333](https://www.python.org/dev/peps/pep-0333/)。
+将示例代码 [leancloud/python-getting-started](https://github.com/leancloud/python-getting-started) 克隆到本地：
 
-{% endblock %}
+```sh
+git clone https://github.com/leancloud/python-getting-started.git
+```
 
-{% block project_start %}
 在本地运行 LeanEngine Python 应用，首先需要这几个依赖：
 
 - **python**：请确保本地安装的 Python 版本与线上使用的相同，以免不同版本之间的兼容性导致问题。推荐使用 [pyenv](https://github.com/pyenv/pyenv) 来管理本地 Python 版本。
@@ -29,16 +28,21 @@
 pip install -r requirements.txt
 ```
 
-接下来便可以在项目目录，用我们的命令行工具来启动本地调试了：
-
-```sh
-lean up
-```
-
 更多有关命令行工具和本地调试的内容请参考 [命令行工具使用指南](leanengine_cli.html)。
 
 {% endblock %}
 
+{% block project_constraint %}
+
+## 项目骨架
+
+参照示例项目，你的项目需要遵循一定格式才会被云引擎识别并运行。
+
+{{fullName}} 使用 WSGI 规范来运行项目，项目根目录下必须有 `wsgi.py` 与 `requirements.txt` 文件，可选文件 `.python-version`、`runtime.txt`。云引擎运行时会首先加载 `wsgi.py` 这个模块，并将此模块的全局变量 `application` 做为 WSGI 函数进行调用。因此请保证 `wsgi.py` 文件中包含一个 `application` 的全局变量／函数／类，并且符合 WSGI 规范。
+
+更多关于 **WSGI 函数** 的内容，请参考 [WSGI 接口](http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432012393132788f71e0edad4676a3f76ac7776f3a16000) 或者 [PEP333](https://www.python.org/dev/peps/pep-0333/)。
+
+{% endblock %}
 {% block custom_runtime %}
 ### 添加第三方依赖模块
 
@@ -90,6 +94,9 @@ Python 云引擎每次在重新构建时，都会去执行 `pip install -r requi
 为了避免这种情况的发生，建议在 `requirements.txt` 中明确指定全部第三方依赖的版本。使用 `pip freeze` 命令，可以查看当前 `pip` 安装的第三方模块的版本。如果使用 `virtualenv` 来进行开发，并且当前 `virtualenv` 只包含当前项目的依赖的话，可以考虑将 `pip freeze` 的所有内容都写到 `requirements.txt` 中。
 
 {% block use_leanstorage %}
+
+## 使用数据存储服务
+
 在云引擎中你可以使用 LeanCloud 提供的 [数据存储](storage_overview.html) 作为应用的后端数据库，以及使用其他 LeanCloud 提供的功能。 LeanCloud Python SDK 可以让你更加方便地使用这些功能。
 
 ### 安装

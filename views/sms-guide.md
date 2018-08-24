@@ -49,6 +49,22 @@ options.signatureName = @"LeanCloud";     // 控制台预设的短信签名
                                     }
                                 }];
 ```
+```swift
+let options = AVShortMessageRequestOptions()
+
+options.templateName = "Register_Notice"
+options.signatureName = "LeanCloud"
+
+// 控制台预设的短信签名
+// 往 18612345678 这个手机号码发送短信，使用预设的模板和签名
+AVSMS.requestShortMessage(forPhoneNumber: "18612345678", options: options) { (succeeded, error) in
+    if succeeded {
+        /* 请求成功 */
+    } else {
+        /* 请求失败 */
+    }
+}
+```
 ```android
 AVSMSOption option = new AVSMSOption();
 option.setTemplateName("Register_Notice");  // 控制台预设的模板名称
@@ -149,6 +165,21 @@ options.operation = @"某种操作";        // 操作名称
                                     }
                                 }];
 ```
+```swift
+let options = AVShortMessageRequestOptions()
+
+options.ttl = 10 /* 验证码有效时间 */
+options.applicationName = "应用名称" /* 应用名称 */
+options.operation = "某种操作" /* 操作名称 */
+
+AVSMS.requestShortMessage(forPhoneNumber: "186xxxxxxxx", options: options) { (succeeded, error) in
+    if succeeded {
+        /* 请求成功 */
+    } else {
+        /* 请求失败 */
+    }
+}
+```
 ```android
 AVSMSOption option = new AVSMSOption();
 option.setTtl(10);                     // 验证码有效时间为 10 分钟
@@ -204,6 +235,13 @@ AVOSCloud.requestSMSCode("186xxxxxxxx", "应用名称", "某种操作", 10);
     }
 }];
 ```
+```swift
+AVOSCloud.verifySmsCode("123456", mobilePhoneNumber: "186xxxxxxxx") { (succeeded, error) in
+    if succeeded {
+        /* 验证成功 */
+    }
+}
+```
 ```android
 AVSMS.verifySMSCodeInBackground("123456", "186xxxxxxxx", new AVMobilePhoneVerifyCallback() {
   @Override
@@ -257,6 +295,17 @@ options.type = AVShortMessageTypeVoice;
         }
 }];
 ```
+```swift
+let options = AVShortMessageRequestOptions()
+
+options.type = .voice
+
+AVSMS.requestShortMessage(forPhoneNumber: "188xxxxxxxx", options: options) { (succeeded, error) in
+    if succeeded {
+        print("A voice short message has been sent.")
+    }
+}
+```
 ```android
 AVSMSOption option = new AVSMSOption();
 option.setSmsType(AVSMSOption.AVSMS_TYPE.VOICE_SMS);
@@ -299,6 +348,13 @@ AVOSCloud.requestVoiceCode("18688888888");
         //验证成功
     }
 }];
+```
+```swift
+AVOSCloud.verifySmsCode("123456", mobilePhoneNumber: "186xxxxxxxx") { (succeeded, error) in
+    if succeeded {
+        /* 验证成功 */
+    }
+}
 ```
 ```android
 AVSMS.verifySMSCodeInBackground("123456", "186xxxxxxxx", new AVMobilePhoneVerifyCallback() {
@@ -404,6 +460,22 @@ options.templateVariables = @{ @"order_id": @"7623432424540" }; // 使用实际�
                                         /* 请求失败 */
                                     }
                                 }];
+```
+```swift
+let options = AVShortMessageRequestOptions()
+
+options.templateName = "Order_Notice"
+options.signatureName = "sign_BuyBuyBuy"
+options.templateVariables = ["order_id": "7623432424540"]
+
+/* 使用实际的值来替换模板中的变量 */
+AVSMS.requestShortMessage(forPhoneNumber: "186xxxxxxxx", options: options) { (succeeded, error) in
+    if succeeded {
+        /* 请求成功 */
+    } else {
+        /* 请求失败 */
+    }
+}
 ```
 ```android
 AVSMSOption option = new AVSMSOption();
@@ -693,6 +765,17 @@ options.height = 50;
                                 NSString *url = captchaDigest.URLString;
                             }];
 ```
+```swift
+let options = AVCaptchaRequestOptions()
+
+options.width = 100
+options.height = 50
+
+AVCaptcha.request(with: options) { (captchaDigest, error) in
+    /* URL string of captcha image. */
+    var url = captchaDigest?.urlString
+}
+```
 ```android
 AVCaptchaOption option = new AVCaptchaOption();
 option.setWidth(85);
@@ -736,6 +819,11 @@ AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
                         /* validationToken 可用短信认证 */
                     }];
 ```
+```swift
+AVCaptcha.verifyCaptchaCode(code, for: captchaDigest) { (validationToken, error) in
+    /* validationToken 可用短信认证 */
+}
+```
 ```android
 AVCaptcha.verifyCaptchaCodeInBackground(code, captchaDigest, new AVCallback<String>() {
   @Override
@@ -778,6 +866,21 @@ options.validationToken = <#validationToken#>;
                                         /* 请求失败 */
                                     }
                                 }];
+```
+```swift
+let options = AVShortMessageRequestOptions()
+
+options.templateName = "New_Series"
+options.signatureName = "sign_BuyBuyBuy"
+options.validationToken = <#A validation Token#>
+
+AVSMS.requestShortMessage(forPhoneNumber: "186xxxxxxxx", options: options) { (succeeded, error) in
+    if succeeded {
+        /* 请求成功 */
+    } else {
+        /* 请求失败 */
+    }
+}
 ```
 ```android
 AVSMSOption option = new AVSMSOption();
@@ -1001,6 +1104,16 @@ user.mobilePhoneNumber = @"18612340000";
 NSError *error = nil;
 [user signUp:&error];
 ```
+```swift
+user.username = "hjiang"
+user.password = "f32@ds*@&dsa"
+user.email = "hang@leancloud.rocks"
+user.mobilePhoneNumber = "18612340000"
+
+var error: NSError? = nil
+
+user.signUp(&error)
+```
 ```android
 AVUser user = new AVUser();
 user.setUsername("hjiang");
@@ -1050,6 +1163,11 @@ user.SignUpAsync().ContinueWith(t =>
     //验证结果
 }];
 ```
+```swift
+AVUser.verifyMobilePhone("123456") { (succeeded, error) in
+    /* 验证结果 */
+}
+```
 ```android
 AVUser.verifyMobilePhoneInBackground("123456", new AVMobilePhoneVerifyCallback() {
     @Override
@@ -1096,6 +1214,13 @@ if(succeeded){
 }
 }];
 ```
+```swift
+AVUser.requestMobilePhoneVerify("18612345678") { (succeeded, error) in
+    if succeeded {
+        /* 调用成功 */
+    }
+}
+```
 ```android
 AVUser.requestMobilePhoneVerifyInBackground("13800000000", new RequestMobileCodeCallback() {
     @Override
@@ -1135,6 +1260,13 @@ AVUser.RequestMobilePhoneVerifyAsync("186xxxxxxxx").ContinueWith(t =>
         //验证成功
     }
 }];
+```
+```swift
+AVUser.verifyMobilePhone("123456") { (succeeded, error) in
+    if succeeded {
+        /* 验证成功 */
+    }
+}
 ```
 ```android
 AVUser.verifyMobilePhoneInBackground("654321", new AVMobilePhoneVerifyCallback() {

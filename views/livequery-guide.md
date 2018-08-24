@@ -40,6 +40,9 @@ HTML5 Video is required for this demo. 您的浏览器不支持播放 HTML5 视�
 [AVOSCloud setApplicationId:@"{{appid}}"
                   clientKey:@"{{appkey}}"];
 ```
+```swift
+AVOSCloud.setApplicationId("{{appid}}", clientKey: "{{appkey}}")
+```
 ```java
 // LiveQuery 需要依赖即时通讯模块，所以需要在 AndroidManifest.xml 文件里面配置如下内容：
  <!-- 即时通讯模块、推送、LiveQuery（均需要加入以下声明） START -->
@@ -63,7 +66,9 @@ AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
 
 // 如果在浏览器中使用 script 标签的方式，需要引入 av-live-query-min.js：
 // 推荐使用 CDN：
-<script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-live-query-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-live-query-min.js"></script>
+
+更多环境下的安装方式，请参考 [JavaScript SDK 安装文档](sdk_setup-js.html)。
 
 {{ parts.debugLiveQuery(true) }}
 ```
@@ -100,6 +105,13 @@ AVQuery *doneQuery  = [AVQuery queryWithClassName:@"Todo"];
 [doingQuery whereKey:@"state" equalTo:@"doing"];
 [doneQuery  whereKey:@"state" equalTo:@"done"];
 ```
+```swift
+let doingQuery = AVQuery(className: "Todo")
+let doneQuery = AVQuery(className: "Todo")
+
+doingQuery.whereKey("state", equalTo: "doing")
+doneQuery.whereKey("state", equalTo: "done")
+```
 ```java
 // 正在进行中的 Todo
 AVQuery<AVObject> doingQuery = new AVQuery<>("Todo");
@@ -131,6 +143,15 @@ var doneQuery = new AVQuery<AVObject>("Todo").WhereEqualTo("state", "done");
     /* Doing list did fetch. */
 }];
 ```
+```swift
+let doingQuery = AVQuery(className: "Todo")
+
+doingQuery.whereKey("state", equalTo: "doing")
+
+doingQuery.findObjectsInBackground { objects, error in
+    /* Doing list did fetch. */
+}
+```
 ```java
 AVQuery<AVObject> doingQuery = new AVQuery<>("Todo");
 doingQuery.whereEqualTo("state", "doing");
@@ -142,7 +163,7 @@ doingQuery.findInBackground(new FindCallback<AVObject>() {
 });
 ```
 ```js
-doingQuery.find(function(doingList) {
+doingQuery.find().then(function(doingList) {
   // 展示 doingList
 });
 ```
@@ -176,6 +197,23 @@ self.doingLiveQuery.delegate = self;
     if (liveQuery == self.doingLiveQuery) {
         /* A new doing task did create. */
     }
+}
+```
+```swift
+func subscribe() {
+    let doingQuery = AVQuery(className: "Todo")
+    doingQuery.whereKey("state", equalTo: "doing")
+
+    let doingLiveQuery = AVLiveQuery(query: doingQuery)
+
+    doingLiveQuery.delegate = self
+    doingLiveQuery.subscribe { (succeeded, error) in
+        /* Subscribed. */
+    }
+}
+
+func liveQuery(_ liveQuery: AVLiveQuery, objectDidCreate object: Any) {
+    /* A new doing task did create. */
 }
 ```
 ```java
@@ -220,6 +258,11 @@ livequery.OnLiveQueryReceived += (sender, e) =>
     /* Subscribed. */
 }];
 ```
+```swift
+doingLiveQuery.subscribe { (succeeded, error) in
+    /* Subscribed. */
+}
+```
 ```java
 doingLiveQuery.subscribeInBackground(new AVLiveQuerySubscribeCallback() {
   @Override
@@ -261,6 +304,11 @@ todo[@"state"] = @"doing";
     /* Saved. */
 }];
 ```
+```swift
+let todo = AVObject(className: "Todo")
+todo["state"] = "doing"
+todo.save()
+```
 ```java
 AVObject todo = new AVObject("Todo");
 todo.put("state", "doing");
@@ -292,6 +340,13 @@ await testObj.SaveAsync();
     if (liveQuery == self.doingLiveQuery) {
         /* A new doing task did create. */
     }
+}
+```
+```swift
+#pragma mark - LiveQuery delegate methods
+
+func liveQuery(_ liveQuery: AVLiveQuery, objectDidCreate object: Any) {
+    /* A new doing task did create. */
 }
 ```
 ```java
@@ -330,6 +385,11 @@ todo[@"title"] = @"新的标题";
     /* Saved. */
 }];
 ```
+```swift
+let todo = AVObject(className: "Todo", objectId: "5915bb92a22b9d005804a4ee")
+todo["title"] = "新的标题"
+todo.save()
+```
 ```java
 AVObject todo = AVObject.createWithoutData("Todo", "5915bb92a22b9d005804a4ee");
 todo.put("title", "新的标题");
@@ -361,6 +421,11 @@ await oneDoing.SaveAsync();
     for (NSString *key in updatedKeys) {
         NSLog(@"%@: %@", key, object[key]);
     }
+}
+```
+```swift
+func liveQuery(_ liveQuery: AVLiveQuery, objectDidUpdate object: Any, updatedKeys: [String]) {
+    /* A doing task did update. */
 }
 ```
 ```java
@@ -404,6 +469,11 @@ todo[@"state"] = @"doing";
     /* Saved. */
 }];
 ```
+```swift
+let todo = AVObject(className: "Todo", objectId: "591672df2f301e006b9b2829")
+todo["state"] = "doing"
+todo.save()
+```
 ```java
 AVObject todo = AVObject.createWithoutData("Todo", "591672df2f301e006b9b2829");
 todo.put("state", "doing");
@@ -438,6 +508,11 @@ await anotherDone.SaveAsync();
     }
 }
 ```
+```swift
+func liveQuery(_ liveQuery: AVLiveQuery, objectDidEnter object: Any, updatedKeys: [String]) {
+    /* A todo did change to doing from other state. */
+}
+```
 ```java
 liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
   @Override
@@ -447,7 +522,7 @@ liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
 });
 ```
 ```js
-liveQuery.on('update', function(updatedDoingItem, updatedKeys) {
+liveQuery.on('enter', function(updatedDoingItem, updatedKeys) {
   // 将 doingList 中对应的 doingItem 替换成 updatedDoingItem
 });
 ```
@@ -477,6 +552,11 @@ todo[@"state"] = @"done";
 [todo saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
     /* Saved. */
 }];
+```
+```swift
+let todo = AVObject(className: "Todo", objectId: "591672df2f301e006b9b2829")
+todo["state"] = "done"
+todo.save()
 ```
 ```java
 AVObject todo = AVObject.createWithoutData("Todo", "591672df2f301e006b9b2829");
@@ -509,6 +589,11 @@ await willDone.SaveAsync();
     if (liveQuery == self.doingLiveQuery) {
         /* A todo did change to other state from doing. */
     }
+}
+```
+```swift
+func liveQuery(_ liveQuery: AVLiveQuery, objectDidLeave object: Any, updatedKeys: [String]) {
+    /* A todo did change to other state from doing. */
 }
 ```
 ```java
@@ -548,6 +633,10 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo" objectId:@"591d9b302f301e
     /* Deleted. */
 }];
 ```
+```swift
+let todo = AVObject(className: "Todo", objectId: "591d9b302f301e006be22c83")
+todo.delete()
+```
 ```java
 AVObject todo = AVObject.createWithoutData("Todo", "591672df2f301e006b9b2829");
 todo.deleteInBackground(new DeleteCallback() {
@@ -574,6 +663,11 @@ LiveQuery 会得到一条数据同步：
 ```objc
 #pragma mark - LiveQuery delegate methods
 - (void)liveQuery:(AVLiveQuery *)liveQuery objectDidDelete:(id)object {
+    /* A todo has been deleted. */
+}
+```
+```swift
+func liveQuery(_ liveQuery: AVLiveQuery, objectDidDelete object: Any) {
     /* A todo has been deleted. */
 }
 ```

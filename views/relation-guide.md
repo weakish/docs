@@ -112,6 +112,18 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
     [studentTom setObject:addr forKey:@"address"];
     [studentTom saveInBackground];// 保存到云端
 ```
+```swift
+    let studentTom = AVObject(className: "Student")
+
+    studentTom["name"] = "Tom"
+    studentTom["address"] = [
+        "city" : "北京",
+        "address" : "西城区西长安街 1 号",
+        "postcode" : "100017"
+    ]
+
+    studentTom.save()
+```
 ```java
     final AVObject studentTom = new AVObject("Student");// 学生 Tom
     studentTom.put("name", "Tom");
@@ -193,6 +205,17 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
     }];
     // 广东无需被单独保存，因为在保存广州的时候已经上传到云端。
 ```
+```swift
+    let guangZhou = AVObject(className: "City")
+    guangZhou["name"] = "广州"
+
+    let guangDong = AVObject(className: "Province")
+    guangDong["name"] = "广东"
+
+    guangZhou["dependent"] = guangDong
+
+    guangZhou.save()
+```
 ```java
     AVObject guangZhou = new AVObject("City");// 广州
     guangZhou.put("name", "广州");
@@ -263,6 +286,13 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
 
     [DongGuan setObject:GuangDong forKey:@"dependent"];// 为东莞设置 dependent 属性为广东
 ```
+```swift
+    let guangDong = AVObject(className: "Province", objectId: "56545c5b00b09f857a603632")
+    let dongGuan = AVObject(className: "City")
+
+    dongGuan["name"] = "东莞"
+    dongGuan["dependent"] = guangDong
+```
 ```java
     // 假设 GuangDong 的 objectId 为 56545c5b00b09f857a603632
     AVObject guangDong = AVObject.createWithoutData("Province", "56545c5b00b09f857a603632");
@@ -316,6 +346,13 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
          // 获取广东省
          AVObject *province = [object objectForKey:@"dependent"];
     }];
+```
+```swift
+    let dongGuan = AVObject(className: "City", objectId: "5b73993efe88c2005b8584e7")
+
+    dongGuan.fetchInBackground(withKeys: ["dependent"]) { object, error in
+        let province = object?["dependent"] as? AVObject
+    }
 ```
 ```java
     // 假设东莞作为 City 对象存储的时候它的 objectId 是 568e743c00b09aa22162b11f，这个 objectId 可以在控制台查看
@@ -376,6 +413,20 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
             AVObject *province = [city objectForKey:@"dependent"];
         }
     }];
+```
+```swift
+    let query = AVQuery(className: "City")
+
+    query.whereKey("name", equalTo: "广州")
+    query.includeKey("dependent")
+
+    query.findObjectsInBackground { cities, error in
+        let cities = cities as? [AVObject] ?? []
+
+        for city in cities {
+            let province = city["dependent"] as? AVObject
+        }
+    }
 ```
 ```java
     AVQuery<AVObject> query = new AVQuery<>("City");
@@ -460,6 +511,15 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
         }
     }];
 ```
+```swift
+    let query = AVQuery(className: "City")
+    let guangDong = AVObject(className: "Province", objectId: "56545c5b00b09f857a603632")
+
+    query.whereKey("dependent", equalTo: guangDong)
+    query.findObjectsInBackground { cities, error in
+        let cities = cities as? [AVObject] ?? []
+    }
+```
 ```java
     // 假设 GuangDong 的 objectId 为 56545c5b00b09f857a603632
     AVObject guangDong = AVObject.createWithoutData("Province", "56545c5b00b09f857a603632");
@@ -542,6 +602,25 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
         [zhejiang saveInBackground];
     }];
 ```
+```swift
+    let hangzhou = AVObject(className: "City")
+    hangzhou["name"] = "杭州"
+
+    let ningbo = AVObject(className: "City")
+    ningbo["name"] = "宁波"
+
+    AVObject.saveAll(inBackground: [hangzhou, ningbo]) { succeeded, error in
+        let zheJiang = AVObject(className: "Province")
+        zheJiang["浙江"] = "name"
+
+        let relation = zheJiang.relation(forKey: "includedCities")
+
+        relation.add(hangzhou)
+        relation.add(ningbo)
+
+        zheJiang.save()
+    }
+```
 ```java
     final AVObject hangzhou = new AVObject("City");
     hangzhou.put("name","杭州");
@@ -610,6 +689,16 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
         }
     }];
 ```
+```swift
+    let zheJiang = AVObject(className: "Province", objectId: "56545c5b00b09f857a603632")
+
+    let relation = zheJiang.relation(forKey: "includedCities")
+    let query = relation.query()
+
+    query.findObjectsInBackground { cities, error in
+        let cities = cities as? [AVObject] ?? []
+    }
+```
 ```java
     AVObject zhejiang = AVObject.createWithoutData("Province","56545c5b00b09f857a603632");
     AVRelation relation = zhejiang.getRelation("includedCities");
@@ -666,6 +755,16 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
         // 理论上 provinceList 应该只有浙江这一条数据
         AVObject *zhejiang = provinceList[0];
     }];
+```
+```swift
+    let wenZhou = AVObject(className: "City", objectId: "587d8156b123db4d5e7dddd2")
+    let query = AVQuery(className: "Province")
+
+    query.whereKey("includedCities", equalTo: wenZhou)
+
+    query.findObjectsInBackground { provinceList, error in
+        let zhejiang = provinceList?[0] as? AVObject
+    }
 ```
 ```java
     AVObject wenzhou = AVObject.createWithoutData("City", "587d8156b123db4d5e7dddd2");
@@ -764,6 +863,22 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
 
     // 保存选课表对象
     [studentCourseMapTom saveInBackground];
+```
+```swift
+    let studentTom = AVObject(className: "Student")
+    studentTom["name"] = "Tom"
+
+    let courseLinearAlgebra = AVObject(className: "Course")
+    courseLinearAlgebra["name"] = "线性代数"
+
+    let studentCourseMapTom = AVObject(className: "StudentCourseMap")
+
+    studentCourseMapTom["student"] = studentTom
+    studentCourseMapTom["course"] = courseLinearAlgebra
+    studentCourseMapTom["duration"] = ["2016-02-19", "2016-04-21"]
+    studentCourseMapTom["platform"] = "iOS"
+
+    studentCourseMapTom.save()
 ```
 ```java
     AVObject studentTom = new AVObject("Student");// 学生 Tom
@@ -879,6 +994,25 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
         }
     }];
 ```
+```swift
+    let query = AVQuery(className: "StudentCourseMap")
+    let courseCalculus = AVObject(className: "Course", objectId: "562da3fdddb2084a8a576d49")
+
+    query.whereKey("course", equalTo: courseCalculus)
+    query.findObjectsInBackground { studentCourseMaps, error in
+        let studentCourseMaps = studentCourseMaps as? [AVObject] ?? []
+
+        for studentCourseMap in studentCourseMaps {
+            let student = studentCourseMap["student"] as? AVObject
+            let course = studentCourseMap["course"] as? AVObject
+            let duration = studentCourseMap["duration"] as? [Any]
+
+            if let platform = studentCourseMap["platform"] {
+                print("platform: \(platform)")
+            }
+        }
+    }
+```
 ```java
     // 微积分课程
     AVObject courseCalculus = AVObject.createWithoutData("Course", "562da3fdddb2084a8a576d49");
@@ -977,6 +1111,12 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
     AVObject *studentTom = [AVObject objectWithoutDataWithClassName:@"Student" objectId:@"562da3fc00b0bf37b117c250"];
     [query whereKey:@"student" equalTo:studentTom];
 ```
+```swift
+    let query = AVQuery(className: "StudentCourseMap")
+    let studentTom = AVObject(className: "Student", objectId: "562da3fc00b0bf37b117c250")
+
+    query.whereKey("student", equalTo: studentTom)
+```
 ```java
     AVQuery<AVObject> query = new AVQuery<>("StudentCourseMap");
     AVObject studentTom = AVObject.createWithoutData("Student", "562da3fc00b0bf37b117c250");
@@ -1030,6 +1170,33 @@ RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用�
             [studentTom saveInBackground];
         }
     }];
+```
+```swift
+    let studentTom = AVObject(className: "Student")
+    studentTom["name"] = "Tom"
+
+    let courseLinearAlgebra = AVObject(className: "Course")
+    courseLinearAlgebra["name"] = "线性代数"
+
+    let courseObjectOrientedProgramming = AVObject(className: "Course")
+    courseObjectOrientedProgramming["name"] = "面向对象程序设计"
+
+    let courseOperatingSystem = AVObject(className: "Course")
+    courseOperatingSystem["name"] = "操作系统"
+
+    let objects = [courseLinearAlgebra, courseObjectOrientedProgramming, courseOperatingSystem]
+
+    AVObject.saveAll(inBackground: objects) { succeeded, error in
+        if succeeded {
+            let relation = studentTom.relation(forKey: "coursesChosen")
+
+            relation.add(courseLinearAlgebra)
+            relation.add(courseObjectOrientedProgramming)
+            relation.add(courseOperatingSystem)
+        } else {
+            /* Show error */
+        }
+    }
 ```
 ```java
     final AVObject studentTom = new AVObject("Student");// 学生 Tom
@@ -1268,6 +1435,10 @@ if(存在附加属性){
 ```objc
     AVObject *beckham= [[AVObject alloc] initWithClassName:@"Boy"];
     [beckham setObject: [NSArray arrayWithObjects:@"颜值爆表",@"明星范儿",nil] forKey:@"tags"];
+```
+```swift
+    let beckham = AVObject(className: "Boy")
+    beckham["tags"] = ["颜值爆表", "明星范儿"]
 ```
 ```java
     AVObject beckham = new AVObject("Boy");

@@ -149,12 +149,55 @@ $redis->ping();
 
 从环境变量中获取链接字符串，然后再创建 redis client 实例即可。
 
-```
+```java
 String redisUrl = System.getenv("REDIS_URL_<实例名称>");
 Jedis jedis = new Jedis(redisUrl);
 jedis.set("foo", "bar");
 String value = jedis.get("foo");
 ```
+
+### 在云引擎中使用(.NET Core 环境)
+
+首先在项目里面安装 nuget 依赖：
+
+```sh
+dotnet add LeanCloud.Engine.Middleware.AspNetCore
+```
+
+直接使用 [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) 里面构建的方式。
+
+假设在控制台创建了一个名字叫做 `dev` 云缓存实例，如下代码将演示如何连接这个实例，并且存储、读取数据： 
+
+```cs
+// 获取 dev 实例
+var leancache = new LeanCache("dev");
+// 获取 dev 的配置
+var redisConfiguration = leancache.CurrentConfigurations;
+// 构建 StackExchange.Redis.ConfigurationOptions 
+ConfigurationOptions config = new ConfigurationOptions
+{
+    ServiceName = this.InstanceName,
+    ClientName = this.InstanceName,
+    EndPoints =
+        {
+            {
+                redisConfiguration.Host, redisConfiguration.Port
+            },
+        },
+    KeepAlive = 180,
+    DefaultVersion = new Version(2, 8, 8),
+    Password = redisConfiguration.Password,
+    AbortOnConnectFail = false,
+    ConnectRetry = 3,
+};
+// 直接连接
+var conn = ConnectionMultiplexer.Connect(config);
+IDatabase db = conn.GetDatabase();
+db.StringSet("foo", "bar");
+var bar = db.StringGet("foo");
+```
+
+关于 `IConnectionMultiplexer` 的用法和相关文档请参阅：[StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/)，这个库是 .NET Core 环境中比较推荐的 Redis Client。
 
 ### 在本地调试依赖 LeanCache 的应用
 

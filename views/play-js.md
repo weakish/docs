@@ -30,6 +30,10 @@ import {
   Region,
   // Play SDK 事件常量
   Event,
+  // 事件接收组
+  ReceiverGroup,
+  // 创建房间标志
+  CreateRoomFlag,
 } from '../play';
 ```
 
@@ -178,7 +182,7 @@ const options = {
 	// 房间不可见
 	visible: false,
 	// 房间空后保留的时间，单位：秒
-	emptyRoomTtl: 600,
+	emptyRoomTtl: 300,
 	// 允许的最大玩家数量
 	maxPlayerCount: 2,
 	// 玩家离线后，保留玩家数据的时间，单位：秒
@@ -206,7 +210,7 @@ play.createRoom({
 
 - `opened`：房间是否开放。如果设置为 false，则不允许其他玩家加入。
 - `visible`：房间是否可见。如果设置为 false，则不会出现在大厅的房间列表中，但是其他玩家可以通过指定「房间名称」加入房间。
-- `emptyRoomTtl`：当房间中没有玩家时，房间保留的时间（单位：秒）。默认为 0，即 房间中没有玩家时，立即销毁房间数据。最大值为 1800，即 30 分钟。
+- `emptyRoomTtl`：当房间中没有玩家时，房间保留的时间（单位：秒）。默认为 0，即 房间中没有玩家时，立即销毁房间数据。最大值为 300，即 5 分钟。
 - `playerTtl`：当玩家掉线时，保留玩家在房间内的数据的时间（单位：秒）。默认为 0，即 玩家掉线后，立即销毁玩家数据。最大值为 300，即 5 分钟。
 - `maxPlayerCount`：房间允许的最大玩家数量。
 - `customRoomProperties`：房间的自定义属性。
@@ -597,7 +601,7 @@ play.on(Event.CUSTOM_EVENT, event => {
 | ------------------------------------ | ------------------ | ---------------------------------------- |
 | eventId    | Number/String | 事件 Id，用于表示事件                         |
 | eventData   | Object  | 事件参数 |
-| senderId   | Number  | 事件发送者 |
+| senderId   | Number  | 事件发送者 Id（玩家的 actorId） |
 
 ## 断开连接
 
@@ -708,5 +712,19 @@ play.on(Event.ROOM_JOINED, () => {
 ```
 
 这个接口相当于 `reconnect()` 和 `rejoin()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
+
+
+
+## 错误处理
+
+在游戏过程中，可能会触发一些错误事件，开发者可以通过注册「错误事件」来处理。
+
+```javascript
+play.on(Event.Error, (err) => {
+	const { code, detail } = err;
+	// TODO 处理错误事件
+
+});
+```
 
 更多接口及详情，请参考 [API 接口](https://leancloud.github.io/Play-SDK-JS/doc/)。

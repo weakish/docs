@@ -1920,7 +1920,6 @@ LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾�
      }
   }
 ```
-
 同时，请在控制台的 `_User` 表里为 `authData.第三方平台名称.uid` 建立唯一索引，并且勾选上 **允许缺失值** 选项，这样才能保证一个第三方账号只绑定到一个 LeanCloud 应用内用户上。
 
 {{ 
@@ -1996,10 +1995,92 @@ Location: https://{{host}}/1.1/users/55a4800fe4b05001a7745c41
   "objectId":"55a4800fe4b05001a7745c41"
 }
 ```
+#### UnionID 注册和登录
+
+微信与新浪微博都有 UnionID 登录机制，使用 UnionID 注册登录，可以使得不同微信公众号或小程序之间共享用户。
+
+微信的 authData 内容：
+
+```json
+  "authData": {
+    "access_token" : "access_token",
+    "expires_in" : 7200,
+    "openid" : "openid",
+    "refresh_token" : "refresh_token",
+    "scope" : "snsapi_userinfo",
+    "unionid" : "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
+}
+```
+
+使用 UnionID 注册登录，需要提供带有 `unionid` 参数的 `authData`。另外需要配合传递 `main_account` 和 `platform` 这两个字段。
+
+* `main_account`： `main_account` 为 true 表示使用 `unionid` 来登录或者注册。
+* `platform`：用来识别注册平台，如新浪微博或微信等。
+
+在服务端进行存储的时候会根据 `platform` 来命名新增的平台，如传入 `"platform" = "weibo"` 时，返回数据中会增加 `_weibo_unionid` 字段存储 `{"uid":"xxxxx"}`。
+
+```
+"_weibo_unionid": {
+            "uid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
+        }
+```
+
+完整的第三方注册登录请求如下，以使用微信 UnionId 为例：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \ 
+  -H "Content-Type: application/json" \
+  -d '{
+     "authData": {
+       "weixin1": {
+         "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc",
+         "access_token": "12_b6mz7ujXbTY4vpbqCRaKVa_y0Ij3N9grCeVtM8VJT8KFd4qnQ9lXtBsZVxG6x9c9Nay_oNgvbKK7KYKbn8R2P7uEgA0EhsXMHmxkx-xU-Tk",
+         "expires_in": 7200,
+         "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838",
+          "scope": "snsapi_userinfo",
+          "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
+          "platform": "weixin",
+          "main_account":"true"
+         }
+    }
+    }' \
+   https://{{host}}/1.1/users
+  
+```
+应答内容包括 objectId、createdAt、sessionToken、authData 以及一个自动生成的随机 username，应答的 body 类似：
+
+```json
+{
+    "sessionToken": "v53f0q4oecbrjojn530w89s5f", 
+    "updatedAt": "2018-08-16T08:03:44.203Z", 
+    "objectId": "5b752fe0a22b9d003137e16d", 
+    "username": "vp7szn9ytuaylgtnw14qnjx2u", 
+    "createdAt": "2018-08-16T08:03:44.203Z", 
+    "emailVerified": false, 
+    "authData": {
+        "weixin1": {
+            "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc", 
+            "access_token": "12_b6mz7ujXbTY4vpbqCRaKVa_y0Ij3N9grCeVtM8VJT8KFd4qnQ9lXtBsZVxG6x9c9Nay_oNgvbKK7KYKbn8R2P7uEgA0EhsXMHmxkx-xU-Tk", 
+            "expires_in": 7200, 
+            "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838", 
+            "scope": "snsapi_userinfo", 
+            "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U", 
+            "platform": "weixin", 
+            "main_account": "true"
+        }, 
+        "_weixin_unionid": {
+            "uid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
+        }
+    }, 
+    "mobilePhoneVerified": false
+}
+```
 
 #### 连接
 
-连接一个现有的用户到新浪微博或者腾讯微博账号，可以向 user endpoint 发送一个附带 `authData` 字段的 PUT 请求来实现。例如，连接一个用户到新浪微博账号发起的请求类似这样：
+连接一个现有的用户到新浪微博或者微信，可以向 user endpoint 发送一个附带 `authData` 字段的 PUT 请求来实现。例如，连接一个用户到微信账号发起的请求类似这样：
 
 ```sh
 curl -X PUT \
@@ -2009,10 +2090,11 @@ curl -X PUT \
   -H "Content-Type: application/json" \
   -d '{
         "authData": {
-          "weibo": {
+          "weixin": {
             "uid": "123456789",
             "access_token": "2.00vs3XtCI5FevCff4981adb5jj1lXE",
             "expiration_in": "36000"
+            ...
           }
         }
       }' \
@@ -2023,20 +2105,45 @@ curl -X PUT \
 
 #### 断开连接
 
-断开一个现有用户到某个服务，可以发送一个PUT请求设置 `authData` 中对应的服务为 null 来做到。例如，取消新浪微博关联：
+断开一个现有用户到某个服务，可以通过删除 `authData` 中对应的平台来做到。
+例如，已经绑定过微信的用户 `authData` 数据格式如下，平台名称为 `weixin`：
+
+```json
+{
+  "username": "3td7p1nucap1i1p53m1zibwgx",
+   "authData": {
+    "weixin": {
+      "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc",
+      "scope": "snsapi_userinfo",
+      "refresh_token": "refresh_token",
+      "platform": "weixin",
+      "unionid": "unionid,
+      "access_token": "access_token",
+      "expires_in": 7200
+    }
+  },
+}
+```
+
+取消微信关联通过删除 `authData.weixin` 来实现:
 
 ```sh
 curl -X PUT \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
-  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  -H "X-LC-Session: 6fehqhr2t2na5mv1aq2om7jgz" \
   -H "Content-Type: application/json" \
-  -d '{
-        "authData": {
-      "weibo" : null
-    }
-      }' \
-  https://{{host}}/1.1/users/55a47496e4b05001a7732c5f
+  -d '{"authData.weixin":{"__op":"Delete"}}' \
+  https://{{host}}/1.1/users/5b7e53a767f356005fb374f6
+```
+
+其返回值类似于：
+
+```json
+{
+  "updatedAt":"2018-08-23T06:32:47.633Z",
+  "objectId":"5b7e53a767f356005fb374f6"
+}
 ```
 
 ### 安全
