@@ -3,8 +3,14 @@
 
 # 即时通讯开发指南 &middot; 基础入门
 
+## 即时通讯要解决的需求
 
-即时通讯是提供了实时通讯的功能，在不需要编写服务端的代码的情况下，仅使用客户端 SDK 即可实现在线聊天/多人群组/私聊/消息群发等实时通讯的功能，如下时序图简单的介绍了一下即时通讯的业务流程：
+- 社交应用需要接入聊天功能
+- 游戏需要接入聊天频道
+- 直播应用要接入聊天室弹幕服务
+- 系统广播消息在线通知
+
+即时通讯使得开发者可以在不编写服务端的代码的情况下，仅使用客户端 SDK 即可实现在线聊天/多人群组/私聊/消息群发等实时通讯的功能，如下时序图简单的介绍了一下即时通讯的业务流程：
 
 ![rtm-message-seq](images/rtm-message-seq.svg)
 
@@ -16,102 +22,111 @@
 - [Android-Java](sdk_setup-android.html)
 - [Unity3D-C#](sdk_setup-dotnet.html)
 
-## 登录
 
-登录的含义是：
+## 一对一单聊
+我们从最基本的一对一私聊开始接入即时通讯模块，首先我们需要明确一个需求：
 
-> 在客户端设置一个全局唯一字符串类型的 ID（例如 Tom），然后调用 SDK 的方法打开与服务端的长连接
+> 假设我们正在制作一个社交聊天的应用，第一步要实现一个用户向另一个用户发起聊天的功能
+
+### 1.建立连接
+
+建立连接的含义是：
+
+> 在客户端设置一个全局唯一字符串类型的 ID（例如 Tom），然后调用 SDK 的方法建立与服务端的长连接
 
 对应的 SDK 方法如下：
 
 ```js
 var AV = require('leancloud-storage');
 var { Realtime,TextMessage } = require('leancloud-realtime');
-// Tom 用自己的名字作为 clientId，获取 IMClient 对象实例
+// Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
 }).catch(console.error);
 ```
 
-### 客户端事件与网络状态响应
+推荐使用的方式：在用户登录之后用当前的用户名当做 `clientId` 建立连接。
 
-{{ docs.note("注意：在网络中断的情况下，所有的消息收发和对话操作都会失败。开发者应该监听与网络状态相关的事件并更新 UI，以免影响用户的使用体验。") }}
+### 2.创建对话
 
-当网络连接出现中断、恢复等状态变化时，SDK 会在 Realtime 实例上派发以下事件：
+对话是即时通讯抽象出来的概念，它是客户端之间互发消息的载体，可以理解为一个通道，所有在这个对话内的成员都可以在这个对话内收发消息。
 
-* `DISCONNECT`：与服务端连接断开，此时聊天服务不可用。
-* `OFFLINE`：网络不可用。
-* `ONLINE`：网络恢复。
-* `SCHEDULE`：计划在一段时间后尝试重连，此时聊天服务仍不可用。
-* `RETRY`：正在重连。
-* `RECONNECT`：与服务端连接恢复，此时聊天服务可用。
-
-```javascript
-var { Event } = require('leancloud-realtime');
-
-realtime.on(Event.DISCONNECT, function() {
-  console.log('服务器连接已断开');
-});
-realtime.on(Event.OFFLINE, function() {
-  console.log('离线（网络连接已断开）');
-});
-realtime.on(Event.ONLINE, function() {
-  console.log('已恢复在线');
-});
-realtime.on(Event.SCHEDULE, function(attempt, delay) {
-  console.log(delay + 'ms 后进行第' + (attempt + 1) + '次重连');
-});
-realtime.on(Event.RETRY, function(attempt) {
-  console.log('正在进行第' + (attempt + 1) + '次重连');
-});
-realtime.on(Event.RECONNECT, function() {
-  console.log('与服务端连接恢复');
-});
-```
-
-本姐内容介绍的是客户端如何与云端建立长连接，并且如何监听网络状态的变化，这样可以在客户端的 UI 上做一些优化。
-
-## 聊天模式
-
-即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景我们可能会有如下几种典型的通讯模式：
-
-- 一对一的单聊
-- 多对多的群组聊天
-- 系统管理员的在线通知，也就是现在普遍被使用的服务号，公众号等
-
-
-在 LeanCloud 即时通讯的内部，我们将上述场景统一称为「对话」，下面我们从最简单的一对一私聊开始完整地学习创建对话/互发消息/离开对话：
-
-
-### 一对一单聊
-
-首先我们沿用刚才[登录](#登录)章节里面的代码进行拓展：
-
+Tom 已经建立了连接，因此他需要一个对话来发送消息给 Jerry：
 
 ```js
 var { TextMessage } = require('leancloud-realtime');
-// Tom 用自己的名字作为 clientId，获取 IMClient 对象实例
+// om 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
   // 创建与Jerry之间的对话
   return tom.createConversation({
+    // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
     members: ['Jerry'],
+    // 对话名称
+    name: 'Tom & Jerry',
+  });
+}).catch(console.error);
+```
+
+对比[建立连接](#建立连接)的代码有如下关键改动:
+
+```js
+return tom.createConversation({
+  // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
+  members: ['Jerry'],
+  // 对话名称
+  name: 'Tom & Jerry',
+});
+```
+
+`createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 _Conversation 表内，可以打开控制台->存储查看数据。
+
+
+### 3.发送消息
+
+对话已经创建成功了，接下来 Tom 可以发出第一条消息了：
+
+```js
+var { TextMessage } = require('leancloud-realtime');
+// om 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
+realtime.createIMClient('Tom').then(function(tom) {
+  // 成功登录
+  // 创建与Jerry之间的对话
+  return tom.createConversation({
+    // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
+    members: ['Jerry'],
+    // 对话名称
     name: 'Tom & Jerry',
   });
 }).then(function(conversation) {
-  // 发送消息
-  return conversation.send(new TextMessage('耗子，起床！'));
+  // 发送一条最简单的文本消息
+  return conversation.send(new TextMessage('Jerry，起床了！'));
 }).then(function(message) {
   console.log('Tom & Jerry', '发送成功！');
 }).catch(console.error);
 ```
 
-上述代码的含义是：
+再次比对前一章节代码，修改的关键片段如下:
 
-> Tom 打开了与云端的长连接，并且创建了一个对话，并且在创建对话的时候邀请了 Jerry 一起加入到这个对话当中，在创建对话之后，Tom 还主动的发送了一条消息
+```js
+  // 发送一条最简单的文本消息
+  return conversation.send(new TextMessage('Jerry，起床了！'));
+```
 
+`conversation.send` 接口实现的功能就是向对话中发送一条消息，而 Jerry 只要在线他就会收到消息，至此 Jerry 还没有登场，那么他怎么接收消息呢？
+
+### 4.接收消息
 
-而 Tom 此时并不在线，他不会收到任何的消息通知，因此我们就需要在另一个客户端添加如下代码，让 Jerry 能够感知到自己被邀请到了一个新的对话当中：
+我们在另一个设备上启动应用，然后使用 Jerry 当做 `clientId` 建立连接:
+
+```js
+var { Event } = require('leancloud-realtime');
+// Jerry 登录
+realtime.createIMClient('Jerry').then(function(jerry) {
+}).catch(console.error);
+```
+
+紧接着让 Jerry 开始订阅事件通知：
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -124,17 +139,41 @@ realtime.createIMClient('Jerry').then(function(jerry) {
     // 当前用户收到了某一条消息
     jerry.on(Event.MESSAGE, function(message, conversation) {
         console.log('Message received: ' + message.text);
-  });
+    });
 }).catch(console.error);
 ```
 
-上述代码的含义是：
+这里 Jerry 订阅了两种事件通知:
 
-> Jerry 打开了与云端的长连接，然后开始监听事件，当他发现自己被邀请到一个新的对话之后就会触发 jerry.on(Event.INVITED) ，而如果他收到新的消息也会触发 jerry.on(Event.MESSAGE)
+```js
+jerry.on(Event.INVITED, function invitedEventHandler(payload, conversation) {
+      console.log(payload.invitedBy, conversation.id);
+});
+```
+
+`Event.INVITED` 在当前用户被邀请加入一个对话的时候触发。
+
+而接收消息对应的是:
+
+```js
+// 当前用户收到了某一条消息
+jerry.on(Event.MESSAGE, function(message, conversation) {
+    console.log('Message received: ' + message.text);
+});
+```
+
+而当 Tom 创建了对话之后，Jerry 会这一端会立即触发 `Event.INVITED`，此时客户端可以做出一些 UI 展示，引导用户加载聊天的界面，紧接着 Tom 发送了消息，则会触发 Jerry `Event.MESSAGE`，这个时候就可以直接在聊天界面的消息列表里面渲染这条消息了。
 
 
-如果执行完了上述代码，请打开控制台找到存储服务，可以查看 _Conversation 表里面的多出了一条数据。
+## 聊天模式
 
+即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景我们可能会有如下几种典型的通讯模式：
+
+- 一对一的单聊(前一章节已做介绍)
+- 多对多的群组聊天
+- 系统管理员的在线通知，也就是现在普遍被使用的服务号，公众号等
+
+在 LeanCloud 即时通讯的内部，我们将上述场景统一称为「对话」，下面我们从最简单的一对一私聊开始完整地学习创建对话/互发消息/离开对话：
 
 ### 多人群聊
 
@@ -210,7 +249,6 @@ realtime.createIMClient('Tom').then(function(tom) {
 
 ![rtm-member-remove-seq](images/rtm-member-remove-seq.svg)
 
-
 紧接着 William 通过 conversation id 他自己主动加入对话：
 
 ```js
@@ -228,7 +266,6 @@ realtime.createIMClient('William').then(function(william) {
 
 ![rtm-join-conv-seq](images/rtm-join-conv-seq.svg)
 
-
 Jerry 不想继续呆在这个对话里面了，他选择退出对话:
 
 ```js
@@ -237,7 +274,6 @@ conversation.quit().then(function(conversation) {
   // 退出成功 ['William', 'Tom']
 }).catch(console.error.bind(console));
 ```
-
 执行了这段代码之后会触发如下流程：
 
 ![rtm-leave-conv-seq](images/rtm-leave-conv-seq.svg)
@@ -334,4 +370,38 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
 
 如要获取更多图像消息，可以效仿前一章节中使用 `conversation.createMessagesIterator` 接口生成迭代器来查询更多图像消息。
 
+## 客户端事件与网络状态响应
 
+{{ docs.note("注意：在网络中断的情况下，所有的消息收发和对话操作都会失败。开发者应该监听与网络状态相关的事件并更新 UI，以免影响用户的使用体验。") }}
+
+当网络连接出现中断、恢复等状态变化时，SDK 会在 Realtime 实例上派发以下事件：
+
+* `DISCONNECT`：与服务端连接断开，此时聊天服务不可用。
+* `OFFLINE`：网络不可用。
+* `ONLINE`：网络恢复。
+* `SCHEDULE`：计划在一段时间后尝试重连，此时聊天服务仍不可用。
+* `RETRY`：正在重连。
+* `RECONNECT`：与服务端连接恢复，此时聊天服务可用。
+
+```js
+var { Event } = require('leancloud-realtime');
+
+realtime.on(Event.DISCONNECT, function() {
+  console.log('服务器连接已断开');
+});
+realtime.on(Event.OFFLINE, function() {
+  console.log('离线（网络连接已断开）');
+});
+realtime.on(Event.ONLINE, function() {
+  console.log('已恢复在线');
+});
+realtime.on(Event.SCHEDULE, function(attempt, delay) {
+  console.log(delay + 'ms 后进行第' + (attempt + 1) + '次重连');
+});
+realtime.on(Event.RETRY, function(attempt) {
+  console.log('正在进行第' + (attempt + 1) + '次重连');
+});
+realtime.on(Event.RECONNECT, function() {
+  console.log('与服务端连接恢复');
+});
+```
