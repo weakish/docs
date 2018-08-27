@@ -491,7 +491,7 @@ file.save().then(function() {
 }).catch(console.error.bind(console));
 ```
 
-### 接收图像消息
+#### 接收图像消息
 
 对话中的其他成员修改一下接收消息的事件订阅逻辑，根据消息类型来做不同的 UI 展现：
 
