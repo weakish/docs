@@ -1,8 +1,8 @@
-# Play 开发指南 &middot; JavaScript
+# 实时对战开发指南 &middot; JavaScript
 
 ## 前言
 
-Play 是一款基于 JavaScript 编写的实时对战类游戏 SDK，它为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。Play 提供的主要功能如下：
+实时对战是一款基于 JavaScript 编写的游戏 SDK，它为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。实时对战提供的主要功能如下：
 
 - 获取房间列表
 - 创建房间
@@ -16,11 +16,11 @@ Play 是一款基于 JavaScript 编写的实时对战类游戏 SDK，它为有�
 
 ## SDK 导入
 
-请阅读 [安装](play-quick-start-js.html#安装)，获取 js 库文件。
+请阅读 [安装](multiplayer-quick-start-js.html#安装)，获取 js 库文件。
 
 ## 初始化
 
-首先 Play SDK 在内部实例化了一个 `Play` 类型的对象 `play`，我们只需要引入并使用即可。后文中的 `play` 都是指这个对象。
+首先实时对战 SDK 在内部实例化了一个 `Play` 类型的对象 `play`，我们只需要引入并使用即可。后文中的 `play` 都是指这个对象。
 
 ```javascript
 import {
@@ -37,7 +37,7 @@ import {
 } from '../play';
 ```
 
-接着我们需要实例化一个对象作为初始化 Play 的参数。
+接着我们需要实例化一个对象作为初始化实时对战的参数。
 
 ```javascript
 play.init({
@@ -135,7 +135,7 @@ play.on(Event.LOBBY_JOINED, () => {
 });
 ```
 
-当玩家加入到大厅后，Play SDK 会自动同步当前大厅的房间列表，开发者可以根据需求显示房间列表，或加入房间参与游戏。
+当玩家加入到大厅后，实时对战 SDK 会自动同步当前大厅的房间列表，开发者可以根据需求显示房间列表，或加入房间参与游戏。
 
 开发者可以根据下面的接口获取房间列表。
 
@@ -306,7 +306,7 @@ play.joinRandomRoom({
 });
 ```
 
-与 [加入指定房间](play-js.html#加入指定房间) 一样，我们也有可能接收到 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
+与 [加入指定房间](multiplayer-js.html#加入指定房间) 一样，我们也有可能接收到 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
 
 ### 加入或创建指定房间
 
@@ -431,7 +431,7 @@ play.on(Event.MASTER_SWITCHED, (data) => {
 
 ## 自定义属性及同步
 
-为了满足开发者不同的游戏需求，Play SDK 允许开发者设置「自定义属性」。自定义属性接口参数定义为 JavaScript 的 `Object` 类型，支持的数据类型包括：
+为了满足开发者不同的游戏需求，实时对战 SDK 允许开发者设置「自定义属性」。自定义属性接口参数定义为 JavaScript 的 `Object` 类型，支持的数据类型包括：
 
 - Boolean
 - Number
@@ -461,7 +461,7 @@ play.room.setCustomProperties(props);
 
 注意：这个接口并不是直接设置「客户端中自定义属性的内存值」，而是发送修改自定义属性的消息，由服务端最终确定是否修改。
 
-当房间属性变化时，Play SDK 将派发 `ROOM_CUSTOM_PROPERTIES_CHANGED`（房间自定义属性）事件通知所有玩家客户端（包括自己）。
+当房间属性变化时，SDK 将派发 `ROOM_CUSTOM_PROPERTIES_CHANGED`（房间自定义属性）事件通知所有玩家客户端（包括自己）。
 
 ```javascript
 // 注册房间属性变化事件
@@ -477,7 +477,7 @@ play.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (data) => {
 
 ### 玩家自定义属性
 
-玩家自定义属性与 [房间自定义属性](play-js.html#房间自定义属性) 基本一致。
+玩家自定义属性与 [房间自定义属性](multiplayer-js.html#房间自定义属性) 基本一致。
 
 ```javascript
 // 扑克牌对象
@@ -605,7 +605,7 @@ play.on(Event.CUSTOM_EVENT, event => {
 
 ## 断开连接
 
-当游戏过程中，由于网络原因可能会断开连接，此时 Play SDK 会向客户端派发 `DISCONNECTED`（断开连接）事件，开发者可以根据需要注册并处理。
+当游戏过程中，由于网络原因可能会断开连接，此时 SDK 会向客户端派发 `DISCONNECTED`（断开连接）事件，开发者可以根据需要注册并处理。
 
 ```javascript
 // 注册断开连接事件
