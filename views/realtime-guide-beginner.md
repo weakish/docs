@@ -12,11 +12,11 @@
 - 直播应用要接入聊天室弹幕服务
 - 系统广播消息在线通知，游戏 GM 在线全服广播
 
-而上述只是一些比较经典和流行的场景，即时通讯不局限于上述用法和场景，我们提供的易用性支持开发者可以拓展更多的场景和模式。
+而上述只是一些比较经典和流行的场景，即时通讯不局限于上述用法和场景，我们提供了许多易用性较高的接口支持开发者可以拓展更多的场景和模式。
 
 即时通讯要解决的核心需求就是:
 
-> 让你的应用/软件/网站/小程序/游戏拥有私聊/群聊/聊天室/系统消息等通讯能力
+> 让你的应用拥有私聊、群聊、聊天室、系统消息等通讯能力
 
 
 即时通讯使得开发者可以在不编写服务端的代码的情况下，仅使用客户端 SDK 即可实现在线聊天/多人群组/私聊/消息群发等实时通讯的功能，如下时序图简单的介绍了一下即时通讯的业务流程：
@@ -60,7 +60,7 @@ AVIMClient tom = AVIMClient.getInstance("Tom");
 
 1. 它必须为一个字符串
 2. 在一个应用内全局唯一
-3. 长度不能超过 128 个字符
+3. 长度不能超过 64 个字符
 
 创建完毕之后，`AVIMClient` 的处于未初始化的状态，如果想收发消息我们需要让客户端与云端建立一个长连接。
 
@@ -164,13 +164,7 @@ realtime.createIMClient('Tom').then(function(tom) {
 conversation.send(new TextMessage('Jerry，起床了！'));
 ```
 
-`conversation.send` 接口实现的功能就是向对话中发送一条消息，它的参数解释如下:
-
-1. `transient`: 是否作为暂态消息发送
-2. `receipt`:	bool,	可选参数，是否需要回执，仅在普通对话中有效
-3. `will`:	bool,	可选参数是否指定该消息作为「掉线消息」发送， 「掉线消息」会延迟到当前用户掉线后发送，常用来实现「下线通知」功能
-4. `priority`:枚举, 消息优先级，仅在暂态对话中有效
-5. `pushData`: 字典类型, 消息对应的离线推送内容，如果消息接收方不在线，会推送指定的内容。
+`conversation.send` 接口实现的功能就是向对话中发送一条消息。
 
 
 Jerry 只要在线他就会收到消息，至此 Jerry 还没有登场，那么他怎么接收消息呢？
@@ -451,6 +445,8 @@ query.limit(10).contains('name', 'NBA').find().then(function(conversations) {
 
 ### 图像消息
 
+#### 发送图像文件
+
 我们从发送一张图片消息的生命周期的时序图来了解整个过程：
 
 ![rtm-image-message-send-seq](images/rtm-image-message-send-seq.svg)
@@ -477,9 +473,50 @@ file.save().then(function() {
 }).catch(console.error.bind(console));
 ```
 
+#### 发送图像连接
+
+除了上述这种从本地直接发送图片文件的消息之外，在很多时候，用户可能从网络上或者别的应用中拷贝了一个图像的网络连接地址，当做一条图像消息发送到对话中，这种需求可以用如下代码来实现：
+
+```js
+var AV = require('leancloud-storage');
+var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+// 从网络链接直接构建一个图像消息
+var file = new AV.File.withURL('萌妹子', 'http://pic2.zhimg.com/6c10e6053c739ed0ce676a0aff15cf1c.gif');
+file.save().then(function() {
+  var message = new ImageMessage(file);
+  message.setText('萌妹子一枚');
+  return conversation.send(message);
+}).then(function() {
+  console.log('发送成功');
+}).catch(console.error.bind(console));
+```
+
+### 接收图像消息
+
+对话中的其他成员修改一下接收消息的事件订阅逻辑，根据消息类型来做不同的 UI 展现：
+
+```js
+var { Event, TextMessage } = require('leancloud-realtime');
+var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+   var file;
+   switch (message.type) {
+      case ImageMessage.TYPE:
+        file = message.getFile();
+        console.log('收到图像消息，url: ' + file.url());
+        break;
+   }
+}
+```
+
 ### 多媒体消息
 
-与图像消息一样，多媒体消息消息本身的物理文件的内容会先试用 `AVFile` 存储在云端，然后发送云端链接到对话当中，而在接收方的客户端只要对链接做一些处理，根据消息的类型不同做不同的 UI 展现，例如语音消息可以做成一个小按钮，用户点击之后就播放语音，而视频消息则是一张视频截图，用户点击之后播放视频，诸如此类。
+与图像消息一样，其他多媒体消息都拥有如下两种用法：
+
+- 如果发送的是多媒体消息本身的物理文件，那么它的的内容会先试用 `AVFile` 存储在云端，然后发送云端链接到对话当中，而在接收方的客户端只要对链接做一些处理，根据消息的类型不同做不同的 UI 展现，例如语音消息可以做成一个小按钮，用户点击之后就播放语音，而视频消息则是一张视频截图，用户点击之后播放视频，诸如此类。
+- 如果是一个网络连接地址，它的物理内容并不会被存放于 `AVFile` 表内，而是直接将其转化成一个消息，发送出去
+
 
 ### 其他类型消息
 
@@ -487,7 +524,7 @@ file.save().then(function() {
 
 ## 消息记录
 
-消息记录默认会在云端保存 **30** 天， SDK 提供了多种方式来获取到本地。
+消息记录默认会在云端保存 **180** 天， SDK 提供了多种方式来获取到本地。
 
 iOS 和 Android SDK 分别提供了内置的消息缓存机制，减少客户端对云端消息记录的查询次数，并且在离线情况下，也能查询到准确的消息记录。
 
@@ -503,7 +540,7 @@ conversation.queryMessages({
 }).catch(console.error.bind(console));
 ```
 
-而如果想继续拉取更早的消息记录，需要用到如下代码：
+而如果想继续拉取更早的消息记录，可以使用如下代码：
 
 ```js
 // 创建一个迭代器，每次获取 10 条历史消息
@@ -522,12 +559,9 @@ messageIterator.next().then(function(result) {
   //   done: false,
   // }
 }).catch(console.error.bind(console));
-// 第二次调用 next 方法，获得第 21 条消息，没有更多消息，done 为 true
-messageIterator.next().then(function(result) {
-  // No more messages
-  // result: { value: [message21], done: true }
-}).catch(console.error.bind(console));
 ```
+
+持续调用 `messageIterator.next()` 可以获取更多的聊天记录。
 
 ### 进入对话之后显示最近的聊天记录
 
