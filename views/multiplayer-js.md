@@ -473,7 +473,7 @@ play.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (data) => {
 });
 ```
 
-注意：`changedProperties` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `play.room.getCustomProperties()` 获得。
+注意：`changedProps` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `play.room.getCustomProperties()` 获得。
 
 ### 玩家自定义属性
 
@@ -711,7 +711,7 @@ play.on(Event.ROOM_JOINED, () => {
 });
 ```
 
-这个接口相当于 `reconnect()` 和 `rejoin()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
+这个接口相当于 `reconnect()` 和 `rejoinRoom()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
 
 
 
