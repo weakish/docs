@@ -770,11 +770,11 @@ option.pushData = @{@"alert" : @"您有一条未读消息", @"sound" : @"message
 
 {% block api_method_conversation_join %} `AVIMConversation.joinWithCallback`{% endblock %}
 
-{% block api_method_conversation_invite %} `AVIMConversation.addMembersWithClientIds`{% endblock %}
+{% block api_method_conversation_invite %} `AVIMConversation.addMembers`{% endblock %}
 
 {% block api_method_conversation_quit %} `AVIMConversation.quitWithCallback`{% endblock %}
 
-{% block api_method_conversation_kick %} `AVIMConversation.removeMembersWithClientIds`{% endblock %}
+{% block api_method_conversation_kick %} `AVIMConversation.kickMembers`{% endblock %}
 
 {% block conversation_members_change_notice_intro %}
 在 iOS 中，开发者需要实现 `AVIMClientDelegate` 代理，并且为 AVIMClient 指定该代理的一个实例。
