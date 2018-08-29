@@ -57,69 +57,53 @@ AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
         });
 ```
 ```js
-// 待补充
+var AV = require('leancloud-storage');
+var { Realtime } = require('leancloud-realtime');
+// Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.getQuery().equalTo('sys', true).find();
+}).then(function(conversations){
+    // 查询到的服务号
+}).catch(console.error);
 ```
-
 
 ## 订阅
 根据上一个步骤，获取到的系统对话，选取一个符合条件的，比如就获取最新创建的系统对话，在客户端订阅它：
 
 ```objc
-AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+AVIMServiceConversation *serviceConversation = (AVIMServiceConversation *)conv;
 
-[client openWithCallback:^(BOOL success, NSError *error) {
+[serviceConversation subscribeWithCallback:^(BOOL success, NSError *error) {
     
     if (success && !error) {
         
-        [client.conversationQuery getConversationById:@"Service Conversation ID" callback:^(AVIMConversation *conv, NSError *error) {
-            
-            if (conv && [conv isKindOfClass:[AVIMServiceConversation class]] && !error) {
-                
-                AVIMServiceConversation *serviceConversation = (AVIMServiceConversation *)conv;
-                
-                [serviceConversation subscribeWithCallback:^(BOOL success, NSError *error) {
-                    
-                    if (success && !error) {
-                        
-                        // subscribe Service Conversation success.
-                    }
-                }];
-            }
-        }];
+        // subscribe Service Conversation success.
     }
 }];
 ```
 ```java
-AVIMClient avimClient = AVIMClient.getInstance("Tom");
-avimClient.open(new AVIMClientCallback() {
-    @Override
-    public void done(AVIMClient avimClient, AVIMException e) {
-        AVIMConversationsQuery avimConversationsQuery = avimClient.getServiceConversationQuery();
-        avimConversationsQuery.whereEqualTo("objectId", "Service Conversation ID");
-        avimConversationsQuery.findInBackground(new AVIMConversationQueryCallback() {
-            @Override
-            public void done(List<AVIMConversation> list, AVIMException e) {
-                if (list.get(0) instanceof AVIMServiceConversation) {
-                    ((AVIMServiceConversation) list.get(0)).subscribe(new AVIMConversationCallback() {
-                        @Override
-                        public void done(AVIMException e) {
-                            if (e == null) {
+if (list.get(0) instanceof AVIMServiceConversation) {
+    ((AVIMServiceConversation) list.get(0)).subscribe(new AVIMConversationCallback() {
+        @Override
+        public void done(AVIMException e) {
+            if (e == null) {
 
-                            } else {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                } else {
-                    e.printStackTrace();
-                }
+            } else {
+                e.printStackTrace();
             }
-        });
-    }
-});
+        }
+    });
+} else {
+    e.printStackTrace();
+}
 ```
 ```js
-// 待补充
+tom.getQuery().equalTo('sys', true).find().then(function(conversations){
+    var serviceConversation = conversations[0];
+    return serviceConversation.subscribe();
+}).then(function(success){
+
+}).catch(console.error);
 ```
 
 ## 接收消息
@@ -133,40 +117,30 @@ avimClient.open(new AVIMClientCallback() {
 ## 取消订阅
 
 ```objc
- AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+AVIMServiceConversation *serviceConversation = (AVIMServiceConversation *)conv;
+
+[serviceConversation unsubscribeWithCallback:^(BOOL success, NSError *error) {
     
-    [client openWithCallback:^(BOOL success, NSError *error) {
+    if (success && !error) {
         
-        if (success && !error) {
-            
-            [client.conversationQuery getConversationById:@"Service Conversation ID" callback:^(AVIMConversation *conv, NSError *error) {
-                
-                if (conv && [conv isKindOfClass:[AVIMServiceConversation class]] && !error) {
-                    
-                    AVIMServiceConversation *serviceConversation = (AVIMServiceConversation *)conv;
-                    
-                    [serviceConversation unsubscribeWithCallback:^(BOOL success, NSError *error) {
-                        
-                        if (success && !error) {
-                            
-                            // unsubscribe Service Conversation success.
-                        }
-                    }];
-                }
-            }];
-        }
-    }];
+        // unsubscribe Service Conversation success.
+    }
+}];
 ```
 ```java
 AVIMServiceConversation sc = imClient.getServiceConversation("convId");
 sc.unsubscribe(new AVIMConversationCallback() {
   @Override
   public void done(AVIMException e) {
+
   }
 });
 ```
 ```js
-// 待补充
+tom.getConversation(CONVERSATION_ID).then(function(conversation) {
+    var serviceConversation = conversation;
+    return serviceConversation.unsubscribe();
+}).catch(console.error);
 ```
 
 ## FAQ
