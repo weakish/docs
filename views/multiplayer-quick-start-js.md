@@ -1,11 +1,11 @@
-# Play 入门教程 · JavaScript
+# 实时对战入门教程 · JavaScript
 
-欢迎使用 LeanCloud Play。本教程将通过模拟一个比较玩家分数大小的场景，来讲解 Play SDK 的核心使用方法。
+欢迎使用 Play 实时对战。本教程将通过模拟一个比较玩家分数大小的场景，来讲解 SDK 的核心使用方法。
 
 
 ## 安装
 
-Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。
+实时对战客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。
 
 支持原生导入平台：微信小程序
 
@@ -81,7 +81,7 @@ play.userId = randId.toString();
 ```
 
 
-## 连接至 Play 服务器
+## 连接至实时对战服务器
 
 ```javascript
 play.connect();
@@ -92,7 +92,7 @@ play.connect();
 
 ## 创建或加入房间
 
-默认情况下 Play SDK 会在连接成功后自动加入大厅；玩家在大厅中，创建 / 加入指定房间。
+默认情况下 SDK 会在连接成功后自动加入大厅；玩家在大厅中，创建 / 加入指定房间。
 
 ```javascript
 // 注册连接成功事件
@@ -103,7 +103,7 @@ play.on(Event.CONNECTED, () => {
 });
 ```
 
-`joinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](play-js.html#创建房间) 获取更多关于 `joinOrCreateRoom` 的用法。
+`joinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-js.html#创建房间) 获取更多关于 `joinOrCreateRoom` 的用法。
 
 
 ## 通过 CustomPlayerProperties 同步玩家属性
@@ -214,7 +214,7 @@ onLoad() {
 }
 ```
 
-这样做的原因是 Play SDK 使用了基于 WebSocket 的 wss 进行安全通信，需要通过以上代码适配 Android 平台的 CA 证书机制。
+这样做的原因是 SDK 使用了基于 WebSocket 的 wss 进行安全通信，需要通过以上代码适配 Android 平台的 CA 证书机制。
 
 
 
