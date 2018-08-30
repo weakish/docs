@@ -37,6 +37,10 @@ private Play play = Play.Instance;
 play.Init(YOUR_APP_ID, YOUR_APP_KEY, YOUR_APP_REGION);
 ```
 
+注意：由于 Unity 要求必须在「主线程」调用 API，所以，为了减少开发者在使用上的麻烦，SDK 将保证会在「主线程」回调 `EVENT`。但是，需要开发者在 MonoBehavior 的 Update() 中调用 play.HandleMessage()。
+（建议可以做一个 DontDestroy 的 GameObject 挂载脚本调用）
+
+
 
 
 ## 连接
