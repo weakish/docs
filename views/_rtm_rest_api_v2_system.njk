@@ -295,6 +295,33 @@ to_clients | 必填 | 数组类型，表示接收目标消息的 client Id 列�
 {"result": {}}
 ```
 
+### 删除给用户单独发送的消息
+
+本接口要求使用 master key，并且只能删除订阅消息或给用户单独发送的消息，无法删除广播消息。广播消息请使用 [删除广播消息](realtime_rest_api_v2.html#hash-1748962119) 来删除。
+
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'from_client=some-client-id' \
+  --data-urlencode 'timestamp=123' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers/{client_id}/messages/{message_id}
+```
+
+> NOTE：该接口仅删除服务端的消息，对客户端无影响。
+
+参数 | 约束 | 说明
+---|---|---
+from_client | 必填 | 消息的发件人 client ID
+timestamp | 必填 | 消息的时间戳
+
+返回：
+```
+{}
+```
+
 ### 查询服务号给某用户发的消息
 
 该接口要求使用 master key。查询结果包含服务号发送的订阅广播消息也包含单独发送的消息。
