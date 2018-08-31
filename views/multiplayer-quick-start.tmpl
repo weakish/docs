@@ -1,0 +1,74 @@
+# 实时对战入门教程 · {{platform}}
+
+欢迎使用 Play 实时对战。本教程将通过模拟一个比较玩家分数大小的场景，来讲解 SDK 的核心使用方法。
+
+
+## 安装
+
+{% block installation %}
+{% endblock %}
+
+
+
+## 初始化
+
+{% block import %}
+{% endblock %}
+
+
+
+## 设置玩家 ID
+
+{% block set_userid %}
+{% endblock %}
+
+
+
+## 连接至实时对战服务器
+
+{% block connection %}
+{% endblock %}
+
+连接完成后，会通过 `CONNECTED`（连接成功）或 `CONNECT_FAILED`（连接失败）事件来通知客户端。
+
+
+## 创建或加入房间
+
+默认情况下 Play SDK 不需要加入「大厅」，即可创建 / 加入指定房间。
+
+{% block connectio_event %}
+{% endblock %}
+
+
+## 通过 CustomPlayerProperties 同步玩家属性
+
+当有新玩家加入房间时，Master 为每个玩家分配一个分数，这个分数通过「玩家自定义属性」同步给玩家。
+（这里没有做更复杂的算法，只是为 Master 分配了 10 分，其他玩家分配了 5 分）。
+
+{% block join_room %}
+{% endblock %}
+
+玩家得到分数后，显示自己的分数。
+
+{% block player_custom_props_event %}
+{% endblock %}
+
+
+
+## 通过「自定义事件」通信
+
+当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
+
+{% block win %}
+{% endblock %}
+
+根据判断胜利者是不是自己，做不同的 UI 显示。
+
+{% block custom_event %}
+{% endblock %}
+
+
+## Demo
+
+{% block demo %}
+{% endblock %}

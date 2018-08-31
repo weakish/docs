@@ -1,10 +1,11 @@
-# 实时对战入门教程 · JavaScript
+{% extends "./multiplayer-quick-start.tmpl" %}
 
-欢迎使用 Play 实时对战。本教程将通过模拟一个比较玩家分数大小的场景，来讲解 SDK 的核心使用方法。
+{% set platform = "JavaScript" %}
 
 
-## 安装
 
+
+{% block installation %}
 实时对战客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。
 
 支持原生导入平台：微信小程序
@@ -41,10 +42,11 @@ DEBUG='Play:*' lean up
 # Windows cmd
 set DEBUG=Play:* lean up
 ```
+{% endblock %}
 
 
-## 初始化
 
+{% block import %}
 导入需要的类和变量：
 
 ```javascript
@@ -70,30 +72,29 @@ const opts = {
 }
 play.init(opts);
 ```
+{% endblock %}
 
 
-## 设置玩家 ID
 
+{% block set_userid %}
 ```javascript
 // 这里使用随机数作为 userId
 const randId = parseInt(Math.random() * 1000000, 10);
 play.userId = randId.toString();
 ```
+{% endblock %}
 
 
-## 连接至实时对战服务器
 
+{% block connection %}
 ```javascript
 play.connect();
 ```
+{% endblock %}
 
-连接完成后，会通过 `CONNECTED`（连接成功）或 `CONNECT_FAILED`（连接失败）事件来通知客户端。
 
 
-## 创建或加入房间
-
-默认情况下 Play SDK 不需要加入「大厅」，即可创建 / 加入指定房间。
-
+{% block connectio_event %}
 ```javascript
 // 注册连接成功事件
 play.on(Event.CONNECTED, () => {
@@ -104,13 +105,11 @@ play.on(Event.CONNECTED, () => {
 ```
 
 `joinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-js.html#创建房间) 获取更多关于 `joinOrCreateRoom` 的用法。
+{% endblock %}
 
 
-## 通过 CustomPlayerProperties 同步玩家属性
 
-当有新玩家加入房间时，Master 为每个玩家分配一个分数，这个分数通过「玩家自定义属性」同步给玩家。
-（这里没有做更复杂的算法，只是为 Master 分配了 10 分，其他玩家分配了 5 分）。
-
+{% block join_room %}
 ```javascript
 // 注册新玩家加入房间事件
 play.on(Event.PLAYER_ROOM_JOINED, (data) => {
@@ -136,9 +135,11 @@ play.on(Event.PLAYER_ROOM_JOINED, (data) => {
   }
 });
 ```
+{% endblock %}
 
-玩家得到分数后，显示自己的分数。
 
+
+{% block player_custom_props_event %}
 ```javascript
 // 注册「玩家属性变更」事件
 play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
@@ -152,12 +153,11 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
   }
 });
 ```
+{% endblock %}
 
 
-## 通过「自定义事件」通信
 
-当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
-
+{% block win %}
 ```javascript
 if (play.player.isMaster()) {
   play.sendEvent('win', 
@@ -165,9 +165,11 @@ if (play.player.isMaster()) {
     { receiverGroup: ReceiverGroup.All });
 }
 ```
+{% endblock %}
 
-根据判断胜利者是不是自己，做不同的 UI 显示。
 
+
+{% block custom_event %}
 ```javascript
 // 注册自定义事件
 play.on(Event.CUSTOM_EVENT, event => {
@@ -187,10 +189,11 @@ play.on(Event.CUSTOM_EVENT, event => {
   }
 });
 ```
+{% endblock %}
 
 
-## Demo
 
+{% block demo %}
 我们通过 Cocos Creator 完成了这个 Demo，供大家运行参考。
 
 [QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)。
@@ -215,8 +218,4 @@ onLoad() {
 ```
 
 这样做的原因是 SDK 使用了基于 WebSocket 的 wss 进行安全通信，需要通过以上代码适配 Android 平台的 CA 证书机制。
-
-
-
-
-
+{% endblock %}

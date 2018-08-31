@@ -1,122 +1,165 @@
-# 实时对战入门教程 · Unity
+{% extends "./multiplayer-quick-start.tmpl" %}
 
-欢迎使用 Play 实时对战。本教程将模拟一个比较玩家点数大小的场景来讲解 SDK 的核心使用方法。
+{% set platform = "C#" %}
 
-我们推荐通过以下方法来学习：
 
-1. 下载 [demo 工程](https://github.com/leancloud/Play-SDK-dotNET)，通过 Unity 打开 demo 工程，浏览和运行 demo 代码，观察日志输出。
-1. 创建一个新的 Unity 工程，安装好 SDK 后，替换你申请的 App ID 和 App Key，根据 demo 代码尝试修改并运行，观察变化。
+{% block installation %}
+Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-CSharp](https://github.com/leancloud/Play-SDK-CSharp)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-CSharp/releases)。
 
-## 安装和初始化
+将下载的 SDK.zip，解压后将 Plugins 目录拖拽至 Unity 工程。如果项目中已有 Plugins 目录，则合并至项目中的 Plugins 目录。
+{% endblock %}
 
-实时对战客户端 SDK 是开源的，源码地址请访问：[Play-SDK-dotNET](https://github.com/leancloud/Play-SDK-dotNET)， 下载请访问 [Play-SDK-dotNET@Release](https://github.com/leancloud/Play-SDK-dotNET/releases)。
 
-下载之后导入到 Unity 的 `Assets/Plugins` 文件里，如下图：
 
-![import-play-sdk](images/import-play-sdk.png)
-
-然后将 `LeanCloud.Play.dll` 里面的 `PlayInitializeBehaviour` 挂载到 Main Camera（或者其他 Game Object）上，如下图：
-
-![import-play-sdk](images/link-play-init-script.png)
-
-## 连接至实时对战服务器
-
-在连接服务器之前请先设置用户唯一 ID，这里使用随机数作为简单示例。
+{% block import %}
+导入需要的命名空间
 
 ```cs
-void Start ()
-{
-	// 随机生成一个用户 ID
-	string userId = Random.Range(0, int.MaxValue).ToString();
-	Debug.Log("userId: " + userId);
-	// 设置用户 ID，请保证游戏内唯一
-	Play.UserID = userId;
-	Play.Connect("1.0.0");
-}
-``` 
-
-## 创建或加入房间
-
-在连接服务器并认证成功后，实时对战 SDK 会回调 `OnAuthenticated()` 接口，我们在此接口中「加入或创建某个房间」。
-
-```cs
-// 连接成功回调接口
-[PlayEvent]
-public override void OnAuthenticated ()
-{
-	// 根据房间名称「加入或创建房间」
-	PlayRoom room = new PlayRoom(roomName);
-	Play.JoinOrCreateRoom(room);
-}
+using LeanCloud.Play;
 ```
 
-## 通过 CustomPlayerProperties 同步玩家属性
-
-当有别的玩家加入到房间时，SDK 会回调 `OnNewPlayerJoinedRoom (Player player)` 接口，我们在此接口中生成随机点数，并进行点数比对。
+通过 `private Play play = Play.Instance;` 获取客户端实例。
 
 ```cs
-// 其他玩家加入回调接口
-[PlayEvent]
-public override void OnNewPlayerJoinedRoom (Player player)
+// App Id
+var APP_ID = YOUR_APP_ID;
+// App Key
+var APP_KEY = YOUR_APP_KEY;
+// App 节点地区
+var APP_REGION = YOUR_APP_REGION;
+// 初始化
+play.Init(APP_ID, APP_KEY, APP_REGION);
+```
+{% endblock %}
+
+
+
+{% block set_userid %}
+```cs
+var random = new System.Random();
+var randId = string.Format("{0}", random.Next(10000000));
+play.UserId = randId;
+```
+{% endblock %}
+
+
+
+{% block connection %}
+```cs
+play.Connect();
+```
+{% endblock %}
+
+
+
+{% block connectio_event %}
+```cs
+play.On(LeanCloud.Play.Event.CONNECTED, (evtData) =>
 {
-	Debug.Log("OnNewPlayerJoinedRoom");
-	if (Play.Player.IsMasterClient) {
-		// 如果当前玩家是房主，则由当前玩家执行分配点数，判断胜负逻辑
-		int count = Play.Room.Players.Count();
-		if (count == 2) {
-			// 两个人即开始游戏
-			foreach (Player p in Play.Players) {
-				Hashtable prop = new Hashtable();
-				if (p.IsMasterClient) {
-					// 如果是房主，则设置 10 分
-					prop.Add("POINT", 10);
-				} else {
-					// 否则设置 5 分
-					prop.Add("POINT", 5);
-				}
-				// 通过设置玩家的 Properties，可以触发所有玩家的 OnPlayerCustomPropertiesChanged(Player player, Hashtable updatedProperties) 回调
-				p.CustomProperties = prop;
-			}
-			// 使用房主作为胜利者，将其 UserId 作为 RPC 参数，通知所有玩家
-			Play.RPC("RPCResult", PlayRPCTargets.All, Play.Room.MasterClientId);
-		}
-	}
-}
+    Debug.Log("connected");
+    // 根据当前时间（时，分）生成房间名称
+    var now = System.DateTime.Now;
+    var roomName = string.Format("{0}_{1}", now.Hour, now.Minute);
+    play.JoinOrCreateRoom(roomName);
+});
+```
 
-// 玩家属性变化回调接口
-[PlayEvent]
-public override void OnPlayerCustomPropertiesChanged (Player player, Hashtable updatedProperties)
+`JoinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-csharp.html#创建房间) 获取更多关于 `JoinOrCreateRoom` 的用法。
+{% endblock %}
+
+
+
+{% block join_room %}
+```cs
+// 注册新玩家加入房间事件
+play.On(LeanCloud.Play.Event.PLAYER_ROOM_JOINED, (evtData) =>
 {
-	if (updatedProperties.ContainsKey("POINT")) {
-		Debug.LogFormat("{0}: {1}", player.UserID, updatedProperties["POINT"]);
-	}
+    var newPlayer = evtData["newPlayer"] as Player;
+    Debug.LogFormat("new player: {0}", newPlayer.UserId);
+    if (play.Player.IsMaster) {
+        // 获取房间内玩家列表
+        var playerList = play.Room.PlayerList;
+        for (int i = 0; i < playerList.Count; i++) {
+            var player = playerList[i];
+            var props = new Dictionary<string, object>();
+            // 判断如果是房主，则设置 10 分，否则设置 5 分
+            if (player.IsMaster) {
+                props.Add("point", 10);
+            } else {
+                props.Add("point", 5);
+            }
+            player.SetCustomProperties(props);
+        }
+        // ...
+    }
+})
+```
+{% endblock %}
+
+
+
+{% block player_custom_props_event %}
+```cs
+// 注册「玩家属性变更」事件
+play.On(LeanCloud.Play.Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
+    var player = evtData["player"] as Player;
+    // 判断如果玩家是自己，则做 UI 显示
+    if (player.IsLocal) {
+        // 得到玩家的分数
+        long point = (long)player.CustomProperties["point"];
+        Debug.LogFormat("{0} : {1}", player.UserId, point);
+        this.scoreText.text = string.Format("Score: {0}", point);
+    }
+});
+```
+{% endblock %}
+
+
+
+{% block win %}
+```cs
+if (play.Player.IsMaster) {
+    // ...
+    var data = new Dictionary<string, object>();
+    data.Add("winnerId", play.Room.Master.ActorId);
+    var opts = new SendEventOptions();
+    opts.ReceiverGroup = ReceiverGroup.All;
+    play.SendEvent("win", data, opts);
 }
 ```
+{% endblock %}
 
-### 通过 RPC 通知玩家消息
 
-在判断出胜利者之后，通过 RPC 机制通知玩家。
 
+{% block custom_event %}
 ```cs
-// 此行代码在 OnNewPlayerJoinedRoom (Player player) 中已被调用过
-// 使用房主作为胜利者，将其 UserId 作为 RPC 参数，通知所有玩家
-Play.RPC("RPCResult", PlayRPCTargets.All, Play.Room.MasterClientId);
+// 注册自定义事件
+play.On(LeanCloud.Play.Event.CUSTOM_EVENT, (evtData) =>
+{
+    // 得到事件参数
+    var eventId = evtData["eventId"] as string;
+    if (eventId == "win") {
+        var eventData = evtData["eventData"] as Dictionary<string, object>;
+        // 得到胜利者 Id
+        int winnerId = (int)(long)eventData["winnerId"];
+        // 如果胜利者是自己，则显示胜利 UI；否则显示失败 UI
+        if (play.Player.ActorId == winnerId) {
+            Debug.Log("win");
+            this.resultText.text = "Win";
+        } else {
+            Debug.Log("lose");
+            this.resultText.text = "Lose";
+        }
+        play.Disconnect();
+    }
+});
 ```
+{% endblock %}
 
-当玩家接收到 RPC 消息后，根据参数做出胜负提示。
 
-```cs
-[PlayRPC]
-public void RPCResult(string winnerId) {
-	// 如果胜利者是自己，则输出胜利日志，否则输出失败日志
-	if (winnerId == Play.Player.UserID) {
-		Debug.Log("win");
-	} else {
-		Debug.Log("lose");
-	}
-}
-```
 
-输出日志参考，如图：
+{% block demo %}
+我们通过 Unity 完成了这个 Demo，供大家运行参考。
 
-![输出日志](images/unity/quick-start-3.png)
+[QuickStart 工程](https://github.com/leancloud/Play-CSharp-Quick-Start)。
+{% endblock %}
