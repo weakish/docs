@@ -97,8 +97,8 @@ $ grunt serve
 
 ## 版本更新
 
-- 请通过 `grunt release` 命令自动 bump `package.json`、自动打标签，请不要手动更新
-- 请按照 `CONVENTIONS.md` 的格式书写有意义的 commits，`CHANGELOG.md` 会被自动生成，请不要手动修改
+- 请通过 `grunt release` 命令自动 bump `package.json` 来自动打标签，请不要手动更新。
+- 请按照 `CONVENTIONS.md` 的格式书写有意义的 commits，`CHANGELOG.md` 会被自动生成，请不要手动修改。
 
 ## 一套模板多份渲染
 
