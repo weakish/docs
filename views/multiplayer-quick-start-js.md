@@ -219,16 +219,3 @@ onLoad() {
 
 这样做的原因是 SDK 使用了基于 WebSocket 的 wss 进行安全通信，需要通过以上代码适配 Android 平台的 CA 证书机制。
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-
-
