@@ -33,6 +33,26 @@ LeanCloud 的每一个账户都可以创建多个应用。同一个应用可分�
 
 目前 Unity 的初始化**只允许**用 `GameObject` 绑定 `AVInitializeBehaviour` 脚本的方法，**不可以**使用其他方式显式调用 `AVClient.Initialize` 的方法。
 
+
+#### 运行时切换应用
+有一部分游戏需求是动态切换服务器，在**一个服务器对应一个 LeanCloud 应用**的场景下，SDK 提供了 `AVClient.Switch(appId, appKey)` 接口进行运行时切换，实例代码如下:
+
+```cs
+bool appToggle = false;
+public void SwitchApp()
+{
+    var appId = "appId1";
+    var appKey = "appKey1";
+    if (appToggle)
+    {
+        appId = "appId2";
+        appKey = "appKey2";
+    }
+    AVClient.Switch(appId, appKey);
+    appToggle = !appToggle;
+}
+```
+
 ## 对象
 
 ### AVObject
