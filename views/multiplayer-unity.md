@@ -10,6 +10,7 @@
 {% set setCustomProperties = "SetCustomProperties" %}
 {% set playerTtl = "PlayerTtl" %}
 {% set api_url = "https://leancloud.github.io/Play-SDK-CSharp/html/" %}
+{% set gameversion = "这个参数" %}
 
 
 {% block import %}
@@ -20,13 +21,13 @@
 {% block initialization %}
 首先实时对战 SDK 在内部实会例化了一个 `Play` 类型的实例对象，我们只需要通过 `Play.Instance` 使用即可。后文中的 `play` 都是指这个对象。
 
-```csharp
+```cs
 private Play play = Play.Instance;
 ```
 
 接着我们需要实例化一个对象作为初始化实时对战的参数。
 
-```csharp
+```cs
 // 初始化
 play.Init(YOUR_APP_ID, YOUR_APP_KEY, YOUR_APP_REGION);
 ```
@@ -37,39 +38,37 @@ play.Init(YOUR_APP_ID, YOUR_APP_KEY, YOUR_APP_REGION);
 
 
 {% block set_userid %}
-```csharp
+```cs
 play.UserId = "leancloud";
 ```
 {% endblock %}
 
 
 {% block connection %}
-```csharp
+```cs
 play.Connect();
 ```
 {% endblock %}
 
 
 {% block connection_with_gameversion %}
-```csharp
+```cs
 play.Connect("0.0.1");
 ```
-
-这个参数表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器。
 {% endblock %}
 
 
 {% block connection_event %}
-```csharp
+```cs
 // 注册连接成功事件
 play.On(Event.CONNECTED, (evtData) => {
-	// TODO 可以做跳转场景等操作
+    // TODO 可以做跳转场景等操作
 
 });
 
 // 注册连接失败事件
 play.On(Event.CONNECT_FAILED, (error) => {
-	// TODO 可以根据 error 提示用户失败原因
+    // TODO 可以根据 error 提示用户失败原因
 
 });
 ```
@@ -78,20 +77,20 @@ play.On(Event.CONNECT_FAILED, (error) => {
 
 
 {% block join_lobby %}
-```csharp
+```cs
 play.AutoJoinLobby = true;
 ```
 
 或手动加入
 
-```csharp
+```cs
 play.JoinLobby();
 ```
 
-```csharp
+```cs
 // 注册成功加入大厅事件
 play.On(Event.LOBBY_JOINED, (evtData) => {
-	// TODO 可以做房间列表展示的逻辑
+    // TODO 可以做房间列表展示的逻辑
 
 });
 ```
@@ -100,7 +99,7 @@ play.On(Event.LOBBY_JOINED, (evtData) => {
 
 
 {% block room_list %}
-```csharp
+```cs
 // 返回 List<LobbyRoom>
 play.LobbyRoomList;
 ```
@@ -109,7 +108,7 @@ play.LobbyRoomList;
 
 
 {% block create_default_room %}
-```csharp
+```cs
 play.CreateRoom();
 ```
 {% endblock %}
@@ -117,14 +116,14 @@ play.CreateRoom();
 
 
 {% block create_custom_room %}
-```csharp
+```cs
 // 房间的自定义属性
 var props = new Dictionary<string, object>();
 props.Add("title", "room title");
 props.Add("level", 2);
 var options = new RoomOptions()
 {
-	Visible = false,
+    Visible = false,
     EmptyRoomTtl = 10000,
     PlayerTtl = 600,
     MaxPlayerCount = 2,
@@ -158,16 +157,16 @@ play.CreateRoom(roomName, options, expectedUserIds);
 
 
 {% block create_room_event %}
-```csharp
+```cs
 // 注册创建房间成功事件
 play.On(Event.ROOM_CREATED, (evtData) => {
-	// 房间创建成功
+    // 房间创建成功
 
 });
 
 // 注册创建房间失败事件
 play.On(Event.ROOM_CREATE_FAILED, (error) => {
-	// TODO 可以根据 error 提示用户创建失败
+    // TODO 可以根据 error 提示用户创建失败
 
 });
 ```
@@ -176,7 +175,7 @@ play.On(Event.ROOM_CREATE_FAILED, (error) => {
 
 
 {% block join_room %}
-```csharp
+```cs
 // 玩家在加入 'LiLeiRoom' 房间
 play.JoinRoom("LiLeiRoom");
 ```
@@ -185,7 +184,7 @@ play.JoinRoom("LiLeiRoom");
 
 
 {% block join_room_with_ids %}
-```csharp
+```cs
 var expectedUserIds = new List<string>() { "LiLei", "Jim" };
 // 玩家在加入 "game" 房间，并为 hello 和 world 玩家占位
 play.JoinRoom("game", expectedUserIds);
@@ -201,16 +200,16 @@ play.JoinRoom("game", expectedUserIds);
 
 
 {% block join_room_event %}
-```csharp
+```cs
 // 注册加入房间成功事件
 play.On(Event.ROOM_JOINED, (evtData) => {
-	// TODO 可以做跳转场景之类的操作
+    // TODO 可以做跳转场景之类的操作
 
 });
 
 // 注册加入房间失败事件
 play.On(Event.ROOM_JOIN_FAILED, (evtData) => {
-	// TODO 可以提示用户加入失败，请重新加入
+    // TODO 可以提示用户加入失败，请重新加入
 
 });
 ```
@@ -219,7 +218,7 @@ play.On(Event.ROOM_JOIN_FAILED, (evtData) => {
 
 
 {% block join_random_room %}
-```csharp
+```cs
 play.JoinRandomRoom();
 ```
 {% endblock %}
@@ -227,7 +226,7 @@ play.JoinRandomRoom();
 
 
 {% block join_random_room_with_condition %}
-```csharp
+```cs
 // 设置匹配属性
 var matchProps = new Dictionary<string, object>();
 matchProps.Add("level", 2);
@@ -238,7 +237,7 @@ play.JoinRandomRoom(matchProps);
 
 
 {% block join_or_create_room %}
-```csharp
+```cs
 // 例如，有 10 个玩家同时加入一个房间名称为 「room1」 的房间，如果不存在，则创建并加入
 play.JoinOrCreateRoom("room1");
 ```
@@ -253,11 +252,11 @@ play.JoinOrCreateRoom("room1");
 
 
 {% block player_room_joined %}
-```csharp
+```cs
 // 注册新玩家加入事件
 play.On(Event.PLAYER_ROOM_JOINED, (evtData) => {
-	var newPlayer = evtData["newPlayer"] as Player;
-	// TODO 新玩家加入逻辑
+    var newPlayer = evtData["newPlayer"] as Player;
+    // TODO 新玩家加入逻辑
 
 });
 ```
@@ -268,7 +267,7 @@ play.On(Event.PLAYER_ROOM_JOINED, (evtData) => {
 
 
 {% block leave_room %}
-```csharp
+```cs
 play.LeaveRoom();
 ```
 {% endblock %}
@@ -276,10 +275,10 @@ play.LeaveRoom();
 
 
 {% block leave_room_event %}
-```csharp
+```cs
 // 注册离开房间事件
 play.On(Event.ROOM_LEFT, (evtData) => {
-	// TODO 可以执行跳转场景等逻辑
+    // TODO 可以执行跳转场景等逻辑
 
 });
 ```
@@ -288,11 +287,11 @@ play.On(Event.ROOM_LEFT, (evtData) => {
 
 
 {% block player_room_left_event %}
-```csharp
+```cs
 // 注册有玩家离开房间事件
 play.On(Event.PLAYER_ROOM_LEFT, (evtData) => {
-	var leftPlayer = evtData["leftPlayer"] as Player;
-	// TODO 可以执行玩家离开的销毁工作
+    var leftPlayer = evtData["leftPlayer"] as Player;
+    // TODO 可以执行玩家离开的销毁工作
 
 });
 ```
@@ -301,7 +300,7 @@ play.On(Event.PLAYER_ROOM_LEFT, (evtData) => {
 
 
 {% block open_room %}
-```csharp
+```cs
 // 设置房间关闭
 play.SetRoomOpened(false);
 ```
@@ -310,7 +309,7 @@ play.SetRoomOpened(false);
 
 
 {% block visible_room %}
-```csharp
+```cs
 // 设置房间不可见
 play.SetRoomVisible(false);
 ```
@@ -319,7 +318,7 @@ play.SetRoomVisible(false);
 
 
 {% block set_master %}
-```csharp
+```cs
 // 通过玩家的 Id 指定 MasterClient
 play.SetMaster(newMasterId);
 ```
@@ -328,16 +327,16 @@ play.SetMaster(newMasterId);
 
 
 {% block master_switched_event %}
-```csharp
+```cs
 // 注册主机切换事件
 play.On(Event.MASTER_SWITCHED, (evtData) => {
-	var newMaster = evtData["newMaster"] as Player;
-	// TODO 可以做主机切换的展示
+    var newMaster = evtData["newMaster"] as Player;
+    // TODO 可以做主机切换的展示
 
-	// 可以根据判断当前客户端是否是 Master，来确定是否执行逻辑处理。
-	if (play.Player.IsMaster) {
+    // 可以根据判断当前客户端是否是 Master，来确定是否执行逻辑处理。
+    if (play.Player.IsMaster) {
 
-	}
+    }
 });
 ```
 {% endblock %}
@@ -353,7 +352,7 @@ play.On(Event.MASTER_SWITCHED, (evtData) => {
 {% block set_custom_props %}
 房间除了固有的属性外，还包括一个 `Dictionary<string, object>` 类型的自定义属性，比如战斗的回合数、所有棋牌等。
 
-```csharp
+```cs
 // 设置想要修改的自定义属性
 var props = new Dictionary<string, object>();
 props.Add("gold", 1000);
@@ -365,12 +364,12 @@ play.Room.SetCustomProperties(props);
 
 
 {% block custom_props_event %}
-```csharp
+```cs
 // 注册房间属性变化事件
 play.On(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (changedProps) => {
-	var props = play.Room.CustomProperties;
-	long gold = (long)props["gold"];
-	// TODO 可以做属性变化的界面展示
+    var props = play.Room.CustomProperties;
+    long gold = (long)props["gold"];
+    // TODO 可以做属性变化的界面展示
 
 });
 ```
@@ -381,7 +380,7 @@ play.On(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (changedProps) => {
 
 
 {% block set_player_custom_props %}
-```csharp
+```cs
 // 扑克牌对象
 var poker = new Dictionary<string, object>();
 poker.Add("flower", 1);
@@ -398,16 +397,16 @@ play.Player.SetCustomProperties(props);
 
 
 {% block player_custom_props_event %}
-```csharp
+```cs
 // 注册玩家自定义属性变化事件
 play.On(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
-	// 结构事件参数
-	var player = evtData["player"] as Player;
-	// 得到玩家所有自定义属性
-	var props = player.CustomProperties;
-	var title = props["title"] as string;
-	var gold = (long)props["gold"];
-	// TODO 可以做属性变化的界面展示
+    // 结构事件参数
+    var player = evtData["player"] as Player;
+    // 得到玩家所有自定义属性
+    var props = player.CustomProperties;
+    var title = props["title"] as string;
+    var gold = (long)props["gold"];
+    // TODO 可以做属性变化的界面展示
 
 });
 ```
@@ -416,7 +415,7 @@ play.On(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
 
 
 {% block set_player_custom_props_with_cas %}
-```csharp
+```cs
 var props = new Dictionary<string, object>();
 // X 分别表示当前的客户端
 props.Add("tulong", X);
@@ -432,12 +431,12 @@ play.Room.SetCustomProperties(props, expectedValues);
 
 
 {% block send_event %}
-```csharp
+```cs
 var options = new SendEventOptions() {
-	// 设置事件的接收组为 Master
-	ReceiverGroup = ReceiverGroup.MasterClient
-	// 也可以指定接收者 actorId
-	// targetActorIds = new List<int>() { 1 },
+    // 设置事件的接收组为 Master
+    ReceiverGroup = ReceiverGroup.MasterClient
+    // 也可以指定接收者 actorId
+    // targetActorIds = new List<int>() { 1 },
 };
 // 设置技能 Id
 var eventData = new Dictionary<string, object>();
@@ -454,18 +453,18 @@ play.SendEvent("skill", eventData, options);
 
 
 {% block send_event_event %}
-```csharp
+```cs
 // 注册自定义事件
 play.On(Event.CUSTOM_EVENT, (evtData) => {
-	// 解构事件参数
-	var eventId = evtData["eventId"] as string;
-	var eventData = evtData["eventData"] as Dictionary<string, object>;
-	if (eventId == "skill") {
-		// 如果是 skill 事件
-		var skillId = eventData["skillId"] as string;
-		// TODO 处理释放技能的表现
+    // 解构事件参数
+    var eventId = evtData["eventId"] as string;
+    var eventData = evtData["eventData"] as Dictionary<string, object>;
+    if (eventId == "skill") {
+        // 如果是 skill 事件
+        var skillId = eventData["skillId"] as string;
+        // TODO 处理释放技能的表现
 
-	}
+    }
 });
 ```
 
@@ -481,10 +480,10 @@ play.On(Event.CUSTOM_EVENT, (evtData) => {
 
 
 {% block disconnect_event %}
-```csharp
+```cs
 // 注册断开连接事件
 play.On(Event.DISCONNECTED, (evtData) => {
-	// TODO 如果需要，可以选择重连
+    // TODO 如果需要，可以选择重连
 
 });
 ```
@@ -493,7 +492,7 @@ play.On(Event.DISCONNECTED, (evtData) => {
 
 
 {% block disconnect %}
-```csharp
+```cs
 play.Disconnect();
 ```
 {% endblock %}
@@ -502,21 +501,21 @@ play.Disconnect();
 
 {% block player_activity %}
 
-```csharp
+```cs
 var options = new RoomOptions() {
-	// 将 PlayerTtl 设置为 300 秒
-	PlayerTtl = 300
+    // 将 PlayerTtl 设置为 300 秒
+    PlayerTtl = 300
 }
 play.CreateRoom(roomOptions: options);
 ```
 
-```csharp
+```cs
 // 注册玩家掉线 / 上线事件
 play.On(Event.PLAYER_ACTIVITY_CHANGED, (evtData) => {
-	var player = evtData["player"] as Player;
-	// 获得用户是否「活跃」状态
-  	// player.IsActive;
-  	// TODO 根据玩家的在线状态可以做显示和逻辑处理
+    var player = evtData["player"] as Player;
+    // 获得用户是否「活跃」状态
+      // player.IsActive;
+      // TODO 根据玩家的在线状态可以做显示和逻辑处理
 
 });
 ```
@@ -525,10 +524,10 @@ play.On(Event.PLAYER_ACTIVITY_CHANGED, (evtData) => {
 
 
 {% block reconnect %}
-```csharp
+```cs
 play.On(Event.DISCONNECTED, (evtData) => {
-	// 重连
-	play.Reconnect();
+    // 重连
+    play.Reconnect();
 });
 ```
 {% endblock %}
@@ -536,30 +535,30 @@ play.On(Event.DISCONNECTED, (evtData) => {
 
 
 {% block rejoin_room %}
-```csharp
+```cs
 play.On(Event.DISCONNECTED, (evtData) => {
-	// 重连
-	play.Reconnect();
+    // 重连
+    play.Reconnect();
 });
 
 play.On(Event.CONNECTED, (evtData) => {
-	// TODO 根据是否有缓存的之前的房间名，回到房间。
+    // TODO 根据是否有缓存的之前的房间名，回到房间。
 
-	if (roomName) {
-		play.RejoinRoom(roomName);
-	}
+    if (roomName) {
+        play.RejoinRoom(roomName);
+    }
 });
 ```
 
 如果房间存在并且玩家的 `ttl` 没到期，则其他玩家将会收到 `PLAYER_ACTIVITY_CHANGED` 事件。
 
-```csharp
+```cs
 // 注册玩家在线状态变化事件
 play.On(Event.PLAYER_ACTIVITY_CHANGED, (evtData) => {
-	var player = data["player"] as Player;
-	// 获得用户是否「活跃」状态
-  	// player.IsActive;
-	// TODO 根据玩家的在线状态可以做显示和逻辑处理
+    var player = data["player"] as Player;
+    // 获得用户是否「活跃」状态
+      // player.IsActive;
+    // TODO 根据玩家的在线状态可以做显示和逻辑处理
 
 });
 ```
@@ -568,15 +567,15 @@ play.On(Event.PLAYER_ACTIVITY_CHANGED, (evtData) => {
 
 
 {% block reconnect_and_rejoin %}
-```csharp
+```cs
 play.On(Event.DISCONNECTED, (evtData) => {
-	// 重连并回到房间
-	play.ReconnectAndRejoin();
+    // 重连并回到房间
+    play.ReconnectAndRejoin();
 });
 
 // 在加入房间后，更新数据和界面
 play.On(Event.ROOM_JOINED, (evtData) => {
-	// TODO 根据房间和玩家最新数据进行界面重构
+    // TODO 根据房间和玩家最新数据进行界面重构
 
 });
 ```
@@ -587,11 +586,11 @@ play.On(Event.ROOM_JOINED, (evtData) => {
 
 
 {% block error_event %}
-```csharp
+```cs
 play.On(Event.Error, (err) => {
-	var code = (int)err["code"];
-	var detail = err["detail"] as string;
-	// TODO 处理错误事件
+    var code = (int)err["code"];
+    var detail = err["detail"] as string;
+    // TODO 处理错误事件
 
 });
 ```

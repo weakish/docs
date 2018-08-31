@@ -14,19 +14,19 @@ Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-CSharp](https:
 {% block import %}
 导入需要的命名空间
 
-```csharp
+```cs
 using LeanCloud.Play;
 ```
 
 通过 `private Play play = Play.Instance;` 获取客户端实例。
 
-```csharp
+```cs
 // App Id
-var APP_ID = "315XFAYyIGPbd98vHPCBnLre-9Nh9j0Va";
+var APP_ID = YOUR_APP_ID;
 // App Key
-var APP_KEY = "Y04sM6TzhMSBmCMkwfI3FpHc";
+var APP_KEY = YOUR_APP_KEY;
 // App 节点地区
-var APP_REGION = Region.EastChina;
+var APP_REGION = YOUR_APP_REGION;
 // 初始化
 play.Init(APP_ID, APP_KEY, APP_REGION);
 ```
@@ -35,7 +35,7 @@ play.Init(APP_ID, APP_KEY, APP_REGION);
 
 
 {% block set_userid %}
-```csharp
+```cs
 var random = new System.Random();
 var randId = string.Format("{0}", random.Next(10000000));
 play.UserId = randId;
@@ -45,7 +45,7 @@ play.UserId = randId;
 
 
 {% block connection %}
-```csharp
+```cs
 play.Connect();
 ```
 {% endblock %}
@@ -53,7 +53,7 @@ play.Connect();
 
 
 {% block connectio_event %}
-```csharp
+```cs
 play.On(LeanCloud.Play.Event.CONNECTED, (evtData) =>
 {
     Debug.Log("connected");
@@ -70,7 +70,7 @@ play.On(LeanCloud.Play.Event.CONNECTED, (evtData) =>
 
 
 {% block join_room %}
-```csharp
+```cs
 // 注册新玩家加入房间事件
 play.On(LeanCloud.Play.Event.PLAYER_ROOM_JOINED, (evtData) =>
 {
@@ -99,7 +99,7 @@ play.On(LeanCloud.Play.Event.PLAYER_ROOM_JOINED, (evtData) =>
 
 
 {% block player_custom_props_event %}
-```csharp
+```cs
 // 注册「玩家属性变更」事件
 play.On(LeanCloud.Play.Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
     var player = evtData["player"] as Player;
@@ -117,7 +117,7 @@ play.On(LeanCloud.Play.Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
 
 
 {% block win %}
-```csharp
+```cs
 if (play.Player.IsMaster) {
     // ...
     var data = new Dictionary<string, object>();
@@ -132,7 +132,7 @@ if (play.Player.IsMaster) {
 
 
 {% block custom_event %}
-```csharp
+```cs
 // 注册自定义事件
 play.On(LeanCloud.Play.Event.CUSTOM_EVENT, (evtData) =>
 {

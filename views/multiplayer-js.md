@@ -10,7 +10,7 @@
 {% set setCustomProperties = "setCustomProperties" %}
 {% set playerTtl = "playerTtl" %}
 {% set api_url = "https://leancloud.github.io/Play-SDK-JS/doc/" %}
-
+{% set gameversion = "`gameVersion` " %}
 
 
 {% block import %}
@@ -72,8 +72,6 @@ play.connect();
 ```javascript
 play.connect({ gameVersion: '0.0.1' });
 ```
-
-`gameVersion` 表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器。
 {% endblock %}
 
 

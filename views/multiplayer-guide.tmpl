@@ -56,6 +56,7 @@
 {% block connection_with_gameversion %}
 {% endblock %}
 
+{{gameversion}}表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器。
 
 在连接成功后，会收到 `CONNECTED`（连接成功）事件；否则，将会收到 `CONNECT_FAILED`（连接失败）事件，回调参数 `error` 将包含失败原因。
 
