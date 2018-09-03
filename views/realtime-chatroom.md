@@ -57,25 +57,23 @@ public void done(AVIMException ex) {
 });
 ```
 ```js
+var AV = require('leancloud-storage');
+var { Realtime } = require('leancloud-realtime');
+// Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.createChatRoom({ name:'聊天室' })
+}).catch(console.error);
 ```
 
 ## 查询聊天室
 
 ```objc
-AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
-
-[client openWithCallback:^(BOOL success, NSError *error) {
-    
-    if (success && !error) {
-        
-        [client.conversationQuery getConversationById:@"Chat Room ID" callback:^(AVIMConversation *chatRoom, NSError *error) {
+[client.conversationQuery getConversationById:@"Chat Room ID" callback:^(AVIMConversation *chatRoom, NSError *error) {
             
             if (chatRoom && [chatRoom isKindOfClass:[AVIMChatRoom class]] && !error) {
                 
                 // query success.
             }
-        }];
-    }
 }];
 ```
 ```java
@@ -93,12 +91,57 @@ public void done(List<AVIMConversation> conversations, AVIMException e) {
 });
 ```
 ```js
+tom.getQuery().equalTo('name', '天南海北聊天室').find(function(conversations){
+      var chatRoom = conversations[0];// 聊天室对象
+}).catch(console.error);
 ```
 
 ## 加入聊天室
 
+注意，一个 client id 在一个应用内同一时间只允许存在于一个聊天室，只要他再次加入别的聊天室，他就会自动离开上一个聊天室，不再接收到上一个聊天室产生的新消息，这个很好理解，比如你在观看斗鱼直播时，不可以同时进入两个直播间。
 
-注意，一个 client id 在一个应用内同一时间只允许存在于一个聊天室，只要他再次加入别的聊天室，他就会自动离开上一个聊天室，不再接收到上一个聊天室产生的新消息，这个很好理解，比如你在斗鱼直播，除非你在手机上只可能同时观看一个直播，不可以同时进入两个直播间。
+```objc
+[client.conversationQuery getConversationById:@"Chat Room ID" callback:^(AVIMConversation *conversation, NSError *error) {
+            AVIMChatRoom *chatRoom = (AVIMChatRoom *)conversation;
+            if ([chatRoom isKindOfClass:[AVIMChatRoom class]]) {
+                [chatRoom joinWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
+                    if (succeeded) {
+                        // handle it.
+                    }
+                }];
+            }
+}];
+```
+```java
+AVIMConversationsQuery avimConversationsQuery = avimClient.getConversationsQuery();
+avimConversationsQuery.whereEqualTo("objectId", "Chat Room ID");
+avimConversationsQuery.findInBackground(new AVIMConversationQueryCallback() {
+    @Override
+    public void done(List<AVIMConversation> list, AVIMException e) {
+        if (list.get(0) instanceof AVIMChatRoom) {
+            list.get(0).join(new AVIMConversationCallback() {
+                @Override
+                public void done(AVIMException e) {
+                    if (e == null) {
+
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } 
+    }
+});
+```
+```js
+tom.getQuery({ name:'天南海北聊天室' }).find(function(conversations){
+      var chatRoom = conversations[0];// 聊天室对象
+      return chatRoom.join();
+}).then(function(success)
+{
+    if(success) console.log('加入成功');
+}).catch(console.error);
+```
 
 ## 接收消息
 
@@ -110,42 +153,29 @@ public void done(List<AVIMConversation> conversations, AVIMException e) {
 当然前面已经说过，只要你加入新的聊天室，服务的端自然会帮你退出旧的聊天室，但是有一些情况是，客户端就只想退出聊天室，SDK 也提供了相应的接口：
 
 ```objc
-AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+[chatRoom quitWithCallback:^(BOOL success, NSError *error) {
     
-    [client openWithCallback:^(BOOL success, NSError *error) {
+    if (success && !error) {
         
-        if (success && !error) {
-            
-            [client.conversationQuery getConversationById:@"Chat Room ID" callback:^(AVIMConversation *chatRoom, NSError *error) {
-                
-                if (chatRoom && [chatRoom isKindOfClass:[AVIMChatRoom class]] && !error) {
-                    
-                    [chatRoom quitWithCallback:^(BOOL success, NSError *error) {
-                        
-                        if (success && !error) {
-                            
-                            // quit success.
-                        }
-                    }];
-                }
-            }];
-        }
-    }];
+        // quit success.
+    }
+}];
 ```
 ```java
-AVIMChatRoom room = (AVIMChatRoom) LCChatKit.getInstance().getClient().getChatRoom("conversationId");
-      room.quit(new AVIMConversationCallback() {
-        @Override
-        public void done(AVIMException ex) {
-          if (null != ex) {
-            showToast(ex.getMessage());
-          } else {
-            ;
-          }
-        }
-      });
+chatRoom.quit(new AVIMConversationCallback() {
+@Override
+public void done(AVIMException ex) {
+    if (null != ex) {
+        showToast(ex.getMessage());
+    } else {
+
+    }}
+});
 ```
 ```js
+chatRoom.quit().then(function(success){
+    if(success) console.log('退出成功');
+}).catch(console.error);
 ```
 
 

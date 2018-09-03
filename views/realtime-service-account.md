@@ -23,50 +23,87 @@
 客户端可以通过在查询对话列时，传入 sys = ture 的参数来获取系统对话列表，为之后的订阅操作做准备：
 
 ```objc
-```
-```java
-```
-```js
-```
-
-
-## 订阅
-根据上一个步骤，获取到的系统对话，选取一个符合条件的，比如就获取最新创建的系统对话，在客户端订阅它：
-
-```objc
 AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
-
 [client openWithCallback:^(BOOL success, NSError *error) {
-    
-    if (success && !error) {
-        
-        [client.conversationQuery getConversationById:@"Service Conversation ID" callback:^(AVIMConversation *conv, NSError *error) {
-            
-            if (conv && [conv isKindOfClass:[AVIMServiceConversation class]] && !error) {
-                
-                AVIMServiceConversation *serviceConversation = (AVIMServiceConversation *)conv;
-                
-                [serviceConversation subscribeWithCallback:^(BOOL success, NSError *error) {
-                    
-                    if (success && !error) {
-                        
-                        // subscribe Service Conversation success.
-                    }
-                }];
+    if (success) {
+        AVIMConversationQuery *query = client.conversationQuery;
+        [query whereKey:@"sys" equalTo:@(true)];
+        [query findConversationsWithCallback:^(NSArray<AVIMConversation *> * _Nullable conversations, NSError * _Nullable error) {
+            if (conversations && conversations.count > 0) {
+                // handle it
             }
         }];
     }
 }];
 ```
 ```java
-AVIMServiceConversation sc = imClient.getServiceConversation("convId");
-sc.subscribe(new AVIMConversationCallback() {
-  @Override
-  public void done(AVIMException e) {
-  }
-});
+ AVIMClient avimClient = AVIMClient.getInstance("Tom");
+        avimClient.open(new AVIMClientCallback() {
+            @Override
+            public void done(AVIMClient avimClient, AVIMException e) {
+                AVIMConversationsQuery avimConversationsQuery = avimClient.getConversationsQuery();
+                avimConversationsQuery.whereEqualTo("sys",true);
+                avimConversationsQuery.findInBackground(new AVIMConversationQueryCallback() {
+                    @Override
+                    public void done(List<AVIMConversation> list, AVIMException e) {
+                        if (e == null){
+
+                        }else {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
 ```
 ```js
+var AV = require('leancloud-storage');
+var { Realtime } = require('leancloud-realtime');
+// Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.getQuery().equalTo('sys', true).find();
+}).then(function(conversations){
+    // 查询到的服务号
+}).catch(console.error);
+```
+
+## 订阅
+根据上一个步骤，获取到的系统对话，选取一个符合条件的，比如就获取最新创建的系统对话，在客户端订阅它：
+
+```objc
+AVIMServiceConversation *serviceConversation = (AVIMServiceConversation *)conv;
+
+[serviceConversation subscribeWithCallback:^(BOOL success, NSError *error) {
+    
+    if (success && !error) {
+        
+        // subscribe Service Conversation success.
+    }
+}];
+```
+```java
+if (list.get(0) instanceof AVIMServiceConversation) {
+    ((AVIMServiceConversation) list.get(0)).subscribe(new AVIMConversationCallback() {
+        @Override
+        public void done(AVIMException e) {
+            if (e == null) {
+
+            } else {
+                e.printStackTrace();
+            }
+        }
+    });
+} else {
+    e.printStackTrace();
+}
+```
+```js
+tom.getQuery().equalTo('sys', true).find().then(function(conversations){
+    var serviceConversation = conversations[0];
+    return serviceConversation.subscribe();
+}).then(function(success){
+
+}).catch(console.error);
 ```
 
 ## 接收消息
@@ -80,39 +117,30 @@ sc.subscribe(new AVIMConversationCallback() {
 ## 取消订阅
 
 ```objc
- AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+AVIMServiceConversation *serviceConversation = (AVIMServiceConversation *)conv;
+
+[serviceConversation unsubscribeWithCallback:^(BOOL success, NSError *error) {
     
-    [client openWithCallback:^(BOOL success, NSError *error) {
+    if (success && !error) {
         
-        if (success && !error) {
-            
-            [client.conversationQuery getConversationById:@"Service Conversation ID" callback:^(AVIMConversation *conv, NSError *error) {
-                
-                if (conv && [conv isKindOfClass:[AVIMServiceConversation class]] && !error) {
-                    
-                    AVIMServiceConversation *serviceConversation = (AVIMServiceConversation *)conv;
-                    
-                    [serviceConversation unsubscribeWithCallback:^(BOOL success, NSError *error) {
-                        
-                        if (success && !error) {
-                            
-                            // unsubscribe Service Conversation success.
-                        }
-                    }];
-                }
-            }];
-        }
-    }];
+        // unsubscribe Service Conversation success.
+    }
+}];
 ```
 ```java
 AVIMServiceConversation sc = imClient.getServiceConversation("convId");
 sc.unsubscribe(new AVIMConversationCallback() {
   @Override
   public void done(AVIMException e) {
+
   }
 });
 ```
 ```js
+tom.getConversation(CONVERSATION_ID).then(function(conversation) {
+    var serviceConversation = conversation;
+    return serviceConversation.unsubscribe();
+}).catch(console.error);
 ```
 
 ## FAQ
@@ -123,7 +151,7 @@ A: 完全可以，我们封装这个对象的原因就是要解决这种需求�
 
 Q: 服务号有订阅人数上限么？
 
-A: 最高支持 5000 个人。
+A: 无上限。
 
 Q: 服务号可以创建多少个？
 
