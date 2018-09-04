@@ -172,22 +172,21 @@ return tom.createConversation({
 
 `createConversation` 的参数详解:
 
-{{ docs.langSpecStart('js') }} 
+{{ docs.langSpecStart('js') }}
 
 1. `members` : 字符串数组，必要参数，对话的初始成员(clientId)列表，默认包含当前 clientId
 2. `name`: 字符串，可选参数，对话的名字，如果不传默认值为 null
 3. `unique`： bool 类型，可选参数，是否唯一对话，当其为 true 时，如果当前已经有相同成员的对话存在则返回该对话，否则会创建新的对话
 
-{{ docs.langSpecEnd('js') }} 
+{{ docs.langSpecEnd('js') }}
 
-{{ docs.langSpecStart('objc') }} 
+{{ docs.langSpecStart('cs') }}
 
 1. `members` : 字符串数组，必要参数，对话的初始成员(clientId)列表，默认包含当前 clientId
-2. `name`: 字符串，可选参数，对话的名字，如果不传默认值为 null
-3. `unique`： bool 类型，可选参数，是否唯一对话，当其为 true 时，如果当前已经有相同成员的对话存在则返回该对话，否则会创建新的对话
+2. `member`: 字符串，可选参数，对话的名字，如果不传默认值为 null
+3. `isUnique`： bool 类型，可选参数，是否唯一对话，当其为 true 时，如果当前已经有相同成员的对话存在则返回该对话，否则会创建新的对话
 
-{{ docs.langSpecEnd('objc') }} 
-
+{{ docs.langSpecEnd('cs') }}
 
 ### 4.发送消息
 
@@ -222,7 +221,6 @@ conversation.send(new TextMessage('Jerry，起床了！'));
 ```
 
 `conversation.send` 接口实现的功能就是向对话中发送一条消息。
-
 
 Jerry 只要在线他就会收到消息，至此 Jerry 还没有登场，那么他怎么接收消息呢？
 
