@@ -1,6 +1,6 @@
 {% extends "./multiplayer-guide.tmpl" %}
 
-{% set platformName = "C#" %}
+{% set platformName = "C\#` `" %}
 {% set userId = "UserId" %}
 {% set autoJoinLobby = "AutoJoinLobby" %}
 {% set lobby_room_url = "https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1LobbyRoom.htm" %}
@@ -14,7 +14,7 @@
 
 
 {% block import %}
-请阅读 [安装](multiplayer-quick-start-csharp.html#安装)，获取 dll 库文件。
+请阅读 [安装](multiplayer-quick-start-unity.html#安装)，获取 dll 库文件。
 {% endblock %}
 
 
@@ -32,7 +32,15 @@ private Play play = Play.Instance;
 play.Init(YOUR_APP_ID, YOUR_APP_KEY, YOUR_APP_REGION);
 ```
 
-注意：由于 Unity 要求必须在「主线程」调用 API，所以，为了减少开发者在使用上的麻烦，SDK 将保证会在「主线程」回调 `EVENT`。但是，需要开发者在 MonoBehavior 的 Update() 中调用 play.HandleMessage()。
+注意：由于 Unity 要求必须在「主线程」调用 API，所以，为了减少开发者在使用上的麻烦，SDK 将保证会在「主线程」回调 `EVENT`。但是，需要开发者在 MonoBehavior 的 Update() 中调用 play.HandleMessage()，参考代码：
+
+```cs
+// Update is called once per frame
+void Update () {
+    play.HandleMessage();
+}
+```
+
 （建议可以做一个 DontDestroy 的 GameObject 挂载脚本调用）
 {% endblock %}
 
@@ -456,7 +464,7 @@ play.SendEvent("skill", eventData, options);
 ```cs
 // 注册自定义事件
 play.On(Event.CUSTOM_EVENT, (evtData) => {
-    // 解构事件参数
+    // 获取事件参数
     var eventId = evtData["eventId"] as string;
     var eventData = evtData["eventData"] as Dictionary<string, object>;
     if (eventId == "skill") {
@@ -467,14 +475,6 @@ play.On(Event.CUSTOM_EVENT, (evtData) => {
     }
 });
 ```
-
-`event` 参数
-
-| 事件   | 参数     | 描述                                       |
-| ------------------------------------ | ------------------ | ---------------------------------------- |
-| eventId    | string | 事件 Id，用于表示事件                         |
-| eventData   | Dictionary<string, object>  | 事件参数 |
-| senderId   | int  | 事件发送者 Id（玩家的 actorId） |
 {% endblock %}
 
 
