@@ -1,6 +1,6 @@
 // Init scrollStopped jQuery plugin
-$.fn.scrollStopped = function(callback) {
-  $(this).scroll(function() {
+$.fn.scrollStopped = function (callback) {
+  $(this).scroll(function () {
     var self = this, $this = $(self);
     if ($this.data('scrollTimeout')) {
       clearTimeout($this.data('scrollTimeout'));
@@ -10,10 +10,10 @@ $.fn.scrollStopped = function(callback) {
 };
 
 // Init TOC
-(function() {
-   // id has been set in the build process
-   // no manipulation here
-  gajus.contents.formatId = function(str){
+(function () {
+  // id has been set in the build process
+  // no manipulation here
+  gajus.contents.formatId = function (str) {
     return str;
   };
 
@@ -23,19 +23,19 @@ $.fn.scrollStopped = function(callback) {
   });
 
   // Add essential classes
-  $('#toc-wrapper ol').first().attr('id','toc');
+  $('#toc-wrapper ol').first().attr('id', 'toc');
   $('#toc').addClass('nav');
 
   tocContents.eventProxy.on('ready', function () {
     doSideBar();
-    if(window.location.hash){//因为 dom改变导致 hash位置不正确，需要进行重新定位
-      window.location=window.location.hash;
+    if (window.location.hash) {//因为 dom改变导致 hash位置不正确，需要进行重新定位
+      window.location = window.location.hash;
     }
   });
 })();
 
 var SidebarAffixShadow = $('.sidebar-affix-shadow');
-var updateSidebarAffixShadowWidth = function() {
+var updateSidebarAffixShadowWidth = function () {
   var tocWidth = $('#left-nav').width();
   SidebarAffixShadow.removeClass('bottom').addClass('on').attr('data-width', tocWidth);
   $('style[title=css-sidebar-affix-shadow-width]').remove();
@@ -44,7 +44,7 @@ var updateSidebarAffixShadowWidth = function() {
 };
 
 // Sidebar affix
-var doSideBar = function() {
+var doSideBar = function () {
   $('.sidebar-loading').removeClass('on');
   $('.sidebar-wrapper').affix({
     offset: {
@@ -54,51 +54,51 @@ var doSideBar = function() {
       }
     }
   })
-  .on('affix.bs.affix', function (e) {
-    updateSidebarAffixShadowWidth();
-  })
-  .on('affix-top.bs.affix', function (e) {
-    // If scrolls back to top
-    $('#toc-wrapper').removeAttr('style');
-    SidebarAffixShadow.removeClass('bottom on');
-  })
-  .on('affix-bottom.bs.affix', function (e) {
-    // If window reaches bottom (Affix style)
-    SidebarAffixShadow.addClass('bottom').removeClass('on');
-  });
+    .on('affix.bs.affix', function (e) {
+      updateSidebarAffixShadowWidth();
+    })
+    .on('affix-top.bs.affix', function (e) {
+      // If scrolls back to top
+      $('#toc-wrapper').removeAttr('style');
+      SidebarAffixShadow.removeClass('bottom on');
+    })
+    .on('affix-bottom.bs.affix', function (e) {
+      // If window reaches bottom (Affix style)
+      SidebarAffixShadow.addClass('bottom').removeClass('on');
+    });
 };
 
-var updateScrollSpy = function() {
-  setTimeout(function(){
+var updateScrollSpy = function () {
+  setTimeout(function () {
     $('body').scrollspy({ target: '.sidebar-wrapper' });
   }, 200);
 };
 
 // Add a hover class to detect if users mouse is hovering over the sidebar
-var addSidebarHoverListener = function() {
+var addSidebarHoverListener = function () {
   $('.sidebar-affix-shadow').hover(
-    function() {
+    function () {
       $(this).removeClass('sidebar-hover-off');
-    }, function() {
+    }, function () {
       $(this).addClass('sidebar-hover-off');
     }
   );
 };
 
 // Smooth scrolling, disabled by default
-var initSmoothScroll = function() {
+var initSmoothScroll = function () {
   // Bind to the click of all links with a #hash in the href
-  $('a[href^="#"]').click(function(e) {
+  $('a[href^="#"]').click(function (e) {
     // Prevent the jump and the #hash from appearing on the address bar
     e.preventDefault();
     // Scroll the window, stop any previous animation, stop on user manual scroll
     // Check https://github.com/flesler/jquery.scrollTo for more customizability
-    $(window).stop(true).scrollTo(this.hash, {duration: 400, interrupt: true});
+    $(window).stop(true).scrollTo(this.hash, { duration: 400, interrupt: true });
   });
 };
 
 // Init GitHub links
-var initGitHubLinks = function() {
+var initGitHubLinks = function () {
   // var currentPath = window.location.pathname.match(/.*\/(.+).html/i)[1];
   // $('#content').prepend("<div class=docs-meta>\
   //     <span class='icon icon-github'></span>\
@@ -115,9 +115,9 @@ function getGitHubContributors() {
   var appendTarget = $('#content h1');
   var githubAvatarUrl = 'https://avatars.githubusercontent.com/u';
   var githubAvatarCdn = 'https://dn-experiments.qbox.me/ghavatar';
-  $.getJSON(url, function(data) {
-    $.each(data, function(index, item) {
-      if(item.author) {
+  $.getJSON(url, function (data) {
+    $.each(data, function (index, item) {
+      if (item.author) {
         contributors.push({
           handle: item.author.login,
           url: item.author.html_url,
@@ -126,67 +126,67 @@ function getGitHubContributors() {
       }
     });
   })
-  .done(function() {
-    // Make contributor array of objects unique
-    var uniqArr = {};
-    for ( var i = 0, n = contributors.length; i < n; i++ ) {
-      var item = contributors[i];
-      uniqArr[item.handle] = item;
-    }
+    .done(function () {
+      // Make contributor array of objects unique
+      var uniqArr = {};
+      for (var i = 0, n = contributors.length; i < n; i++) {
+        var item = contributors[i];
+        uniqArr[item.handle] = item;
+      }
 
-    contributors = [];
-    for ( var key in uniqArr ) {
-      contributors.push(uniqArr[key]);
-    }
+      contributors = [];
+      for (var key in uniqArr) {
+        contributors.push(uniqArr[key]);
+      }
 
-    if($.isEmptyObject(contributors)) {
-      return;
-    } else {
-      $('<ul />', {
-        'class': 'github-contributors'
-      }).insertAfter(appendTarget);
+      if ($.isEmptyObject(contributors)) {
+        return;
+      } else {
+        $('<ul />', {
+          'class': 'github-contributors'
+        }).insertAfter(appendTarget);
 
-      $('.doc-content h1').addClass('github-contributors-loaded');
+        $('.doc-content h1').addClass('github-contributors-loaded');
 
-      var wrap = $('.github-contributors');
+        var wrap = $('.github-contributors');
 
-      $.each(contributors, function(index, item) {
-        $('<li />').append(
-          $('<a />', {
-            'href': item.url,
-            'data-title': item.handle
-          }).append(
-            $('<img />', {
-              'src': item.avatar,
-              'alt': item.handle
-            })
-          )
-        ).appendTo(wrap);
-      });
+        $.each(contributors, function (index, item) {
+          $('<li />').append(
+            $('<a />', {
+              'href': item.url,
+              'data-title': item.handle
+            }).append(
+              $('<img />', {
+                'src': item.avatar,
+                'alt': item.handle
+              })
+            )
+          ).appendTo(wrap);
+        });
 
-      $(wrap).find('a').tooltip();
-    }
+        $(wrap).find('a').tooltip();
+      }
 
-    console.log('fetch contributors success');
-  })
-  .fail(function() { console.log('fetch contributors error'); })
-  .always(function() { console.log('fetch contributors complete'); });
+      console.log('fetch contributors success');
+    })
+    .fail(function () { console.log('fetch contributors error'); })
+    .always(function () { console.log('fetch contributors complete'); });
 }
 
 function sidebarExpandAll() {
   var el = $('.do-expand-all');
   var target = $('.sidebar-wrapper');
 
-  el.on('click', function(e) {
+  el.on('click', function (e) {
     e.preventDefault();
     target.toggleClass('expand-all');
-    $(this).text(function(i, t) {
+    $(this).text(function (i, t) {
       return t === '展开所有' ? '折叠所有' : '展开所有';
     });
   });
 }
 
-var initScrollHistoryState = function() {
+var initScrollHistoryState = function () {
   var activeItem = $('#toc li .active').last().find('a').attr('href');
   if (typeof activeItem === 'undefined') {
     activeItem = '';
@@ -197,18 +197,79 @@ var initScrollHistoryState = function() {
   console.log(location.origin + location.pathname + activeItem);
 };
 
-var codeBlockTabber = (function() {
+var codeBlockTabber = (function () {
   'use strict';
 
   // save some bytes
   var w = window,
-      d = document;
+    d = document;
 
   function uniqArr(a) {
     var seen = {};
-    return a.filter(function(item) {
+    return a.filter(function (item) {
       return seen.hasOwnProperty(item) ? false : (seen[item] = true);
     });
+  }
+
+  function getApiName(apiNameKey, lang) {
+    var apiName = '';
+
+    var nameKeyMap = {
+      'AVIMClient': 'im-client',
+      'IMClient': 'im-client',
+      'AVIMConversation': 'im-conversation',
+      'Conversation': 'im-conversation',
+      'AVIMMessage': 'im-message',
+      'IMMessage': 'im-message'
+    };
+
+    if (apiNameKey in nameKeyMap) {
+      apiName = nameKeyMap[apiNameKey];
+    }
+
+    if (apiName != '') {
+      var langMap = {
+        'js-im-client': 'IMClient',
+        'objc-im-client': 'AVIMClient',
+        'java-im-client': 'AVIMClient',
+        'cs-im-client': 'AVIMClient',
+        'js-im-conversation': 'Conversation',
+        'objc-im-conversation': 'AVIMConversation',
+        'java-im-conversation': 'AVIMConversation',
+        'cs-im-conversation': 'AVIMConversation',
+      };
+      var key = `${lang}-${apiName}`;
+      return langMap[key];
+    }
+
+    return apiNameKey;
+  }
+
+  function checkApiName(targetLang) {
+    // update api name or class name by language
+    $.each($('.code-api-name'), function () {
+      var currentLang = targetLang.split('-').pop();
+      var codeContent = getApiName($(this).html(), currentLang);
+      $(this).html(codeContent);
+    });
+  }
+
+  function toggleLangSpec(targetLang) {
+    var currentLang = targetLang.split('-').pop();
+    var languageArray = ['js', 'objc', 'java', 'cs'];
+    languageArray.forEach(function (lang) {
+      var langSpecStartClassName = `.lang-spec-${lang}-start`;
+      var langSpecEndClassName = `.lang-spec-${lang}-end`;
+      $.each($(langSpecStartClassName), function () {
+        var content = $(this).nextUntil(langSpecEndClassName).show();
+        if (lang == currentLang) {
+          content.show();
+        } else {
+          content.hide();
+        }
+      });
+    });
+
   }
 
   function checkCodeBlocks() {
@@ -223,7 +284,7 @@ var codeBlockTabber = (function() {
       'lang-js': 'JavaScript',
       'lang-python': 'Python',
       'lang-java': 'Java',
-      'lang-ts':'TypeScript',
+      'lang-ts': 'TypeScript',
       'lang-es7': 'ECMAScript7',
       'lang-html': 'HTML',
       'lang-cs': 'C#',
@@ -233,25 +294,34 @@ var codeBlockTabber = (function() {
       'lang-node': 'Node.js'
     };
 
+    var defaultLangHost = $('.code-default-lang').first();
+    if (defaultLangHost != undefined) {
+      var defaultLang = defaultLangHost.data('lang');
+      if (defaultLang != undefined) {
+        checkApiName(defaultLang);
+        toggleLangSpec(defaultLang);
+      }
+    }
+
     // Multilingual init
     var $translatableElements = $('code, var');
     var snippetMap = {};
     var snippetDefault = 'objc';
     var snippetsJson = 'custom/js/languages.json';
-    $.getJSON(snippetsJson, function(data) {
+    $.getJSON(snippetsJson, function (data) {
       snippetMap = data;
     })
-    .done(function() {
-      $.each($translatableElements, function () {
-        for (var key in snippetMap[snippetDefault]) {
-          if ($(this).text() === key) {
-            $(this).attr('data-translatable', key);
+      .done(function () {
+        $.each($translatableElements, function () {
+          for (var key in snippetMap[snippetDefault]) {
+            if ($(this).text() === key) {
+              $(this).attr('data-translatable', key);
+            }
           }
-        }
-      });
-    })
-    .fail(function() { console.log('fetch language error'); })
-    .always(function() { console.log('fetch language complete'); });
+        });
+      })
+      .fail(function () { console.log('fetch language error'); })
+      .always(function () { console.log('fetch language complete'); });
 
     $.each($codeBlocks, function () {
       var $current = $(this);
@@ -310,11 +380,14 @@ var codeBlockTabber = (function() {
       }
     });
 
+    // click to switch language
     $('.code-lang-toggles .toggle').click(function (e) {
       e.preventDefault();
       var targetLang = $(this).data('toggle-lang');
       var $blocks = $('.codeblock-toggle-enabled');
 
+      checkApiName(targetLang);
+      toggleLangSpec(targetLang);
       // check if is switching to another language first
       if (!$(this).hasClass('active')) {
         var prevHeihgt = 0;
@@ -392,7 +465,7 @@ var codeBlockTabber = (function() {
 
 })();
 
-$(function() {
+$(function () {
   prettyPrepare(); // prepare elements that need to be prettified
   refactDom();//
   prettyPrint(updateScrollSpy);
@@ -406,42 +479,42 @@ $(function() {
   // initSmoothScroll();
 
   var arr = $('#toc ul').parents('li');
-  angular.forEach(arr, function(v, k) {
+  angular.forEach(arr, function (v, k) {
     var a = $(v).children('a:first-child');
     a.addClass('has-subdoc-nav');
   });
 
-  setTimeout(function() {
+  setTimeout(function () {
     updateSidebarAffixShadowWidth();
   }, 400);
 
 });
 
 // If the cursor is off the sidebar, scrolls to parent active heading
-$(window).scrollStopped(function() {
+$(window).scrollStopped(function () {
   var activeToc = $('#toc > li .active').first();
   if (activeToc.length === 0) {
     activeToc = $('#toc > li:first-child');
   }
 
-  setTimeout(function() {
-    $('.sidebar-affix-shadow.on.sidebar-hover-off .sidebar-wrapper').scrollTo(activeToc, 800, {offset: -20});
+  setTimeout(function () {
+    $('.sidebar-affix-shadow.on.sidebar-hover-off .sidebar-wrapper').scrollTo(activeToc, 800, { offset: -20 });
     // console.log('Haven't scrolled in 250ms, fired in 250ms later.');
     updateSidebarAffixShadowWidth();
     initScrollHistoryState();
   }, 200);
 });
 
-$(window).resize(function() {
+$(window).resize(function () {
   updateSidebarAffixShadowWidth();
 });
 
-$(window).load(function() {
+$(window).load(function () {
   //2016-11-07 add scrollbar for out-streched tables
-  $('.doc-content table').each(function(index, el) {
+  $('.doc-content table').each(function (index, el) {
     var $el = $(el);
-    if ( $el.outerWidth() > $('.doc-content').width() ){
-      $el.css('display','block');
+    if ($el.outerWidth() > $('.doc-content').width()) {
+      $el.css('display', 'block');
     }
   });
 });

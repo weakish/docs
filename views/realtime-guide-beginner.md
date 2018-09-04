@@ -1,6 +1,8 @@
 {% import "views/_helper.njk" as docs %}
 {% import "views/_im.njk" as im %}
 
+{{ docs.defaultLang('js') }}
+
 # 即时通讯开发指南 &middot; 基础入门
 
 ## 应用场景和需求
@@ -38,13 +40,13 @@
 
 > 假设我们正在制作一个社交聊天的应用，第一步要实现一个用户向另一个用户发起聊天的功能
 
-首先我们需要介绍一下在即时通讯服务中的  `AVIMClient` 对象：
+首先我们需要介绍一下在即时通讯服务中的 {{ docs.className('AVIMClient') }} 对象：
 
-> `AVIMClient` 对应实体的是一个用户，它表示一个用户以客户端的身份登录到整个即时通讯的系统。
+> {{ docs.className('AVIMClient') }} 对应实体的是一个用户，它表示一个用户以客户端的身份登录到整个即时通讯的系统。
 
 ### 1.创建 AVIMClient
 
-在 iOS 和 Android SDK 中使用如下代码创建出一个 `AVIMClient`:
+在 iOS 和 Android SDK 中使用如下代码创建出一个 {{ docs.className('AVIMClient') }}:
 
 ```objc
 @property (nonatomic, strong) AVIMClient *client;
@@ -62,15 +64,16 @@ AVIMClient tom = AVIMClient.getInstance("Tom");
 2. 在一个应用内全局唯一
 3. 长度不能超过 64 个字符
 
-创建完毕之后，`AVIMClient` 的处于未初始化的状态，如果想收发消息我们需要让客户端与云端建立一个长连接。
+创建完毕之后，{{ docs.className('AVIMClient') }} 的处于未初始化的状态，如果想收发消息我们需要让客户端与云端建立一个长连接。
 
-注： JavaScript 和 C#(Unity3D) SDK 不需要创建 AVIMClient，直接看下一章节[建立连接](#建立连接)
+注： JavaScript 和 C#(Unity3D) SDK 不需要创建 {{ docs.className('AVIMClient') }}。 直接看下一章节[建立连接](#建立连接)。
+
 
 ### 2.建立连接
 
 建立连接的含义是：
 
-> `AVIMClient` 建立一个于云端的长连接，然后就可以开始收发消息了，并且可以监听事件。
+> {{ docs.className('AVIMClient') }} 建立一个于云端的长连接，然后就可以开始收发消息了，并且可以监听事件。
 
 对应的 SDK 方法如下：
 
@@ -82,33 +85,76 @@ realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
 }).catch(console.error);
 ```
+```objc
+// Tom 创建了一个 client，用自己的名字作为 clientId
+self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+// Tom 创建连接
+[self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+  if(succeeded) {
+    // 成功打开连接
+  }
+}];
+```
+```java
+// Tom 创建了一个 client，用自己的名字作为 clientId
+AVIMClient tom = AVIMClient.getInstance("Tom");
+// Tom 创建连接
+tom.open(new AVIMClientCallback() {
+  @Override
+  public void done(AVIMClient client, AVIMException e) {
+    if (e == null) {
+      // 成功打开连接
+    }
+  }
+}
+```
+```cs
+var realtime = new AVRealtime('your-app-id','your-app-key');
+var tom = await realtime.CreateClientAsync('Tom');
+```
 
-注：JavaScript 和 C#(Unity3D) SDK 建立连接成功之后，会返回一个 `AVIMClient`。
+注：JavaScript 和 C#(Unity3D) SDK 建立连接成功之后，会返回一个 {{ docs.className('AVIMClient') }}。
 
-推荐使用的方式：在用户登录之后用当前的用户名当做 `clientId` 来创建 `AVIMClient` 并建立连接。
+推荐使用的方式：在用户登录之后用当前的用户名当做 `clientId` 来创建 {{ docs.className('AVIMClient') }} 并建立连接。
 
 我们推荐在连接创建成功之后订阅[客户端事件与网络状态响应](#客户端事件与网络状态响应)，针对网络的异常情况作出应有的 UI 展示，以确保应用的健壮性。
 
 ### 3.创建对话 AVIMConversation
 
-对话(`AVIMConversation`) 是即时通讯抽象出来的概念，它是客户端之间互发消息的载体，可以理解为一个通道，所有在这个对话内的成员都可以在这个对话内收发消息:
+对话({{ docs.className('AVIMConversation') }}) 是即时通讯抽象出来的概念，它是客户端之间互发消息的载体，可以理解为一个通道，所有在这个对话内的成员都可以在这个对话内收发消息:
 
-> 对话(`AVIMConversation`)对话是消息的载体，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
+> 对话({{ docs.className('AVIMConversation') }})对话是消息的载体，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
 
-Tom 已经建立了连接，因此他需要创建一个 `AVIMConversation` 来发送消息给 Jerry：
+Tom 已经建立了连接，因此他需要创建一个 {{ docs.className('AVIMConversation') }} 来发送消息给 Jerry：
 
 ```js
-// om 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
-realtime.createIMClient('Tom').then(function(tom) {
-  // 成功登录
-  // 创建与Jerry之间的对话
-  return tom.createConversation({
-    // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
-    members: ['Jerry'],
-    // 对话名称
-    name: 'Tom & Jerry',
-  });
-}).catch(console.error);
+// 创建与 Jerry 之间的对话
+return tom.createConversation({
+  // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
+  members: ['Jerry'],
+  // 对话名称
+  name: 'Tom & Jerry',
+});.catch(console.error);
+```
+```objc
+// 创建与 Jerry 之间的对话
+[tom createConversationWithName:@"Tom & Jerry" clientIds:@[@"Jerry"] callback:^(AVIMConversation *conversation, NSError *error) {
+
+}];
+```
+```java
+tom.createConversation(Arrays.asList("Jerry"), "Tom & Jerry", null, 
+    new AVIMConversationCreatedCallback() {
+        @Override
+        public void done(AVIMConversation conversation, AVIMException e) {
+          if(e == null) {
+            // 创建成功
+          }
+        }
+});
+```
+```cs
+var conversation = await client.CreateConversationAsync("Jerry",name:"Tom & Jerry");
 ```
 
 对比[建立连接](#建立连接)的代码有如下关键改动:
@@ -126,9 +172,21 @@ return tom.createConversation({
 
 `createConversation` 的参数详解:
 
+{{ docs.langSpecStart('js') }} 
+
 1. `members` : 字符串数组，必要参数，对话的初始成员(clientId)列表，默认包含当前 clientId
 2. `name`: 字符串，可选参数，对话的名字，如果不传默认值为 null
 3. `unique`： bool 类型，可选参数，是否唯一对话，当其为 true 时，如果当前已经有相同成员的对话存在则返回该对话，否则会创建新的对话
+
+{{ docs.langSpecEnd('js') }} 
+
+{{ docs.langSpecStart('objc') }} 
+
+1. `members` : 字符串数组，必要参数，对话的初始成员(clientId)列表，默认包含当前 clientId
+2. `name`: 字符串，可选参数，对话的名字，如果不传默认值为 null
+3. `unique`： bool 类型，可选参数，是否唯一对话，当其为 true 时，如果当前已经有相同成员的对话存在则返回该对话，否则会创建新的对话
+
+{{ docs.langSpecEnd('objc') }} 
 
 
 ### 4.发送消息
