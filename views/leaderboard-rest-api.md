@@ -348,8 +348,7 @@ curl -X DELETE \
   -H "X-LC-Key: {{appkey}}" \
   -H "X-LC-Session: <sessionToken>" \
   -H "Content-Type: application/json" \
-  -d '[{"statisticName": "wins"}, {"statisticName": "world"}]' \
-  https://{{host}}/1.1/leaderboard/users/self/statistics
+  https://{{host}}/1.1/leaderboard/users/self/statistics?statistics=wins,world
 ```
 
 也可以通过 master key 来删除任何用户的成绩：
@@ -360,20 +359,13 @@ curl -X DELETE \
   -H "X-LC-Key: {{appkey}}" \
   -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
-  -d '[{"statisticName": "wins"}, {"statisticName": "world"}]' \
-  https://{{host}}/1.1/leaderboard/users/<uid>/statistics
+  https://{{host}}/1.1/leaderboard/users/<uid>/statistics?statistics=wins,world
 ```
 
+成功返回空对象：
 
-返回结果如下：
-
-```json
-{
-  "results": [
-    {},
-    {}
-  ]
-}
+```
+{}
 ```
 
 
