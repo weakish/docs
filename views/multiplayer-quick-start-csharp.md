@@ -6,6 +6,8 @@
 {% block installation %}
 Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-CSharp](https://github.com/leancloud/Play-SDK-CSharp)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-CSharp/releases)。
 
+### Unity
+
 将下载的 SDK.zip，解压后将 `Plugins` 目录拖拽至 Unity 工程。如果项目中已有 `Plugins` 目录，则合并至项目中的 `Plugins` 目录。
 
 为方便调试，你可以通过注册回调获取日志。在 Unity 中，可以参考如下设置：
@@ -83,7 +85,7 @@ play.On(LeanCloud.Play.Event.CONNECTED, (evtData) =>
 });
 ```
 
-`JoinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-unity.html#加入或创建指定房间) 获取更多关于 `JoinOrCreateRoom` 的用法。
+`JoinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-guide-csharp.html#加入或创建指定房间) 获取更多关于 `JoinOrCreateRoom` 的用法。
 {% endblock %}
 
 
