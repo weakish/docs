@@ -14,7 +14,7 @@
 
 
 {% block import %}
-请阅读 [安装](multiplayer-quick-start-unity.html#安装)，获取 dll 库文件。
+请阅读 [安装](multiplayer-quick-start-csharp.html#安装)，获取 dll 库文件。
 {% endblock %}
 
 
