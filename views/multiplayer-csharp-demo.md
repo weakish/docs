@@ -1,12 +1,10 @@
 # 实现小游戏「炸金花」
 
-本文是基于 Play SDK for Unity（C#）制作的简化版在线对战类游戏「炸金花」，目的在于让用户迅速了解如何使用 Play。
-
-Play 已开放公测，所有应用均可试用。最大免费使用 100 CCU，如果您需要更高额度，请联系 support@leancloud.rocks
+本文是基于实时对战 SDK Unity（C#）制作的简化版在线对战类游戏「炸金花」，目的在于让用户迅速了解如何使用实时对战。
 
 ## Demo
 
-这个 Demo 是基于 Unity 引擎实时对战 SDK「LeanCloud Play」开发的，从中你可以了解：
+这个 Demo 是基于 Unity 引擎及 Play 实时对战 SDK 开发的，从中你可以了解：
 
 * 连接游戏大厅
 * 创建或加入房间
@@ -21,11 +19,11 @@ Play 已开放公测，所有应用均可试用。最大免费使用 100 CCU，�
 
 * Unity 5.6.3p4
 * Visual Studio Community
-* Play SDK
+* 实时对战 SDK Unity（C#)
 
 ## Demo 流程
 
-* 玩家输入 UserID 后连接至 Play 云。
+* 玩家输入 UserID 后连接至实时对战云。
 * 选择创建或加入房间。
 * 普通玩家加入房间之后可以选择「准备状态」。
 * 当房间总玩家数不少于 2 人，并且其他玩家处于「准备状态」时，房主可以开始游戏。
@@ -37,7 +35,7 @@ Play 已开放公测，所有应用均可试用。最大免费使用 100 CCU，�
 
 ### 连接
 
-通过输入用户的 UserID 连接至 Play，此处的 UserID 由开发者提供，可以是用户名，昵称等，或任意字段的组合。UserID 最好是字母和数字的组合。
+通过输入用户的 UserID 连接至实时对战服务器，此处的 UserID 由开发者提供，可以是用户名，昵称等，或任意字段的组合。UserID 最好是字母和数字的组合。
 
 ![连接](images/unity/playdemo-1.png)
 
@@ -59,7 +57,7 @@ public override void OnAuthenticated()
 }
 ```
 
-注意：所有 Play SDK 回调的方法都要注意命名，并且需要添加 `[PlayEvent]` 属性。
+注意：所有 SDK 回调的方法都要注意命名，并且需要添加 `[PlayEvent]` 属性。
 
 ### 创建 / 加入房间
 
@@ -238,7 +236,7 @@ void onPlayerPokerPropertiesChanged(LeanCloud.Player player, Hashtable updatedPr
 
 #### 跟牌
 
-从这里开始，我们将使用 Play 中的另一个同步方式：RPC。RPC 由一个开发者定义的字符串名称，接受对象枚举值，调用参数组成。
+从这里开始，我们将使用实时对战中的另一个同步方式：RPC。RPC 由一个开发者定义的字符串名称，接受对象枚举值，调用参数组成。
 
 在 Demo 中，如果玩家选择「跟牌」，会执行三步逻辑：
 

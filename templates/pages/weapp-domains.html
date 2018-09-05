@@ -2,7 +2,7 @@
 layout: start.swig
 title: 小程序域名白名单配置
 ---
-<script src="//cdn1.lncld.net/static/js/3.4.1/av-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0-beta.0/dist/av-min.js"></script>
 <div class="start-page doc-content" ng-controller="WeappDomainsCtrl" >
   <h1 class="font-logo">小程序域名白名单配置</h1>
   <!-- .doc-home-title -->
@@ -55,29 +55,7 @@ title: 小程序域名白名单配置
         <table>
           <tr>
             <th rowspan="{{ requestDomainsLength }}" width="40%"><strong>request 域名</strong><small class="help-block text-warning mb-0">所列出的域名都要添加，缺一不可。</small></th>
-            <td>
-              {% if node === 'qcloud' %}
-              e1-api.leancloud.cn
-              {% elseif node === 'us' %}
-              us-api.leancloud.cn
-              {% else %}
-              api.leancloud.cn
-              {% endif %}
-            </td>
-          </tr>
-          <tr>
-            <td>app-router.leancloud.cn</td>
-          </tr>
-          <tr>
-            <td>
-              {% if node === 'qcloud' %}
-              router-q0-push.leancloud.cn
-              {% elseif node === 'us' %}
-              router-a0-push.leancloud.cn
-              {% else -%}
-              router-g0-push.leancloud.cn
-              {% endif %}
-            </td>
+              <td>app-router.leancloud.cn</td>
           </tr>
           <tr ng-repeat="domain in extraRequestDomains">
             <td>{{domain}}</td>

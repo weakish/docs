@@ -8,19 +8,21 @@
 {% set leanengine_middleware = "[LeanEngine Java SDK](https://github.com/leancloud/leanengine-java-sdk)" %}
 {% set leanengine_java_sdk_latest_version = '0.1.11' %}
 
+{% block getting_started %}
 
-{% block runtime_description %}
-Java 运行环境对内存的使用较多，所以建议：
+将示例代码 [java-war-getting-started](https://github.com/leancloud/java-war-getting-started) 克隆到本地：
 
-* 以 [示例项目](https://github.com/leancloud/java-war-getting-started) 起步的应用，建议使用 512 MB 或以上规格的实例。
-* 使用 [Spring Boot](https://projects.spring.io/spring-boot/) 的应用，建议使用 1 GB 或以上规格的实例。
-* 本地启动并模拟完成主要业务流程操作，待应用充分初始化后，根据 Java 进程内存占用量选择相应的实例规格，需要注意保留一定的余量用以应对请求高峰。
+```sh
+git clone https://github.com/leancloud/java-war-getting-started.git
+```
 
-<div class="callout callout-danger">如果云引擎 [实例规格](leanengine_plan.html#选择实例规格) **选择不当**，可能造成应用启动时因为内存溢出（OOM）导致部署失败，或运行期内存溢出导致应用频繁重启。</div>
 {% endblock %}
 
 {% block project_constraint %}
-你的项目需要遵循一定格式才会被云引擎识别并运行。
+
+## 项目骨架
+
+参照示例项目，你的项目需要遵循一定格式才会被云引擎识别并运行。
 
 云引擎 Java 运行环境使用 Maven 进行构建，所以 {{fullName}} 项目必须有 `$PROJECT_DIR/pom.xml` 文件，该文件为整个项目的配置文件。构建完成后云引擎会尝试到 `$PROJECT_DIR/target` 目录下寻找可以使用的包：
 
@@ -31,7 +33,16 @@ Java 运行环境对内存的使用较多，所以建议：
 
 * [java-war-getting-started](https://github.com/leancloud/java-war-getting-started): 使用 Servlet，集成 LeanEngine Java SDK 的一个简单项目，打包成 WAR 文件。
 * [spring-boot-getting-started](https://github.com/leancloud/spring-boot-getting-started): 使用 [Spring boot](https://projects.spring.io/spring-boot/) 做为项目框架，集成 LeanEngine Java SDK 的一个简单的项目，打包成 JAR 文件。
+{% endblock %}
 
+{% block runtime_description %}
+Java 运行环境对内存的使用较多，所以建议：
+
+* 以 [示例项目](https://github.com/leancloud/java-war-getting-started) 起步的应用，建议使用 512 MB 或以上规格的实例。
+* 使用 [Spring Boot](https://projects.spring.io/spring-boot/) 的应用，建议使用 1 GB 或以上规格的实例。
+* 本地启动并模拟完成主要业务流程操作，待应用充分初始化后，根据 Java 进程内存占用量选择相应的实例规格，需要注意保留一定的余量用以应对请求高峰。
+
+<div class="callout callout-danger">如果云引擎 [实例规格](leanengine_plan.html#选择实例规格) **选择不当**，可能造成应用启动时因为内存溢出（OOM）导致部署失败，或运行期内存溢出导致应用频繁重启。</div>
 {% endblock %}
 
 {% block project_start %}
@@ -169,6 +180,8 @@ Java 云引擎只支持 1.8 运行环境和 war 包运行
 
 {% block use_leanstorage %}
 
+## 使用数据存储服务
+
 云引擎使用 {{leanengine_middleware}} 来代替 [Java 存储 SDK](https://github.com/leancloud/java-sdk) 。前者依赖了后者，并增加了云函数和 Hook 函数的支持，因此开发者可以直接使用 [LeanCloud 的存储服务](leanstorage_guide-java.html) 来存储自己的数据。
 
 如果使用项目框架作为基础开发，{{leanengine_middleware}} 默认是配置好的，可以根据示例程序的方式直接使用。
@@ -301,12 +314,13 @@ public class UploadServlet extends HttpServlet {
 
 ```java
 // 加载 cookieSession 以支持 AV.User 的会话状态
-LeanEngine.addSessionCookie(new EngineSessionCookie(3600000,true));
+LeanEngine.addSessionCookie(new EngineSessionCookie("my secret", 3600, true));
 ```
 
 `EngineSessionCookie` 的构造函数参数包括：
 
-* **maxAge**：设置 Cookie 的过期时间。
+* **secret**：一个只保存在服务端的字符串，可以设置为任意值。但每次修改之后，所有已有的 cookie 都会失效，也就是所有用户的登录 session 都将过期。
+* **maxAge**：设置 Cookie 的过期时间。单位秒。
 * **fetchUser**：**是否自动 fetch 当前登录的 AV.User 对象。默认为 false。**
   如果设置为 true，每个 HTTP 请求都将发起一次 LeanCloud API 调用来 fetch 用户对象。如果设置为 false，默认只可以访问 `AVUser.getCurrentUser()` 的 `id`（`_User` 表记录的 ObjectId）和 `sessionToken` 属性，你可以在需要时再手动 fetch 整个用户。
 
@@ -321,20 +335,17 @@ LeanEngine.addSessionCookie(new EngineSessionCookie(3600000,true));
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
 
-
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
       IOException {
     req.getRequestDispatcher("/login.jsp").forward(req, resp);
   }
 
-
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
-      IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String username = req.getParameter("username");
     String passwd = req.getParameter("password");
     try {
       AVUser.logIn(username, passwd);
-      req.getRequestDispatcher("/profile").forward(req, resp);
+      resp.sendRedirect("/profile");
     } catch (AVException e) {
       resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       resp.setContentType("application/json; charset=UTF-8");
@@ -345,20 +356,28 @@ public class LoginServlet extends HttpServlet {
       e.printStackTrace();
     }
   }
+
 }
 ```
 #### 登出
 ``` java
 @WebServlet(name = "LogoutServlet", urlPatterns = {"/logout"})
 public class LogoutServlet extends HttpServlet {
+
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
+      IOException {
+    doPost(req, resp);
+  }
+
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
       IOException {
     AVUser user = AVUser.getCurrentUser();
     if (user != null) {
       user.logOut();
     }
-    req.getRequestDispatcher("/profile").forward(req, resp);
+    resp.sendRedirect("/profile");
   }
+
 }
 ```
 
@@ -370,17 +389,15 @@ public class ProfileServlet extends HttpServlet {
 
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
       IOException {
-    if (AVUser.getCurrentUser() == null) {
-      req.getRequestDispatcher("/login").forward(req, resp);
-    } else {
-      resp.setContentType("application/json; charset=UTF-8");
-      JSONObject result = new JSONObject();
+    resp.setContentType("application/json; charset=UTF-8");
+    JSONObject result = new JSONObject();
+    if (AVUser.getCurrentUser() != null) {
       result.put("currentUser", AVUser.getCurrentUser());
-      resp.getWriter().write(result.toJSONString());
     }
+    resp.getWriter().write(result.toJSONString());
   }
-}
 
+}
 ```
 
 一个简单的登录页面（`login.jsp`）可以是这样：
@@ -394,7 +411,7 @@ public class ProfileServlet extends HttpServlet {
         <input name="username"></input>
         <label>Password</label>
         <input name="password" type="password"></input>
-        <input class="button" type="submit" value="登录">
+        <input class="button" type="submit" value="Login">
       </form>
     </body>
   </html>

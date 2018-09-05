@@ -1,0 +1,433 @@
+# 实时对战开发指南 · {{platformName}}
+
+
+
+## 前言
+
+实时对战是一款基于 {{platformName}} 编写的游戏 SDK，它为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。实时对战提供的主要功能如下：
+
+- 获取房间列表
+- 创建房间
+- 加入房间
+- 随机加入（符合条件的）房间
+- 获取房间玩家
+- 获取、设置、同步房间的属性
+- 获取、设置、同步玩家的属性
+- 发送和接收「自定义事件」
+- 离开房间
+
+
+
+## SDK 导入
+
+{% block import %}
+{% endblock %}
+
+
+
+## 初始化
+
+{% block initialization %}
+{% endblock %}
+
+
+
+## 连接
+
+### 设置 `{{userId}}`
+
+我们需要设置一个 `{{userId}}` 作为客户端的唯一标识连接至服务器。
+
+{% block set_userid %}
+{% endblock %}
+
+需要注意，这个 `userId` 有如下限制：
+- 只允许英文、数字与下划线。
+- 长度不能超过 32 字符
+- 一个应用内全局唯一
+
+### 建立连接
+
+{% block connection %}
+{% endblock %}
+
+如果需要通过版本号隔离玩家，可以通过以下接口连接。
+
+{% block connection_with_gameversion %}
+{% endblock %}
+
+{{gameversion}}表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器。
+
+在连接成功后，会收到 `CONNECTED`（连接成功）事件；否则，将会收到 `CONNECT_FAILED`（连接失败）事件，回调参数 `error` 将包含失败原因。
+
+{% block connection_event %}
+{% endblock %}
+
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| CONNECTED | 无 | 连接成功                                  |
+| CONNECT_FAILED    | error  | 连接失败                                 |
+
+
+
+## 大厅
+
+我们鼓励您「不要」将玩家加入大厅，因为在大厅中，SDK 会拉取并同步一个很长的房间列表，由玩家选择一个房间进行游戏。这种方式不仅对玩家体验不友好，同时来会带来很大的带宽压力。
+
+我们推荐您像现在的绝大部分手游一样，直接通过[房间匹配](#房间匹配)方法，快速匹配开始游戏。
+
+因此 SDK 默认情况下 {{autoJoinLobby}} 为 false，不需要加入大厅。
+
+如果您有特殊的游戏场景需要获取房间列表，可以调用以下方法
+
+{% block join_lobby %}
+{% endblock %}
+
+当玩家加入到大厅后，实时对战 SDK 会自动同步当前大厅的房间列表，开发者可以根据需求显示房间列表，或加入房间参与游戏。
+
+开发者可以根据下面的接口获取房间列表。
+
+{% block room_list %}
+{% endblock %}
+
+更多关于 `LobbyRoom`，请参考 [API 文档]({{lobby_room_url}})。
+
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| LOBBY_JOINED    | 无 | 加入大厅                         |
+| LOBBY_LEFT   | 无  | 离开大厅 |
+| LOBBY_ROOM_LIST_UPDATED | 无 | 大厅房间列表更新                                  |
+
+
+
+## 房间匹配
+
+房间，是指产生玩家「战斗交互」的单位。比如斗地主的牌桌、MMO 的副本、微信游戏的对战 等，广义上都属于房间的范畴。
+
+玩家之间的战斗交互都是在房间内完成的。所以，玩家「如何进入房间」就成了房间匹配的关键。下面我们将从「创建房间」和「加入房间」两方面来分析一下常用的「房间匹配」功能。
+
+### 创建房间
+
+我们可以创建一个默认的房间。
+
+{% block create_default_room %}
+{% endblock %}
+
+也可以创建一个包含参数的房间。
+
+{% block create_custom_room %}
+{% endblock %}
+
+其中 `roomName`、`roomOptions` 和 `expectedUserIds` 这些参数都是可选参数。
+
+#### roomName
+
+房间名称必须保证唯一；如果不设置，则由服务端生成唯一房间 Id 并返回。
+
+#### roomOptions
+
+创建房间时的指定参数，包括：
+
+{% block room_options %}
+{% endblock %}
+
+#### expectedUserIds
+
+指定的玩家 ID 数组。这个参数主要用于为某些能加入到房间中的特定玩家「占位」。
+
+注意：这些「特定的玩家」并不会真地加入到房间里来，而只会在房间的「空位」上预留出位置，只允许「特定的玩家」加入。如果开发者要做「邀请加入」的功能，还需要通过其他途径，例如 IM、微信分享等将「房间名称」发送给好友，好友再通过 `{{joinRoom}}(roomName)` 接口加入房间。
+
+{% block create_room_api %}
+{% endblock %}
+
+当玩家请求创建房间后，将有可能接收到 `ROOM_CREATED`（房间创建成功）或 `ROOM_CREATE_FAILED`（房间创建失败）事件。
+
+{% block create_room_event %}
+{% endblock %}
+
+注意：当房主创建好房间后会自动加入房间，所以也会收到 `ROOM_JOINED`（加入房间成功）事件。
+
+### 加入房间
+
+当房间创建好后，其他的玩家可以通过「加入房间」参与到游戏中。
+
+#### 加入指定房间
+
+通过指定「房间名称」加入房间。
+
+{% block join_room %}
+{% endblock %}
+
+在加入房间时，也可以为玩家占位。
+
+{% block join_room_with_ids %}
+{% endblock %}
+
+注意：当房间空位小于「用户加入时的占位数量」时，会收到 `ROOM_JOIN_FAILED`（加入房间失败）事件。
+
+{% block join_room_api %}
+{% endblock %}
+
+当玩家请求加入房间后，将有可能接收到 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
+
+{% block join_room_event %}
+{% endblock %}
+
+#### 随机加入房间
+
+有时候，我们不需要加入指定某个房间，而是随机加入「符合某些条件的房间」（甚至可以是没有条件），比如快速开始、快速匹配等，这时我们可以通过调用 `{{joinRandomRoom}}` 方法随机加入房间。
+
+{% block join_random_room %}
+{% endblock %}
+
+也可以为随机加入设置「条件」，例如随机加入到 level = 2 的房间。
+
+{% block join_random_room_with_condition %}
+{% endblock %}
+
+与[加入指定房间](#加入指定房间)一样，我们也有可能接收到 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
+
+### 加入或创建指定房间
+
+与 Master 先创建房间后其他人再加入的方式不同的是，有些游戏需要一些玩家加入到「同一个房间」，当房间不存在时，则创建房间，而不需要显示地指定 Master。这时我们可以通过 `{{joinOrCreateRoom}}()` 实现。
+
+{% block join_or_create_room %}
+{% endblock %}
+
+{% block join_or_create_room_api %}
+{% endblock %}
+
+当调用这个接口后，只有**第一个**调用这个接口的玩家的请求会执行「创建房间」逻辑，而其他玩家的请求将会执行「加入房间」逻辑。所以，如果执行了创建房间逻辑，则会回调 `ROOM_CREATED`（创建房间成功）或 `ROOM_CREATE_FAILED`（创建房间失败）事件；如果执行了加入房间逻辑，则会回调 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
+
+### 新玩家加入事件
+
+对于已经在房间的玩家，当有新玩家加入到房间时，会派发 `PLAYER_ROOM_JOINED`（新玩家加入）事件通知客户端，客户端可以通过新玩家的属性，做一些显示逻辑。
+
+{% block player_room_joined %}
+{% endblock %}
+
+### 离开房间
+
+当玩家想要「主动」离开房间时，可以调用下面的接口。
+
+{% block leave_room %}
+{% endblock %}
+
+当玩家离开房间成功后，客户端会接收到 `ROOM_LEFT`（离开房间）事件。
+
+{% block leave_room_event %}
+{% endblock %}
+
+而房间里的其他玩家将会接收到 `PLAYER_ROOM_LEFT`（有玩家离开房间）事件。
+
+{% block player_room_left_event %}
+{% endblock %}
+
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| ROOM_CREATED    | 无  | 创建房间                                 |
+| ROOM_CREATE_FAILED   | error   | 创建房间失败                           |
+| ROOM_JOINED    | 无 | 加入房间                         |
+| ROOM_JOIN_FAILED   | error  | 加入房间失败 |
+| PLAYER_ROOM_JOINED    | { newPlayer } | 新玩家加入房间                         |
+| PLAYER_ROOM_LEFT   | { leftPlayer }  | 玩家离开房间 |
+| MASTER_SWITCHED    | { player }  | Master 更换                                 |
+| ROOM_LEFT   | 无   | 离开房间                           |
+
+
+
+## 设置房间属性
+
+### 设置房间是否开放
+
+房主可以设置房间是否开放，当房间关闭时，不允许其他玩家加入。
+
+{% block open_room %}
+{% endblock %}
+
+### 设置房间是否可见
+
+房主可以设置房间是否可见，当房间不可见时，这个房间将不会出现在玩家的大厅房间列表中，但是**其他玩家可以通过指定 roomName 加入**。
+
+{% block visible_room %}
+{% endblock %}
+
+
+
+## MasterClient
+
+为了不依赖于服务端而更快速地开发实时对战游戏，我们引入了 `MasterClient` 的概念，即承担「逻辑运算功能」的特殊客户端。
+
+有以下几点需要注意：
+1. 默认房间的创建者为 MasterClient。
+2. 在游戏过程中，MasterClient 可以指定其他玩家作为新的 MasterClient。
+3. 当 MasterClient 掉线后，服务器会指任一名新的玩家为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。
+
+{% block set_master %}
+{% endblock %}
+
+当 MasterClient 变化时，Play SDK 会派发 `MASTER_SWITCHED`（主机切换）事件通知客户端。
+
+{% block master_switched_event %}
+{% endblock %}
+
+
+
+## 自定义属性及同步
+
+{% block custom_props %}
+{% endblock %}
+
+自定义属性同步的主要作用包括：
+
+- 使每个客户端的数据保持一致。
+- 自定义属性由服务端管理，当有玩家进入房间后，即可得到所有的自定义属性。
+
+自定义属性又分为「房间自定义属性」和「玩家自定义属性」。
+
+### 房间自定义属性
+
+{% block set_custom_props %}
+{% endblock %}
+
+注意：这个接口并不是直接设置「客户端中自定义属性的内存值」，而是发送修改自定义属性的消息，由服务端最终确定是否修改。
+
+当房间属性变化时，SDK 将派发 `ROOM_CUSTOM_PROPERTIES_CHANGED`（房间自定义属性）事件通知所有玩家客户端（包括自己）。
+
+{% block custom_props_event %}
+{% endblock %}
+
+### 玩家自定义属性
+
+玩家自定义属性与 [房间自定义属性](#房间自定义属性) 基本一致。
+
+{% block set_player_custom_props %}
+{% endblock %}
+
+玩家自定义属性变化事件：
+
+{% block player_custom_props_event %}
+{% endblock %}
+
+### CAS
+
+CAS 全称为 Compare And Swap，即「检测并更新」的意思，用于避免一些「并发问题」。
+
+当调用 `{{setCustomProperties}}` 时，服务器会接收所有客户端提交的值，这无法满足某些场景下的需求。
+
+比如，一个属性保存着这个房间的某件物品的持有者，即属性的 key 是物品，value 是持有者。
+任何客户端都可以在任何时候设置这个属性，如果多个客户端同时调用，**服务端会将最后收到的调用作为最终的值**，这样通常是不符合逻辑的，一般来说，应该属于第一个获得的人。
+
+`{{setCustomProperties}}` 有一个可选参数 `expectedValues` 可作为判断条件。服务器只会更新当前和 `expectedValues` 匹配的属性，使用过期的 `expectedValues` 的更新将会被忽略。
+
+假设一个房间里有 10 名玩家，但是只有 1 把屠龙刀，屠龙刀只能被第一个「抢到」的人获得。
+
+我们可以设置 `expectedValues` 中 `tulong` 值：
+
+{% block set_player_custom_props_with_cas %}
+{% endblock %}
+
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| ROOM_CUSTOM_PROPERTIES_CHANGED    | { changedProps } | 房间自定义属性变化                         |
+| PLAYER_CUSTOM_PROPERTIES_CHANGED   | { player, changedProps }  | 玩家自定义属性变化 |
+
+
+
+## 自定义事件
+
+在[自定义属性](#自定义属性及同步)中，我们介绍了如何根据游戏需求来自定义游戏的数据结构和数据类型。
+但是，只有数据是不够的，开发者还需要自定义事件（协议）进行扩展。
+
+### 发送自定义事件
+
+我们可以通过「自定义事件」发送各种事件，比如游戏开始、抓牌、释放 X 技能、游戏结束等等。
+
+{% block send_event %}
+{% endblock %}
+
+注意：如果同时设置「接收组」和「接收者 ID 数组」，则「接收者 ID 数组」将会覆盖「接收组」。
+
+### 接收自定义事件
+
+我们通过注册 `CUSTOM_EVENT`（自定义事件），根据 `eventId`（事件 ID）来处理不同事件。
+
+{% block send_event_event %}
+{% endblock %}
+
+`event` 参数
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| eventId    | Number/String | 事件 Id，用于表示事件                         |
+| eventData   | Object  | 事件参数 |
+| senderId   | Number  | 事件发送者 Id（玩家的 actorId） |
+
+
+
+## 断开连接
+
+当游戏过程中，由于网络原因可能会断开连接，此时 SDK 会向客户端派发 `DISCONNECTED`（断开连接）事件，开发者可以根据需要注册并处理。
+
+{% block disconnect_event %}
+{% endblock %}
+
+开发者也可以通过下面的接口断开连接。
+
+{% block disconnect %}
+{% endblock %}
+
+
+
+## 断线重连
+
+有时候由于网路不稳定，可能导致玩家掉线，而我们希望能保留掉线玩家的数据，并在一段时间内等待掉线的玩家恢复上线。
+
+针对这种情况，我们可以在创建房间时，通过 `{{playerTtl}}` 来设置「玩家掉线后的保留时间」，即 玩家掉线后，并不将玩家数据「立即销毁」，而是通过 `PLAYER_ACTIVITY_CHANGED` 事件通知客户端。
+只要掉线玩家在 `{{playerTtl}}` 时间内重连并回到房间，则可以恢复游戏（玩家上线也是通过 `PLAYER_ACTIVITY_CHANGED` 事件通知）。
+如果超过 `{{playerTtl}}` 时间，则会销毁玩家数据，并认为其离开房间。其他玩家会收到 `PLAYER_ROOM_LEFT` （玩家离开房间）事件。
+
+{% block player_activity %}
+{% endblock %}
+
+### 重新连接
+
+不论是由于网络原因或者用户主动断开连接，都可以通过下面的接口重新连接至服务器。
+
+{% block reconnect %}
+{% endblock %}
+
+注意：这个接口只是重新连接至服务器，如果之前在「房间内游戏」，并不会直接回到房间。如需重连并回到断线前的房间，请参考[重连并回到房间](#重连并回到房间)。
+
+### 回到房间
+
+当玩家连接至大厅以后，可以通过此接口「再次回到某房间」。
+
+{% block rejoin_room %}
+{% endblock %}
+
+### 重连并回到房间
+
+例如，在断线后，重连并回到房间。
+
+{% block reconnect_and_rejoin %}
+{% endblock %}
+
+
+
+## 错误处理
+
+在游戏过程中，可能会触发一些错误事件，开发者可以通过注册「错误事件」来处理。
+
+{% block error_event %}
+{% endblock %}
+
+更多接口及详情，请参考 [API 接口]({{api_url}})。

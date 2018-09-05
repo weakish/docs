@@ -18,7 +18,7 @@
 这里给出简单的示例代码使您更快地了解到整体流程，详细的开发指南请参考：
 
 * [实时对战开发指南 · JavaScript](multiplayer-guide-js.html)
-* [实时对战开发指南 · Unity（C#）](multiplayer-guide-csharp.html)
+* [实时对战开发指南 · C#](multiplayer-guide-csharp.html)
 
 ### 连接服务器
 
@@ -273,7 +273,7 @@ public void OnRandomJoinRoomFailed() {
 }
 ```
 
-更多匹配接口请参考房间匹配文档：[JavaScript](multiplayer-guide-js.html#房间匹配)、[Unity](multiplayer-guide-csharp.html#房间匹配)。
+更多匹配接口请参考房间匹配文档：[JavaScript](multiplayer-guide-js.html#房间匹配)、[c#](multiplayer-guide-csharp.html#房间匹配)。
 
 
 ### 游戏中
@@ -453,9 +453,9 @@ Play.LeaveRoom();
 * [快速入门](multiplayer-quick-start-js.html)：快速接入实时对战并运行一个小 Demo
 * [实时对战开发指南 · JavaScript](multiplayer-guide-js.html)：对实时对战所有功能及接口的详细介绍。
 
-### Unity(C#)
+### `C#`
 * [快速入门](multiplayer-quick-start-csharp.html)：快速接入实时对战并运行一个小 Demo
-* [实时对战开发指南 · Unity（C#）](multiplayer-guide-csharp.html)：对实时对战所有功能及接口的详细介绍。
+* [实时对战开发指南 · C#](multiplayer-guide-csharp.html)：对实时对战所有功能及接口的详细介绍。
 * [实现小游戏「炸金花」](multiplayer-csharp-demo.html)
 
 ## 价格及试用
