@@ -104,7 +104,7 @@ play.on(Event.CONNECTED, () => {
 });
 ```
 
-`joinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-js.html#创建房间) 获取更多关于 `joinOrCreateRoom` 的用法。
+`joinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-js.html#加入或创建指定房间) 获取更多关于 `joinOrCreateRoom` 的用法。
 {% endblock %}
 
 
