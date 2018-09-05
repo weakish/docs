@@ -23,7 +23,13 @@
 
 即时通讯使得开发者可以在不编写服务端的代码的情况下，仅使用客户端 SDK 即可实现在线聊天/多人群组/私聊/消息群发等实时通讯的功能，如下时序图简单的介绍了一下即时通讯的业务流程：
 
-![rtm-message-seq](images/rtm-message-seq.svg)
+```seq
+Alice->Bob: Hello Bob, how are you?
+Note right of Bob: Bob thinks
+Bob-->Alice: I am good thanks!
+```
+
+<!-- ![rtm-message-seq](images/rtm-message-seq.svg) -->
 
 
 首先，如果您还没有下载对应开发环境（语言）的 SDK，请查看如下内容，选择一门语言，查看下载和安装的文档：
@@ -44,10 +50,21 @@
 
 > {{ docs.className('AVIMClient') }} 对应实体的是一个用户，它表示一个用户以客户端的身份登录到整个即时通讯的系统。
 
-### 1.创建 AVIMClient
+### 1.创建 {{ docs.className('AVIMClient') }}
 
 在 iOS 和 Android SDK 中使用如下代码创建出一个 {{ docs.className('AVIMClient') }}:
 
+```js
+var realtime = new Realtime({
+  appId: 'your-app-id',
+  appKey: 'your-app-key',
+  plugins: [TypedMessagesPlugin], // 注册富媒体消息插件
+});
+// Tom 用自己的名字作为 clientId
+realtime.createIMClient('Tom').then(function(tom) {
+  // 成功登录
+}).catch(console.error);
+```
 ```objc
 @property (nonatomic, strong) AVIMClient *client;
 // clientId 为 Tom
@@ -57,6 +74,10 @@ self.client = [[AVIMClient alloc] initWithClientId:@"Tom"]
 // clientId 为 Tom
 AVIMClient tom = AVIMClient.getInstance("Tom");
 ```
+```cs
+var realtime = new AVRealtime('your-app-id','your-app-key');
+var tom = await realtime.CreateClientAsync('Tom');
+```
 
 示例代码中 `clientId` 被设置为 Tom, 这里我们需要明确一下 `clientId` 的约束：
 
@@ -64,9 +85,7 @@ AVIMClient tom = AVIMClient.getInstance("Tom");
 2. 在一个应用内全局唯一
 3. 长度不能超过 64 个字符
 
-创建完毕之后，{{ docs.className('AVIMClient') }} 的处于未初始化的状态，如果想收发消息我们需要让客户端与云端建立一个长连接。
-
-注： JavaScript 和 C#(Unity3D) SDK 不需要创建 {{ docs.className('AVIMClient') }}。 直接看下一章节[建立连接](#建立连接)。
+注： JavaScript 和 C#(Unity3D) SDK 创建 {{ docs.className('AVIMClient') }} 成功同时意味着连接也已经建立，而 iOS 和 Android SDK 则需要额外下一步[2.建立连接](#2.建立连接)
 
 
 ### 2.建立连接
@@ -78,8 +97,6 @@ AVIMClient tom = AVIMClient.getInstance("Tom");
 对应的 SDK 方法如下：
 
 ```js
-var AV = require('leancloud-storage');
-var { Realtime } = require('leancloud-realtime');
 // Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
@@ -119,7 +136,7 @@ var tom = await realtime.CreateClientAsync('Tom');
 
 我们推荐在连接创建成功之后订阅[客户端事件与网络状态响应](#客户端事件与网络状态响应)，针对网络的异常情况作出应有的 UI 展示，以确保应用的健壮性。
 
-### 3.创建对话 AVIMConversation
+### 3.创建对话 {{ docs.className('AVIMConversation') }}
 
 对话({{ docs.className('AVIMConversation') }}) 是即时通讯抽象出来的概念，它是客户端之间互发消息的载体，可以理解为一个通道，所有在这个对话内的成员都可以在这个对话内收发消息:
 

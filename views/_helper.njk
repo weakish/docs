@@ -121,3 +121,9 @@
 {% macro langSpecEnd(lang) %}
 <p class="lang-spec-{{lang}}-end"></p>
 {% endmacro %}
+
+{% macro titleNote(title,content) %}
+  {% if content | trim != "" -%}
+  <blockquote><strong> {{title}} </strong><p> {{ content | replace(r/<p>\s*<\/p>/gi,"") | safe }} </p></blockquote>
+  {%- endif %}
+{% endmacro %}

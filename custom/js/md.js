@@ -272,6 +272,13 @@ var codeBlockTabber = (function () {
 
   }
 
+  function prettySequence() {
+    var options = { theme: 'simple' };
+    var $ds = $(".lang-seq");
+    $ds.parent().removeClass('prettyprint').removeClass('prettyprinted');
+    $ds.sequenceDiagram(options);
+  }
+
   function checkCodeBlocks() {
     var $codeBlocks = $('.prettyprint');
     var langLabelMap = {
@@ -460,7 +467,8 @@ var codeBlockTabber = (function () {
   }
 
   return {
-    start: checkCodeBlocks
+    start: checkCodeBlocks,
+    render: prettySequence
   };
 
 })();
@@ -486,6 +494,7 @@ $(function () {
 
   setTimeout(function () {
     updateSidebarAffixShadowWidth();
+    codeBlockTabber.render();
   }, 400);
 
 });
