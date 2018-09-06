@@ -468,3 +468,37 @@ POST http://e1-api.leancloud.cn/1/functions/Todo/beforeUpdate  {"Connection":["c
 AVClient.UseMasterKey = true;
 ```
 {% endblock %}
+
+{% block hookDeadLoop %}
+
+{{ 
+    LE.deadLoopText({
+      hookName:                hook_after_update,
+      objectName:              'post',
+      createWithoutDataMethod: 'AVObject.CreateWithoutData()',
+      disableBeforeHook:       'post.DisableBeforeHook()', 
+      disableAfterHook:        'post.DisableAfterHook()'
+    })
+}}
+
+```cs
+cloud.AfterSave("Post", (EngineObjectHookDeltegateSynchronous)(async post =>
+    {
+        // 直接修改并保存对象不会再次触发 after update hook 函数
+        post["foo"] = "bar";
+        await post.SaveAsync();
+        // 如果有 FetchAsync 操作，则需要在新获得的对象上调用相关的 disable 方法
+        // 来确保不会再次触发 Hook 函数
+        await post.FetchAsync();
+        post.DisableAfterHook();
+        post["foo"] = "bar";
+
+        // 如果是其他方式构建对象，则需要在新构建的对象上调用相关的 disable 方法
+        // 来确保不会再次触发 Hook 函数
+        post = AVObject.CreateWithoutData<AVObject>(post.ObjectId);
+        post.DisableAfterHook();
+        await post.SaveAsync();
+    }));
+```
+
+{% endblock %}
