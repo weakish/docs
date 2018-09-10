@@ -1178,16 +1178,16 @@ LeanCloud 后端要求 authData 至少含有 `openid 或 uid`、`access_token` �
 
 其他平台，如 QQ 的 UnionID 体系，和微信的设计保持一致。
 
-LeanCloud 支持 UnionID 体系。您只需要给 loginWithauthData 和 associateWithauthData 接口传入更多的参数，即可完成新 UnionID 体系的集成。
+LeanCloud 支持 UnionID 体系。您只需要给 `loginWithauthData` 和 `associateWithauthData` 接口传入更多的参数，即可完成新 UnionID 体系的集成。
 
 要使用到的关键参数列表：
 
 参数名 | 类型 | 意义
 ---- | ----- | ----
-platform | String | 平台，命名如 `weixinapp1`、`wxminiprogram1` 和 `qqapp1` 等。
-unionIdPlatform | String | UnionID 平台，如 `weixin`、`weibo` 和 `qq` 等。
-unionId | String | 由 UnionID 平台提供。需 **配合 asMainAccount、unionIdPlatform 一起使用**。
-asMainAccount | boolean | true 表示会把 UnionID 绑定进当前 authData 并作为主账号，之后该 unionId 来识别用。需 **配合 unionId 、unionIdPlatform 一起使用**。
+`platform` | String | 平台，命名随意，如 `weixinapp`、`wxminiprogram`、`qqapp1` 等。
+`unionIdPlatform` | String | UnionID 平台，如 `weixin`、`weibo` 和 `qq` 等。
+`unionId` | String | 由 UnionID 平台提供。**需配合 asMainAccount、unionIdPlatform 一起使用**。
+`asMainAccount` | boolean | true 代表将 UnionID 绑定入当前 authData 并作为主账号，之后该 unionId 来识别用。**需配合 `unionId`、`unionIdPlatform` 一起使用**。
 
 接入新 UnionID 系统时，每次传入的 authData 必须包含成对的平台 `uid 或 openid` 和平台 `unionid`。示例代码如下：
 
