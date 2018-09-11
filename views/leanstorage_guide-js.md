@@ -1228,46 +1228,6 @@ file.save({
 ```
 {% endblock %}
 
-{% block sns_authdata %}
-#### 第三方账号登录
-
-为了简化用户注册的繁琐流程，许多应用都在登录界面提供了第三方社交账号登录的按钮选项，例如微信、QQ、微博、Github、豆瓣、Twitter、FaceBook 等，以此来提高用户体验。LeanCloud 封装的 {{userObjectName}} 对象也支持通过第三方账号的 accessToken 信息来创建一个用户。例如，使用微信授权信息创建 {{userObjectName}} 的代码如下：
-
-```js
-  AV.User.signUpOrlogInWithAuthData({
-      // 微博（weibo）用 uid
-      // 微信（weixin）和 QQ（qq）用 openid
-      "openid": "oPrJ7uM5Y5oeypd0fyqQcKCaRv3o",
-      "access_token": "OezXcEiiBSKSxW0eoylIeNFI3H7HsmxM7dUj1dGRl2dXJOeIIwD4RTW7Iy2IfJePh6jj7OIs1GwzG1zPn7XY_xYdFYvISeusn4zfU06NiA1_yhzhjc408edspwRpuFSqtYk0rrfJAcZgGBWGRp7wmA",
-      "expires_in": "2016-01-06T11:43:11.904Z"
-  }, 'weixin').then(function (s) {
-  }, function (e) {
-
-  });
-```
-
-目前我们仅支持验证以下平台的 `access_token` 的合法性：
-- 微信
-- QQ 
-- 微博
-
-要接入其他平台，开发者需要完成以下步骤：
-
-- 进入 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf) 中取消 **第三方登录时，验证用户 AccessToken 合法性** 的勾选。这样开发者要自行验证 `access_token` 的合法性。
-- 确保 authData 包含 `uid`（即将上例代码中的 `openid` 换为 `uid`），否则 SDK 会返回「无效的第三方注册数据（authData）」的错误。
-
-以使用 Github 登录为例：
-
-```js
-  AV.User.signUpOrlogInWithAuthData({
-    'uid':          githubClientId,
-    'access_token': accessToken
-  }, 'github');
-```
-
-更多用法请参考 [REST API · 连接用户账户和第三方平台](rest_api.html#连接用户账户和第三方平台)。
-{% endblock %}
-
 {% block code_send_verify_email %}
 
 ```js
@@ -1439,7 +1399,6 @@ AV.User.requestLoginSmsCode('13577778888').then(function (success) {
 
 
 {% block text_subclass %}{% endblock %}
-{% block text_sns %}{% endblock %}
 {% block text_feedback %}{% endblock %}
 
 {% block text_js_promise %}
@@ -1729,3 +1688,195 @@ if (currentUser.isAnonymous()) {
 {%  endblock %}
 
 {% block text_using_async_methods %}{% endblock %}
+
+{% block login_with_authdata %}
+```js
+var authData = {
+    access_token: 'ACCESS_TOKEN',
+    expires_in: 7200,
+    refresh_token: 'REFRESH_TOKEN',
+    openid: 'OPENID',
+    scope: 'SCOPE',
+};
+
+AV.User.signUpOrlogInWithAuthData(authData, 'weixin').then(function (s) {
+    //登录成功
+}, function (error) {
+    // 登录失败
+});
+```
+{% endblock %}
+
+{% block login_with_authdata_result %}
+```js
+{
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "access_token": "11_gaS_CfX47PH3n6g33zwONEyUsFRmiWJPIEcmWVzqS48JeZjpII6uRkTD6g36GY7_5pxKciSM-v8OGnYR26DC-VBffwMHaVx5_ik8FVQdE5Y"
+    }
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-05T10:13:26.310Z"
+}
+```
+{% endblock %}
+
+{% block associate_with_authdata %}
+```js
+var authData = {
+    access_token: 'ACCESS_TOKEN',
+    expires_in: 7200,
+    refresh_token: 'REFRESH_TOKEN',
+    openid: 'OPENID',
+    scope: 'SCOPE',
+};
+var user = AV.User.current();
+user.associateWithAuthData(authData, 'weixin').then(function (user) {
+    // 绑定成功
+}, function (error) {
+    // 绑定失败
+});
+```
+{% endblock %}
+
+{% block associate_with_authdata_result %}
+```js
+{
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "access_token": "11_U4Nuh9PGpfuBJqtm7KniWn48rkJ7vBTCVN2beHcVvceswua2sLU_5Afq26ZJrRF0vpSX0xcDwI-zxeo3qcf-cMftjqEvWh7Vpp05bgxeWtc",
+      "expires_in": 7200,
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk"
+    },
+    "qq": {
+      "openid": "0395BA18A5CD6255E5BA185E7BEBA242",
+      "expires_in": 7200,
+      "access_token": "11_CCveaBR_Lu0lmhff6NC33Lhx662zCnbzcSYhbYZQZ01YPdFav3sjhzjoM1hxs3AMMMydhguh2M0PumUaglpzuAlpzRzQn4vEXTRaZuovEnQ"
+    }
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-06T07:46:58.097Z"
+}
+```
+{% endblock %}
+
+{% block login_with_authdata_without_fail %}
+``` js
+var authData = {
+    access_token: 'ACCESS_TOKEN',
+    expires_in: 7200,
+    refresh_token: 'REFRESH_TOKEN',
+    openid: 'OPENID',
+    scope: 'SCOPE',
+};
+
+AV.User.signUpOrlogInWithAuthData(authData, 'weixin',{ failOnNotExist:true }).then(function (s) {
+    // 登录成功
+}, function (error) {
+    // 登录失败
+    // 检查 error.code == 211，跳转到用户名、手机号等资料的输入页面
+});
+
+
+var user = new AV.User();
+// 设置用户名
+user.setUsername('Tom');
+// 设置密码
+user.setMobilePhoneNumber('18666666666');
+user.setPassword('cat@#123');
+// 设置邮箱
+user.setEmail('tom@leancloud.cn');
+user.loginWithAuthData(authData, 'wexin').then(function (loggedInUser) {
+    console.log(loggedInUser);
+}, function (error) {
+});
+```
+{% endblock %}
+
+{% block login_with_authdata_unionid %}
+```js
+var authData = {
+    access_token: 'ACCESS_TOKEN',
+    expires_in: 7200,
+    refresh_token: 'REFRESH_TOKEN',
+    openid: 'OPENID',
+    scope: 'SCOPE',
+};
+
+AV.User.loginWithAuthDataAndUnionId(authData,
+    'wxminiprogram1', 'o6_bmasdasdsad6_2sgVt7hMZOPfL', {
+    unionIdPlatform: 'weixin',
+    asMainAccount: true,
+  }).then(function(user) {
+    // 绑定成功
+  },function (error) {
+    // 绑定失败 
+});
+```
+{% endblock %}
+
+{% block login_with_authdata_unionid_result %}
+```js
+  "authData": {
+    "weixinapp1": {
+      "platform": "weixin",
+      "openid": "oTY851axxxgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+      "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+  }
+```
+{% endblock %}
+
+{% block login_with_authdata_unionid_result_more %}
+```js
+  "authData": {
+    "weixinapp1": {
+      "platform": "weixin",
+      "openid": "oTY851axxxgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+      "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "miniprogram1": {
+      "platform": "weixin",
+      "openid": "ohxoK3ldpsGDGGSaniEEexxx",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_QfDeXVp8fUKMBYC_d4PKujpuLo3sBV_pxxxxIZivS77JojQPLrZ7OgP9PC9ZvFCXxIa9G6BcBn45wSBebsv9Pih7Xdr4-hzr5hYpUoSA",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+  }
+```
+{% endblock %}

@@ -260,9 +260,14 @@ Hook 函数本质上是云函数，但它有固定的名称，定义之后会**�
 
 ### {{hook_after_update}}
 
+{{ docs.alert("本 Hook 使用不当可能会造成死循环，导致数据存储 API 的调用次数暴涨，甚至产生更多的费用。因此请仔细阅读 [防止死循环调用](#防止死循环调用) 部分，做出必要的调整和预防措施。") }}
+
 在更新已存在的对象后执行特定的动作，比如每次修改文章后记录下日志：
 
 {% block afterUpdateExample %}{% endblock %}
+
+{% block hookDeadLoop %}
+{% endblock %}
 
 ### {{hook_before_delete}}
 
@@ -334,9 +339,6 @@ Hook 函数本质上是云函数，但它有固定的名称，定义之后会**�
 修改对话属性、设置或取消对话消息提醒，在实际修改之前触发。例如在更新发生时，在云引擎日志中打印出对话的名称：
 
 {% block code_hook_conversation_update %}{% endblock %}
-{% endblock %}
-
-{% block hookDeadLoop %}
 {% endblock %}
 
 ### Hook 函数错误响应码

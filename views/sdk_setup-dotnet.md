@@ -7,18 +7,16 @@
 .NET Framework 支持以下运行时：
 
 - Classic Desktop 4.5+
-- Windows 8 暂不支持
+- Windows 10
 - Windows Phone 不再支持
 - UWP 4.5+
+- .NET Core 2.0+
 
 在 Visual Studio 执行安装 nuget 依赖：
 
 ```sh
 PM> Install-Package LeanCloud
 ```
-
-### .NET Core
-暂不支持
 
 ### Xamarin
 

@@ -1,12 +1,30 @@
 {% extends "./multiplayer-quick-start.tmpl" %}
 
-{% set platform = "C#" %}
+{% set platform = "C\#` `" %}
 
 
 {% block installation %}
 Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-CSharp](https://github.com/leancloud/Play-SDK-CSharp)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-CSharp/releases)。
 
-将下载的 SDK.zip，解压后将 Plugins 目录拖拽至 Unity 工程。如果项目中已有 Plugins 目录，则合并至项目中的 Plugins 目录。
+### Unity
+
+将下载的 SDK.zip，解压后将 `Plugins` 目录拖拽至 Unity 工程。如果项目中已有 `Plugins` 目录，则合并至项目中的 `Plugins` 目录。
+
+为方便调试，你可以通过注册回调获取日志。在 Unity 中，可以参考如下设置：
+
+```cs
+// 设置 SDK 日志委托
+LeanCloud.Play.Logger.LogDelegate = (level, log) =>
+{
+    if (level == LogLevel.Debug) {
+        Debug.LogFormat("[DEBUG] {0}", log);
+    } else if (level == LogLevel.Warn) {
+        Debug.LogFormat("[WARN] {0}", log);
+    } else if (level == LogLevel.Error) {
+        Debug.LogFormat("[ERROR] {0}", log);
+    }
+};
+```
 {% endblock %}
 
 
@@ -26,6 +44,9 @@ var APP_ID = YOUR_APP_ID;
 // App Key
 var APP_KEY = YOUR_APP_KEY;
 // App 节点地区
+// Region.EastChina：华东节点
+// Region.NorthChina：华北节点
+// Region.NorthAmerica：美国节点
 var APP_REGION = YOUR_APP_REGION;
 // 初始化
 play.Init(APP_ID, APP_KEY, APP_REGION);
@@ -64,7 +85,7 @@ play.On(LeanCloud.Play.Event.CONNECTED, (evtData) =>
 });
 ```
 
-`JoinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-csharp.html#创建房间) 获取更多关于 `JoinOrCreateRoom` 的用法。
+`JoinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-guide-csharp.html#加入或创建指定房间) 获取更多关于 `JoinOrCreateRoom` 的用法。
 {% endblock %}
 
 

@@ -4,7 +4,6 @@
 
 
 
-
 {% block installation %}
 实时对战客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。
 
@@ -104,7 +103,7 @@ play.on(Event.CONNECTED, () => {
 });
 ```
 
-`joinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-js.html#创建房间) 获取更多关于 `joinOrCreateRoom` 的用法。
+`joinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-guide-js.html#加入或创建指定房间) 获取更多关于 `joinOrCreateRoom` 的用法。
 {% endblock %}
 
 

@@ -1671,4 +1671,211 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo" objectId:@"5735aae7c4c971
 ```
 {% endblock %}
 
+{% block login_with_authdata %}
+```objc
+NSDictionary *authData = @{
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"openid":@"OPENID",
+                            @"scope":@"SCOPE",
+                            };
+AVUser *user = [AVUser user];
+AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+[user loginWithAuthData:authData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+            NSLog(@"登录成功");
+        }else{
+            NSLog(@"登录失败：%@",error.localizedFailureReason);
+        }
+}];
+```
+{% endblock %}
+
+{% block login_with_authdata_result %}
+```objc
+{
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "access_token": "11_gaS_CfX47PH3n6g33zwONEyUsFRmiWJPIEcmWVzqS48JeZjpII6uRkTD6g36GY7_5pxKciSM-v8OGnYR26DC-VBffwMHaVx5_ik8FVQdE5Y"
+    }
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-05T10:13:26.310Z"
+}
+```
+{% endblock %}
+
+{% block associate_with_authdata %}
+```objc
+NSDictionary *authData = @{
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"openid":@"OPENID",
+                            @"scope":@"SCOPE",
+                            };
+AVUser * user = [AVUser currentUser];
+AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+[user associateWithAuthData:authData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+   if (succeeded) {
+            NSLog(@"绑定成功");
+        }else{
+            NSLog(@"绑定失败：%@",error.localizedFailureReason);
+        }
+}];
+```
+{% endblock %}
+
+{% block associate_with_authdata_result %}
+```objc
+{
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "access_token": "11_U4Nuh9PGpfuBJqtm7KniWn48rkJ7vBTCVN2beHcVvceswua2sLU_5Afq26ZJrRF0vpSX0xcDwI-zxeo3qcf-cMftjqEvWh7Vpp05bgxeWtc",
+      "expires_in": 7200,
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk"
+    },
+    "qq": {
+      "openid": "0395BA18A5CD6255E5BA185E7BEBA242",
+      "expires_in": 7200,
+      "access_token": "11_CCveaBR_Lu0lmhff6NC33Lhx662zCnbzcSYhbYZQZ01YPdFav3sjhzjoM1hxs3AMMMydhguh2M0PumUaglpzuAlpzRzQn4vEXTRaZuovEnQ"
+    }
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-06T07:46:58.097Z"
+}
+```
+{% endblock %}
+
+{% block login_with_authdata_without_fail %}
+``` objc
+NSDictionary *authData = @{
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"openid":@"OPENID",
+                            @"scope":@"SCOPE",
+                            };
+  AVUser *user = [AVUser user];
+  AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
+  option.platform = LeanCloudSocialPlatformWeiXin;
+  option.failOnNotExist = true;
+  [user loginWithAuthData:authData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+           // do whatever you want.
+        } else if ([error.domain isEqualToString:kLeanCloudErrorDomain] && error.code == 211) {
+           //不存在 AuthData 的 AVUser 的实例,跳转到输入用户名、密码、手机号等业务页面
+       }
+   }];
+
+
+  // 跳转到输入用户名、密码、手机号等业务页面之后
+    AVUser *user = [AVUser user];
+    user.username = @"Tom";
+    user.mobilePhoneNumber = @"12211112222";
+    AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
+    option.platform = LeanCloudSocialPlatformWeiXin;
+    [user loginWithAuthData:authData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+         if (succeeded) {
+             NSLog(@"登录成功");
+        }else{
+             NSLog(@"登录失败：%@",error.localizedFailureReason);
+        }
+    }];```
+{% endblock %}
+
+{% block login_with_authdata_unionid %}
+```objc
+NSDictionary *authData = @{
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"openid":@"OPENID",
+                            @"scope":@"SCOPE",
+                            @"unionid":@"o6_bmasdasdsad6_2sgVt7hMZOPfL"
+                            };
+AVUser *currentuser = [AVUser user];
+AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+option.unionId = authData[@"unionid"];
+option.isMainAccount = true;
+[currentuser loginWithAuthData:authData platformId:@"wxminiprogram1" options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+            NSLog(@"登录成功");
+        }else{
+            NSLog(@"登录失败：%@",error.localizedFailureReason);
+        }
+}];
+```
+{% endblock %}
+
+{% block login_with_authdata_unionid_result %}
+```objc
+  "authData": {
+    "weixinapp1": {
+      "platform": "weixin",
+      "openid": "oTY851axxxgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+      "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+  }
+```
+{% endblock %}
+
+{% block login_with_authdata_unionid_result_more %}
+```objc
+  "authData": {
+    "weixinapp1": {
+      "platform": "weixin",
+      "openid": "oTY851axxxgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+      "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "miniprogram1": {
+      "platform": "weixin",
+      "openid": "ohxoK3ldpsGDGGSaniEEexxx",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_QfDeXVp8fUKMBYC_d4PKujpuLo3sBV_pxxxxIZivS77JojQPLrZ7OgP9PC9ZvFCXxIa9G6BcBn45wSBebsv9Pih7Xdr4-hzr5hYpUoSA",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+  }
+```
+{% endblock %}
+
 {# --End--主模板留空的代码段落，子模板根据自身实际功能给予实现 #}

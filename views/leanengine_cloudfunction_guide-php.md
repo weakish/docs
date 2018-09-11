@@ -417,21 +417,15 @@ Cloud::define('_conversationUpdate', function($params, $user) {
 {% endblock %}
 
 {% block hookDeadLoop %}
-#### 防止死循环调用
-
-在实际使用中有这样一种场景：在 `Post` 类的 `{{hook_after_update}}` Hook 函数中，对传入的 `Post` 对象做了修改并且保存，而这个保存动作又会再次触发 `{{hook_after_update}}`，由此形成死循环。针对这种情况，我们为所有 Hook 函数传入的 `LeanObject` 对象做了处理，以阻止死循环调用的产生。
-
-不过请注意，以下情况还需要开发者自行处理：
-
-- 对传入的 `LeanObject` 对象进行 `fetch` 操作。
-- 重新构造传入的 `LeanObject` 对象，如使用 `LeanObject::create()` 方法。
-
-对于使用上述方式产生的对象，请根据需要自行调用以下 API：
-
-- `LeanObject->disableBeforeHook()` 或
-- `LeanObject->disableAfterHook()`
-
-这样，对象的保存或删除动作就不会再次触发相关的 Hook 函数。
+{{ 
+    LE.deadLoopText({
+      hookName:                hook_after_update,
+      objectName:              'LeanObject',
+      createWithoutDataMethod: 'LeanObject::create()', 
+      disableBeforeHook:       'LeanObject->disableBeforeHook()', 
+      disableAfterHook:        'LeanObject->disableAfterHook()'
+    })
+}}
 
 ```php
 Cloud::afterUpdate("Post", function($post, $user) {
@@ -453,7 +447,6 @@ Cloud::afterUpdate("Post", function($post, $user) {
     $post->save();
 });
 ```
-
 {% endblock %}
 {% block errorCodeExample %}
 错误响应码允许自定义。云引擎抛出的 FunctionError（数据存储 API 会抛出此异常）会直接将错误码和原因返回给客户端。若想自定义错误码，可以自行构造 FunctionError，将 code 与 error 传入。否则 code 为 1， message 为错误对象的字符串形式。

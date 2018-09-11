@@ -1681,6 +1681,195 @@ currentUser.signUpInBackground(new SignUpCallback() {
 ```
 {% endblock %}
 
+{% block login_with_authdata %}
+```java
+    // 以下的 platform 是通过 ShareSDK 获取的 authData 结果集。
+    // 使用其他第三方登录 SDK 的获取方法，请自行查询对应 SDK 提供商的文档 
+    Map<String, Object> map = new HashMap<>();
+    map.put("access_token", platform.getDb().getToken());
+    map.put("expires_in", platform.getDb().getExpiresIn());
+    map.put("openid", platform.getDb().getUserId());
+
+    AVUser.loginWithAuthData(map, "weixin", new LogInCallback<AVUser>() {
+      @Override
+      public void done(AVUser avUser, AVException e) {
+    if (e == null) {
+
+        } else {
+          e.printStackTrace();
+        }
+      }
+    });
+```
+{% endblock %}
+
+{% block login_with_authdata_result %}
+```java
+{
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "access_token": "11_gaS_CfX47PH3n6g33zwONEyUsFRmiWJPIEcmWVzqS48JeZjpII6uRkTD6g36GY7_5pxKciSM-v8OGnYR26DC-VBffwMHaVx5_ik8FVQdE5Y"
+    }
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-05T10:13:26.310Z"
+}
+```
+{% endblock %}
+
+{% block associate_with_authdata %}
+```java
+    // 以下是用登录获取 avuser 的示例，您也可以直接用当前用户 currentUser 对象来操作
+    AVUser.logInInBackground("大卫", "79Lis13SSv", new LogInCallback<AVUser>() {
+      @Override
+      public void done(AVUser avUser, AVException e) {
+        avUser.associateWithAuthData(authData, "qq", new SaveCallback() {
+          @Override
+          public void done(AVException e) {
+            if (e == null) {
+              // 绑定成功，authData 成功加入到 username 为"大卫"的 AVUser authData 字段数据里
+            } else {
+              e.printStackTrace();
+            }
+          }
+        });
+      }
+    });
+```
+{% endblock %}
+
+{% block associate_with_authdata_result %}
+```java
+{
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "access_token": "11_U4Nuh9PGpfuBJqtm7KniWn48rkJ7vBTCVN2beHcVvceswua2sLU_5Afq26ZJrRF0vpSX0xcDwI-zxeo3qcf-cMftjqEvWh7Vpp05bgxeWtc",
+      "expires_in": 7200,
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk"
+    },
+    "qq": {
+      "openid": "0395BA18A5CD6255E5BA185E7BEBA242",
+      "expires_in": 7200,
+      "access_token": "11_CCveaBR_Lu0lmhff6NC33Lhx662zCnbzcSYhbYZQZ01YPdFav3sjhzjoM1hxs3AMMMydhguh2M0PumUaglpzuAlpzRzQn4vEXTRaZuovEnQ"
+    }
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-06T07:46:58.097Z"
+}
+```
+{% endblock %}
+
+{% block login_with_authdata_without_fail %}
+``` java
+    AVUser.loginWithAuthData(authData, "weixin", true, new LogInCallback<AVUser>() {
+      @Override
+      public void done(AVUser avUser, AVException e) {
+        if (e == null) {
+
+        } else if (e.getCode() == 211) {
+          // 跳转到输入用户名、密码、手机号等业务页面
+        } else {
+          e.printStackTrace();
+        }
+      }
+    });
+
+    .....
+    
+    // 跳转到输入用户名、密码、手机号等业务页面之后
+    AVUser avUser = new AVUser();
+    avUser.setUsername("大卫");
+    avUser.setMobilePhoneNumber("1xxxxxxxxxx");
+    avUser.loginWithAuthData(authData, "weixinapp", new LogInCallback<AVUser>() {
+      @Override
+      public void done(AVUser avUser, AVException e) {
+
+      }
+    });
+```
+{% endblock %}
+
+{% block login_with_authdata_unionid %}
+```java
+    AVUser.loginWithauthData(authData, "weixinapp1", platform.getDb().get("unionid"), "weixin", true, new LogInCallback<AVUser>() {
+      @Override
+      public void done(final AVUser avUser, AVException e) {
+        if (e == null) {
+      // avUser 用户创建并登录成功
+        } else {
+          e.printStackTrace();
+        }
+      }
+    });
+```
+{% endblock %}
+
+{% block login_with_authdata_unionid_result %}
+```java
+  "authData": {
+    "weixinapp1": {
+      "platform": "weixin",
+      "openid": "oTY851axxxgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+      "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+  }
+```
+{% endblock %}
+
+{% block login_with_authdata_unionid_result_more %}
+```java
+  "authData": {
+    "weixinapp1": {
+      "platform": "weixin",
+      "openid": "oTY851axxxgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+      "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "miniprogram1": {
+      "platform": "weixin",
+      "openid": "ohxoK3ldpsGDGGSaniEEexxx",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_QfDeXVp8fUKMBYC_d4PKujpuLo3sBV_pxxxxIZivS77JojQPLrZ7OgP9PC9ZvFCXxIa9G6BcBn45wSBebsv9Pih7Xdr4-hzr5hYpUoSA",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+  }
+```
+{% endblock %}
+
 {% block determine_a_user_is_anonymous %}
 ```java
 AVUser currentUser = AVUser.getCurrentUser();
