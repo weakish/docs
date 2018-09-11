@@ -107,11 +107,15 @@
 
 
 {% macro defaultLang(lang) %}
-<div class="code-default-lang" data-lang="lang-{{lang}}"></div>
+<div class="code-default-lang" data-lang="lang-{{lang}}" data-auto-switch="true"></div>
 {% endmacro %}
 
 {% macro className(name) %}
 <code class="code-api-name">{{ name }}</code>
+{% endmacro %}
+
+{% macro spec(name) %}
+className-{{ name }}
 {% endmacro %}
 
 {% macro langSpecStart(lang) %}

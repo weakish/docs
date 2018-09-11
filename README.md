@@ -100,6 +100,9 @@ $ grunt serve
 - 请通过 `grunt release` 命令自动 bump `package.json` 来自动打标签，请不要手动更新。
 - 请按照 `CONVENTIONS.md` 的格式书写有意义的 commits，`CHANGELOG.md` 会被自动生成，请不要手动修改。
 
+## 特殊语法
+
+- [时序图](https://github.com/leancloud/docs/issues/2710)
 
 ## 多语言多平台共享文案解决方案1 - 使用预编译宏
 
@@ -132,6 +135,10 @@ AVObject|AVObject|AV.Object|LCObject|LeanCloud.Object|AVObject
 在文档中使用如下方式，前端会自动根据当前用户选择实例代码来渲染类名:
 
 `{{ docs.className('AVObject') }}`
+
+还有一种方式就是在文档开头编写：`{{ docs.defaultLang('js') }}`，这样就是告知文档引擎当前文档需要开启自动切换类名的开关。
+
+这意味着你在全文任何地方只要单独编写了如下 \`AVObject\` 这样的独立字段都会根据语言切换，**实例代码的变量名和类名不会收到影响**。
 
 ### 不同语言存在小部分文字描述不一致
 

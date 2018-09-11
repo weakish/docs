@@ -1,7 +1,8 @@
 // Init scrollStopped jQuery plugin
 $.fn.scrollStopped = function (callback) {
   $(this).scroll(function () {
-    var self = this, $this = $(self);
+    var self = this,
+      $this = $(self);
     if ($this.data('scrollTimeout')) {
       clearTimeout($this.data('scrollTimeout'));
     }
@@ -28,7 +29,7 @@ $.fn.scrollStopped = function (callback) {
 
   tocContents.eventProxy.on('ready', function () {
     doSideBar();
-    if (window.location.hash) {//因为 dom改变导致 hash位置不正确，需要进行重新定位
+    if (window.location.hash) { //因为 dom改变导致 hash位置不正确，需要进行重新定位
       window.location = window.location.hash;
     }
   });
@@ -47,13 +48,13 @@ var updateSidebarAffixShadowWidth = function () {
 var doSideBar = function () {
   $('.sidebar-loading').removeClass('on');
   $('.sidebar-wrapper').affix({
-    offset: {
-      top: 80,
-      bottom: function () {
-        return (this.bottom = $('.footer').outerHeight(true));
+      offset: {
+        top: 80,
+        bottom: function () {
+          return (this.bottom = $('.footer').outerHeight(true));
+        }
       }
-    }
-  })
+    })
     .on('affix.bs.affix', function (e) {
       updateSidebarAffixShadowWidth();
     })
@@ -70,7 +71,9 @@ var doSideBar = function () {
 
 var updateScrollSpy = function () {
   setTimeout(function () {
-    $('body').scrollspy({ target: '.sidebar-wrapper' });
+    $('body').scrollspy({
+      target: '.sidebar-wrapper'
+    });
   }, 200);
 };
 
@@ -79,7 +82,8 @@ var addSidebarHoverListener = function () {
   $('.sidebar-affix-shadow').hover(
     function () {
       $(this).removeClass('sidebar-hover-off');
-    }, function () {
+    },
+    function () {
       $(this).addClass('sidebar-hover-off');
     }
   );
@@ -93,7 +97,10 @@ var initSmoothScroll = function () {
     e.preventDefault();
     // Scroll the window, stop any previous animation, stop on user manual scroll
     // Check https://github.com/flesler/jquery.scrollTo for more customizability
-    $(window).stop(true).scrollTo(this.hash, { duration: 400, interrupt: true });
+    $(window).stop(true).scrollTo(this.hash, {
+      duration: 400,
+      interrupt: true
+    });
   });
 };
 
@@ -116,16 +123,16 @@ function getGitHubContributors() {
   var githubAvatarUrl = 'https://avatars.githubusercontent.com/u';
   var githubAvatarCdn = 'https://dn-experiments.qbox.me/ghavatar';
   $.getJSON(url, function (data) {
-    $.each(data, function (index, item) {
-      if (item.author) {
-        contributors.push({
-          handle: item.author.login,
-          url: item.author.html_url,
-          avatar: item.author.avatar_url.replace(githubAvatarUrl, githubAvatarCdn)
-        });
-      }
-    });
-  })
+      $.each(data, function (index, item) {
+        if (item.author) {
+          contributors.push({
+            handle: item.author.login,
+            url: item.author.html_url,
+            avatar: item.author.avatar_url.replace(githubAvatarUrl, githubAvatarCdn)
+          });
+        }
+      });
+    })
     .done(function () {
       // Make contributor array of objects unique
       var uniqArr = {};
@@ -169,8 +176,12 @@ function getGitHubContributors() {
 
       console.log('fetch contributors success');
     })
-    .fail(function () { console.log('fetch contributors error'); })
-    .always(function () { console.log('fetch contributors complete'); });
+    .fail(function () {
+      console.log('fetch contributors error');
+    })
+    .always(function () {
+      console.log('fetch contributors complete');
+    });
 }
 
 function sidebarExpandAll() {
@@ -218,6 +229,9 @@ var codeBlockTabber = (function () {
       'AVIMClient': 'im-client',
       'IMClient': 'im-client',
       'AVIMConversation': 'im-conversation',
+      'createConversation': 'im-createConversation',
+      'createConversationWithName': 'im-createConversation',
+      'CreateConversationAsync': 'im-createConversation',
       'Conversation': 'im-conversation',
       'AVIMMessage': 'im-message',
       'IMMessage': 'im-message'
@@ -233,6 +247,10 @@ var codeBlockTabber = (function () {
         'objc-im-client': 'AVIMClient',
         'java-im-client': 'AVIMClient',
         'cs-im-client': 'AVIMClient',
+        'cs-im-createConversation': 'CreateConversationAsync',
+        'js-im-createConversation': 'createConversation',
+        'objc-im-createConversation': 'createConversationWithName',
+        'java-im-createConversation': 'createConversation',
         'js-im-conversation': 'Conversation',
         'objc-im-conversation': 'AVIMConversation',
         'java-im-conversation': 'AVIMConversation',
@@ -247,16 +265,26 @@ var codeBlockTabber = (function () {
 
   function checkApiName(targetLang) {
     // update api name or class name by language
+    var currentLang = targetLang.split('-').pop();
     $.each($('.code-api-name'), function () {
-      var currentLang = targetLang.split('-').pop();
       var codeContent = getApiName($(this).html(), currentLang);
       $(this).html(codeContent);
     });
+
+    // check inline code
+    $.each($('code'), function () {
+      if (autoSwitchApiName) {
+        var codeContent = $(this).html().toString();
+        var convertedContent = getApiName(codeContent, currentLang);
+        $(this).html(convertedContent);
+      }
+    });
   }
+
 
   function toggleLangSpec(targetLang) {
     var currentLang = targetLang.split('-').pop();
-    var languageArray = ['js', 'objc', 'java', 'cs'];
+    var languageArray = ['js', 'objc', 'java', 'cs', 'android'];
     languageArray.forEach(function (lang) {
       var langSpecStartClassName = `.lang-spec-${lang}-start`;
       var langSpecEndClassName = `.lang-spec-${lang}-end`;
@@ -273,11 +301,15 @@ var codeBlockTabber = (function () {
   }
 
   function prettySequence() {
-    var options = { theme: 'simple' };
+    var options = {
+      theme: 'simple'
+    };
     var $ds = $(".lang-seq");
     $ds.parent().removeClass('prettyprint').removeClass('prettyprinted');
+    $ds.parent().addClass('no-pre-style');
     $ds.sequenceDiagram(options);
   }
+  var autoSwitchApiName = false;
 
   function checkCodeBlocks() {
     var $codeBlocks = $('.prettyprint');
@@ -305,6 +337,7 @@ var codeBlockTabber = (function () {
     if (defaultLangHost != undefined) {
       var defaultLang = defaultLangHost.data('lang');
       if (defaultLang != undefined) {
+        autoSwitchApiName = true;
         checkApiName(defaultLang);
         toggleLangSpec(defaultLang);
       }
@@ -316,8 +349,8 @@ var codeBlockTabber = (function () {
     var snippetDefault = 'objc';
     var snippetsJson = 'custom/js/languages.json';
     $.getJSON(snippetsJson, function (data) {
-      snippetMap = data;
-    })
+        snippetMap = data;
+      })
       .done(function () {
         $.each($translatableElements, function () {
           for (var key in snippetMap[snippetDefault]) {
@@ -327,8 +360,12 @@ var codeBlockTabber = (function () {
           }
         });
       })
-      .fail(function () { console.log('fetch language error'); })
-      .always(function () { console.log('fetch language complete'); });
+      .fail(function () {
+        console.log('fetch language error');
+      })
+      .always(function () {
+        console.log('fetch language complete');
+      });
 
     $.each($codeBlocks, function () {
       var $current = $(this);
@@ -360,6 +397,7 @@ var codeBlockTabber = (function () {
             <a class="toggle" data-toggle-lang="' + lang + '" href="#">' + langLabelMap[lang] + '</a>\
           </div>\
         ');
+        //tabToggleDoms.push(`<div class="toggle-item"><a class="edit" href="#">修改示例语言类型</a></div>`);
       });
 
       if (nextCodeClass) {
@@ -431,7 +469,7 @@ var codeBlockTabber = (function () {
           langArr.push(lang);
         });
 
-        if (langArr.indexOf(targetLang) > - 1) {
+        if (langArr.indexOf(targetLang) > -1) {
           // Update toggler visibility
           $(this).find('.toggle').removeClass('active');
           $(this).find('.toggle[data-toggle-lang=' + targetLang + ']').addClass('active');
@@ -475,7 +513,7 @@ var codeBlockTabber = (function () {
 
 $(function () {
   prettyPrepare(); // prepare elements that need to be prettified
-  refactDom();//
+  refactDom(); //
   prettyPrint(updateScrollSpy);
   glueCopy();
   updateScrollSpy();
@@ -507,7 +545,9 @@ $(window).scrollStopped(function () {
   }
 
   setTimeout(function () {
-    $('.sidebar-affix-shadow.on.sidebar-hover-off .sidebar-wrapper').scrollTo(activeToc, 800, { offset: -20 });
+    $('.sidebar-affix-shadow.on.sidebar-hover-off .sidebar-wrapper').scrollTo(activeToc, 800, {
+      offset: -20
+    });
     // console.log('Haven't scrolled in 250ms, fired in 250ms later.');
     updateSidebarAffixShadowWidth();
     initScrollHistoryState();
