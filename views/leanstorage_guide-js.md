@@ -26,7 +26,6 @@
 {% set sms_guide_url = "[JavaScript 短信服务使用指南](sms-guide.html#注册验证)" %}
 {% set inapp_search_guide_url = "[JavaScript 应用内搜索指南](app_search_guide.html)" %}
 {% set status_system_guide_url = "[JavaScript 应用内社交模块](status_system.html#JavaScript_SDK)" %}
-{% set sns_guide_url = "（JavaScript SDK 文档待补充）" %}
 {% set feedback_guide_url = "（JavaScript SDK 文档待补充）" %}
 {% set funtionName_whereKeyHasPrefix = "startsWith" %}
 {% set saveOptions_query= "query" %}

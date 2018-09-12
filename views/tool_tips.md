@@ -19,7 +19,7 @@
 * 我们提供了 iOS、Android、Windows Phone、JavaScript、Unity3D 等平台的 SDK，进入 [SDK 下载页面](sdk_down.html)。
 {% if node != 'qcloud' %}
 * 如果你想做一个形如微博的 Feed 系统，也许你可以尝试使用我们的 [事件流系统](status_system.html)。
-* 我们提供简易的 [SNS 组件](sns.html)，用于第三方登录和分享。
+* 我们提供简易的 [第三方登录组件](leanstorage_guide-js.html#第三方账户登录)。
 {% endif %}
 * [Android 应用代码混淆注意事项](android_faq.html#代码混淆怎么做)
 * [基于 LeanCloud 的一对多、多对多关系数据建模](https://blog.leancloud.cn/1723/)

@@ -24,7 +24,6 @@
 {% set relation_guide_url = "（Java SDK 文档待补充）" %}
 {% set inapp_search_guide_url = "[Android 应用内搜索指南](app_search_guide.html)" %}
 {% set status_system_guide_url = "[Android 应用内社交模块](status_system.html#Android_SDK)" %}
-{% set sns_guide_url = "[Android SNS 开发指南](sns.html#Android_SNS_组件)" %}
 {% set feedback_guide_url = "[Android 用户反馈指南](feedback.html#Android_反馈组件)" %}
 {% set funtionName_whereKeyHasPrefix = "whereStartsWith()" %}
 {% set saveOptions_query = "query" %}

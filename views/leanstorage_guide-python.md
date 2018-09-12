@@ -26,7 +26,6 @@
 {% set sms_guide_url = "（Python SDK 文档待补充）" %}
 {% set inapp_search_guide_url = "（Python SDK 暂不支持）" %}
 {% set status_system_guide_url = "（Python SDK 暂不支持）" %}
-{% set sns_guide_url = "（Python 文档待补充）" %}
 {% set feedback_guide_url = "（Python SDK 暂不支持）" %}
 
 {% set funtionName_whereKeyHasPrefix = "startswith()" %}
