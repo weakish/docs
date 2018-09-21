@@ -20,9 +20,11 @@
 * 信息 - CCU_QUOTA_EXCEEDED
 * 含义 - CCU 超过当前额度限制，请升级商用版或企业版。
 
+<!-- 
+Hook 相关错误，Hook 还未上线
 ### 4005
 * 信息 - LOAD_GAME_HOOK_FAILED
-* 含义 - 加载 GameHook 失败。
+* 含义 - 加载 GameHook 失败。 -->
 
 ### 4006
 * 信息 - JOIN_OR_CREATE_ROOM_NOT_ALLOWED_DUE_TO_APP_MSG_QUOTA_EXCEEDED
@@ -41,7 +43,9 @@
 ##  Room 错误码
 ### 4301
 * 信息 - ROOM_NOT_FOUND
-* 含义 - 找不到 Room，相关 Room 已经销毁或 Room 名称不正确。
+* 含义 - 找不到 Room，以下情况会导致该错误：
+  * 随机匹配时没有符合条件的房间，此时您可以创建一个新的房间。
+  * 指定 Room 名称加入房间时，该 Room 已经销毁或名称不正确。
 
 ### 4302
 * 信息 - ROOM_FULL
@@ -141,7 +145,7 @@ Hook 相关错误，Hook 还未上线
 
 ### 4326
 * 信息 - ROOM_ATTR_NOT_MATCHED
-* 含义 - 按 Room 属性匹配方式加入 Room 时，目标 Room 属性匹配失败。
+* 含义 - 按 Room 属性匹配方式加入 Room 时，没有符合相关属性的房间，此时您可以创建新的符合相关属性的房间。
 
 <!-- 
 这种情况极少，先隐藏掉
@@ -165,9 +169,11 @@ Hook 相关错误，Hook 还未上线
 
 
 ## RPC 消息相关错误
+<!-- 
+Hook 相关错误，Hook 还未上线
 ### 4402
 * 信息 - MESSAGE_REJECTED_BY_APP
-* 含义 - 消息被 Game Hook 拒绝。
+* 含义 - 消息被 Game Hook 拒绝。 -->
 
 ### 4406
 * 信息 - NO_VALID_MESSAGE_RECEIVER
