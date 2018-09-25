@@ -20,7 +20,7 @@ composer require leancloud/leancloud-sdk
 use \LeanCloud\Client;
 // 参数依次为 AppId, AppKey, MasterKey
 Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
-Client::setServerUrl("https://{{host}}.api.lncld.net"); // 0.7.0 及以上版本支持
+Client::setServerUrl("https://{{host}}"); // 0.7.0 及以上版本支持
 ```
 {% endblock %}
 
