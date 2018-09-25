@@ -3,6 +3,8 @@
 
 {{ docs.defaultLang('js') }}
 
+{{ docs.useIMLangSpec()}}
+
 # 即时通讯开发指南 &middot; 进阶功能
 
 ## 阅前准备
@@ -14,7 +16,7 @@
 
 ## 对话属性
 
-对话(`IMConversation`)是即时通信的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。
+对话(`Conversation`)是即时通信的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。
 
 默认提供的属性的对应关系如下：
 
@@ -120,39 +122,108 @@ tom.createConversation({
 }).catch(console.error.bind(console));
 ```
 ```objc
+// Tom 创建名称为「猫和老鼠」的会话，并附加会话属性
+NSDictionary *attributes = @{ 
+    @"type": @"private",
+    @"pinned": @(YES) 
+};
+[tom createConversationWithName:@"猫和老鼠" clientIds:@[@"Jerry"] attributes:attributes options:AVIMConversationOptionNone callback:^(AVIMConversation *conversation, NSError *error) {
+    if (succeeded) {
+        NSLog(@"创建成功！");
+    }
+}];
 ```
 ```java
+HashMap<String,Object> attr = new HashMap<String,Object>();
+attr.put("type","private");
+attr.put("pinned",true);
+client.createConversation(Arrays.asList("Jerry"),"猫和老鼠",attr,
+    new AVIMConversationCreatedCallback(){
+        @Override
+        public void done(AVIMConversation conv,AVIMException e){
+          if(e==null){
+            //创建成功
+          }
+        }
+    });
+}
 ```
 ```cs
+// 推荐使用 Builder 模式来构建对话
+var conversationBuilder = tom.GetConversationBuilder().SetProperty("type", "private").SetProperty("pinned", true);
+var conversation = await tom.CreateConversationAsync(conversationBuilder);
 ```
 
 **自定义属性在 SDK 级别是对所有成员可见的**。要对属性进行查询，请参见[对话的查询](#对话的查询)
 
 ### 属性使用和修改
 
-以 `conversation.name` 为例，对话的 `conversation.name` 的属性是所有成员共享的，在获取对话列表的时候，对话的名字一般会被显示在列表中，采用如下代码可以获取指定的属性，用作后续绑定列表的需求：
+以 `conversation.name` 为例，对话的 `conversation.name` 的属性是所有成员共享的，可以通过如下代码修改：
 
 ```js
+conversation.name = '聪明的喵星人';
+conversation.save();
 ```
 ```objc
+AVIMConversationUpdateBuilder *updateBuilder = [conversation newUpdateBuilder];
+updateBuilder.name = @"聪明的喵星人";
+[conversation update:[updateBuilder dictionary] callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"修改成功！");
+    }
+}];
 ```
 ```java
+AVIMConversation conversation = client.getConversation("55117292e4b065f7ee9edd29");
+conversation.setName("聪明的喵星人");
+conversation.updateInfoInBackground(new AVIMConversationCallback(){
+  @Override
+  public void done(AVIMException e){        
+    if(e==null){
+    //更新成功
+    }
+  }
+});
 ```
 ```cs
+conversation.Name = "聪明的喵星人";
+await conversation.SaveAsync();
 ```
-
 
 以 `conversation.type` 为例来演示自定义属性，读取、使用、修改的操作如下：
 
 ```js
+// 获取自定义属性
+var type = conversation.get('type');
+conversation.set('pinned',false);
+conversation.save();
 ```
 ```objc
+// 获取自定义属性
+NSString *type = [conversation objectForKey:@"type"];
+// 设置 boolean 属性值
+[conversation setObject:@(NO) forKey:@"pinned"];
+[conversation updateWithCallback:];
 ```
 ```java
+// 获取自定义属性
+String type = conversation.get("type");
+conversation.set("pinned",false);
+conversation.updateInfoInBackground(new AVIMConversationCallback(){
+  @Override
+  public void done(AVIMException e){        
+    if(e==null){
+    //更新成功
+    }
+  }
+});
 ```
 ```cs
+// 获取自定义属性
+var type = conversation["type"];
+conversation["pinned"] = false;
+await conversation.SaveAsync();
 ```
-
 
 ## 对话类型（聊天模式）
 
@@ -178,10 +249,10 @@ tom.createConversation({
 
 在 SDK 中已经默认提供了以下四种对话类型：
 
-- 普通对话 `AVIMConversation`
-- 聊天室 `AVIMChatRoom`
-- 服务号 & 系统账号 `AVIMServiceConversation`
-- 临时对话 `AVIMTemporaryConversation`
+- 普通对话 `Conversation`
+- 聊天室 `ChatRoom`
+- 服务号 & 系统账号 `ServiceConversation`
+- 临时对话 `TemporaryConversation`
 
 
 首先我们通过下面的表格来归类，更加直观地展现不同需求对应的基础类型：
@@ -189,18 +260,18 @@ tom.createConversation({
 对应场景|基础类型|特征备注
 --|--|--
 社交私聊|普通对话|成员数量恒定为 2
-同学/同事群聊|`AVIMConversation`|成员数量不定，并且对话本身持久化存储
-游戏公会/帮派群聊|`AVIMConversation`|与同学/同事群聊类似
-文字直播/聊天室|`AVIMChatRoom`|成员数量变化频率较高，消息数量较大，消息频率/峰值变化明显
-副本/战斗聊天|`AVIMChatRoom`|与文字直播/聊天室类似
-系统广播/GM 全服广播|`AVIMServiceConversation`|用户订阅了对话之后才会收到消息
-在线客服聊天|`AVIMTemporaryConversation`|不占用持久化存储资源，对话生命周期仅存在于使用期间
+同学/同事群聊|`Conversation`|成员数量不定，并且对话本身持久化存储
+游戏公会/帮派群聊|`Conversation`|与同学/同事群聊类似
+文字直播/聊天室|`ChatRoom`|成员数量变化频率较高，消息数量较大，消息频率/峰值变化明显
+副本/战斗聊天|`ChatRoom`|与文字直播/聊天室类似
+系统广播/GM 全服广播|`ServiceConversation`|用户订阅了对话之后才会收到消息
+在线客服聊天|`TemporaryConversation`|不占用持久化存储资源，对话生命周期仅存在于使用期间
 
 **注意：对话模型不仅仅是应对上述的场景，开发者可以根据自己实际场景的需要从上述的类型中选择一种进行拓展。**
 
 ### 普通对话
 
-普通对话 `AVIMConversation` 有一个典型用例：
+普通对话 `Conversation` 有一个典型用例：
 
 [即时通讯开发指南 &middot; 基础入门#一对一单聊](realtime-guide-beginner.html#一对一单聊)中介绍了如何建立一个一对一单聊，实际上这种单聊已经对应到了社交软件中的私聊，因为对话里面只有两个成员，如果在之后的操作中能确保**不会向当前对话继续添加新成员**，这个对话就可以用以应对社交聊天中的私聊场景。
 
@@ -211,60 +282,48 @@ tom.createConversation({
 
 #### 普通对话实例 - 同学/同事群组
 
-创建一个对话，邀请超过 3 个成员，一起加入对话：
+创建一个对话，邀请超过 3 个成员，同时设置名称为 `三年二班`：
 
 ```js
+tom.createConversation({
+  members: ['Bob', 'Harry', 'William'],
+  name: '三年二班'
+});
 ```
 ```objc
+[tom createConversationWithName:@"三年二班" clientIds:@[@"Bob",@"Harry",@"William"] callback:^(AVIMConversation *conversation, NSError *error) {
+}];
 ```
 ```java
+tom.createConversation(Arrays.asList("Bob", "Harry", "William"), "三年二班", null,
+    new AVIMConversationCreatedCallback() {
+        @Override
+        public void done(AVIMConversation conv, AVIMException e) {
+            if (e == null) {
+                // 创建成功
+            }
+        }
+});
 ```
 ```cs
+var conversationBuilder = tom.GetConversationBuilder().SetName("三年二班")
+                              .AddMember("Bob")
+                              .AddMember("Harry")
+                              .AddMember("William");
+var conversation = await tom.CreateConversationAsync(conversationBuilder);
 ```
 
-修改对话名称为 `三年二班同学群`：
+#### 通过名字来找到同学群
 
-```js
-```
-```objc
-```
-```java
-```
-```cs
-```
+参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)
 
-其他同学可以通过名字来找到这个对话：
+#### 直接加入同学的群
 
-```js
-```
-```objc
-```
-```java
-```
-```cs
-```
+参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)
 
-查找之后可以直接加入：
+### 添加其他同学
 
-```js
-```
-```objc
-```
-```java
-```
-```cs
-```
-
-也可以通过接口直接邀请目标用户加入对话：
-
-```js
-```
-```objc
-```
-```java
-```
-```cs
-```
+参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)
 
 ### 聊天室
 
@@ -283,13 +342,44 @@ tom.createConversation({
 ####  聊天室实例 - 文字直播/聊天室
 
 ```js
+tom.createChatRoom({ name:'聊天室' }).catch(console.error);
 ```
 ```objc
+[client createChatRoomWithName:@"聊天室" attributes:nil callback:^(AVIMChatRoom *chatRoom, NSError *error) {
+    if (chatRoom && !error) {        
+        AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这是一条消息" attributes:nil];
+        [chatRoom sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+            if (success && !error) {
+
+            }
+        }];
+    }
+}];
 ```
 ```java
+tom.createChatRoom(null, "聊天室", null,
+    new AVIMConversationCreatedCallback() {
+        @Override
+        public void done(AVIMConversation conv, AVIMException e) {
+            if (e == null) {
+                // 创建成功
+            }
+        }
+});
 ```
 ```cs
+tom.CreateChatRoomAsync("聊天室");
+// 更推荐用如下 Builder 模式
+var chatRoomBuilder = tom.GetConversationBuilder().SetName("聊天室")
+                              .SetTransient();
+var chatRoom = await tom.CreateConversationAsync(chatRoomBuilder);
 ```
+
+### 加入/离开/邀请他人加入聊天室
+
+与普通对话的对应接口没有区别，详细请参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)。最大的区别就是：
+
+> 聊天室没有成员加入、成员离开的通知
 
 ### 服务号（系统账号）
 
@@ -323,10 +413,51 @@ tom.createConversation({
 
 ## 对话查询
 
-## 对话的有效期
+### 根据 id 查询
+
+`id` 对应就是 `_Conversation` 表中的 `objectId` 的字段值:
+
+```js
+tom.getConversation('551260efe4b01608686c3e0f').then(function(conversation) {
+  console.log(conversation.id);
+}).catch(console.error.bind(console));
+```
+```objc
+AVIMConversationQuery *query = [tom conversationQuery];
+[query getConversationById:@"551260efe4b01608686c3e0f" callback:^(AVIMConversation *conversation, NSError *error) {
+    if (succeeded) {
+        NSLog(@"查询成功！");
+    }
+}];
+```
+```java
+AVIMConversationsQuery query = tom.getConversationsQuery();
+query.whereEqualTo("objectId","551260efe4b01608686c3e0f");
+query.findInBackground(new AVIMConversationQueryCallback(){
+    @Override
+    public void done(List<AVIMConversation> convs,AVIMException e){
+      if(e==null){
+      if(convs!=null && !convs.isEmpty()){
+        //convs.get(0) 就是想要的conversation
+      }
+      }
+    }
+});
+```
+```cs
+var query = tom.GetQuery();
+var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
+```
+
+{{ docs.langSpecStart('java') }}
+由于历史原因，AVIMConversationQuery 只能检索 _Conversation 表中 attr 列中的属性，而不能完整检索 _Conversation 表的其他自定义属性，所以在 v4.1.1 版本之后被废弃。v4.1.1 后请使用 AVIMConversation**s**Query 来完成相关查询。AVIMConversationsQuery 在查询属性时不会再自动添加 attr 前缀，如果开发者需要查询 _Conversation 表中 attr 列中具体属性，请自行添加 attr 前缀。
+{{ docs.langSpecEnd('java') }}
+
+
+### 对话的有效期
 
 一个对话（包括普通、暂态、系统对话）如果 1 年内没有通过 SDK 或者 REST API 发送过新的消息，或者它在 _Conversation 表中的任意字段没有被更新过，即被视为不活跃对话，云端会自动将其删除。（查询对话的消息记录并不会更新 _Conversation 表，所以只查询不发送消息的对话仍会被视为不活跃对话。）
-+
+
 
 不活跃的对话被删除后，当客户端再次通过 SDK 或 REST API 对其发送消息时，会遇到 4401 INVALID_MESSAGING_TARGET 错误，表示该对话已经不存在了。同时，与该对话相关的消息历史也无法获取。
 
@@ -343,19 +474,452 @@ tom.createConversation({
 
 ## 消息类型
 
-### 音频消息
+### 发送音频消息/视频/文件
 
-### 视频消息
+#### 发送流程
 
-### 文件消息
+对于图像、音频、视频和文件这四种类型的消息，SDK 均采取如下的发送流程：
+
+如果文件是从**客户端 API 读取的数据流 (Stream)**，步骤为：
+
+1. 从本地构造 `File`
+2. 调用 `File` 的上传方法将文件上传到云端，并获取文件元信息（MetaData）
+3. 把 `File` 的 objectId、URL、文件元信息都封装在消息体内
+4. 调用接口发送消息
+
+如果文件是**外部链接的 URL**，则：
+
+1. 直接将 URL 封装在消息体内，不获取元信息，不包含 objectId
+1. 调用接口发送消息
+
+以发送音频消息为例，基本流程是：读取音频文件（或者录制音频）> 构建音频消息 > 消息发送。
+
+```js
+var AV = require('leancloud-storage');
+var { AudioMessage } = require('leancloud-realtime-plugin-typed-messages');
+
+var fileUploadControl = $('#photoFileUpload')[0];
+var file = new AV.File('忐忑.mp3', fileUploadControl.files[0]);
+file.save().then(function() {
+  var message = new AudioMessage(file);
+  message.setText('听听人类的神曲');
+  return conversation.send(message);
+}).then(function() {
+  console.log('发送成功');
+}).catch(console.error.bind(console));
+```
+```objc
+NSString *path = [[NSBundle mainBundle] pathForResource:@"忐忑" ofType:@"mp3"];
+AVFile *file = [AVFile fileWithName:@"忐忑.mp3" contentsAtPath:path];
+AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"听听人类的神曲" file:file attributes:nil];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"发送成功！");
+    }
+}];
+```
+```java
+AVFile file = AVFile.withAbsoluteLocalPath("忐忑.mp3",localFilePath);
+AVIMAudioMessage m = new AVIMAudioMessage(file);
+m.setText("听听人类的神曲");
+// 创建一条音频消息
+conv.sendMessage(m, new AVIMConversationCallback() {
+    @Override
+    public void done(AVIMException e) {
+      if (e == null) {
+        // 发送成功
+      }
+    }
+});
+```
+```cs
+// 假设在程序运行目录下有一张图片，Unity/Xamarin 可以参照这种做法通过路径获取音频文件
+// 以下是发送音频消息的快捷用法
+using (FileStream fileStream = new FileStream(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "忐忑.mp3"), FileMode.Open, FileAccess.Read))
+{
+    await conversation.SendAudioAsync("忐忑.mp3", fileStream);
+}
+
+// 或者如下比较常规的用法
+var audioMessage = new AVIMAudioMessage();
+audioMessage.File = new AVFile("忐忑.mp3", fileStream);
+audioMessage.TextContent = "听听人类的神曲";
+await conversation.SendAsync(audioMessage);
+```
+
+与图像消息类似，音频消息也支持从 URL 构建：
+
+```js
+var AV = require('leancloud-storage');
+var { AudioMessage } = require('leancloud-realtime-plugin-typed-messages');
+
+var file = new AV.File.withURL('apple.acc', 'https://some.website.com/apple.acc');
+file.save().then(function() {
+  var message = new AudioMessage(file);
+  message.setText('来自苹果发布会现场的录音');
+  return conversation.send(message);
+}).then(function() {
+  console.log('发送成功');
+}).catch(console.error.bind(console));
+```
+```objc
+AVFile *file = [AVFile fileWithURL:[self @"https://some.website.com/apple.acc"]];
+AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"来自苹果发布会现场的录音" file:file attributes:nil];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"发送成功！");
+    }
+}];
+```
+```java
+AVFile file =new AVFile("apple.acc","来自苹果发布会现场的录音", null);
+AVIMAudioMessage m = new AVIMAudioMessage(file);
+m.setText("来自苹果发布会现场的录音");
+conv.sendMessage(m, new AVIMConversationCallback() {
+    @Override
+    public void done(AVIMException e) {
+      if (e == null) {
+        // 发送成功
+      }
+    }
+});
+```
+```cs
+await conversation.SendAudioAsync("https://some.website.com/apple.acc", "apple.acc", "来自苹果发布会现场的录音");
+```
+
+### 内置消息类型
+
+参考图像消息和音频消息的发送，其他富媒体消息（文件消息， 例如附带 .doc 文件消息），SDK 内置了如下消息类型用来满足常见的需求：
+
+
+- `TextMessage` 文本消息
+- `ImageMessage` 图像消息
+- `AudioMessage` 音频消息
+- `VideoMessage` 视频消息
+- `FileMessage` 普通文件消息(.txt/.doc/.md 等各种)
+- `LocationMessage` 地理位置消息
+
+还有如下注意事项：
+
+- 通过 URL 发送富媒体消息的时候， URL 指的是文件自身的 URL，而不是视频/音乐/文库网站上播放页/预览页的 URL。
+
+### 发送地理位置消息
+
+地理位置消息构建方式如下：
+
+```js
+var AV = require('leancloud-storage');
+var { LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
+
+var location = new AV.GeoPoint(31.3753285,120.9664658);
+var message = new LocationMessage(location);
+message.setText('蛋糕店的位置');
+conversation.send(message).then(function() {
+  console.log('发送成功');
+}).catch(console.error.bind(console));
+```
+```objc
+AVIMLocationMessage *message = [AVIMLocationMessage messageWithText:@"蛋糕店的位置" latitude:31.3753285 longitude:120.9664658 attributes:nil];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"发送成功！");
+    }
+}];
+```
+```java
+final AVIMLocationMessage locationMessage=new AVIMLocationMessage();
+// 开发者更可以通过具体的设备的 API 去获取设备的地理位置，此处仅设置了 2 个经纬度常量仅做演示
+locationMessage.setLocation(new AVGeoPoint(31.3753285,120.9664658));
+locationMessage.setText("蛋糕店的位置");
+conversation.sendMessage(locationMessage, new AVIMConversationCallback() {
+    @Override
+    public void done(AVIMException e) {
+        if (null != e) {
+          e.printStackTrace();
+        } else {
+          // 发送成功
+        }
+    }
+});
+```
+```cs
+await conv.SendLocationAsync(new AVGeoPoint(31.3753285, 120.9664658));
+```
 
 ### 自定义消息类型
 
 如果遇到了有强需求的自定义消息，我们推荐按照如下需求分级，来选择自定义的方式：
 
-### 消息发送选项
+- 通过设置简单 key-value 实现一个自定义消息
+- 通过继承内置的消息类型添加一些属性
+- 完全自由实现一个全新的消息类型
+
+
+### 接收消息
+
+在接收消息的事件通知上可以使用如下代码来判断接收到的消息类型：
+
+```js
+// 在初始化 Realtime 时，需加载 TypedMessagesPlugin
+// var realtime = new Realtime({
+//   appId: appId,
+//   plugins: [TypedMessagesPlugin]
+// });
+var { Event, TextMessage } = require('leancloud-realtime');
+var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
+// 注册 message 事件的 handler
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  // 请按自己需求改写
+  var file;
+  switch (message.type) {
+    case TextMessage.TYPE:
+      console.log('收到文本消息， text: ' + message.getText() + ', msgId: ' + message.id);
+      break;
+    case FileMessage.TYPE:
+      file = message.getFile(); // file 是 AV.File 实例
+      console.log('收到文件消息，url: ' + file.url() + ', size: ' + file.metaData('size'));
+      break;
+    case ImageMessage.TYPE:
+      file = message.getFile();
+      console.log('收到图片消息，url: ' + file.url() + ', width: ' + file.metaData('width'));
+      break;
+    case AudioMessage.TYPE:
+      file = message.getFile();
+      console.log('收到音频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
+      break;
+    case VideoMessage.TYPE:
+      file = message.getFile();
+      console.log('收到视频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
+      break;
+    case LocationMessage.TYPE:
+      var location = message.getLocation();
+      console.log('收到位置消息，latitude: ' + location.latitude + ', longitude: ' + location.longitude);
+      break;
+    default:
+      console.warn('收到未知类型消息');
+  }
+});
+
+// 同时，对应的 conversation 上也会派发 `MESSAGE` 事件：
+conversation.on(Event.MESSAGE, function messageEventHandler(message) {
+  // 这里补充业务逻辑
+});
+```
+```objc
+```
+```java
+```
+```cs
+// 这里使用的是简单的演示，推荐使用 switch/case 搭配模式匹配来判断类型
+private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
+{
+    if (e.Message is AVIMImageMessage imageMessage)
+    {
+
+    }
+    else if (e.Message is AVIMAudioMessage audioMessage)
+    {
+
+    }
+    else if (e.Message is AVIMVideoMessage videoMessage)
+    {
+
+    }
+    else if (e.Message is AVIMFileMessage fileMessage)
+    {
+
+    }
+    else if (e.Message is AVIMLocationMessage locationMessage)
+    {
+
+    }
+    else if (e.Message is AVIMTypedMessage baseTypedMessage)
+    {
+
+    }// 这里可以继续添加自定义类型的判断条件
+}
+```
+
+## 消息发送选项
+
+发送消息的时候可以额外指定参数支持一些特性：
+
+### 消息等级
+为了保证消息的时效性，当聊天室消息过多导致客户端连接堵塞时，服务器端会选择性地丢弃部分低等级的消息。目前支持的消息等级有：
+
+消息等级 | 描述
+---------|-----
+`MessagePriority.HIGH`    | 高等级，针对时效性要求较高的消息，比如直播聊天室中的礼物，打赏等。
+`MessagePriority.NORMAL`  | 正常等级，比如普通非重复性的文本消息。
+`MessagePriority.LOW`     | 低等级，针对时效性要求较低的消息，比如直播聊天室中的弹幕。
+
+消息等级在发送接口的参数中设置。以下代码演示了如何发送一个高等级的消息：
+
+<div class="callout callout-info">此功能仅针对<u>聊天室消息</u>有效。普通对话的消息不需要设置等级，即使设置了也会被系统忽略，因为普通对话的消息不会被丢弃。</div>
+
 
 ### @ 成员提醒
+
+发送消息的时候可以显式地指定这条消息提醒某一个或者一些人:
+
+```js
+const message = new TextMessage(`@Tom`).setMentionList('Tom').mentionAll();
+```
+```objc
+AVIMMessage *message = [AVIMTextMessage messageWithText:@"@Tom" attributes:nil];
+message.mentionList = @[@"Tom"];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError * _Nullable error) {
+    /* A message which will mention Tom has been sent. */
+}];
+```
+```java
+String content = "@Tom";
+AVIMTextMessage  message = new AVIMTextMessage();
+message.setText(content);
+List<String> list = new ArrayList<>(); // 部分用户的 mention list，你可以向下面代码这样来填充
+list.add("Tom");
+
+imConversation.sendMessage(message, option, new AVIMConversationCallback() {
+   @Override
+   public void done(AVIMException e) {
+   }
+});
+```
+```cs
+var textMessage = new AVIMTextMessage("@Tom")
+{
+    MentionList = new List<string>() { "Tom" }
+};
+await conversation.SendAsync(textMessage);
+```
+
+或者也可以提醒所有人：
+
+```js
+const message = new TextMessage(`@all`).mentionAll();
+```
+```objc
+AVIMMessage *message = [AVIMTextMessage messageWithText:@"@all!" attributes:nil];
+message.mentionAll = YES;
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError * _Nullable error) {
+    /* A message which will mention all members has been sent. */
+}];
+```
+```java
+String content = "something as you will";
+AVIMTextMessage  message = new AVIMTextMessage();
+message.setText(content);
+
+boolean mentionAll = true;// 指示是否 mention 了所有人
+
+imConversation.sendMessage(message, option, new AVIMConversationCallback() {
+   @Override
+   public void done(AVIMException e) {
+   }
+});
+```
+```cs
+var textMessage = new AVIMTextMessage("@all")
+{
+    MentionAll = true
+};
+await conv.SendAsync(textMessage);
+```
+
+消息的接收方，可以通过读取消息的提醒列表来获取哪些 client Id 被提醒了：
+
+```js
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  var mentionList = receivedMessage.getMentionList();
+});
+```
+```objc
+// 示例代码演示 AVIMTypedMessage 接收时，获取该条消息提醒的 client id 列表，同理可以用类似的代码操作 AVIMMessage 的其他子类
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    // get mention list of client id.
+     NSArray *mentionList = message.mentionList;
+}
+```
+```java
+@Override
+public void onMessage(AVIMAudioMessage msg, AVIMConversation conv, AVIMClient client) {
+  // 读取消息 @ 的 client id 列表
+  List<String> currentMsgMentionUserList = message.getMentionList();
+}
+```
+```cs
+private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
+{
+    if (e.Message is AVIMImageMessage imageMessage)
+    {
+        var mentionedList = e.Message.MentionList;
+    }
+}
+```
+
+消息有一个标识位，用来标识是否提醒了当前对话的全体成员:
+
+```js
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  var mentionedAll = receivedMessage.mentionedAll;
+});
+```
+```objc
+  // 示例代码演示 AVIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员，同理可以用类似的代码操作 AVIMMessage 的其他子类
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    // get this message mentioned all members of this conversion.
+    BOOL mentionAll = message.mentionAll;
+}
+```
+```java
+@Override
+public void onMessage(AVIMAudioMessage msg, AVIMConversation conv, AVIMClient client) {
+  // 读取消息是否 @ 了对话的所有成员
+  boolean currentMsgMentionAllUsers = message.isMentionAll();
+}
+```
+```cs
+private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
+{
+    if (e.Message is AVIMImageMessage imageMessage)
+    {
+         var mentionedAll = e.Message.MentionAll;
+    }
+}
+```
+
+消息另一个标识位用来标识当前用户是否被提醒，SDK 通过读取消息是否提醒了全体成员和当前 client id 是否在被提醒的列表里这两个条件计算出来当前用户是否被提醒：
+
+```js
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  var mentioned = receivedMessage.mentioned;
+});
+```
+```objc
+  // 示例代码演示 AVIMTypedMessage 接收时，获取该条消息是否 @ 了当前 client id，同理可以用类似的代码操作 AVIMMessage 的其他子类
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    // get if current client id mentioned by this message
+    BOOL mentioned = message.mentioned;
+}
+```
+```java
+@Override
+public void onMessage(AVIMAudioMessage msg, AVIMConversation conv, AVIMClient client) {
+  // 读取消息是否 @ 了当前 client id
+  boolean currentMsgMentionedMe = message.mentioned();
+}
+```
+```cs
+private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
+{
+    if (e.Message is AVIMImageMessage imageMessage)
+    {
+         // 判断当前用户是否被 @
+         var mentioned = e.Message.MentionAll || e.Message.MentionList.Contains("Tom");
+    }
+}
+```
 
 ### 消息的撤回和修改
 
@@ -365,10 +929,9 @@ tom.createConversation({
 
 ## 消息记录
 
-
 ### 获取较新的消息
 
-[基础入门#消息记录](realtime-guide-beginner.html#消息记录)演示的是从后往前（从最近的向更早）查询的方式，还有从前往后（从某一条消息为基准，查询它之后产生的消息）的查询方式
+[基础入门#消息记录](realtime-guide-beginner.html#消息记录)演示的是从后往前（从最近的向更早）查询的方式，还有从前往后（以某一条消息为基准，查询它之后产生的消息）的查询方式
 
 ```js
 ```

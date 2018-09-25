@@ -632,7 +632,6 @@ Cloud-->Jerry: 2. 下发通知：Mary 被 Tom 移除
 Cloud-->Tom: 2. 下发通知：Mary 被移除了对话 
 ```
 
-
 ### 加入对话
 
 紧接着 William 通过 `Conversation.id` 他自己主动加入对话：
@@ -1005,12 +1004,12 @@ AVIMImageMessage m = new AVIMImageMessage(file);
 m.setText("萌妹子一枚");
 // 创建一条图片消息
 conv.sendMessage(m, new AVIMConversationCallback() {
-  @Override
-  public void done(AVIMException e) {
-    if (e == null) {
-      // 发送成功
+    @Override
+    public void done(AVIMException e) {
+      if (e == null) {
+        // 发送成功
+      }
     }
-  }
 });
 ```
 ```cs
@@ -1199,23 +1198,6 @@ var oldestMessage = messages.ToList()[0];
 var messagesInPage = await conversation.QueryMessageAsync(beforeMessageId: oldestMessage.Id, beforeTimeStamp: oldestMessage.ServerTimestamp); 
 ```
 
-
-### 进入对话之后显示最近的聊天记录
-
-在客户端加载对话界面之后，第一个操作就是去加载最近的几条聊天记录（一般情况下都不会太多，比如我们设定为 10 条），那么如下的代码可以实现这个功能：
-
-假设我们有一个叫做 messageList 的控件，需要为它绑定消息列表,
-
-```js
-conversation.queryMessages({
-  limit: 10, // limit 取值范围 1~1000，默认 20
-}).then(function(messages) {
-  // 最新的十条消息，按时间增序排列
-  messageList.data = messages;
-  //sdk 已经为 messages 做好了排序，直接绑定即可
-}).catch(console.error.bind(console));
-```
-
 ### 按照消息类型获取
 
 如下代码的功能是：获取所有的图像消息：
@@ -1225,8 +1207,27 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
   console.log(messages);
 }).catch(console.error);
 ```
+```objc
+[conversation queryMediaMessagesFromServerWithType:kAVIMMessageMediaTypeImage limit:10 fromMessageId:nil fromTimestamp:0 callback:^(NSArray *messages, NSError *error) {
+    if (!error) {
+        NSLog(@"查询成功！");
+    }
+}];
+```
+```java
+int msgType = .AVIMMessageType.TEXT_MESSAGE_TYPE;
+conversation.queryMessagesByType(msgType, limit, new AVIMMessagesQueryCallback() {
+    @Override
+    public void done(List<AVIMMessage> messages, AVIMException e){
+    }
+});
+```
+```cs
+// 传入泛型参数，SDK 会自动读取类型的信息发送给服务端，用作筛选目标类型的消息
+var imageMessages = await conversation.QueryMessageAsync<AVIMImageMessage>();
+```
 
-如要获取更多图像消息，可以效仿前一章节中使用 `conversation.createMessagesIterator` 接口生成迭代器来查询更多图像消息。
+如要获取更多图像消息，可以效仿前一章节中的示例代码，继续查询可以获取更多的图像消息。
 
 ### 更多的获取方式
 
@@ -1236,7 +1237,9 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
 
 {{ docs.note("注意：在网络中断的情况下，所有的消息收发和对话操作都会失败。开发者应该监听与网络状态相关的事件并更新 UI，以免影响用户的使用体验。") }}
 
-当网络连接出现中断、恢复等状态变化时，SDK 会在 Realtime 实例上派发以下事件：
+当网络连接出现中断、恢复等状态变化时，SDK 会派发以下事件：
+
+{{ docs.langSpecStart('js') }}
 
 * `DISCONNECT`：与服务端连接断开，此时聊天服务不可用。
 * `OFFLINE`：网络不可用。
@@ -1267,10 +1270,75 @@ realtime.on(Event.RECONNECT, function() {
   console.log('与服务端连接恢复');
 });
 ```
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('objc') }}
+
+在 AVIMClientDelegate 上会有如下事件通知：
+
+- `imClientPaused:(AVIMClient *)imClient` 指网络连接断开事件发生，此时聊天服务不可用。
+- `imClientResuming:(AVIMClient *)imClient` 指网络断开后开始重连，此时聊天服务依然不可用。
+- `imClientResumed:(AVIMClient *)imClient` 指网络连接恢复正常，此时聊天服务变得可用。
+
+{{ docs.langSpecEnd('objc') }}
+
+{{ docs.langSpecStart('java') }}
+
+`AVIMClientEventHandler` 上会有如下事件通知：
+
+- `onConnectionPaused()` 指网络连接断开事件发生，此时聊天服务不可用。
+- `onConnectionResume()` 指网络连接恢复正常，此时聊天服务变得可用。
+- `onClientOffline()` 指单点登录被踢下线的事件。
+
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('cs') }}
+
+`AVRealtime` 上会有如下事件通知：
+
+- `OnDisconnected` 指网络连接断开事件发生，此时聊天服务不可用。
+- `OnReconnecting` 指网络正在尝试重连，此时聊天服务不可用。
+- `OnReconnected` 指网络连接恢复正常，此时聊天服务变得可用。
+- `OnReconnectFailed` 指重连失败，此时聊天服务不可用。
+
+{{ docs.langSpecEnd('cs') }}
+
+### 断线重连
+
+目前 SDK 默认内置了断线重连的功能，从客户端与云端建立连接成功开始，只要没有调用退出登录的接口，SDK 会一直尝试和云端保持长连接，此时 `IMClient` 的状态可以通过 网络状态响应接口得到。
+
+**注意：用户如果自行实现了重连逻辑可能会报出 1001 错误。**
+
+## 退出登录与断开连接
+
+```js
+tom.close().then(function() {
+  console.log('Tom 退出登录');
+}).catch(console.error.bind(console));
+```
+```objc
+[tom closeWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"退出即时通讯服务");
+    }
+}];
+```
+```java
+tom.close(new AVIMClientCallback(){
+    @Override
+    public void done(AVIMClient client,AVIMException e){
+        if(e==null){
+        //登出成功
+        }
+    }
+});
+```
+```cs
+await tom.CloseAsync();
+```
 
 {{ docs.relatedLinks("更多文档",[
   { title: "服务总览", href: "realtime_v2.html" },
   { title: "进阶功能", href: "realtime-guide-intermediate.html"}, 
   { title: "高阶技巧", href: "/realtime-guide-senior.html"}])
 }}
-<!-- { title: "基础入门", href: "realtime-guide-beginner.html" }, -->

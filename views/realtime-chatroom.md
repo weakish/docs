@@ -16,11 +16,8 @@
 
 ```objc
  AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
-    
     [client openWithCallback:^(BOOL success, NSError *error) {
-        
         if (success && !error) {
-            
             [client createChatRoomWithName:@"聊天室"
                                 attributes:nil
                                   callback:
@@ -44,16 +41,14 @@
     }];
 ```
 ```java
-AVIMChatRoom room = (AVIMChatRoom) LCChatKit.getInstance().getClient().getChatRoom("conversationId");
-room.quit(new AVIMConversationCallback() {
-@Override
-public void done(AVIMException ex) {
-    if (null != ex) {
-    showToast(ex.getMessage());
-    } else {
-    ;
-    }
-}
+tom.createChatRoom(null, "聊天室", null,
+    new AVIMConversationCreatedCallback() {
+        @Override
+        public void done(AVIMConversation conv, AVIMException e) {
+            if (e == null) {
+                // 创建成功
+            }
+        }
 });
 ```
 ```js

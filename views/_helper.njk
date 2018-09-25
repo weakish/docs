@@ -210,4 +210,58 @@ className-{{ name }}
     { lang: "java", value: "AVIMMessageHandler.onMemberLeft"},
     { lang: "cs", value: "AVIMClient.OnMembersLeft"}
   ])}}
+  {{ useLangSpec('ChatRoom',[
+    { lang: "js", value: "ChatRoom" },
+    { lang: "objc", value: "AVIMChatRoom" },
+    { lang: "java", value: "AVIMChatRoom"},
+    { lang: "cs", value: "AVIMChatRoom"}
+  ])}}
+  {{ useLangSpec('ServiceConversation',[
+    { lang: "js", value: "ServiceConversation" },
+    { lang: "objc", value: "AVIMServiceConversation" },
+    { lang: "java", value: "AVIMServiceConversation"},
+    { lang: "cs", value: "AVIMServiceConversation"}
+  ])}}
+  {{ useLangSpec('TemporaryConversation',[
+    { lang: "js", value: "TemporaryConversation" },
+    { lang: "objc", value: "AVIMTemporaryConversation" },
+    { lang: "java", value: "AVIMTemporaryConversation"},
+    { lang: "cs", value: "AVIMTemporaryConversation"}
+  ])}}
+  {{ useLangSpec('TextMessage',[
+    { lang: "js", value: "TextMessage" },
+    { lang: "objc", value: "AVIMTextMessage" },
+    { lang: "java", value: "AVIMTextMessage"},
+    { lang: "cs", value: "AVIMTextMessage"}
+  ])}}
+  {{ useLangSpec('ImageMessage',[
+    { lang: "js", value: "ImageMessage" },
+    { lang: "objc", value: "AVIMImageMessage" },
+    { lang: "java", value: "AVIMImageMessage"},
+    { lang: "cs", value: "AVIMImageMessage"}
+  ])}}
+  {{ useLangSpec('AudioMessage',[
+    { lang: "js", value: "AudioMessage" },
+    { lang: "objc", value: "AVIMAudioMessage" },
+    { lang: "java", value: "AVIMAudioMessage"},
+    { lang: "cs", value: "AVIMAudioMessage"}
+  ])}}
+  {{ useLangSpec('VideoMessage',[
+    { lang: "js", value: "VideoMessage" },
+    { lang: "objc", value: "AVIMVideoMessage" },
+    { lang: "java", value: "AVIMVideoMessage"},
+    { lang: "cs", value: "AVIMVideoMessage"}
+  ])}}
+  {{ useLangSpec('FileMessage',[
+    { lang: "js", value: "FileMessage" },
+    { lang: "objc", value: "AVIMFileMessage" },
+    { lang: "java", value: "AVIMFileMessage"},
+    { lang: "cs", value: "AVIMFileMessage"}
+  ])}}
+  {{ useLangSpec('LocationMessage',[
+    { lang: "js", value: "LocationMessage" },
+    { lang: "objc", value: "AVIMLocationMessage" },
+    { lang: "java", value: "AVIMLocationMessage"},
+    { lang: "cs", value: "AVIMLocationMessage"}
+  ])}}
 {% endmacro %}
