@@ -14,9 +14,9 @@
 
 ## 对话属性
 
-对话是即时通信的核心逻辑对象，它有一些内置的常用的属性：
+对话(`IMConversation`)是即时通信的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。
 
-对话实例（Conversation）与控制台中 _Conversation 表是一一对应的，默认提供的属性的对应关系如下：
+默认提供的属性的对应关系如下：
 
 {{ docs.langSpecStart('js') }}
 
@@ -84,10 +84,40 @@
 
 {{ docs.langSpecEnd('java') }}
 
-### 拓展自定义属性
+{{ docs.langSpecStart('cs') }}
 
+| AVIMConversation 属性名 | _Conversation 字段 | 含义                        |
+| -------------------- | ---------------- | ------------------------ |
+| `Id`                 | `objectId`       | 全局唯一的 Id                   |
+| `Name`               | `name`           | 成员共享的统一的名字              |
+| `MemberIds`          | `m`              | 成员列表                        |
+| `MuteMemberIds`      | `mu`             | 静音该对话的成员                 |
+| `Creator`            | `c`              | 对话创建者                      |
+| `IsTransient`        | `tr`             | 是否为聊天室（暂态对话）           |
+| `IsUnique`           | `unique`         | 是否为相同成员的唯一对话（暂态对话）    |
+| `IsSystem`           | `sys`            | 是否为系统对话                   |
+| `LastMessageAt`      | `lm`             | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
+| `LastMessage`        | N/A              | 最后一条消息，可能会空               |
+| `LastDeliveredAt`    | N/A              | （仅限单聊）最后一条已送达对方的消息时间 |
+| `LastReadAt`         | N/A              | （仅限单聊）最后一条对方已读的消息时间 |
+| `CreatedAt`          | `createdAt`      | 创建时间                      |
+| `UpdatedAt`          | `updatedAt`      | 最后更新时间                    |
+
+{{ docs.langSpecEnd('cs') }}
+
+### 自定义属性
+
+创建时可以指定一些自定义属性：
 
 ```js
+tom.createConversation({
+  members: ['Jerry'],
+  name: '猫和老鼠',
+  type: 'private',
+  pinned: true,
+}).then(function(conversation) {
+  console.log('创建成功。id: ' + conversation.id);
+}).catch(console.error.bind(console));
 ```
 ```objc
 ```
@@ -96,7 +126,9 @@
 ```cs
 ```
 
-### 使用和修改属性
+**自定义属性在 SDK 级别是对所有成员可见的**。要对属性进行查询，请参见[对话的查询](#对话的查询)
+
+### 属性使用和修改
 
 以 `conversation.name` 为例，对话的 `conversation.name` 的属性是所有成员共享的，在获取对话列表的时候，对话的名字一般会被显示在列表中，采用如下代码可以获取指定的属性，用作后续绑定列表的需求：
 
@@ -108,6 +140,19 @@
 ```
 ```cs
 ```
+
+
+以 `conversation.type` 为例来演示自定义属性，读取、使用、修改的操作如下：
+
+```js
+```
+```objc
+```
+```java
+```
+```cs
+```
+
 
 ## 对话类型（聊天模式）
 
@@ -319,6 +364,20 @@
 ### 消息的离线推送通知
 
 ## 消息记录
+
+
+### 获取较新的消息
+
+[基础入门#消息记录](realtime-guide-beginner.html#消息记录)演示的是从后往前（从最近的向更早）查询的方式，还有从前往后（从某一条消息为基准，查询它之后产生的消息）的查询方式
+
+```js
+```
+```objc
+```
+```java
+```
+```cs
+```
 
 {{ docs.relatedLinks("更多文档",[
   { title: "服务总览", href: "realtime_v2.html" },

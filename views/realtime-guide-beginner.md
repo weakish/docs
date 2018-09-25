@@ -922,7 +922,7 @@ var fileUploadControl = $('#photoFileUpload')[0];
 var file = new AV.File('avatar.jpg', fileUploadControl.files[0]);
 file.save().then(function() {
   var message = new ImageMessage(file);
-  message.setText('发自我的小米');
+  message.setText('发自我的 Ins');
   message.setAttributes({ location: '旧金山' });
   return conversation.send(message);
 }).then(function() {
@@ -930,8 +930,11 @@ file.save().then(function() {
 }).catch(console.error.bind(console));
 ```
 ```objc
-// Tom 发了一张图片给 Jerry
-AVFile *file = [AVFile fileWithURL:[self @"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"]];
+NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+NSString *documentsDirectory = [paths objectAtIndex:0];
+NSString *imagePath = [documentsDirectory stringByAppendingPathComponent:@"LeanCloud.png"];
+NSError *error;
+AVFile *file = [AVFile fileWithLocalPath:imagePath error:&error];
 AVIMImageMessage *message = [AVIMImageMessage messageWithText:@"萌妹子一枚" file:file attributes:nil];
 [conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
@@ -940,10 +943,10 @@ AVIMImageMessage *message = [AVIMImageMessage messageWithText:@"萌妹子一枚"
 }];
 ```
 ```java
-AVFile file =new AVFile("萌妹子","http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", null);
-AVIMImageMessage m = new AVIMImageMessage(file);
-m.setText("萌妹子一枚");
+AVFile file = AVFile.withAbsoluteLocalPath("San_Francisco.png", Environment.getExternalStorageDirectory() + "/San_Francisco.png");
 // 创建一条图片消息
+AVIMImageMessage m = new AVIMImageMessage(file);
+m.setText("发自我的小米手机");
 conv.sendMessage(m, new AVIMConversationCallback() {
   @Override
   public void done(AVIMException e) {
@@ -954,7 +957,20 @@ conv.sendMessage(m, new AVIMConversationCallback() {
 });
 ```
 ```cs
+// 假设在程序运行目录下有一张图片，Unity/Xamarin 可以参照这种做法通过路径获取图片
+// 以下是发送图片消息的快捷用法
+using (FileStream fileStream = new FileStream(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "San_Francisco.png"), FileMode.Open, FileAccess.Read))
+{
+    await conversation.SendImageAsync("San_Francisco.png", fileStream);
+}
+// 或者如下比较常规的用法
+
+var imageMessage = new AVIMImageMessage();
+imageMessage.File = new AVFile("San_Francisco.png", fileStream);
+imageMessage.TextContent = "发自我的 Windows";
+await conversation.SendAsync(imageMessage);
 ```
+
 
 #### 发送图像链接
 
@@ -1019,7 +1035,55 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
    }
 }
 ```
+```objc
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    AVIMImageMessage *imageMessage = (AVIMImageMessage *)message;
+
+    // 消息的 id
+    NSString *messageId = imageMessage.messageId;
+    // 图像文件的 URL
+    NSString *imageUrl = imageMessage.file.url;
+    // 发该消息的 ClientId
+    NSString *fromClientId = message.clientId;
+}
 ```
+```java
+AVIMMessageManager.registerMessageHandler(AVIMImageMessage.class,
+    new AVIMTypedMessageHandler<AVIMImageMessage>() {
+        @Override
+        public void onMessage(AVIMImageMessage msg, AVIMConversation conv, AVIMClient client) {
+            //只处理 Jerry 这个客户端的消息
+            //并且来自 conversationId 为 55117292e4b065f7ee9edd29 的 conversation 的消息    
+            if ("Jerry".equals(client.getClientId()) && "55117292e4b065f7ee9edd29".equals(conv.getConversationId())) {
+                String fromClientId = msg.getFrom();
+                String messageId = msg.getMessageId();
+                String url = msg.getFileUrl();
+                Map<String, Object> metaData = msg.getFileMetaData();
+                if (metaData.containsKey("size")) {
+                  int size = (Integer) metaData.get("size");
+                }
+                if (metaData.containsKey("width")) {
+                  int width = (Integer) metaData.get("width");
+                }
+                if (metaData.containsKey("height")) {
+                  int height = (Integer) metaData.get("height");
+                }
+                if (metaData.containsKey("format")) {
+                  String format = (String) metaData.get("format");
+                }
+            }
+        }
+});
+```
+```cs
+private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
+{
+    if (e.Message is AVIMImageMessage imageMessage)
+    {
+        Console.WriteLine(imageMessage.File.Url);
+        // imageMessage.File 是一个 AVFile 对象，更多操作可以参考数据存储里面的文件
+    }
+}
 ```
 
 ### 多媒体消息
@@ -1032,7 +1096,7 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
 
 ### 其他类型消息
 
-更多消息类型请点击[进阶功能#消息类型](realtime-guide-intermediate.html#消息类型)
+更多消息类型请点击[进阶功能#消息类型](realtime-guide-intermediate.html#消息类型)。
 
 ## 消息记录
 
@@ -1050,6 +1114,27 @@ conversation.queryMessages({
 }).then(function(messages) {
   // 最新的十条消息，按时间增序排列
 }).catch(console.error.bind(console));
+```
+```objc
+// 查询对话中最后 10 条消息， limit 取值范围 1~1000，默认 20
+[conversation queryMessagesWithLimit:10 callback:^(NSArray *objects, NSError *error) {
+    NSLog(@"查询成功！");
+}];
+```
+```java
+//  limit 取值范围 1~1000，默认 20
+conv.queryMessages(10, new AVIMMessagesQueryCallback() {
+  @Override
+  public void done(List<AVIMMessage> messages, AVIMException e) {
+    if (e == null) {
+      //成功获取最新10条消息记录
+    }
+  }
+});
+```
+```cs
+// limit 取值范围 1~1000，默认 20
+var messages = await conversation.QueryMessageAsync(limit: 10);
 ```
 
 而如果想继续拉取更早的消息记录，可以使用如下代码：
@@ -1072,8 +1157,48 @@ messageIterator.next().then(function(result) {
   // }
 }).catch(console.error.bind(console));
 ```
+```objc
+// 查询对话中最后 10 条消息
+[conversation queryMessagesWithLimit:10 callback:^(NSArray *messages, NSError *error) {
+    NSLog(@"查询成功！");
+    // 以第一页的最早的消息作为开始，继续向前拉取消息
+    AVIMMessage *oldestMessage = [messages firstObject];
+    [conversation queryMessagesBeforeId:oldestMessage.messageId timestamp:oldestMessage.sendTimestamp limit:10 callback:^(NSArray *messagesInPage, NSError *error) {
+        NSLog(@"查询成功！");
+    }];
+}];
+```
+```java
+//  limit 取值范围 1~1000，默认 20
+conv.queryMessages(10, new AVIMMessagesQueryCallback() {
+  @Override
+  public void done(List<AVIMMessage> messages, AVIMException e) {
+    if (e == null) {
+      //成功获取最新10条消息记录
+      //返回的消息一定是时间增序排列，也就是最早的消息一定是第一个
+      AVIMMessage oldestMessage = messages.get(0);
 
-持续调用 `messageIterator.next()` 可以获取更多的聊天记录。
+      conv.queryMessages(oldestMessage.getMessageId(), oldestMessage.getTimestamp(),20,
+          new AVIMMessageQueryCallback(){
+            @Override
+            public void done(List<AVIMMessage> messagesInPage,AVIMException e){
+              if(e== null){
+                //查询成功返回
+                Log.d("Tom & Jerry","got "+messagesInPage.size()+" messages ");
+              }
+          }
+      });
+    }
+  }
+});
+```
+```cs
+// limit 取值范围 1~1000，默认 20
+var messages = await conversation.QueryMessageAsync(limit: 10);
+var oldestMessage = messages.ToList()[0];
+var messagesInPage = await conversation.QueryMessageAsync(beforeMessageId: oldestMessage.Id, beforeTimeStamp: oldestMessage.ServerTimestamp); 
+```
+
 
 ### 进入对话之后显示最近的聊天记录
 
