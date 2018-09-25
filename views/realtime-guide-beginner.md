@@ -3,9 +3,11 @@
 
 {{ docs.defaultLang('js') }}
 
+{{ docs.useIMLangSpec()}}
+
 # 即时通讯开发指南 &middot; 基础入门
 
-## 应用场景和需求
+## 使用场景和解决的需求
 
 针对如下应用场景，即时通讯都有对应的解决方案：
 
@@ -30,11 +32,16 @@ Cloud-->ClientC: onMessage(ClientA,'大家好，我是 A');
 
 首先，如果您还没有下载对应开发环境（语言）的 SDK，请查看如下内容，选择一门语言，查看下载和安装的文档：
 
-- [JavaScript](sdk_setup-js.html)
-- [iOS-Objective-C](sdk_setup-objc.html)
-- [Android-Java](sdk_setup-android.html)
-- [Unity3D-C#](sdk_setup-dotnet.html)
+{{ docs.relatedLinks("安装与初始化",[
+   {title: "JavaScript", href: "sdk_setup-js.html"},
+   {title: "iOS-Objective-C", href: "sdk_setup-objc.html"},
+   {title: "Android-Java", href: "sdk_setup-android.html"},
+   {title: "Unity3D-C#", href: "sdk_setup-dotnet.html"}
+]) }}
 
+## 阅前准备
+
+建议先阅读[即时通信服务总览](realtime_v2.html)之后，再阅读本文效果最佳。
 
 ## 一对一单聊
 
@@ -42,13 +49,13 @@ Cloud-->ClientC: onMessage(ClientA,'大家好，我是 A');
 
 > 假设我们正在制作一个社交聊天的应用，第一步要实现一个用户向另一个用户发起聊天的功能
 
-首先我们需要介绍一下在即时通讯服务中的 `AVIMClient` 对象：
+首先我们需要介绍一下在即时通讯服务中的 `IMClient` 对象：
 
-> `AVIMClient`对应实体的是一个用户，它表示一个用户以客户端的身份登录到整个即时通讯的系统。
+> `IMClient` 对应实体的是一个用户，它代表着一个用户以客户端的身份登录到了即时通讯的系统。
 
-### 1.创建 `AVIMClient`
+### 1.创建 `IMClient`
 
-在 iOS 和 Android SDK 中使用如下代码创建出一个 `AVIMClient`:
+在 iOS 和 Android SDK 中使用如下代码创建出一个 `IMClient`:
 
 ```js
 var realtime = new Realtime({
@@ -62,9 +69,9 @@ realtime.createIMClient('Tom').then(function(tom) {
 }).catch(console.error);
 ```
 ```objc
-@property (nonatomic, strong) AVIMClient *client;
+@property (nonatomic, strong) AVIMClient *tom;
 // clientId 为 Tom
-self.client = [[AVIMClient alloc] initWithClientId:@"Tom"]
+tom = [[AVIMClient alloc] initWithClientId:@"Tom"]
 ```
 ```java
 // clientId 为 Tom
@@ -81,14 +88,13 @@ var tom = await realtime.CreateClientAsync('Tom');
 2. 在一个应用内全局唯一
 3. 长度不能超过 64 个字符
 
-注： JavaScript 和 C#(Unity3D) SDK 创建 `AVIMClient` 成功同时意味着连接也已经建立，而 iOS 和 Android SDK 则需要额外下一步[2.建立连接](#2.建立连接)
-
+注： JavaScript 和 C#(Unity3D) SDK 创建 `IMClient` 成功同时意味着连接也已经建立，而 iOS 和 Android SDK 则需要额外下一步[2.建立连接](#2.建立连接)
 
 ### 2.建立连接
 
 建立连接的含义是：
 
-> `AVIMClient` 建立一个于云端的长连接，然后就可以开始收发消息了，并且可以监听事件。
+> `IMClient` 建立一个于云端的长连接，然后就可以开始收发消息了，并且可以监听事件。
 
 对应的 SDK 方法如下：
 
@@ -100,9 +106,9 @@ realtime.createIMClient('Tom').then(function(tom) {
 ```
 ```objc
 // Tom 创建了一个 client，用自己的名字作为 clientId
-self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+AVIMClient *tom = [[AVIMClient alloc] initWithClientId:@"Tom"];
 // Tom 创建连接
-[self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+[tom openWithCallback:^(BOOL succeeded, NSError *error) {
   if(succeeded) {
     // 成功打开连接
   }
@@ -126,19 +132,19 @@ var realtime = new AVRealtime('your-app-id','your-app-key');
 var tom = await realtime.CreateClientAsync('Tom');
 ```
 
-注：JavaScript 和 C#(Unity3D) SDK 建立连接成功之后，会返回一个 `AVIMClient`。
+注：JavaScript 和 C#(Unity3D) SDK 建立连接成功之后，会返回一个 `IMClient`。
 
-推荐使用的方式：在用户登录之后用当前的用户名当做 `clientId` 来创建 `AVIMClient` 并建立连接。
+推荐使用的方式：在用户登录之后用当前的用户名当做 `clientId` 来创建 `IMClient` 并建立连接。
 
 我们推荐在连接创建成功之后订阅[客户端事件与网络状态响应](#客户端事件与网络状态响应)，针对网络的异常情况作出应有的 UI 展示，以确保应用的健壮性。
 
-### 3.创建对话 `AVIMConversation`
+### 3.创建对话 `Conversation`
 
-对话(`AVIMConversation`) 是即时通讯抽象出来的概念，它是客户端之间互发消息的载体，可以理解为一个通道，所有在这个对话内的成员都可以在这个对话内收发消息:
+对话(`Conversation`) 是即时通讯抽象出来的概念，它是客户端之间互发消息的载体，可以理解为一个通道，所有在这个对话内的成员都可以在这个对话内收发消息:
 
-> 对话(`AVIMConversation`)对话是消息的载体，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
+> 对话(`Conversation`)对话是消息的载体，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
 
-Tom 已经建立了连接，因此他需要创建一个 `AVIMConversation` 来发送消息给 Jerry：
+Tom 已经建立了连接，因此他需要创建一个 `Conversation` 来发送消息给 Jerry：
 
 ```js
 // 创建与 Jerry 之间的对话
@@ -219,42 +225,41 @@ var conversation = await tom.CreateConversationAsync("Jerry",name:"Tom & Jerry")
 
 {{ docs.langSpecEnd('cs') }}
 
+创建对话之后，可以获取对话的内置属性，云端会为每一个对话生成一个全局唯一的 ID 属性： `Conversation.id`，它是查询对话和获取对话时常用的匹配字段。
+
 ### 4.发送消息
 
 对话已经创建成功了，接下来 Tom 可以发出第一条文本消息了：
 
 ```js
 var { TextMessage } = require('leancloud-realtime');
-// om 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
-realtime.createIMClient('Tom').then(function(tom) {
-  // 成功登录
-  // 创建与Jerry之间的对话
-  return tom.createConversation({
-    // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
-    members: ['Jerry'],
-    // 对话名称
-    name: 'Tom & Jerry',
-  });
-}).then(function(conversation) {
-  // 本章节关键代码：
-  // 发送一条最简单的文本消息
-  return conversation.send(new TextMessage('Jerry，起床了！'));
-}).then(function(message) {
+conversation.send(new TextMessage('Jerry，起床了！')).then(function(message) {
   console.log('Tom & Jerry', '发送成功！');
 }).catch(console.error);
 ```
 ```objc
+[conversation sendMessage:[AVIMTextMessage messageWithText:@"耗子，起床！" attributes:nil] callback:^(BOOL succeeded, NSError *error) {
+  if (succeeded) {
+    NSLog(@"发送成功！");
+  }
+}];
 ```
 ```java
+AVIMTextMessage msg = new AVIMTextMessage();
+msg.setText("Jerry，起床了！");
+// 发送消息
+conversation.sendMessage(msg, new AVIMConversationCallback() {
+  @Override
+  public void done(AVIMException e) {
+    if (e == null) {
+      Log.d("Tom & Jerry", "发送成功！");
+    }
+  }
+});
 ```
 ```cs
-```
-
-再次比对前一章节代码，修改的关键片段如下:
-
-```js
-// 发送一条最简单的文本消息
-conversation.send(new TextMessage('Jerry，起床了！'));
+var textMessage = new AVIMTextMessage("Jerry，起床了！");
+await conversation.SendAsync(textMessage);
 ```
 
 `conversation.send` 接口实现的功能就是向对话中发送一条消息。
@@ -263,7 +268,7 @@ Jerry 只要在线他就会收到消息，至此 Jerry 还没有登场，那么�
 
 ### 5.接收消息
 
-我们在另一个设备上启动应用，然后使用 Jerry 当做 `clientId` 建立连接:
+我们在另一个设备上启动应用，然后使用 Jerry 当做 `clientId` 创建 `AVIMClient` 和 建立连接（参照前两章节 Tom 的示例代码）:
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -271,52 +276,125 @@ var { Event } = require('leancloud-realtime');
 realtime.createIMClient('Jerry').then(function(jerry) {
 }).catch(console.error);
 ```
+```objc
+jerry = [[AVIMClient alloc] initWithClientId:@"Jerry"];
+[jerry openWithCallback:^(BOOL succeeded, NSError *error) {}];
+```
+```java
+//Jerry登录
+AVIMClient jerry = AVIMClient.getInstance("Jerry");
+jerry.open(new AVIMClientCallback(){
 
-紧接着让 Jerry 开始订阅事件通知：
+  @Override
+  public void done(AVIMClient client,AVIMException e){
+      if(e==null){
+        ...//登录成功后的逻辑
+      }
+  }
+});
+```
+```cs
+var realtime = new AVRealtime('your-app-id','your-app-key');
+var jerry = await realtime.CreateClientAsync('Jerry');
+```
+
+紧接着让 Jerry 开始订阅对话加入的事件通知：
+
+```js
+// 当前用户被添加至某个对话
+jerry.on(Event.INVITED, function invitedEventHandler(payload, conversation) {
+    console.log(payload.invitedBy, conversation.id);
+});
+```
+```objc
+jerry.delegate = self;
+-(void)conversation:(AVIMConversation *)conversation invitedByClientId:(NSString *)clientId{
+    NSLog(@"%@", [NSString stringWithFormat:@"当前 ClientId(Jerry) 被 %@ 邀请，加入了对话",clientId]);
+}
+```
+```java
+public class CustomConversationEventHandler extends AVIMConversationEventHandler {
+  @Override
+  public void onInvited(AVIMClient client, AVIMConversation conversation, String invitedBy) {
+    // 当前 ClientId(Jerry) 被邀请到对话，执行此处逻辑
+  }
+}
+AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
+```
+```cs
+var jerry =await realtime.CreateClientAsync("Jerry");
+jerry.OnInvited += (sender, args) =>
+{
+  var invitedBy = args.InvitedBy;
+  var conversationId = args.ConversationId;
+};
+```
+
+为 Jerry 添加了加入对话的事件订阅之后，继续为 Jerry 订阅消息接收的事件：
 
 ```js
 var { Event } = require('leancloud-realtime');
 // Jerry 登录
 realtime.createIMClient('Jerry').then(function(jerry) {
-    // 当前用户被添加至某个对话
-    jerry.on(Event.INVITED, function invitedEventHandler(payload, conversation) {
-        console.log(payload.invitedBy, conversation.id);
-    });
+
     // 当前用户收到了某一条消息
     jerry.on(Event.MESSAGE, function(message, conversation) {
         console.log('Message received: ' + message.text);
     });
 }).catch(console.error);
 ```
+```objc
+jerry.delegate = self;
+#pragma mark - AVIMClientDelegate
+// 接收消息的回调函数
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    NSLog(@"%@", message.text); // Jerry，起床了！
+}
+```
+```java
+public static class CustomMessageHandler extends AVIMMessageHandler{
+   //接收到消息后的处理逻辑 
+   @Override
+   public void onMessage(AVIMMessage message,AVIMConversation conversation,AVIMClient client){
+     if(message instanceof AVIMTextMessage){
+       Log.d(((AVIMTextMessage)message).getText());// Jerry，起床了
+     }
+   }
+ }
 
-这里 Jerry 订阅了两种事件通知:
-
-```js
-jerry.on(Event.INVITED, function invitedEventHandler(payload, conversation) {
-      console.log(payload.invitedBy, conversation.id);
-});
+AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
+```
+```cs
+jerry.OnMessageReceived += Jerry_OnMessageReceived;
+private void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
+{
+    if (e.Message is AVIMTextMessage)
+    {
+        var textMessage = (AVIMTextMessage)e.Message;
+        // textMessage.ConversationId 是该条消息所属于的对话 Id
+        // textMessage.TextContent 是该文本消息的文本内容
+        // textMessage.FromClientId 是消息发送者的 client Id
+    }
+}
 ```
 
-`Event.INVITED` 在当前用户被邀请加入一个对话的时候触发。
-
-而接收消息对应的是:
-
-```js
-// 当前用户收到了某一条消息
-jerry.on(Event.MESSAGE, function(message, conversation) {
-    console.log('Message received: ' + message.text);
-});
-```
-
-而当 Tom 创建了对话之后，Jerry 会这一端会立即触发 `Event.INVITED`，此时客户端可以做出一些 UI 展示，引导用户加载聊天的界面，紧接着 Tom 发送了消息，则会触发 Jerry `Event.MESSAGE`，这个时候就可以直接在聊天界面的消息列表里面渲染这条消息了。
+而当 Tom 创建了对话之后，Jerry 会这一端会立即触发 `INVITED`（更多关于 `INVITED` 的描述在[成员变更的事件通知总结](#成员变更的事件通知总结)），此时客户端可以做出一些 UI 展示，引导用户加载聊天的界面，紧接着 Tom 发送了消息，则会触发 Jerry `MESSAGE`，这个时候就可以直接在聊天界面的消息列表里面渲染这条消息了。
 
 对应的时序图如下:
 
-![rtm-member-invite-seq](images/rtm-member-invite-seq.svg)
+
+```seq
+Tom->Cloud: 1.Tom 将 Jerry 加入对话
+Cloud-->Jerry: 2.下发通知：你被邀请加入对话
+Jerry-->UI: 3.加载聊天的 UI 界面
+Tom->Cloud: 4.发送消息
+Cloud-->Jerry: 5.下发通知：接收到有新消息
+Jerry-->UI: 6.显示收到的消息内容
+```
 
 ## 多人群聊
 
-多人群聊与单聊十分接近，只是在现有的对话上继续加入新的成员就可以实现多人群聊了：
+多人群聊与单聊十分接近，在一个现有对话上加入更多的成员即可转化为群聊：
 
 ### 1.创建多人群聊对话
 
@@ -328,7 +406,7 @@ jerry.on(Event.MESSAGE, function(message, conversation) {
 
 首先我们实现第一种方式： **向现有对话中添加更多成员**，将其转化成一个群聊。
 
-Tom 的代码做如下修改：
+Tom 继续添加 Mary 到对话中：
 
 ```js
 tom.getConversation(CONVERSATION_ID).then(function(conversation) {
@@ -337,6 +415,32 @@ tom.getConversation(CONVERSATION_ID).then(function(conversation) {
   console.log('添加成功', conversation.members);
   // 此时对话成员为: ['Mary', 'Tom', 'Jerry']
 }).catch(console.error.bind(console));
+```
+```objc
+AVIMConversationQuery *query = [self.client conversationQuery];
+[query getConversationById:@"CONVERSATION_ID" callback:^(AVIMConversation *conversation, NSError *error) {
+    // Jerry 邀请 Mary 到会话中
+    [conversation addMembersWithClientIds:@[@"Mary"] callback:^(BOOL succeeded, NSError *error) {
+        if (succeeded) {
+            NSLog(@"邀请成功！");
+        }
+    }];
+}];
+```
+```java
+AVIMClient jerry = AVIMClient.getInstance("Jerry");
+final AVIMConversation conv = client.getConversation("CONVERSATION_ID");
+conv.addMembers(Arrays.asList("Mary"), new AVIMConversationCallback() {
+    @Override
+    public void done(AVIMException e) {
+      // 添加成功
+    }
+});
+```
+```cs
+var tom = await realtime.CreateClientAsync();
+var conversation = await tom.GetConversationAsync("CONVERSATION_ID");
+await tom.InviteAsync(conversation, "Mary");
 ```
 
 而 Jerry 添加如下代码也能随时知道当前对话还有谁加进来了：
@@ -352,33 +456,105 @@ realtime.createIMClient('Jerry').then(function(jerry) {
   });
 }).catch(console.error);
 ```
+```objc
+-(void)maryNoticedWhenJerryInviteMary{
+    // Mary 创建一个 client，用自己的名字作为 clientId
+    self.client = [[AVIMClient alloc] initWithClientId:@"Mary"];
+    self.client.delegate = self;
 
-其中 payload 参数包含如下:
+    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+        // 登录成功
+    }];
+}
+#pragma mark - AVIMClientDelegate
+
+- (void)conversation:(AVIMConversation *)conversation membersAdded:(NSArray *)clientIds byClientId:(NSString *)clientId {
+    NSLog(@"%@", [NSString stringWithFormat:@"%@ 加入到对话，操作者为：%@",[clientIds objectAtIndex:0],clientId]);
+}
+```
+```java
+public static class CustomMessageHandler extends AVIMMessageHandler {
+    @Override
+    public void onMemberJoined(AVIMClient client, AVIMConversation conversation,
+        List<String> members, String invitedBy) {
+        // 手机屏幕上会显示一小段文字：Mary 加入到 551260efe4b01608686c3e0f ；操作者为：Tom
+        Toast.makeText(AVOSCloud.applicationContext,
+          members + "加入到" + conversation.getConversationId() + "；操作者为： "
+              + invitedBy, Toast.LENGTH_SHORT).show();
+    }
+}
+AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
+```
+```cs
+jerry.OnMembersJoined += OnMembersJoined;
+private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
+{
+    // e.InvitedBy 是该项操作的发起人, e.ConversationId 是该项操作针对的对话 Id
+    Debug.Log(string.Format("{0} 邀请了 {1} 加入了 {2} 对话", e.InvitedBy,e.JoinedMembers, e.ConversationId));
+}
+```
+
+{{ docs.langSpecStart('js') }}
+
+其中 payload 参数包含如下内容：
 
 1. `members`: 字符串数组, 被添加的用户 clientId 列表
 2. `invitedBy`	字符串, 邀请者 clientId
 
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('cs') }}
+
+其中 `AVIMOnInvitedEventArgs` 参数包含如下内容：
+1. `InvitedBy`: 改操作的发起者
+2. `JoinedMembers`：此次加入对话的包含的成员列表
+3. `ConversationId`：被操作的对话
+
+{{ docs.langSpecEnd('cs') }}
 
 如下时序图可以简单的概括上述流程：
 
-![rtm-member-add-seq](images/rtm-member-add-seq.svg)
+```seq
+Tom->Cloud: 1.添加 Mary
+Cloud->Tom: 2.下发通知：Mary 被你邀请加入了对话
+Cloud-->Mary: 2.下发通知：你被 Tom 邀请加入对话
+Cloud-->Jerry: 2.下发通知: Mary 被 Tom 邀请加入了对话
+```
 
-而 Mary 如果在另一台设备上登录了，Ta 可以参照[一对一单聊](#一对一单聊)中 Jerry 的做法监听 `Event.INVITED` 事件，就可以自己被邀请到了一个对话当中。
+而 Mary 如果在另一台设备上登录了，Ta 可以参照[一对一单聊](#一对一单聊)中 Jerry 的做法监听 `INVITED` 事件，就可以自己被邀请到了一个对话当中。
 
 而**重新创建一个对话，并在创建的时候指定至少为 2 的成员数量**的方式如下：
 
 ```js
-// Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
-realtime.createIMClient('Tom').then(function(tom) {
-  // 成功登录
-  // 创建与 Jerry,Mary 的多人群聊
-  return tom.createConversation({
-    // 创建的时候直接指定 Jerry 和 Mary 一起加入多人群聊，当然根据需求可以添加更多成员
-    members: ['Jerry','Mary'],
-    // 对话名称
-    name: '一个群聊',
-  });
+tom.createConversation({
+  // 创建的时候直接指定 Jerry 和 Mary 一起加入多人群聊，当然根据需求可以添加更多成员
+  members: ['Jerry','Mary'],
+  // 对话名称
+  name: 'Tom & Jerry & friends',
 }).catch(console.error);
+```
+```objc
+// Jerry 建立了与朋友们的会话
+NSArray *friends = @[@"Jerry", @"Mary"];
+[tom createConversationWithName:@"Tom & Jerry & friends" clientIds:friends callback:^(AVIMConversation *conversation, NSError *error) {
+    if (!error) {
+        NSLog(@"创建成功");
+    }
+}];
+```
+```java
+tom.createConversation(Arrays.asList("Jerry","Mary"), "Tom & Jerry & friends", null,
+   new AVIMConversationCreatedCallback() {
+      @Override
+      public void done(AVIMConversation conversation, AVIMException e) {
+           if (e == null) {
+              // 创建成功
+           }
+      }
+   });
+```
+```cs
+var conversation = await tom.CreateConversationAsync(new string[]{ "Jerry","Mary" },"Tom & Jerry & friends");
 ```
 
 ### 2.群发消息
@@ -387,12 +563,35 @@ realtime.createIMClient('Tom').then(function(tom) {
 
 Tom 向群聊对话发送了消息：
 
-
 ```js
 conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对话'));
 ```
+```objc
+[conversation sendMessage:[AVIMTextMessage messageWithText:@"大家好，欢迎来到我们的群聊对话！" attributes:nil] callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"发送成功！");
+    }
+}];
+```
+```java
+AVIMTextMessage msg = new AVIMTextMessage();
+msg.setText("大家好，欢迎来到我们的群聊对话！");
+// 发送消息
+conversation.sendMessage(msg, new AVIMConversationCallback() {
 
-而 Jerry 和 Mary 都会触发 `Event.MESSAGE` 事件，来接收群聊消息。
+  @Override
+  public void done(AVIMException e) {
+    if (e == null) {
+      Log.d("群聊", "发送成功！");
+    }
+  }
+});
+```
+```cs
+await conversation.SendAsync("大家好，欢迎来到我们的群聊对话！");
+```
+
+而 Jerry 和 Mary 都会有 `Event.MESSAGE` 事件触发，利用它来接收群聊消息，这一点与一对一单聊没区别。
 
 
 ### 将他人踢出对话
@@ -402,44 +601,120 @@ conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对�
 Tom 又把 Mary 踢出对话了:
 
 ```js
-realtime.createIMClient('Tom').then(function(tom) {
-  return tom.getConversation(CONVERSATION_ID);
-}).then(function(conversation) {
-  return conversation.remove(['Mary']);
-}).then(function(conversation) {
+conversation.remove(['Mary']).then(function(conversation) {
   console.log('移除成功', conversation.members);
 }).catch(console.error.bind(console));
+```
+```objc
+[conversation removeMembersWithClientIds:@[@"Mary"] callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"踢人成功！");
+    }
+}];
+```
+```java
+ conv.kickMembers(Arrays.asList("Mary"),new AVIMConversationCallback(){
+      @Override
+      public void done(AVIMException e){
+      }
+ });
+```
+```cs
+await conversation.RemoveMembersAsync("Mary");
 ```
 
 执行了这段代码之后会触发如下流程：
 
-![rtm-member-remove-seq](images/rtm-member-remove-seq.svg)
+```seq
+Tom->Cloud: 1. 对话中移除 Mary
+Cloud-->Mary: 2. 下发通知：你被 Tom 从对话中剔除了
+Cloud-->Jerry: 2. 下发通知：Mary 被 Tom 移除
+Cloud-->Tom: 2. 下发通知：Mary 被移除了对话 
+```
+
 
 ### 加入对话
 
-紧接着 William 通过 CONVERSATION_ID 他自己主动加入对话：
+紧接着 William 通过 `Conversation.id` 他自己主动加入对话：
+
+注意，如下代码运行的前提有几个前提：
+
+1. William 需要参照前面章节里面的创建了一个 `IMClient` 的实例，并且确保已经与云端建立连接。
+2. `590aa654fab00f41dda86f51` 是一个在 `_Conversation` 表里面真是存在的对话 Id。
 
 ```js
-realtime.createIMClient('William').then(function(william) {
-  return william.getConversation(CONVERSATION_ID);
-}).then(function(conversation) {
+william.getConversation('590aa654fab00f41dda86f51').then(function(conversation) {
   return conversation.join();
 }).then(function(conversation) {
   console.log('加入成功', conversation.members);
   // 加入成功 ['William', 'Tom', 'Jerry']
 }).catch(console.error.bind(console));
 ```
+```objc
+AVIMConversationQuery *query = [william conversationQuery];
+[query getConversationById:@"590aa654fab00f41dda86f51" callback:^(AVIMConversation *conversation, NSError *error) {
+    [conversation joinWithCallback:^(BOOL succeeded, NSError *error) {
+        if (succeeded) {
+            NSLog(@"加入成功！");
+        }
+    }];
+}];
+```
+```java
+AVIMClient william = AVIMClient.getInstance("William");
+AVIMConversation conv = client.getConversation("590aa654fab00f41dda86f51");
+conv.join(new AVIMConversationCallback(){
+    @Override
+    public void done(AVIMException e){
+        if(e==null){
+        //加入成功
+        }
+    }
+});
+```
+```cs
+await william.JoinAsync("590aa654fab00f41dda86f51");
+```
 
 执行了这段代码之后会触发如下流程：
 
-![rtm-join-conv-seq](images/rtm-join-conv-seq.svg)
+```seq
+William->Cloud: 1.加入对话
+Cloud-->William: 2. 下发通知: 你已加入对话
+Cloud-->Tom: 2. 下发通知：William 加入对话
+Cloud-->Jerry: 2. 下发通知：William 加入对话
+```
 
 其他人则通过订阅 `MEMBERS_JOINED` 来接收 William 加入对话的通知:
 
 ```js
-  jerry.on(Event.MEMBERS_JOINED, function membersjoinedEventHandler(payload, conversation) {
-      console.log(payload.members, payload.invitedBy, conversation.id);
-  });
+jerry.on(Event.MEMBERS_JOINED, function membersJoinedEventHandler(payload, conversation) {
+    console.log(payload.members, payload.invitedBy, conversation.id);
+});
+```
+```objc
+- (void)conversation:(AVIMConversation *)conversation membersAdded:(NSArray *)clientIds byClientId:(NSString *)clientId {
+    NSLog(@"%@", [NSString stringWithFormat:@"%@ 加入到对话，操作者为：%@",[clientIds objectAtIndex:0],clientId]);
+}
+```
+```java
+@Override
+public void onMemberJoined(AVIMClient client, AVIMConversation conversation,
+    List<String> members, String invitedBy) {
+    // 手机屏幕上会显示一小段文字：Tom 加入到 551260efe4b01608686c3e0f ；操作者为：Tom
+    Toast.makeText(AVOSCloud.applicationContext,
+      members + "加入到" + conversation.getConversationId() + "；操作者为： "
+          + invitedBy, Toast.LENGTH_SHORT).show();
+}
+
+```
+```cs
+jerry.OnMembersJoined += OnMembersJoined;
+private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
+{
+    // e.InvitedBy 是该项操作的发起人, e.ConversationId 是该项操作针对的对话 Id
+    Debug.Log(string.Format("{0} 加入了 {1} 对话，操作者是 {2}",e.JoinedMembers, e.ConversationId, e.InvitedBy));
+}
 ```
 ### 退出对话
 
@@ -451,17 +726,65 @@ conversation.quit().then(function(conversation) {
   // 退出成功 ['William', 'Tom']
 }).catch(console.error.bind(console));
 ```
+```objc
+[conversation quitWithCallback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"退出成功！");
+    }
+}];
+```
+```java
+conversation.quit(new AVIMConversationCallback(){
+    @Override
+    public void done(AVIMException e){
+      if(e==null){
+      //退出成功
+      }
+    }
+});
+```
+```cs
+jerry.LeaveAsync(conversation);
+// 或者传入 conversation id
+jerry.LeaveAsync("590aa654fab00f41dda86f51");
+```
 
 执行了这段代码之后会触发如下流程：
 
-![rtm-leave-conv-seq](images/rtm-leave-conv-seq.svg)
+```seq
+Jerry->Cloud: 1. 离开对话
+Cloud-->Jerry: 2. 下发通知：你已离开对话
+Cloud-->Mary: 2. 下发通知：Jerry 已离开对话
+Cloud-->Tom: 2. 下发通知：Jerry 已离开对话
+```
 
 而其他人需要通过订阅 `MEMBERS_LEFT` 来接收 Jerry 离开对话的事件通知:
 
 ```js
-  mary.on(Event.MEMBERS_LEFT, function membersLeftEventHandler(payload, conversation) {
-      console.log(payload.members, payload.invitedBy, conversation.id);
-  });
+mary.on(Event.MEMBERS_LEFT, function membersLeftEventHandler(payload, conversation) {
+    console.log(payload.members, payload.invitedBy, conversation.id);
+});
+```
+```objc
+// mary 登录之后，jerry 退出了对话，在 mary 所在的客户端就会激发以下回调
+-(void)conversation:(AVIMConversation *)conversation membersRemoved:(NSArray *)clientIds byClientId:(NSString *)clientId{
+    NSLog(@"%@", [NSString stringWithFormat:@"%@ 离开了对话， 操作者为：%@",[clientIds objectAtIndex:0],clientId]);
+}
+```
+```java
+@Override
+public void onMemberLeft(AVIMClient client, AVIMConversation conversation, List<String> members,
+    String kickedBy) {
+    // 有其他成员离开时，执行此处逻辑
+}
+```
+```cs
+mary.OnMembersLeft += OnMembersLeft;
+private void OnMembersLeft(object sender, AVIMOnMembersLeftEventArgs e)
+{
+    // e.InvitedBy 是该项操作的发起人, e.ConversationId 是该项操作针对的对话 Id
+    Debug.Log(string.Format("{0} 离开了 {1} 对话，操作者是 {2}",e.JoinedMembers, e.ConversationId, e.InvitedBy));
+}
 ```
 
 ### 成员变更的事件通知总结
@@ -487,8 +810,7 @@ Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
 - 服务号，例如公众号，游戏 GM 在线群发通知
 
 
-关于上述的几种场景对应的实现，请参阅[进阶功能#通讯模式](realtime-guide-intermediate.html#通讯模式)
-
+关于上述的几种场景对应的实现，请参阅[进阶功能#对话类型](realtime-guide-intermediate.html#对话类型)。
 
 ## 对话
 
@@ -504,14 +826,44 @@ tom.getQuery().containsMembers(['Tom']).find().then(function(conversations) {
   });
 }).catch(console.error.bind(console));
 ```
+```objc
+// Tom 构建一个查询
+AVIMConversationQuery *query = [tom conversationQuery];
+// 执行查询
+[query findConversationsWithCallback:^(NSArray *conversations, NSError *error) {
+    NSLog(@"找到 %ld 个对话！", [conversations count]);
+}];
+```
+```java
+AVIMConversationsQuery query = client.getConversationsQuery();
+query.findInBackground(new AVIMConversationQueryCallback(){
+    @Override
+    public void done(List<AVIMConversation> conversations,AVIMException e){
+      if(e==null){
+      //conversations 就是获取到的 conversation 列表
+      //注意：按每个对话的最后更新日期（收到最后一条消息的时间）倒序排列
+      }
+    }
+});      
+```
+```cs
+var query = tom.GetQuery().WhereContainedIn("m","Tom");
+await query.FindAsync();
+```
 
 上述代码默认返回最近活跃的 10 个对话，若要更改返回对话的数量，请设置 limit 值。
 
 ```js
-var query = tom.getQuery();
-query.limit(20).containsMembers(['Tom']).find().then(function(conversations) {
-  console.log(conversations.length);
-}).catch(console.error.bind(console));
+query.limit(20);
+```
+```objc
+query.limit = 20;
+```
+```java
+query.limit(20);
+```
+```cs
+query.Limit(20);
 ```
 
 ### 根据关键字查询
@@ -519,10 +871,16 @@ query.limit(20).containsMembers(['Tom']).find().then(function(conversations) {
 在某些场景下，我们需要根据对话的一些特性来做查找，比如我要查找名字里包含 NBA 的对话:
 
 ```js
-ar query = tom.getQuery();
-query.limit(10).contains('name', 'NBA').find().then(function(conversations) {
-  console.log(conversations.length);
-}).catch(console.error.bind(console));
+query.contains('name', 'NBA');
+```
+```objc
+[query whereKey:@"name" containsString:@"NBA"];
+```
+```java
+query.whereContains("name", "NBA");
+```
+```cs
+query.WhereContains("name", "NBA");
 ```
 
 ### 更多查询方式
@@ -541,10 +899,17 @@ query.limit(10).contains('name', 'NBA').find().then(function(conversations) {
 
 我们从发送一张图片消息的生命周期的时序图来了解整个过程：
 
-![rtm-image-message-send-seq](images/rtm-image-message-send-seq.svg)
+```seq
+Tom-->source: 1. 获取图像实体内容
+Tom->Cloud: 2. 调用发送图像消息的接口
+Cloud-->AVFile: 3. SDK 后台上传文件到 AVFile 表
+AVFile-->Tom: 4. 返回图像的云端地址
+Tom-->Cloud: 5. SDK 将图像消息发送给云端
+Cloud->Jerry: 6. 收到图像消息，根据接口获取图像的云端地址，在对话框里面做 UI 展现
+```
 
 图解：
-1. localStorage/camera 表示图像的来源可以是本地存储例如 iPhone 手机的媒体库或者直接调用相机 API 实时地拍照获取的照片。
+1. source 可能是来自于 localStorage/camera， 表示图像的来源可以是本地存储例如 iPhone 手机的媒体库或者直接调用相机 API 实时地拍照获取的照片。
 2. AVFile 是 LeanCloud 提供的文件存储服务对象，详细可以参阅[文件存储 AVFile](storage_overview.html#文件存储 AVFile)
 
 对应的代码并没有时序图那样复杂，因为调用 send 接口的时候，SDK 会自动上传图像，不需要开发者再去关心这一步:
@@ -564,6 +929,32 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
+```objc
+// Tom 发了一张图片给 Jerry
+AVFile *file = [AVFile fileWithURL:[self @"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"]];
+AVIMImageMessage *message = [AVIMImageMessage messageWithText:@"萌妹子一枚" file:file attributes:nil];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"发送成功！");
+    }
+}];
+```
+```java
+AVFile file =new AVFile("萌妹子","http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", null);
+AVIMImageMessage m = new AVIMImageMessage(file);
+m.setText("萌妹子一枚");
+// 创建一条图片消息
+conv.sendMessage(m, new AVIMConversationCallback() {
+  @Override
+  public void done(AVIMException e) {
+    if (e == null) {
+      // 发送成功
+    }
+  }
+});
+```
+```cs
+```
 
 #### 发送图像链接
 
@@ -581,6 +972,33 @@ file.save().then(function() {
 }).then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
+```
+```objc
+// Tom 发了一张图片给 Jerry
+AVFile *file = [AVFile fileWithURL:[self @"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"]];
+AVIMImageMessage *message = [AVIMImageMessage messageWithText:@"萌妹子一枚" file:file attributes:nil];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"发送成功！");
+    }
+}];
+```
+```java
+AVFile file =new AVFile("萌妹子","http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", null);
+AVIMImageMessage m = new AVIMImageMessage(file);
+m.setText("萌妹子一枚");
+// 创建一条图片消息
+conv.sendMessage(m, new AVIMConversationCallback() {
+  @Override
+  public void done(AVIMException e) {
+    if (e == null) {
+      // 发送成功
+    }
+  }
+});
+```
+```cs
+await conversation.SendImageAsync("http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", "Satomi_Ishihara", "萌妹子一枚");
 ```
 
 #### 接收图像消息
@@ -600,6 +1018,8 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
         break;
    }
 }
+```
+```
 ```
 
 ### 多媒体消息
@@ -722,3 +1142,10 @@ realtime.on(Event.RECONNECT, function() {
   console.log('与服务端连接恢复');
 });
 ```
+
+{{ docs.relatedLinks("更多文档",[
+  { title: "服务总览", href: "realtime_v2.html" },
+  { title: "进阶功能", href: "realtime-guide-intermediate.html"}, 
+  { title: "高阶技巧", href: "/realtime-guide-senior.html"}])
+}}
+<!-- { title: "基础入门", href: "realtime-guide-beginner.html" }, -->

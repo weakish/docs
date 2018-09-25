@@ -131,3 +131,83 @@ className-{{ name }}
   <blockquote><strong> {{title}} </strong><p> {{ content | replace(r/<p>\s*<\/p>/gi,"") | safe }} </p></blockquote>
   {%- endif %}
 {% endmacro %}
+
+{% macro relatedLinks(title,links) %}
+<div>
+  <h2>{{ title }}</h2>
+  {{ linksPanel(links) }}
+</div>
+{% endmacro %}
+
+{% macro linksPanel(links) %}
+  <ul class="list-unstyled tags">
+    {% for link in links %}
+    <li><a href="{{ link.href }}">{{ link.title }}</a></li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{% macro useLangSpec(apiOrClassNameKey,langMap) %}
+  <div class="code-key" data-code-key="{{apiOrClassNameKey}}"
+    {% for kv in langMap %}
+      data-{{kv.lang}} = "{{kv.value}}"
+    {% endfor %}
+  ></div>
+{% endmacro %}
+
+{% macro useIMLangSpec() %}
+  {{ useLangSpec('Conversation.id',[
+    { lang: "js", value: "Conversation.id" },
+    { lang: "objc", value: "AVIMConversation.conversationId" },
+    { lang: "java", value: "AVIMConversation.conversationId"},
+    { lang: "cs", value: "AVIMConversation.conversationId"}
+  ])}}
+  {{ useLangSpec('IMClient',[
+    { lang: "js", value: "IMClient" },
+    { lang: "objc", value: "AVIMClient" },
+    { lang: "java", value: "AVIMClient"},
+    { lang: "cs", value: "AVIMClient"}
+  ])}}
+  {{ useLangSpec('Conversation',[
+    { lang: "js", value: "Conversation" },
+    { lang: "objc", value: "AVIMConversation" },
+    { lang: "java", value: "AVIMConversation"},
+    { lang: "cs", value: "AVIMConversation"}
+  ])}}
+  {{ useLangSpec('conversation.send',[
+    { lang: "js", value: "conversation.send" },
+    { lang: "objc", value: "[conversation sendMessage]" },
+    { lang: "java", value: "conversation.sendMessage"},
+    { lang: "cs", value: "conversation.SendAsync"}
+  ])}}
+  {{ useLangSpec('INVITED',[
+    { lang: "js", value: "INVITED" },
+    { lang: "objc", value: "AVIMClientDelegate.invitedByClientId" },
+    { lang: "java", value: "AVIMConversationEventHandler.onInvited"},
+    { lang: "cs", value: "AVIMClient.OnInvited"}
+  ])}}
+  {{ useLangSpec('KICKED',[
+    { lang: "js", value: "KICKED" },
+    { lang: "objc", value: "AVIMClientDelegate.kickedByClientId" },
+    { lang: "java", value: "AVIMConversationEventHandler.onKicked"},
+    { lang: "cs", value: "AVIMClient.OnKicked"}
+  ])}}
+  {{ useLangSpec('MESSAGE',[
+    { lang: "js", value: "MESSAGE" },
+    { lang: "objc", value: "AVIMClientDelegate.didReceiveTypedMessage" },
+    { lang: "java", value: "AVIMMessageHandler.onMessage"},
+    { lang: "cs", value: "AVIMClient.OnMessageReceived"}
+  ])}}
+  {{ useLangSpec('MEMBERS_JOINED',[
+    { lang: "js", value: "MEMBERS_JOINED" },
+    { lang: "objc", value: "AVIMClientDelegate.membersAdded" },
+    { lang: "java", value: "AVIMMessageHandler.onMemberJoined"},
+    { lang: "cs", value: "AVIMClient.OnMembersJoined"}
+  ])}}
+  {{ useLangSpec('MEMBERS_LEFT',[
+    { lang: "js", value: "MEMBERS_LEFT" },
+    { lang: "objc", value: "AVIMClientDelegate.membersRemoved" },
+    { lang: "java", value: "AVIMMessageHandler.onMemberLeft"},
+    { lang: "cs", value: "AVIMClient.OnMembersLeft"}
+  ])}}
+{% endmacro %}

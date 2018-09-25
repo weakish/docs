@@ -1560,10 +1560,10 @@ blockquote{
   margin-top: -10px;
   margin-bottom: 18px;
 
-  .toggle-item {
+  .toggle-item, .toggle-select {
     float: left;
 
-    .toggle {
+    .toggle, .langToggle {
       position: relative;
       display: inline-block;
       padding: 2px 10px;
@@ -1581,13 +1581,56 @@ blockquote{
       }
     }
 
-    &:first-child .toggle {
+    select.langToggle {
+      text-align: center;
+      text-align-last: center;
+      text-align: -webkit-center;
+      text-align-last: -webkit-center;
+      option {
+        text-align: left;
+        text-align: -webkit-left;
+      }
+    }
+
+    &:first-child .toggle, &:last-child .langToggle {
       border-radius: @border-radius-base 0 0 @border-radius-base;
     }
 
-    &:last-child .toggle {
+    &:last-child .toggle,  &:last-child .langToggle {
       border-radius: 0 @border-radius-base @border-radius-base 0;
       margin-right: 0;
     }
+
+    &:last-child .fixed-langToggle {
+      border-radius: @border-radius-base;
+    }
   }
+}
+.tags>li {
+  display: inline-block;
+}
+.tags>li>a {
+  min-width: 90px;
+}
+.tags>li>a {
+  padding:4px 8px;
+  background-color: #f1f8ff;
+  margin: 8px 0;
+  display: block;
+  text-align: center;
+  line-height: 1.8;
+  text-decoration: none;
+  border-radius: 3px;
+}
+.tags>li>a {
+  line-height: 1.8;
+  white-space: nowrap;
+}
+.tags>li>a:hover {
+  background-color: #2c97e8;
+  color: #fff;
+}
+.tags>li::after,
+.tags>li:last-child::after {
+  content: none!important;
 }

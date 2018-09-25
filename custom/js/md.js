@@ -222,65 +222,36 @@ var codeBlockTabber = (function () {
     });
   }
 
-  function getApiName(apiNameKey, lang) {
-    var apiName = '';
-
-    var nameKeyMap = {
-      'AVIMClient': 'im-client',
-      'IMClient': 'im-client',
-      'AVIMConversation': 'im-conversation',
-      'createConversation': 'im-createConversation',
-      'createConversationWithName': 'im-createConversation',
-      'CreateConversationAsync': 'im-createConversation',
-      'Conversation': 'im-conversation',
-      'AVIMMessage': 'im-message',
-      'IMMessage': 'im-message'
-    };
-
-    if (apiNameKey in nameKeyMap) {
-      apiName = nameKeyMap[apiNameKey];
+  function getHashCode(str) {
+    var hash = 0,
+      i, chr;
+    if (str.length === 0) return hash;
+    for (i = 0; i < str.length; i++) {
+      chr = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
     }
-
-    if (apiName != '') {
-      var langMap = {
-        'js-im-client': 'IMClient',
-        'objc-im-client': 'AVIMClient',
-        'java-im-client': 'AVIMClient',
-        'cs-im-client': 'AVIMClient',
-        'cs-im-createConversation': 'CreateConversationAsync',
-        'js-im-createConversation': 'createConversation',
-        'objc-im-createConversation': 'createConversationWithName',
-        'java-im-createConversation': 'createConversation',
-        'js-im-conversation': 'Conversation',
-        'objc-im-conversation': 'AVIMConversation',
-        'java-im-conversation': 'AVIMConversation',
-        'cs-im-conversation': 'AVIMConversation',
-      };
-      var key = `${lang}-${apiName}`;
-      return langMap[key];
-    }
-
-    return apiNameKey;
-  }
+    return hash;
+  };
 
   function checkApiName(targetLang) {
     // update api name or class name by language
     var currentLang = targetLang.split('-').pop();
-    $.each($('.code-api-name'), function () {
-      var codeContent = getApiName($(this).html(), currentLang);
-      $(this).html(codeContent);
-    });
 
     // check inline code
     $.each($('code'), function () {
       if (autoSwitchApiName) {
-        var codeContent = $(this).html().toString();
-        var convertedContent = getApiName(codeContent, currentLang);
-        $(this).html(convertedContent);
+        var code = $(this);
+        var codeContent = code.html().toString();
+
+        var codeId = code.data("codeId");
+        var codeData = $(`.${codeId}`).data(currentLang);
+        if (codeData) {
+          code.html(codeData);
+        }
       }
     });
   }
-
 
   function toggleLangSpec(targetLang) {
     var currentLang = targetLang.split('-').pop();
@@ -289,7 +260,7 @@ var codeBlockTabber = (function () {
       var langSpecStartClassName = `.lang-spec-${lang}-start`;
       var langSpecEndClassName = `.lang-spec-${lang}-end`;
       $.each($(langSpecStartClassName), function () {
-        var content = $(this).nextUntil(langSpecEndClassName).show();
+        var content = $(this).nextUntil(langSpecEndClassName);
         if (lang == currentLang) {
           content.show();
         } else {
@@ -297,7 +268,6 @@ var codeBlockTabber = (function () {
         }
       });
     });
-
   }
 
   function prettySequence() {
@@ -310,6 +280,39 @@ var codeBlockTabber = (function () {
     $ds.sequenceDiagram(options);
   }
   var autoSwitchApiName = false;
+
+  function fillLangSpec() {
+    if (autoSwitchApiName) {
+      $.each($('.code-key'), function () {
+        var codeKey = $(this).data('codeKey');
+        if (codeKey) {
+          var codeId = getHashCode(codeKey);
+          $(this).addClass(`${codeId}`);
+        }
+      });
+
+      $.each($('code'), function () {
+        var code = $(this);
+        if (code.children().length > 0) return;
+        var codeContent = code.html().toString();
+        var codeId = getHashCode(codeContent);
+        code.attr("data-code-id", `${codeId}`);
+      });
+    }
+  }
+
+  function checkLangSpec() {
+    var defaultLangHost = $('.code-default-lang').first();
+    if (defaultLangHost != undefined) {
+      var defaultLang = defaultLangHost.data('lang');
+      if (defaultLang != undefined) {
+        autoSwitchApiName = true;
+        fillLangSpec();
+        checkApiName(defaultLang);
+        toggleLangSpec(defaultLang);
+      }
+    }
+  }
 
   function checkCodeBlocks() {
     var $codeBlocks = $('.prettyprint');
@@ -332,16 +335,6 @@ var codeBlockTabber = (function () {
       'lang-nodejs': 'Node.js',
       'lang-node': 'Node.js'
     };
-
-    var defaultLangHost = $('.code-default-lang').first();
-    if (defaultLangHost != undefined) {
-      var defaultLang = defaultLangHost.data('lang');
-      if (defaultLang != undefined) {
-        autoSwitchApiName = true;
-        checkApiName(defaultLang);
-        toggleLangSpec(defaultLang);
-      }
-    }
 
     // Multilingual init
     var $translatableElements = $('code, var');
@@ -375,6 +368,7 @@ var codeBlockTabber = (function () {
       var nextCodeClass = $current.next('.prettyprint').children().attr('class');
       var nextAllLangs = [currentCodeClass];
       var tabToggleDoms = [];
+      var langSelectDoms = [];
       var isFirstBlock = true;
 
       // if $nextAll exists, push lang tags to a temporary array
@@ -397,7 +391,8 @@ var codeBlockTabber = (function () {
             <a class="toggle" data-toggle-lang="' + lang + '" href="#">' + langLabelMap[lang] + '</a>\
           </div>\
         ');
-        //tabToggleDoms.push(`<div class="toggle-item"><a class="edit" href="#">修改示例语言类型</a></div>`);
+
+        langSelectDoms.push(`<option value="${lang}">${langLabelMap[lang]}</option>`);
       });
 
       if (nextCodeClass) {
@@ -406,7 +401,7 @@ var codeBlockTabber = (function () {
         if (currentCodeClass !== nextCodeClass) {
           var langCounter = uniqArr(nextAllLangs).length - 1;
 
-          // hide silbing element
+          // hide sibling element
           $.each($nextAll, function () {
             $(this).addClass('codeblock-toggle-enabled');
             $(this).hide();
@@ -414,6 +409,11 @@ var codeBlockTabber = (function () {
 
           // append toggle
           if (isFirstBlock) {
+            tabToggleDoms.push(`<div class="toggle-select">
+            <select class="langSelectOption langToggle">
+            ${langSelectDoms.join('')}
+            <option value="lang-all" selected="selected">全部</option>
+            </select></div>`)
             $('<div/>', {
               class: "code-lang-toggles",
               html: tabToggleDoms.join('')
@@ -425,23 +425,40 @@ var codeBlockTabber = (function () {
       }
     });
 
-    // click to switch language
-    $('.code-lang-toggles .toggle').click(function (e) {
-      e.preventDefault();
-      var targetLang = $(this).data('toggle-lang');
-      var $blocks = $('.codeblock-toggle-enabled');
+    $(".langSelectOption").change(function () {
+      var targetLang = this.value;
+      setLang(targetLang);
+      $.each($('.toggle-item'), function () {
+        if (targetLang == 'lang-all') {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
 
+      $.each($('.langSelectOption'), function () {
+        $(this).val(targetLang);
+        if (targetLang != 'lang-all') {
+          $(this).addClass('fixed-langToggle');
+        } else {
+          $(this).removeClass('fixed-langToggle');
+        }
+      });
+    });
+
+    function setLang(targetLang) {
+      var $blocks = $('.codeblock-toggle-enabled');
       checkApiName(targetLang);
       toggleLangSpec(targetLang);
       // check if is switching to another language first
       if (!$(this).hasClass('active')) {
-        var prevHeihgt = 0;
+        var prevHeight = 0;
         var nextHeight = 0;
         var heightOffset = 0;
 
         // sum all heights of previous visible code blocks with multilang enabled
         $(this).closest('.code-lang-toggles').prevAll('.codeblock-toggle-enabled:visible').each(function () {
-          prevHeihgt += $(this).outerHeight(true);
+          prevHeight += $(this).outerHeight(true);
         });
 
         // sum all heights of previous hidden code blocks with multilang enabled, also excludes unrelated (non-targetLang) codeblocks
@@ -449,7 +466,7 @@ var codeBlockTabber = (function () {
           nextHeight += $(this).outerHeight(true);
         });
 
-        heightOffset = prevHeihgt - nextHeight;
+        heightOffset = prevHeight - nextHeight;
 
         if (heightOffset !== 0) {
           var currentTop = document.documentElement.scrollTop || document.body.scrollTop;
@@ -501,12 +518,20 @@ var codeBlockTabber = (function () {
           }
         }
       });
+    }
+
+    // click to switch language
+    $('.code-lang-toggles .toggle').click(function (e) {
+      e.preventDefault();
+      var targetLang = $(this).data('toggle-lang');
+      setLang(targetLang);
     });
   }
 
   return {
     start: checkCodeBlocks,
-    render: prettySequence
+    render: prettySequence,
+    end: checkLangSpec,
   };
 
 })();
@@ -566,4 +591,6 @@ $(window).load(function () {
       $el.css('display', 'block');
     }
   });
+
+  codeBlockTabber.end();
 });
