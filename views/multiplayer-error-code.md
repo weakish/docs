@@ -66,8 +66,8 @@ Hook 相关错误，Hook 还未上线
 * 含义 - 需要当前玩家在该房间内才能进行操作。
 
 ### 4309
-* 信息 - ROOM_GAME_VERSION_NOT_MATCH
-* 含义 - Room 的 Game Version 和用户的 Game Version 不匹配。当使用 Room 名称强制加入一个和自己 Game Version 不一致的房间时会出现这个错误。
+* 信息 - ROOM_GAME_VERSION_OR_SDK_VERSION_NOT_MATCH
+* 含义 - 创建 Room 用户的 Game Version 或 SDK Version 和当前加入 Room 用户的 Game Version 或 SDK Version 不匹配。当使用 Room 名称强制加入一个和自己 Game Version 或 SDK Version 不一致的房间时会出现这个错误。
 
 <!-- 
 开发者不太可能遇到，先干掉
