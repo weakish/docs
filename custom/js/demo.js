@@ -117,7 +117,7 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         qcloudShow: true
       },{
         name: 'SNS 第三方登录',
-        desc: '演示如何通过 QQ 和微博授权来登录。',
+        desc: 'Android 第三方登录示例 Demo',
         downPath: '',
         mdPath: 'https://github.com/leancloud/LeanCloudSNSDemo-Android',
         type: 'android',
