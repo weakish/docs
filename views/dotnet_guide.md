@@ -5,11 +5,11 @@
 ## 简介
 目前我们的 .NET 数据存储支持如下运行时：
 
-* Windows Phone Silverlight （8.0 & 8.1）
 * Windows Desktop .NET Framework 4.5+
 * Xamarin Form 1.4+
 * Xamarin iOS 8+
 * Xamarin Android 5+
+* .NET Core 2.0+
 
 以上几个运行时，我们称之为 `.NET Portable`。
 
@@ -70,8 +70,8 @@ key 必须是字母数字或下划线组成的字符串。值可以是字符串�
 ### 保存对象
 接下来，你需要将上文中的 `Sport` 存储到 LeanCloud 的服务。LeanCloud 的相关接口和 `IDictionary<string, object>` 类似，但只有调用 `SaveAsync` 方法时才会实际保存到服务器：
 
-```
-AVObject football =new AVObject("Sport");
+```cs
+AVObject football = new AVObject("Sport");
 football["totalTime"] = 90;
 football["name"] = "Football";
 Task saveTask = football.SaveAsync();
@@ -94,9 +94,10 @@ await saveTask;
 
 LeanCloud .NET SDK 都采用了 TAP 的方式去实现把所有跟 LeanCloud 服务端交互的部分放在后台去进行，这样可以让开发者可以花更多时间去做客户端应该做的事情，而把跟服务端交互的各种进程管理放权给 LeanCloud SDK 去做。
 ### 更新对象
+
 更新对象和保存对象有点相似，只是更新对象会覆盖同名属性的值，在调用 `SaveAsync` 之后会发送到服务端生效。
 
-```
+```cs
 var peter = new AVObject("Character")
 {
 	{ "age", 37 },
@@ -112,10 +113,11 @@ await peter.SaveAsync().ContinueWith(t =>
 	peter.SaveAsync();
 });
 ```
+
 ### 获取对象
 如果确定了一个 `AVObject` 的 `objectId` 可以通过如下代码构造一个 `AVObject` 然后通过 `FetchAsync` 从服务端把数据加载到本地：
 
-```
+```cs
 AVObject character = AVObject.CreateWithoutData("Character", "549818e0e4b096e3561a6abd");
 await character.FetchAsync();
 ```
@@ -123,12 +125,12 @@ await character.FetchAsync();
 ### 删除对象
 如果想删除某个对象可以直接调用 `AVObject` 的 `DeleteAsync` 方法。
 
-```
+```cs
 await myObject.DeleteAsync();
 ```
 如果仅仅想删除某个对象的某一个属性，可以调用 `Remove` 方法。
 
-```
+```cs
 //执行下面的语句会将age字段置为空
 myObject.Remove("age");
 // 将删除操作发往服务器生效。
@@ -141,23 +143,23 @@ await myObject.SaveAsync();
 软件程序就是抽象现实中的对象之间的关系在计算机世界里面的解释和展现。有对象必然就会有对象之间的关系，在 LeanCloud 中也给出了传统关系型的解决方案，并且简化了代码，使得代码简洁易维护。
 假设这样一种场景，做一款时髦的相亲社交软件，男孩会在自己的资料里面标明自己喜欢的女生类型，于是有如下代码：
 
-```
+```cs
 AVObject girlType = new AVObject ("GirType");
 girlType ["typeName"] = "Hot";
 AVObject beckham = new AVObject ("Boy");
 beckham["name"]="David Beckham";
 beckham ["age"] = 38;
 beckham ["focusType"] = girlType;
-await beckham.SaveAsync ();//保存beckham的时候会自动将girlType也保存到服务器。
+await beckham.SaveAsync();//保存beckham的时候会自动将girlType也保存到服务器。
 ```
 当然必然存在一种方法就是将已存在的对象通过`ObjectId`将它于目标对象进行关联：
 
-```
+```cs
 beckham["focusType"] = AVObject.CreateWithoutData("GirType", "5372d119e4b0d4bef5f036ae");
 ```
 值得注意的地方是，当需要从 LeanCloud 上读取数据的时候，默认的 fetch 方法是`不会加载关联数据类型的`，直到像如下代码执行之后，这些关联数据字段（如上实例中 Boy 的 focusType 字段）才会被实例化。
 
-```
+```cs
 AVObject focusType = beckham.Get<AVObject>("focusType");
 await focusType.FetchIfNeededAsync();
 ```
@@ -165,15 +167,15 @@ await focusType.FetchIfNeededAsync();
 ### AVQuery.GetAsync
 此方法对应的理解是根据 `objectId` 查询指定的一条数据，`GetAsync` 方法的参数为一个 `objectId`：
 
-```
- AVQuery<AVObject> query = AVObject.GetQuery("Character");
-            AVObject character = await query.GetAsync("549818e0e4b096e3561a6abd");
+```cs
+AVQuery<AVObject> query = AVObject.GetQuery("Character");
+AVObject character = await query.GetAsync("549818e0e4b096e3561a6abd");
 ```
 ### 构建 AVQuery 的注意事项
 根据 `objectId` 查询，显然无法满足正常的需求，所以SDK提供了许多简化了操作的查询。
 首先需要明确最核心的一点，在.NET SDK中，`AVQuery` 对象的所有带有 `Where` 开头方法，以及查询范围限定类的方法(`Skip||Limit||ThenBy||Include`等)都会返回一个全新的对象，它并不是在原始的 `AVQuery` 对象上修改内部属性。比如:
 
-```
+```cs
 AVQuery<AVObject> query=new AVQuery<AVObject>("Character")
 query.WhereEqualTo ("age", 37);//注意：这是错误的！！！
 await query.FindAsync ();
@@ -183,23 +185,23 @@ await query.FindAsync ();
 以上这段代码将返回 `Character` 中所有的数据，并不会返回所设想的那样 `age` 等于37数据。
 正确地写法应该是：
 
-```
+```cs
 AVQuery<AVObject> query=new AVQuery<AVObject>("Character").WhereEqualTo ("age", "37");
 ```
 以此类推，所有复合条件查询的构造都应该遵循用`.`这个符号进行链式创建出来的 `AVQuery<T>`，比如，查找所有 `age` 等于37，并且 `name` 包含 `peter` 的`Character`：
 
-```
+```cs
 AVQuery<AVObject> query = new AVQuery<AVObject> ("Character").WhereEqualTo ("age", 37).WhereContains("name","peter");
 ```
 ### 基本查询
 `AVQuery<T>.WhereEqualTo` 基本查询逻辑上可以理解为类似于sql语句中的
 
-```
+```cs
 SELECT * FROM Persons WHERE FirstName='Bush'
 ```
 的`=`操作，如下：
 
-```
+```cs
 AVQuery<AVObject> query=new AVQuery<AVObject>("Persons").WhereEqualTo ("FirstName", "Bush");
 await query.FindAsync ().ContinueWith (t => {
 	IEnumerable<AVObject> persons=t.Result;
@@ -209,30 +211,30 @@ await query.FindAsync ().ContinueWith (t => {
 ### 查询条件
 如果要过滤掉特定键的值时可以使用 whereNotEqualTo 方法。比如需要查询 `name`不等于 `Peter Burke` 的数据时可以这样写：
 
-```
+```cs
 query = query.WhereNotEqualTo ("name", "Peter Burke");
 ```
 同时包含多个约束条件的查询，可以这样写：
 
-```
+```cs
 query = query.WhereNotEqualTo ("name", "Peter Burke");
 query = query.WhereGreaterThan("age", 18);//这样书写是为了文档阅读方便，但是我们还是比较推荐上一节介绍的链式表达式去创建AVQuery
 ```
 以此类推，可以添加多个约束条件，他们彼此是`AND`的关系。
 有些需求中，也许只要较少的几条查询结果即可，这种情况下，可以通过设定查询结果的数量：
 
-```
+```cs
 query = query.Limit (10);
 ```
 在数据较多的情况下，分页显示数据是比较合理的解决办法，limit 默认 100，最大1000，在 0 到 1000 范围之外的都强制转成默认的 100。
 Skip 方法可以做到跳过首次查询的多少条数据来实现分页的功能。比如，一页显示10条数据，那么跳过前10个查询结果的方法就是：
 
-```
+```cs
 query = query.Skip (10);
 ```
 对应数据的排序，如数字或字符串，你可以使用升序或降序的方式来控制查询数据的结果顺序：
 
-```
+```cs
 // 根据 age 字段升序显示数据
 query = query.OrderBy("age");
 // 根据 age 字段降序显示数据
@@ -249,23 +251,23 @@ query = query.WhereGreaterThanOrEqualTo("age", 37);
 ```
 如果你想查询匹配几个不同值的数据，如：要查询 “peter”，“neal”，“alex” 三个人的详细数据，你可以使用 WhereContainedIn（类似 SQL 中的 in 查询）方法来实现。
 
-```
+```cs
 var names = new[] { "peter", "neal", "alex" };
 query = query.WhereContainedIn("name", names);
 ```
 相反，你想查询排除 “peter”，“neal”，“alex” 这三个人的其他同学的信息（类似 SQL 中的 not in 查询），你可以使用 WhereNotContainedIn 方法来实现。
 
-```
+```cs
 query = query.WhereNotContainedIn ("name", names);
 ```
 对字符串值的查询 查询包含字符串的值，有几种方法。你可以使用任何正确的正则表达式来检索相匹配的值，使用 WhereMatches 方法：
 
-```
+```cs
 query = query.WhereMatches("name", "^[A-Z]\\d");
 ```
 查询字符串中包含“XX“内容，可用如下方法：
 
-```
+```cs
 // 查询 name 字段的值中包含 “pet” 字的数据
 query = query.WhereContains("name", "pet");
 
@@ -278,13 +280,13 @@ query = query.WhereEndsWith("name", "oz");
 ### 数组值的查询
 如果一个 Key 对应的值是一个数组，你可以查询 key 的数组包含了数字 2 的所有对象:
 
-```
+```cs
 // 查找出所有arrayKey对应的数组同时包含了数字2的所有对象
 query = query.WhereEqualTo("arrayKey", 2);
 ```
 同样，你可以查询出 Key 的数组同时包含了 2,3 和 4 的所有对象：
 
-```
+```cs
 //查找出所有arrayKey对应的数组同时包含了数字2,3,4的所有对象。
 List<int> numbers = new List<int>();
 numbers.Add(2);
@@ -295,7 +297,7 @@ query = query.WhereContainsAll("arrayKey", numbers);
 ### 查询对象个数
 如果你只是想统计有多少个对象满足查询，你并不需要获取所有匹配的对象，可以直接使用 `CountAsync` 替代 `FindAsync`。例如，查询一部电视剧里面一共有多个角色：
 
-```
+```cs
 query = query.WhereNotEqualTo ("from", "White Collar");
 await query.CountAsync().ContinueWith(t =>
 {
@@ -308,7 +310,7 @@ await query.CountAsync().ContinueWith(t =>
 ### 关系查询
 LeanCloud 支持用关系 `AVRelation` 关联 2 个对象，当然也支持用关系查询来获取相关联的对象。
 
-```
+```cs
 AVObject girlType = new AVObject ("GirType");
 girlType ["typeName"] = "Hot";
 girlType ["ageMax"] = 27;
@@ -330,8 +332,8 @@ Task saveTask = beckham.SaveAsync ().ContinueWith (t =>
 ```
 关系的内嵌查询可以帮助开发者用简洁的代码处理复杂的关系内嵌查询，比如要查询`查询所有关注了年龄小于27岁女生类型的那些男生们`：
 
-```
-AVQuery<AVObject> girlTypeQuery=new AVQuery<AVObject>("GirType");//
+```cs
+AVQuery<AVObject> girlTypeQuery= new AVQuery<AVObject>("GirType");//
 girlTypeQuery = girlTypeQuery.WhereLessThan ("ageMax", 27);//年龄小于27的萌妹纸
 AVQuery<AVObject> query = new AVQuery<AVObject>("Boy");
 query = query.WhereMatchesQuery ("focusType", girlTypeQuery);//找出喜欢这些类型的男生们
@@ -341,7 +343,7 @@ query = query.WhereMatchesQuery ("focusType", girlTypeQuery);//找出喜欢这�
 
 查询已经选择了喜欢的类型的男生，并且是限定在最近 10 个加入系统的男生，可以如此做：
 
-```
+```cs
 AVQuery<AVObject> query = new AVQuery<AVObject>("Boy");
 query = query.OrderByDescending("createdAt");
 query = query.Limit(10);
@@ -349,7 +351,7 @@ query = query.Include("focusType");
 ```
 你可以使用 dot（英语句号:"."）操作符来多层 Include 内嵌的对象。比如，你还想进一步获取 `GirType` 所关联的女生（就是那些标明了自己隶属于这个类型的女生）：
 
-```
+```cs
 query = query.Include("focusType.girls");
 ```
 ### CQL 查询
@@ -357,7 +359,7 @@ Cloud Query Language（简称 CQL） 是 LeanCloud 为查询 API 定制的一套
 
 在 .NET 中调用 CQL 查询很便捷，在 `AVQuery` 中有一个 `DoCloudQuery` 的静态方法，可以直接传入 sql 语句即可实现查询，如下：
 
-```
+```cs
 await AVQuery<AVObject>.DoCloudQuery("select * from Character where age=37");
 ```
 如此做即可，其后续的操作与以前习惯的 `AVQuery` 其他查询一样，只是我们提供了另一种方式便于长期累积关系型数据库知识的开发者可以迅速迁移到 LeanCloud 上，CQL 的语法和详细用法可以参照：[CQL 详细指南](./cql_guide.html)
@@ -371,7 +373,7 @@ await AVQuery<AVObject>.DoCloudQuery("select * from Character where age=37");
 ### 注册
 注册用户在LeanCloud SDK中极为简单，看如下实例代码：
 
-```
+```cs
 var userName = "demoUser";
 var pwd = "avoscloud";
 var email = "xxx@xxx.com";
@@ -399,9 +401,10 @@ await user.SignUpAsync().ContinueWith(t =>
 验证注册用户手机号码
 允许用户使用手机短信登录
 ```
+
 如下一个简单的案例：
 
-```
+```cs
 //第一步先注册
 var user = new AVUser();
 user.Username = "WPUser";
@@ -413,7 +416,7 @@ await task；
 ```
 以上完成之后，需要给用户一个输入界面，让用户输入收到的6位数字的验证码，然后再运行如下代码：
 
-```
+```cs
 //第二步回调认证
 var task = AVUser.VerifyMobilePhoneAsync(code, mobilePhoneNumber);//code代表6位数字的验证码
 await task.ContinueWith(t =>
@@ -427,7 +430,7 @@ await task.ContinueWith(t =>
 ### 登录
 登录是一个 `AVUser` 的静态方法，通过如下代码可以实现登录，登录之后，SDK会默认将此次登录的用户设置为 `AVUser.CurrentUser`：
 
-```
+```cs
 var userName = "demoUser";
 var pwd = "avoscloud";
 await AVUser.LogInAsync(userName, pwd).ContinueWith(t =>
@@ -446,7 +449,7 @@ await AVUser.LogInAsync(userName, pwd).ContinueWith(t =>
 #### 手机号和密码登录
 在短信服务上线之后，只要是<u>通过认证</u>的手机号可以当做用户名在 LeanCloud 服务端进行登录，自然 SDK 里面也加入了相应的支持（WP SDK 自 V1.1.0 以及以后的版本都有支持）。它的调用与用户名登录一样，只是方法名字不一样，代码如下:
 
-```
+```cs
 await AVUser.LogInByMobilePhoneNumberAsync (mobilePhone, password).ContinueWith (t =>
         {
 			AVUser user=t.Result;
@@ -458,7 +461,7 @@ await AVUser.LogInByMobilePhoneNumberAsync (mobilePhone, password).ContinueWith 
 #### 手机号和短信验证码登录
 在对客户端验证要求比较高的应用里面，也许有些应用要求支持短信随机的验证码作为临时的密码登录，这个应用场景在现在已经被普遍的采用了，这种验证机制被认为是安全性高的一种机制，自然 LeanCloud 也给予了支持。它比前2种静态登录的方法多了`发送短信验证码`这一步，具体代码如下：
 
-```
+```cs
 //第一步，请求服务端发送6为数字的验证码到指定mobilePhoneNumber上。
 try
 {
@@ -474,7 +477,7 @@ catch(AVException avException)
 }
 ```
 
-```
+```cs
 //第二步，直接使用验证码登录，如果验证码输入错误也会抛出异常。
 try
 {
@@ -505,7 +508,7 @@ catch(AVException avException)
 ### 手机号认证
 相对于邮箱认证，手机号认证的过程稍微需要多一点代码，如果当您的应用在注册的时候没有开启短信验证，伴随业务发展，发现需要验证用户的手机，LeanCloud 正好提供了这一接口。
 
-```
+```cs
 //调用的前提是，该手机号已经与已存在的用户有关联(_User表中的mobilePhoneNumber即可关联手机，至于如何关联取决于客户端的业务逻辑)
 await AVUser.RequestMobilePhoneVerifyAsync ("18688888888").ContinueWith(t=>
 		{
@@ -521,7 +524,7 @@ await AVUser.RequestMobilePhoneVerifyAsync ("18688888888").ContinueWith(t=>
 #### 手机短信针对应用自定义操作的验证
 `AVCloud` 类包含了相关的静态方法，实例如下：
 
-```
+```cs
 //第一步，先请求发送，如果手机号无效则会发送失败。
 public void RequestSMSCode()
 {
@@ -537,7 +540,7 @@ public void RequestSMSCode()
 ```
 如果开发者想简单地自定义短信的内容，可以调用另外一个版本，如下：
 
-```
+```cs
 public void RequestSMSCodeWithCustomParameters()
 {
    var task=AVCloud.RequestSMSCode ("18688888888","PP打车","叫车服务",8).ContinueWith(t=>
@@ -556,7 +559,7 @@ public void RequestSMSCodeWithCustomParameters()
 
 以上是调用发送，下一步就是验证。
 
-```
+```cs
 public void VerifySMSCode(string mobileNumber,string code)
 {
 	var task=AVCloud.VerifySmsCode (mobileNumber,code).ContinueWith(t=>
@@ -576,12 +579,12 @@ public void VerifySMSCode(string mobileNumber,string code)
 ##### 语音短信验证码
 文本短信验证码在到达率上有一定的风险，尽管经过我们长期得到的用户反馈，到达率已接近 100%，但是有些应用的时效性和安全性要求极高，所以我们也推出了语音短信验证码的服务，调用的方式如下：
 
-```
+```cs
 await AVCloud.RequestVoiceCode ("18688888888");
 ```
 发送成功之后，用户的手机就会收到一段语音通话，它会播报 6 位数的验证码，然后开发者需要再次调用：
 
-```
+```cs
 AVCloud.VerifySmsCode ("18688888888","012345")
 ```
 再次验证用户输入的验证码是否正确。
@@ -592,11 +595,12 @@ AVCloud.VerifySmsCode ("18688888888","012345")
 ### 当前用户
 诚如所有移动应用一样当前用户一直是被在客户端视作持久化存储处理，比如手机QQ等流行的App，LeanCloud必然也会如此为开发者解决持久化存储当前用户，只要调用了`登录`相关的接口，当前用户就会被持久化存储在客户端。
 
-```
+```cs
 var user = AVUser.CurrentUser;
 ```
 如果调用了登出接口，那么当前用户就会被清除，并置为`null`：
-```
+
+```cs
 AVUser.LogOut();
 var user = AVUser.CurrentUser;	//如此做就会抛出异常，因为登出之后，CurrentUser已经为空。
 ```
@@ -605,9 +609,11 @@ var user = AVUser.CurrentUser;	//如此做就会抛出异常，因为登出之�
 #### 邮箱重置
 密码管理一直是移动应用的比较通用又比较繁琐的事情，LeanCloud也为开发者提供了一套通用的解决方案，将开发者从繁琐中解脱出来。
 当用户忘记密码的时候，开发者完全可以在客户端做一个简单的按钮，然后做一些友好的页面，但是真正实现重置密码的功能只需要如下一段代码：
-```
+
+```cs
 await AVUser.RequestPasswordResetAsync(user.Email);
 ```
+
 这样服务端就会再次发送重置密码的邮件，开发者只要引导用户登录邮箱，进行操作就完成了。
 
 {% if node != 'qcloud' and node != 'us' %}
@@ -615,13 +621,13 @@ await AVUser.RequestPasswordResetAsync(user.Email);
 如果用户的手机是有效地，并且已经通过了验证码验证手机的有效性，那么开发者可以提供另一种在手机上体验较好的方式：通过短信验证码重置密码。具体实例如下：
 首先，需要发送一个请求到服务端去发送6位数的验证码：
 
-```
+```cs
 var smsCodeResetPasswordTask =	AVUser.RequestPasswordResetBySmsCode ("138012345678");//只需要手机号即可，服务端会自动寻找与之匹配的用户，如果没有用户与此手机号绑定，将会提示错误信息。
 await smsCodeResetPasswordTask；
 ```
 发送之后，再给一个界面给用户，让用户输入6位数的短信验证码，并且同时输入新的密码，然后如下调用：
 
-```
+```cs
 var resetTask = AVUser.ResetPasswordBySmsCode(NewPassword,SMSCode);//第一个参数是新密码（明文传递，请放心我们传输的时候做了加密，并且在服务端也绝不可能明文存储），第二个参数是上一步发送到用户手机的6位数验证码。
 await resetTask；
 ```
@@ -634,7 +640,7 @@ await resetTask；
 
 用户既然是个特殊的 `AVObject`，它当然也具备了 `AVObject` 的一些共同特性，很多场景下，关于用户的操作，首先就是通过条件查询，把符合特定条件的用户查询到客户端进行展现或者一些修改之类的操作。
 
-```
+```cs
 await AVUser.Query.WhereEqualTo("gender", "female").FindAsync().ContinueWith(t =>
 {
      IEnumerable<AVUser> women = t.Result;
@@ -646,7 +652,7 @@ await AVUser.Query.WhereEqualTo("gender", "female").FindAsync().ContinueWith(t =
 ### 用户安全数据的认证规则
 很多时候，就算是开发者也不要轻易修改用户的基本信息，比如用户的一些比较敏感的个人信息，例如手机号，社交账号等，这些都应该让用户在App中自行修改，所以为了用户数据的数据有且仅有自己在登录的情况下得以修改，LeanCloud服务端对所有针对 `AVUser` 对象的数据做了验证。
 
-```
+```cs
 AVUser user = null;
 await AVUser.LogInAsync("demoUser", "asvscloud").ContinueWith(t =>
 {
@@ -691,11 +697,12 @@ await AVUser.LogInAsync("demoUser", "asvscloud").ContinueWith(t =>
 ### 默认访问权限
 在没有显式指定的情况下，LeanCloud 中的每一个对象都会有一个默认的 ACL 值。这个值代表了，所有的用户，对这个对象都是可读可写的。此时你可以在数据管理的表中 ACL 属性中看到这样的值:
 
-```
+```cs
   {"*":{"read":true,"write":true}}
 ```
 在.NET SDK中创建符合默认的开放读写权限的`AVACL`的代码如下：
-```
+
+```cs
 var defaultACL = new AVACL();
 defaultACL.PublicWriteAccess = true;
 defaultACL.PublicReadAccess = true;
@@ -706,7 +713,7 @@ defaultACL.PublicReadAccess = true;
 当一个用户在实现一个网盘类应用时，针对不同文件的私密性，用户就需要不同的文件访问权限。 譬如公开的文件，每一个其他用户都有读的权限，然后仅仅只有创建者才拥有更改和删除的权限。
 
 
-```
+```cs
 byte[] data = System.Text.Encoding.UTF8.GetBytes("AVOSCloud is a great cloud service!");
 AVFile file = new AVFile("mytxtFile.txt", data, new Dictionary<string, object>()
     {
@@ -735,7 +742,7 @@ await book.SaveAsync();
 
 指定用户访问权限虽然很方便，但是依然会有局限性。 以工资系统为例，一家公司的工资系统，工资最终的归属者和公司的出纳们只拥有工资的读权限，而公司的人事和老板才拥有全部的读写权限。当然你可以通过多次设置指定用户的访问权限来实现这一功能（多个用户的 ACL 设置是追加的而非覆盖）。
 
-```
+```cs
 AVObject salary = new AVObject("salary");
 salary["value"] = 2000000;
 
@@ -759,7 +766,7 @@ await salary.SaveAsync();
 但是这些涉及其中的人可能不止一个，也有离职换岗新员工的问题存在。这样的代码既不优雅，也太啰嗦, 同样会很难维护。 这个时候我们就引入了 `AVRole` 来解决这个问题。 公司的员工可以成百上千，然而一个公司组织里的角色却能够在很长一段时间时间内相对稳定。
 
 
-```
+```cs
 AVObject salary = new AVObject("salary");
 salary["value"] = 2000000;
 
@@ -884,7 +891,7 @@ await Task.WhenAll(saveUsersTask).ContinueWith(t =>
 AVFile可以让你的应用程序将文件存储到服务器中，比如常见的文件类型图像文件、影像文件、音乐文件和任何其他二进制数据都可以使用。
 在这个例子中，我们将一段文本保存到服务器端：
 
-```
+```cs
 byte[] data = System.Text.Encoding.UTF8.GetBytes(“ LeanCloud is a great cloud service!”);
 AVFile file = new AVFile("mytxtFile.txt", data, new Dictionary<string, object>()
 {
@@ -910,7 +917,7 @@ AVFile构造函数的第一个参数指定文件名称，第二个构造函数�
 
 在.NET SDK中，如果很清楚地知道某一个文件所存在的路径，比如在游戏中上传一张游戏截图到LeanCloud中，可以通过SDK直接获取指定的文件，上传到LeanCloud中。
 
-```
+```cs
 AVFile localFile = AVFile.CreateFileWithLocalPath("screenshot.PNG", Path.Combine("<Local Folder Path>", "screenshot.PNG"));
 ```
 之后的操作与上一节类似。
@@ -918,7 +925,8 @@ AVFile localFile = AVFile.CreateFileWithLocalPath("screenshot.PNG", Path.Combine
 ### 文件元信息
 
 AVFile默认会存储文件大小和文件上传者objectId作为元信息。同样的，我们提供了一个字典接口帮助开发者可以为任意文件添加任意符合字典命名规则的自定义元数据。在本小节的第一个例子了已经为文件添加了一个自定义的元数据：
-```
+
+```cs
  AVFile file = new AVFile("mytxtFile.txt", data, new Dictionary<string, object>()
  {
      {"author","AVOSCloud"}
@@ -928,16 +936,16 @@ AVFile默认会存储文件大小和文件上传者objectId作为元信息。同
 
 你还可以在上传前自动一些元信息保存起来，以便后续获取，例如我们还保存图片的高度和宽度：
 
-```
- file.MetaData.Add("width", 100);
- file.MetaData.Add("height", 100);
+```cs
+file.MetaData.Add("width", 100);
+file.MetaData.Add("height", 100);
 ```
 
 ### 下载文件
 
 下载文件其实跟获取单个普通对象一样，首先必须知道这个文件的`objectdId`，或者你可以通过条件查询先获取这个`objectdId`，然后调用` AVFile.GetFileWithObjectIdAsync`方法首先实例化文件对象，然后就可以下载：
 
-```
+```cs
 await AVFile.GetFileWithObjectIdAsync("538ed669e4b0e335f6102809").ContinueWith(t =>
    {
        var file = t.Result;
@@ -952,7 +960,7 @@ await AVFile.GetFileWithObjectIdAsync("538ed669e4b0e335f6102809").ContinueWith(t
 
 **删除文件就意味着，执行之后在数据库中立刻删除记录，并且原始文件也会从存储仓库中删除（所有涉及到物理级别删除的操作请谨慎使用）**
 
-```
+```cs
  await  AVFile.GetFileWithObjectIdAsync("538ed669e4b0e335f6102809").ContinueWith(t =>
    {
       var file = t.Result;
@@ -964,7 +972,7 @@ await AVFile.GetFileWithObjectIdAsync("538ed669e4b0e335f6102809").ContinueWith(t
 
 调用云引擎在SDK中比较方便，它是 `AVCloud` 的静态方法，全局均可调用。
 
-```
+```cs
 var dic = new Dictionary<string, object>();
 dic.Add("name", "Justin");
 //...
@@ -977,19 +985,20 @@ await callTask;
 只需要传入云引擎中函数的名字和这个函数需要参数即可，如果是无参的函数，直接传入`null`即可。
 
 ## 自定义参数
+
 {% if node=='qcloud' %}
 在控制台的`自定义参数设置`页面可以设置一些静态的全局共享的参数，他们都是键值对的格式，在 SDK 中提供了获取这些在线参数的方法：
 {% else %}
 在控制台的[自定义参数设置](/devcomponent.html?appid={{appid}}#/component/custom_param)页面可以设置一些静态的全局共享的参数，他们都是键值对的格式，在 SDK 中提供了获取这些在线参数的方法：
 {% endif %}
 
-```
+```cs
 IDictionary<string, object> cp=await AVCloud.GetCustomParameters();
 ```
 ## 消息推送
 ### 推送给所有的设备
 
-```
+```cs
 AVPush push = new AVPush();
 push.Alert = "message to all devices.";
 var task = push.SendAsync();
@@ -1000,7 +1009,7 @@ await task;
 ### 发送给特定的用户
 发送给public频道的用户：
 
-```
+```cs
  AVPush push = new AVPush();
  push.Alert = "message to public channel.";
  push.Query = new AVQuery<AVInstallation>().WhereEqualTo("channels", "public");
