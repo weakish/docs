@@ -22,88 +22,88 @@
 
 {{ docs.langSpecStart('js') }}
 
-| Conversation 属性名      | _Conversation 字段 | 含义                        |
-| --------------------- | ---------------- | ------------------------- |
-| `id`                  | `objectId`       | 全局唯一的 Id                  |
-| `name`                | `name`           | 成员共享的统一的名字                |
-| `members`             | `m`              | 成员列表                      |
-| `creator`             | `c`              | 对话创建者                     |
-| `transient`           | `tr`             | 是否为聊天室（暂态对话）              |
-| `system`              | `sys`            | 是否为服务号（系统对话）                   |
-| `mutedMembers`        | `mu`             | 静音该对话的成员                  |
-| `muted`               | N/A              | 当前用户是否静音该对话               |
-| `createdAt`           | `createdAt`      | 创建时间                      |
-| `updatedAt`           | `updatedAt`      | 最后更新时间                    |
-| `lastMessageAt`       | `lm`             | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
-| `lastMessage`         | N/A              | 最后一条消息，可能会空               |
-| `unreadMessagesCount` | N/A              | 未读消息数                     |
-| `lastDeliveredAt`     | N/A              | （仅限单聊）最后一条已送达对方的消息时间 |
-| `lastReadAt`          | N/A              | （仅限单聊）最后一条对方已读的消息时间 |
+| Conversation 属性名   | _Conversation 字段 | 含义                                               |
+| --------------------- | ------------------ | -------------------------------------------------- |
+| `id`                  | `objectId`         | 全局唯一的 Id                                      |
+| `name`                | `name`             | 成员共享的统一的名字                               |
+| `members`             | `m`                | 成员列表                                           |
+| `creator`             | `c`                | 对话创建者                                         |
+| `transient`           | `tr`               | 是否为聊天室（暂态对话）                           |
+| `system`              | `sys`              | 是否为服务号（系统对话）                           |
+| `mutedMembers`        | `mu`               | 静音该对话的成员                                   |
+| `muted`               | N/A                | 当前用户是否静音该对话                             |
+| `createdAt`           | `createdAt`        | 创建时间                                           |
+| `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
+| `lastMessageAt`       | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
+| `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
+| `unreadMessagesCount` | N/A                | 未读消息数                                         |
+| `lastDeliveredAt`     | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `lastReadAt`          | N/A                | （仅限单聊）最后一条对方已读的消息时间             |
 
 {{ docs.langSpecEnd('js') }}
 
 {{ docs.langSpecStart('objc') }}
 
-| AVIMConversation 属性名 | _Conversation 字段 | 含义           |
-| -------------------- | ---------------- | ------------ |
-| `conversationId`     | `objectId`       | 全局唯一的 Id     |
-| `name`               | `name`           | 成员共享的统一的名字   |
-| `members`            | `m`              | 成员列表         |
-| `creator`            | `c`              | 对话创建者        |
-| `attributes`         | `attr`           | 自定义属性        |
-| `transient`          | `tr`             | 是否为聊天室（暂态对话） |
-| `createdAt`           | `createdAt`      | 创建时间                      |
-| `updatedAt`           | `updatedAt`      | 最后更新时间                    |
-| `system`              | `sys`            | 是否为系统对话                   |
-| `lastMessageAt`       | `lm`             | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
-| `lastMessage`         | N/A              | 最后一条消息，可能会空               |
-| `muted`               | N/A              | 当前用户是否静音该对话               |
-| `unreadMessagesCount` | N/A              | 未读消息数                     |
-| `lastDeliveredAt`     | N/A              | （仅限单聊）最后一条已送达对方的消息时间 |
-| `lastReadAt`          | N/A              | （仅限单聊）最后一条对方已读的消息时间 |
+| AVIMConversation 属性名 | _Conversation 字段 | 含义                                               |
+| ----------------------- | ------------------ | -------------------------------------------------- |
+| `conversationId`        | `objectId`         | 全局唯一的 Id                                      |
+| `name`                  | `name`             | 成员共享的统一的名字                               |
+| `members`               | `m`                | 成员列表                                           |
+| `creator`               | `c`                | 对话创建者                                         |
+| `attributes`            | `attr`             | 自定义属性                                         |
+| `transient`             | `tr`               | 是否为聊天室（暂态对话）                           |
+| `createdAt`             | `createdAt`        | 创建时间                                           |
+| `updatedAt`             | `updatedAt`        | 最后更新时间                                       |
+| `system`                | `sys`              | 是否为系统对话                                     |
+| `lastMessageAt`         | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
+| `lastMessage`           | N/A                | 最后一条消息，可能会空                             |
+| `muted`                 | N/A                | 当前用户是否静音该对话                             |
+| `unreadMessagesCount`   | N/A                | 未读消息数                                         |
+| `lastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `lastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间             |
 
 {{ docs.langSpecEnd('objc') }}
 
 {{ docs.langSpecStart('java') }}
 
-| AVIMConversation 属性名 | _Conversation 字段 | 含义                       |
-| -------------------- | ---------------- | ------------------------ |
-| `conversationId`     | `objectId`       | 全局唯一的 Id                 |
-| `name`               | `name`           | 成员共享的统一的名字               |
-| `members`            | `m`              | 成员列表                     |
-| `creator`            | `c`              | 对话创建者                    |
-| `attributes`         | `attr`           | 自定义属性                    |
-| `isTransient`        | `tr`             | 是否为聊天室（暂态对话）             |
-| `lastMessageAt`      | `lm`             | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
-| `lastMessage`         | N/A              | 最后一条消息，可能会空               |
-| `muted`               | N/A              | 当前用户是否静音该对话               |
-| `unreadMessagesCount` | N/A              | 未读消息数                     |
-| `lastDeliveredAt`     | N/A              | （仅限单聊）最后一条已送达对方的消息时间 |
-| `lastReadAt`          | N/A              | （仅限单聊）最后一条对方已读的消息时间 |
-| `createdAt`           | `createdAt`      | 创建时间                      |
-| `updatedAt`           | `updatedAt`      | 最后更新时间                    |
-| `system`              | `sys`            | 是否为系统对话                   |
+| AVIMConversation 属性名 | _Conversation 字段 | 含义                                             |
+| ----------------------- | ------------------ | ------------------------------------------------ |
+| `conversationId`        | `objectId`         | 全局唯一的 Id                                    |
+| `name`                  | `name`             | 成员共享的统一的名字                             |
+| `members`               | `m`                | 成员列表                                         |
+| `creator`               | `c`                | 对话创建者                                       |
+| `attributes`            | `attr`             | 自定义属性                                       |
+| `isTransient`           | `tr`               | 是否为聊天室（暂态对话）                         |
+| `lastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
+| `lastMessage`           | N/A                | 最后一条消息，可能会空                           |
+| `muted`                 | N/A                | 当前用户是否静音该对话                           |
+| `unreadMessagesCount`   | N/A                | 未读消息数                                       |
+| `lastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间         |
+| `lastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间           |
+| `createdAt`             | `createdAt`        | 创建时间                                         |
+| `updatedAt`             | `updatedAt`        | 最后更新时间                                     |
+| `system`                | `sys`              | 是否为系统对话                                   |
 
 {{ docs.langSpecEnd('java') }}
 
 {{ docs.langSpecStart('cs') }}
 
-| AVIMConversation 属性名 | _Conversation 字段 | 含义                        |
-| -------------------- | ---------------- | ------------------------ |
-| `Id`                 | `objectId`       | 全局唯一的 Id                   |
-| `Name`               | `name`           | 成员共享的统一的名字              |
-| `MemberIds`          | `m`              | 成员列表                        |
-| `MuteMemberIds`      | `mu`             | 静音该对话的成员                 |
-| `Creator`            | `c`              | 对话创建者                      |
-| `IsTransient`        | `tr`             | 是否为聊天室（暂态对话）           |
-| `IsUnique`           | `unique`         | 是否为相同成员的唯一对话（暂态对话）    |
-| `IsSystem`           | `sys`            | 是否为系统对话                   |
-| `LastMessageAt`      | `lm`             | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
-| `LastMessage`        | N/A              | 最后一条消息，可能会空               |
-| `LastDeliveredAt`    | N/A              | （仅限单聊）最后一条已送达对方的消息时间 |
-| `LastReadAt`         | N/A              | （仅限单聊）最后一条对方已读的消息时间 |
-| `CreatedAt`          | `createdAt`      | 创建时间                      |
-| `UpdatedAt`          | `updatedAt`      | 最后更新时间                    |
+| AVIMConversation 属性名 | _Conversation 字段 | 含义                                             |
+| ----------------------- | ------------------ | ------------------------------------------------ |
+| `Id`                    | `objectId`         | 全局唯一的 Id                                    |
+| `Name`                  | `name`             | 成员共享的统一的名字                             |
+| `MemberIds`             | `m`                | 成员列表                                         |
+| `MuteMemberIds`         | `mu`               | 静音该对话的成员                                 |
+| `Creator`               | `c`                | 对话创建者                                       |
+| `IsTransient`           | `tr`               | 是否为聊天室（暂态对话）                         |
+| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话（暂态对话）             |
+| `IsSystem`              | `sys`              | 是否为系统对话                                   |
+| `LastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
+| `LastMessage`           | N/A                | 最后一条消息，可能会空                           |
+| `LastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间         |
+| `LastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间           |
+| `CreatedAt`             | `createdAt`        | 创建时间                                         |
+| `UpdatedAt`             | `updatedAt`        | 最后更新时间                                     |
 
 {{ docs.langSpecEnd('cs') }}
 
@@ -313,17 +313,87 @@ var conversationBuilder = tom.GetConversationBuilder().SetName("三年二班")
 var conversation = await tom.CreateConversationAsync(conversationBuilder);
 ```
 
-#### 通过名字来找到同学群
+#### 通过查询加入同学群
 
-参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)
+此时，有两种方式可以实现精准查找：
 
-#### 直接加入同学的群
+1. 在控制台为 `_Conversation` 设置 `name` 字段的唯一索引，这样其他人再创建 `三年二班` 的同名对话就会报错
+2. 开发者自己可以自定义一个 `uniqueId` 的唯一字段（可由客户端算法生成或者请求一个云函数来生成，类似 QQ 群号），然后就通过这个号码来查找
 
-参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)
+下面演示的是第一种，**假设 `name` 字段上有唯一索引**：
 
-### 添加其他同学
+```js
+tom.getQuery().equalTo('name', '三年二班').find().then(function(conversations) {
+  var schoolmateGroup = conversations[0];
+  return schoolmateGroup.join();
+}).catch(console.error.bind(console));
+```
+```objc
+AVIMConversationQuery *query = [tom conversationQuery];
+[query whereKey:@"name" equalTo:@"三年二班"];
+[query findConversationsWithCallback:^(NSArray *conversations, NSError *error) {
+    AVIMConversation *schoolmateGroup = (AVIMConversation *)[conversations objectAtIndex:0];
+    [conversation joinWithCallback:^(BOOL succeeded, NSError *error) {
+        if (succeeded) {
+            NSLog(@"加入成功！");
+        }
+    }];
+}];
+```
+```java
+AVIMConversationsQuery query = client.getConversationsQuery();
+conversationQuery.whereEqualTo("name", "三年二班");
+query.findInBackground(new AVIMConversationQueryCallback(){
+    @Override
+    public void done(List<AVIMConversation> conversations,AVIMException e){
+      if(e==null){
+        AVIMConversation schoolmateGroup = conversations.get(0);
+        schoolmateGroup.join(new AVIMConversationCallback(){
+            @Override
+            public void done(AVIMException e){
+                if(e==null){
+                //加入成功
+                }
+            }
+        });        
+      }
+    }
+});
+```
+```cs
+var query = tom.GetQuery().WhereEqualTo("name", "三年二班");
+var schoolmateGroup = await query.FirstAsync();
+await schoolmateGroup.JoinAsync();
+```
 
-参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)
+#### 添加其他同学
+
+通过如下代码就可以直接将对应的 `clientId` 加入到同学群中：
+
+```js
+return conversation.add(['Harry']).then(function(conversation) {
+  console.log('添加成功');
+}).catch(console.error.bind(console));
+```
+```objc
+[conversation addMembersWithClientIds:@[@"Harry"] callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"邀请成功！");
+    }
+}];
+```
+```java
+conv.addMembers(Arrays.asList("Harry"), new AVIMConversationCallback() {
+    @Override
+    public void done(AVIMException e) {
+      // 添加成功
+    }
+});
+```
+```cs
+await schoolmateGroup.InviteAsync(new string[]{ "Harry" });
+```
+
 
 ### 聊天室
 
@@ -375,9 +445,22 @@ var chatRoomBuilder = tom.GetConversationBuilder().SetName("聊天室")
 var chatRoom = await tom.CreateConversationAsync(chatRoomBuilder);
 ```
 
-### 加入/离开/邀请他人加入聊天室
+#### 查找聊天室列表
 
-与普通对话的对应接口没有区别，详细请参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)。最大的区别就是：
+与查找普通对话不同查找聊天室需要额外设置一个条件:
+
+```js
+```
+```objc
+```
+```java
+```
+```cs
+```
+
+#### 加入/离开/邀请他人加入聊天室
+
+查询到聊天室之后，加入/离开/邀请他人加入聊天室与普通对话的对应接口没有区别，详细请参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)。最大的区别就是：
 
 > 聊天室没有成员加入、成员离开的通知
 
@@ -748,11 +831,11 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 ### 消息等级
 为了保证消息的时效性，当聊天室消息过多导致客户端连接堵塞时，服务器端会选择性地丢弃部分低等级的消息。目前支持的消息等级有：
 
-消息等级 | 描述
----------|-----
-`MessagePriority.HIGH`    | 高等级，针对时效性要求较高的消息，比如直播聊天室中的礼物，打赏等。
-`MessagePriority.NORMAL`  | 正常等级，比如普通非重复性的文本消息。
-`MessagePriority.LOW`     | 低等级，针对时效性要求较低的消息，比如直播聊天室中的弹幕。
+| 消息等级                 | 描述                                                               |
+| ------------------------ | ------------------------------------------------------------------ |
+| `MessagePriority.HIGH`   | 高等级，针对时效性要求较高的消息，比如直播聊天室中的礼物，打赏等。 |
+| `MessagePriority.NORMAL` | 正常等级，比如普通非重复性的文本消息。                             |
+| `MessagePriority.LOW`    | 低等级，针对时效性要求较低的消息，比如直播聊天室中的弹幕。         |
 
 消息等级在发送接口的参数中设置。以下代码演示了如何发送一个高等级的消息：
 
@@ -779,7 +862,9 @@ AVIMTextMessage  message = new AVIMTextMessage();
 message.setText(content);
 List<String> list = new ArrayList<>(); // 部分用户的 mention list，你可以向下面代码这样来填充
 list.add("Tom");
-
+message.setMentionList(list);
+AVIMMessageOption option = new AVIMMessageOption();
+option.setReceipt(true);
 imConversation.sendMessage(message, option, new AVIMConversationCallback() {
    @Override
    public void done(AVIMException e) {
@@ -812,6 +897,10 @@ AVIMTextMessage  message = new AVIMTextMessage();
 message.setText(content);
 
 boolean mentionAll = true;// 指示是否 mention 了所有人
+message.mentionAll(mentionAll);
+
+AVIMMessageOption option = new AVIMMessageOption();
+option.setReceipt(true);
 
 imConversation.sendMessage(message, option, new AVIMConversationCallback() {
    @Override
@@ -922,6 +1011,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 ```
 
 ### 消息的撤回和修改
+
 
 ### 客户端消息缓存与重发
 

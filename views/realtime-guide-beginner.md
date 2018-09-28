@@ -800,7 +800,7 @@ William 加入|`MEMBERS_JOINED`|`MEMBERS_JOINED`|/|`MEMBERS_JOINED`
 Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
 
 
-### 其他聊天模式
+### 其他对话类型（聊天模式）
 
 即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外,即时通讯也支持但不限于如下中流行的通讯模式：
 
