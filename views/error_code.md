@@ -26,7 +26,7 @@
 ## 101
 
 * 信息 - `Object doesn't exist, or has an incorrect password.`
-* 含义 - 查询的 Class 不存在，或者要关联的 Pointer 对象不存在。
+* 含义 - 对象不存在，或者密码不正确。
 
 ## 103
 

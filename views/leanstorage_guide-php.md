@@ -29,7 +29,6 @@
 {% set relation_guide_url = "（PHP 文档待补充）" %}
 {% set inapp_search_guide_url = "（PHP SDK 暂不支持）" %}
 {% set status_system_guide_url = "（PHP SDK 暂不支持）" %}
-{% set sns_guide_url = "（PHP 文档待补充）" %}
 {% set feedback_guide_url = "（PHP SDK 暂不支持）" %}
 
 {# --End--变量定义，主模板使用的单词，短语的定义所有子模板都必须赋值 #}

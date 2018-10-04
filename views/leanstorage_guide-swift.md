@@ -26,7 +26,6 @@
 {% set sms_guide_url = "[Objective-C 短信服务使用指南（Swift 文档待补充）](sms-guide.html#注册验证)" %}
 {% set inapp_search_guide_url = "[Objective-C 应用内搜索指南](app_search_guide.html)" %}
 {% set status_system_guide_url = "[Objective-C 应用内社交模块](status_system.html#iOS_SDK)" %}
-{% set sns_guide_url = "[Objective-C SNS 开发指南](sns.html#iOS_SNS_组件)" %}
 {% set feedback_guide_url = "[Objective-C 用户反馈指南](feedback.html#iOS_反馈组件)" %}
 {% set funtionName_whereKeyHasPrefix = "whereKey:hasPrefix:" %}
 {% set saveOptions_query= "where" %}
