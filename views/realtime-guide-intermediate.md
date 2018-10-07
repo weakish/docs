@@ -438,8 +438,9 @@ tom.createChatRoom(null, "聊天室", null,
 });
 ```
 ```cs
+// 第一种是最直接间接的方式，传入 name 即可
 tom.CreateChatRoomAsync("聊天室");
-// 更推荐用如下 Builder 模式
+// 第二种是更为推荐的形式采用 Builder 模式
 var chatRoomBuilder = tom.GetConversationBuilder().SetName("聊天室")
                               .SetTransient();
 var chatRoom = await tom.CreateConversationAsync(chatRoomBuilder);
@@ -536,6 +537,46 @@ var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
 由于历史原因，AVIMConversationQuery 只能检索 _Conversation 表中 attr 列中的属性，而不能完整检索 _Conversation 表的其他自定义属性，所以在 v4.1.1 版本之后被废弃。v4.1.1 后请使用 AVIMConversation**s**Query 来完成相关查询。AVIMConversationsQuery 在查询属性时不会再自动添加 attr 前缀，如果开发者需要查询 _Conversation 表中 attr 列中具体属性，请自行添加 attr 前缀。
 {{ docs.langSpecEnd('java') }}
 
+### 根据条件查询
+
+SDK 提供了各种条件查询方式，可以满足各种对话查询的需求，首先从最简单的 `equalTo` 开始。
+
+有如下需求：需要查询所有对话的一个自定义属性 `type`(字符串类型) 为 `private` 的对话需要如下代码：
+
+```js
+```
+```objc
+```
+```java
+```
+```cs
+```
+
+与 `equalTo` 类似，针对 number 和 date 类型的属性还可以使用大于、大于等于、小于、小于等于等，详见下表：
+
+{{ docs.langSpecStart('js') }}
+
+| 逻辑操作 | ConversationQuery 方法 |      |
+| ---- | ------------------------ | ---- |
+| 等于   | `equalTo`                |      |
+| 不等于  | `notEqualTo`             |      |
+| 大于   | `greaterThan`            |      |
+| 大于等于 | `greaterThanOrEqualTo`   |      |
+| 小于   | `lessThanOrEqualTo`      |      |
+| 小于等于 | `lessThanOrEqualTo`      |      |
+
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('objc') }}
+| 逻辑操作 | AVIMConversationQuery 方法 |      |
+| ---- | ------------------------ | ---- |
+| 等于   | `equalTo`                |      |
+| 不等于  | `notEqualTo`             |      |
+| 大于   | `greaterThan`            |      |
+| 大于等于 | `greaterThanOrEqualTo`   |      |
+| 小于   | `lessThanOrEqualTo`      |      |
+| 小于等于 | `lessThanOrEqualTo`      |      |
+{{ docs.langSpecEnd('objc') }}
 
 ### 对话的有效期
 
@@ -1012,10 +1053,204 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 ### 消息的撤回和修改
 
+> 需要在 控制台 > 消息 > 设置 中启用「聊天服务，对消息启用撤回功能」。
 
-### 客户端消息缓存与重发
+Tom 要撤回一条已发送的消息：
+
+```js
+conversation.recall(oldMessage).then(function(recalledMessage) {
+  // 修改成功
+  // recalledMessage is an RecalledMessage
+}).catch(function(error) {
+  // 异常处理
+});
+```
+```objc
+AVIMMessage *oldMessage = <#MessageYouWantToRecall#>;
+
+[conversation recallMessage:oldMessage callback:^(BOOL succeeded, NSError * _Nullable error, AVIMRecalledMessage * _Nullable recalledMessage) {
+    if (succeeded) {
+        NSLog(@"Message has been recalled.");
+    }
+}];
+```
+```java
+conversation.recallMessage(message, new AVIMMessageRecalledCallback() {
+    @Override
+    public void done(AVIMRecalledMessage recalledMessage, AVException e) {
+        if (null == e) {
+            // 消息撤回成功，可以更新 UI
+        }
+    }
+});
+```
+```cs
+await conversation.RecallAsync(message);
+```
+
+对应的是接收方会触发 `Event.MESSAGE_RECALL` 的事件：
+
+```js
+var { Event } = require('leancloud-realtime');
+conversation.on(Event.MESSAGE_RECALL, function(recalledMessage) {
+  // recalledMessage 为已撤回的消息
+  // 在视图层可以通过消息的 id 找到原来的消息并用 recalledMessage 替换
+});
+```
+```objc
+/* 实现 delegate 方法，以处理消息修改和撤回的事件 */
+- (void)conversation:(AVIMConversation *)conversation messageHasBeenUpdated:(AVIMMessage *)message {
+    /* A message has been updated or recalled. */
+
+    switch (message.mediaType) {
+    case kAVIMMessageMediaTypeRecalled:
+        NSLog(@"message 是一条撤回消息");
+        break;
+    default:
+        NSLog(@"message 是一条更新消息");
+        break;
+    }
+}
+```
+```java
+void onMessageRecalled(AVIMClient client, AVIMConversation conversation, AVIMMessage message) {
+  // message 即为被撤回的消息
+}
+```
+```cs
+tom.OnMessageRecalled += Tom_OnMessageRecalled;
+private void Tom_OnMessageRecalled(object sender, AVIMMessagePatchEventArgs e)
+{
+    // e.Messages 为被修改的消息，它是一个集合，SDK 可能会合并多次的消息撤回统一分发
+}
+```
+
+Tom 要修改一条已发送的消息：
+
+```js
+var newMessage = new TextMessage('new message');
+conversation.update(oldMessage, newMessage).then(function() {
+  // 修改成功
+}).catch(function(error) {
+  // 异常处理
+});
+```
+```objc
+AVIMMessage *oldMessage = <#MessageYouWantToUpdate#>;
+AVIMMessage *newMessage = [AVIMTextMessage messageWithText:@"Just a new message" attributes:nil];
+
+[conversation updateMessage:oldMessage
+                    toNewMessage:newMessage
+                        callback:^(BOOL succeeded, NSError * _Nullable error) {
+                            if (succeeded) {
+                                NSLog(@"Message has been updated.");
+                            }
+}];
+```
+```java
+AVIMTextMessage textMessage = new AVIMTextMessage();
+textMessage.setContent("修改后的消息");
+imConversation.updateMessage(oldMessage, textMessage, new AVIMMessageUpdatedCallback() {
+  @Override
+  public void done(AVIMMessage avimMessage, AVException e) {
+    if (null == e) {
+      // 消息修改成功，avimMessage 即为被修改后的最新的消息
+    }
+  }
+});
+```
+```cs
+// 直接修改对应的内容
+textMessage.TextContent = "修改之后的文本消息内容";
+// 将修改后的消息传入 ModifyAsync
+conversation.ModifyAsync(textMessage);
+```
+
+对应的是接收方会触发 `Event.MESSAGE_UPDATE`：
+
+```js
+var { Event } = require('leancloud-realtime');
+conversation.on(Event.MESSAGE_UPDATE, function(newMessage) {
+  // newMessage 为修改后的的消息
+  // 在视图层可以通过消息的 id 找到原来的消息并用 newMessage 替换
+});
+```
+```objc
+/* 实现 delegate 方法，以处理消息修改和撤回的事件 */
+- (void)conversation:(AVIMConversation *)conversation messageHasBeenUpdated:(AVIMMessage *)message {
+    /* A message has been updated or recalled. */
+
+    switch (message.mediaType) {
+    case kAVIMMessageMediaTypeRecalled:
+        NSLog(@"message 是一条撤回消息");
+        break;
+    default:
+        NSLog(@"message 是一条更新消息");
+        break;
+    }
+}
+```
+```java
+void onMessageUpdated(AVIMClient client, AVIMConversation conversation, AVIMMessage message) {
+  // message 即为被修改的消息
+}
+```
+```cs
+tom.OnMessageModified += Tom_OnMessageModified;
+private void Tom_OnMessageModified(object sender, AVIMMessagePatchEventArgs e)
+{
+    // e.Messages  是一个集合，SDK 可能会合并多次消息修改统一分发
+}
+```
+
 
 ### 消息的离线推送通知
+
+iOS 和 Android 分别提供了内置的离线消息推送通知服务，但是使用的前提是按照推送文档配置 iOS 的推送证书和 Android 开启推送的开关，详细请阅读如下文档：
+
+
+在移动设备普及的现在，一个客户端离线是经常会出现的场景（进入地铁/电梯等无信号环境中），此时设备的离线会让消息无法通过实时地长连接送达到对方客户端，因此即时通信服务通过移动设备的消息推送功能实现了离线消息的推送通知。
+
+需要通过如下几个文档结合 LeanCloud 消息推送和即时通信来实现如上需求：
+
+1. [消息推送服务总览](push_guide.html)
+2. [Android 消息推送开发指南](android_push_guide.html)/[iOS 消息推送开发指南](ios_push_guide.html)
+3. [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)
+
+#### 自定义离线推送的内容
+
+如下代码实现的是在**发送消息时**指定离线推送的内容：
+
+```js
+var { Realtime, TextMessage } = require('leancloud-realtime');
+var realtime = new Realtime({ appId: '', region: 'cn' });
+realtime.createIMClient('Tom').then(function (host) {
+    return host.createConversation({
+        members: ['Jerry'],
+        name: 'Tom & Jerry',
+        unique: true
+    });
+}).then(function (conversation) {
+    console.log(conversation.id);
+    return conversation.send(new TextMessage('耗子，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！'), {
+        pushData: {
+            "alert": "您有一条未读的消息",
+            "category": "消息",
+            "badge": 1,
+            "sound": "声音文件名，前提在应用里存在",
+            "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
+        }
+    });
+}).then(function (message) {
+    console.log(message);
+}).catch(console.error);
+```
+
+另外一种方式是，在云引擎使用 Hook 的方式统一设置离线推送消息内容，这种方式更为推荐，当客户端平台较多的时候（例如同时有 iOS 和 Android），在服务端统一设置可以减少客户端的重复代码逻辑，可以根据所需语言选择对应的云引擎即时通信 Hook 文档：
+
+- [云引擎 PHP 即时通信 Hook#_receiversOffline](leanengine_cloudfunction_guide-php.html#_receiversOffline)
+- [云引擎 NodeJS 即时通信 Hook#_receiversOffline](leanengine_cloudfunction_guide-node.html#_receiversOffline)
+- [云引擎 Python 即时通信 Hook#_receiversOffline](leanengine_cloudfunction_guide-python.html#_receiversOffline)
 
 ## 消息记录
 
@@ -1031,6 +1266,21 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 ```
 ```cs
 ```
+
+### 客户端消息缓存
+
+iOS 和 Android SDK 针对移动应用的特殊场景，实现了客户端消息的缓存（JavaScript 和 C# 暂不支持）。
+
+客户端消息的缓存提供了如下便利：
+
+1. 客户端可以在未联网的情况下进入对话列表之后，可以获取聊天记录，提升用户体验
+2. 减少查询的次数和流量的消耗
+3. 极大地提升了消息记录的查询速度和性能
+
+而这一功能对于开发者来说是无感地：
+
+1. 无需特殊设置，只要接收到消息就会自动被缓存在客户端
+2. 修改/撤回等操作都有对本地消息缓存生效
 
 {{ docs.relatedLinks("更多文档",[
   { title: "服务总览", href: "realtime_v2.html" },

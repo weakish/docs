@@ -1099,7 +1099,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 ## 消息记录
 
-消息记录默认会在云端保存 **180** 天， SDK 提供了多种方式来获取到本地。
+消息记录默认会在云端保存 **180** 天， SDK 提供了多种方式来获取到本地。开发者可以付费来延长这一期限，请联系 support@leancloud.rocks。另外可以参考 对话的有效期。你也随时可以通过 REST API 将聊天记录同步到自己的服务器上。
 
 iOS 和 Android SDK 分别提供了内置的消息缓存机制，减少客户端对云端消息记录的查询次数，并且在离线情况下，也能查询到准确的消息记录。
 
