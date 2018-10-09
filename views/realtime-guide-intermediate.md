@@ -448,15 +448,31 @@ var chatRoom = await tom.CreateConversationAsync(chatRoomBuilder);
 
 #### 查找聊天室列表
 
-与查找普通对话不同查找聊天室需要额外设置一个条件:
+构建聊天室的查询：
 
 ```js
+var query = tom.getQuery().equalTo('tr',true);// 聊天室对象
+}).catch(console.error);
 ```
 ```objc
+AVIMConversationQuery *query = [tom conversationQuery];
+[query whereKey:@"tr" equalTo:@(YES)]; 
 ```
 ```java
+AVIMConversationsQuery query = tom.getChatRoomQuery();
+query.findInBackground(new AVIMConversationQueryCallback() {
+    @Override
+    public void done(List<AVIMConversation> conversations, AVIMException e) {
+        if (null != e) {
+            // 获取成功
+        } else {
+          // 获取失败
+        }
+    }
+});
 ```
 ```cs
+var query = tom.GetChatRoomQuery();
 ```
 
 #### 加入/离开/邀请他人加入聊天室
@@ -474,26 +490,63 @@ var chatRoom = await tom.CreateConversationAsync(chatRoomBuilder);
 1. 服务号的订阅必须确保是由服务端发起，而客户端可以通过访问服务端的 API 去订阅一个服务号
 2. 在服务号里，既可以给所有订阅者发送消息，也可以单独某一个或者某几个用户发消息
 
-
-####  服务号实例 - 企业公众号
-
-创建 LeanCloud 企业公众号：
-
-```js
-```
-```objc
-```
-```java
-```
-```cs
-```
-
-订阅该公众号：
+其他操作与普通对话无异，更多功能请查看[即时通讯 - 服务号开发指南](realtime-service-account.html)。
 
 
 ### 临时对话
 
+临时对话最大的特点是**较短的有效期**，这个特点可以解决对话的持久化存储在服务端占用的存储资源越来越大的问题，也可以应对一些临时聊天的场景。
+
 #### 临时对话实例 - 电商在线客服
+
+买家询问商品的详情，可以发起一个临时对话：
+
+```js
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.createTemporaryConversation({
+    members: ['Jerry', 'William'],
+  });
+}).then(function(conversation) {
+  return conversation.send(new AV.TextMessage('这里是临时对话'));
+}).catch(console.error);
+```
+```objc
+[tom createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
+                                                timeToLive:3600
+                                                callback:
+            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
+
+                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这里是临时对话，一小时之后，这个对话就会消失"
+                                                                    attributes:nil];
+                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+
+                    if (success) {
+                        // send message success.
+                    }
+                }];
+            }];
+```
+```java
+tom.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
+    @Override
+    public void done(AVIMConversation conversation, AVIMException e) {
+        if (null == e) {
+        AVIMTextMessage msg = new AVIMTextMessage();
+        msg.setText("这里是临时对话，一小时之后，这个对话就会消失");
+        conversation.sendMessage(msg, new AVIMConversationCallback(){
+            @Override
+            public void done(AVIMException e) {
+            }
+        });
+        }
+    }
+});
+```
+```cs
+var temporaryConversation = await tom.CreateTemporaryConversationAsync();
+```
+
+其他操作与普通对话无异，更多功能请查看[即时通讯 - 临时对话开发指南](realtime-temporary-conversation.html)。
 
 ## 对话查询
 
@@ -537,46 +590,204 @@ var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
 由于历史原因，AVIMConversationQuery 只能检索 _Conversation 表中 attr 列中的属性，而不能完整检索 _Conversation 表的其他自定义属性，所以在 v4.1.1 版本之后被废弃。v4.1.1 后请使用 AVIMConversation**s**Query 来完成相关查询。AVIMConversationsQuery 在查询属性时不会再自动添加 attr 前缀，如果开发者需要查询 _Conversation 表中 attr 列中具体属性，请自行添加 attr 前缀。
 {{ docs.langSpecEnd('java') }}
 
-### 根据条件查询
+### 基础的条件查询
+
+> 对云存储熟悉的开发者可以更容易理解对话的查询构建，因为对话查询和云存储的对象查询在接口上是十分接近的。
 
 SDK 提供了各种条件查询方式，可以满足各种对话查询的需求，首先从最简单的 `equalTo` 开始。
 
 有如下需求：需要查询所有对话的一个自定义属性 `type`(字符串类型) 为 `private` 的对话需要如下代码：
 
 ```js
+query.equalTo('type','private')
 ```
 ```objc
+[query whereKey:@"type" equalTo:@"private"];
 ```
 ```java
+query.whereEqualTo("type","private");
 ```
 ```cs
+query.WhereEqualTo("type","private");
 ```
 
 与 `equalTo` 类似，针对 number 和 date 类型的属性还可以使用大于、大于等于、小于、小于等于等，详见下表：
 
 {{ docs.langSpecStart('js') }}
 
-| 逻辑操作 | ConversationQuery 方法 |      |
+| 逻辑比较 | ConversationQuery 方法 |      |
 | ---- | ------------------------ | ---- |
 | 等于   | `equalTo`                |      |
 | 不等于  | `notEqualTo`             |      |
 | 大于   | `greaterThan`            |      |
 | 大于等于 | `greaterThanOrEqualTo`   |      |
-| 小于   | `lessThanOrEqualTo`      |      |
+| 小于   | `lessThan`      |      |
 | 小于等于 | `lessThanOrEqualTo`      |      |
 
 {{ docs.langSpecEnd('js') }}
 
 {{ docs.langSpecStart('objc') }}
-| 逻辑操作 | AVIMConversationQuery 方法 |      |
+| 逻辑比较 | AVIMConversationQuery 方法 |      |
 | ---- | ------------------------ | ---- |
 | 等于   | `equalTo`                |      |
 | 不等于  | `notEqualTo`             |      |
 | 大于   | `greaterThan`            |      |
 | 大于等于 | `greaterThanOrEqualTo`   |      |
-| 小于   | `lessThanOrEqualTo`      |      |
+| 小于   | `lessThan`      |      |
 | 小于等于 | `lessThanOrEqualTo`      |      |
 {{ docs.langSpecEnd('objc') }}
+
+{{ docs.langSpecStart('java') }}
+| 逻辑比较 | AVIMConversationQuery 方法 |      |
+| ---- | ------------------------ | ---- |
+| 等于   | `whereEqualTo`                |      |
+| 不等于  | `whereNotEqualsTo`             |      |
+| 大于   | `whereGreaterThan`            |      |
+| 大于等于 | `whereGreaterThanOrEqualsTo`   |      |
+| 小于   | `whereLessThan`      |      |
+| 小于等于 | `whereLessThanOrEqualsTo`      |      |
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('cs') }}
+| 逻辑比较 | AVIMConversationQuery 方法 |      |
+| ---- | ------------------------ | ---- |
+| 等于   | `WhereEqualTo`                |      |
+| 不等于  | `WhereNotEqualsTo`             |      |
+| 大于   | `WhereGreaterThan`            |      |
+| 大于等于 | `WhereGreaterThanOrEqualsTo`   |      |
+| 小于   | `WhereLessThan`      |      |
+| 小于等于 | `WhereLessThanOrEqualsTo`      |      |
+{{ docs.langSpecEnd('cs') }}
+
+### 正则匹配查询
+
+匹配查询是指在 `ConversationsQuery` 的查询条件中使用正则表达式来匹配数据。
+
+比如要查询所有 language 是中文的对话：
+
+```js
+query.matches('language',/[\\u4e00-\\u9fa5]/);
+```
+```objc
+[query whereKey:@"language" matchesRegex:@"[\u4e00-\u9fa5]"];
+```
+```java
+query.whereMatches("language","[\\u4e00-\\u9fa5]"); //language 是中文字符 
+```
+```cs
+query.WhereMatches("language","[\\u4e00-\\u9fa5]"); //language 是中文字符 
+```
+
+### 包含查询
+
+包含查询是指方法名字包含 `Contains` 单词的方法，例如查询关键字包含「教育」的对话：
+
+```js
+query.contains('keywords','教育');
+```
+```objc
+[query whereKey:@"keywords" containsString:@"教育"];
+```
+```java
+query.whereContains("keywords","教育"); 
+```
+```cs
+query.WhereContains("keywords","教育"); 
+```
+
+### 空值查询
+
+空值查询是指查询相关列是否为空值的方法，例如要查询 lm 列为空值的对话：
+
+```js
+query.doesNotExist('lm')
+```
+```objc
+[query whereKeyDoesNotExist:@"lm"];
+```
+```java
+query.whereDoesNotExist("lm");
+```
+```cs
+query.WhereDoesNotExist("lm");
+```
+
+如果要查询 lm 列不为空的对话，则替换为如下：
+
+```js
+query.exists('lm')
+```
+```objc
+[query whereKeyExists:@"lm"];
+```
+```java
+query.whereExists("lm");
+```
+```cs
+query.WhereExists("lm");
+```
+
+### 组合查询
+
+查询年龄小于 18 岁，并且关键字包含「教育」的对话：
+
+```js
+// 查询 keywords 包含「教育」且 age 小于 18 的对话
+query.contains('keywords', '教育').lessThan('age', 18);
+```
+```objc
+[query whereKey:@"keywords" containsString:@"教育"];
+[query whereKey:@"age" lessThan:@(18)];
+```
+```java
+query.whereContains("keywords", "教育");
+query.whereLessThan("age", 18);
+```
+```cs
+query.WhereContains("keywords", "教育");
+query.WhereLessThan("age", 18);
+```
+
+另外一种组合的方式是，两个查询采用 Or 或者 And 的方式构建一个新的查询。
+
+查询年龄小于 18 或者关键字包含「教育」的对话：
+
+```js
+// var ageQuery = tom.GetQuery();
+// ageQuery.lessThan('age', 18);
+
+// var keywordsQuery = tom.GetQuery();
+// keywordsQuery.contains('keywords', '教育').
+
+// var query = ConversationQuery.or(ageQuery,keywordsQuery);
+
+JavaScript SDK 暂不支持
+```
+```objc
+AVIMConversationQuery *ageQuery = [tom conversationQuery];
+[ageQuery whereKey:@"age" greaterThan:@(18)];
+AVIMConversationQuery *keywordsQuery = [tom conversationQuery];
+[keywordsQuery whereKey:@"keywords" containsString:@"教育"];
+AVIMConversationQuery *query = [AVIMConversationQuery orQueryWithSubqueries:[NSArray arrayWithObjects:ageQuery,keywordsQuery,nil]];
+```
+```java
+AVIMConversationsQuery ageQuery = tom.getConversationsQuery();
+ageQuery.whereLessThan('age', 18);
+
+AVIMConversationsQuery keywordsQuery = tom.getConversationsQuery();
+keywordsQuery.whereContains('keywords', '教育').
+AVIMConversationsQuery query = AVIMConversationsQuery.or(Arrays.asList(priorityQuery, statusQuery));
+```
+```cs
+var ageQuery = tom.GetQuery();
+ageQuery.WhereLessThan('age', 18);
+
+var keywordsQuery = tom.GetQuery();
+keywordsQuery.WhereContains('keywords', '教育').
+
+var query = AVIMConversationQuery.or(new AVIMConversationQuery[] { ageQuery, keywordsQuery});
+```
+
 
 ### 对话的有效期
 
@@ -775,7 +986,7 @@ await conv.SendLocationAsync(new AVGeoPoint(31.3753285, 120.9664658));
 
 如果遇到了有强需求的自定义消息，我们推荐按照如下需求分级，来选择自定义的方式：
 
-- 通过设置简单 key-value 实现一个自定义消息
+- 通过设置简单 key-value 的自定义属性实现一个消息类型
 - 通过继承内置的消息类型添加一些属性
 - 完全自由实现一个全新的消息类型
 
@@ -1232,7 +1443,7 @@ realtime.createIMClient('Tom').then(function (host) {
     });
 }).then(function (conversation) {
     console.log(conversation.id);
-    return conversation.send(new TextMessage('耗子，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！'), {
+    return conversation.send(new TextMessage('Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！'), {
         pushData: {
             "alert": "您有一条未读的消息",
             "category": "消息",
@@ -1244,6 +1455,46 @@ realtime.createIMClient('Tom').then(function (host) {
 }).then(function (message) {
     console.log(message);
 }).catch(console.error);
+```
+```objc
+AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
+option.pushData = @{@"alert" : @"您有一条未读消息", @"sound" : @"message.mp3", @"badge" : @1, @"custom-key" : @"由用户添加的自定义属性，custom-key 仅是举例，可随意替换"};
+[conversation sendMessage:[AVIMTextMessage messageWithText:@"Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // 在这里处理发送失败或者成功之后的逻辑
+}];
+```
+```java
+AVIMTextMessage msg = new AVIMTextMessage();
+msg.setText("Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！");
+
+AVIMMessageOption messageOption = new AVIMMessageOption();
+messageOption.setPushData("自定义离线消息推送内容");
+conv.sendMessage(msg, messageOption, new AVIMConversationCallback() {
+    @Override
+    public void done(AVIMException e) {
+        if (e == null) {
+        // 发送成功
+        }
+    }
+});
+```
+```cs
+var message = new AVIMTextMessage()
+{
+    TextContent = "Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！"
+};
+
+AVIMSendOptions sendOptions = new AVIMSendOptions()
+{
+    PushData = new Dictionary<string, object>()
+    {
+        { "alert", "您有一条未读的消息"},
+        { "category", "消息"},
+        { "badge", 1},
+        { "sound", "message.mp3//声音文件名，前提在应用里存在"},
+        { "custom-key", "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"}
+    }
+};
 ```
 
 另外一种方式是，在云引擎使用 Hook 的方式统一设置离线推送消息内容，这种方式更为推荐，当客户端平台较多的时候（例如同时有 iOS 和 Android），在服务端统一设置可以减少客户端的重复代码逻辑，可以根据所需语言选择对应的云引擎即时通信 Hook 文档：

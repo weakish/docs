@@ -13,13 +13,17 @@
 - [即时通讯开发指南 &middot; 基础入门](realtime-guide-beginner.html)
 - [即时通讯开发指南 &middot; 进阶功能](realtime-guide-intermediate.html)
 
+
+## REST API
+
+即时通信 REST API 的目的是为了给开发者提供一个不依赖 SDK 的高级功能接口。首先请阅读[即时通讯 REST API 使用指南 v2](realtime_rest_api_v2.html)。
+
 ## 消息
 
 ### 敏感词过滤
 
 敏感词在[即时通信服务总览#敏感词过滤](realtime_v2.html#敏感词过滤)有介绍，这是默认选项，而一些特殊场景中，可能会有一些自定义敏感词的需求，因此在控制台->消息->设置页面可以开关这个功能，并且还可以提交自定义敏感词的词库。
 
-
 ### 遗愿消息
 
 ### 实时音视频
@@ -36,7 +40,6 @@
 即时通信服务通过云引擎服务可以实现 Hook 函数的功能：
 
 > 开发者在服务端定义一些 Hook 函数，在对话创建/消息发送等函数被调用的时候，即时通信服务会调用这些 Hook 函数，让开发者更自由的控制业务逻辑。
-
 
 举个例子，做一个游戏聊天系统的时候，要合理地屏蔽一些竞争对手游戏的关键字，以下是使用云引擎支持的各种服务端编程语言实现这个函数的代码：
 
@@ -60,6 +63,12 @@ Engine-->Cloud: 3.返回 hook 函数处理结果
 Cloud-->SDK: 4.将 hook 函数处理结果发送给接收方
 ```
 
+更多的 Hook 函数请根据所需语言点击：
+
+- [PHP#即时通讯 Hook 函数](leanengine_cloudfunction_guide-php.html#即时通讯 Hook 函数)
+- [NodeJS#即时通讯 Hook 函数](leanengine_cloudfunction_guide-node.html#即时通讯 Hook 函数)
+- [Python#即时通讯 Hook 函数](leanengine_cloudfunction_guide-python.html#即时通讯 Hook 函数)
+- [Java#即时通讯 Hook 函数](leanengine_cloudfunction_guide-java.html#即时通讯 Hook 函数)
 
 ## 安全与权限
 
@@ -71,7 +80,6 @@ Cloud-->SDK: 4.将 hook 函数处理结果发送给接收方
 
 
 ### 黑名单
-
 
 
 
