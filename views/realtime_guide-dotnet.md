@@ -1373,3 +1373,5 @@ await client.ConnectAsync();//Tom 登录客户端
 {% block conversation_query_cache %}{% endblock %}
 
 {% block goto_create_unique_conversation %}{% endblock %}
+
+{% block text_cache_message %}{% endblock %}
