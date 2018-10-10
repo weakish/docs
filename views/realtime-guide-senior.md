@@ -63,6 +63,27 @@ Engine-->Cloud: 3.返回 hook 函数处理结果
 Cloud-->SDK: 4.将 hook 函数处理结果发送给接收方
 ```
 
+注：上图假设的是对话所有成员都在线，而如果有成员不在线，流程有些不一样，下一节会做介绍。
+
+### 消息 Hook
+
+前一小节介绍的是最为常见的**服务端收到消息时的 Hook，并且所有成员都在线**，而完整的消息 Hook 的生命周期和执行顺序如下图所示：
+
+
+<div class="mermaid">
+graph LR
+B(_messageReceived) --> C{接收者是否在线?}
+    C -->|否| D(_receiversOffline)
+    C -->|是| E(_messageSent)
+</div>
+
+
+### 对话 Hook
+
+
+
+
+
 更多的 Hook 函数请根据所需语言点击：
 
 - [PHP#即时通讯 Hook 函数](leanengine_cloudfunction_guide-php.html#即时通讯 Hook 函数)
