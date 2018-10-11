@@ -38,7 +38,7 @@ function prettyPrepare() {
       var code = $(this);
       var noPretty = false;
       noPrettyLangSpec.forEach(function (lang) {
-        if (code.hasClass(`lang-${lang}`)) {
+        if (code.hasClass('lang-' + lang)) {
           noPretty = true;
         }
       });
