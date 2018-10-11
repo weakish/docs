@@ -57,10 +57,6 @@ Hook 相关错误，Hook 还未上线
 * 信息 - ROOM_ID_REQUIRED
 * 含义 - 需要传 room id -->
 
-### 4307
-* 信息 - ROOM_ALREADY_JOINED
-* 含义 - 重复加入已经加入过的房间。如果玩家已经在房间内，不管断线还是在线，调用 Join 方法时都会报这个错误，请使用 Rejoin 回到房间。
-
 ### 4308
 * 信息 - ROOM_MEMBERSHIP_REQUIRED
 * 含义 - 需要当前玩家在该房间内才能进行操作。
