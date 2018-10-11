@@ -270,8 +270,13 @@ var codeBlockTabber = (function () {
     });
   }
 
-  function prettySequence() {
+  function prettyGraph() {
 
+    $.each($('.lang-mermaid'), function () {
+      $(this).parent().removeClass('prettyprint').removeClass('prettyprinted');
+      $(this).parent().addClass('no-pre-style');
+      $(this).addClass('mermaid');
+    });
     mermaid.initialize({
       startOnLoad: true,
       // theme: 'forest'
@@ -284,17 +289,11 @@ var codeBlockTabber = (function () {
     var options = {
       theme: 'simple'
     };
+
     var $ds = $(".lang-seq");
     $ds.parent().removeClass('prettyprint').removeClass('prettyprinted');
     $ds.parent().addClass('no-pre-style');
     $ds.sequenceDiagram(options);
-
-    $.each($('.lang-mermaid'), function () {
-      $(this).parent().removeClass('prettyprint').removeClass('prettyprinted');
-      $(this).parent().addClass('no-pre-style');
-      $(this).addClass('mermaid');
-
-    });
 
   }
   var autoSwitchApiName = false;
@@ -548,7 +547,7 @@ var codeBlockTabber = (function () {
 
   return {
     start: checkCodeBlocks,
-    render: prettySequence,
+    render: prettyGraph,
     end: checkLangSpec,
   };
 

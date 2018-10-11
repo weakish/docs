@@ -24,11 +24,29 @@ function refactDom() {
   });
 }
 
+var noPrettyLangSpec = ['mermaid', 'seq', 'sequence'];
+
 function prettyPrepare() {
-  var pres = document.getElementsByTagName("pre");
-  for (var i = 0; i < pres.length; i++) {
-    pres[i].className = "prettyprint";
-  }
+  // var pres = document.getElementsByTagName("pre");
+  // for (var i = 0; i < pres.length; i++) {
+  //   pres[i].className = "prettyprint";
+  // }
+
+  $.each($('pre'), function () {
+    var pre = $(this);
+    pre.find('code').each(function () {
+      var code = $(this);
+      var noPretty = false;
+      noPrettyLangSpec.forEach(lang => {
+        if (code.hasClass(`lang-${lang}`)) {
+          noPretty = true;
+        }
+      });
+      if (!noPretty) {
+        pre.addClass('prettyprint');
+      }
+    });
+  });
 }
 
 function glueCopy() {

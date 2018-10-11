@@ -11,12 +11,12 @@
 
 建议先按照顺序阅读如下文档之后，再阅读本文效果最佳：
 
-- [即时通信服务总览](realtime_v2.html)
+- [即时通讯服务总览](realtime_v2.html)
 - [即时通讯开发指南 &middot; 基础入门](realtime-guide-beginner.html)
 
 ## 对话属性
 
-对话(`Conversation`)是即时通信的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。
+对话(`Conversation`)是即时通讯的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。
 
 默认提供的属性的对应关系如下：
 
@@ -483,7 +483,7 @@ var query = tom.GetChatRoomQuery();
 
 ### 服务号（系统账号）
 
-服务号和系统账号在即时通信服务里面是同一个概念。
+服务号和系统账号在即时通讯服务里面是同一个概念。
 
 服务号和普通对话有如下区别：
 
@@ -1420,9 +1420,9 @@ private void Tom_OnMessageModified(object sender, AVIMMessagePatchEventArgs e)
 iOS 和 Android 分别提供了内置的离线消息推送通知服务，但是使用的前提是按照推送文档配置 iOS 的推送证书和 Android 开启推送的开关，详细请阅读如下文档：
 
 
-在移动设备普及的现在，一个客户端离线是经常会出现的场景（进入地铁/电梯等无信号环境中），此时设备的离线会让消息无法通过实时地长连接送达到对方客户端，因此即时通信服务通过移动设备的消息推送功能实现了离线消息的推送通知。
+在移动设备普及的现在，一个客户端离线是经常会出现的场景（进入地铁/电梯等无信号环境中），此时设备的离线会让消息无法通过实时地长连接送达到对方客户端，因此即时通讯服务通过移动设备的消息推送功能实现了离线消息的推送通知。
 
-需要通过如下几个文档结合 LeanCloud 消息推送和即时通信来实现如上需求：
+需要通过如下几个文档结合 LeanCloud 消息推送和即时通讯来实现如上需求：
 
 1. [消息推送服务总览](push_guide.html)
 2. [Android 消息推送开发指南](android_push_guide.html)/[iOS 消息推送开发指南](ios_push_guide.html)
@@ -1497,11 +1497,11 @@ AVIMSendOptions sendOptions = new AVIMSendOptions()
 };
 ```
 
-另外一种方式是，在云引擎使用 Hook 的方式统一设置离线推送消息内容，这种方式更为推荐，当客户端平台较多的时候（例如同时有 iOS 和 Android），在服务端统一设置可以减少客户端的重复代码逻辑，可以根据所需语言选择对应的云引擎即时通信 Hook 文档：
+另外一种方式是，在云引擎使用 Hook 的方式统一设置离线推送消息内容，这种方式更为推荐，当客户端平台较多的时候（例如同时有 iOS 和 Android），在服务端统一设置可以减少客户端的重复代码逻辑，可以根据所需语言选择对应的云引擎即时通讯 Hook 文档：
 
-- [云引擎 PHP 即时通信 Hook#_receiversOffline](leanengine_cloudfunction_guide-php.html#_receiversOffline)
-- [云引擎 NodeJS 即时通信 Hook#_receiversOffline](leanengine_cloudfunction_guide-node.html#_receiversOffline)
-- [云引擎 Python 即时通信 Hook#_receiversOffline](leanengine_cloudfunction_guide-python.html#_receiversOffline)
+- [云引擎 PHP 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-php.html#_receiversOffline)
+- [云引擎 NodeJS 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-node.html#_receiversOffline)
+- [云引擎 Python 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-python.html#_receiversOffline)
 
 ## 消息记录
 

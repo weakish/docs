@@ -41,7 +41,7 @@ Cloud-->ClientC: onMessage(ClientA,'大家好，我是 A');
 
 ## 阅前准备
 
-建议先阅读[即时通信服务总览](realtime_v2.html)之后，再阅读本文效果最佳。
+建议先阅读[即时通讯服务总览](realtime_v2.html)之后，再阅读本文效果最佳。
 
 ## 一对一单聊
 
