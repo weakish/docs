@@ -277,14 +277,15 @@ var codeBlockTabber = (function () {
       $(this).parent().addClass('no-pre-style');
       $(this).addClass('mermaid');
     });
-    mermaid.initialize({
-      startOnLoad: true,
-      // theme: 'forest'
-    });
+    
+    // mermaid.initialize({
+    //   startOnLoad: true,
+    //   // theme: 'forest'
+    // });
 
-    mermaid.init({
-      noteMargin: 10
-    }, ".lang-mermaid");
+    // mermaid.init({
+    //   noteMargin: 10
+    // }, ".lang-mermaid");
 
     var options = {
       theme: 'simple'
