@@ -24,14 +24,15 @@ function refactDom() {
   });
 }
 
-var noPrettyLangSpec = ['mermaid', 'seq', 'sequence'];
+
 
 function prettyPrepare() {
   // var pres = document.getElementsByTagName("pre");
   // for (var i = 0; i < pres.length; i++) {
   //   pres[i].className = "prettyprint";
   // }
-
+  var noPrettyLangSpec = ['mermaid', 'seq', 'sequence'];
+  
   $.each($('pre'), function () {
     var pre = $(this);
     pre.find('code').each(function () {
