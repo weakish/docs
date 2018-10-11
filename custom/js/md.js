@@ -272,21 +272,6 @@ var codeBlockTabber = (function () {
 
   function prettyGraph() {
 
-    // $.each($('.lang-mermaid'), function () {
-    //   $(this).parent().removeClass('prettyprint').removeClass('prettyprinted');
-    //   $(this).parent().addClass('no-pre-style');
-    //   $(this).addClass('mermaid');
-    // });
-    
-    // mermaid.initialize({
-    //   startOnLoad: true,
-    //   // theme: 'forest'
-    // });
-
-    // mermaid.init({
-    //   noteMargin: 10
-    // }, ".lang-mermaid");
-
     var options = {
       theme: 'simple'
     };
@@ -295,6 +280,22 @@ var codeBlockTabber = (function () {
     $ds.parent().removeClass('prettyprint').removeClass('prettyprinted');
     $ds.parent().addClass('no-pre-style');
     $ds.sequenceDiagram(options);
+
+
+    $.each($('.lang-mermaid'), function () {
+      $(this).parent().removeClass('prettyprint').removeClass('prettyprinted');
+      $(this).parent().addClass('no-pre-style');
+      $(this).addClass('mermaid');
+    });
+    
+    mermaid.initialize({
+      startOnLoad: true,
+      // theme: 'forest'
+    });
+
+    mermaid.init({
+      noteMargin: 10
+    }, ".lang-mermaid");
 
   }
   var autoSwitchApiName = false;
