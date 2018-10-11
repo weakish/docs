@@ -272,11 +272,11 @@ var codeBlockTabber = (function () {
 
   function prettyGraph() {
 
-    $.each($('.lang-mermaid'), function () {
-      $(this).parent().removeClass('prettyprint').removeClass('prettyprinted');
-      $(this).parent().addClass('no-pre-style');
-      $(this).addClass('mermaid');
-    });
+    // $.each($('.lang-mermaid'), function () {
+    //   $(this).parent().removeClass('prettyprint').removeClass('prettyprinted');
+    //   $(this).parent().addClass('no-pre-style');
+    //   $(this).addClass('mermaid');
+    // });
     
     // mermaid.initialize({
     //   startOnLoad: true,
