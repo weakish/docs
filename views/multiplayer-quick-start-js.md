@@ -18,7 +18,7 @@
 如果你通过浏览器调试，可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到浏览器的 console 中。请打开浏览器的控制台，运行以下命令：
 
 ```shell
-localStorage.debug = 'Play:*'
+localStorage.debug = 'Play'
 ```
 
 ### 微信小程序
@@ -33,13 +33,13 @@ localStorage.debug = 'Play:*'
 npm install @leancloud/play --save。
 ```
 
-为方便调试，你可以在 Node.js 平台中打开调试日志。这就需要将环境变量 DEBUG 设置为 `Play:*`。你可以在启动某个命令之前设置环境变量。下面以本地启动云引擎调试的命令 `lean up` 为例：
+为方便调试，你可以在 Node.js 平台中打开调试日志。这就需要将环境变量 DEBUG 设置为 `Play`。你可以在启动某个命令之前设置环境变量。下面以本地启动云引擎调试的命令 `lean up` 为例：
 
 ```sh
 # Unix
-DEBUG='Play:*' lean up
+DEBUG='Play' lean up
 # Windows cmd
-set DEBUG=Play:* lean up
+set DEBUG=Play lean up
 ```
 {% endblock %}
 
