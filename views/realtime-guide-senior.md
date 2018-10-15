@@ -445,7 +445,7 @@ Hook 函数的示例代码请根据所需语言了解更多：
 
 即时通讯采用基于签名的权限控制，关于签名的基本概念请阅读[即时通讯服务总览-权限和认证](realtime_v2.html#权限和认证)。
 
-### 对话的权限控制
+### 签名鉴权与 Hook 的关系 
 
 对话的权限控制与 Hook 有一些关联，对话级别上的所有 Hook 触发都有另外一个前置条件：
 
@@ -514,7 +514,7 @@ currentClient.open(new AVIMClientCallback() {
 });
 ```
 ```cs
-AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile");
+AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile", deviceId: "your-device-id");
 ```
 
 上述代码可以理解为 LeanCloud 版 QQ 的登录，而另一个带有同样 Tag 的客户端打开连接，则较早前登录系统的客户端会被强制下线。
