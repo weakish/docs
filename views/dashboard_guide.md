@@ -415,7 +415,7 @@ puts result.gsub(/\n/,'')
 
 非常感谢用户「残圆」贡献了一段 C# 语言示例代码：
 
-```
+```cs
 /// 根据数据字符串和自定义 salt 值，获取对应加密后的字符串
 /// </summary>
 /// <param name="password">数据字符串</param>
@@ -443,6 +443,24 @@ public static string SHA512Encrypt(string password, string salt)
     }
     shaM.Clear();
     return Convert.ToBase64String(result);
+}
+```
+非常感谢用户「snnui」贡献了一段 JavaScript（NodeJS） 语言示例代码：
+```js
+function encrypt(password,salt) {
+  var hash = crypto.createHash('sha512');
+  hash.update(salt);
+  hash.update(password);
+  var value = hash.digest();
+
+  for (var i = 0; i < 512; i++) {
+      var hash = crypto.createHash('sha512'); 
+      hash.update(value);
+      value = hash.digest();
+  }
+
+  var result = value.toString('base64');
+  return result;
 }
 ```
 
