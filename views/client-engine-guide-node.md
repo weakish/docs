@@ -1,24 +1,24 @@
 # Client Engine 开发指南 · Node.js
 
 ## 初始项目
-请先阅读[Client Engine 快速入门 · Node.js](client-engine-quick-start-node.md)获得初始项目，并了解如何本地运行及部署项目，本文档需要在初始项目的基础上进行开发。
+请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.md) 获得初始项目，并了解如何本地运行及部署项目，本文档需要在初始项目的基础上进行开发。
 
 ## 实现您的游戏逻辑
 初始项目中 `rps-game.ts` 中的 `RPSGame` 是我们实现的一个示例游戏类，你可以直接改动这个文件来实现自己的游戏逻辑，绝大部分游戏逻辑都应该写在这个文件中。
 
-`RPSGame` 继承自 `AutomaticGame` 类， `AutomaticGame` 类继承自 `Game` 类。`Game` 负责具体的游戏逻辑，`AutomaticGame` 在这两种场景下会自动调用相关方法：房间人满及游戏销毁，因此 `RPSGame` 可以方便的使用 `Game` 及 `AutomaticGame` 的便利属性及方法。
+`RPSGame` 继承自 `AutomaticGame` 类， `AutomaticGame` 类继承自 `Game` 类。`RPSGame` 负责具体的自定义游戏逻辑，`Game` 中已经写好了通用的游戏属性及方法，`AutomaticGame` 在这两种场景下会自动调用相关方法：房间人满及游戏销毁，因此 `RPSGame` 可以方便的使用 `Game` 及 `AutomaticGame` 的便利属性及方法。
 
 每一个 `RPSGame` 实例都是一个房间内的游戏，下面从实际使用场景出发，以 `RPSGame` 为例说明如何使用初始项目。
 
 ### 连接服务器
-初始项目已经帮您完成了这一步逻辑，不需要您在 Client Engine 中自己写代码，如果您对实现方式感兴趣，可以自行阅读初始项目中的代码。
+初始项目已经帮您完成了这一步逻辑，不需要您在 Client Engine 中自己写代码，如果您对实现方式感兴趣，可以自行阅读初始项目 `Game` 中的 `createNewGame()` 方法。
 
 ### 设置最大玩家数量
 `Game` 提供了 playerLimit 静态属性配置每局游戏的最大玩家数量，默认为 2 个玩家对战，如果您需要改变最大玩家数量，例如像斗地主一样三个人才能开始游戏，可以在 `RPSGame` 中通过以下代码配置：
 
 ```js
 // 最大不能超过 9
-public static playerLimit = 2;
+public static playerLimit = 3;
 ```
 
 需要注意的是，对于实时对战服务来说，MasterClient 也算做房间内的一个成员，这里 Client Engine 初始项目对成员进行了封装，`Game` 中的 playerLimit 为不包含 MasterClient 的成员数量，而实时对战服务一个房间限制为最多 10 个成员，因此这里**最多只能设置为 9 个玩家**一起游戏。

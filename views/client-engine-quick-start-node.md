@@ -14,7 +14,7 @@ git clone https://github.com/leancloud/client-engine-nodejs-getting-started
 cd client-engine-nodejs-getting-started
 ```
 
-添加应用 appId 等信息到该项目：
+添加应用 App ID 等信息到该项目：
 
 ```
 lean switch
@@ -45,16 +45,32 @@ DEBUG=ClientEngine*,RPS*,Play  lean up
 lean up
 ```
 
+## 游戏流程
+
+在这个项目中，服务端负责创建房间，创建房间后由 MasterClient 控制游戏内的逻辑，具体的流程为：
+
+1. 客户端通过 Websocket 连接到实时对战服务，向实时对战服务请求匹配房间。
+2. 如果实时对战服务没有合适的房间，客户端转而向 Client Engine 发起 HTTP 请求新建房间。
+3. Client Engine 每次收到请求后都会创建一个 MasterClient ，MasterClient 连接实时对战服务并创建房间，返回房间名称给客户端。
+4. 客户端通过 Client Engine 返回的房间名称加入房间，MasterClient 和客户端在同一房间内通过实时对战服务进行消息互动，完成对游戏逻辑的控制。
+
 ## 访问站点
-使用浏览器访问 `http://localhost:3000`，就能看到相关页面，由于这部分是服务端代码，所以我们可以根据页面指引下载[客户端示例代码](https://github.com/leancloud/client-engine-demo-webapp)。
 
-运行以下命令启动客户端应用
+使用浏览器访问 `http://localhost:3000`，就能看到服务端正在运行的文本。如果希望体验 Demo 游戏，需要额外同时打开两个[客户端示例 Demo](https://client-engine-app.leanapp.cn/)页面，在这两个页面中做如下配置：
 
+点击 Configs，APP_ID 和 APP_KEY 填入之前使用 `lean switch` 的选择的应用的 App ID 及 App Key，请在下方选择相关应用，复制粘贴相关信息到 Configs 中：
+
+
+```sh
+ APP_ID:{{appid}}
+ APP_KEY:{{appkey}}
 ```
-npm install
-npm run serve
-```
-使用浏览器打开两个页面访问 `http://localhost:8080/` ，就可以模拟两个玩家的剪刀石头布游戏了。
+
+接着在Client Engine Server 中输入 `http://localhost:3000`。如图所示：
+
+![image](images/client-engine-browser-demo.png)
+
+信息填写完成后，点击「Login to Play」就可以开始游戏了。
 
 
 ## 部署到云端
@@ -70,4 +86,4 @@ lean deploy
 例如填写 `myapp`，设置成功后通过 `http://myapp.leanapp.cn`访问，此时可以看到 Client Engine 服务端正在运行的文本。
 
 ## 开发指南
-进一步了解如何开发 Client Engine 请参考[Client Engine 开发指南 · Node.js](client-engine-guide-node.html)。
+进一步了解如何开发 Client Engine 请参考 [Client Engine 开发指南 · Node.js](client-engine-guide-node.html)。
