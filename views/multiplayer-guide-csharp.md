@@ -137,9 +137,10 @@ var options = new RoomOptions()
     MaxPlayerCount = 2,
     CustomRoomProperties = props,
     CustoRoomPropertyKeysForLobby = new List<string>() { "level" },
+    Flag = MasterSetMaster | MasterUpdateRoomProperties,
 };
 var expectedUserIds = new List<string>() { "cr3_2" };
-play.CreateRoom(roomName, options, expectedUserIds);
+play.CreateRoom(roomName: roomName, roomOptions: options, expectedUserIds: expectedUserIds);
 ```
 {% endblock %}
 
@@ -153,7 +154,7 @@ play.CreateRoom(roomName, options, expectedUserIds);
 - `MaxPlayerCount`：房间允许的最大玩家数量。
 - `CustomRoomProperties`：房间的自定义属性。
 - `CustomRoomPropertyKeysForLobby`：房间的自定义属性 `CustomRoomProperties` 中「键」的数组，包含在 `CustomRoomPropertyKeysForLobby` 中的属性将会出现在大厅的房间属性中（`play.LobbyRoomList`），而全部属性要在加入房间后的 `room.CustomProperties` 中查看。这些属性将会在匹配房间时用到。
-- `Flag`：创建房间标志位，包括是否固定 Master、只允许 Master 设置房间属性、只允许 Master 设置 Master。请参考 [API 文档](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1CreateRoomFlag.htm)。
+- `Flag`：创建房间标志位，详情请看下文中 [MasterClient 掉线不转移](#MasterClient 掉线不转移), [指定其他成员为 MasterClient](#指定其他成员为 MasterClient)，[只允许 MasterClient 修改房间属性](#只允许 MasterClient 修改房间属性)。
 {% endblock %}
 
 
@@ -332,6 +333,15 @@ play.SetMaster(newMasterId);
 ```
 {% endblock %}
 
+{% block master_set_master %}
+```cs
+var options = new RoomOptions()
+{
+   Flag = MasterSetMaster
+};
+play.CreateRoom(roomOptions: options);
+```
+{% endblock %}
 
 
 {% block master_switched_event %}
@@ -349,7 +359,15 @@ play.On(Event.MASTER_SWITCHED, (evtData) => {
 ```
 {% endblock %}
 
-
+{% block master_fixed %}
+```cs
+var options = new RoomOptions()
+{
+   Flag = FixedMaster
+};
+play.CreateRoom(roomOptions: options);
+```
+{% endblock %}
 
 {% block custom_props %}
 为了满足开发者不同的游戏需求，实时对战 SDK 允许开发者设置「自定义属性」。
@@ -385,6 +403,18 @@ play.On(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (changedProps) => {
 注意：`changedProps` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `play.Room.CustomProperties` 获得。
 {% endblock %}
 
+
+{% block master_update_room_properties %}
+
+```cs
+var options = new RoomOptions()
+{
+   Flag = MasterUpdateRoomProperties
+};
+play.CreateRoom(roomOptions: options);
+```
+
+{% endblock %}
 
 
 {% block set_player_custom_props %}

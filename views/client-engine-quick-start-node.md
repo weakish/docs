@@ -2,11 +2,21 @@
 
 该文档帮助你快速了解如何创建一个 Client Engine 项目，本地开发调试以及如何部署到云端。
 
-## 安装命令行工具
+## 项目逻辑
+该项目是将 MasterClient 托管到 Client Engine 的示例项目，实现的是简单的双人剪刀石头布游戏，游戏逻辑的开发依赖于实时对战 JavaScript SDK。整个游戏主要逻辑为：服务端负责创建房间，创建房间后玩家客户端加入房间，之后在房间内由 MasterClient 控制游戏内的逻辑：
+
+1. 玩家客户端[连接](multiplayer-guide-js.html#连接)实时对战服务，向实时对战服务请求[匹配房间](multiplayer-guide-js.html#房间匹配)。
+2. 如果实时对战服务没有合适的房间，玩家客户端转而请求 Client Engine 提供的 REST API 接口请求新建房间。
+3. Client Engine 每次收到请求后都会创建一个 MasterClient ，MasterClient [连接](multiplayer-guide-js.html#连接)实时对战服务并[创建房间](multiplayer-guide-js.html#创建房间)，相关接口返回房间名称给客户端。
+4. 客户端通过 Client Engine 返回的房间名称[加入房间](multiplayer-guide-js.html#加入房间)，MasterClient 和客户端在同一房间内通过[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)等方式进行消息互动，完成对游戏逻辑的控制。
+
+## 启动项目
+
+### 安装命令行工具
 请查看命令行工具**[安装部分](leanengine_cli.html#安装)**的文档，安装命令行工具，并执行**[登录](leanengine_cli.html#登录)**命令登录。
 
 
-## 创建项目
+### 创建项目
 从 Github 迁出示例项目，请将该项目作为你的项目基础：
 
 ```js
@@ -25,7 +35,7 @@ lean switch
 ![image](images/client-engine-lean-switch.png)
 
 
-## 本地运行
+### 本地运行
 
 首先在当前项目的目录下安装必要的依赖，执行如下命令行：
 
@@ -45,32 +55,29 @@ DEBUG=ClientEngine*,RPS*,Play  lean up
 lean up
 ```
 
-## 游戏流程
+### 访问站点
 
-在这个项目中，服务端负责创建房间，创建房间后由 MasterClient 控制游戏内的逻辑，具体的流程为：
+#### 感受游戏
 
-1. 客户端通过 Websocket 连接到实时对战服务，向实时对战服务请求匹配房间。
-2. 如果实时对战服务没有合适的房间，客户端转而向 Client Engine 发起 HTTP 请求新建房间。
-3. Client Engine 每次收到请求后都会创建一个 MasterClient ，MasterClient 连接实时对战服务并创建房间，返回房间名称给客户端。
-4. 客户端通过 Client Engine 返回的房间名称加入房间，MasterClient 和客户端在同一房间内通过实时对战服务进行消息互动，完成对游戏逻辑的控制。
+服务端项目启动完成后，如果希望体验 Demo 游戏，需要额外同时打开两个[客户端示例 Demo](https://client-engine-app.leanapp.cn/)页面，在这两个页面中做如下配置：
 
-## 访问站点
-
-使用浏览器访问 `http://localhost:3000`，就能看到服务端正在运行的文本。如果希望体验 Demo 游戏，需要额外同时打开两个[客户端示例 Demo](https://client-engine-app.leanapp.cn/)页面，在这两个页面中做如下配置：
-
-点击 Configs，APP_ID 和 APP_KEY 填入之前使用 `lean switch` 的选择的应用的 App ID 及 App Key，请在下方选择相关应用，复制粘贴相关信息到 Configs 中：
-
+点击 Configs，APP_ID 和 APP_KEY 填入之前选择的应用的 App ID 及 App Key：
 
 ```sh
+# 如果您的浏览器已经登录 LeanCloud，请在下方选择相关应用，复制粘贴相关信息到 Configs 中：
  APP_ID:{{appid}}
  APP_KEY:{{appkey}}
 ```
 
-接着在Client Engine Server 中输入 `http://localhost:3000`。如图所示：
+接着在 Client Engine Server 中输入 `http://localhost:3000`。如图所示：
 
 ![image](images/client-engine-browser-demo.png)
 
 信息填写完成后，点击「Login to Play」就可以开始游戏了。
+
+#### 客户端代码
+
+如果您希望查看详细的客户端代码，可以访问位于 github 的[客户端示例代码](https://github.com/leancloud/client-engine-demo-webapp)。
 
 
 ## 部署到云端
@@ -81,9 +88,12 @@ lean up
 lean deploy
 ```
 
-在浏览器中登录 LeanCloud 控制台，进入 Play - Client Engine - 设置，在「Web 主机域名」中设置二级域名，通过 `http://${your_app_domain}.leanapp.cn` 访问生产环境。
+在浏览器中登录 LeanCloud 控制台，进入 Play - Client Engine - 设置，在「Web 主机域名」中设置二级域名，通过 `http://$stg-{your_app_domain}.leanapp.cn` 访问预备环境。
 
-例如填写 `myapp`，设置成功后通过 `http://myapp.leanapp.cn`访问，此时可以看到 Client Engine 服务端正在运行的文本。
+例如填写 `myapp`，设置成功后通过 `http://stg-myapp.leanapp.cn`访问，此时可以看到 Client Engine 服务端正在运行的文本。
+
+其他详细的部署方式请参考命令行工具文档中的[部署](leanengine_cli.html#部署)及[发布到生产环境](leanengine_cli.html#发布到生产环境)。
 
 ## 开发指南
-进一步了解如何开发 Client Engine 请参考 [Client Engine 开发指南 · Node.js](client-engine-guide-node.html)。
+该初始项目已经帮您写好了通用的游戏逻辑，并提供了便利的方法及属性，因此我们推荐您在该项目的基础上开发自己的游戏逻辑。
+进一步了解如何使用该项目请参考 [Client Engine 开发指南 · Node.js](client-engine-guide-node.html)。
