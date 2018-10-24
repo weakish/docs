@@ -32,11 +32,10 @@ https://ruby.taobao.org
 在项目根目录下创建一个名为 `Podfile` 的文件（无扩展名），并添加以下内容：
 
 ```ruby
-use_frameworks! # LeanCloud Swift SDK can only be integrated as framework.
+use_frameworks!
 
-target '你的项目名称' do
-    # 显式指定版本号，如 '~> 11.0.0'
-	pod 'LeanCloud', '~> 替换为所使用的 SDK 版本号'
+target 'YOUR_APP_TARGET' do # Replace YOUR_APP_TARGET with your app target name.
+    pod 'LeanCloud', '~> 13.0.0'
 end
 ```
 
@@ -65,30 +64,28 @@ import LeanCloud
 然后粘贴下列代码到 `application:didFinishLaunchingWithOptions` 函数内：
 
 ```swift
-// applicationId 即 App Id，applicationKey 是 App Key
-LeanCloud.initialize(applicationID: "{{appid}}", applicationKey: "{{appkey}}")
-```
-{% endblock %}
-
-{% block sdk_switching_node %}
-
-```swift
-// 如果使用美国站点，请加上这行代码，并且写在初始化前面
-LeanCloud.setServiceRegion(.US)
-
-// applicationId 即 App Id，applicationKey 是 App Key
-LeanCloud.initialize(applicationID: "{{appid}}", applicationKey: "{{appkey}}")
+LCApplication.default.set(
+    id:  "{{appid}}", /* Your app ID */
+    key: "{{appkey}}" /* Your app key */
+)
 ```
 {% endblock %}
 
 {% block save_a_hello_world %}
 
 ```swift
-let post = LCObject(className: "TestObject")
+let post = LCObject(className: "Post")
 
 post.set("words", value: "Hello World!")
 
-post.save()
+_ = post.save { result in
+    switch result {
+    case .success:
+        break
+    case .failure(let error):
+        break
+    }
+}
 ```
 
 然后，点击 `Run` 运行调试，真机和虚拟机均可。
