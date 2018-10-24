@@ -31,7 +31,14 @@
 #### 获取 HMS SDK 和 HMS Agent SDK
 华为 HMS 推送 SDK 分为两部分，一个是 HMS SDK，一个是 HMS Agent SDK，两者需要主版本号一致才能正常使用（当前 LeanCloud 混合推送基于 v2.6.1 这一主版本），具体可以参见 [华为 SDK 获取](http://developer.huawei.com/consumer/cn/service/hms/catalog/HuaweiJointOperation.html?page=hmssdk_jointOper_sdkdownload)。
 
-HMS SDK 可以直接通过 jar 包加入，HMS Agent SDK 则需要下载解压之后把源码完全拷贝进入工程。
+HMS SDK 可以直接通过 jar 包加入，HMS Agent SDK 则需要下载解压之后把源码完全拷贝进入工程。解压 HMS SDK 目录如下表所示，华为要求将 HMS 资源文件和证书文件打包到 apk 中，详情请见 [HMS SDK 接入流程](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweiid.html?page=hmssdk_huaweiid_devprepare)。
+
+目录 | 说明 | 使用方式
+----|----|----
+libs/ | 包含 HMS 所有功能的 jar 包。通用包不再按照业务功能分成多个 jar 包，包含帐号、支付、消息、推送、游戏服务。 |请直接将 libs 目录拷贝到应用工程根目录
+res/ | HMS SDK 需要使用的资源目录，包含多国语言。应用如果不需要集成多种语言的，可以适当裁剪。但是必须保留默认语言和简体中文。 | 请直接将 res 目录拷贝到应用工程根目录
+assets/ | HMS SDK 请求华为服务器需要使用的证书文件 | 请直接将 assets 目录拷贝到应用工程根目录
+
 
 > 注意：华为 HMS 推送不能与老的 HwPush 共存，如果切换到 HMS 推送，则需要将原来的 HwPush SDK 全部删除干净才行。
 
