@@ -5,8 +5,8 @@
 ## 项目逻辑
 该项目是将 MasterClient 托管到 Client Engine 的示例项目，实现的是简单的双人剪刀石头布游戏，游戏逻辑的开发依赖于实时对战 JavaScript SDK。整个游戏主要逻辑为：服务端负责创建房间，创建房间后玩家客户端加入房间，之后在房间内由 MasterClient 控制游戏内的逻辑：
 
-1. 玩家客户端[连接](multiplayer-guide-js.html#连接)实时对战服务，向实时对战服务请求[匹配房间](multiplayer-guide-js.html#房间匹配)。
-2. 如果实时对战服务没有合适的房间，玩家客户端转而请求 Client Engine 提供的 REST API 接口请求新建房间。
+1. 玩家客户端[连接](multiplayer-guide-js.html#连接)实时对战服务，向实时对战服务请求[随机匹配房间](multiplayer-guide-js.html#随机加入房间)。
+2. 如果实时对战服务没有合适的房间，玩家客户端转而请求 Client Engine 提供的 `/reservation` 接口请求新建房间。
 3. Client Engine 每次收到请求后都会创建一个 MasterClient ，MasterClient [连接](multiplayer-guide-js.html#连接)实时对战服务并[创建房间](multiplayer-guide-js.html#创建房间)，相关接口返回房间名称给客户端。
 4. 客户端通过 Client Engine 返回的房间名称[加入房间](multiplayer-guide-js.html#加入房间)，MasterClient 和客户端在同一房间内通过[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)等方式进行消息互动，完成对游戏逻辑的控制。
 
@@ -54,6 +54,8 @@ DEBUG=ClientEngine*,RPS*,Play  lean up
 ```
 lean up
 ```
+
+启动后在浏览器中打开 `http://localhost:3000/` ，检测项目是否正常启动。
 
 ### 访问站点
 
