@@ -173,7 +173,7 @@ this.broadcast('game-start', gameData);
 此时客户端的[接收自定义事件](multiplayer-guide-js.html#接收自定义事件)方法会被触发，如果发现是 `game-start` 事件，客户端在 UI 上展示对战开始。
 
 #### 转发自定义事件
-对战开始后，客户端 A 会将自己的操作（例如当前动作是剪刀）通过[自定义事件](multiplayer-guide-js.html#自定义事件)的方式发送给 MasterClient，MasterClient 在收到这个操作事件后会告诉客户端 B 其他玩家已经操作了，但不告诉他玩家 A 具体是什么操作，此时可以使用 Game 提供的转发自定义事件方法 `forwardToTheRests()` 。您可以在这个方法中对事件内容做一些处理，然后转发给房间内的其他玩家：
+对战开始后，客户端 A 会将自己的操作（例如当前动作是剪刀）通过[自定义事件](multiplayer-guide-js.html#自定义事件)的方式发送给 MasterClient，MasterClient 在[收到这个操作事件](multiplayer-guide-js.html#接收自定义事件)后会告诉客户端 B 其他玩家已经操作了，但不告诉他玩家 A 具体是什么操作，此时可以使用 Game 提供的转发自定义事件方法 `forwardToTheRests()` 。您可以在这个方法中对事件内容做一些处理，隐藏掉 A 具体的动作，然后转发给房间内的其他玩家：
 
 ```js
 this.forwardToTheRests(event, (eventData) => {
@@ -185,12 +185,16 @@ this.forwardToTheRests(event, (eventData) => {
 }, 'someOneAct')
 ```
 
+MasterClient 发送该事件后，客户端 B 会[接收到该自定义事件](multiplayer-guide-js.html#接收自定义事件)，此时客户端 B 的页面上可以展现 UI 提示：`对手已选择`。
+
 #### 客户端与服务端进行通信
 除了上方初始项目提供的[广播自定义事件](#广播自定义事件)及[转发自定义事件](#转发自定义事件)外，您依然可以使用实时通信服务中的[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)进行通信。
 
 
 ### 游戏结束
-当两个玩家都做出选择时，`RPSGame` 会判断输赢，并广播游戏结束事件。当所有玩家都离开后，`Game` 的 `destroy()` 方法帮您自动销毁当前房间的 MasterClient。此时如果您没有其他的逻辑要做，则不需要关心这个方法，即游戏结束，如果您希望自己做一些清理工作，例如保存用户数据等，可以使用 `autoDestroy` 装饰器，这个装饰器会自动触发 `Game` 子类中的 `destroy()` 方法，您可以将相关逻辑写在这个方法中。
+当客户端 B 也做出选择，通过[自定义事件](multiplayer-guide-js.html#自定义事件)发送给 MasterClient 时，`RPSGame` 会判断输赢，并广播游戏结束事件。
+
+当所有玩家都离开后，`Game` 的 `destroy()` 方法帮您自动销毁当前房间的 MasterClient。此时如果您没有其他的逻辑要做，则不需要关心这个方法，即游戏结束，如果您希望自己做一些清理工作，例如保存用户数据等，可以使用 `autoDestroy` 装饰器，这个装饰器会自动触发 `Game` 子类中的 `destroy()` 方法，您可以将相关逻辑写在这个方法中。
 
 ```js
 import Game from "./game";
