@@ -1117,12 +1117,23 @@ CQL 是 {{productName}} 独创的使用类似 SQL 语法来实现云端查询功
 
 第三方登录是应用常见的功能。它直接使用第三方平台（如微信、QQ）已有的账户信息来完成新用户注册，这样不但简化了用户注册流程的操作，还提升了用户体验。
 
-此功能的开发过程主要分为两个阶段：
+开发此功能的主要步骤有：
 
-1. 开发者从第三方获取账户的授权信息 authData；
-2. 把 authData 和 LeanCloud 的用户体系 AVUser 进行绑定。
+1. 配置平台账号
+2. 开发者从第三方获取账户的授权信息 authData；
+3. 把 authData 和 LeanCloud 的用户体系 AVUser 进行绑定。
 
 ### 常规开发流程介绍
+
+#### 配置平台账号
+
+在 [LeanCloud 应用控制台 > 组件 > 社交](/dashboard/devcomponent.html?appid={{appid}}#/component/sns) 配置相应平台的 **应用 ID** 和 **应用 Secret Key** 。点击保存，自动生成 **回调 URL** 和 **登录 URL**。
+
+以微博开放平台举例，它需要单独配置 **回调 URL**。 在微博开放平台的 **应用信息** > **高级信息** > **OAuth2.0 授权设置** 里的「授权回调页」中绑定生成的 **回调 URL**。测试阶段，在微博开放平台的 **应用信息** > **测试信息** 添加微博账号，在腾讯开放平台的 **QQ 登录** > **应用调试者** 里添加 QQ 账号即可。在应用通过审核后，可以获取公开的第三方登录能力。
+
+配置平台账号的目的在于创建 AVUser 时，LeanCloud 云端会使用相关信息去校验 authData 的合法性，确保 AVUser 实际对应着一个合法真实的用户，确保平台安全性。如果想关闭自动校验 authData 的功能，需要在 [应用控制台 > 组件 > 社交](/dashboard/devcomponent.html?appid={{appid}}#/component/sns)中**取消勾选**「第三方登录时，验证用户 AccessToken 合法性」。
+
+#### 获取 authData 并创建 AVUser
 
 LeanCloud **暂不提供** 获取第三方 authData 的 SDK。开发者需要调用微信、QQ 等官方的 SDK，并根据其文档进行获取，也可以使用其他服务商提供的社交登录组件。
 
@@ -1140,9 +1151,7 @@ LeanCloud 后端要求 authData 至少含有 `openid 或 uid`、`access_token` �
 
 如果是已有用户，则返回对应 authData 的 AVUser 实例并登录。
 
-用户已经有了 AVUser 并登录成功后，可以用这个接口绑定新的第三方账号信息。绑定成功后，新的第三方账户信息会被添加到 AVUser 的 authData 字段里。
-
-示例代码如下：
+用户已经有了 AVUser 并登录成功后，可以用这个接口绑定新的第三方账号信息。绑定成功后，新的第三方账户信息会被添加到 AVUser 的 authData 字段里。示例代码如下：
 
 {% block associate_with_authdata %}{% endblock %}
 
