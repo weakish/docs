@@ -14,7 +14,7 @@
 3. 厂商通过手机端的系统通道下发推送消息，同时手机端系统消息接收器将推送消息展示到通知栏；
 4. 终端用户点击消息之后唤起目标应用或者页面。
 
-在这一过程中，LeanCloud SDK 在客户端能做的事情较少，消息的下发和展示都依赖客户端系统的行为，整个流程与苹果的 APNs 推送类似。
+整个流程与苹果的 APNs 推送类似，LeanCloud SDK 在客户端基本不会得到调用，消息的下发和展示都依赖厂商客户端的行为。所以如果部分厂商在某些推送中夹带了其他非开发者提交的消息，或者在服务启用的时候，有额外营销性质的弹窗，这都是厂商自己的行为，与 LeanCloud 完全无关，还请大家了解。另外，如果开发者碰到厂商 SDK 的问题，我们也无法深入调查，还请大家自行到厂商的论坛或技术支持渠道咨询解决。
 
 下面我们逐一看看如何对接华为、小米、魅族等厂商的推送服务，文档的最后也提及了在海外市场如何对接 Firebase Cloud Messaging 的方法。
 
@@ -31,7 +31,14 @@
 #### 获取 HMS SDK 和 HMS Agent SDK
 华为 HMS 推送 SDK 分为两部分，一个是 HMS SDK，一个是 HMS Agent SDK，两者需要主版本号一致才能正常使用（当前 LeanCloud 混合推送基于 v2.6.1 这一主版本），具体可以参见 [华为 SDK 获取](http://developer.huawei.com/consumer/cn/service/hms/catalog/HuaweiJointOperation.html?page=hmssdk_jointOper_sdkdownload)。
 
-HMS SDK 可以直接通过 jar 包加入，HMS Agent SDK 则需要下载解压之后把源码完全拷贝进入工程。
+HMS SDK 可以直接通过 jar 包加入，HMS Agent SDK 则需要下载解压之后把源码完全拷贝进入工程。解压 HMS SDK 目录如下表所示，华为要求将 HMS 资源文件和证书文件打包到 apk 中，详情请见 [HMS SDK 接入流程](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweiid.html?page=hmssdk_huaweiid_devprepare)。
+
+目录 | 说明 | 使用方式
+----|----|----
+libs/ | 包含 HMS 所有功能的 jar 包。通用包不再按照业务功能分成多个 jar 包，包含帐号、支付、消息、推送、游戏服务。 |请直接将 libs 目录拷贝到应用工程根目录
+res/ | HMS SDK 需要使用的资源目录，包含多国语言。应用如果不需要集成多种语言的，可以适当裁剪。但是必须保留默认语言和简体中文。 | 请直接将 res 目录拷贝到应用工程根目录
+assets/ | HMS SDK 请求华为服务器需要使用的证书文件 | 请直接将 assets 目录拷贝到应用工程根目录
+
 
 > 注意：华为 HMS 推送不能与老的 HwPush 共存，如果切换到 HMS 推送，则需要将原来的 HwPush SDK 全部删除干净才行。
 
