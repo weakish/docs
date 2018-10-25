@@ -13,18 +13,13 @@
 - [即时通讯开发指南 &middot; 基础入门](realtime-guide-beginner.html)
 - [即时通讯开发指南 &middot; 进阶功能](realtime-guide-intermediate.html)
 
-
-## REST API
-
-即时通讯 REST API 的目的是为了给开发者提供一个不依赖 SDK 的高级功能接口。首先请阅读[即时通讯 REST API 使用指南 v2](realtime_rest_api_v2.html)。
-
-## 消息
+## 敏感词过滤和掉线通知
 
 ### 敏感词过滤
 
 敏感词在[即时通讯服务总览#敏感词过滤](realtime_v2.html#敏感词过滤)有介绍，这是默认选项，而一些特殊场景中，可能会有一些自定义敏感词的需求，因此在控制台->消息->设置页面可以开关这个功能，并且还可以提交自定义敏感词的词库。
 
-### 遗愿消息
+### 掉线通知 - 遗愿消息
 
 遗愿消息是在一个用户突然掉线之后，系统自动通知对话的其他成员关于该成员已掉线的消息。好似在掉线后要给对话中的其他成员一个妥善的交待，所以被戏称为「遗愿」消息，如下图中的「Tom 已掉线，无法收到消息」。
 
@@ -80,7 +75,8 @@ await conversation.SendAsync(message, sendOptions);
 ```
 
 
-## Hook
+## 在云端进行消息控制
+
 即时通讯服务通过云引擎服务可以实现 Hook 函数的功能：
 
 > 开发者在服务端定义一些 Hook 函数，在对话创建/消息发送等函数被调用的时候，即时通讯服务会调用这些 Hook 函数，让开发者更自由的控制业务逻辑。
@@ -94,7 +90,7 @@ AV.Cloud.onIMMessageReceived((request) => {
     //     receipt: false,
     //     groupId: null,
     //     system: null,
-    //     content: '{"_lctext":"耗子，起床！","_lctype":-1}',
+    //     content: '{"_lctext":"来我们去XX传奇玩吧","_lctype":-1}',
     //     convId: '5789a33a1b8694ad267d8040',
     //     toPeers: ['Jerry'],
     //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
@@ -106,7 +102,7 @@ AV.Cloud.onIMMessageReceived((request) => {
 
     let content = request.params.content;
     console.log('content', content);
-    let processedContent = content.replace('XX中介', '**');
+    let processedContent = content.replace('XX传奇', '**');
     // 必须含有以下语句给服务端一个正确的返回，否则会引起异常
   return {
     content: processedContent
@@ -121,7 +117,7 @@ def _messageReceived(**params):
     #     'receipt': false,
     #     'groupId': null,
     #     'system': null,
-    #     'content': '{"_lctext":"耗子，起床！","_lctype":-1}',
+    #     'content': '{"_lctext":"来我们去XX传奇玩吧","_lctype":-1}',
     #     'convId': '5789a33a1b8694ad267d8040',
     #     'toPeers': ['Jerry'],
     #     '__sign': '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
@@ -134,7 +130,7 @@ def _messageReceived(**params):
     content = json.loads(params['content'])
     text = content._lctext
     print('text:', text)
-    processed_content = text.replace('XX中介', '**')
+    processed_content = text.replace('XX传奇', '**')
     print('_messageReceived end')
     # 必须含有以下语句给服务端一个正确的返回，否则会引起异常
     return {
@@ -148,7 +144,7 @@ Cloud::define("_messageReceived", function($params, $user) {
     //     receipt: false,
     //     groupId: null,
     //     system: null,
-    //     content: '{"_lctext":"耗子，起床！","_lctype":-1}',
+    //     content: '{"_lctext":"来我们去XX传奇玩吧","_lctype":-1}',
     //     convId: '5789a33a1b8694ad267d8040',
     //     toPeers: ['Jerry'],
     //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
@@ -162,7 +158,7 @@ Cloud::define("_messageReceived", function($params, $user) {
     $content = json_decode($params["content"], true);
     $text = $content["_lctext"];
     error_log($text);
-    $processedContent = preg_replace("XX中介", "**", $text);
+    $processedContent = preg_replace("XX传奇", "**", $text);
     return array("content" => $processedContent);
 });
 ```
@@ -207,9 +203,8 @@ RTM-->SDK: 4.将 hook 函数处理结果发送给接收方
 ```mermaid
 graph LR
 A(SDK 客户端) --> |发送消息| B(RTM)
-B -.-> C(Engine)
-C --> D(_messageReceived)
-D --> E{接收者是否在线?}
+B -.-> C(Engine/_messageReceived)
+C --> E{接收者是否在线?}
 E --> |否| F(_receiversOffline)
 E --> |是| G(_messageSent)
 F --> H[自定义离线消息推送]
@@ -402,9 +397,8 @@ Cloud::define('_messageSent', function($params, $user) {
 ```mermaid
 graph LR
 A(SDK 客户端) -->|创建对话|B(RTM)
-B -.-> C(Engine)
-C --> D(_conversationStart)
-D --> E(_conversationStarted)
+B -.-> C(Engine/_conversationStart)
+C --> E(_conversationStarted)
 E --> F[送达对话创建成功通知]
 ```
 
@@ -417,9 +411,8 @@ E --> F[送达对话创建成功通知]
 ```mermaid
 graph LR
 A(SDK 客户端) -->|加入对话/邀请他人加入|B(RTM)
-B -.-> C(Engine)
-C --> D(_conversationAdd)
-D --> E[送达对话加入成功通知]
+B -.-> C(Engine/_conversationAdd)
+C --> E[送达对话加入成功通知]
 ```
 
 对应的成员离开时的 Hook 流程图如下：
@@ -427,9 +420,8 @@ D --> E[送达对话加入成功通知]
 ```mermaid
 graph LR
 A(SDK 客户端) -->| 将他人从对话中踢出|B(RTM)
-B -.-> C(Engine)
-C --> D(_conversationRemove)
-D --> E[送达踢出成功通知]
+B -.-> C(Engine/_conversationRemove)
+C --> E[送达踢出成功通知]
 ```
 
 注意：此处有一个与 `_conversationAdd` 不同之处，自己退出对话，不会触发 `_conversationRemove`
@@ -458,9 +450,8 @@ graph LR
 A(SDK 客户端) -->|创建对话|B(RTM)
 B --> C{签名是否合法}
 C -->|否| D[拒绝操作]
-C -.->|是| E(Engine)
-E --> F(_conversationStart)
-F --> G(_conversationStarted)
+C -.->|是| E(Engine/_conversationStart)
+E --> G(_conversationStarted)
 G --> H[送达对话创建成功通知]
 ```
 
@@ -582,3 +573,8 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
   { title: "基础入门", href: "realtime-guide-beginner.html" }, 
   { title: "进阶功能", href: "realtime-guide-intermediate.html"}])
 }}
+
+
+## REST API
+
+即时通讯 REST API 的目的是为了给开发者提供一个不依赖 SDK 的高级功能接口。首先请阅读[即时通讯 REST API 使用指南 v2](realtime_rest_api_v2.html)。

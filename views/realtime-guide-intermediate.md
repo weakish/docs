@@ -7,6 +7,16 @@
 
 # 即时通讯开发指南 &middot; 进阶功能
 
+## 使用场景和解决的需求
+
+在[即时通讯开发指南 &middot; 基础入门](realtime-guide-beginner.html)中介绍了即时通讯的基础功能，在更多时候，我们需要解决的不只是基础的聊天，发文字，发图片，更多的时候我们要解决更为复杂的通信场景和丰富的功能：
+
+- 对话的自定义属性添加和使用
+- 更多的富媒体消息类型，例如短视频消息、文件消息等
+- 离线消息推送到移动端
+- 消息记录的查询和缓存
+
+
 ## 阅前准备
 
 建议先按照顺序阅读如下文档之后，再阅读本文效果最佳：
@@ -14,7 +24,7 @@
 - [即时通讯服务总览](realtime_v2.html)
 - [即时通讯开发指南 &middot; 基础入门](realtime-guide-beginner.html)
 
-## 对话属性
+## 给对话添加自定义属性
 
 对话(`Conversation`)是即时通讯的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。
 
@@ -107,7 +117,8 @@
 
 {{ docs.langSpecEnd('cs') }}
 
-### 自定义属性
+
+### 创建自定义属性
 
 创建时可以指定一些自定义属性：
 
@@ -154,9 +165,9 @@ var conversationBuilder = tom.GetConversationBuilder().SetProperty("type", "priv
 var conversation = await tom.CreateConversationAsync(conversationBuilder);
 ```
 
-**自定义属性在 SDK 级别是对所有成员可见的**。要对属性进行查询，请参见[对话的查询](#对话的查询)
+**自定义属性在 SDK 级别是对所有成员可见的**。我们也支持通过自定义属性来查询对话，请参见[对话的查询](#对话的查询)
 
-### 属性使用和修改
+### 修改和使用属性
 
 以 `conversation.name` 为例，对话的 `conversation.name` 的属性是所有成员共享的，可以通过如下代码修改：
 
@@ -225,7 +236,7 @@ conversation["pinned"] = false;
 await conversation.SaveAsync();
 ```
 
-## 对话类型（聊天模式）
+## 同学/同事群、聊天室、公众号及其他
 
 在[即时通讯开发指南 &middot; 基础入门](realtime-guide-beginner.html)中介绍了两种通用的对话类型：
 
@@ -259,7 +270,7 @@ await conversation.SaveAsync();
 
 对应场景|基础类型|特征备注
 --|--|--
-社交私聊|普通对话|成员数量恒定为 2
+社交私聊|`Conversation`|成员数量恒定为 2
 同学/同事群聊|`Conversation`|成员数量不定，并且对话本身持久化存储
 游戏公会/帮派群聊|`Conversation`|与同学/同事群聊类似
 文字直播/聊天室|`ChatRoom`|成员数量变化频率较高，消息数量较大，消息频率/峰值变化明显
@@ -393,7 +404,6 @@ conv.addMembers(Arrays.asList("Harry"), new AVIMConversationCallback() {
 ```cs
 await schoolmateGroup.InviteAsync(new string[]{ "Harry" });
 ```
-
 
 ### 聊天室
 
@@ -680,7 +690,7 @@ query.WhereMatches("language","[\\u4e00-\\u9fa5]"); //language 是中文字符
 
 ### 包含查询
 
-包含查询是指方法名字包含 `Contains` 单词的方法，例如查询关键字包含「教育」的对话：
+例如查询关键字包含「教育」的对话：
 
 ```js
 query.contains('keywords','教育');
@@ -753,14 +763,6 @@ query.WhereLessThan("age", 18);
 查询年龄小于 18 或者关键字包含「教育」的对话：
 
 ```js
-// var ageQuery = tom.GetQuery();
-// ageQuery.lessThan('age', 18);
-
-// var keywordsQuery = tom.GetQuery();
-// keywordsQuery.contains('keywords', '教育').
-
-// var query = ConversationQuery.or(ageQuery,keywordsQuery);
-
 JavaScript SDK 暂不支持
 ```
 ```objc
@@ -802,7 +804,7 @@ var query = AVIMConversationQuery.or(new AVIMConversationQuery[] { ageQuery, key
 
 在一些常见的需求中，进入对话列表界面的时候，客户端需要展现一个当前用户所参与的所有对话，一般情况下是按照活跃时间逆序排列在首页，因此给出一个查询优化的建议：
 
-- 查询的时候可以尽量提供了一个 `updatedAt` 或者 `lastMessageAt` 的参数来限定返回结果
+- 查询的时候可以尽量提供了一个 `updatedAt` 或者 `lastMessageAt` 的参数来限定返回结果，原因是 skip 搭配 limit 的查询性能相对较低。
 - 使用 `m` 列的 `contains` 查询来查找包含某人的对话时，也尽量使用默认的 limit 大小 10，再配合 `updatedAt` 或者 `lastMessageAt` 来做条件约束，性能会提升较大
 - 整个应用对话如果数量太多，可以考虑在云引擎封装一个云函数，用定时任务启动之后，周期性地做一些清理，例如可以归档一些不活跃的对话，直接删除即可。
 
