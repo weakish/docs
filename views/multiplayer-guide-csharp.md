@@ -333,17 +333,6 @@ play.SetMaster(newMasterId);
 ```
 {% endblock %}
 
-{% block master_set_master %}
-```cs
-var options = new RoomOptions()
-{
-   Flag = MasterSetMaster
-};
-play.CreateRoom(roomOptions: options);
-```
-{% endblock %}
-
-
 {% block master_switched_event %}
 ```cs
 // 注册主机切换事件

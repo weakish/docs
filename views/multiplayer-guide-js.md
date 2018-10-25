@@ -356,16 +356,6 @@ play.setMaster(newMasterId);
 ```
 {% endblock %}
 
-{% block master_set_master %}
-```javascript
-play.createRoom({
-  roomOptions: {
-    flag: CreateRoomFlag.MasterSetMaster
-  },
-});
-```
-{% endblock %}
-
 {% block master_switched_event %}
 ```javascript
 // 注册主机切换事件

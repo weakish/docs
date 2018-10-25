@@ -1,7 +1,16 @@
 # Client Engine 开发指南 · Node.js
 
 ## 初始项目
-请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.md) 获得初始项目，了解其大致的逻辑、如何本地运行及部署项目。本文档在[初始项目](https://github.com/leancloud/client-engine-nodejs-getting-started)的基础上讲解如何开发您自己的游戏逻辑。
+请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.md) 获得初始项目，了解如何本地运行及部署项目。本文档在[初始项目](https://github.com/leancloud/client-engine-nodejs-getting-started)的基础上讲解如何开发您自己的游戏逻辑。
+
+## 示例游戏逻辑
+初始项目中双人剪刀石头布游戏的主要逻辑为：Client Engine 负责向客户端分配可用的房间，客户端加入房间后，在房间内由 MasterClient 控制游戏内的逻辑：
+
+1. 玩家客户端[连接](multiplayer-guide-js.html#连接)实时对战服务，向实时对战服务请求[随机匹配房间](multiplayer-guide-js.html#随机加入房间)。
+2. 如果实时对战服务没有合适的房间，玩家客户端转而请求 Client Engine 提供的 `/reservation` 接口请求房间。
+3. Client Engine 每次收到请求后会再次寻找可用的房间，如果没有可用的房间则创建一个新的 MasterClient ，MasterClient [连接](multiplayer-guide-js.html#连接)实时对战服务并[创建房间](multiplayer-guide-js.html#创建房间)，相关接口返回房间名称给客户端。
+4. 客户端通过 Client Engine 返回的房间名称[加入房间](multiplayer-guide-js.html#加入房间)，MasterClient 和客户端在同一房间内通过[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)等方式进行消息互动，完成对游戏逻辑的控制。
+5. MasterClient 判定游戏结束，客户端离开房间，Client Engine 销毁游戏。
 
 ## 项目详解
 
@@ -13,7 +22,7 @@
 ├── configs.ts        // 配置文件
 ├── index.ts          // 项目入口
 ├── utils.ts          // 一些工具方法
-├── game-manager.ts   // Game 管理类，负责创建并管理具体的 Game 对象
+├── game-manager.ts   // 管理 Game 的类，负责创建并管理具体的 Game 对象
 ├── game.ts           // Game 抽象类的实现文件，提供了 Game 通用的属性及方法。
 ├── automation.ts     // AutomaticGame 类实现文件，Game 的子类，支持了 Game 通用的自动逻辑。
 └── rps-game.ts       // RPSGame 类实现文件，Game 的子类，在这个文件中撰写了具体猜拳游戏的逻辑
@@ -24,7 +33,7 @@
 下面我们重点看一下游戏的层次关系和生命周期。
 
 #### Game 角色
-* **Game**：负责游戏的具体逻辑，每个 Game 实例持有一个唯一的 Play Room 与对应的 masterClient。具体的游戏必须继承自该类。
+* **Game**：负责游戏的具体逻辑，每个 Game 实例对应一个唯一的 Play Room 与 masterClient。具体的游戏必须继承自该类。
 * **AutomaticGame**：`Game` 的子类，提供了两种场景场景的便利调用：您可能需要在「房间人满」时执行某些逻辑、在所有玩家离开房间「销毁游戏」时做一些清理工作，具体的实现方式请参考后面的文档[房间人满事件](#房间人满事件)及[游戏结束](#游戏结束)。
 * **RPSGame**：是我们实现的猜拳游戏的核心类，继承自 `Game`，您可以参考这个类来实现自己的房间内游戏逻辑。
 
@@ -50,10 +59,7 @@ Game 类在实时对战 SDK 的基础上封装了以下方法，使得 MasterCli
 你需要通过创建一个继承自 `Game` 的类来撰写自己的游戏逻辑，**尽可能避免**对 `Game`、`AutomaticGame` 及 `GameManager`做任何改动，以避免出现任何无法解决的问题。具体实现方法请参考接下来的文档。
 
 ## 自定义游戏逻辑
-下面从实际使用场景出发，以 `RPSGame` 为例，讲解如何使用初始项目实现自己的游戏逻辑。
-
-### 连接实时对战服务器
-Client Engine 托管了 N 个 MasterClient，每一个 MasterClient 都需要连接到实时对战服务，初始项目已经帮您处理了 MasterClient 的创建及连接，不需要您再自己写代码，如果您对实现方式感兴趣，可以自行阅读初始项目 `Game` 中的 `createNewGame()` 方法。
+下面从实际使用场景出发，以 `RPSGame` 为例，讲解如何使用初始项目实现自己的游戏逻辑。整个游戏的核心流程如下：
 
 ### 设置最大玩家数量
 `Game` 提供了 playerLimit 静态属性配置每局游戏的最大玩家数量，默认为 2 个玩家对战，如果您需要改变最大玩家数量，例如像斗地主一样三个人才能开始游戏，可以在 `RPSGame` 中通过以下代码配置：
@@ -67,13 +73,10 @@ export default class RPSGame extends Game {
 
 需要注意的是，对于实时对战服务来说，一个房间限制为最多 10 个成员，并且MasterClient 也算做其中之一，而 `Game` 中的 playerLimit 是不包含 MasterClient 的成员数量，因此这里**最多只能设置为 9 个玩家**一起游戏。
 
-
 ### 玩家匹配
-初始项目中的 `index.ts` 中的 `/reservation` 接口已经为您准备好了返回可用房间的逻辑，您可以这样使用此接口：
+客户端首先向实时对战服务发起[随机匹配](multiplayer-guide-js.html#随机加入房间)请求，当匹配失败且错误码为 [4301](multiplayer-error-code.html#4301) 时，调用 Client Engine 中的 `/reservation` 接口创建房间，该接口会返回 roomName 给客户端。客户端再通过 roomName [加入指定房间](multiplayer-guide-js.html#加入指定房间)。
 
-客户端首先向实时对战服务发起[随机匹配](multiplayer-guide-js.html#随机加入房间)请求，当匹配时失败原因为 [4301](multiplayer-error-code.html#4301) 错误码时，调用 Client Engine 中的 `/reservation` 接口创建房间，该接口会返回 roomName 给客户端。客户端再通过 roomName [加入指定房间](multiplayer-guide-js.html#加入指定房间)。
-
-**客户端**示例代码（非 Client Engine）：
+**客户端示例代码（非 Client Engine）：**
 
 ```js
 // 匹配房间
@@ -105,17 +108,25 @@ play.on(Event.ROOM_JOIN_FAILED, (error) => {
 });
 ```
 
+**Client Engine 代码：**
+
+初始项目中的 `index.ts` 中的 `/reservation` 接口已经为您准备好了返回可用房间的逻辑，同时帮您处理了 MasterClient 连接实时对战服务并创建房间的逻辑，不需要您再自己写代码，如果您对实现方式感兴趣，可以自行阅读 `/reservation` 接口代码及 `Game` 中的 `createNewGame()` 方法。
+
 ### 房间内逻辑
+客户端加入房间后，MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，此时 MasterClient 和客户端就可以在同一房间内通信了。当房间人满时，初始项目提供的房间人满事件会被触发，MasterClient 广播游戏开始，客户端和 MasterClient 之间开始通信交互。当一局游戏完成后，客户端离开房间，游戏结束。
 
 #### 加入房间事件
 当客户端成功加入房间后，位于 Client Engine 的 MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，如果您需要监听此事件，可以在 `RPSGame` 中的 `constructor()` 方法中撰写监听的代码：
 
 ```js
-constructor(room: Room, masterClient: Play) {
-  super(room, masterClient);
-  this.masterClient.on(Event.PLAYER_ROOM_JOINED, () => {
-    console.log('有人来了');
-  });
+import Game from "./game";
+export default class RPSGame extends Game {
+  constructor(room: Room, masterClient: Play) {
+    super(room, masterClient);
+    this.masterClient.on(Event.PLAYER_ROOM_JOINED, () => {
+      console.log('有人来了');
+    });
+  }
 }
 ```
 
@@ -127,7 +138,7 @@ import Game from "./game";
 import {watchRoomFull, AutomaticGameEvent} from "./automation";
 
 @watchRoomFull()
-export default class NewGame extends Game {
+export default class RPSGame extends Game {
   constructor(room: Room, masterClient: Play) {
     super(room, masterClient);
     // 监听 ROOM_FULL 事件，收到此事件后调用 `onRoomFull() 方法`
@@ -186,7 +197,7 @@ import Game from "./game";
 import {autoDestroy} from "./automation";
 
 @autoDestroy()
-export default class NewGame extends Game {
+export default class RPSGame extends Game {
   protected destroy() {
     super.destroy();
     console.log('在这里可以做额外的清理工作');

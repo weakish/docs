@@ -21,5 +21,5 @@ Client Engine 是 LeanCloud Play 提供的实时对战游戏客户端托管方�
 
 详细的使用方式请参考文档：
 
-* [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html)
-* [Client Engine 开发指南 · Node.js](client-engine-guide-node.html)
+* [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 介绍了从初始项目开始，如何本地开发调试，以及部署到云端。
+* [Client Engine 开发指南 · Node.js](client-engine-guide-node.html) 对初始项目的逻辑、提供的通用属性方法等进行了详细的说明，最终您可以在初始项目的基础上完成自己的游戏。

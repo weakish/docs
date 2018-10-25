@@ -1,14 +1,8 @@
 # Client Engine 快速入门 · Node.js
 
-该文档帮助你快速了解如何创建一个 Client Engine 项目，本地开发调试以及如何部署到云端。
+该文档帮助你快速了解如何创建一个 Client Engine 项目，该项目是一个简单的双人剪刀石头布游戏，游戏逻辑的开发依赖于实时对战 JavaScript SDK。
 
-## 项目逻辑
-该项目是将 MasterClient 托管到 Client Engine 的示例项目，实现的是简单的双人剪刀石头布游戏，游戏逻辑的开发依赖于实时对战 JavaScript SDK。整个游戏主要逻辑为：服务端负责创建房间，创建房间后玩家客户端加入房间，之后在房间内由 MasterClient 控制游戏内的逻辑：
-
-1. 玩家客户端[连接](multiplayer-guide-js.html#连接)实时对战服务，向实时对战服务请求[随机匹配房间](multiplayer-guide-js.html#随机加入房间)。
-2. 如果实时对战服务没有合适的房间，玩家客户端转而请求 Client Engine 提供的 `/reservation` 接口请求新建房间。
-3. Client Engine 每次收到请求后都会创建一个 MasterClient ，MasterClient [连接](multiplayer-guide-js.html#连接)实时对战服务并[创建房间](multiplayer-guide-js.html#创建房间)，相关接口返回房间名称给客户端。
-4. 客户端通过 Client Engine 返回的房间名称[加入房间](multiplayer-guide-js.html#加入房间)，MasterClient 和客户端在同一房间内通过[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)等方式进行消息互动，完成对游戏逻辑的控制。
+我们在这篇文档中先了解如何本地启动项目，简单试玩一下，然后部署项目到云端。之后在[开发指南](client-engine-guide-node.html)中会介绍详细的游戏逻辑以及如何开发自己的游戏。
 
 ## 启动项目
 
@@ -90,7 +84,7 @@ lean up
 lean deploy
 ```
 
-在浏览器中登录 LeanCloud 控制台，进入 Play - Client Engine - 设置，在「Web 主机域名」中设置二级域名，通过 `http://$stg-{your_app_domain}.leanapp.cn` 访问预备环境。
+在浏览器中登录 LeanCloud 控制台，进入 Play - Client Engine - 设置，在「Web 主机域名」中设置二级域名，通过 `http://stg-<YOUR-APP-DOMAIN>.leanapp.cn` 访问预备环境。
 
 例如填写 `myapp`，设置成功后通过 `http://stg-myapp.leanapp.cn`访问，此时可以看到 Client Engine 服务端正在运行的文本。
 
