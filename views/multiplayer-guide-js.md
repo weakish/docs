@@ -150,7 +150,9 @@ const options = {
 	playerTtl: 300,
 	customRoomProperties: props,
 	// 用于做房间匹配的自定义属性键，即房间匹配条件为 level = 2
-	customRoomPropertyKeysForLobby: ['level']
+	customRoomPropertyKeysForLobby: ['level'],
+	// 给 MasterClient 设置权限
+	flag: CreateRoomFlag.MasterSetMaster | CreateRoomFlag.MasterUpdateRoomProperties
 };
 const expectedUserIds = ['world'];
 play.createRoom({ 
@@ -170,7 +172,7 @@ play.createRoom({
 - `maxPlayerCount`：房间允许的最大玩家数量。
 - `customRoomProperties`：房间的自定义属性。
 - `customRoomPropertyKeysForLobby`：房间的自定义属性 `customRoomProperties` 中「键」的数组，包含在 `customRoomPropertyKeysForLobby` 中的属性将会出现在大厅的房间属性中（`play.lobbyRoomList`），而全部属性要在加入房间后的 `room.getCustomProperties()` 中查看。这些属性将会在匹配房间时用到。
-- `flag`：创建房间标志位，包括是否固定 Master、只允许 Master 设置房间属性、只允许 Master 设置 Master。请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/global.html#CreateRoomFlag)。
+- `flag`：创建房间标志位，详情请看下文中 [MasterClient 掉线不转移](#MasterClient 掉线不转移), [指定其他成员为 MasterClient](#指定其他成员为 MasterClient)，[只允许 MasterClient 修改房间属性](#只允许 MasterClient 修改房间属性)。
 {% endblock %}
 
 
@@ -354,8 +356,6 @@ play.setMaster(newMasterId);
 ```
 {% endblock %}
 
-
-
 {% block master_switched_event %}
 ```javascript
 // 注册主机切换事件
@@ -367,6 +367,17 @@ play.on(Event.MASTER_SWITCHED, (data) => {
 	if (play.player.isMaster()) {
 
 	}
+});
+```
+{% endblock %}
+
+
+{% block master_fixed %}
+```js
+play.createRoom({
+  roomOptions: {
+    flag: CreateRoomFlag.FixedMaster
+  },
 });
 ```
 {% endblock %}
@@ -412,6 +423,18 @@ play.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (data) => {
 ```
 
 注意：`changedProps` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `play.room.getCustomProperties()` 获得。
+{% endblock %}
+
+{% block master_update_room_properties %}
+
+```js
+play.createRoom({
+  roomOptions: {
+    flag: CreateRoomFlag.MasterUpdateRoomProperties
+  },
+});
+```
+
 {% endblock %}
 
 

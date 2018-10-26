@@ -262,22 +262,38 @@
 
 ## MasterClient
 
-为了不依赖于服务端而更快速地开发实时对战游戏，我们引入了 `MasterClient` 的概念，即承担「逻辑运算功能」的特殊客户端。
+MasterClient 在实时对战中是承担「逻辑运算功能」的特殊 Client，它充当服务器的存在，例如它在游戏中可以负责以下场景：
 
-有以下几点需要注意：
-1. 默认房间的创建者为 MasterClient。
-2. 在游戏过程中，MasterClient 可以指定其他玩家作为新的 MasterClient。
-3. 当 MasterClient 掉线后，服务器会指任一名新的玩家为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。
+* 在卡牌游戏中为用户发牌；
+* 控制刷怪的时机及逻辑；
+* 游戏结束时判断胜负；
+* ...等等。
 
-{% block set_master %}
-{% endblock %}
+实时对战服务默认房间的创建者为 MasterClient。
 
-当 MasterClient 变化时，Play SDK 会派发 `MASTER_SWITCHED`（主机切换）事件通知客户端。
+### MasterClient 位于玩家客户端
+您可以将 MasterClient 的逻辑写在客户端中，作为房间创建者的玩家终端会承担游戏运算。在这种情况下，实时对战为 MasterClient 提供了以下方便的功能：
+
+#### MasterClient 掉线转移
+当 MasterClient 掉线后，实时对战服务会指任一名新的玩家客户端为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。当 MasterClient 变化时，Play SDK 会派发 `MASTER_SWITCHED`（主机切换）事件通知客户端。
 
 {% block master_switched_event %}
 {% endblock %}
 
+#### 指定其他成员为 MasterClient
+在游戏过程中，MasterClient 如果不想再承担运算功能，可以调用以下方法主动将自己的角色转移给其他玩家客户端：
+{% block set_master %}
+{% endblock %}
 
+### 在 Client Engine 中托管 MasterClient
+
+为了确保游戏安全，防止用户作弊等，我们推荐您将 MasterClient 托管在 LeanCloud 提供的服务端 [Client Engine](client-engine) 中，同时做以下权限配置：
+
+#### MasterClient 掉线不转移
+将 MasterClient 放在服务端后，MasterClient 意外掉线时也不应当转移角色，此时需要在创建房间时指定 `FixedMaster` Flag：
+
+{% block master_fixed %}
+{% endblock %}
 
 ## 自定义属性及同步
 
@@ -302,6 +318,14 @@
 
 {% block custom_props_event %}
 {% endblock %}
+
+
+#### 只允许 MasterClient 修改房间属性
+默认情况下房间内所有 Client 都可以修改房间的自定义属性，如果您希望只允许 MasterClient 修改，可以在创建房间时指定 `MasterUpdateRoomProperties` Flag：
+
+{% block master_update_room_properties %}
+{% endblock %}
+
 
 ### 玩家自定义属性
 
