@@ -150,6 +150,7 @@ AVOSCloud.requestSMSCode("18612345678", "Register_Notice", null);
   
 2. **调用接口发送验证短信**  
   注意，在这一步之前，我们假设开发者已经完成了前面章节提及的所有短信服务设置。
+
 ```objc
 AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
 options.TTL = 10;                      // 验证码有效时间为 10 分钟
@@ -1095,6 +1096,7 @@ LeanCloud 提供了内建的 [账户系统](leanstorage_guide-js.html#用户) �
   引导用户正确的输入，建议在调用 SDK 接口之前，验证一下手机号的格式。
 
 2. **调用 AVUser 的注册接口，传入手机号以及密码。**  
+
 ```objc
 AVUser *user = [AVUser user];
 user.username = @"hjiang";
