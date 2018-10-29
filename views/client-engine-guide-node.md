@@ -115,7 +115,7 @@ play.on(Event.ROOM_JOIN_FAILED, (error) => {
 当客户端成功加入房间后，位于 Client Engine 的 MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，如果您需要监听此事件，可以在 `RPSGame` 中的 `constructor()` 方法中撰写监听的代码：
 
 ```js
-import Game from "@leancloud/client-engine";
+import { Game } from "@leancloud/client-engine";
 export default class RPSGame extends Game {
   constructor(room: Room, masterClient: Play) {
     super(room, masterClient);
@@ -137,11 +137,11 @@ import { AutomaticGameEvent, Game, watchRoomFull } from "@leancloud/client-engin
 export default class RPSGame extends Game {
   constructor(room: Room, masterClient: Play) {
     super(room, masterClient);
-    // 监听 ROOM_FULL 事件，收到此事件后调用 `onRoomFull() 方法`
-    this.once(AutomaticGameEvent.ROOM_FULL, () => this.onRoomFull());
+    // 监听 ROOM_FULL 事件，收到此事件后调用 `start() 方法`
+    this.once(AutomaticGameEvent.ROOM_FULL, this.start);
   }
 
-  protected async onRoomFull(): Promise<void> {
+  protected start = async () => {
     // 在这里撰写自己房间人满后的逻辑
     // 标记房间不再可加入
     this.masterClient.setRoomOpened(false);
