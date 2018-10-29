@@ -192,6 +192,18 @@ className-{{ name }}
     { lang: "java", value: "AVIMConversationEventHandler.onKicked"},
     { lang: "cs", value: "AVIMClient.OnKicked"}
   ])}}
+  {{ useLangSpec('MESSAGE_RECALL',[
+    { lang: "js", value: "MESSAGE_RECALL" },
+    { lang: "objc", value: "conversation:messageHasBeenUpdated:" },
+    { lang: "java", value: "AVIMConversationEventHandler.onMessageRecalled"},
+    { lang: "cs", value: "AVIMClient.OnMessageRecalled"}
+  ])}}
+  {{ useLangSpec('MESSAGE_UPDATE',[
+    { lang: "js", value: "MESSAGE_UPDATE" },
+    { lang: "objc", value: "conversation:messageHasBeenUpdated:" },
+    { lang: "java", value: "AVIMConversationEventHandler.onMessageUpdated"},
+    { lang: "cs", value: "AVIMClient.OnMessageModified"}
+  ])}}
   {{ useLangSpec('MESSAGE',[
     { lang: "js", value: "MESSAGE" },
     { lang: "objc", value: "AVIMClientDelegate.didReceiveTypedMessage" },

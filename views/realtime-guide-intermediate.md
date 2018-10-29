@@ -1300,7 +1300,7 @@ conversation.recallMessage(message, new AVIMMessageRecalledCallback() {
 await conversation.RecallAsync(message);
 ```
 
-对应的是接收方会触发 `Event.MESSAGE_RECALL` 的事件：
+对应的是接收方会触发 `MESSAGE_RECALL` 的事件：
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -1378,7 +1378,7 @@ textMessage.TextContent = "修改之后的文本消息内容";
 conversation.ModifyAsync(textMessage);
 ```
 
-对应的是接收方会触发 `Event.MESSAGE_UPDATE`：
+对应的是接收方会触发 `MESSAGE_UPDATE`：
 
 ```js
 var { Event } = require('leancloud-realtime');
