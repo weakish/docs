@@ -1103,7 +1103,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 iOS 和 Android SDK 分别提供了内置的消息缓存机制，减少客户端对云端消息记录的查询次数，并且在离线情况下，也能查询到准确的消息记录。
 
-### 获取对话的全部消息记录
+### 获取对话的消息记录
 
 如下代码可以获取一个对话最近的 10 条消息，注意，返回结果是按照时间**由新到旧**排序的：
 

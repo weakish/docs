@@ -16,7 +16,6 @@
 - 离线消息推送到移动端
 - 消息记录的查询和缓存
 
-
 ## 阅前准备
 
 建议先按照顺序阅读如下文档之后，再阅读本文效果最佳：
@@ -28,7 +27,7 @@
 
 对话(`Conversation`)是即时通讯的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。
 
-默认提供的属性的对应关系如下：
+默认提供的**内置**属性的对应关系如下：
 
 {{ docs.langSpecStart('js') }}
 
@@ -268,7 +267,7 @@ await conversation.SaveAsync();
 
 首先我们通过下面的表格来归类，更加直观地展现不同需求对应的基础类型：
 
-对应场景|基础类型|特征备注
+对应场景|推荐使用类型|特征备注
 --|--|--
 社交私聊|`Conversation`|成员数量恒定为 2
 同学/同事群聊|`Conversation`|成员数量不定，并且对话本身持久化存储
@@ -1505,19 +1504,105 @@ AVIMSendOptions sendOptions = new AVIMSendOptions()
 - [云引擎 NodeJS 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-node.html#_receiversOffline)
 - [云引擎 Python 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-python.html#_receiversOffline)
 
-## 消息记录
+## 消息记录的查询与获取
 
 ### 获取较新的消息
 
-[基础入门#消息记录](realtime-guide-beginner.html#消息记录)演示的是从后往前（从最近的向更早）查询的方式，还有从前往后（以某一条消息为基准，查询它之后产生的消息）的查询方式
+[基础入门#消息记录](realtime-guide-beginner.html#消息记录)演示的是从后往前（从最近的向更早）查询的方式，还有从前往后（以某一条消息为基准，查询它之后产生的消息）的查询方式。
+
+如下代码演示从对话创建的时间点开始，从前往后查询消息记录：
 
 ```js
 ```
 ```objc
+[conversation queryMessagesInInterval:nil direction:AVIMMessageQueryDirectionFromOldToNew limit:20 callback:^(NSArray<AVIMMessage *> * _Nullable messages, NSError * _Nullable error) {
+    if (messages.count) {
+        // handle result.
+    }
+}];
 ```
 ```java
+AVIMMessageInterval internal = new AVIMMessageInterval(null, null);
+conversation.queryMessages(internal, AVIMMessageQueryDirectionFromOldToNew, limit,
+  new AVIMMessagesQueryCallback(){
+    public void done(List<AVIMMessage> messages, AVIMException exception) {
+      // handle result
+    }
+});
 ```
 ```cs
+var earliestMessages = await conversation.QueryMessageFromOldToNewAsync();
+```
+
+为了实现翻页，请配合下一节[从某一时间戳往某一方向查询](#从某一时间戳往某一方向查询)
+
+### 从某一时间戳往某一方向查询
+
+已某一条消息的 Id 和 时间戳为准，往一个方向查：
+
+- 从后向前：以某一条消息为基准，查询它之**前**产生的消息
+- 从前向后：以某一条消息为基准，查询它之**后**产生的消息
+
+
+```js
+```
+```objc
+AVIMMessageIntervalBound *start = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:timestamp closed:false];
+AVIMMessageInterval *interval = [[AVIMMessageInterval alloc] initWithStartIntervalBound:start endIntervalBound:nil];
+[conversation queryMessagesInInterval:interval direction:direction limit:20 callback:^(NSArray<AVIMMessage *> * _Nullable messages, NSError * _Nullable error) {
+    if (messages.count) {
+        // handle result.
+    }
+}];
+```
+```java
+AVIMMessageIntervalBound start = AVIMMessageInterval.createBound(messageId, timestamp, false);
+AVIMMessageInterval internal = new AVIMMessageInterval(start, null);
+AVIMMessageQueryDirection direction;
+conversation.queryMessages(internal, direction, limit,
+  new AVIMMessagesQueryCallback(){
+    public void done(List<AVIMMessage> messages, AVIMException exception) {
+      // handle result
+    }
+});
+```
+```cs
+var earliestMessages = await conversation.QueryMessageFromOldToNewAsync();
+// get some messages after earliestMessages.Last()
+var nextPageMessages = await conversation.QueryMessageAfterAsync(earliestMessages.Last());
+```
+
+### 获取区间内的消息
+
+```js
+```
+```objc
+AVIMMessageIntervalBound *start = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:startTimestamp closed:false];
+    AVIMMessageIntervalBound *end = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:endTimestamp closed:false];
+AVIMMessageInterval *interval = [[AVIMMessageInterval alloc] initWithStartIntervalBound:start endIntervalBound:end];
+[conversation queryMessagesInInterval:interval direction:direction limit:100 callback:^(NSArray<AVIMMessage *> * _Nullable messages, NSError * _Nullable error) {
+    if (messages.count) {
+        // handle result.
+    }
+}];
+```
+```java
+AVIMMessageIntervalBound start = AVIMMessageInterval.createBound(messageId, timestamp, false);
+AVIMMessageIntervalBound end = AVIMMessageInterval.createBound(endMessageId, endTimestamp, false);
+AVIMMessageInterval internal = new AVIMMessageInterval(start, end);
+AVIMMessageQueryDirection direction;
+conversation.queryMessages(internal, direction, limit,
+  new AVIMMessagesQueryCallback(){
+    public void done(List<AVIMMessage> messages, AVIMException exception) {
+      // handle result
+    }
+});
+```
+```cs
+var earliestMessage = await conversation.QueryMessageFromOldToNewAsync(limit: 1);
+var latestMessage = await conversation.QueryMessageAsync(limit: 1);
+// mex count for messagesInInterval is 100
+var messagesInInterval = await conversation.QueryMessageInIntervalAsync(earliestMessage.FirstOrDefault(), latestMessage.FirstOrDefault());
 ```
 
 ### 客户端消息缓存
