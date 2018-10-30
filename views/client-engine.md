@@ -26,4 +26,4 @@ Client Engine 是 LeanCloud Play 提供的实时对战游戏客户端托管方�
 
 ## 试用
 
-Client Engine 正在公测中，每一个应用可免费使用资源 0.5 CPU / 256 MB。如果您测试没问题需要正式上线，请联系 suppor@leancloud.rocks 获得更大额度。
+Client Engine 正在公测中，每一个应用可免费使用资源 0.5 CPU / 256 MB 并遵循[休眠策略](leanengine_plan.html#休眠策略)。如果您测试没问题需要正式上线，请联系 suppor@leancloud.rocks 。
