@@ -265,7 +265,7 @@ dependencies {
 在 `AVOSCloud.initialize` 时调用以下函数：
 
 ```java
-AVMixpushManager.registerXiaomiPush(context, miAppId, miAppKey, profile)
+AVMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile)
 ```
 
 - 参数 `miAppKey` 需要的是 AppKey，而在控制台的混合推送配置中 Profile 的第二个参数是 AppSecret，请注意区分，并分别正确填写。
@@ -296,7 +296,7 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用小
 ```
 dependencies {
     compile ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar')
-    compile ('com.meizu.flyme.internet:push-internal:3.6.+@aar‘)
+    compile ('com.meizu.flyme.internet:push-internal:3.6.+@aar')
 }
 ```
 
@@ -338,7 +338,7 @@ dependencies {
 
 ### 具体使用
 
-在 `AVOSCloud.initialize` 时调用 `AVMixpushManager.registerFlymePush(context, flymeId, flymeKey, profile)` 即可。参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
+在 `AVOSCloud.initialize` 时调用 `AVMixPushManager.registerFlymePush(context, flymeId, flymeKey, profile)` 即可。参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
 
 注意，LeanCloud 云端只有在以下三个条件都满足的情况下，才会使用魅族推送。
 
@@ -451,7 +451,7 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 对于已经注册了混合推送的用户，如果想取消混合推送的注册而改走 LeanCloud 自有的 WebSocket 的话，可以调用如下函数：
 
 ```java
-AVMixpushManager.unRegisterMixPush();
+AVMixPushManager.unRegisterMixPush();
 ```
 
 此函数为异步函数，如果取消成功会有「Registration canceled successfully」的日志输出，万一取消注册失败的话会有类似「unRegisterMixPush error」的日志输出。
