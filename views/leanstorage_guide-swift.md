@@ -635,7 +635,14 @@ let value = lcDate.value
 
 {% block module_in_app_social %}{% endblock %}
 
-{% block code_create_avfile_by_stream_data %}{% endblock %}
+{% block code_create_avfile_by_stream_data %}
+
+```swift
+if let data = "My work experience".data(using: .utf8) {
+    let file = LCFile(payload: .data(data: data))
+}
+```
+{% endblock %}
 
 {% block text_sns %}{% endblock %}
 
@@ -643,21 +650,91 @@ let value = lcDate.value
 
 {% block js_push_guide %}{% endblock %}
 
-{% block code_create_avfile_from_local_path %}{% endblock %}
+{% block code_create_avfile_from_local_path %}
 
-{% block code_create_avfile_from_url %}{% endblock %}
+```swift
+if let url = Bundle.main.url(forResource: "LeanCloud", withExtension: "png") {
+    let file = LCFile(payload: .fileURL(fileURL: url))
+}
+```
+{% endblock %}
 
-{% block code_upload_file %}{% endblock %}
+{% block code_create_avfile_from_url %}
 
-{% block code_upload_file_with_progress %}{% endblock %}
+```swift
+if let url = URL(string: "https://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif") {
+    let file = LCFile(url: url)
+}
+
+// or use a URL string directly to construct a LCFile instance.
+let file = LCFile(url: "https://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif")
+```
+{% endblock %}
+
+{% block code_upload_file %}
+
+```swift
+file.save { result in
+    switch result {
+    case .success:
+        break
+    case .failure(let error):
+        break
+    }
+}
+```
+{% endblock %}
+
+{% block code_upload_file_with_progress %}
+
+```swift
+file.save(
+    progress: { progress in
+        print(progress)
+    },
+    completion: { result in
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            break
+        }
+    })
+```
+{% endblock %}
 
 {% block code_file_image_thumbnail %}{% endblock %}
 
-{% block code_file_metadata %}{% endblock %}
+{% block code_file_metadata %}
+
+```swift
+if let fileURL = Bundle.main.url(forResource: "LeanCloud", withExtension: "png") {
+    let file = LCFile(payload: .fileURL(fileURL: fileURL))
+
+    file.metaData = LCDictionary([
+        "width": 100,
+        "height": 100,
+        "author": "LeanCloud"
+    ])
+}
+```
+{% endblock %}
 
 {% block code_download_file %}{% endblock %}
 
-{% block code_file_delete %}{% endblock %}
+{% block code_file_delete %}
+
+```swift
+file.delete { result in
+    switch result {
+    case .success:
+        break
+    case .failure(let error):
+        break
+    }
+}
+```
+{% endblock %}
 
 {% block code_cache_operations_file %}
 {% endblock %}
