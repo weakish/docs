@@ -624,48 +624,48 @@ query.WhereEqualTo("type","private");
 
 {{ docs.langSpecStart('js') }}
 
-| 逻辑比较 | ConversationQuery 方法 |      |
-| ---- | ------------------------ | ---- |
-| 等于   | `equalTo`                |      |
-| 不等于  | `notEqualTo`             |      |
-| 大于   | `greaterThan`            |      |
-| 大于等于 | `greaterThanOrEqualTo`   |      |
-| 小于   | `lessThan`      |      |
-| 小于等于 | `lessThanOrEqualTo`      |      |
+| 逻辑比较 | ConversationQuery 方法 |     |
+| -------- | ---------------------- | --- |
+| 等于     | `equalTo`              |     |
+| 不等于   | `notEqualTo`           |     |
+| 大于     | `greaterThan`          |     |
+| 大于等于 | `greaterThanOrEqualTo` |     |
+| 小于     | `lessThan`             |     |
+| 小于等于 | `lessThanOrEqualTo`    |     |
 
 {{ docs.langSpecEnd('js') }}
 
 {{ docs.langSpecStart('objc') }}
-| 逻辑比较 | AVIMConversationQuery 方法 |      |
-| ---- | ------------------------ | ---- |
-| 等于   | `equalTo`                |      |
-| 不等于  | `notEqualTo`             |      |
-| 大于   | `greaterThan`            |      |
-| 大于等于 | `greaterThanOrEqualTo`   |      |
-| 小于   | `lessThan`      |      |
-| 小于等于 | `lessThanOrEqualTo`      |      |
+| 逻辑比较 | AVIMConversationQuery 方法 |     |
+| -------- | -------------------------- | --- |
+| 等于     | `equalTo`                  |     |
+| 不等于   | `notEqualTo`               |     |
+| 大于     | `greaterThan`              |     |
+| 大于等于 | `greaterThanOrEqualTo`     |     |
+| 小于     | `lessThan`                 |     |
+| 小于等于 | `lessThanOrEqualTo`        |     |
 {{ docs.langSpecEnd('objc') }}
 
 {{ docs.langSpecStart('java') }}
-| 逻辑比较 | AVIMConversationQuery 方法 |      |
-| ---- | ------------------------ | ---- |
-| 等于   | `whereEqualTo`                |      |
-| 不等于  | `whereNotEqualsTo`             |      |
-| 大于   | `whereGreaterThan`            |      |
-| 大于等于 | `whereGreaterThanOrEqualsTo`   |      |
-| 小于   | `whereLessThan`      |      |
-| 小于等于 | `whereLessThanOrEqualsTo`      |      |
+| 逻辑比较 | AVIMConversationQuery 方法   |     |
+| -------- | ---------------------------- | --- |
+| 等于     | `whereEqualTo`               |     |
+| 不等于   | `whereNotEqualsTo`           |     |
+| 大于     | `whereGreaterThan`           |     |
+| 大于等于 | `whereGreaterThanOrEqualsTo` |     |
+| 小于     | `whereLessThan`              |     |
+| 小于等于 | `whereLessThanOrEqualsTo`    |     |
 {{ docs.langSpecEnd('java') }}
 
 {{ docs.langSpecStart('cs') }}
-| 逻辑比较 | AVIMConversationQuery 方法 |      |
-| ---- | ------------------------ | ---- |
-| 等于   | `WhereEqualTo`                |      |
-| 不等于  | `WhereNotEqualsTo`             |      |
-| 大于   | `WhereGreaterThan`            |      |
-| 大于等于 | `WhereGreaterThanOrEqualsTo`   |      |
-| 小于   | `WhereLessThan`      |      |
-| 小于等于 | `WhereLessThanOrEqualsTo`      |      |
+| 逻辑比较 | AVIMConversationQuery 方法   |     |
+| -------- | ---------------------------- | --- |
+| 等于     | `WhereEqualTo`               |     |
+| 不等于   | `WhereNotEqualsTo`           |     |
+| 大于     | `WhereGreaterThan`           |     |
+| 大于等于 | `WhereGreaterThanOrEqualsTo` |     |
+| 小于     | `WhereLessThan`              |     |
+| 小于等于 | `WhereLessThanOrEqualsTo`    |     |
 {{ docs.langSpecEnd('cs') }}
 
 ### 正则匹配查询
@@ -1043,8 +1043,105 @@ conversation.on(Event.MESSAGE, function messageEventHandler(message) {
 });
 ```
 ```objc
+// handle  built-in typed message
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    // for example: received image message
+    if (message.mediaType == kAVIMMessageMediaTypeImage) {
+        AVIMImageMessage *imageMessage = (AVIMImageMessage *)message;
+        // handle image message.
+    } else if(message.mediaType == kAVIMMessageMediaTypeAudio){
+        // handle audio message
+    } else if(message.mediaType == kAVIMMessageMediaTypeVideo){
+        // handle video message
+    } else if(message.mediaType == kAVIMMessageMediaTypeLocation){
+        // handle location message
+    } else if(message.mediaType == kAVIMMessageMediaTypeFile){
+        // handle file message
+    } else if(message.mediaType == kAVIMMessageMediaTypeText){
+        // handle text message
+    }
+}
+
+// handle customize typed message
+
+// 1. register subclass
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [AVIMCustomMessage registerSubclass];
+}
+// 2. received message
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    if (message.mediaType == 1) {
+        AVIMCustomMessage *imageMessage = (AVIMCustomMessage *)message;
+        // handle image message.
+    }
+}
 ```
 ```java
+// 1. register default handler
+AVIMMessageManager.registerDefaultMessageHandler(new AVIMMessageHandler(){
+    public void onMessage(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
+      // receive new-coming message
+    }
+
+    public void onMessageReceipt(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
+      // do something responding of message receipt event.
+    }
+});
+// 2. register typed message handler
+AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, new AVIMTypedMessageHandler<AVIMTypedMessage>(){
+    public void onMessage(AVIMTypedMessage message, AVIMConversation conversation, AVIMClient client) {
+    switch (message.getMessageType()) {
+        case AVIMMessageType.TEXT_MESSAGE_TYPE:
+        // do something
+        AVIMTextMessage textMessage = (AVIMTextMessage)message;
+        break;
+        case AVIMMessageType.IMAGE_MESSAGE_TYPE:
+        // do something
+        AVIMImageMessage imageMessage = (AVIMImageMessage)message;
+        break;
+        case AVIMMessageType.AUDIO_MESSAGE_TYPE:
+        // do something
+        AVIMAudioMessage audioMessage = (AVIMAudioMessage)message;
+        break;
+        case AVIMMessageType.VIDEO_MESSAGE_TYPE:
+        // do something
+        AVIMVideoMessage videoMessage = (AVIMVideoMessage)message;
+        break;
+        case AVIMMessageType.LOCATION_MESSAGE_TYPE:
+        // do something
+        AVIMLocationMessage locationMessage = (AVIMLocationMessage)message;
+        break;
+        case AVIMMessageType.FILE_MESSAGE_TYPE:
+        // do something
+        AVIMFileMessage fileMessage = (AVIMFileMessage)message;
+        break;
+        case AVIMMessageType.RECALLED_MESSAGE_TYPE:
+        // do something
+        AVIMRecalledMessage recalledMessage = (AVIMRecalledMessage)message;
+        break;
+        default:
+        // UnsupportedMessageType
+        break;
+    }
+    }
+
+    public void onMessageReceipt(AVIMTypedMessage message, AVIMConversation conversation, AVIMClient client) {
+    // do something responding of message receipt event.
+    }
+});
+
+public class CustomMessage extends AVIMMessage {
+  
+    AVIMMessageManager.registerMessageHandler(CustomMessage.class, new MessageHandler<CustomMessage>(){
+      public void onMessage(CustomMessage message, AVIMConversation conversation, AVIMClient client) {
+        // receive new-coming message
+      }
+
+      public void onMessageReceipt(CustomMessage message, AVIMConversation conversation, AVIMClient client){
+        // do something responding of message receipt event.
+      }
+    });
+}
 ```
 ```cs
 // 这里使用的是简单的演示，推荐使用 switch/case 搭配模式匹配来判断类型
@@ -1513,6 +1610,14 @@ AVIMSendOptions sendOptions = new AVIMSendOptions()
 如下代码演示从对话创建的时间点开始，从前往后查询消息记录：
 
 ```js
+var { MessageQueryDirection } = require('leancloud-realtime');
+conversation.queryMessages({
+  direction: MessageQueryDirection.OLD_TO_NEW,
+}).then(function(messages) {
+  // handle result
+}.catch(function(error) {
+  // handle error
+});
 ```
 ```objc
 [conversation queryMessagesInInterval:nil direction:AVIMMessageQueryDirectionFromOldToNew limit:20 callback:^(NSArray<AVIMMessage *> * _Nullable messages, NSError * _Nullable error) {
@@ -1545,6 +1650,17 @@ var earliestMessages = await conversation.QueryMessageFromOldToNewAsync();
 
 
 ```js
+var { MessageQueryDirection } = require('leancloud-realtime');
+conversation.queryMessages({
+  startTime: timestamp,
+  startMessageId: messageId,
+startClosed: false,
+  direction: MessageQueryDirection.OLD_TO_NEW,
+}).then(function(messages) {
+  // handle result
+}.catch(function(error) {
+  // handle error
+});
 ```
 ```objc
 AVIMMessageIntervalBound *start = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:timestamp closed:false];
@@ -1574,7 +1690,21 @@ var nextPageMessages = await conversation.QueryMessageAfterAsync(earliestMessage
 
 ### 获取区间内的消息
 
+假设已知 2 条消息，这 2 条消息以较早的一条为起始点，而较晚的一条为终点，这个区间内产生的消息可以用如下方式查询：
+
+注意：**每次查询也有 100 条限制，如果想要查询区间内所有产生的消息，替换区间起始点的参数即可。**
+
 ```js
+conversation.queryMessages({
+  startTime: timestamp,
+  startMessageId: messageId,
+  endTime: endTimestamp,
+  endMessageId: endMessageId,
+}).then(function(messages) {
+  // handle result
+}.catch(function(error) {
+  // handle error
+});
 ```
 ```objc
 AVIMMessageIntervalBound *start = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:startTimestamp closed:false];
