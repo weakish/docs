@@ -356,7 +356,6 @@ curl -X DELETE \
 ```
 curl -X DELETE \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
   -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
   https://{{host}}/1.1/leaderboard/users/<uid>/statistics?statistics=wins,world
