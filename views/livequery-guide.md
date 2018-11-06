@@ -650,7 +650,7 @@ todo.deleteInBackground(new DeleteCallback() {
 ```
 ```js
 var todo = new AV.Object.createWithoutData('Todo','591d9b302f301e006be22c83');
-todo.delete();
+todo.destroy();
 ```
 ```cs
 var willDelete = AVObject.CreateWithoutData("Todo", "591d9b302f301e006be22c83");
