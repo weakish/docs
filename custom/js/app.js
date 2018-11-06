@@ -1,10 +1,10 @@
 //apps data
 
 var purl = '/1/';
-angular.module("app", ['ui.gravatar','md5']);
-angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout','$compile','$rootScope','$filter',
+angular.module("app", ['ui.gravatar', 'md5']);
+angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout', '$compile', '$rootScope', '$filter',
 
-    function($scope, $http, $timeout, $compile,$rootScope,$filter) {
+    function ($scope, $http, $timeout, $compile, $rootScope, $filter) {
         $scope.appid = "{{appid}}";
         $scope.appkey = "{{appkey}}";
         $scope.masterkey = "{{masterkey}}";
@@ -15,21 +15,21 @@ angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout','$com
         $scope.domainE1 = '{{appid 前八位}}.' + service + '.lncldapi.com';
         $rootScope.pageState = {};
         var sdkversion = 'unknown';
-        if(typeof $sdk_versions != 'undefined'){
-          sdkversion = $sdk_versions;
+        if (typeof $sdk_versions != 'undefined') {
+            sdkversion = $sdk_versions;
         }
         angular.element("body").scope().sdkversion = sdkversion;
 
-        $http.get('/1/clients/self').success(function(data){
-            $scope.user=data;
+        $http.get('/1/clients/self').success(function (data) {
+            $scope.user = data;
         });
 
         $http.get("/1/clients/self/apps").success(
-            function(data) {
+            function (data) {
                 if (data.length > 0) {
                     $rootScope.pageState.currentApp = data[0];
-                    $scope.$watch('pageState.currentApp', function() {
-                        if($scope.pageState.currentApp&&$scope.pageState.currentApp.app_id){
+                    $scope.$watch('pageState.currentApp', function () {
+                        if ($scope.pageState.currentApp && $scope.pageState.currentApp.app_id) {
                             $scope.appid = $scope.pageState.currentApp.app_id;
                             $scope.appkey = $scope.pageState.currentApp.app_key;
                             $scope.masterkey = $scope.pageState.currentApp.master_key;
@@ -43,30 +43,30 @@ angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout','$com
                     $scope.apps = data;
                 }
 
-            }).error(function(data) {
+            }).error(function (data) {
 
             });
-        $scope.signout = function(){
-            $http.post('/1/signout').success(function(data) {
+        $scope.signout = function () {
+            $http.post('/1/signout').success(function (data) {
                 location.reload();
             });
         }
         // 2017-03-24 output undefined variables as is(surrounded by double curl braces)
-        $scope.mustache = function(val){
-          if ( typeof $scope[val] == 'undefined' ){
-            return '{{' + val + '}}';
-          }
-          else {
-            return $scope[val];
-          }
+        $scope.mustache = function (val) {
+            if (typeof $scope[val] == 'undefined') {
+                return '{{' + val + '}}';
+            }
+            else {
+                return $scope[val];
+            }
         }
 
         window.addEventListener("message", receiveMessage, false);
 
-        function receiveMessage(event)
-        {
-            win.close();
-            $scope.$apply(function(){
+        function receiveMessage(event) {
+            if (win != undefined)
+                win.close();
+            $scope.$apply(function () {
                 getUser();
             });
         }
@@ -75,12 +75,12 @@ angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout','$com
         $scope.commentHost = commentHost;
         var docVersion = $('html').first().attr('version');
 
-        $scope.loginComment = function(){
-            win = openWindow(commentHost+'/users/login','登录',600,500);
+        $scope.loginComment = function () {
+            win = openWindow(commentHost + '/users/login', '登录', 600, 500);
             return false
         }
 
-        $scope.showCommentDialog = function(e,snippetVersion){
+        $scope.showCommentDialog = function (e, snippetVersion) {
             $scope.snippetVersion = snippetVersion;
             getCommentsBySnipeet(snippetVersion);
             var mouseX = e.pageX;
@@ -90,18 +90,18 @@ angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout','$com
 
             $('#comment-container').fadeIn(100);
             $('#comment-container').css({
-                left:mouseX+xoffset,
-                top: mouseY+yoffset
+                left: mouseX + xoffset,
+                top: mouseY + yoffset
             });
             $('p[version=' + snippetVersion + ']').addClass('on');
         }
 
-        function getComments(){
-            $http.get(commentHost+'/docs/'+docVersion+'/commentCount',{
+        function getComments() {
+            $http.get(commentHost + '/docs/' + docVersion + '/commentCount', {
                 withCredentials: true
-            }).success(function(result){
+            }).success(function (result) {
                 var all = {};
-                angular.forEach(result,function(v,k){
+                angular.forEach(result, function (v, k) {
                     // $('[version="'+v.snippetVersion+'"]').append(v.count);
                     all[v.snippetVersion] = v.count;
                 });
@@ -110,67 +110,67 @@ angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout','$com
         }
 
         $scope.getCommentUser = getUser;
-        function getUser(){
-            $http.get(commentHost+'/users/current',{
+        function getUser() {
+            $http.get(commentHost + '/users/current', {
                 withCredentials: true
-            }).success(function(result){
+            }).success(function (result) {
                 $scope.currentCommentUser = result;
             });
         }
 
-        function getCommentsBySnipeet(snippet){
+        function getCommentsBySnipeet(snippet) {
             snippet = snippet || $scope.snippetVersion;
-            $http.get(commentHost+'/docs/'+docVersion+'/snippets/'+snippet+'/comments',{
-                withCredentials:true
-            }).success(function(result){
+            $http.get(commentHost + '/docs/' + docVersion + '/snippets/' + snippet + '/comments', {
+                withCredentials: true
+            }).success(function (result) {
                 $scope.currentComments = result;
             });
         }
 
-        $scope.createComment = function(e){
-            if(!$scope.commentContent){
+        $scope.createComment = function (e) {
+            if (!$scope.commentContent) {
                 return;
             }
             $http({
                 method: 'post',
-                url:commentHost+'/docs/'+docVersion+'/snippets/'+$scope.snippetVersion+'/comments',
+                url: commentHost + '/docs/' + docVersion + '/snippets/' + $scope.snippetVersion + '/comments',
                 withCredentials: true,
-                headers:{
+                headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                transformRequest: function(obj) {
-                        var str = [];
-                        for(var p in obj)
+                transformRequest: function (obj) {
+                    var str = [];
+                    for (var p in obj)
                         str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-                        return str.join("&");
+                    return str.join("&");
                 },
-                data:{
+                data: {
                     content: $scope.commentContent
                 }
 
             })
-            .success(function(result){
-                $scope.commentContent = '';
-                var snippet = $scope.snippetVersion;
-                if($scope.allComment[snippet]){
-                    $scope.allComment[snippet]+=1;
-                }else{
-                    $scope.allComment[snippet]=1;
-                }
-                $scope.getCommentsBySnipeet();
+                .success(function (result) {
+                    $scope.commentContent = '';
+                    var snippet = $scope.snippetVersion;
+                    if ($scope.allComment[snippet]) {
+                        $scope.allComment[snippet] += 1;
+                    } else {
+                        $scope.allComment[snippet] = 1;
+                    }
+                    $scope.getCommentsBySnipeet();
 
-            }).error(function(err){
-                if(err.status == 401){
-                    // window.open(commentHost+'/users/login')
+                }).error(function (err) {
+                    if (err.status == 401) {
+                        // window.open(commentHost+'/users/login')
 
-                    // location.href = commentHost+'/users/login';
-                }
-            });
+                        // location.href = commentHost+'/users/login';
+                    }
+                });
         }
 
         $scope.getCommentsBySnipeet = getCommentsBySnipeet;
 
-        $scope.closeCommentModal = function(){
+        $scope.closeCommentModal = function () {
             $('p[version=' + $scope.snippetVersion + ']').removeClass('on');
             $('#comment-container').fadeOut(100);
         }
@@ -180,9 +180,9 @@ angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout','$com
     }]);
 
 angular.module('ui.gravatar').config([
-    'gravatarServiceProvider', function(gravatarServiceProvider) {
+    'gravatarServiceProvider', function (gravatarServiceProvider) {
         gravatarServiceProvider.defaults = {
-            size         : 100,
+            size: 100,
             "default": 'https://leancloud.cn/images/static/default-avatar.png' // Mystery man as default for missing avatars
         };
 
@@ -229,32 +229,32 @@ angular.module('app').controller('StartCtrl', [
             });
         };
 
-        $scope.$watch('selectedPlat',function(){
+        $scope.$watch('selectedPlat', function () {
             var dom = $('#start-main');
             dom.css("visibility", 'hidden').prev().removeClass('loaded');
             //$http.get('start/'+$scope.selectedPlat+'_start.html').
-            $http.get('sdk_setup-'+$scope.selectedPlat+'.html').
-                success(function(result){
+            $http.get('sdk_setup-' + $scope.selectedPlat + '.html').
+                success(function (result) {
                     //$('#start-main').html(result);
                     var temp = $(result).find('.doc-content');
-                    
+
                     dom.html(
-                      temp.find('.docs-meta').insertAfter(temp.find('h1').addClass('font-logo')).end().end()
-                      .children()
+                        temp.find('.docs-meta').insertAfter(temp.find('h1').addClass('font-logo')).end().end()
+                            .children()
                     );
 
-                    $timeout(function(){
+                    $timeout(function () {
                         //$compile($('#start-main').contents())($scope);
                         $compile(dom.contents())($scope);
-                        setTimeout(function() {
+                        setTimeout(function () {
                             prettyPrepare();
                             prettyPrint();
-                            $("pre.prettyprint code").each(function(index, ele) {
-                              $(ele).after("<div class='doc-example-action'><button class='copybtn'><span class='icon icon-clipboard'></span></button></div>");
+                            $("pre.prettyprint code").each(function (index, ele) {
+                                $(ele).after("<div class='doc-example-action'><button class='copybtn'><span class='icon icon-clipboard'></span></button></div>");
                             });
                             glueCopy();
                         }, 0);
-                    },0);
+                    }, 0);
                     dom.css("visibility", 'visible').prev().addClass('loaded');
                 });
         });
@@ -264,17 +264,17 @@ angular.module('app').controller('StartCtrl', [
     }
 ]);
 
-angular.module('app').directive('lcComment',['$compile',function($compile){
+angular.module('app').directive('lcComment', ['$compile', function ($compile) {
     return {
         restrict: 'AE',
-        scope:{
-            version:'@version',
+        scope: {
+            version: '@version',
             allComment: '=allComment'
         },
-        template:'<div class="toggle-comment" ng-class="{\'has-comments\':allComment[version]}" ng-click="f($event)"><span>{{allComment[version]}}<var ng-show="!allComment[version]">+</var></span></div>',
-        link: function(scope, element, attrs) {
-            scope.f = function(e){
-                scope.$parent.showCommentDialog(e,scope.version);
+        template: '<div class="toggle-comment" ng-class="{\'has-comments\':allComment[version]}" ng-click="f($event)"><span>{{allComment[version]}}<var ng-show="!allComment[version]">+</var></span></div>',
+        link: function (scope, element, attrs) {
+            scope.f = function (e) {
+                scope.$parent.showCommentDialog(e, scope.version);
             }
         }
     }
@@ -290,14 +290,14 @@ angular.module('app').directive('lcComment',['$compile',function($compile){
 // });
 
 // 2017-03-22 LC-X-SIGN
-angular.module('app').filter('signify', ['md5',function (md5) {
-    return function (item,type) {
-      var suffix = '';
-      var ts = Date.now() || new Date().getTime();
-      if ( type === 'master' ){
-        suffix = ',master';
-      }
-      return md5(ts + item) + ',' + ts + suffix;
+angular.module('app').filter('signify', ['md5', function (md5) {
+    return function (item, type) {
+        var suffix = '';
+        var ts = Date.now() || new Date().getTime();
+        if (type === 'master') {
+            suffix = ',master';
+        }
+        return md5(ts + item) + ',' + ts + suffix;
     };
 }]);
 

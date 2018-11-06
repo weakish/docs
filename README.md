@@ -100,7 +100,69 @@ $ grunt serve
 - 请通过 `grunt release` 命令自动 bump `package.json` 来自动打标签，请不要手动更新。
 - 请按照 `CONVENTIONS.md` 的格式书写有意义的 commits，`CHANGELOG.md` 会被自动生成，请不要手动修改。
 
-## 一套模板多份渲染
+## 特殊语法
+
+- [时序图](https://github.com/leancloud/docs/issues/2710)
+
+## 多语言多平台共享文案解决方案1 - 使用预编译宏
+
+LeanCloud 产品线较多，每一个产品都有多平台/多语言/多运行时的 SDK 的开发指南，而为了让文档的可维护性进一步增强和统一管理，致力于实现一下目标：
+
+> 单个产品线包含的单个子模块的文档只拥有一份文字描述文档，而多平台/多语言/多运行通过内置的拓展语法/前端展现来实现切换
+
+举个例子阐述如上目标：
+
+针对云存储产品线的 SDK（子模块）的文档只有一份叫做 `storage-sdk-guide.md` 的文档，而在它内部通过 Web 前端技术的来做不同语言(js/java/objc)的示例代码切换。
+
+切换按钮如下图：
+
+![image](https://user-images.githubusercontent.com/5119542/45036931-5903ca80-b090-11e8-8828-a44ddfee2777.png)
+
+### 导入预编译宏
+
+```
+{% import "views/_helper.njk" as docs %}
+```
+
+### 不同语言中定义的功能一致但是名称不一致的类名
+
+例如存储对象 `AVObject`:
+
+iOS|Android|js|php|python|c#
+--|--|--|--|--|--
+AVObject|AVObject|AV.Object|LCObject|LeanCloud.Object|AVObject
+
+在文档中使用如下方式，前端会自动根据当前用户选择实例代码来渲染类名:
+
+`{{ docs.className('AVObject') }}`
+
+还有一种方式就是在文档开头编写：`{{ docs.defaultLang('js') }}`，这样就是告知文档引擎当前文档需要开启自动切换类名的开关。
+
+这意味着你在全文任何地方只要单独编写了如下 \`AVObject\` 这样的独立字段都会根据语言切换，**实例代码的变量名和类名不会收到影响**。
+
+### 不同语言存在小部分文字描述不一致
+
+例如有一部分配置文件是某一个平台独有，而其他平台没有的，这部分可以用如下方式来编写:
+
+```
+{{ docs.langSpecStart('js') }} 
+
+这里的内容只有在用户选择 js 示例代码的时候才会显示
+
+{{ docs.langSpecEnd('js') }} 
+```
+
+### 为文档设置默认的语言
+
+在 `{% import "views/_helper.njk" as docs %}` 之后可以引入如下内容：
+
+```
+{{ docs.defaultLang('js') }}
+```
+
+这样设置表示当前文档的默认首选语言是 js。
+
+## 多语言多平台共享文案解决方案2 - 一套模板多份渲染
 
 有些文档的相似度非常高，所以可以使用一份模板、多份变量渲染的方式一次性生成多份文档，比如《云函数开发指南》就是这样生成的。这份文档分为多个运行时：[Node.js](https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html)、[Python](https://leancloud.cn/docs/leanengine_cloudfunction_guide-python.html)、[Java](https://leancloud.cn/docs/leanengine_cloudfunction_guide-java.html)、[PHP](https://leancloud.cn/docs/leanengine_cloudfunction_guide-php.html)。这类文档编写方式如下：
 
@@ -160,28 +222,48 @@ $ grunt serve
 {% include ... %}
 ```
 
-### 辅助工具
+### 辅助工具	
 
-「一套模板多分渲染」的不同渲染文件编写起来比较困难，需要先从主模板上找到变量在对应到渲染文件，所以开发了一个简单的工具来简化这一步骤。使用方式如下：
+ 「一套模板多分渲染」的不同渲染文件编写起来比较困难，需要先从主模板上找到变量在对应到渲染文件，所以开发了一个简单的工具来简化这一步骤。使用方式如下：	
+ * 安装需要的依赖，该步骤只需要执行一次：	
+   ```	
+  npm install	
+  ```	
+ * 启动辅助工具的本地 webServer，使用以下命令：	
+   ```	
+  $ node server	
+  ```	
+* 使用浏览器打开 http://localhost:3001，将会看到一个「选择模板」的下拉列表框，该列表框里会显示 `views/<tmplName>.tmpl` 的所有模板文件，文件名的 `tmplName` 部分是下拉列表框选项的名称。选择你需要编写的模板（比如 `leanengine_guide`）。	
+* 你会看到模板文件被读取，其中所有 `{% block <blockName> %}<content>{% endblock %}` 部分的下面都会有一些按钮。这些按钮表示该「模板」拥有的不同「渲染」，也就是对应的 `views/<tmplName>-<impl>.md` 文件，文件名的 `impl` 部分是按钮的名称。	
+* 点击对应的按钮，即可看到「渲染」文件中对应 `block` 的内容已经读取到一个文本域中，如果为空，表明该「渲染」文件未渲染该 block，或者内容为空。	
+* 在文本域中写入需要的内容，然后点击保存，编写的内容就会保存到对应的「渲染」文件的 block 中。	
+* 最后建议打开「渲染」文件确认下内容，没问题即可通过 `grunt serve` 查看效果。当然整个过程打开 `grunt serve` 也是没问题的，它会发现「渲染」文件变动后重新加载。	
+ 有问题请与 <wchen@leancloud.rocks> 联系。
 
-* 安装需要的依赖，该步骤只需要执行一次：
 
-  ```
-  npm install
-  ```
+## 新功能文档上线步骤
 
-* 启动辅助工具的本地 webServer，使用以下命令：
+前置条件：
 
-  ```
-  $ node server
-  ```
-* 使用浏览器打开 http://localhost:3001，将会看到一个「选择模板」的下拉列表框，该列表框里会显示 `views/<tmplName>.tmpl` 的所有模板文件，文件名的 `tmplName` 部分是下拉列表框选项的名称。选择你需要编写的模板（比如 `leanengine_guide`）。
-* 你会看到模板文件被读取，其中所有 `{% block <blockName> %}<content>{% endblock %}` 部分的下面都会有一些按钮。这些按钮表示该「模板」拥有的不同「渲染」，也就是对应的 `views/<tmplName>-<impl>.md` 文件，文件名的 `impl` 部分是按钮的名称。
-* 点击对应的按钮，即可看到「渲染」文件中对应 `block` 的内容已经读取到一个文本域中，如果为空，表明该「渲染」文件未渲染该 block，或者内容为空。
-* 在文本域中写入需要的内容，然后点击保存，编写的内容就会保存到对应的「渲染」文件的 block 中。
-* 最后建议打开「渲染」文件确认下内容，没问题即可通过 `grunt serve` 查看效果。当然整个过程打开 `grunt serve` 也是没问题的，它会发现「渲染」文件变动后重新加载。
+- 包含该功能的 SDK 确定已经经过单元测试和集成测试
+- 服务端已经上线
+- 所有包含该功能的语言 SDK （JavaScript/Objective-C/Java 等）都已经经过单元测试和集成测试
 
-有问题请与 <wchen@leancloud.rocks> 联系。
+### 功能提出者编写
+
+直接修改对应的文档，提交 PR，交由文档工程师审核，合并之后由功能提出者安排发布上线的时间。
+
+### 文档工程师编写
+
+步骤：
+
+1. 功能提出者提交 issue 描述该功能隶属于哪个子产品的哪个功能
+2. 功能提出者给出使用场景的描述文档
+3. 功能提出者给出对应所有的语言的 SDK 的示例代码/注释
+4. 文档工程师发出 PR，功能提出者来审阅
+
+然后文档工程师会在上述步骤都完成之后，合并之后由功能提出者安排发布上线的时间。
+
 
 ## License
 

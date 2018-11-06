@@ -7,6 +7,7 @@
     "test": "grunt test --no-comments",
     "postinstall": "grunt build --no-comments",
     "start": "static dist -p $PORT -a 0.0.0.0",
+    "simulate":"grunt build --no-comments && static dist",
     "preview": "grunt serve"
   },
   "repository": {
@@ -126,7 +127,7 @@
     "windwild <gjywindwild@gmail.com>",
     "Panmax <967168@qq.com>",
     "sdjcw <sdjcw13@gmail.com>",
-    "freewing99 <wujun19890209@gmail.com>",
+    "wujun4code <wujun19890209@gmail.com>",
     "Hong Jiang <hjiang@avos.com>",
     "NemoAlex <zhhjchina@gmail.com>",
     "Hong Jiang <hjiang@leancloud.rocks>",
