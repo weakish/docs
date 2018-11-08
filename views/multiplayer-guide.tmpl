@@ -287,7 +287,7 @@ MasterClient 在实时对战中是承担「逻辑运算功能」的特殊 Client
 
 ### 在 Client Engine 中托管 MasterClient
 
-为了确保游戏安全，防止用户作弊等，我们推荐您将 MasterClient 托管在 LeanCloud 提供的服务端 [Client Engine](client-engine) 中，同时做以下权限配置：
+为了确保游戏安全，防止用户作弊等，我们推荐您将 MasterClient 托管在 LeanCloud 提供的服务端 [Client Engine](client-engine.html) 中，同时做以下权限配置：
 
 #### MasterClient 掉线不转移
 将 MasterClient 放在服务端后，MasterClient 意外掉线时也不应当转移角色，此时需要在创建房间时指定 `FixedMaster` Flag：
