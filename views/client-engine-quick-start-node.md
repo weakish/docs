@@ -37,6 +37,12 @@ lean switch
 npm install
 ```
 
+如果同时会使用到数据存储服务，执行如下命令：
+
+```
+npm install leancloud-storage
+```
+
 启动应用时打开调试日志：
 
 ```

@@ -1,7 +1,7 @@
 # Client Engine 开发指南 · Node.js
 
 ## 初始项目
-请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.md) 获得初始项目，了解如何本地运行及部署项目。您需要在[初始项目](https://github.com/leancloud/client-engine-nodejs-getting-started)的基础上开发您自己的游戏逻辑。
+请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 获得初始项目，了解如何本地运行及部署项目。您需要在[初始项目](https://github.com/leancloud/client-engine-nodejs-getting-started)的基础上开发您自己的游戏逻辑。
 
 ## 示例游戏逻辑
 初始项目中写了一个非常简单的双人剪刀石头布游戏作为示例，主要逻辑为：Client Engine 负责向客户端分配可用的房间，客户端加入房间后，在房间内由 MasterClient 控制游戏内的逻辑：
