@@ -1,3 +1,6 @@
+{% import "views/_helper.njk" as docs %}
+{% import "views/_data.njk" as data %}
+
 # Client Engine 快速入门 · Node.js
 
 该文档帮助你快速了解如何创建一个 Client Engine 项目，该项目是一个简单的双人剪刀石头布游戏，游戏逻辑的开发依赖于实时对战 JavaScript SDK。
