@@ -1,6 +1,3 @@
-{% import "views/_helper.njk" as docs %}
-{% import "views/_data.njk" as data %}
-
 # Client Engine 快速入门 · Node.js
 
 该文档帮助你快速了解如何创建一个 Client Engine 项目，该项目是一个简单的双人剪刀石头布游戏，游戏逻辑的开发依赖于实时对战 JavaScript SDK。
@@ -70,8 +67,8 @@ lean up
 
 ```sh
 # 如果您的浏览器已经登录 LeanCloud，请在下方选择相关应用，复制粘贴相关信息到 Configs 中：
- APP_ID:{{appid}}
- APP_KEY:{{appkey}}
+ APP_ID:  "{{appid}}"
+ APP_KEY: "{{appkey}}"
 ```
 
 接着在 Client Engine Server 中输入 `http://localhost:3000`。如图所示：
