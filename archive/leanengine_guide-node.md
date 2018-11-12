@@ -715,7 +715,7 @@ app.get('/logout', function(req, res) {
 
 ### 自定义 session
 
-有时候你需要将一些自己需要的属性保存在 session 中，你可以增加通用的 `cookie-session` 组件，详情可以参考 [express.js &middot; cookie-session](https://github.com/expressjs/cookie-session)。该组件和 `AV.Cloud.CookieSession` 组件可以并存。
+如果你需要将一些属性保存在 session 中，可以增加通用的 `cookie-session` 组件，详情可以参考 [express.js &middot; cookie-session](https://github.com/expressjs/cookie-session)。该组件和 `AV.Cloud.CookieSession` 组件可以并存。
 {% endblock %}
 
 {% block https_redirect %}
