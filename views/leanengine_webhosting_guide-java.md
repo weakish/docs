@@ -326,7 +326,7 @@ LeanEngine.addSessionCookie(new EngineSessionCookie("my secret", 3600, true));
 
 * 在云引擎方法中，通过 `AVUser.getCurrentUser()` 获取用户信息。
 * 在网站托管中，通过 `AVUser.getCurrentUser()` 获取用户信息。
-* 在后续的方法调用显示传递 user 对象。
+* 在后续的方法调用显式传递 user 对象。
 
 你可以这样简单地实现一个具有登录功能的站点：
 
