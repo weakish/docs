@@ -21,6 +21,30 @@
 localStorage.debug = 'Play'
 ```
 
+### LayaAir
+
+下载 `play-laya.js` 至 Laya 工程的 bin/libs 目录下。
+
+在 bin/index.html 中项目「IDE 生成的 UI 文件」之前引入刚下载的 SDK 文件：
+
+```diff
+  <!--提供了制作 UI 的各种组件实现-->
+    <script type="text/javascript" src="libs/laya.ui.js"></script>
+  <!--用户自定义顺序文件添加到这里-->
+  <!--jsfile--Custom-->
++   <script src="libs/play-laya.js"></script>
+  <!--jsfile--Custom-->
+  <!--IDE 生成的 UI 文件-->
+  <script src="../src/ui/layaUI.max.all.js"></script>
+```
+
+在脚本中，可通过如下代码导入:
+
+```javascript
+const { play: p,
+  Region, Event, ReceiverGroup, setAdapters, LogLevel, setLogger } = play;
+```
+
 ### 微信小程序
 
 下载 `play-weapp.js` 并拖拽至微信小程序的工程目录下即可。
