@@ -83,6 +83,8 @@ const { play: p,
 
 **注意：由于 Laya 加载时将 play 作为了模块名，所以对于全局 play 对象，需要 alias。这里使用 p 表示。**
 
+如果您使用的是 Laya 编译器，请将下方示例代码中的 play 替换为 p
+
 ```javascript
 const opts = {
   // 设置 APP ID
