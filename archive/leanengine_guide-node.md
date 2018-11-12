@@ -650,7 +650,7 @@ app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser
 
 * 在云引擎方法中，通过 request.user 获取用户信息。
 * 在 webHosting 中，通过 req.AV.user 获取用户信息。
-* 在后续的方法调用显示传递 user 对象。
+* 在后续的方法调用显式传递 user 对象。
 
 登录很简单：
 
