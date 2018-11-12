@@ -38,13 +38,6 @@ localStorage.debug = 'Play'
   <script src="../src/ui/layaUI.max.all.js"></script>
 ```
 
-在脚本中，可通过如下代码导入:
-
-```javascript
-const { play: p,
-  Region, Event, ReceiverGroup, setAdapters, LogLevel, setLogger } = play;
-```
-
 ### 微信小程序
 
 下载 `play-weapp.js` 并拖拽至微信小程序的工程目录下即可。
@@ -80,6 +73,13 @@ import {
 } from '../play';
 ```
 其中 `play` 是 SDK 实例化并导出的 Play 的对象，并不是 Play 类。
+
+在 Laya 中，由于引擎负责加载模块，所以需要引用。
+
+```javascript
+const { play: p,
+  Region, Event, ReceiverGroup, setAdapters, LogLevel, setLogger } = play;
+```
 
 ```javascript
 const opts = {
