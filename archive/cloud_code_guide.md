@@ -1267,7 +1267,7 @@ app.get('/logout', function(req, res) {
 
 ### 自定义 session
 
-有时候你需要将一些自己需要的属性保存在 session 中，你可以增加通用的 `cookieSession` 组件：
+如果你需要将一些属性保存在 session 中，可以增加通用的 `cookieSession` 组件：
 
 ```javascript
 // 使用 cookieSession 记录自定义信息到 cookie
