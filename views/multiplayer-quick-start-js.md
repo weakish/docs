@@ -63,7 +63,7 @@ set DEBUG=Play lean up
 
 
 {% block import %}
-导入需要的类和变量：
+在微信小程序、Cocos、Node.js 中，按以下方法导入需要的类和变量：
 
 ```javascript
 import {
@@ -74,12 +74,14 @@ import {
 ```
 其中 `play` 是 SDK 实例化并导出的 Play 的对象，并不是 Play 类。
 
-在 Laya 中，由于引擎负责加载模块，所以需要引用。
+在 Laya 中，由于引擎负责加载模块，需要这样导入：
 
 ```javascript
 const { play: p,
   Region, Event, ReceiverGroup, setAdapters, LogLevel, setLogger } = play;
 ```
+
+**注意：由于 Laya 加载时将 play 作为了模块名，所以对于全局 play 对象，需要 alias。这里使用 p 表示。**
 
 ```javascript
 const opts = {
