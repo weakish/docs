@@ -21,6 +21,23 @@
 localStorage.debug = 'Play'
 ```
 
+### LayaAir
+
+下载 `play-laya.js` 至 Laya 工程的 bin/libs 目录下。
+
+在 bin/index.html 中项目「IDE 生成的 UI 文件」之前引入刚下载的 SDK 文件：
+
+```diff
+  <!--提供了制作 UI 的各种组件实现-->
+    <script type="text/javascript" src="libs/laya.ui.js"></script>
+  <!--用户自定义顺序文件添加到这里-->
+  <!--jsfile--Custom-->
++   <script src="libs/play-laya.js"></script>
+  <!--jsfile--Custom-->
+  <!--IDE 生成的 UI 文件-->
+  <script src="../src/ui/layaUI.max.all.js"></script>
+```
+
 ### 微信小程序
 
 下载 `play-weapp.js` 并拖拽至微信小程序的工程目录下即可。
@@ -46,7 +63,7 @@ set DEBUG=Play lean up
 
 
 {% block import %}
-导入需要的类和变量：
+在微信小程序、Cocos、Node.js 中，按以下方法导入需要的类和变量：
 
 ```javascript
 import {
@@ -56,6 +73,16 @@ import {
 } from '../play';
 ```
 其中 `play` 是 SDK 实例化并导出的 Play 的对象，并不是 Play 类。
+
+在 Laya 中，由于引擎负责加载模块，需要这样导入：
+
+```javascript
+const { play: p,
+  Region, Event, ReceiverGroup, setAdapters, LogLevel, setLogger } = play;
+```
+
+**注意：由于 Laya 加载时将 play 作为了模块名，所以对于全局 play 对象，需要 alias。这里使用 p 表示。
+如果您使用的是 Laya，请将下方示例代码中的 play 替换为 p**
 
 ```javascript
 const opts = {
