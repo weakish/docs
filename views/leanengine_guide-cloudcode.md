@@ -733,7 +733,7 @@ app.use(avosExpressCookieSession({ cookie: { maxAge: 3600000 }, fetchUser: true}
 
 * 在云引擎方法中通过 `request.user` 获取用户信息。
 * 在网站托管中通过 `req.AV.user` 获取用户信息。
-* 在后续的方法调用显示传递 user 对象。
+* 在后续的方法调用显式传递 user 对象。
 
 登录很简单：
 

@@ -1,6 +1,6 @@
 # Client Engine 总览
 
-**在阅读本文档之前，请先阅读[实时对战服务总览](multiplayer.html)及 [MasterClient](multiplayer.html#相关概念) ，了解实时对战开发的基础结构。**
+**在阅读本文档之前，请先阅读[实时对战服务总览](multiplayer.html)及 [MasterClient](multiplayer-guide-js.html#MasterClient) ，了解实时对战开发的基础结构。**
 
 Client Engine 是 LeanCloud Play 提供的实时对战游戏客户端托管方案。实时对战服务提供了 MasterClient 机制来控制游戏逻辑：MasterClient 是一个特殊的客户端，它接收和处理游戏内的所有事件与消息，进行实时处理之后将结果下发给其他游戏客户端，用以控制游戏向下执行。开发者可以基于实时对战 SDK 开发出一套完整的 MasterClient 逻辑，继而将这样的「客户端」托管到 Client Engine，省去程序部署、运维的负担。如图所示：
 

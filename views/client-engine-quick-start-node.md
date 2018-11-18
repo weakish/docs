@@ -37,6 +37,12 @@ lean switch
 npm install
 ```
 
+如果同时会使用到数据存储服务，执行如下命令：
+
+```
+npm install leancloud-storage
+```
+
 启动应用时打开调试日志：
 
 ```
@@ -61,8 +67,8 @@ lean up
 
 ```sh
 # 如果您的浏览器已经登录 LeanCloud，请在下方选择相关应用，复制粘贴相关信息到 Configs 中：
- APP_ID:{{appid}}
- APP_KEY:{{appkey}}
+ APP_ID:  "{{appid}}"
+ APP_KEY: "{{appkey}}"
 ```
 
 接着在 Client Engine Server 中输入 `http://localhost:3000`。如图所示：

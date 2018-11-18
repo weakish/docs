@@ -260,7 +260,7 @@ $app->get('/logout', function($req, $res) {
 {% endblock %}
 
 {% block custom_session %}
-有时候你需要将一些自己需要的属性保存在会话中，我们建议使用 CookieStorage 来保存：
+如果你需要将一些属性保存在 session 中，可以增加通用的 CookieStorage 来保存：
 
 ```php
 // 在项目启动时启用 CookieStorage

@@ -309,7 +309,7 @@ app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 
 
 * 在云引擎方法中，通过 `request.currentUser` 获取用户信息。
 * 在网站托管中，通过 `request.currentUser` 获取用户信息。
-* 在后续的方法调用显示传递 user 对象。
+* 在后续的方法调用显式传递 user 对象。
 
 你可以这样简单地实现一个具有登录功能的站点：
 
@@ -460,7 +460,7 @@ app.post('/upload', function(req, res){
 {% endblock %}
 
 {% block custom_session %}
-有时候你需要将一些自己需要的属性保存在 session 中，你可以增加通用的 `cookie-session` 组件，详情可以参考 [express.js &middot; cookie-session](https://github.com/expressjs/cookie-session)。该组件和 `AV.Cloud.CookieSession` 组件可以并存。
+如果你需要将一些属性保存在 session 中，可以增加通用的 `cookie-session` 组件，详情可以参考 [express.js &middot; cookie-session](https://github.com/expressjs/cookie-session)。该组件和 `AV.Cloud.CookieSession` 组件可以并存。
 
 <div class="callout callout-info">express 框架的 `express.session.MemoryStore` 在云引擎中是无法正常工作的，因为云引擎是多主机、多进程运行，因此内存型 session 是无法共享的，建议用 [express.js &middot; cookie-session 中间件](https://github.com/expressjs/cookie-session)。</div>
 {% endblock %}

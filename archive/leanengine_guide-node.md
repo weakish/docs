@@ -650,7 +650,7 @@ app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser
 
 * 在云引擎方法中，通过 request.user 获取用户信息。
 * 在 webHosting 中，通过 req.AV.user 获取用户信息。
-* 在后续的方法调用显示传递 user 对象。
+* 在后续的方法调用显式传递 user 对象。
 
 登录很简单：
 
@@ -715,7 +715,7 @@ app.get('/logout', function(req, res) {
 
 ### 自定义 session
 
-有时候你需要将一些自己需要的属性保存在 session 中，你可以增加通用的 `cookie-session` 组件，详情可以参考 [express.js &middot; cookie-session](https://github.com/expressjs/cookie-session)。该组件和 `AV.Cloud.CookieSession` 组件可以并存。
+如果你需要将一些属性保存在 session 中，可以增加通用的 `cookie-session` 组件，详情可以参考 [express.js &middot; cookie-session](https://github.com/expressjs/cookie-session)。该组件和 `AV.Cloud.CookieSession` 组件可以并存。
 {% endblock %}
 
 {% block https_redirect %}
