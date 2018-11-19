@@ -163,7 +163,7 @@ const { roomName } = await (await fetch(
 
 **Client Engine 代码：**
 
-您在 Client Engine 中无需撰写自己的 `/reservation` 接口，只需要在客户端使用即可。如果您对该接口的实现感兴趣，可以在 `index.ts` 中找到这个接口的代码。
+初始项目中的 `index.ts` 中的 `/reservation` 接口已经为您写好了所有代码，不需要您再自己实现。如果您对实现方式感兴趣，可以自行阅读 `/reservation` 接口代码。
 
 ### 房间内逻辑
 客户端加入房间后，MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，此时 MasterClient 和客户端就可以在同一房间内通信了。在示例项目 `RPSGame` 中，当房间人满时，在被触发的房间人满事件中 MasterClient 广播游戏开始，客户端和 MasterClient 之间开始通信交互。当一局游戏完成后，客户端离开房间，游戏结束。
