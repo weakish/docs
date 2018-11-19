@@ -70,21 +70,15 @@ export default class SampleGame extends Game {
 ### 设置房间内玩家数量
 这里的玩家数量指的是不包括 MasterClient 的玩家数量，根据实时对战服务的限制，最多不能超过 9 个人。
 
-#### 默认玩家数量
-
-`Game` 的 `defaultSeatCount` 静态属性可以指定默认的玩家数量。例如斗地主需要 3 个人才能玩，可以这样设置：
+在 `Game` 中需要指定 `defaultSeatCount` 静态属性作为默认的玩家数量，Client Engine 会根据这个值向实时对战服务请求创建房间。例如斗地主需要 3 个人才能玩，可以这样设置：
 
 ```js
 export default class SampleGame extends Game {
-  public static defaultSeatCount = 2; // 最大不能超过 9 
+  public static defaultSeatCount = 3; // 最大不能超过 9 
 }
 ```
 
-当房间内玩家数量达到 `defaultSeatCount` 时，[房间人满事件](#房间人满事件)会被触发。
-
-#### 动态设置玩家数量
-
-如果您的游戏需要的玩家数量在某个范围内，除了设置[默认玩家数量](#默认玩家数量)外，还需要使用 `minSeatCount` 静态属性限定最小玩家数量，`maxSeatCount` 静态属性设定最大玩家数量。例如三国杀要求至少 2 个人，最多 8 个人才能玩，默认 5 个人可以玩，可以这样设置：
+如果您的游戏需要的玩家数量在某个范围内，除了设置 `defaultSeatCount` 外，还需要使用 `minSeatCount` 静态属性限定最小玩家数量，`maxSeatCount` 静态属性设定最大玩家数量。例如三国杀要求至少 2 个人，最多 8 个人才能玩，默认 5 个人可以玩，可以这样设置：
 
 ```js
 export default class SampleGame extends Game {
@@ -94,8 +88,9 @@ export default class SampleGame extends Game {
 }
 ```
 
-在[创建房间](#创建房间)的接口中，客户端可以指定 `seatCount` 参数来动态覆盖掉 `defaultSeatCount`，当房间内玩家数量达到 `seatCount` 时，[房间人满事件](#房间人满事件)会被触发。
+在[创建房间](#创建房间)的接口中，客户端可以指定 `seatCount` 参数来动态覆盖掉 `defaultSeatCount`。
 
+当房间人数达到 `defaultSeatCount` 或 `seatCount` 时，您可以选择配置触发[房间人满事件](#房间人满事件)。
 
 ### 创建房间
 Client Engine 的 `/reservation` 接口提供了创建新房间的功能，当客户端没有可以加入的房间时，可以调用该接口获得一个可以加入的新房间。该接口在示例 Demo 中使用场景如下：
@@ -132,7 +127,7 @@ play.on(Event.ROOM_JOIN_FAILED, (error) => {
 在这段客户端示例代码中，我们只传入了 `playerId`，除此之外 `/reservation` 接口中还接受 `createGameOptions` 作为 key 指定额外的参数：
 * roomName（可选）：创建指定 roomName 的房间。例如您需要和好友一起玩时，可以用这个接口创建房间后，把 roomName 分享给好友。如果您不关心 roomName，可以不指定这个参数。
 * roomOptions（可选）：通过这个参数，客户端在请求 Client Engine 创建房间时，可以设置 `customRoomProperties`，`customRoomPropertyKeysForLobby`，`visible`，对这三个参数的说明请参考[创建房间](multiplayer-guide-js.html#创建房间)。
-* seatCount(可选)：创建房间时，指定本次游戏需要多少人，这个值需要在[动态设置玩家数量](#动态设置玩家数量)的 `minSeatCount` 和 `maxSeatCount` 之间。当房间人数达到指定的值时，[房间人满事件](#房间人满事件)会被自动触发。
+* seatCount(可选)：创建房间时，指定本次游戏需要多少人，这个值需要在[动态设置玩家数量](#动态设置玩家数量)的 `minSeatCount` 和 `maxSeatCount` 之间，否则 Client Engine 会拒绝创建房间。
 
 例如当客户端希望 `/reservation` 创建一个带有匹配条件的新房间时，可以这样请求：
 
@@ -163,7 +158,7 @@ const { roomName } = await (await fetch(
       playerId: play.userId,
       createGameOptions
     })
-})
+}).json();
 ```
 
 **Client Engine 代码：**
@@ -171,7 +166,7 @@ const { roomName } = await (await fetch(
 您在 Client Engine 中无需撰写自己的 `/reservation` 接口，只需要在客户端使用即可。如果您对该接口的实现感兴趣，可以在 `index.ts` 中找到这个接口的代码。
 
 ### 房间内逻辑
-客户端加入房间后，MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，此时 MasterClient 和客户端就可以在同一房间内通信了。当房间人满时，初始项目提供的房间人满事件会被触发，MasterClient 广播游戏开始，客户端和 MasterClient 之间开始通信交互。当一局游戏完成后，客户端离开房间，游戏结束。
+客户端加入房间后，MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，此时 MasterClient 和客户端就可以在同一房间内通信了。在示例项目 `RPSGame` 中，当房间人满时，在被触发的房间人满事件中 MasterClient 广播游戏开始，客户端和 MasterClient 之间开始通信交互。当一局游戏完成后，客户端离开房间，游戏结束。
 
 #### 加入房间事件
 当客户端成功加入房间后，位于 Client Engine 的 MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，如果您需要监听此事件，可以在自定义的 `Game` 中的 `constructor()` 方法中撰写监听的代码：
