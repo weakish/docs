@@ -60,7 +60,7 @@ Game 类在实时对战 SDK 的基础上封装了以下方法，使得 MasterCli
 
 ```js
 import { Game } from "@leancloud/client-engine";
-export default class NewGame extends Game {
+export default class SampleGame extends Game {
   constructor(room: Room, masterClient: Play) {
     super(room, masterClient);
   }
@@ -68,19 +68,37 @@ export default class NewGame extends Game {
 ```
 
 ### 设置房间内玩家数量
-您可以在 `Game` 中限定房间内的玩家数量，`maxSeatCount` 是最大数量，`minSeatCount` 是最少玩家数量，如果您房间内的玩家数量固定，那么这两个变量可以设置为相同的值。如果您的游戏 2-5 人都可以开始玩，可以这样设置：
+这里的玩家数量指的是不包括 MasterClient 的玩家数量，根据实时对战服务的限制，最多不能超过 9 个人。
+
+#### 默认玩家数量
+
+`Game` 的 `defaultSeatCount` 静态属性可以指定默认的玩家数量。例如斗地主需要 3 个人才能玩，可以这样设置：
 
 ```js
-export default class NewGame extends Game {
-  public static minSeatCount = 2;
-  public static maxSeatCount = 5; // 最大不能超过 9 
+export default class SampleGame extends Game {
+  public static defaultSeatCount = 2; // 最大不能超过 9 
 }
 ```
 
-需要注意的是，对于实时对战服务来说，一个房间限制为最多 10 个成员，并且MasterClient 也算做其中之一，而 `Game` 中的 playerLimit 是不包含 MasterClient 的成员数量，因此这里**最多只能设置为 9 个玩家**一起游戏。
+当房间内玩家数量达到 `defaultSeatCount` 时，[房间人满事件](#房间人满事件)会被触发。
+
+#### 动态设置玩家数量
+
+如果您的游戏需要的玩家数量在某个范围内，除了设置 `defaultSeatCount` 外，还需要使用 `minSeatCount` 静态属性限定最小玩家数量，`maxSeatCount` 静态属性设定最大玩家数量。例如三国杀要求至少 2 个人，最多 8 个人才能玩，默认 5 个人可以玩，可以这样设置：
+
+```js
+export default class SampleGame extends Game {
+  public static minSeatCount = 2;
+  public static maxSeatCount = 8; // 最大不能超过 9 
+  public static defaultSeatCount = 5;
+}
+```
+
+在[创建房间](#创建房间)的接口中，客户端可以指定 `seatCount` 参数来动态覆盖掉 `defaultSeatCount`，当房间内玩家数量达到 `seatCount` 时，[房间人满事件](#房间人满事件)会被触发。
+
 
 ### 创建房间
-Client Engine 的 `/reservation` 接口提供了创建可用房间的功能，该接口在示例 Demo 中使用场景如下：
+Client Engine 的 `/reservation` 接口提供了创建新房间的功能，当客户端没有可以加入的房间时，可以调用该接口获得一个可以加入的新房间。该接口在示例 Demo 中使用场景如下：
 
 客户端首先向实时对战服务发起[加入房间](multiplayer-guide-js.html#加入房间)请求，当加入失败且错误码为 [4301](multiplayer-error-code.html#4301) 时，调用 Client Engine 中的 `/reservation` 接口，获得 Client Engine 返回的 roomName 并加入房间。客户端示例代码如下：
 
@@ -110,12 +128,13 @@ play.on(Event.ROOM_JOIN_FAILED, (error) => {
   }
 });
 ```
+
 在这段客户端示例代码中，我们只传入了 `playerId`，除此之外 `/reservation` 接口中还接受 `createGameOptions` 作为 key 指定额外的参数：
 * roomName（可选）：创建指定 roomName 的房间。例如您需要和好友一起玩时，可以用这个接口创建房间后，把 roomName 分享给好友。如果您不关心 roomName，可以不指定这个参数。
-* roomOptions（可选）：指定创建房间时的条件，通过这个参数，客户端在请求 Client Engine 创建房间时，可以设置 `customRoomProperties`，`customRoomPropertyKeysForLobby`，`visible`，对这三个参数的说明请参考[创建房间](multiplayer-guide-js.html#创建房间)。
-* seatCount(可选)：创建房间时，指定本次游戏需要多少人才能开始，这个值需要在[设置房间内玩家数量](#设置房间内玩家数量)的 `minSeatCount` 和 `maxSeatCount` 之间。当房间人数达到指定的值时，[房间人满事件](#房间人满事件)会被自动触发。
+* roomOptions（可选）：通过这个参数，客户端在请求 Client Engine 创建房间时，可以设置 `customRoomProperties`，`customRoomPropertyKeysForLobby`，`visible`，对这三个参数的说明请参考[创建房间](multiplayer-guide-js.html#创建房间)。
+* seatCount(可选)：创建房间时，指定本次游戏需要多少人，这个值需要在[动态设置玩家数量](#动态设置玩家数量)的 `minSeatCount` 和 `maxSeatCount` 之间。当房间人数达到指定的值时，[房间人满事件](#房间人满事件)会被自动触发。
 
-例如您需要指定有匹配条件的房间时，可以这样请求 `/reservation` 接口：
+例如当客户端希望 `/reservation` 创建一个带有匹配条件的新房间时，可以这样请求：
 
 **客户端调用接口示例代码（非 Client Engine）：**
 
@@ -130,8 +149,7 @@ const roomOptions = {
 };
 
 const createGameOptions = {
-  roomOptions,
-  seatCount: 2,
+  roomOptions
 };
 
 const { roomName } = await (await fetch(
@@ -145,7 +163,7 @@ const { roomName } = await (await fetch(
       playerId: play.userId,
       createGameOptions
     })
-}
+})
 ```
 
 **Client Engine 代码：**
@@ -160,7 +178,7 @@ const { roomName } = await (await fetch(
 
 ```js
 import { Game } from "@leancloud/client-engine";
-export default class NewGame extends Game {
+export default class SampleGame extends Game {
   constructor(room: Room, masterClient: Play) {
     super(room, masterClient);
     this.masterClient.on(Event.PLAYER_ROOM_JOINED, () => {
@@ -171,14 +189,14 @@ export default class NewGame extends Game {
 ```
 
 #### 房间人满事件
-如果客户端在请求 Client Engine [创建房间](#创建房间)调用 `/reservation` 接口时， 指定了 `seatCount`，当房间人数达到 `seatCount` 时，`watchRoomFull` 装饰器会让您收到 Game 抛出的 `AutomaticGameEvent.ROOM_FULL` 事件，您可以在这个事件中撰写相应的游戏逻辑，例如关闭房间，向客户端广播游戏开始：
+当房间的人数满足[设置房间内玩家数量](#设置房间内玩家数量)的人满逻辑时，`watchRoomFull` 装饰器会让您收到 Game 抛出的 `AutomaticGameEvent.ROOM_FULL` 事件，您可以在这个事件中撰写相应的游戏逻辑，例如关闭房间，向客户端广播游戏开始：
 
 ```js
 
 import { AutomaticGameEvent, Game, watchRoomFull } from "@leancloud/client-engine";
 
 @watchRoomFull()
-export default class RPSGame extends Game {
+export default class SampleGame extends Game {
   constructor(room: Room, masterClient: Play) {
     super(room, masterClient);
     // 监听 ROOM_FULL 事件，收到此事件后调用 `start() 方法`
@@ -213,7 +231,7 @@ this.broadcast('game-start', gameData);
 此时客户端的[接收自定义事件](multiplayer-guide-js.html#接收自定义事件)方法会被触发，如果发现是 `game-start` 事件，客户端在 UI 上展示对战开始。
 
 #### 转发自定义事件
-对战开始后，客户端 A 会将自己的操作（例如当前动作是剪刀）通过[自定义事件](multiplayer-guide-js.html#自定义事件)的方式发送给 MasterClient，MasterClient 在[收到这个操作事件](multiplayer-guide-js.html#接收自定义事件)后会告诉客户端 B 其他玩家已经操作了，但不告诉他玩家 A 具体是什么操作，此时可以使用 Game 提供的转发自定义事件方法 `forwardToTheRests()` 。您可以在这个方法中对事件内容做一些处理，隐藏掉 A 具体的动作，然后转发给房间内的其他玩家：
+对战开始后，在示例 `RPSGame` 中，客户端 A 会将自己的操作（例如当前动作是剪刀）通过[自定义事件](multiplayer-guide-js.html#自定义事件)的方式发送给 MasterClient，MasterClient 在[收到这个操作事件](multiplayer-guide-js.html#接收自定义事件)后会告诉客户端 B 其他玩家已经操作了，但不告诉他玩家 A 具体是什么操作，此时可以使用 Game 提供的转发自定义事件方法 `forwardToTheRests()` 。您可以在这个方法中对事件内容做一些处理，隐藏掉 A 具体的动作，然后转发给房间内的其他玩家：
 
 ```js
 this.forwardToTheRests(event, (eventData) => {
@@ -232,7 +250,7 @@ MasterClient 发送该事件后，客户端 B 会[接收到该自定义事件](m
 
 
 ### 游戏结束
-当客户端 B 也做出选择，通过[自定义事件](multiplayer-guide-js.html#自定义事件)发送给 MasterClient 时，`RPSGame` 会判断输赢，并广播游戏结束事件。
+在示例 `RPSGame` 中，当客户端 B 也做出选择，通过[自定义事件](multiplayer-guide-js.html#自定义事件)将选择发送给 MasterClient 时，MasterClient 会判断输赢，并广播游戏结束事件。
 
 当所有玩家都离开后，`Game` 的 `destroy()` 方法帮您自动销毁当前房间的 MasterClient。此时如果您没有其他的逻辑要做，则不需要关心这个方法，即游戏结束，如果您希望自己做一些清理工作，例如保存用户数据等，可以使用 `autoDestroy` 装饰器，这个装饰器会自动触发 `Game` 子类中的 `destroy()` 方法，您可以将相关逻辑写在这个方法中。
 
@@ -240,7 +258,7 @@ MasterClient 发送该事件后，客户端 B 会[接收到该自定义事件](m
 import { autoDestroy, Game } from "@leancloud/client-engine";
 
 @autoDestroy()
-export default class RPSGame extends Game {
+export default class SampleGame extends Game {
   protected destroy() {
     super.destroy();
     console.log('在这里可以做额外的清理工作');
