@@ -27,7 +27,7 @@
 您可以从 `index.ts` 文件入手来了解整个项目，该文件是项目启动的入口，它通过 express 框架定义了名为 `/reservation` 的 Web API，供客户端新开一局游戏时调用。`/reservation` API 会调用 Client Engine SDK 中的 `GameManager` 的 `makeReservation()` 方法为指定的玩家分配一个可用的游戏房间并预留位置。
 
 ## Client Engine SDK
-该初始项目依赖了专门的 Client Engine SDK，您可以通过[快速入门](client-engine-quick-start-node.md)安装依赖，下面我们重点看一下 SDK 提供的角色及相关生命周期：
+Client Engine 开发需要依赖专门的 Client Engine SDK，您可以通过[快速入门](client-engine-quick-start-node.md)安装依赖，下面我们重点看一下 SDK 提供的角色及相关生命周期：
 
 ### 角色
 * **`Game` ：**负责游戏的具体逻辑，每个 Game 实例对应一个唯一的 Play Room 与 masterClient。具体的游戏必须继承自该类。
@@ -51,36 +51,43 @@ Game 类在实时对战 SDK 的基础上封装了以下方法，使得 MasterCli
 * `broadcast()` 方法：向所有玩家广播自定义事件。示例代码请参考[广播自定义事件](#广播自定义事件)。
 * `forwardToTheRests`() 方法：将一个用户发送的自定义事件转发给其他用户。示例代码请参考[转发自定义事件](#转发自定义事件)。
 
-### 自定义 Game
-你需要通过创建一个继承自 `Game` 的类来撰写自己的游戏逻辑，具体实现方法请参考接下来的文档。
-
 ## 自定义游戏逻辑
-下面从实际使用场景出发，以 `RPSGame` 为例，讲解如何使用初始项目实现自己的游戏逻辑。整个游戏的核心流程如下：
+您可以参考 `RPSGame` 来实现自己的游戏逻辑，具体实现方法请参考接下来的文档。
 
-### 设置最大玩家数量
-`Game` 提供了 playerLimit 静态属性配置每局游戏的最大玩家数量，默认为 2 个玩家对战，如果您需要改变最大玩家数量，例如像斗地主一样三个人才能开始游戏，可以在 `RPSGame` 中通过以下代码配置：
+### 自定义 Game 类
+
+您需要创建一个继承自 `Game` 的类来撰写自己的游戏逻辑，示例方法如下：
 
 ```js
-export default class RPSGame extends Game {
-  // 最大不能超过 9
-  public static playerLimit = 3;
+import { Game } from "@leancloud/client-engine";
+export default class NewGame extends Game {
+  constructor(room: Room, masterClient: Play) {
+    super(room, masterClient);
+  }
+}
+```
+
+### 设置房间内玩家数量
+您可以在 `Game` 中限定房间内的玩家数量，`maxSeatCount` 是最大数量，`minSeatCount` 是最少玩家数量，如果您房间内的玩家数量固定，那么这两个变量可以设置为相同的值。如果您的游戏 2-5 人都可以开始玩，可以这样设置：
+
+```js
+export default class NewGame extends Game {
+  public static minSeatCount = 2;
+  public static maxSeatCount = 5; // 最大不能超过 9 
 }
 ```
 
 需要注意的是，对于实时对战服务来说，一个房间限制为最多 10 个成员，并且MasterClient 也算做其中之一，而 `Game` 中的 playerLimit 是不包含 MasterClient 的成员数量，因此这里**最多只能设置为 9 个玩家**一起游戏。
 
-### 玩家匹配
-客户端首先向实时对战服务发起[随机匹配](multiplayer-guide-js.html#随机加入房间)请求，当匹配失败且错误码为 [4301](multiplayer-error-code.html#4301) 时，调用 Client Engine 中的 `/reservation` 接口创建房间，该接口会返回 roomName 给客户端。客户端再通过 roomName [加入指定房间](multiplayer-guide-js.html#加入指定房间)。
+### 创建房间
+Client Engine 的 `/reservation` 接口提供了创建可用房间的功能，该接口在示例 Demo 中使用场景如下：
 
-**客户端示例代码（非 Client Engine）：**
+客户端首先向实时对战服务发起[加入房间](multiplayer-guide-js.html#加入房间)请求，当加入失败且错误码为 [4301](multiplayer-error-code.html#4301) 时，调用 Client Engine 中的 `/reservation` 接口，获得 Client Engine 返回的 roomName 并加入房间。客户端示例代码如下：
 
-```js
-// 匹配房间
-play.joinRandomRoom();
-```
+**客户端调用接口示例代码（非 Client Engine）：**
 
 ```js
-// 匹配失败后请求 Client Engine 创建房间
+// 加入房间失败后请求 Client Engine 创建房间
 play.on(Event.ROOM_JOIN_FAILED, (error) => {
   if (error.code === 4301) {
     // 这里通过 HTTP 调用在 Client Engine 中实现的 `/reservation` 接口
@@ -92,7 +99,7 @@ play.on(Event.ROOM_JOIN_FAILED, (error) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          playerId: play.userId
+          playerId: play.userId,
         })
       }
     )).json();
@@ -103,20 +110,57 @@ play.on(Event.ROOM_JOIN_FAILED, (error) => {
   }
 });
 ```
+在这段客户端示例代码中，我们只传入了 `playerId`，除此之外 `/reservation` 接口中还接受 `createGameOptions` 作为 key 指定额外的参数：
+* roomName（可选）：创建指定 roomName 的房间。例如您需要和好友一起玩时，可以用这个接口创建房间后，把 roomName 分享给好友。如果您不关心 roomName，可以不指定这个参数。
+* roomOptions（可选）：指定创建房间时的条件，通过这个参数，客户端在请求 Client Engine 创建房间时，可以设置 `customRoomProperties`，`customRoomPropertyKeysForLobby`，`visible`，对这三个参数的说明请参考[创建房间](multiplayer-guide-js.html#创建房间)。
+* seatCount(可选)：创建房间时，指定本次游戏需要多少人才能开始，这个值需要在[设置房间内玩家数量](#设置房间内玩家数量)的 `minSeatCount` 和 `maxSeatCount` 之间。当房间人数达到指定的值时，[房间人满事件](#房间人满事件)会被自动触发。
+
+例如您需要指定有匹配条件的房间时，可以这样请求 `/reservation` 接口：
+
+**客户端调用接口示例代码（非 Client Engine）：**
+
+```js
+const props = {
+    level: 2,
+};
+
+const roomOptions = {
+  customRoomPropertyKeysForLobby: ['level'],
+  customRoomProperties: props,
+};
+
+const createGameOptions = {
+  roomOptions,
+  seatCount: 2,
+};
+
+const { roomName } = await (await fetch(
+  `${CLIENT_ENGINE_SERVER}/reservation`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      playerId: play.userId,
+      createGameOptions
+    })
+}
+```
 
 **Client Engine 代码：**
 
-初始项目中的 `index.ts` 中的 `/reservation` 接口已经为您准备好了返回可用房间的逻辑，同时帮您处理了 MasterClient 连接实时对战服务并创建房间的逻辑，不需要您再自己写代码，如果您对实现方式感兴趣，可以自行阅读 `/reservation` 接口代码。
+您在 Client Engine 中无需撰写自己的 `/reservation` 接口，只需要在客户端使用即可。如果您对该接口的实现感兴趣，可以在 `index.ts` 中找到这个接口的代码。
 
 ### 房间内逻辑
 客户端加入房间后，MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，此时 MasterClient 和客户端就可以在同一房间内通信了。当房间人满时，初始项目提供的房间人满事件会被触发，MasterClient 广播游戏开始，客户端和 MasterClient 之间开始通信交互。当一局游戏完成后，客户端离开房间，游戏结束。
 
 #### 加入房间事件
-当客户端成功加入房间后，位于 Client Engine 的 MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，如果您需要监听此事件，可以在 `RPSGame` 中的 `constructor()` 方法中撰写监听的代码：
+当客户端成功加入房间后，位于 Client Engine 的 MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，如果您需要监听此事件，可以在自定义的 `Game` 中的 `constructor()` 方法中撰写监听的代码：
 
 ```js
 import { Game } from "@leancloud/client-engine";
-export default class RPSGame extends Game {
+export default class NewGame extends Game {
   constructor(room: Room, masterClient: Play) {
     super(room, masterClient);
     this.masterClient.on(Event.PLAYER_ROOM_JOINED, () => {
@@ -127,7 +171,7 @@ export default class RPSGame extends Game {
 ```
 
 #### 房间人满事件
-您可以像 `RPSGame` 一样使用 `watchRoomFull` 装饰器，当房间内的人数到达之前设置的[最大玩家数量](#设置最大玩家数量)的值时，这个装饰器会让您收到 Game 抛出的 `AutomaticGameEvent.ROOM_FULL` 事件，您可以在这个事件中撰写相应的游戏逻辑，例如像 `RPSGame` 一样关闭房间，向客户端广播游戏开始：
+如果客户端在请求 Client Engine [创建房间](#创建房间)调用 `/reservation` 接口时， 指定了 `seatCount`，当房间人数达到 `seatCount` 时，`watchRoomFull` 装饰器会让您收到 Game 抛出的 `AutomaticGameEvent.ROOM_FULL` 事件，您可以在这个事件中撰写相应的游戏逻辑，例如关闭房间，向客户端广播游戏开始：
 
 ```js
 
