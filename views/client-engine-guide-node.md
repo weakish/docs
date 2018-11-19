@@ -84,7 +84,7 @@ export default class SampleGame extends Game {
 
 #### 动态设置玩家数量
 
-如果您的游戏需要的玩家数量在某个范围内，除了设置 `defaultSeatCount` 外，还需要使用 `minSeatCount` 静态属性限定最小玩家数量，`maxSeatCount` 静态属性设定最大玩家数量。例如三国杀要求至少 2 个人，最多 8 个人才能玩，默认 5 个人可以玩，可以这样设置：
+如果您的游戏需要的玩家数量在某个范围内，除了设置[默认玩家数量](#默认玩家数量)外，还需要使用 `minSeatCount` 静态属性限定最小玩家数量，`maxSeatCount` 静态属性设定最大玩家数量。例如三国杀要求至少 2 个人，最多 8 个人才能玩，默认 5 个人可以玩，可以这样设置：
 
 ```js
 export default class SampleGame extends Game {
