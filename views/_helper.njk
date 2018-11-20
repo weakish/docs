@@ -155,6 +155,17 @@ className-{{ name }}
   ></div>
 {% endmacro %}
 
+
+{% macro useStorageLangSpec() %}
+  {{ useLangSpec('AVObject',[
+    { lang: "js", value: "AV.Object" },
+    { lang: "objc", value: "AVObject" },
+    { lang: "java", value: "AVObject"},
+    { lang: "cs", value: "AVObject"},
+    { lang: "php", value: "LCObject"},
+    { lang: "python", value: "LeanCloud.Object"}
+  ])}}
+{% endmacro %}
 {% macro useIMLangSpec() %}
   {{ useLangSpec('Conversation.id',[
     { lang: "js", value: "Conversation.id" },

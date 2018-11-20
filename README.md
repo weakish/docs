@@ -134,11 +134,22 @@ AVObject|AVObject|AV.Object|LCObject|LeanCloud.Object|AVObject
 
 在文档中使用如下方式，前端会自动根据当前用户选择实例代码来渲染类名:
 
-`{{ docs.className('AVObject') }}`
+1. 首先在 `views/_helper.njk` 里面添加如下字典：
+   ```
+    {% macro useStorageLangSpec() %}
+      {{ useLangSpec('AVObject',[
+        { lang: "js", value: "AV.Object" },
+        { lang: "objc", value: "AVObject" },
+        { lang: "java", value: "AVObject"},
+        { lang: "cs", value: "AVObject"},
+        { lang: "php", value: "LCObject"},
+        { lang: "python", value: "LeanCloud.Object"}
+      ])}}
+    {% endmacro %}
+   ```
+2. 然后在文档开头指定默认的语言：`{{ docs.defaultLang('js') }}`，这样就是告知文档引擎当前文档需要开启自动切换类名的开关。
 
-还有一种方式就是在文档开头编写：`{{ docs.defaultLang('js') }}`，这样就是告知文档引擎当前文档需要开启自动切换类名的开关。
-
-这意味着你在全文任何地方只要单独编写了如下 \`AVObject\` 这样的独立字段都会根据语言切换，**实例代码的变量名和类名不会收到影响**。
+这意味着你在全文任何地方只要单独编写了如下 \`AVObject\` 这样的独立字段都会根据语言切换，**实例代码的变量名和类名不会受到影响**。
 
 ### 不同语言存在小部分文字描述不一致
 
@@ -225,20 +236,19 @@ AVObject|AVObject|AV.Object|LCObject|LeanCloud.Object|AVObject
 ### 辅助工具	
 
  「一套模板多分渲染」的不同渲染文件编写起来比较困难，需要先从主模板上找到变量在对应到渲染文件，所以开发了一个简单的工具来简化这一步骤。使用方式如下：	
- * 安装需要的依赖，该步骤只需要执行一次：	
-   ```	
-  npm install	
-  ```	
- * 启动辅助工具的本地 webServer，使用以下命令：	
-   ```	
-  $ node server	
-  ```	
-* 使用浏览器打开 http://localhost:3001，将会看到一个「选择模板」的下拉列表框，该列表框里会显示 `views/<tmplName>.tmpl` 的所有模板文件，文件名的 `tmplName` 部分是下拉列表框选项的名称。选择你需要编写的模板（比如 `leanengine_guide`）。	
-* 你会看到模板文件被读取，其中所有 `{% block <blockName> %}<content>{% endblock %}` 部分的下面都会有一些按钮。这些按钮表示该「模板」拥有的不同「渲染」，也就是对应的 `views/<tmplName>-<impl>.md` 文件，文件名的 `impl` 部分是按钮的名称。	
-* 点击对应的按钮，即可看到「渲染」文件中对应 `block` 的内容已经读取到一个文本域中，如果为空，表明该「渲染」文件未渲染该 block，或者内容为空。	
-* 在文本域中写入需要的内容，然后点击保存，编写的内容就会保存到对应的「渲染」文件的 block 中。	
-* 最后建议打开「渲染」文件确认下内容，没问题即可通过 `grunt serve` 查看效果。当然整个过程打开 `grunt serve` 也是没问题的，它会发现「渲染」文件变动后重新加载。	
- 有问题请与 <wchen@leancloud.rocks> 联系。
+ 1. 安装需要的依赖，该步骤只需要执行一次：	
+    ```	
+    $ npm install	
+    ```	
+ 2. 启动辅助工具的本地 webServer，使用以下命令：	
+    ```	
+    $ node server	
+    ```	
+1. 使用浏览器打开 http://localhost:3001，将会看到一个「选择模板」的下拉列表框，该列表框里会显示 `views/<tmplName>.tmpl` 的所有模板文件，文件名的 `tmplName` 部分是下拉列表框选项的名称。选择你需要编写的模板（比如 `leanengine_guide`）。	
+2. 你会看到模板文件被读取，其中所有 `{% block <blockName> %}<content>{% endblock %}` 部分的下面都会有一些按钮。这些按钮表示该「模板」拥有的不同「渲染」，也就是对应的 `views/<tmplName>-<impl>.md` 文件，文件名的 `impl` 部分是按钮的名称。	
+3. 点击对应的按钮，即可看到「渲染」文件中对应 `block` 的内容已经读取到一个文本域中，如果为空，表明该「渲染」文件未渲染该 block，或者内容为空。	
+4. 在文本域中写入需要的内容，然后点击保存，编写的内容就会保存到对应的「渲染」文件的 block 中。	
+5. 最后建议打开「渲染」文件确认下内容，没问题即可通过 `grunt serve` 查看效果。当然整个过程打开 `grunt serve` 也是没问题的，它会发现「渲染」文件变动后重新加载。	有问题请与 <wchen@leancloud.rocks> 联系。
 
 
 ## 新功能文档上线步骤
