@@ -972,7 +972,7 @@ var smsPrices = [{"CountryNumber":1,"CountryOrRegion":"美国","CountryCode":"US
 {"CountryNumber":91,"CountryOrRegion":"印度","CountryCode":"IN","UnitPrice":0.09},
 {"CountryNumber":95,"CountryOrRegion":"缅甸","CountryCode":"MM","UnitPrice":1.1},
 {"CountryNumber":351,"CountryOrRegion":"葡萄牙","CountryCode":"PT","UnitPrice":0.43},
-{"CountryNumber":852,"CountryOrRegion":"香港","CountryCode":"HK","UnitPrice":0.52},
+{"CountryNumber":852,"CountryOrRegion":"香港","CountryCode":"HK","UnitPrice":0.53},
 {"CountryNumber":853,"CountryOrRegion":"澳门","CountryCode":"MO","UnitPrice":0.27},
 {"CountryNumber":855,"CountryOrRegion":"柬埔寨","CountryCode":"KH","UnitPrice":0.93},
 {"CountryNumber":856,"CountryOrRegion":"老挝","CountryCode":"LA","UnitPrice":0.68},
