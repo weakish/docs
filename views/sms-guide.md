@@ -944,7 +944,7 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","New_Series",null,"sign_BuyBuyBuy","�
 var smsPrices = [{"CountryNumber":1,"CountryOrRegion":"美国","CountryCode":"US","UnitPrice":0.07},
 {"CountryNumber":1,"CountryOrRegion":"加拿大","CountryCode":"CA","UnitPrice":0.07},
 {"CountryNumber":7,"CountryOrRegion":"哈萨克斯坦","CountryCode":"KZ","UnitPrice":0.85},
-{"CountryNumber":7,"CountryOrRegion":"俄罗斯","CountryCode":"RU","UnitPrice":0.28},
+{"CountryNumber":7,"CountryOrRegion":"俄罗斯","CountryCode":"RU","UnitPrice":0.85},
 {"CountryNumber":27,"CountryOrRegion":"南非","CountryCode":"ZA","UnitPrice":0.23},
 {"CountryNumber":30,"CountryOrRegion":"希腊","CountryCode":"GR","UnitPrice":0.5},
 {"CountryNumber":33,"CountryOrRegion":"法国","CountryCode":"FR","UnitPrice":0.64},
