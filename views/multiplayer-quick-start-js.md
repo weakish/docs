@@ -7,9 +7,14 @@
 {% block installation %}
 实时对战客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。
 
-支持原生导入平台：微信小程序
+## 支持开发平台
 
-支持 CocosCreator 导出以下平台的项目：Mac、Web、微信小游戏、Facebook Instant Game、iOS、Android。
+微信开发者工具：微信小程序 / 微信小游戏
+
+CocosCreator：Mac、Web、微信小游戏、Facebook Instant Game、iOS、Android。
+
+LayaAir：微信小游戏
+
 
 ### Cocos Creator
 
