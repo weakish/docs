@@ -90,7 +90,7 @@ export default class SampleGame extends Game {
 
 在[创建房间](#创建房间)的接口中，客户端可以指定 `seatCount` 参数来动态覆盖掉 `defaultSeatCount`。
 
-当房间人数达到 `defaultSeatCount` 或 `seatCount` 时，您可以选择配置触发[房间人满事件](#房间人满事件)。
+当房间人数达到 `seatCount` 时，您可以选择配置触发[房间人满事件](#房间人满事件)，如果您的客户端没有指定 `seatCount`，人满事件时将以 `defaultSeatCount` 的值为准。
 
 ### 创建房间
 Client Engine 的 `/reservation` 接口提供了创建新房间的功能，当客户端没有可以加入的房间时，可以调用该接口获得一个可以加入的新房间。该接口在示例 Demo 中使用场景如下：
