@@ -171,7 +171,7 @@ public class LeanEngineMetadataServlet extends HttpServlet {
 
 {% block custom_runtime %}
 
-Java 云引擎只支持 1.8 运行环境和 war 包运行
+Java 云引擎支持 1.8 运行环境。
 {% endblock %}
 
 {% block use_leanstorage %}
