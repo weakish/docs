@@ -1,16 +1,16 @@
 # Client Engine 开发指南 · Node.js
 
 ## 初始项目
-请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 及[你的第一个 Client Engine 小游戏](#client-engine-quick-start-rps-game-node.html)来初步了解如何使用初始项目来开发游戏。本文档将在初始项目的基础上深入讲解 Client Engine 初始项目架构。
+请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 及[你的第一个 Client Engine 小游戏](client-engine-quick-start-rps-game-node.html)来初步了解如何使用初始项目来开发游戏。本文档将在初始项目的基础上深入讲解 Client Engine 初始项目架构。
 
 ## 入口 API
 Client Engine 初始项目的入口位于 `./src/index.ts` ，其入口 API 是通过 express 自定义的 `/reservation` 接口，该接口提供了创建新房间的功能。当客户端调用这个 API 时，`/reservation` 会通过 Client Engine SDK 中 `GameManager` 的 `makeReservation()` 方法来创建房间。
 
-在[你的第一个 Client Engine 小游戏](#client-engine-quick-start-rps-game-node.html#MasterClient 及客户端进入同一房间)中，我们曾使用到过这个接口，使用场景是：当客户端没有可以加入的房间时，调用该接口获得了一个新房间并加入，最终 Client Engine 中的 MasterClient 和客户端加入同一个房间。
+在[你的第一个 Client Engine 小游戏](client-engine-quick-start-rps-game-node.html#MasterClient 及客户端进入同一房间)中，我们曾使用到过这个接口，使用场景是：当客户端没有可以加入的房间时，调用该接口获得了一个新房间并加入，最终 Client Engine 中的 MasterClient 和客户端加入同一个房间。
 
 `/reservation` 接口接受以下参数：
 
-* playerId：发起请求的客户端在实时对战服务中的 [userId](https://leancloud.cn/docs/multiplayer-guide-js.html#hash-1514704093)。
+* playerId：发起请求的客户端在实时对战服务中的 [userId](multiplayer-guide-js.html#设置 userId)。
 * createGameOptions（可选）：创建指定条件的房间。
   * roomName（可选）：创建指定 roomName 的房间。例如您需要和好友一起玩时，可以用这个接口创建房间后，把 roomName 分享给好友。如果您不关心 roomName，可以不指定这个参数。
   * roomOptions（可选）：通过这个参数，客户端在请求 Client Engine 创建房间时，可以设置 `customRoomProperties`，`customRoomPropertyKeysForLobby`，`visible`，对这三个参数的说明请参考[创建房间](multiplayer-guide-js.html#创建房间)。

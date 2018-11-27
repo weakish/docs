@@ -60,6 +60,7 @@ export default class RPSGame extends Game {
 Client Engine SDK 中，`GameManger` 负责 `Game` 的创建及销毁，具体的原理及结构介绍请参考 [Client Engine 开发指南](client-engine-guide-node.html)。在这篇文档中，我们通过简单的配置就可以使用 `GameMnager` 的管理功能。在 `index.ts` 文件 new `gameManager` 的方法中可以看到，第一个参数已经传入了 `RPSGame`，如果您的自定义 `Game` 使用的是其他的名字，可以将 `RPSGame` 换成您自定义的 `Game` 类。
 
 ```js
+import PRSGame from "./rps-game";
 const gameManager = new SampleGameManager(
   RPSGame,
   APP_ID,
