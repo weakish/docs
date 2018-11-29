@@ -4,7 +4,7 @@
 
 ## 准备初始项目
 
-这个小游戏分为服务端和客户端两部分，其中服务端使用 Client Engine 来实现，客户端则是一个简单的 Web 页面。在这个教程中我们着重一步一步来写 Client Engine 的代码，客户端的代码请您查看示例项目。
+这个小游戏分为服务端和客户端两部分，其中服务端使用 Client Engine 来实现，客户端则是一个简单的 Web 页面。在这个教程中我们着重教您一步一步写 Client Engine 中的代码，客户端的代码请您查看示例项目。
 
 ### Client Engine 项目
 请先阅读 [Client Engine 快速入门：运行及部署项目](client-engine-quick-start-node.html) 获得初始项目，了解如何本地运行及部署项目。
@@ -139,7 +139,7 @@ import { AutomaticGameEvent, Game, watchRoomFull } from "@leancloud/client-engin
 import { Event, Play, Room } from "@leancloud/play";
 
 @watchRoomFull()
-export default class SampleGame extends Game {
+export default class RPSGame extends Game {
   public static defaultSeatCount = 2;
   constructor(room: Room, masterClient: Play) {
     super(room, masterClient);
@@ -254,8 +254,10 @@ protected start = async () => {
       ......
       // 存储当前玩家的选择
       if (this.players[0].actorId === senderId) {
+        // 如果是 player[0] 就存储到 choices[0]中
         choices[0] = eventData.index;
       } else {
+        // 如果是 player[1] 就存储到 choices[1]中
         choices[1] = eventData.index;
       }
     }
@@ -278,14 +280,7 @@ protected start = async () => {
       // 存储当前玩家的选择
       ......
       // 检查两个玩家是不是都已经做出选择了
-      const actualChoicesLength = choices.reduce((total, choice) => {
-        if (choice > -1) {
-          return total + 1
-        }
-        return total;
-      }, 0)
-      
-      if (actualChoicesLength === choices.length){
+      if (choices.every((choice) => choice > 0)) {
         // 两个玩家都已经做出选择，游戏结束,向客户端广播游戏结果
         const winner = this.getWinner(choices);
         this.broadcast("game-over", {

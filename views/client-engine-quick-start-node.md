@@ -98,5 +98,5 @@ lean deploy
 
 ## 你的第一个 Client Engine 小游戏
 
-接下来请查看文档[你的第一个 Client Engine 小游戏](#client-engine-quick-start-rps-game-node.html)，了解如何根据该初始项目一步一步开发出来一个剪刀石头布小游戏。
+接下来请查看文档[你的第一个 Client Engine 小游戏](client-engine-first-game-node.html)，了解如何根据该初始项目一步一步开发出来一个剪刀石头布小游戏。
 
