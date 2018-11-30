@@ -58,7 +58,7 @@ lean deploy
 
 如果你的应用在 30 天内无访问且没有购买标准实例，二级域名有可能会被回收。
 
-{% block runtime_description %}{% endblock %}
+## 项目骨架
 
 {% block project_constraint %}{% endblock %}
 
@@ -70,14 +70,14 @@ lean deploy
 
 {% block use_leanstorage %}{% endblock %}
 
-## 健康监测	
+## 健康监测
 
 你的应用在启动时，云引擎的管理程序会每秒去检查你的应用是否启动成功，如果 **30 秒** 仍未启动成功，即认为启动失败；在之后应用正常运行的过程中，也会有定期的「健康监测」，以确保你的应用正常运行，如果健康监测失败，云引擎管理程序会自动重启你的应用。
 
-健康检查的 URL 包括你的应用首页（`/`）和 {{platformName}} SDK 负责处理的 `/__engine/1/ping`，只要 **两者之一** 返回了 HTTP 200 的响应，就视作成功。因此请确保你的程序使用了 {{platformName}} SDK，或你的应用 **首页能够正常地返回 HTTP 200** 响应。	
-除此之外，为了支持云引擎的云函数和 Hook 功能，管理程序会使用 `/1.1/functions/_ops/metadatas` 这个 URL 和 {{platformName}} SDK 交互，请确保将这个 URL 交给 {{platformName}} SDK 处理，或 **返回一个 HTTP 404 表示不使用云函数** 和 Hook 相关的功能。	
+健康检查的 URL 包括你的应用首页（`/`）和 {{platformName}} SDK 负责处理的 `/__engine/1/ping`，只要 **两者之一** 返回了 HTTP 200 的响应，就视作成功。因此请确保你的程序使用了 {{platformName}} SDK，或你的应用 **首页能够正常地返回 HTTP 200** 响应。
+除此之外，为了支持云引擎的云函数和 Hook 功能，管理程序会使用 `/1.1/functions/_ops/metadatas` 这个 URL 和 {{platformName}} SDK 交互，请确保将这个 URL 交给 {{platformName}} SDK 处理，或 **返回一个 HTTP 404 表示不使用云函数** 和 Hook 相关的功能。
 
-{% block ping %}	
+{% block ping %}
 关于如何加载 {{platformName}} SDK，见前一小节 [使用数据存储服务](#使用数据存储服务)
 {% endblock %}
 
@@ -123,9 +123,9 @@ lean deploy
 {% endblock %}
 
 ### CSRF Token
-如果你的云引擎应用使用 Cookie 作为鉴权方式的话（例如使用 SDK 的 CookieSession 中间件），那就有受到 [CSRF](https://github.com/pillarjs/understanding-csrf) 攻击的风险，将会允许其他站点伪造带有正确 Cookie 的恶意请求。
+如果你的云引擎应用使用 Cookie 作为鉴权方式的话（例如使用 SDK 的 CookieSession 中间件），那么就有受到 [CSRF](https://github.com/pillarjs/understanding-csrf) 攻击的风险，将会允许其他站点伪造带有正确 Cookie 的恶意请求。
 
-业界通常使用 CSRF Token 来防御 CSRF 统计，你需要传递给客户端一个随机字符串（即 CSRF Token，可通过 Cookie 传递），客户端在每个有副作用的请求中都要将 CSRF 包含在请求正文或 Header 中，服务器端需要校验这个 CSRF Token 是否正确。
+业界通常使用 CSRF Token 来防御 CSRF 攻击，你需要传递给客户端一个随机字符串（即 CSRF Token，可通过 Cookie 传递），客户端在每个有副作用的请求中都要将 CSRF 包含在请求正文或 Header 中，服务器端需要校验这个 CSRF Token 是否正确。
 
 {% block csrf_token %}{% endblock %}
 
@@ -203,12 +203,12 @@ git push -u origin master
 {% block get_env %}{% endblock %}
 
 客户端 SDK 都有类似于 `setProduction` 的方法，比如 [JavaScript SDK API 的 AV.setProduction(production)](leanengine_cloudfunction_guide-node.html#hash1210911107)，其中 `production` 设置为 `0` 则该 SDK 将请求预备环境；设置为 `1` 将请求生产环境，默认为 `1`。
- 
+
 ## 云端环境
 
-### 系统级依赖 
+### 系统级依赖
 
-系统级依赖指的是运行时操作系统上的一些常见的功能模块，例如 [ffmpeg](https://www.ffmpeg.org/), 当前项目如果需要使用的话，只要通过添加 `leanengine.yaml` 文件的 systemDependencies 部分中可以指定需要的系统依赖，类似：
+在云引擎的线上环境中，你可以通过 `leanengine.yaml` 文件的 systemDependencies 部分来自定义系统级依赖：
 
 ```yaml
 systemDependencies:
@@ -219,10 +219,13 @@ systemDependencies:
 
 - `ffmpeg` 一个音视频处理工具库
 - `imagemagick` 一个图片处理工具库
-- `fonts-wqy` 文泉驿点阵宋体、文泉驿微米黑，通常和 phantomjs 配合来显示中文。
-- `phantomjs` 一个无 UI 的 WebKit 浏览器
+- `fonts-wqy` 文泉驿点阵宋体、文泉驿微米黑，通常和 phantomjs 或 chrome-headless 配合来显示中文。
+- `fonts-noto` 思源黑体（体积较大）
+- `phantomjs` 一个无 UI 的 WebKit 浏览器（该项目已停止维护）
+- `chrome-headless` 一个无 UI 的 Chrome 浏览器（体积很大，会显著增加部署耗时，运行时也会消耗大量 CPU 和内存；如果使用 puppeter 的话，需要给 puppeteer.launch 传递这些参数：`{executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-setuid-sandbox']}`；暂不支持 Java）
+- `node-canvas` 安装 node-canvas 所需要的系统级依赖（你仍需要安装 node-canvas）
 
-注意**系统级依赖的功能模块不会默认添加**，添加系统依赖将会拖慢部署速度，因此请不要添加未用到的依赖。
+注意添加系统依赖将会拖慢部署速度，因此请不要添加未用到的依赖。
 
 ### 环境变量
 
@@ -238,7 +241,7 @@ systemDependencies:
 `LEANCLOUD_API_SERVER`|访问存储服务时使用的地址（类似于 `https://api.leancloud.cn`）。该值会因为所在数据中心等原因导致不一样，所以使用 REST API 请求存储服务或 LeanCloud 其他服务时请使用此环境变量的值。在云引擎中**不要**直接使用 `https://api.leancloud.cn`。
 `LEANCLOUD_AVAILABLE_CPUS`|云引擎实例可用 CPU 的数量，高规格实例（如：2CPU 1024MB 内存）时该值大于 1。应用可以根据该值启动对应数量的线程或者进程。在云引擎中**不要**直接使用操作系统 CPU 核数，否则可能启动过多的进程导致超出实例规格而异常退出。
 `LEANCLOUD_APP_GROUP`|云引擎实例所在的组。当使用云引擎 [组管理](leanengine_plan.html#组管理) 功能时，该值为组的名称。
-`LEANCLOUD_REGION`|云引擎服务所在区域，{% if node != 'qcloud' %}值为 `CN` 或 `US`，分别表示国内节点和美国节点。{% else %}目前仅支持 `CN` 即中国节点。{% endif %}
+`LEANCLOUD_REGION`|云引擎服务所在区域，值为 `CN` 或 `US`，分别表示国内节点和美国节点。
 
 <div class="callout callout-info">旧版云引擎使用的以 `LC_` 开头的环境变量（如 `LC_APP_ID`）已经被弃用。为了保证代码兼容性，`LC_` 变量在一段时间内依然有效，但未来可能会完全失效。为了避免报错，建议使用 `LEANCLOUD_` 变量来替换。</div>
 
@@ -296,7 +299,7 @@ systemDependencies:
 
 ## 备案和自定义域名
 
-在前面介绍过的[设置域名](#设置域名)指的是设置一个二级域名，严格来说，**不建议直接用于生产环境**，出于安全考虑和法律法规的规定，网站准备正式运营之前，您应该绑定自己的注册的并已经备案过的域名。
+在前面介绍过的[设置域名](#设置域名)指的是设置一个二级域名，**不建议直接用于生产环境**，出于安全考虑和法律法规的规定，网站准备正式运营之前，您应该绑定自己的注册的并已经备案过的域名。
 
 如果需要绑定自己的域名，进入 [应用控制台 > 账号设置 > 域名绑定](/settings.html#/setting/domainbind)，按照步骤填写资料即可。
 
@@ -305,5 +308,3 @@ systemDependencies:
 如果没有 ICP 备案，请进入 [应用控制台 > 账号设置 > 域名备案](/settings.html#/setting/domainrecord)，按照步骤填写资料进行备案。在主域名已在 LeanCloud 备案的情况下，子域名不需要额外备案；主域名在其他云服务商备案的情况下，如需在 LeanCloud 使用子域名，还需在 LeanCloud 再次备案。
 
 <div class="callout callout-info">备案之前要求云引擎已经部署，并且网站内容和备案申请的内容一致。仅使用云引擎托管静态文件、未使用其他 LeanCloud 服务的企业用户，需要自行完成域名备案工作。</div>
-
-

@@ -35,17 +35,15 @@ $PROJECT_DIR
     "cookie-parser": "^1.3.5",
     "ejs": "2.3.1",
     "express": "4.12.3",
-    "leanengine": "^0.1.4"
+    "leanengine": "^3.3.2"
+  },
+  "engines": {
+    "node": "8.x"
   }
 }
 ```
 
-可以通过配置文件了解到：
-
-* 项目名称为：leanengine-test-project
-* 项目版本号：1.0.0
-* 项目描述：一个使用了 Express 4 的 Node.js 项目
-* 项目依赖：比如依赖 `body-parser`，版本为 `1.12.3 `；依赖 `leanengine `，版本为 `^0.1.4` 等。
+可以通过这个文件看到各个依赖的版本，例如 Node.js 8.x、leanengine 3.3.2 等。
 
 `package.json` 创建完成后在 `$PROJECT_DIR` 目录执行下列命令：
 
@@ -55,9 +53,7 @@ npm install
 
 这样会根据 `package.json` 中声明的依赖自动从网络下载依赖包，并保存在 `$PROJECT_DIR/node_modules` 目录。
 
-**提示**：该过程可能会比较慢，因为下载源在国外，可以在命令后面增加 `--registry=http://r.cnpmjs.org` 参数来使用国内的源，以提高下载速度。
-
-**提示**：如果项目用到了其他一些三方包，一定要添加到 `package.json` 的依赖声明中，否则部署到服务器时会出现依赖包找不到的情况。
+**提示**：该过程可能会比较慢，因为下载源在国外。
 
 关于 `package.json` 更多的信息，可以参考 [npm 官网 package.json 介绍](https://docs.npmjs.com/files/package.json)。
 
@@ -80,9 +76,9 @@ npm install leanengine --save
 ```
   1 var AV = require('leanengine');
   2
-  3 var APP_ID = process.env.LC_APP_ID;
-  4 var APP_KEY = process.env.LC_APP_KEY;
-  5 var MASTER_KEY = process.env.LC_APP_MASTER_KEY;
+  3 var APP_ID = process.env.LEANCLOUD_APP_ID;
+  4 var APP_KEY = process.env.LEANCLOUD_APP_KEY;
+  5 var MASTER_KEY = process.env.LEANCLOUD_APP_MASTER_KEY;
   6
   7 AV.init({
   8   appId:     APP_ID,
@@ -199,57 +195,45 @@ app 模块保存在 `$PROJECT_DIR/app.js` 文件，是应用主要文件之一�
 
 ### 异常处理器
 
-2.0 沙箱环境默认提供很多异常处理，方便应用使用。新版项目需要手动设置，所以代码可能会变成下面这样：
+2.0 沙箱环境默认提供很多异常处理，方便应用使用。新版项目需要手动设置，所以需要在 `$PROJECT_DIR/app.js` 中添加如下代码：
 
+```js
+app.use(function(req, res, next) {
+  // 如果任何一个路由都没有返回响应，则抛出一个 404 异常给后续的异常处理器
+  if (!res.headersSent) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+  }
+});
+
+// error handlers
+app.use(function(err, req, res, next) {
+  if (req.timedout && req.headers.upgrade === 'websocket') {
+    // 忽略 websocket 的超时
+    return;
+  }
+
+  var statusCode = err.status || 500;
+  if (statusCode === 500) {
+    console.error(err.stack || err);
+  }
+  if (req.timedout) {
+    console.error('请求超时: url=%s, timeout=%d, 请确认方法执行耗时很长，或没有正确的 response 回调。', req.originalUrl, err.timeout);
+  }
+  res.status(statusCode);
+  // 默认不输出异常详情
+  var error = {};
+  if (app.get('env') === 'development') {
+    // 如果是开发环境，则将异常堆栈输出到页面，方便开发调试
+    error = err;
+  }
+  res.render('error', {
+    message: err.message,
+    error: error
+  });
+});
 ```
-> 1 var domain = require('domain');
-  2 var path = require('path');
-  ...
- 15 app.use(cookieParser());
- 16
->17 // 未处理异常捕获 middleware
->18 app.use(function(req, res, next) {
->19   var d = domain.create();
->20   d.add(req);
->21   d.add(res);
->22   d.on('error', function(err) {
->23     console.error('uncaughtException url=%s, msg=%s', req.url, err.stack || err.message || err);
->24     if(!res.finished) {
->25       res.statusCode = 500;
->26       res.setHeader('content-type', 'application/json; charset=UTF-8');
->27       res.end('uncaughtException');
->28     }
->29   });
->30   d.run(next);
->31 });
- 32
- 33 // 使用 Express 路由 API 服务 /hello 的 HTTP GET 请求
- 34 app.get('/hello', function(req, res) {
- 35   res.render('hello', { message: 'Congrats, you just set up your app!' });
- 36 });
- 37
->38 // 如果任何路由都没匹配到，则认为 404
->39 // 生成一个异常让后面的 err handler 捕获
->40 app.use(function(req, res, next) {
->41   var err = new Error('Not Found');
->42   err.status = 404;
->43   next(err);
->44 });
- 45
->46 // error handlers
->47 app.use(function(err, req, res, next) {
->48   console.log(err.stack || err.message || err);
->49   res.status(err.status || 500);
->50   res.send('error:' + err.message);
->51 });
- 54
-```
-
-我们添加了几个异常处理器：
-
-* 未捕获异常处理器：第 17 ~ 31 行，关于 domain 的用法详见 [Node.js 官网 - Domain](https://nodejs.org/api/domain.html#domain_domain)。
-* 404 异常处理：第 38 ~ 44 行，如果未匹配任何 router，则设置 `status` 为 404，并产生一个 `Not Found` 的 `err`
-* 总异常处理：第 46 ~ 51 行。
 
 这些异常处理器可以根据自己的需要修改。
 
@@ -260,13 +244,6 @@ app 模块保存在 `$PROJECT_DIR/app.js` 文件，是应用主要文件之一�
 回忆下我们在 [server.js](#创建_server_js) 部分引用了 `app` 并调用了 `app.listen` 方法，所以 `$PROJECT_DIR/app.js` 可能会是这个样子（第 53 行）：
 
 ```
- 46 // error handlers
- 47 app.use(function(err, req, res, next) {
- 48   console.log(err.stack || err.message || err);
- 49   res.status(err.status || 500);
- 50   res.send('error:' + err.message);
- 51 });
- 52
 >53 module.exports = app;
 ```
 
@@ -276,7 +253,7 @@ app 模块保存在 `$PROJECT_DIR/app.js` 文件，是应用主要文件之一�
 
 新版项目将这样的文件命名为 `$PROJECT_DIR/cloud.js`，所以你需要将 `$PROJECT_DIR/cloud/main.js` 移动并更名为 `$PROJECT_DIR/cloud.js`。
 
-**注意**：新版项目中**不能**存在 `$PROJECT_DIR/cloud/main.js` 文件，否则会被当做 2.0 的项目加载并运行。2.0 和新版的项目约束可以分别参考 [云引擎指南 - 旧版云引擎](leanengine_guide-cloudcode.html#项目约束) 和 [云引擎指南 - Node.js 环境](leanengine_webhosting_guide-node.html#项目约束)。
+**注意**：新版项目中**不能**存在 `$PROJECT_DIR/cloud/main.js` 文件，否则会被当做 2.0 的项目加载并运行。
 
 如果是最基本的 2.0 项目的代码，那它的内容可能是这样：
 
@@ -304,25 +281,22 @@ app 模块保存在 `$PROJECT_DIR/app.js` 文件，是应用主要文件之一�
 ```
 
 * 第 1 行不需要再次引入 `app.js`，取而代之是引入 `leanengine` 模块，然后就可以使用 `AV.Cloud.define` 方法来定义云函数了。
-* 最后一行记得将 `AV.Cloud` 对象 `export` 出来，使引入他的模块可以使用。
 
-因为 `AV.Cloud` 是一个 [connect](https://www.npmjs.com/package/connect) 对象，所以可以作为 Express 的中间件使用：添加到 `$PROJECT_DIR/app.js` 的 Express 中类似于这样：
+然后我们需要将 SDK 提供的 `AV.express()` 作为中间件来挂载到 express 上（在 `$PROJECT_DIR/app.js` 中）：
 
 ```
   5 var bodyParser = require('body-parser');
-> 6 var cloud = require('./cloud');
+> 6 require('./cloud');
   7 var app = express();
   8
   9 // App 全局配置
  10 app.set('views', path.join(__dirname, 'views')); // 设置模板目录
  11 app.set('view engine', 'ejs');    // 设置 template 引擎
->12 app.use(cloud);
+>12 app.use(AV.express());
  13 app.use(express.static('public'));
 ```
 
-我们在第 6 行引入 `cloud` 模块，然后在第 12 行使用该中间件。
-
-**注意**：`cloud` 模块必须引入，而且应该在 Express 的中间件链尽量靠前的位置。因为该中间件会提供一个健康监测的 URL，LeanEngine 监控服务会根据该 URL 的响应判断应用是否启动成功。放在后面很容易被其他的 router 替代，导致响应不是预期而认为启动失败。关于健康监测的详细信息请参考 [云引擎指南 - Node.js 环境](./leanengine_webhosting_guide-node.html#健康监测)。
+我们在第 6 行引入 `cloud` 模块；然后在第 12 行将云函数的中间件挂载到 express 上，请尽量将 `AV.express()` 挂载到靠前的位置，因为该中间件会提供一个健康监测的 URL，LeanEngine 监控服务会根据该 URL 的响应判断应用是否启动成功。放在后面很容易被其他的 router 替代，导致响应不是预期的而被健康监测认为启动失败。关于健康监测的详细信息请参考 [云引擎指南 - Node.js 环境](./leanengine_webhosting_guide-node.html#健康监测)。
 
 ## 移除 global.json
 
@@ -336,7 +310,7 @@ app 模块保存在 `$PROJECT_DIR/app.js` 文件，是应用主要文件之一�
 
 如果你的 2.0 项目使用了 `avos-express-cookie-session` 中间件，则你的 `$PROJECT_DIR/cloud/app.js` 中可能有类似这样的代码：
 
-```
+```js
 var avosExpressCookieSession = require('avos-express-cookie-session');
 
 app.use(express.cookieParser('test'));
@@ -344,7 +318,7 @@ app.use(avosExpressCookieSession({ cookie: { maxAge: 3600000 }, fetchUser: false
 ```
 新版项目该中间件用法稍有不同，代码需要修改为类似这样：
 
-```
+```js
 app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser: true }));
 ```
 
@@ -355,16 +329,16 @@ app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser
 到此为止，我们已经配置了一个基本的新版云引擎项目，应该可以通过命令行工具进行本地调试（确保本机已经安装 Node.js 运行环境），执行下列命令：
 
 ```
-avoscloud
+lean up
 ```
 
-因为 `$PROJECT_DIR/app.js` 中定义了一个 `/hello` 的路由，所以 http://localhost:3000/hello 应该可以正常响应：
+因为 `$PROJECT_DIR/app.js` 中定义了一个 `/hello` 的路由，所以 `http://localhost:3000/hello` 应该可以正常响应：
 
 ```
 Congrats, you just set up your app!
 ```
 
-如果使用其他的 url，比如 http://localhost:3000/foobar 会得到一个 404 响应，内容是
+如果使用其他的 url，比如 `http://localhost:3000/foobar` 会得到一个 404 响应，内容是
 
 ```
 error:Not Found
@@ -372,22 +346,22 @@ error:Not Found
 
 说明我们的异常处理器起作用了。
 
-还可以打开云函数调试页面（需要命令行工具 0.7.6 版本以上）http://localhost:3001 来测试 `$PROJECT_DIR/cloud.js` 里面定义的 `hello`云函数。
+还可以打开云函数调试页面 `http://localhost:3001` 来测试 `$PROJECT_DIR/cloud.js` 里面定义的 `hello`云函数。
 
 ## 部署
 
 可以使用命令行工具部署到测试环境：
 
 ```
-avoscloud deploy
+lean deploy
 ```
 
 或者部署到生产环境：
 
 ```
-avoscloud publish
+lean publish
 ```
 
 ## 其他
 
-可以在这里找到升级完成的项目代码：https://github.com/leancloud/leanengine-upgrade-3.0
+可以在这里找到升级完成的项目代码：<https://github.com/leancloud/leanengine-upgrade-3.0>

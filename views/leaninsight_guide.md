@@ -171,7 +171,7 @@ SELECT col FROM ( SELECT a + b AS col from t1) t2
 {{ docs.note(backtick) }}
 
 简单的 SELECT 查询：
-      
+
 ```sql
 select * from Post
 
@@ -179,7 +179,7 @@ select count(*) from `_User`
 ```
 
 复杂的 SELECT 查询：
-  
+
 ```sql
 select * from Post where createdAt > '2014-12-10'
 
@@ -198,7 +198,7 @@ select count(*) as `count`, pubUser from Post group by pubUser
 
 ## 云引擎和 JavaScript SDK 调用
 
-JavaScript SDK 0.5.5 版本开始支持离线数据分析。**请注意，离线数据分析要求使用 Master Key，否则下面所述内容都没有权限运行，请参考 [《权限说明》](leanengine_guide-cloudcode.html#权限说明)。**
+JavaScript SDK 0.5.5 版本开始支持离线数据分析。**请注意，离线数据分析要求使用 Master Key，否则下面所述内容都没有权限运行，请参考 [《权限说明》](leanengine_cloudfunction_guide-node.html#Master_Key_和超级权限)。**
 
 ### Job 启动
 
@@ -266,9 +266,9 @@ result 是一个 JSON 对象，形如：
 
 ```js
 {  
-  "id":         "976c94ef0847f4ff3a65e661bf7b809a", //任务 id 
-  "status":     "OK", //任务状态 
-  "totalCount": 50, //结果总数 
+  "id":         "976c94ef0847f4ff3a65e661bf7b809a", //任务 id
+  "status":     "OK", //任务状态
+  "totalCount": 50, //结果总数
   "results":[  
      ... 结果数组...
   ]

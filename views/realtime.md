@@ -113,7 +113,7 @@ Session 中的几个动词：
 
 ## 权限和认证
 
-为了满足开发者对权限和认证的需求，我们设计了签名的概念。你可以在 
+为了满足开发者对权限和认证的需求，我们设计了签名的概念。你可以在
 [控制台 > 消息 > 实时消息 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中强制启用签名。启用后，所有的
 Session open 和 watch 行为都需要包含签名，这样你可以对用户的登录以及他
 可以关注哪些用户，进而可以给哪些用户发消息进行充分的控制。
@@ -132,7 +132,7 @@ SignatureFactory 的实现，并携带用户信息和用户行为（登录、关
 
 ### 云引擎签名范例
 
-我们提供了一个运行在 LeanCloud [云引擎](leanengine_guide-cloudcode.html)上的
+我们提供了一个运行在 LeanCloud [云引擎](leanengine_webhosting_guide-node.html)上的
 [签名范例程序](https://github.com/leancloud/realtime-messaging-signature-cloudcode)
 ，他提供了基于 Web Hosting 和 Cloud Function 两种方式的签名实现，你可以根据实际情况选
 择自己的实现。
@@ -238,7 +238,7 @@ LeanChat 用到了大多数即时通讯组件的提供的接口与功能，通�
 * _messageReceived 消息达到服务器，群组成员已解析完成之后，发送给收件人之前。
 * _receiversOffline 消息发送完成，存在离线的收件人
 
-关于如何定义云函数，你可以参考 [云引擎 -云函数](leanengine_guide-cloudcode.html#云函数) 部分的说明。所有云引擎调用都有默认超时时间和容错机制，在出错的情况下将按照默认的流程执行后续的操作。
+关于如何定义云函数，你可以参考 [云引擎 -云函数](leanengine_cloudfunction_guide-node.html#云函数) 部分的说明。所有云引擎调用都有默认超时时间和容错机制，在出错的情况下将按照默认的流程执行后续的操作。
 
 ### _messageReceived
 

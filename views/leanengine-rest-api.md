@@ -31,7 +31,7 @@ curl -X POST \
   https://{{host}}/1.1/functions/hello
 ```
 
-通过 `POST /functions/:name` 这个 API 调用时，参数和结果都是 JSON 格式，不会对其中的 AVObject 进行特殊处理。例如，我们传入电影的名字来获取电影的目前的评分：
+通过 `POST /functions/:name` 这个 API 调用时，参数和结果都是 JSON 格式。例如，我们传入电影的名字来获取电影的目前的评分：
 
 ```sh
 curl -X POST -H "Content-Type: application/json; charset=utf-8" \
@@ -40,18 +40,21 @@ curl -X POST -H "Content-Type: application/json; charset=utf-8" \
        -d '{"movie":"夏洛特烦恼"}' \
 https://{{host}}/1.1/functions/averageStars
 ```
-上述命令行实际上就是向云端发送一个 JSON 对象作为参数，请求 `averageStars` 云函数，参数的内容是要查询的电影的名字。 
+
+上述命令行实际上就是向云端发送一个 JSON 对象作为参数，请求 `averageStars` 云函数，参数的内容是要查询的电影的名字。
 
 响应：
 
 ```json
 {
-  "movie": "夏洛特烦恼",
-  "stars": "2.5"
+  "result": {
+    "movie": "夏洛特烦恼",
+    "stars": "2.5"
+  }
 }
 ```
 
-有些时候，希望云函数直接返回一个 AVObject 对象，因此我们在新版云引擎 SDK 中增加了 `POST /1.1/call/:name` 这个 API，参数中的 AVObject 会在云引擎中被自动转换为对应的类，结果中的 AVObject 会携带用于客户端 SDK 识别的元信息：
+有些时候我们希望使用 AVObject 作为云函数的参数，或者希望云函数返回一个 AVObject，这时我们可以使用 `POST /1.1/call/:name` 这个 API，云函数 SDK 会将参数解释为一个 AVObject，同时在返回 AVObject 时提供必要的元信息：
 
 ```sh
 curl -X POST \
@@ -66,13 +69,13 @@ curl -X POST \
 
 ```json
 {
-  "__type": "Object",
-  "className": "Post",
-  "pubUser": "LeanCloud官方客服"
+  "result": {
+    "__type": "Object",
+    "className": "Post",
+    "pubUser": "LeanCloud官方客服"
+  }
 }
 ```
-
-**注意：`POST /1.1/call/:name` 需要你在云引擎中使用最新版的 SDK，Node.js 需要 0.2 版本以上的云引擎**。
 
 你还可以阅读以下云引擎开发指南来获取更多的信息。
 
@@ -80,3 +83,4 @@ curl -X POST \
 * [云引擎 Python 环境](leanengine_cloudfunction_guide-python.html)
 * [云引擎 PHP 环境](leanengine_cloudfunction_guide-php.html)
 * [云引擎 Java 环境](leanengine_cloudfunction_guide-java.html)
+* [云引擎 .Net 环境](leanengine_cloudfunction_guide-dotnet.html)

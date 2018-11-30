@@ -2,7 +2,7 @@
 
 ## 云引擎都支持哪些语言
 
-目前支持 Node.js、Python、Java 和 PHP 运行环境，未来可能还会引入其他语言。
+目前支持 Node.js、Python、Java、PHP 和 .Net 运行环境，未来可能还会引入其他语言。
 
 ## 云引擎的二级域名多久生效
 
@@ -238,4 +238,4 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 ## 如何定制 Java 的堆内存大小？
 
-云引擎运行 Java 应用时，会自动将 `-Xmx` 参数设置为实例规格的 70%，剩下的 30% 留给堆外内存和其他开销。如果的应用比较特殊（比如大量使用堆外内存）可以自己定制 `-Xmx` 参数。假设使用 2 GB 内存规格的实例运行，则可以在云引擎的设置页面增加「自定义环境变量」，名称为 `JAVA_OPTS`，值为 `-Xmx1500m`，这样会限制 JVM 堆最大为 1.5 GB，剩下 500 MB 留给持久代、堆外内存或者其他一些杂项使用。**注意：`-Xmx` 参数如果设置得过小可能会导致大量 CPU 消耗在反复的的 GC 任务上**。
+见 [网站托管开发指南 · Java](leanengine_webhosting_guide-java.html#项目骨架)。

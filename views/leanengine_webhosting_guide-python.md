@@ -34,8 +34,6 @@ pip install -r requirements.txt
 
 {% block project_constraint %}
 
-## 项目骨架
-
 参照示例项目，你的项目需要遵循一定格式才会被云引擎识别并运行。
 
 {{fullName}} 使用 WSGI 规范来运行项目，项目根目录下必须有 `wsgi.py` 与 `requirements.txt` 文件，可选文件 `.python-version`、`runtime.txt`。云引擎运行时会首先加载 `wsgi.py` 这个模块，并将此模块的全局变量 `application` 做为 WSGI 函数进行调用。因此请保证 `wsgi.py` 文件中包含一个 `application` 的全局变量／函数／类，并且符合 WSGI 规范。
@@ -72,8 +70,6 @@ pip install -r requirements.txt
 如果在本地开发时已使用了 pyenv，pyenv 也会根据此文件来自动使用对应的 Python 运行项目。我们建议本地开发使用 pyenv，以保证本地环境与线上相同。pyenv 的安装方法请参考 [pyenv 官方网站](https://github.com/pyenv/pyenv)。
 
 目前仅支持 CPython 版本，暂时不支持 pypy、jython、iron python 等其他 Python 实现。另外建议尽量使用 3.5 或以上版本的 Python 进行开发，如果仍然在使用 Python2 ，请使用 Python2.7 进行开发。
-
-{{ docs.note("在之前版本的云引擎中，你可以在项目根目录的 `runtime.txt` 中填写 `python-3.5` 或者 `python-2.7` 来指定 Python 版本。如果当前项目仍然在使用此方法，建议使用上面介绍的方式来指定。") }}
 
 {% endblock %}
 
