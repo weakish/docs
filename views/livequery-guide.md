@@ -234,8 +234,8 @@ doingLiveQuery.subscribeInBackground(new AVLiveQuerySubscribeCallback() {
 });
 ```
 ```js
-doingQuery.subscribe().then(function(liveQuery) {
-  liveQuery.on('create', function(newDoingItem) {
+doingQuery.subscribe().then(function(subscription) {
+  subscription.on('create', function(newDoingItem) {
     // add newDoingItem to doingList
   });
 });
@@ -274,8 +274,8 @@ doingLiveQuery.subscribeInBackground(new AVLiveQuerySubscribeCallback() {
 });
 ```
 ```js
-doingQuery.subscribe().then(function(liveQuery) {
-    // liveQuery 是 doingQuery 的订阅
+doingQuery.subscribe().then(function(subscription) {
+    // subscription 是 doingQuery 的订阅
 });
 ```
 ```cs
@@ -698,11 +698,66 @@ livequery.OnLiveQueryReceived += (sender, e) =>
 }
 ```
 
-{# 2017-06-09 时序图涉及存储和 IM 的关系，会加大用户的理解难度，先取消。#}
-{# ## LiveQuery 服务的时序图
+## 取消订阅
 
-![livequery-seq](images/livequery-seq.svg)
-#}
+取消订阅是针对某一个或者某一些 LiveQuery，不再希望云端将数据变更推送到客户端，区别于 [断开链接](#断开链接)。
+
+如果不主动调用取消订阅的接口，如果发生[断开链接](#断开链接)，SDK 会在重连回来之后，自动重新续订，开发者无需做额外操作。
+
+
+取消订阅的接口示例代码：
+
+```objc
+[liveQuery unsubscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+    if (succeeded) {
+        // 取消订阅成功
+    } else {
+        // 发生了异常
+    }
+}];
+```
+```swift
+liveQuery.unsubscribe { (succeeded, error) in
+    if succeeded {
+        // 取消订阅成功
+    } else {
+        // 发生了异常
+    }
+}
+```
+```java
+liveQuery.unsubscribeInBackground(new AVLiveQuerySubscribeCallback() {
+  @Override
+  public void done(AVException ex) {
+    if (null != ex) {
+      // 发生了异常
+    } else {
+     // 取消订阅成功
+    }
+  }
+});
+```
+```js
+liveQuery.unsubscribe().then(function() {
+  // 取消订阅成功
+}).catch(function(error) {
+  // 发生了异常
+});
+```
+```cs
+await  liveQuery.UnsubscribeAsync();
+```
+
+## 断开连接
+
+断开连接有几种情况：
+
+1. 网络异常或者网络切换，非预期性断开。
+2. 退出应用、关机或者打开飞行模式等，用户在应用外的操作导致断开。
+
+如上几种情况开发者无需做额外的操作，只要切回应用，SDK 会自动重新订阅，数据变更会继续推送到客户端。
+
+而另外一种极端情况——**当用户在移动端使用手机的进程管理工具，杀死了进程或者直接关闭了网页的情况下**，SDK 无法自动重新订阅，此时需要开发者根据实际情况实现重新订阅。
 
 ## 常见问题
 
