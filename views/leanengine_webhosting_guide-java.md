@@ -124,10 +124,6 @@ java -jar target/{打包好的 jar 文件}
 
 然后点击 run 按钮启动应用。
 
-#### 命令行工具启动应用
-
-很抱歉，命令行工具暂不支持 JAR 项目的启动。
-
 {% endblock %}
 
 {% block ping %}
@@ -175,7 +171,7 @@ public class LeanEngineMetadataServlet extends HttpServlet {
 
 {% block custom_runtime %}
 
-Java 云引擎只支持 1.8 运行环境和 war 包运行
+Java 云引擎支持 1.8 运行环境。
 {% endblock %}
 
 {% block use_leanstorage %}
