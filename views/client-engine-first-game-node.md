@@ -82,19 +82,31 @@ export default class RPSGame extends Game {
 ```
 在这里配置完成后，Client Engine 初始项目每次请求实时对战服务创建房间时，都会根据这里的值限定房间内的玩家数量。
 
+对设置房间内玩家数量的详细讲解请参考[Client Engine 开发指南](client-engine-guide-node.html#设置房间内玩家数量)。
+
 
 ### MasterClient 及客户端进入同一房间
 
-在完成 Game 的基础配置之后，MasterClient 和客户端就可以准备加入同一个房间了。Client Engine 初始项目的 `/reservation` 接口使用 `GameManager` 提供了准备 MasterClient 及创建新房间的功能，当客户端没有可以加入的房间时，可以调用该接口获得一个可以加入的新房间。该接口在这个小游戏中的使用场景如下：
-
-客户端首先向实时对战服务发起[随机加入房间](multiplayer-guide-js.html#随机加入房间)请求，当加入失败且错误码为 [4301](multiplayer-error-code.html#4301) 时，调用 Client Engine 中的 `/reservation` 接口，获得 Client Engine 返回的 roomName 并加入房间。客户端示例代码如下：
+在完成 Game 的基础配置之后，MasterClient 和客户端就可以准备加入同一个房间了。Client Engine 初始项目的 `/reservation` 接口使用 `GameManager` 提供了准备 MasterClient 及创建新房间的功能，当客户端没有可以加入的房间时，可以调用该接口获得一个可以加入的新房间。调用该接口的客户端示例代码如下：
 
 **客户端调用接口示例代码（非 Client Engine）：**
+
+客户端首先向实时对战服务发起[随机加入房间](multiplayer-guide-js.html#随机加入房间)请求：
 
 ```js
 // 匹配房间
 play.joinRandomRoom();
 ```
+
+如果实时对战服务此时有可以加入的新房间，您会自动加入到新房间中，并触发加入房间成功事件：
+
+```js
+play.on(Event.ROOM_JOINED, () => {
+    // TODO 可以做跳转场景之类的操作
+});
+```
+
+如果没有可以加入的房间，会触发加入房间失败事件。在这个事件中，[4301](multiplayer-error-code.html#4301) 错误码代表着没有可以加入的空房间，此时我们向 Client Engine 请求创建一个新的房间，获得新房间的 roomName 后加入新房间：
 
 ```js
 // 加入房间失败后请求 Client Engine 创建房间
@@ -119,16 +131,11 @@ play.on(Event.ROOM_JOIN_FAILED, (error) => {
     console.log(error);
   }
 });
-
-// 加入房间成功
-play.on(Event.ROOM_JOINED, () => {
-    // 在这里可以展示加入房间成功的 UI
-});
 ```
 
-在上面的代码中，当客户端调用 `play.joinRoom(roomName)` 并最终触发加入房间成功事件后，意味着客户端 Client 及 MasterClient 进入了同一个房间内，此时等待其他玩家使用 `play.joinRandomRoom()` 加入这个还有空位的房间，当房间人数足够时，就可以开始游戏了。
+在上面的代码中，当客户端加入房间成功后，意味着客户端 Client 及 MasterClient 进入了同一个房间内，当房间人数足够时，就可以开始游戏了。
 
-客户端项目中已经帮您写好了调用 `/reservation` 的代码，您可以在 `/src/components/Lobby.vue` 中查看相关代码。
+客户端项目中已经帮您写好了调用 `/reservation` 的代码，无需您自己再写代码，您可以在 `/src/components/Lobby.vue` 中查看相关代码。
 
 ### 宣布游戏开始
 
