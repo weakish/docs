@@ -168,10 +168,10 @@ wx.getUserInfo({
 
 微信开放平台使用 [unionid](https://mp.weixin.qq.com/debug/wxadoc/dev/api/uinionID.html) 来区分用户的唯一性，也就是说同一个微信开放平台帐号下的移动应用、网站应用和公众帐号（包括小程序），用户的 unionid 都是同一个，而 openid 会是多个。
 
-开发者需要自行获得用户的 unionid，然后调用 `AV.User.signUpOrlogInWithAuthDataAndUnionId()` 投入 unionid 完成登录授权（而不应该再使用 `AV.User.loginWithWeapp()`）：
+开发者需要自行获得用户的 unionid，然后调用 `AV.User.loginWithAuthDataAndUnionId()` 投入 unionid 完成登录授权（而不应该再使用 `AV.User.loginWithWeapp()`）：
 
   ```javascript
-AV.User.signUpOrlogInWithAuthDataAndUnionId({
+AV.User.loginWithAuthDataAndUnionId({
   uid: openid,
   access_token: session_key,
   ...其他可选属性
