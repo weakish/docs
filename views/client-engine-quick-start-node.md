@@ -96,6 +96,7 @@ lean deploy
 
 其他详细的部署方式请参考命令行工具文档中的[部署](leanengine_cli.html#部署)及[发布到生产环境](leanengine_cli.html#发布到生产环境)。
 
-## 开发指南
-该初始项目已经帮您写好了通用的游戏逻辑，并提供了便利的方法及属性，因此我们推荐您在该项目的基础上开发自己的游戏逻辑。
-进一步了解如何使用该项目请参考 [Client Engine 开发指南 · Node.js](client-engine-guide-node.html)。
+## 你的第一个 Client Engine 小游戏
+
+接下来请查看文档[你的第一个 Client Engine 小游戏](client-engine-first-game-node.html)，了解如何根据该初始项目一步一步开发出来一个剪刀石头布小游戏。
+
