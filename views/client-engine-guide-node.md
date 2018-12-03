@@ -27,7 +27,7 @@ class SampleGameManager<T extends Game> extends GameManager<T> {
 }
 ```
 
-在 new `SampleGameManager` 的时候，需要在第一个参数内传入[自定义的 Game ](#实现自己的 Game)，这里使用的是[示例 Demo ](client-engine-first-game-node.html)猜拳游戏中的 `RPSGame`。
+在新建 `SampleGameManager` 的时候，需要在第一个参数内传入[自定义的 Game ](#实现自己的 Game)，这里使用的是[示例 Demo ](client-engine-first-game-node.html)猜拳游戏中的 `RPSGame`。
 
 ```js
 import PRSGame from "./rps-game";
@@ -45,13 +45,15 @@ const gameManager = new SampleGameManager(
 ).on(RedisLoadBalancerConsumerEvent.LOAD_CHANGE, () => debug(`Load: ${gameManager.load}`));
 ```
 
-接着我们要 new 一个[负载均衡](#负载均衡)对象，然后将上面的 `gameManager` 对象作为第一个参数传入进去：
+接着我们要创建一个[负载均衡](#负载均衡)对象，然后将上面的 `gameManager` 对象作为第一个参数传入进去：
 
 ```js
 const redisLB = new RedisLoadBalancer(
   gameManager,
+  // 负载均衡使用的 redis url，请不要更改，使用时复制粘贴即可
   process.env.REDIS_URL__CLIENT_ENGINE,
   {
+    // 负载均衡资源池 Id，请不要更改，使用时复制粘贴即可
     poolId: `${APP_ID.slice(0, 5)}-${process.env.LEANCLOUD_APP_ENV || "development"}`,
   },
 );

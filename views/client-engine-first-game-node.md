@@ -82,7 +82,7 @@ export default class RPSGame extends Game {
 ```
 在这里配置完成后，Client Engine 初始项目每次请求实时对战服务创建房间时，都会根据这里的值限定房间内的玩家数量。
 
-对设置房间内玩家数量的详细讲解请参考[Client Engine 开发指南](client-engine-guide-node.html#设置房间内玩家数量)。
+对设置房间内玩家数量的详细讲解请参考 [Client Engine 开发指南](client-engine-guide-node.html#设置房间内玩家数量)。
 
 
 ### MasterClient 及客户端进入同一房间
