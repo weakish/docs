@@ -25,11 +25,7 @@ npm install
 {% endblock %}
 
 {% block project_constraint %}
-## 项目骨架
-
 以示例项目为例，在根目录我们看到有一个 `package.json` 文件，注意：**所有 Node.js 的项目必须包含`package.json` 才会正确地被云引擎识别为 Node.js 项目**。
-
-<div class="callout callout-info">因为一些历史遗留问题，请确保你的项目中 **没有** 名为 `cloud/main.js` 的文件。</div>
 
 #### package.json
 
@@ -71,8 +67,6 @@ Node.js 的 `package.json` 中可以指定 [很多选项](https://docs.npmjs.com
 {% endblock %}
 
 {% block supported_frameworks %}
-
-至此，你已经部署了一个可以从外网访问的站点到云引擎，接下来会介绍更多功能和技术点，帮助你开发出一个满足你需求的网站。
 
 ## 接入 Web 框架
 
@@ -188,7 +182,7 @@ require('http').createServer(function(req, res) {
 
 因为 Node.js 的异步调用容易因运行时错误或编码疏忽中断，为了减少在这种情况下对服务器内存的占用，也为了客户端能够更早地收到错误提示，所以需要添加这个设置，一旦发生超时，服务端会返回一个 HTTP 错误码给客户端。
 
-使用框架实现的自定义路由的时候，请求默认的超时时间为 15 秒，该值可以在 `app.js` 中进行调整：
+使用 Express 框架实现自定义路由的时候，请求默认的超时时间为 15 秒，该值可以在 `app.js` 中进行调整：
 
 ```js
 // 设置默认超时时间
@@ -339,7 +333,6 @@ app.get('/profile', function(req, res) {
 
 // 登出账号
 app.get('/logout', function(req, res) {
-  req.currentUser.logOut();
   res.clearCurrentUser(); // 从 Cookie 中删除用户
   res.redirect('/profile');
 });
@@ -360,7 +353,7 @@ AV.User.login(user, pass).then( user => {
 });
 ```
 
-同时在后端：
+同时在服务器端：
 
 ```javascript
 app.get('/profile', function(req, res) {

@@ -15,7 +15,8 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 * 到免费的[用户社区](https://forum.leancloud.cn/) 进行提问。
 * 购买 [技术支持](/bill.html#/bill/general)，进入 [工单系统](https://leanticket.cn/t/leancloud) 来提交问题。
 * 发送邮件到 {{ include.supportEmail() }} 获取帮助。
-* 紧急情况拨打客服电话：+86-13146446722。
+* 紧急故障拨打客服电话：+8618625038918。
+* 售前咨询请致电 +8613011098244。
 
 ### 计费是基于账号还是应用
 
@@ -119,7 +120,7 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 
 开发版提供每天三万次的免费额度。推送服务和统计服务免费使用，并不占用免费额度。
 
-默认情况下，每个应用同一时刻最多可使用的工作线程数为 30，即同一时刻最多可以同时处理 30 个数据请求。**我们会根据应用运行状况以及运维需要调整改值**。如果需要提高这一上限，请写信至 {{ include.supportEmail() }} 进行申请。
+默认情况下，商用版应用同一时刻最多可使用的工作线程数为 30，即同一时刻最多可以同时处理 30 个数据请求。**我们会根据应用运行状况以及运维需要调整改值**。如果需要提高这一上限，请写信至 {{ include.supportEmail() }} 进行申请。
 
 ### API 调用次数的计算
 
@@ -267,58 +268,11 @@ LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数�
 
 ## iOS/macOS SDK
 
-### 安装 Cocopods 失败怎么解决
-
-推荐使用淘宝提供的 Gem 源，访问 [https://ruby.taobao.org/](https://ruby.taobao.org/)。
-
-```sh
-$ gem sources --add https://ruby.taobao.org/ --remove https://rubygems.org/
-$ gem sources -l
-*** CURRENT SOURCES ***
-
-https://ruby.taobao.org
-# 请确保只有 ruby.taobao.org
-$ gem install cocoapods
-```
-
-由于淘宝已经停止基于 HTTP 协议的镜像服务，如果之前使用的是 [http://ruby.taobao.org/](http://ruby.taobao.org/)，这也可能导致安装 Cocopods 失败。
-
-需要在配置中使用 HTTPS 协议代替：
-
-```sh
-$ gem sources --add https://ruby.taobao.org/ --remove http://ruby.taobao.org/
-$ gem sources -l
-*** CURRENT SOURCES ***
-
-https://ruby.taobao.org
-# 请确保只有 ruby.taobao.org
-$ gem install cocoapods
-```
-
 ### iOS 项目打包后的大小
 
 创建一个全新的空白项目，使用 CocoaPod 安装了 AVOSCloud 和 AVOSCloudIM 模块，此时项目大小超过了 80 MB。打包之后体积会不会缩小？大概会有多大呢？
 
 LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slices。发布过程中，non-ARM 的符号和没有参与连接的符号会被 strip 掉。因此，最终应用体积不会增加超过 10 MB，请放心使用。
-
-### 编译失败
-
-#### Symbol(s) not found x86_64
-
-请使用 32 位模拟器进行编译和调试.
-
-#### Undefined symbols for architecture
-
-一般是由于 Framework 的链接找不到造成的，建议用 CocoaPods 更新一下。没使用 CocoaPods 的项目可以删除对 Framework 的引用，然后再重新加进来。
-
-LeanCloud 依赖的 Framework 包括：
-
-* SystemConfiguration.framework
-* MobileCoreServices.framework
-* CoreTelephony.framework
-* CoreLocation.framework
-
-如果是 `for architecture arm64`，这是因为 Xcode 更新到 5.1 后，CocoaPods 没有及时更新对 64 位 CPU 的支持，解决方法参考 [《StackOverflow - Undefined symbols for architecture arm64》](http://stackoverflow.com/questions/19213782/undefined-symbols-for-architecture-arm64)
 
 ### 请求报错
 
@@ -329,10 +283,6 @@ LeanCloud 依赖的 Framework 包括：
 如果错误信息类似于 `can't find any special indices: 2d (needs index), 2dsphere (needs index), for 字段名`，就代表用于查询的字段没有建立 2D 索引，可以在 Class 管理的 **其他** 菜单里找到 **索引** 管理，点击进入，找到字段名称，选择并创建「2dsphere」索引类型。
 
 ![image](images/geopoint_faq.png)
-
-### 如何先验证手机号码再注册
-
-请参考 [存储开发指南 &middot; 手机号码登录](leanstorage_guide-objc.html#手机号码登录")。
 
 
 ## Android SDK
@@ -350,9 +300,62 @@ LeanCloud 依赖的 Framework 包括：
 * SDK 版本过旧，installationId 的生成逻辑在版本更迭中有修改。请更新至最新版本。
 * 代码混淆引起的，注意在 proguard 文件中添加 [LeanCloud SDK 的混淆排除](android_faq.html#代码混淆怎么做)。
 
-### 如何先验证手机号码再注册
+### 代码混淆怎么做
+为了保证 SDK 在代码混淆后能正常运作，需要保证部分类和第三方库不被混淆，参考下列配置：
 
-请参考 [存储开发指南 &middot; 手机号码登录](leanstorage_guide-android.html#手机号码登录")。
+```
+# proguard.cfg
+
+-keepattributes Signature
+-dontwarn com.jcraft.jzlib.**
+-keep class com.jcraft.jzlib.**  { *;}
+
+-dontwarn sun.misc.**
+-keep class sun.misc.** { *;}
+
+-dontwarn com.alibaba.fastjson.**
+-keep class com.alibaba.fastjson.** { *;}
+
+-dontwarn sun.security.**
+-keep class sun.security.** { *; }
+
+-dontwarn com.google.**
+-keep class com.google.** { *;}
+
+-dontwarn com.avos.**
+-keep class com.avos.** { *;}
+
+-keep public class android.net.http.SslError
+-keep public class android.webkit.WebViewClient
+
+-dontwarn android.webkit.WebView
+-dontwarn android.net.http.SslError
+-dontwarn android.webkit.WebViewClient
+
+-dontwarn android.support.**
+
+-dontwarn org.apache.**
+-keep class org.apache.** { *;}
+
+-dontwarn org.jivesoftware.smack.**
+-keep class org.jivesoftware.smack.** { *;}
+
+-dontwarn com.loopj.**
+-keep class com.loopj.** { *;}
+
+-dontwarn com.squareup.okhttp.**
+-keep class com.squareup.okhttp.** { *;}
+-keep interface com.squareup.okhttp.** { *; }
+
+-dontwarn okio.**
+
+-dontwarn org.xbill.**
+-keep class org.xbill.** { *;}
+
+-keepattributes *Annotation*
+
+```
+
 
 ## JavaScript SDK
 
@@ -371,11 +374,6 @@ AV.Cloud.useMasterKey(true);
 ### Web 端会暴露 App Key 和 App Id，怎么保证安全性？
 首先请阅读「[安全总览](data_security.html)」来了解 LeanCloud 完整的安全体系。其中提到，可以使用「[安全域名](data_security.html#Web_应用安全设置) 」，在没有域名的情况下，可以使用「[ACL](acl-guide.html)」。
 理论上所有客户端都是不可信任的，所以需要在服务端对安全性进行设计。如果需要高级安全，可以使用 ACL 方式来管理，如果需要更高级的自定义方式，可以使用 [LeanEngine（云引擎）](leanengine_overview.html)。
-
-### 如何先验证手机号码再注册
-
-请参考 [存储开发指南 &middot; 手机号码登录](leanstorage_guide-js.html#手机号码登录")。
-
 
 ## 消息推送
 

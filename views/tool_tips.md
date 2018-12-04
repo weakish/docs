@@ -96,11 +96,11 @@
 * 云引擎提供 [命令行工具](leanengine_cli.html)，方便部署、发布、调试云引擎项目。
 * 云引擎支持一份代码部署多个应用，只要使用相同的 git 仓库即可。另外 [命令行工具](leanengine_cli.html#多应用管理) 提供强力支持。
 * 云引擎菜单提供统计功能，查看你的云引擎项目调用状况。
-* 云引擎提供 [定时任务](leanengine_guide-cloudcode.html#定时任务)，特定的时刻，做特定的事情。
-* 云引擎提供 [HTTP 客户端](leanengine_guide-cloudcode.html#发送_HTTP_请求)，抓取第三方数据。
-* 通过定义 [before 或者 after 函数](leanengine_guide-cloudcode.html#在_save_前修改对象)，在 AVObject 存储前后加入校验等额外逻辑。
+* 云引擎提供 [定时任务](leanengine_cloudfunction_guide-node.html#定时任务)，特定的时刻，做特定的事情。
+* 云引擎提供 [HTTP 客户端](leanengine_webhosting_guide-node.html#发送_HTTP_请求)，抓取第三方数据。
+* 通过定义 [before 或者 after 函数](leanengine_cloudfunction_guide-node.html#beforeSave)，在 AVObject 存储前后加入校验等额外逻辑。
 * 避免对象循环引用，将循环关系作为第三个对象存储。
-* 想建立一个应用网站？我们提供 [网站托管](leanengine_guide-cloudcode.html#Web_Hosting)。
+* 想建立一个应用网站？我们提供 [网站托管](leanengine_webhosting_guide-node.html)。
 * 想用好云引擎，请先熟悉 [JavaScript SDK 开发指南](leanstorage_guide-js.html)。
 {% if node != 'qcloud' %}
 * 云引擎 Web 主机托管，可以绑定备案过的独立域名，请在 [工单系统](https://leanticket.cn/t/leancloud) 提出技术申请。
@@ -123,4 +123,3 @@
 * 所有 SDK 都提供 [API 文档](index.html)，开发指南没有覆盖的 API 介绍都可以在里面找到解释。
 * 关注我们的 [博客](https://blog.leancloud.cn/) 和 [微博](http://weibo.com/avoscloud)，获取 LeanCloud 最新消息。
 * 在应用设置的基本设置菜单里，可以更改应用名称，提交应用图标，申请发布到 [应用墙](https://leancloud.cn/customers.html)。
-

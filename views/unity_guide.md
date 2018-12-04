@@ -25,7 +25,7 @@ LeanCloud 的每一个账户都可以创建多个应用。同一个应用可分�
 ### 初始化
 
 在 `LeanCloud.Core.dll` 中有一个 `AVInitializeBehaviour` 把它拖拽到任意一个 `GameObject` 上然后根据下图填写 Application ID 以及 Application Key：
-  
+
   ![unity-init](images/unity-init.png)
 
 
@@ -139,7 +139,7 @@ gameScore.SaveAsync().ContinueWith(t =>//第一次调用 SaveAsync 是为了增�
 });
 ```
 
-<!--TODO: 
+<!--TODO:
 ### 计数器
 ### 数组
 -->
@@ -1173,7 +1173,7 @@ if (GUI.Button(new Rect(50, 50, 200, 50), "Delete file"))
 ```
 
 ## 调用云引擎
-云引擎是 LeanCloud 提供给开发者自定义服务端逻辑的解决方案，例如想在用户注册的时候，服务端统一给用户分配随机的昵称，这一操作就可以用云引擎实现。具体关于云引擎的一些相关概念和操作可以先查看 [云引擎指南](leanengine_guide-cloudcode.html)。
+云引擎是 LeanCloud 提供给开发者自定义服务端逻辑的解决方案，例如想在用户注册的时候，服务端统一给用户分配随机的昵称，这一操作就可以用云引擎实现。具体关于云引擎的一些相关概念和操作可以先查看 [云引擎指南](leanengine_cloudfunction_guide-node.html)。
 
 调用云引擎在 SDK 中比较方便，它是 `AVCloud` 的静态方法，全局均可调用。
 
@@ -1231,23 +1231,23 @@ var task = push.SendAsync();
     }
     else
     {
-        
+
         BOOL authHandled = [self connection:connection handleAuthenticationChallenge:challenge];
-        
+
         if(authHandled == NO)
         {
             self->_retryCount++;
-            
+
             // Empty user or password
             if(self->_retryCount > 1 || self.user == nil || [self.user length] == 0 || self.password == nil || [self.password length]  == 0)
             {
                 [[challenge sender] cancelAuthenticationChallenge:challenge];
                 return;
             }
-            
+
             NSURLCredential* newCredential =
             [NSURLCredential credentialWithUser:self.user password:self.password persistence:NSURLCredentialPersistenceNone];
-            
+
             [challenge.sender useCredential:newCredential forAuthenticationChallenge:challenge];
         }
     }
@@ -1255,4 +1255,3 @@ var task = push.SendAsync();
 ```
 
   目前 Unity 官方还在修复此问题，截止到 V5.0.1f1 该问题一直存在，因此所有升级到 Unity 5.0 的开发者都需要如此修改，才能确保 iOS 正确运行。
-

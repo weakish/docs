@@ -277,7 +277,7 @@ curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
-  -d '{"chatroom_id": "some-conv-id", "ttl": 50}' \
+  -d '{"client_id": "some-client-id", "ttl": 50}' \
   https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/temporary-silenceds
 ```
 

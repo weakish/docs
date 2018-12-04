@@ -50,8 +50,6 @@ composer install
 
 {% block project_constraint %}
 
-## 项目骨架
-
 你的项目需要遵循一定格式才会被云引擎识别并运行。
 
 {{fullName}} 项目必须有 `$PROJECT_DIR/public/index.php` 文件，该文件为整个项目的启动文件。
@@ -98,6 +96,8 @@ app.get('/1.1/_ops/functions/metadatas', function(req, res) {
 
 对于 PHP 项目，我们默认每 64M 内存分配一个 PHP-FPM Worker，如果希望自定义 Worker 数量，可以在云引擎设置页面的「自定义环境变量」中添加名为 PHP_WORKERS 的环境变量，值是一个数字。设置过低会导致收到新请求时无可用的 Worker；过高会导致内存不足、请求处理失败，建议谨慎调整。
 
+在 PHP 7.2 中官方从核心中移除了 mcrypt 这个拓展，云引擎以选装的方式继续提供支持，在 `composer.json` 的 require 中加入 `ext-mcrypt: *` 即可，使用 mcrypt 会增加部署耗时，如果没有用到请不要加。
+
 {% endblock %}
 
 {% block code_get_client_ip_address %}
@@ -133,9 +133,9 @@ composer require leancloud/leancloud-sdk
 use \LeanCloud\Client;
 
 Client::initialize(
-    getenv("LC_APP_ID"),          // 从 LC_APP_ID 这个环境变量中获取应用 app id 的值
-    getenv("LC_APP_KEY"),         // 从 LC_APP_KEY 这个环境变量中获取应用 app key 的值
-    getenv("LC_APP_MASTER_KEY")   // 从 LC_APP_MASTER_KEY 这个环境变量中获取应用 master key 的值
+    getenv("LEANCLOUD_APP_ID"),          // 从 LEANCLOUD_APP_ID 这个环境变量中获取应用 app id 的值
+    getenv("LEANCLOUD_APP_KEY"),         // 从 LEANCLOUD_APP_KEY 这个环境变量中获取应用 app key 的值
+    getenv("LEANCLOUD_APP_MASTER_KEY")   // 从 LEANCLOUD_APP_MASTER_KEY 这个环境变量中获取应用 master key 的值
 );
 
 // 如果不希望使用 masterKey 权限，可以将下面一行删除
@@ -294,7 +294,7 @@ $app->add(new SlimEngine());
 }
 ```
 
-目前云引擎支持 `5.6`、`7.0`、`7.1` 这几个版本，后续如果有新版本发布，也会添加支持。
+目前云引擎支持 `5.6`、`7.0`、`7.1`、`7.2` 这几个版本，后续如果有新版本发布，也会添加支持。
 
 {% endblock %}
 

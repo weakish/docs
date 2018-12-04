@@ -13,11 +13,11 @@
 
 以上几个运行时，我们称之为 `.NET Portable`。
 
-而 Unity 较为特殊，它暂时还不支持 .NET 3.5 之后的版本，因此我们单独列为 `Unity` 
+而 Unity 较为特殊，它暂时还不支持 .NET 3.5 之后的版本，因此我们单独列为 `Unity`
 
 ## 安装
 
-### Visual Studio / Xamarin 
+### Visual Studio / Xamarin
 在 Nuget Package Manager 里面打开 Package Manager Console 执行如下命令行：
 
 ```sh
@@ -40,7 +40,7 @@ LeanCloud 的每一个账户都可以创建多个应用。同一个应用可以�
 ### 初始化
 在 LeanCloud 中，几乎所有平台下的接口我们都尽量保持一致，目的就是为了降低开发者的开发成本，所以在初始化的时候我们几乎都是遵循在 `AVClient` 这个类下有一个叫做 `Initialize`（不同平台的编程规范可能不一样，但是在 C# 语言风格中一般方法名的首字母都是大写）的方法，这个方法目前有 2 个重载：
 
-#### Visual Studio / Xamarin 
+#### Visual Studio / Xamarin
 在 .NET Portable 运行时中，可以在程序初始化的时候执行如下代码：
 
 ```c#
@@ -53,7 +53,7 @@ LeanCloud 的每一个账户都可以创建多个应用。同一个应用可以�
 
 #### Unity
 在 `LeanCloud.Core.dll` 中有一个 `AVInitializeBehaviour` 把它拖拽到任意一个 `GameObject` 上然后根据下图填写 Application ID 以及 Application Key：
-  
+
   ![unity-init](images/unity-init.png)
 
 
@@ -968,7 +968,7 @@ await AVFile.GetFileWithObjectIdAsync("538ed669e4b0e335f6102809").ContinueWith(t
    });
 ```
 ## 调用云引擎
-云引擎是 LeanCloud 提供给开发者自定义服务端逻辑的解决方案，例如想在用户注册的时候，服务端统一给用户分配随机的昵称，这一操作就可以用云引擎实现。具体关于云引擎的一些相关概念和操作可以先查看 [云引擎指南](./leanengine_guide-cloudcode.html)。
+云引擎是 LeanCloud 提供给开发者自定义服务端逻辑的解决方案，例如想在用户注册的时候，服务端统一给用户分配随机的昵称，这一操作就可以用云引擎实现。具体关于云引擎的一些相关概念和操作可以先查看 [云引擎指南](leanengine_cloudfunction_guide-node.html)。
 
 调用云引擎在SDK中比较方便，它是 `AVCloud` 的静态方法，全局均可调用。
 
@@ -1016,4 +1016,3 @@ await task;
  var task = push.SendAsync();
  await task;
 ```
-

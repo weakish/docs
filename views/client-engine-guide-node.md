@@ -1,62 +1,125 @@
 # Client Engine 开发指南 · Node.js
 
-## 初始项目
-请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 获得初始项目，了解如何本地运行及部署项目。您需要在[初始项目](https://github.com/leancloud/client-engine-nodejs-getting-started)的基础上开发您自己的游戏逻辑。
+请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 及[你的第一个 Client Engine 小游戏](client-engine-first-game-node.html)来初步了解如何使用初始项目来开发游戏。本文档将在初始项目的基础上深入讲解 Client Engine SDK。
 
-## 示例游戏逻辑
-初始项目中写了一个非常简单的双人剪刀石头布游戏作为示例，主要逻辑为：Client Engine 负责向客户端分配可用的房间，客户端加入房间后，在房间内由 MasterClient 控制游戏内的逻辑：
 
-1. 玩家客户端[连接](multiplayer-guide-js.html#连接)实时对战服务，向实时对战服务请求[随机匹配房间](multiplayer-guide-js.html#随机加入房间)。
-2. 如果实时对战服务没有合适的房间，玩家客户端转而请求 Client Engine 提供的 `/reservation` 接口请求房间。
-3. Client Engine 每次收到请求后会再次寻找可用的房间，如果没有可用的房间则创建一个新的 MasterClient ，MasterClient [连接](multiplayer-guide-js.html#连接)实时对战服务并[创建房间](multiplayer-guide-js.html#创建房间)，相关接口返回房间名称给客户端。
-4. 客户端通过 Client Engine 返回的房间名称[加入房间](multiplayer-guide-js.html#加入房间)，MasterClient 和客户端在同一房间内通过[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)等方式进行消息互动，完成对游戏逻辑的控制。
-5. MasterClient 判定游戏结束，客户端离开房间，Client Engine 销毁游戏。
+Client Engine 初始项目依赖了专门的 Client Engine SDK， Client Engine SDK 在实时对战 Play SDK 的基础上进行了封装，帮助您更好的撰写服务端游戏逻辑。您可以通过[快速入门](client-engine-quick-start-node.html)安装依赖。
 
-## 项目详解
+## 角色
+SDK 提供以下角色：
 
-### 项目结构
+* **`Game` ：**负责房间内游戏的具体逻辑。Client Engine 维护了许多游戏房间，每一个游戏房间都是一个 Game 实例，即每个 Game 实例对应一个唯一的 Play Room 与 MasterClient。游戏房间内的逻辑由 Game 中的代码来控制，因此**房间内的游戏逻辑必须继承自该类**。
+* **`GameManager` ：**负责创建、管理及分配具体的 Game 对象。SDK 中的 `GameManager` 已经帮您写好了默认的 Game 管理逻辑，您不需要再自己写代码管理 Game。
 
-`./src` 中主要源文件及用途如下：
+### GameManager
+
+#### GameManager 实例化
+
+`GameManager` 会帮您自动创建、管理并销毁 Game，因此在项目启动时，您需要实例化 `GameManager`。相关示例代码如下：
+
+首先需要自定义一个 Class 继承自 `GameManager`，例如示例代码中的 `SampleGameManager`， 这个 Class 要实现 `consume()` 方法，这个 `consume()` 方法中要定义 `GameManager` 创建 `Game` 的方法 `makeReservation()`：
+
+```js
+class SampleGameManager<T extends Game> extends GameManager<T> {
+  public async consume(playerId: string, options: ICreateGameOptions) {
+    return this.makeReservation(playerId, options);
+  }
+}
+```
+
+在新建 `SampleGameManager` 的时候，需要在第一个参数内传入[自定义的 Game ](#实现自己的 Game)，这里使用的是[示例 Demo ](client-engine-first-game-node.html)猜拳游戏中的 `RPSGame`。
+
+```js
+import PRSGame from "./rps-game";
+
+const gameManager = new SampleGameManager(
+  PRSGame,
+  APP_ID,
+  APP_KEY,
+  {
+    concurrency: 2,
+    // 如果要使用其他节点，暂时需要手动指定，该参数会在今后移除。
+    // 需要先 import { Region } from "@leancloud/play";
+    // region: Region.NorthChina,
+  },
+).on(RedisLoadBalancerConsumerEvent.LOAD_CHANGE, () => debug(`Load: ${gameManager.load}`));
+```
+
+接着我们要创建一个[负载均衡](#负载均衡)对象，然后将上面的 `gameManager` 对象作为第一个参数传入进去：
+
+```js
+const redisLB = new RedisLoadBalancer(
+  gameManager,
+  // 负载均衡使用的 redis url，请不要更改，使用时复制粘贴即可
+  process.env.REDIS_URL__CLIENT_ENGINE,
+  {
+    // 负载均衡资源池 Id，请不要更改，使用时复制粘贴即可
+    poolId: `${APP_ID.slice(0, 5)}-${process.env.LEANCLOUD_APP_ENV || "development"}`,
+  },
+);
 
 ```
-├── configs.ts        // 配置文件
-├── index.ts          // 项目入口
-└── rps-game.ts       // RPSGame 类实现文件，Game 的子类，在这个文件中撰写了具体猜拳游戏的逻辑
+
+当每次有客户端创建房间的请求进来时，我们要通过负载均衡将请求转发给 `GameManager`。在下面的示例代码中，当负载均衡对象 `redisLB` 调用 `consume()` 方法时，最终执行的逻辑是 `gameManager` 中的 `consume()` 方法。在  `gameManager` 的 `consume()` 方法中我们使用了 `makeReservation()` 来创建房间。
+
+```js
+const roomName = await redisLB.consume(playerId, createGameOptions);
+```
+#### 创建房间
+在 [GameManager 实例化](#GameManager 实例化)这一节中，我们使用了 `GameManager` 的 `makeReservation()` 来创建房间。
+
+`makeReservation()` 接受以下参数：
+
+* playerId：发起请求的客户端在实时对战服务中的 [userId](multiplayer-guide-js.html#设置 userId)。
+* createGameOptions（可选）：创建指定条件的房间。
+  * roomName（可选）：创建指定 roomName 的房间。例如您需要和好友一起玩时，可以用这个接口创建房间后，把 roomName 分享给好友。如果您不关心 roomName，可以不指定这个参数。
+  * roomOptions（可选）：通过这个参数，客户端在请求 Client Engine 创建房间时，可以设置 `customRoomProperties`，`customRoomPropertyKeysForLobby`，`visible`，对这三个参数的说明请参考[创建房间](multiplayer-guide-js.html#创建房间)。
+  * seatCount(可选)：创建房间时，指定本次游戏需要多少人，这个值需要在[设置房间内玩家数量](#设置房间内玩家数量)的 `minSeatCount` 和 `maxSeatCount` 之间，否则 Client Engine 会拒绝创建房间。如果不指定，则以 `defaultSeatCount` 为准。
+
+例如创建一个带有匹配条件的新房间时，可以这样调用 `makeReservation()`：
+
+```js
+// 您可以从客户端发来的请求中获得 playerId 和 createGameOptions 
+const props = {
+    level: 2,
+};
+
+const roomOptions = {
+  customRoomPropertyKeysForLobby: ['level'],
+  customRoomProperties: props,
+};
+
+const createGameOptions = {
+  roomOptions
+};
+
+gameManager.makeReservation(playerId, createGameOptions);
 ```
 
-您可以从 `index.ts` 文件入手来了解整个项目，该文件是项目启动的入口，它通过 express 框架定义了名为 `/reservation` 的 Web API，供客户端新开一局游戏时调用。`/reservation` API 会调用 Client Engine SDK 中的 `GameManager` 的 `makeReservation()` 方法为指定的玩家分配一个可用的游戏房间并预留位置。
+在[你的第一个 Client Engine 小游戏](client-engine-first-game-node.html)中，`index.ts` 的 `/reservation` 撰写了和 GameManager 相关的代码，如果没有自定义需求您可以直接使用示例 Demo 中的 `/reservation` 接口并传入以上参数。
 
-## Client Engine SDK
-Client Engine 开发需要依赖专门的 Client Engine SDK，您可以通过[快速入门](client-engine-quick-start-node.md)安装依赖，下面我们重点看一下 SDK 提供的角色及相关生命周期：
+### Game
 
-### 角色
-* **`Game` ：**负责游戏的具体逻辑，每个 Game 实例对应一个唯一的 Play Room 与 masterClient。具体的游戏必须继承自该类。
-* **`GameManager` ：**负责创建并管理具体的 Game 对象。
-
-### Game 生命周期
-1. **创建：** `Game` 由 SDK 中的 `GameManager` 管理，`GameManager` 在有新的 `/reservation` 请求时会创建 `Game`。
+#### Game 生命周期
+1. **创建：** `Game` 由 SDK 中的 `GameManager` 管理，`GameManager` 会在收到创建房间的请求时根据情况创建 `Game`。
 2. **运行：** 创建后，`Game` 的控制权从 SDK 中 `GameManager` 移交给 `Game` 本身。从这个时刻开始，会有玩家陆续加入游戏房间。 
 3. **销毁：** 所有玩家离开房间后，意味着游戏结束，`Game` 将控制权交回 `GameManager`，`GameManager` 做最后的清理工作，包括断开并销毁该房间的 masterClient、将 `Game` 从管理的游戏列表中删除等。
 
-### Game 通用属性
+#### Game 通用属性
 在实现游戏逻辑的过程中，`Game` 类提供下面这些属性来简化常见需求的实现，您可以在继承 `Game` 的自己的类中方便的获得以下属性：
 
 * `room` 属性：游戏对应的房间，这是一个 Play SDK 中的 Room 实例。
 * `masterClient` 属性：游戏对应的 masterClient，这是一个 Play SDK 中的 Play 实例。
 * `players` 属性：不包含 masterClient 的玩家列表。注意，如果您通过 Play SDK Room 实例的 `playerList` 属性获取的房间成员列表是包括 masterClient 的。
 
-### Game 通用方法
+#### Game 通用方法
 Game 类在实时对战 SDK 的基础上封装了以下方法，使得 MasterClient 可以更便利的发送自定义事件：
 
 * `broadcast()` 方法：向所有玩家广播自定义事件。示例代码请参考[广播自定义事件](#广播自定义事件)。
-* `forwardToTheRests`() 方法：将一个用户发送的自定义事件转发给其他用户。示例代码请参考[转发自定义事件](#转发自定义事件)。
+* `forwardToTheRests()` 方法：将一个玩家发送的自定义事件转发给其他玩家。示例代码请参考[转发自定义事件](#转发自定义事件)。
 
-## 自定义游戏逻辑
-您可以参考 `RPSGame` 来实现自己的游戏逻辑，具体实现方法请参考接下来的文档。
-
-### 自定义 Game 类
-
-您需要创建一个继承自 `Game` 的类来撰写自己的游戏逻辑，示例方法如下：
+#### 实现自己的 Game
+实现自己的房间内游戏逻辑时，您需要创建一个继承自 `Game` 的类来撰写自己的游戏逻辑，示例方法如下：
 
 ```js
 import { Game } from "@leancloud/client-engine";
@@ -67,7 +130,7 @@ export default class SampleGame extends Game {
 }
 ```
 
-### 设置房间内玩家数量
+#### 设置房间内玩家数量
 这里的玩家数量指的是不包括 MasterClient 的玩家数量，根据实时对战服务的限制，最多不能超过 9 个人。
 
 在 `Game` 中需要指定 `defaultSeatCount` 静态属性作为默认的玩家数量，Client Engine 会根据这个值向实时对战服务请求创建房间。例如斗地主需要 3 个人才能玩，可以这样设置：
@@ -88,85 +151,9 @@ export default class SampleGame extends Game {
 }
 ```
 
-在[创建房间](#创建房间)的接口中，客户端可以指定 `seatCount` 参数来动态覆盖掉 `defaultSeatCount`。
+在[创建房间](#创建房间)的接口中，可以将客户端 request 请求中的 `seatCount` 参数来动态覆盖掉 `defaultSeatCount`。
 
 当房间人数达到 `seatCount` 时，您可以选择配置触发[房间人满事件](#房间人满事件)，如果您的客户端没有指定 `seatCount`，人满事件时将以 `defaultSeatCount` 的值为准。
-
-### 创建房间
-Client Engine 的 `/reservation` 接口提供了创建新房间的功能，当客户端没有可以加入的房间时，可以调用该接口获得一个可以加入的新房间。该接口在示例 Demo 中使用场景如下：
-
-客户端首先向实时对战服务发起[加入房间](multiplayer-guide-js.html#加入房间)请求，当加入失败且错误码为 [4301](multiplayer-error-code.html#4301) 时，调用 Client Engine 中的 `/reservation` 接口，获得 Client Engine 返回的 roomName 并加入房间。客户端示例代码如下：
-
-**客户端调用接口示例代码（非 Client Engine）：**
-
-```js
-// 加入房间失败后请求 Client Engine 创建房间
-play.on(Event.ROOM_JOIN_FAILED, (error) => {
-  if (error.code === 4301) {
-    // 这里通过 HTTP 调用在 Client Engine 中实现的 `/reservation` 接口
-    const { roomName } = await (await fetch(
-      `${CLIENT_ENGINE_SERVER}/reservation`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          playerId: play.userId,
-        })
-      }
-    )).json();
-    // 加入房间
-    return play.joinRoom(roomName);
-  } else {
-    console.log(error);
-  }
-});
-```
-
-在这段客户端示例代码中，我们只传入了 `playerId`，除此之外 `/reservation` 接口中还接受 `createGameOptions` 作为 key 指定额外的参数：
-* roomName（可选）：创建指定 roomName 的房间。例如您需要和好友一起玩时，可以用这个接口创建房间后，把 roomName 分享给好友。如果您不关心 roomName，可以不指定这个参数。
-* roomOptions（可选）：通过这个参数，客户端在请求 Client Engine 创建房间时，可以设置 `customRoomProperties`，`customRoomPropertyKeysForLobby`，`visible`，对这三个参数的说明请参考[创建房间](multiplayer-guide-js.html#创建房间)。
-* seatCount(可选)：创建房间时，指定本次游戏需要多少人，这个值需要在[动态设置玩家数量](#动态设置玩家数量)的 `minSeatCount` 和 `maxSeatCount` 之间，否则 Client Engine 会拒绝创建房间。
-
-例如当客户端希望 `/reservation` 创建一个带有匹配条件的新房间时，可以这样请求：
-
-**客户端调用接口示例代码（非 Client Engine）：**
-
-```js
-const props = {
-    level: 2,
-};
-
-const roomOptions = {
-  customRoomPropertyKeysForLobby: ['level'],
-  customRoomProperties: props,
-};
-
-const createGameOptions = {
-  roomOptions
-};
-
-const { roomName } = await (await fetch(
-  `${CLIENT_ENGINE_SERVER}/reservation`,
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      playerId: play.userId,
-      createGameOptions
-    })
-}).json();
-```
-
-**Client Engine 代码：**
-
-初始项目中的 `index.ts` 中的 `/reservation` 接口已经为您写好了所有代码，不需要您再自己实现。如果您对实现方式感兴趣，可以自行阅读 `/reservation` 接口代码。
-
-### 房间内逻辑
-客户端加入房间后，MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，此时 MasterClient 和客户端就可以在同一房间内通信了。在示例项目 `RPSGame` 中，当房间人满时，在被触发的房间人满事件中 MasterClient 广播游戏开始，客户端和 MasterClient 之间开始通信交互。当一局游戏完成后，客户端离开房间，游戏结束。
 
 #### 加入房间事件
 当客户端成功加入房间后，位于 Client Engine 的 MasterClient 会收到[新玩家加入事件](multiplayer-guide-js.html#新玩家加入事件)，如果您需要监听此事件，可以在自定义的 `Game` 中的 `constructor()` 方法中撰写监听的代码：
@@ -223,10 +210,10 @@ const gameData = {someGameData};
 this.broadcast('game-start', gameData);
 ```
 
-此时客户端的[接收自定义事件](multiplayer-guide-js.html#接收自定义事件)方法会被触发，如果发现是 `game-start` 事件，客户端在 UI 上展示对战开始。
+此时客户端的[接收自定义事件](multiplayer-guide-js.html#接收自定义事件)方法会被触发，如果发现是 `game-start` 事件，客户端可以在 UI 上展示对战开始。
 
 #### 转发自定义事件
-对战开始后，在示例 `RPSGame` 中，客户端 A 会将自己的操作（例如当前动作是剪刀）通过[自定义事件](multiplayer-guide-js.html#自定义事件)的方式发送给 MasterClient，MasterClient 在[收到这个操作事件](multiplayer-guide-js.html#接收自定义事件)后会告诉客户端 B 其他玩家已经操作了，但不告诉他玩家 A 具体是什么操作，此时可以使用 Game 提供的转发自定义事件方法 `forwardToTheRests()` 。您可以在这个方法中对事件内容做一些处理，隐藏掉 A 具体的动作，然后转发给房间内的其他玩家：
+MasterClient 可以转发某个客户端发来的事件给其他客户端，在转发时还可以处理数据：
 
 ```js
 this.forwardToTheRests(event, (eventData) => {
@@ -237,17 +224,21 @@ this.forwardToTheRests(event, (eventData) => {
   // `someOneAct` 是自定义事件的名称
 }, 'someOneAct')
 ```
+在这个代码中，`event` 参数是某个客户端发来的原始事件，`eventData` 是原始事件的数据，您可以在转发事件给其他客户端时处理该数据，例如抹去或增加一些信息。MasterClient 发送该事件后，客户端的[接收自定义事件](multiplayer-guide-js.html#接收自定义事件)会被触发。
 
-MasterClient 发送该事件后，客户端 B 会[接收到该自定义事件](multiplayer-guide-js.html#接收自定义事件)，此时客户端 B 的页面上可以展现 UI 提示：`对手已选择`。
+#### MasterClient 与客户端通信
+除了上方初始项目提供的[广播自定义事件](#广播自定义事件)及[转发自定义事件](#转发自定义事件)外，您依然可以使用实时对战服务中的[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)进行通信。
 
-#### 客户端与服务端进行通信
-除了上方初始项目提供的[广播自定义事件](#广播自定义事件)及[转发自定义事件](#转发自定义事件)外，您依然可以使用实时通信服务中的[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)进行通信。
+除此之外，`Game` 还提供了以下 [RxJS](http://reactivex.io/rxjs) 方法方便您对事件进行流处理，进而精简自己的代码及逻辑：
 
+* `getStream()` 方法：获取玩家发送的自定义事件的流，这是一个 RxJS 中的 Observable 对象。接口说明请参考 [API 文档](https://leancloud.github.io/client-engine-nodejs-sdk/classes/game.html#getstream)。
+* `takeFirst()` 方法：获取玩家发送的指定条件的从现在开始算的第一条自定义事件的流，返回一个 RxJS 中的 Observable 对象。接口说明请参考 [API 文档](https://leancloud.github.io/client-engine-nodejs-sdk/classes/game.html#takefirst)。
 
-### 游戏结束
-在示例 `RPSGame` 中，当客户端 B 也做出选择，通过[自定义事件](multiplayer-guide-js.html#自定义事件)将选择发送给 MasterClient 时，MasterClient 会判断输赢，并广播游戏结束事件。
+注意，以上两个方法需要您了解 [RxJS](http://reactivex.io/rxjs) 才能使用，如果您不了解 [RxJS](http://reactivex.io/rxjs)，依然可以使用实时对战服务中的[事件方法](multiplayer-guide-js.html#自定义事件)进行通信。
 
-当所有玩家都离开后，`Game` 的 `destroy()` 方法帮您自动销毁当前房间的 MasterClient。此时如果您没有其他的逻辑要做，则不需要关心这个方法，即游戏结束，如果您希望自己做一些清理工作，例如保存用户数据等，可以使用 `autoDestroy` 装饰器，这个装饰器会自动触发 `Game` 子类中的 `destroy()` 方法，您可以将相关逻辑写在这个方法中。
+#### 游戏结束
+
+当所有玩家都离开后，`GameManager` 会自动帮您销毁当前房间及相关的 MasterClient。此时如果您没有其他的逻辑要做，则不需要关心本节文档。如果您希望自己做一些清理工作，例如保存用户数据等，可以使用 `autoDestroy` 装饰器，这个装饰器会在所有玩家离开后自动触发 `Game` 子类中的 `destroy()` 方法，您可以将相关逻辑写在这个方法中。
 
 ```js
 import { autoDestroy, Game } from "@leancloud/client-engine";
@@ -259,5 +250,16 @@ export default class SampleGame extends Game {
     console.log('在这里可以做额外的清理工作');
   }
 }
-
 ```
+
+### 负载均衡
+
+Client Engine 会根据整体实例负载的高低自动对实例数量进行调整，新的请求会均匀的分配给当前所有的实例。由于每局游戏一般都会需要持续一段时间，在新的实例启动后会将有一段时间各个实例的负载不均匀，为了让各实例的负载尽快达到均衡状态，Client Engine 提供了一个基于 Redis 的应用层负载均衡方案。
+
+这个特性是由 SDK 提供的 `RedisLoadBalancer` 类实现。在 [GameManager 实例化](#GameManager 实例化)及[创建房间](#创建房间)中我们可以看到， 实际处理客户端的请求时与 `GameManager` 之间使用了一个 `RedisLoadBalancer` 作为代理。这意味着客户端所有的创建房间请求会交给 `RedisLoadBalancer`，`RedisLoadBalancer` 会将请求转交给 Client Engine 中负载最低的实例所持有的 `GameManager` 去处理。
+
+需要特别指出的是，`RedisLoadBalancer` 只负责请求的转发，不关心如何处理请求。在 [GameManager 实例化](#GameManager 实例化)中可以看到，我们先写了一个子类 `SampleGameManager` 继承自 `GameManager`，并实现了它的 `consume()` 方法，然后将实例化的 `SampleGameManager` 传递给负载均衡 `RedisLoadBalancer`，当 `redisLB` 调用 `consume()` 方法时，会通过 `RedisLoadBalancer` 执行 `SampleGameManager` 中的 `consume()` 逻辑。
+
+### API 文档
+
+您可以在 API 文档中找到更多 SDK 的类、方法及属性说明，[点击查看 Client Engine SDK API 文档](https://leancloud.github.io/client-engine-nodejs-sdk/)。

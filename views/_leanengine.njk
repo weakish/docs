@@ -27,7 +27,7 @@
 {%- endmacro %}
 
 {% macro leancacheWithCli() -%}
-在一个已经关联过 LeanCache 实例的云引擎项目中，使用 `$ lean cache` 命令，即可连上对应的 LeanCache 实例。另外需要注意的是，每个 LeanCache 实例，默认会分成 16 个 db，方便管理。没有特殊设置的话，默认使用的都是 db0。
+在一个已经关联过 LeanCache 实例的云引擎项目中，使用 `lean cache` 命令，即可连上对应的 LeanCache 实例。另外需要注意的是，每个 LeanCache 实例，默认会分成 16 个 db，方便管理。没有特殊设置的话，默认使用的都是 db0。
 
 连接成功之后，可以直接执行命令来对数据进行操作，比如查看某个 key 的值：
 
