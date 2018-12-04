@@ -629,11 +629,15 @@ let value = lcDate.value
 
 {% endblock %}
 
-{% block module_file %}{% endblock %}
-
 {% block module_in_app_search %}{% endblock %}
 
 {% block module_in_app_social %}{% endblock %}
+
+{% block text_sns %}{% endblock %}
+
+{% block text_feedback %}{% endblock %}
+
+{% block js_push_guide %}{% endblock %}
 
 {% block code_create_avfile_by_stream_data %}
 
@@ -643,12 +647,6 @@ if let data = "My work experience".data(using: .utf8) {
 }
 ```
 {% endblock %}
-
-{% block text_sns %}{% endblock %}
-
-{% block text_feedback %}{% endblock %}
-
-{% block js_push_guide %}{% endblock %}
 
 {% block code_create_avfile_from_local_path %}
 
