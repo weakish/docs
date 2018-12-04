@@ -10,45 +10,27 @@
 
 # 数据存储开发指南 &middot; {{platform_name}}
 
-数据存储（{{productName}}）是 LeanCloud 提供的核心功能之一，它的使用方法与传统的关系型数据库有诸多不同。下面我们将其与传统数据库的使用方法进行对比，让大家有一个初步了解。
+数据存储（{{productName}}）是 LeanCloud 提供的核心功能之一。下面我们用一个简单的示例来说明它的基本用法。
 
-下面这条 SQL 语句在绝大数的关系型数据库都可以执行，其结果是在 Todo 表里增加一条新数据：
-
-```sql
-INSERT INTO Todo (title, content) VALUES ('工程师周会', '每周工程师会议，周一下午 2 点')
-```
-
-使用传统的关系型数据库作为应用的数据源几乎无法避免以下步骤：
-
-- 插入数据之前一定要先创建一个表结构，并且随着之后需求的变化，开发者需要不停地修改数据库的表结构，维护表数据。
-- 每次插入数据的时候，客户端都需要连接数据库来执行数据的增删改查（CRUD）操作。
-
-使用 {{productName}}，实现代码如下：
+下面这段代码在创建了一个 `Todo` 类型的对象，并将它保存到云端：
 
 {% block code_quick_save_a_todo %}{% endblock %}
 
-使用 {{productName}} 的特点在于：
-
-- 不需要单独维护表结构。例如，为上面的 Todo 表新增一个 `location` 字段，用来表示日程安排的地点，那么刚才的代码只需做如下变动：
+如果你熟悉关系型数据库的话，需要注意 {{productName}} 的不同点。在 {{productName}} 里不需要事先建立表结构（schema），并且可以随时增加新的属性。通常这被成为无模式（schema-free）。例如，为上面的 Todo 类型新增一个表示地点的 `location` 属性，只需做如下变动：
 
   {% block code_quick_save_a_todo_with_location %}{% endblock %}
 
-- 数据可以随用随加，这是一种无模式化（Schema Free）的存储方式。
-- 所有对数据的操作请求都通过 HTTPS 访问标准的 REST API 来实现。
-- 我们为各个平台或者语言开发的 SDK 在底层都是调用统一的 REST API，并提供完整的接口对数据进行增删改查。
+- 我们为各个平台或者语言开发的 SDK 在底层都是通过 HTTPS 协议调用统一的 [REST API](docs/rest_api.html)，提供完整的接口对数据进行各类操作。
 
-{{productName}} 在结构化数据存储方面，与 DB 的区别在于：
+{{productName}} 在结构化数据存储方面，与 MySQL、Postgres、MongoDB 等数据库的区别在于：
 
-1. Schema Free／Not free 的差异；
-2. 数据接口上，{{productName}} 是面向对象的（数据操作接口都是基于 Object 的），开放的（所有移动端都可以直接访问），DB 是面向结构的，封闭的（一般在 Server 内部访问）；
-3. 数据之间关联的方式，DB 是主键外键模型，{{productName}} 则有自己的关系模型（Pointer、Relation 等）；
+1. 数据库是面向服务器端的，用户自己开发的服务器端程序以用户名和密码登录到数据库。用户需要在服务器端程序里自己实现应用层的权限管理并向客户端提供接口。{{productName}} 是面向客户端的存储服务，通过 ACL 机制在 API 层面提供了完整的权限管理功能。很多开发者都选择通过在客户端集成 {{productName}} SDK 来直接访问数据，而不再开发服务端的程序。
+2. 与关系型数据库（MySQL、Postgres等）相比，{{productName}} 对多表查询（join）和事务等功能的支持较弱，所以在有些应用场景中会需要以有一定冗余的方式存储数据，以此换来的是良好的可扩展性，更有利于支撑起大流量的互联网应用。
 
-{{productName}} 支持两种存储类型：
+下面我们逐一介绍 {{productName}} 支持的两类数据：
 
 * 对象
 * 文件
-
-我们将按照顺序逐一介绍各类的使用方法。
 
 {% block section_sdk_setup %}
 ## SDK 安装
