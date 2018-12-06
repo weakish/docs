@@ -4,6 +4,14 @@
 {% import "views/_helper.njk" as docs %}
 {% from "views/_data.njk" import libVersion as version %}
 {% from "views/_data.njk" import androidSDKCompileInstructionLink as compileInstructionLink %}
+{% block sdk_lifecycle_statement %}
+
+#### SDK 维护期说明
+> 我们于 2018 年 9 月推出了新的 [Java Unified SDK](https://blog.leancloud.cn/6376/)，兼容纯 Java、云引擎和 Android 等多个平台，老的 Android SDK（所有 groupId 为`cn.leancloud.android` 的 libraries，即下文介绍的 SDK）进入维护状态，直到 2019 年 9 月底停止维护。
+欢迎大家切换到新的 Unified SDK，具体使用方法详见 [Unified SDK Wiki](https://github.com/leancloud/java-sdk-all/wiki)。
+
+{% endblock %}
+
 {% block libs_tool_automatic %}
 
 #### Gradle
@@ -26,7 +34,42 @@ Gradle 是 Google 官方推荐的构建 Android 程序的工具，使用 Android
 └── settings.gradle
 ```
 
-首先打开根目录下的 `build.gradle` 进行如下标准配置：
+首先打开 `app` 目录下的 `build.gradle` 进行如下配置：
+
+```
+android {
+    //为了解决部分第三方库重复打包了META-INF的问题
+    packagingOptions{
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile ('com.android.support:support-v4:21.0.3')
+
+    // LeanCloud 基础包
+    compile ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
+
+    // 推送与即时通讯需要的包
+    compile ('cn.leancloud.android:avoscloud-push:{{ version.leancloud }}@aar'){transitive = true}
+
+    // Android 混合推送需要的包
+    compile ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar'){transitive = true}
+
+    // LeanCloud 用户反馈包
+    compile ('cn.leancloud.android:avoscloud-feedback:{{ version.leancloud }}@aar')
+
+    // LeanCloud 应用内搜索包
+    compile ('cn.leancloud.android:avoscloud-search:{{ version.leancloud }}@aar')
+}
+```
+
+从 4.7.8 版本开始，我们已经把 SDK library 推送到了 maven central repository，推荐大家大家使用这种方式。
+同时，我们也搭建了 LeanCloud 的 [maven 仓库](http://mvn.leancloud.cn/nexus/)，以便在中央仓库访问不了的时候备用，如果要访问我们的 maven 仓库，需要在项目根目录下的 `build.gradle` 进行如下标准配置：
 
 <pre><code>
 buildscript {
@@ -54,47 +97,23 @@ allprojects {
 }
 </code></pre>
 
-然后打开 `app` 目录下的 `build.gradle` 进行如下配置：
+同时请注意，同一个 library，在 LeanCloud maven 仓库里其版本号前面多了一个`v`。例如中央仓库里版本号为 `4.7.8` 的 SDK，在 LeanCloud maven 仓库里其版本号为 `v4.7.8`，这一点请大家注意。
 
+如果使用 maven 中央仓库，依赖声明如下：
 ```
-android {
-    //为了解决部分第三方库重复打包了META-INF的问题
-    packagingOptions{
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-    }
-    lintOptions {
-        abortOnError false
-    }
-}
-
 dependencies {
-    compile ('com.android.support:support-v4:21.0.3')
-
     // LeanCloud 基础包
     compile ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
-
-    // 推送与即时通讯需要的包
-    compile ('cn.leancloud.android:avoscloud-push:{{ version.leancloud }}@aar'){transitive = true}
-
-    // LeanCloud 统计包
-    compile ('cn.leancloud.android:avoscloud-statistics:{{ version.leancloud }}')
-
-    // LeanCloud 用户反馈包
-    compile ('cn.leancloud.android:avoscloud-feedback:{{ version.leancloud }}@aar')
-
-    // avoscloud-sns：LeanCloud 第三方登录包
-    compile ('cn.leancloud.android:avoscloud-sns:{{ version.leancloud }}@aar')
-    compile ('cn.leancloud.android:qq-sdk:1.6.1-leancloud')
-    // 新浪微博 SDK
-    compile('com.sina.weibo.sdk:core:4.1.4:openDefaultRelease@aar')
-
-    // LeanCloud 应用内搜索包
-    compile ('cn.leancloud.android:avoscloud-search:{{ version.leancloud }}@aar')
 }
 ```
 
-我们已经提供了官方的 [maven 仓库](http://mvn.leancloud.cn/nexus/)，推荐大家使用。
+如果使用 LeanCloud 自建仓库，依赖声明如下：
+```
+dependencies {
+    // LeanCloud 基础包
+    compile ('cn.leancloud.android:avoscloud-sdk:v{{ version.leancloud }}')
+}
+```
 
 #### Eclipse
 
@@ -109,15 +128,10 @@ Eclipse 用户首先 [下载 SDK](sdk_down.html)，然后按照 [手动安装步
 ├── avoscloud-push-{{ version.leancloud }}.jar         // LeanCloud 推送模块和即时通讯模块
 ├── avoscloud-sdk-{{ version.leancloud }}.jar          // LeanCloud 基本存储模块
 ├── avoscloud-search-{{ version.leancloud }}.zip       // LeanCloud 应用内搜索模块
-├── avoscloud-sns-{{ version.leancloud }}.zip          // LeanCloud SNS 模块
-├── avoscloud-statistics-{{ version.leancloud }}.jar   // LeanCloud 统计模块
 ├── fastjson-{{ version.fastjson }}.jar                         // LeanCloud 基本存储模块
-├── Java-WebSocket-1.3.2-leancloud.jar          // LeanCloud 推送模块和即时通讯模块
 ├── protobuf-java-3.4.0.jar                     // LeanCloud 推送模块和即时通讯模块
 ├── okhttp-{{ version.okhttp }}.jar                            // LeanCloud 基本存储模块
 ├── okio-{{ version.okio }}.jar                             // LeanCloud 基本存储模块
-├── qq.sdk.1.6.1.jar                            // LeanCloud SNS 模块
-└── weibo.sdk.android.sso.3.0.1-leancloud.jar   // LeanCloud SNS 模块
 ```
 
 ##### LeanCloud 基本存储模块
@@ -130,20 +144,9 @@ Eclipse 用户首先 [下载 SDK](sdk_down.html)，然后按照 [手动安装步
 ##### LeanCloud 推送模块和即时通讯模块
 
 * LeanCloud 基础存储模块
-* `avospush-{{ version.leancloud }}.jar`
-* `Java-WebSocket-1.3.2-leancloud.jar`
+* `avoscloud-push-{{ version.leancloud }}.jar`
+* `avoscloud-mixpush-{{ version.leancloud }}.jar`
 * `protobuf-java-3.4.0.jar`
-
-##### LeanCloud 统计模块
-
-* LeanCloud 基础存储模块
-* `avosstatistics-{{ version.leancloud }}.jar`
-
-##### LeanCloud SNS 模块
-
-* LeanCloud 基础存储模块
-* `weibo.sdk.android.sso.jar`
-* `qq.sdk.1.6.1.jar`
 
 我们提供的下载包里包含了必须的依赖库，自己下载官方库也可以，不过请确保版本一致。
 

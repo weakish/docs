@@ -10,7 +10,7 @@
 
 {% block demo %}
 * [ChatKit，自带 UI 的聊天工具包](chatkit-android.html)（推荐）
-* [LeanChat](https://github.com/leancloud/leanchat-android)
+* [LeanChat](https://github.com/BaaSBeginner/leanchat-android)
 {% endblock %}
 
 {% block oneOnOneChat_sent %}
