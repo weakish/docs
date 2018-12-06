@@ -16,11 +16,11 @@
 
 {% block code_quick_save_a_todo %}{% endblock %}
 
-如果你熟悉关系型数据库的话，需要注意 {{productName}} 的不同点。在 {{productName}} 里不需要事先建立表结构（schema），并且可以随时增加新的属性。通常这被成为无模式（schema-free）。例如，为上面的 Todo 类型新增一个表示地点的 `location` 属性，只需做如下变动：
+如果你熟悉关系型数据库的话，需要注意 {{productName}} 的不同点。在 {{productName}} 里不需要事先建立表结构（schema），并且可以随时增加新的属性。通常这被称为无模式（schema-free）。例如，为上面的 Todo 类型新增一个表示地点的 `location` 属性，只需做如下变动：
 
   {% block code_quick_save_a_todo_with_location %}{% endblock %}
 
-- 我们为各个平台或者语言开发的 SDK 在底层都是通过 HTTPS 协议调用统一的 [REST API](docs/rest_api.html)，提供完整的接口对数据进行各类操作。
+- 我们为各个平台或者语言开发的 SDK 在底层都是通过 HTTPS 协议调用统一的 [REST API](rest_api.html)，提供完整的接口对数据进行各类操作。
 
 {{productName}} 在结构化数据存储方面，与 MySQL、Postgres、MongoDB 等数据库的区别在于：
 
