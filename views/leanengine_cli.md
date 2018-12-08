@@ -27,7 +27,7 @@ Windows 用户可以在 {{release}} 根据操作系统版本下载最新的 32 �
 
 ### Linux
 
-从 {{release}} 下载预编译好的二进制文件 `lean_linux_amd64`，重命名为 `lean` 并放到 已经在 PATH 环境变量中声明的任意目录中即可。
+从 {{release}} 下载预编译好的二进制文件 `lean_linux_x64`，重命名为 `lean` 并放到已经在 PATH 环境变量中声明的任意目录中即可。
 
 #### Arch Linux
 
@@ -54,7 +54,6 @@ brew upgrade
 ```sh
 $ lean help
 
-
  _                        ______ _                 _
 | |                      / _____) |               | |
 | |      ____ ____ ____ | /     | | ___  _   _  _ | |
@@ -68,24 +67,25 @@ USAGE:
    lean [global options] command [command options] [arguments...]
 
 VERSION:
-   0.10.0
+   0.20.0
 
 COMMANDS:
-     login     登录 LeanCloud 账户
-     info      查看当前登录用户以及应用信息
-     up        本地启动云引擎应用
-     init      初始化云引擎项目
-     switch    切换当前项目关联的 LeanCloud 应用
-     deploy    部署云引擎项目到服务器
-     publish   部署当前预备环境的代码至生产环境
-     upload    上传文件到当前应用 File 表
-     logs      查看 LeanEngine 产生的日志
-     debug     不运行项目，直接启动云函数调试服务
-     env       输出运行当前云引擎应用所需要的环境变量
-     cache     LeanCache 管理相关功能
-     cql       进入 CQL 交互查询
-     search    根据关键词查询开发文档
-     help, h   显示全部命令或者某个子命令的帮助
+     login    Log in to LeanCloud
+     metric   Obtain LeanStorage performance metrics of current project
+     info     Show information about the current user and app
+     up       Start a development instance locally
+     init     Initialize a LeanEngine project
+     switch   Change the associated LeanCloud app
+     deploy   Deploy the project to LeanEngine
+     publish  Publish code from staging to production
+     upload   Upload files to the current application (available in the '_File' class)
+     logs     Show LeanEngine logs
+     debug    Start the debug console without running the project
+     env      Output environment variables used by the current project
+     cache    LeanCache shell
+     cql      Start CQL interactive mode
+     search   Search development docs
+     help, h  Show all commands or help info for one command
 
 GLOBAL OPTIONS:
    --version, -v  print the version
@@ -96,7 +96,7 @@ GLOBAL OPTIONS:
 
 ```sh
 $ lean --version
-lean version 0.3.0
+lean version 0.20.0
 ```
 
 下文中凡是以 `$ lean` 开头的文字即表示在终端里执行命令。
@@ -106,13 +106,10 @@ lean version 0.3.0
 安装完命令行工具之后，首先第一步需要登录 LeanCloud 账户。
 
 ```sh
-# 美国节点用户需要使用参数 --region=US 进行登录
-# 华东节点使用 --region=TAB
-# 不加 region 参数则默认为华北节点
-$ {{ login }} {% if node == 'us' %}--region=US{% endif %}{% if node == 'qcloud' %}--region=TAB{% endif %}
+$ {{ login }}
 ```
 
-然后按照提示输入 LeanCloud 用户名和密码完成登录。
+然后按照提示选择区域并输入 LeanCloud 用户名和密码完成登录。
 
 以 GitHub、微博或 QQ 这种第三方登录方式来注册 LeanCloud 账户的用户，如果未曾设置过账户密码，需要先使用 [忘记密码](/dashboard/login.html#/forgotpass) 功能重新设置一个密码，再进行登录。
 
@@ -125,18 +122,7 @@ $ {{ login }} {% if node == 'us' %}--region=US{% endif %}{% if node == 'qcloud' 
 登录完成之后，可以使用 `init` 命令来初始化一个项目，并且关联到已有的 LeanCloud 应用上。
 
 ```sh
-$ lean init
-[?] 请选择应用节点
- 1) 国内
- 2) 美国
- 3) TAB
- =>
-```
-
-选择项目节点，然后会列示出所选节点上当前用户的所有应用：
-
-```sh
-[?] 请选择 APP
+[?] Please select an app:
  1) AwesomeApp
  2) Foobar
 ```
@@ -144,20 +130,19 @@ $ lean init
 选择项目语言／框架：
 
 ```sh
-[?] 请选择需要创建的应用模版：
- 1) node-js-getting-started
- 2) python-getting-started
- 3) slim-getting-started
- 4) java-war-getting-started
- 5) django-getting-started
- 6) static-getting-started
+[?] Please select a language
+ 1) Node.js
+ 2) Python
+ 3) Java
+ 4) PHP
+ 5) Others
 ```
 
 之后命令行工具会将此项目模版下载到本地，这样初始化就完成了：
 
 ```sh
- ✓ 下载模版文件 5.93 KB / 5.93 KB [=======================================] 100.00% 0s
- ✓ 正在创建项目...
+[INFO] Downloading templates 6.33 KiB / 6.33 KiB [==================] 100.00% 0s
+[INFO] Creating project...
 ```
 
 进入以应用名命名的目录就可以看到新建立的项目。
@@ -169,8 +154,8 @@ $ lean init
 ```sh
 $ lean switch
 ```
-将已有项目关联到 LeanCloud 应用上。
 
+将已有项目关联到 LeanCloud 应用上。
 
 ## 切换分组
 
@@ -225,7 +210,7 @@ $ lean up
 有些情况下，我们需要让 IDE 来运行项目，或者需要调试在虚拟机／远程机器上的项目的云函数，这时可以单独运行云函数调试功能，而不在本地运行项目本身：
 
 ```sh
-$ lean debug --remote=http://remote-url-or-ip-address:remote-port --app-id=xxxxx
+$ lean debug --remote=http://remote-url-or-ip-address:remote-port --app-id=xxxxxx
 ```
 
 更多关于云引擎开发的内容，请参考 [云引擎服务总览](leanengine_overview.html)。
@@ -245,30 +230,28 @@ $ lean deploy
 部署过程会实时打印进度：
 
 ```sh
- ✓ 获取应用信息
- ✓ 准备部署至目标应用：AwesomeApp (xxxxxx)
- ✓ 获取应用分组信息
- ✓ 准备部署应用到生产环境: web
- ✓ 检测到 Python 运行时
- ✓ 压缩项目文件
- ✓ 上传应用文件 6.41 KB / 6.41 KB [=======================================] 100.00% 0s
- ✓ 开始构建 20161021-171836
- ✓ 正在下载应用代码 ...
- ✓ 正在解压缩应用代码 ...
- ✓ 运行环境: python (leanengine/python-base-2.7)
- ✓ 从之前的构建中恢复依赖项 ...
- ✓ 正在下载和安装依赖项 ...
- ✓ 缓存最新的依赖项 ...
- ✓ 存储镜像到仓库 ...
- ✓ 镜像构建完成：20161021-171836
- ✓ 开始部署 20161021-171836 到 web1
- ✓ 正在创建新实例 ...
- ✓ 正在启动新实例 ...
- ✓ 实例启动成功：{"version": "1.6.5", "runtime": "cpython-2.7.6"}
- ✓ 正在统一切换新旧实例 ...
- ✓ 正在更新云函数信息 ...
- ✓ 部署完成：1 个实例部署成功
- ✓ 删除临时文件
+$ lean deploy
+[INFO] Current CLI tool version:  0.20.0
+[INFO] Retrieving app info ...
+[INFO] Preparing to deploy AwesomeApp(xxxxxx) to region: cn group: web staging
+[INFO] Python runtime detected
+[INFO] pyenv detected. Please make sure pyenv is configured properly.
+[INFO] Uploading file 6.40 KiB / 6.40 KiB [=========================] 100.00% 0s
+[REMOTE] 开始构建 20181207-115634
+[REMOTE] 正在下载应用代码 ...
+[REMOTE] 正在解压缩应用代码 ...
+[REMOTE] 运行环境: python
+[REMOTE] 正在下载和安装依赖项 ...
+[REMOTE] 存储镜像到仓库（0B）...
+[REMOTE] 镜像构建完成：20181207-115634
+[REMOTE] 开始部署 20181207-115634 到 web-staging
+[REMOTE] 正在创建新实例 ...
+[REMOTE] 正在启动新实例 ...
+[REMOTE] [Python] 使用 Python 3.7.1, Python SDK 2.1.8
+[REMOTE] 实例启动成功：{"version": "2.1.8", "runtime": "cpython-3.7.1"}
+[REMOTE] 正在更新云函数信息 ...
+[REMOTE] 部署完成：1 个实例部署成功
+[INFO] Deleting temporary files
 ```
 
 默认部署备注为「从命令行工具构建」，显示在 [应用控制台 > 云引擎 > 日志](/cloud.html?appid={{appid}}#/log) 中。你可以通过 `-m` 选项来自定义部署的备注信息：
@@ -310,18 +293,19 @@ $ lean publish
 这样预备环境的云引擎代码就发布到了生产环境：
 
 ```sh
- ✓ 获取应用信息
- ✓ 准备部署至目标应用：AwesomeApp (xxxxxx)
- ✓ 开始部署 20161021-173118 到 web1,web2
- ✓ 正在创建新实例 ...
- ✓ 正在创建新实例 ...
- ✓ 正在启动新实例 ...
- ✓ 实例启动成功：{"version": "1.6.5", "runtime": "cpython-3.5.1"}
- ✓ 正在启动新实例 ...
- ✓ 实例启动成功：{"version": "1.6.5", "runtime": "cpython-3.5.1"}
- ✓ 正在统一切换新旧实例 ...
- ✓ 正在更新云函数信息 ...
- ✓ 部署完成：2 个实例部署成功
+$ lean publish
+[INFO] Current CLI tool version:  0.20.0
+[INFO] Retrieving app info ...
+[INFO] Deploying AwesomeApp(xxxxxx) to region: cn group: web production
+[REMOTE] 开始部署 20181207-115634 到 web1,web2
+[REMOTE] 正在创建新实例 ...
+[REMOTE] 正在创建新实例 ...
+[REMOTE] 正在启动新实例 ...
+[REMOTE] 正在启动新实例 ...
+[REMOTE] 实例启动成功：{"version": "2.1.8", "runtime": "cpython-3.7.1"}
+[REMOTE] 实例启动成功：{"version": "2.1.8", "runtime": "cpython-3.7.1"}
+[REMOTE] 正在更新云函数信息 ...
+[REMOTE] 部署完成：2 个实例部署成功
 ```
 
 ## 查看日志
@@ -408,15 +392,15 @@ Mean Duration Time   9ms          21ms         7ms
 ```sh
 $ lean metric -h
 NAME:
-   lean-macos-x64 metric - 获取当前项目云存储的性能总览
+   lean metric - Obtain LeanStorage performance metrics of current project
 
 USAGE:
-   lean-macos-x64 metric [command options] [--from fromTime --to toTime --format default|json]
+   lean metric [command options] [--from fromTime --to toTime --format default|json]
 
 OPTIONS:
-   --from value    开始时间，格式为 YYYY-MM-DD，例如 1926-08-17
-   --to value      结束时间，格式为 YYYY-MM-DD，例如 1926-08-17
-   --format value  输出格式，默认为 default，可选 json
+   --from value    Start date, formatted as YYYY-MM-DD，e.g., 1926-08-17
+   --to value      End date formated as YYYY-MM-DD，e.g., 1926-08-17
+   --format value  Output format，'default' or 'json'
 ```
 
 ## 多应用管理
@@ -429,8 +413,11 @@ OPTIONS:
 
 ```sh
 $ lean info
-当前登录用户: lan (lan@leancloud.rocks)
-当前目录关联应用：AwesomeApp (xxxxxx)
+[INFO] Retrieving user info from region: cn
+[INFO] Retrieving app info ...
+[INFO] Current region:  cn User: lan (lan@leancloud.rocks)
+[INFO] Current region: cn App: AwesomeApp (xxxxxx)
+[INFO] Current group: web
 ```
 
 此时，执行 `deploy`、`publish`、`logs` 等命令都是针对当前被激活的应用。
