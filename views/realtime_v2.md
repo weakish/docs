@@ -95,7 +95,7 @@ LeanCloud 即时通讯服务的特性主要有：
 **c**|creator|String||对话创建者的 clientId（只读）
 **lm**|lastMessageAt|Date||对话中最后一条消息的发送或接收时间
 **m**|members|Array||普通对话的所有参与者（仅针对普通对话，暂态对话和系统对话并不支持持久化的成员列表）
-**mu**|mute|Array||将对话设为静音的参与者，这部分参与者不会收到推送。<br/>（仅针对 iOS 以及 Windows Phone 用户有效）
+**mu**|mute|Array||将对话设为静音的参与者，这部分参与者不会收到推送。<br/>（仅针对 iOS、 Windows Phone 以及开启了混合推送的 Android 用户有效）
 **name**|name|String|可选|对话的名字，可为群组命名。
 **tr**|transient|Boolean|可选|是否为暂态对话
 **sys**|system|Boolean|可选|是否是系统对话
@@ -233,7 +233,7 @@ TextMessage  ImageMessage  AudioMessage  VideoMessage  LocationMessage   。。�
 
 #### 离线推送通知
 
-对离线的 iOS 和 Windows Phone 用户，每次有离线消息时，我们提供发送离线推送通知的功能。要想使用本功能，用户需要 **自定义推送的内容**，目前有三种方式，按优先级从高到低依次为：
+对离线的 iOS、Windows Phone 和开启了混合推送的 Android 用户，每次有离线消息时，我们提供发送离线推送通知的功能。要想使用本功能，用户需要 **自定义推送的内容**，目前有三种方式，按优先级从高到低依次为：
 
 1. 动态内容方式
 
@@ -246,24 +246,24 @@ TextMessage  ImageMessage  AudioMessage  VideoMessage  LocationMessage   。。�
 
 3. 静态内容方式
 
-  由于不同平台的不同限制，且用户的消息正文可能还包含上层协议，所以我们允许用户在控制台中为应用设置一个静态的 APNs JSON，推送一条内容固定的通知。
+  由于不同平台的不同限制，且用户的消息正文可能还包含上层协议，所以我们允许用户在控制台中为应用设置一个静态的 JSON，推送一条内容固定的通知。
   {% if node=='qcloud' %}
-  进入 `控制台 > 消息 > 实时消息 > 设置 > iOS 用户离线推送设置`，填入：
+  进入 `控制台 > 消息 > 实时消息 > 设置 > 离线推送设置`，填入：
   {% else %}
-  进入 [控制台 > 消息 > 实时消息 > 设置 > iOS 用户离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
+  进入 [控制台 > 消息 > 实时消息 > 设置 > 离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
   {% endif %}
   ```
   {"alert":"您有新的消息", "badge":"Increment"}
   ```
-  注意，`Increment` 大小写敏感，表示自动增加应用 badge 上的数字计数。清除 badge 的操作请参考 [iOS 推送指南 &middot; 清除 badge](ios_push_guide.html#清除_Badge)。
+  注意，`badge` 参数为 iOS 设备专用，且 `Increment` 大小写敏感，表示自动增加应用 badge 上的数字计数。清除 badge 的操作请参考 [iOS 推送指南 &middot; 清除 badge](ios_push_guide.html#清除_Badge)。
   
   ![image](images/realtime_ios_push.png)
 
-  此外，您还可以设置声音等推送属性，具体的字段可以参考[推送 &middot; 消息内容 Data](./push_guide.html#消息内容_Data)。
+  此外，对于 iOS 设备您还可以设置声音等推送属性，具体的字段可以参考[推送 &middot; 消息内容 Data](./push_guide.html#消息内容_Data)。
 
 ##### 限制
 
-通知的过期时间是 7 天，也就是说，如果一个设备 7 天内没有连接到 APNs 或 MPNs，系统将不会再给这个设备推送通知。
+通知的过期时间是 7 天，也就是说，如果一个设备 7 天内没有连接到 APNs、MPNs 或设备对应的混合推送平台，系统将不会再给这个设备推送通知。
 
 ##### 原理
 
@@ -833,9 +833,9 @@ LeanCloud 即时通讯服务是完全独立的即时通讯业务抽象，专注�
 
 ### 为什么我的 iPhone 收不到离线消息推送
 {% if node=='qcloud' %}
-请先参考 [聊天消息没有收到](#聊天消息没有收到)。在 `控制台 > **消息** > **实时消息** > **设置** > **iOS 用户离线推送设置** > **推送内容**`
+请先参考 [聊天消息没有收到](#聊天消息没有收到)。在 `控制台 > **消息** > **实时消息** > **设置** > **离线推送设置** > **推送内容**`
 {% else %}
-请先参考 [聊天消息没有收到](#聊天消息没有收到)。在 [控制台 > **消息** > **实时消息** > **设置** > **iOS 用户离线推送设置** > **推送内容**](/messaging.html?appid={{appid}}#/message/realtime/conf) {% endif %}
+请先参考 [聊天消息没有收到](#聊天消息没有收到)。在 [控制台 > **消息** > **实时消息** > **设置** > **离线推送设置** > **推送内容**](/messaging.html?appid={{appid}}#/message/realtime/conf) {% endif %}
 填写「您有新的未读消息」后，当对方不在线的时候，便会触发一个 APNs 的推送。首先，请确保控制台能向 iOS 推送消息，也即如下图所示的推送能顺利到达 iOS 系统，请参考 [iOS 推送开发文档](ios_push_guide.html)。
 
 ![image](images/realtime_faq_push.png)
