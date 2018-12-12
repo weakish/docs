@@ -27,3 +27,6 @@ Client Engine 是 LeanCloud Play 提供的实时对战游戏 Client 托管方案
 ## 试用
 
 Client Engine 正在公测中，公测期间免费试用。
+
+开启试用：打开 LeanCloud 应用[控制台](/app.html?appid={{appid}})，进入「Play」->「Client Engine」->「部署」页面，点击「试用 Client Engine」。
+

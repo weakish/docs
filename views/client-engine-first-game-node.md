@@ -69,8 +69,7 @@ export default class Reception<T extends Game> extends GameManager<T> {
 
 }
 ```
-
-接下来，我们在 `reception` 中使用 `GameManager` 的方法来实现自己的自定义逻辑：快速开始。
+这个自定义的类`Reception` 用于管理 T 类型的 `Game` 对象，在实际游戏中会是您自定义的 `Game` 类型的实例。接下来，我们在 `reception` 中使用 `GameManager` 的方法来实现自己的自定义逻辑：快速开始。
 
 #### 实现逻辑：「快速开始」
 
@@ -106,7 +105,7 @@ export default class Reception<T extends Game> extends GameManager<T> {
 * 如果所有 `Game` 房间都已经满员了，使用 `GameManager` 的 `createGame()` 方法创建一个新的房间并返回 roomName。
 
 #### 实现逻辑：「创建新游戏」
-如果您希望自己先创建房间，再邀请朋友加入该房间，可以在 `reception` 中写一个创建新游戏的方法供外部调用。同样这里的 `createGame()` 方法是由 SDK 中的 `GameManager` 提供的。
+如果您希望自己先创建房间，再邀请朋友加入该房间，可以在 `reception` 中写一个创建新游戏的方法供供[入口 API ](#入口 API：创建新游戏)调用。同样我们自定义的 `createGameAndGetName()` 方法内用到的 `createGame()` 是由 SDK 中的 `GameManager` 提供的。
 
 ```js
 export default class Reception<T extends Game> extends GameManager<T> {
@@ -129,7 +128,7 @@ export default class Reception<T extends Game> extends GameManager<T> {
 }
 ```
 
-#### 绑定 GameManager 及 Game
+#### 绑定 GameManager 及 Game
 当 `GameManager` 的子类 `Reception` 及 `Game` 的子类 `RPSGame` 都准备好后，我们要在整个项目入口把 `RPSGame` 给到 `Reception`，由 `Reception` 来管理 `RPSGame`。
 
 在 `index.ts` 文件创建 `Reception` 对象的方法中可以看到，第一个参数已经传入了 `RPSGame`，如果您的自定义 `Game` 使用的是其他的名字，可以将 `RPSGame` 换成您自定义的 `Game` 类。
@@ -149,7 +148,7 @@ const reception = new Reception(
 在这里配置完成后，`reception` 会在合适的时机创建并管理 `PRSGame` 和对应的 MasterClient。
 
 #### 配置负载均衡
-由于 `GameManager` 中的逻辑会直接被外部请求所调用，因此需要为在入口处为 `GameManager` 配置[负载均衡](client-engine-guide-node.html#负载均衡)，确保每次请求都能分配到负载最低的实例上。在 `index.ts` 文件中可以发现如下代码：
+由于 `GameManager` 中的逻辑会直接被外部请求所调用，因此需要为在入口处为 `GameManager` 配置负载均衡。关于负载均衡详细的介绍可以参考[Client Engine 开发指南](client-engine-guide-node.html#负载均衡)，在这里我们先简单的查看 `index.ts` 文件中的这些代码，了解如何配置即可：
 
 ```js
 import { ICreateGameOptions,LoadBalancerFactory } from "@leancloud/client-engine";
@@ -163,7 +162,6 @@ const loadBalancerFactory = new LoadBalancerFactory({
 // 将 reception 及我们自定义的方法 makeReservation 配置负载均衡。
 loadBalancerFactory.bind(reception, ["makeReservation", "createGameAndGetName"]) 
 ```
-在这段代码中，我们首先创建了一个负载均衡对象 `loadBalancerFactory`，然后将 `reception` 对象以及自定义的 `makeReservation()` 和 `createGameAndGetName()` 方法作为参数传入到 `loadBalancerFactory` 的 `bind()` 方法中。这样每次当 `makeReservation()` 被调用时，`loadBalancerFactory` 会在负载最低的 Client Engine 实例上运行逻辑。
 
 到这里，管理 `RPSGame` 的 `reception` 我们已经准备完成，接下来开始撰写具体的房间内游戏逻辑。
 
@@ -212,7 +210,7 @@ app.post("/reservation", async (req, res, next) => {
 客户端可以调用这个 API 来快速开始，用该接口的示例代码如下 **（非 Client Engine 代码）**：
 
 ```js
-// 这里通过 HTTP 调用在 Client Engine 中实现的 `/reservation` 接口
+// 这里在客户端通过 HTTP 调用在 Client Engine 中实现的 `/reservation` 接口
 const { roomName } = await (await fetch(
   `${CLIENT_ENGINE_SERVER}/reservation`,
   {

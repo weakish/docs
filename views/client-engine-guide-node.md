@@ -8,7 +8,7 @@ Client Engine 初始项目依赖了专门的 Client Engine SDK， Client Engine 
 SDK 提供以下角色：
 
 * **`Game` ：**负责房间内游戏的具体逻辑。Client Engine 维护了许多游戏房间，每一个游戏房间都是一个 Game 实例，即每个 Game 实例对应一个唯一的 Play Room 与 MasterClient。游戏房间内的逻辑由 Game 中的代码来控制，因此**房间内的游戏逻辑必须继承自该类**。
-* **`GameManager` ：**负责创建、管理及分配具体的 Game 对象。**您需要继承该类，并使用该类的方法撰写自己创建 Game 的逻辑**。而 Game 的管理及销毁由SDK 负责，不需要您再自己额外写代码。
+* **`GameManager` ：**负责创建、管理及分配具体的 Game 对象。Game 的管理及销毁由 SDK 负责，不需要您再自己额外写代码。
 
 ### GameManager
 
@@ -26,8 +26,11 @@ export default class SampleGameManager<T extends Game> extends GameManager<T> {
 }
 ```
 
-##### 自定义逻辑：创建 Game
-在 `SampleGameManager` 这个子类中，我们需要撰写创建 `Game` 的方法供外部调用，例如示例项目中的[快速开始](client-engine-first-game-node.html#实现逻辑：「快速开始」)和[创建新游戏](client-engine-first-game-node.html#实现逻辑：「创建新游戏」)。这里的示例代码我们以创建新游戏为例：
+##### 在 GameManager 中自定义方法
+
+在 GameManager 子类中自定义的每一个方法都需要配置负载均衡，以确保 GameManager 创建的 Game 能够尽可能均匀分配到每一个 Client Engine 实例中。[负载均衡](#负载均衡)的详细文档请看下文，在这里，我们先讲解如何撰写自定义方法。
+
+Client Engine 的核心用法之一是负责创建 Game 并返回 roomName 给客户端，因此在 `SampleGameManager` 这个类中，我们需要撰写创建 `Game` 的方法提供给 Web API 使用。例如示例项目中的[快速开始](client-engine-first-game-node.html#实现逻辑：「快速开始」)和[创建新游戏](client-engine-first-game-node.html#实现逻辑：「创建新游戏」)。这里的示例代码我们以创建新游戏为例：
 
 ```js
 import { Game, GameManager, ICreateGameOptions } from "@leancloud/client-engine";
@@ -45,8 +48,11 @@ export default class SampleGameManager<T extends Game> extends GameManager<T> {
 }
 ```
 
+受[负载均衡系统](#负载均衡)的要求，`GameManager` 子类中的 `public` 方法，其参数与返回值必须是 `string`、`number`、`boolean`、`null`、`Object`、`Array` 中的一种。以上代码中可以看到 `GameManager` 的 `createGame()` 方法返回的是一个 `Game`，不符合负载均衡的要求，因此我们在这里封装为自己的方法 `createGameAndGetName()`。
+
+
 ##### 创建 GameManager 子类对象
-接下来创建 `GameManager` 的子类对象，在创建 `SampleGameManager` 的时候，需要在第一个参数内传入[自定义的 Game ](#实现自己的 Game)，这里使用的是[示例 Demo ](client-engine-first-game-node.html)猜拳游戏中的 `RPSGame`。
+接下来创建 `GameManager` 的子类对象，在创建 `SampleGameManager` 的时候，需要在第一个参数内传入[自定义的 Game ](#实现自己的 Game)，这里使用的是[示例 Demo](client-engine-first-game-node.html) 猜拳游戏中的 `RPSGame`。
 
 ```js
 import PRSGame from "./rps-game";
@@ -64,9 +70,9 @@ const gameManager = new SampleGameManager(
 ```
 
 ##### 设置负载均衡
-Client Engine 提供多实例负载均衡，所以这里还需要对入口处的逻辑方法进行配置，使多个实例共同分担压力，详情请参考[负载均衡](#负载均衡)。
+[负载均衡](#负载均衡)和 `GameManager` 息息相关，因此还需要在整个项目入口处将 `gameManager` 对象配置给负载均衡系统。
 
-在这里我们创建一个[负载均衡](#负载均衡)对象，然后将上面的 `gameManager` 绑定到负载均衡对象中，这样当每次客户端请求 Web API 执行 `gameManager` 中的逻辑时，会通过负载均衡在负载最低的实例上来运行相关逻辑：
+在这里我们创建一个[负载均衡](#负载均衡)对象，然后将上面的 `gameManager` 绑定到负载均衡中：
 
 ```js
 import { ICreateGameOptions,LoadBalancerFactory } from "@leancloud/client-engine";
@@ -81,9 +87,9 @@ const loadBalancerFactory = new LoadBalancerFactory({
 const loadBalancer = loadBalancerFactory.bind(gameManager, ["createGameAndGetName"]);
 ```
 
-`loadBalancerFactory` 的 `bind()` 方法中，第一个参数是 `gameManager` 对象，第二个参数是一个数组，传入在 GameManager 子类中自定义的方法 `createGameAndGetName()`。
+`loadBalancerFactory` 的 `bind()` 方法中，第一个参数是 `gameManager` 对象，第二个参数是一个数组，传入需要进行负载均衡的方法名 `["createGameAndGetName"]`。
 
-到这里，gameManager 的实例化就完成了，您可以在自己定义的 Web API 处通过 `gameManager.createGameAndGetName()` 来调用相关方法。 
+到这里，`gameManager` 的配置就完成了，您可以在自己定义的 Web API 处这样调用相关方法： `gameManager.createGameAndGetName()`。 
 
 #### 创建房间
 在 [GameManager 实例化](#GameManager 实例化)这一节中，我们在子类中使用了 `GameManager` 的 `createGame()` 来创建房间。
@@ -341,10 +347,13 @@ export default class SampleGame extends Game {
 
 ## 负载均衡
 
-Client Engine 会根据整体实例负载的高低自动对实例数量进行调整，客户端发起的 Web 请求会均匀的分配给当前所有的实例。接收 Web 请求的实例会与其他实例进行内部通信，找出负载 `Game` 数量最小的实例，并将相关的 `Game` 返回给客户端或创建新的 `Game。`
+Client Engine 会根据整体实例负载的高低自动对实例数量进行调整。
 
-这个特性由 SDK 提供的 `LoadBalancerFactory` 类实现。在 [GameManager 实例化](#GameManager 实例化)中我们可以看到，`LoadBalancerFactory` 通过绑定 `gameManager` 生成一个 `LoadBalancer` 的对象，每一个 Client Engine 实例中都会有这样一个对象，当外部调用 `gameManager` 中的方法时，会先通过当前接收请求的实例中的 `LoadBalancer` 找到负载最低的实例中的 `gameManager` 对象，然后在这个实例上执行相关逻辑。在这里，`LoadBalancer` 只负责请求的转发，不关心如何处理请求。
+在 Client Engine 中，需要负载均衡的情况有两种：第一种是客户端通过 REST API 发起的请求，第二种是每一个实例运行的 `Game` 数量的负载。对于客户端通过 REST API 发起的请求，Client Engine 会自动将请求均匀的分配给当前的所有实例，不需要我们再做任何配置工作。对于第二种情况，每个 `Game` 对象（每局游戏）一般都会持续存在一段时间，为了让每个实例承载的 `Game` 对象尽可能达到均衡，我们需要额外配置 `GameManager` 到负载均衡系统中。
 
+这个特性由 SDK 提供的 `LoadBalancerFactory` 类实现。在 [GameManager 实例化](#GameManager 实例化)中我们可以看到，`LoadBalancerFactory` 通过绑定 `gameManager` 生成一个 `LoadBalancer` 的对象，每一个 Client Engine 实例中都会有这样一个对象。
+
+当 Client Engine 的某个实例接收到来自客户端的 REST API 请求，并调用 `gameManager` 中的方法时，接收请求的实例中的负载均衡节点 `LoadBalancer` 会找出集群中承载 `Game` 数量最小的实例，将指定的 `gameManager` 的 API 调用转发给该实例的 `gameManager` 运行并将结果返回。在这里，`LoadBalancer` 只负责请求的转发，不关心如何处理请求。
 
 ## API 文档
 
