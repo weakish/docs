@@ -27,9 +27,6 @@ export default class SampleGameManager<T extends Game> extends GameManager<T> {
 ```
 
 ##### 在 GameManager 中自定义方法
-
-在 GameManager 子类中自定义的每一个方法都需要配置负载均衡，以确保 GameManager 创建的 Game 能够尽可能均匀分配到每一个 Client Engine 实例中。[负载均衡](#负载均衡)的详细文档请看下文，在这里，我们先讲解如何撰写自定义方法。
-
 Client Engine 的核心用法之一是负责创建 Game 并返回 roomName 给客户端，因此在 `SampleGameManager` 这个类中，我们需要撰写创建 `Game` 的方法提供给 Web API 使用。例如示例项目中的[快速开始](client-engine-first-game-node.html#实现逻辑：「快速开始」)和[创建新游戏](client-engine-first-game-node.html#实现逻辑：「创建新游戏」)。这里的示例代码我们以创建新游戏为例：
 
 ```js
@@ -48,8 +45,7 @@ export default class SampleGameManager<T extends Game> extends GameManager<T> {
 }
 ```
 
-受[负载均衡系统](#负载均衡)的要求，`GameManager` 子类中的 `public` 方法，其参数与返回值必须是 `string`、`number`、`boolean`、`null`、`Object`、`Array` 中的一种。以上代码中可以看到 `GameManager` 的 `createGame()` 方法返回的是一个 `Game`，不符合负载均衡的要求，因此我们在这里封装为自己的方法 `createGameAndGetName()`。
-
+写完自定义方法之后，在下文我们还需要为这里的方法配置[负载均衡](#负载均衡)，需要注意的是，受[负载均衡系统](#负载均衡)的要求，`GameManager` 子类中的 `public` 方法，其参数与返回值必须是 `string`、`number`、`boolean`、`null`、`Object`、`Array` 中的一种。以上代码中可以看到 `GameManager` 的 `createGame()` 方法返回的是一个 `Game`，不符合负载均衡的要求，因此我们在这里封装为自己的方法 `createGameAndGetName()`。
 
 ##### 创建 GameManager 子类对象
 接下来创建 `GameManager` 的子类对象，在创建 `SampleGameManager` 的时候，需要在第一个参数内传入[自定义的 Game ](#实现自己的 Game)，这里使用的是[示例 Demo](client-engine-first-game-node.html) 猜拳游戏中的 `RPSGame`。
@@ -70,7 +66,7 @@ const gameManager = new SampleGameManager(
 ```
 
 ##### 设置负载均衡
-[负载均衡](#负载均衡)和 `GameManager` 息息相关，因此还需要在整个项目入口处将 `gameManager` 对象配置给负载均衡系统。
+`GameManager` 需要配置负载均衡，以确保 `GameManager` 创建的 `Game` 能够尽可能均匀分配到每一个 Client Engine 实例中。[负载均衡](#负载均衡)的详细文档请看下文，在这里，我们先讲解如何配置。
 
 在这里我们创建一个[负载均衡](#负载均衡)对象，然后将上面的 `gameManager` 绑定到负载均衡中：
 
