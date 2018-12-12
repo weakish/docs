@@ -46,7 +46,7 @@ npm install leancloud-storage
 启动应用时打开调试日志：
 
 ```
-DEBUG=ClientEngine*,RPS*,Play  lean up
+DEBUG=ClientEngine*,RPS*,Play lean up
 ```
 
 如果您不需要调试日志，可以直接使用以下命令启动：

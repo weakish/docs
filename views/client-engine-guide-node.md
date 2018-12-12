@@ -2,14 +2,13 @@
 
 请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 及[你的第一个 Client Engine 小游戏](client-engine-first-game-node.html)来初步了解如何使用初始项目来开发游戏。本文档将在初始项目的基础上深入讲解 Client Engine SDK。
 
-
 Client Engine 初始项目依赖了专门的 Client Engine SDK， Client Engine SDK 在实时对战 Play SDK 的基础上进行了封装，帮助您更好的撰写服务端游戏逻辑。您可以通过[快速入门](client-engine-quick-start-node.html)安装依赖。
 
 ## 角色
 SDK 提供以下角色：
 
 * **`Game` ：**负责房间内游戏的具体逻辑。Client Engine 维护了许多游戏房间，每一个游戏房间都是一个 Game 实例，即每个 Game 实例对应一个唯一的 Play Room 与 MasterClient。游戏房间内的逻辑由 Game 中的代码来控制，因此**房间内的游戏逻辑必须继承自该类**。
-* **`GameManager` ：**负责创建、管理及分配具体的 Game 对象。SDK 中的 `GameManager` 已经帮您写好了默认的 Game 管理逻辑，您不需要再自己写代码管理 Game。
+* **`GameManager` ：**负责创建、管理及分配具体的 Game 对象。**您需要继承该类，并使用该类的方法撰写自己创建 Game 的逻辑**。而 Game 的管理及销毁由SDK 负责，不需要您再自己额外写代码。
 
 ### GameManager
 
@@ -17,21 +16,40 @@ SDK 提供以下角色：
 
 `GameManager` 会帮您自动创建、管理并销毁 Game，因此在项目启动时，您需要实例化 `GameManager`。相关示例代码如下：
 
-首先需要自定义一个 Class 继承自 `GameManager`，例如示例代码中的 `SampleGameManager`， 这个 Class 要实现 `consume()` 方法，这个 `consume()` 方法中要定义 `GameManager` 创建 `Game` 的方法 `makeReservation()`：
+##### 自定义 GameManager
+首先需要自定义一个 Class 继承自 `GameManager`，例如示例代码中的 `SampleGameManager`：
 
 ```js
-class SampleGameManager<T extends Game> extends GameManager<T> {
-  public async consume(playerId: string, options: ICreateGameOptions) {
-    return this.makeReservation(playerId, options);
+import { Game, GameManager, ICreateGameOptions } from "@leancloud/client-engine";
+export default class SampleGameManager<T extends Game> extends GameManager<T> {
+
+}
+```
+
+##### 自定义逻辑：创建 Game
+在 `SampleGameManager` 这个子类中，我们需要撰写创建 `Game` 的方法供外部调用，例如示例项目中的[快速开始](client-engine-first-game-node.html#实现逻辑：「快速开始」)和[创建新游戏](client-engine-first-game-node.html#实现逻辑：「创建新游戏」)。这里的示例代码我们以创建新游戏为例：
+
+```js
+import { Game, GameManager, ICreateGameOptions } from "@leancloud/client-engine";
+export default class SampleGameManager<T extends Game> extends GameManager<T> {
+  /**
+   * 创建一个新的游戏。
+   * @param playerId 预约的玩家 ID
+   * @param options 创建新游戏时可以指定的一些配置项
+   * @return 创建的游戏的房间 name
+   */
+  public async createGameAndGetName(playerId: string, options?: ICreateGameOptions) {
+    const game = await this.createGame(playerId, options);
+    return game.room.name;
   }
 }
 ```
 
-在新建 `SampleGameManager` 的时候，需要在第一个参数内传入[自定义的 Game ](#实现自己的 Game)，这里使用的是[示例 Demo ](client-engine-first-game-node.html)猜拳游戏中的 `RPSGame`。
+##### 创建 GameManager 子类对象
+接下来创建 `GameManager` 的子类对象，在创建 `SampleGameManager` 的时候，需要在第一个参数内传入[自定义的 Game ](#实现自己的 Game)，这里使用的是[示例 Demo ](client-engine-first-game-node.html)猜拳游戏中的 `RPSGame`。
 
 ```js
 import PRSGame from "./rps-game";
-
 const gameManager = new SampleGameManager(
   PRSGame,
   APP_ID,
@@ -42,33 +60,35 @@ const gameManager = new SampleGameManager(
     // 需要先 import { Region } from "@leancloud/play";
     // region: Region.NorthChina,
   },
-).on(RedisLoadBalancerConsumerEvent.LOAD_CHANGE, () => debug(`Load: ${gameManager.load}`));
-```
-
-接着我们要创建一个[负载均衡](#负载均衡)对象，然后将上面的 `gameManager` 对象作为第一个参数传入进去：
-
-```js
-const redisLB = new RedisLoadBalancer(
-  gameManager,
-  // 负载均衡使用的 redis url，请不要更改，使用时复制粘贴即可
-  process.env.REDIS_URL__CLIENT_ENGINE,
-  {
-    // 负载均衡资源池 Id，请不要更改，使用时复制粘贴即可
-    poolId: `${APP_ID.slice(0, 5)}-${process.env.LEANCLOUD_APP_ENV || "development"}`,
-  },
 );
-
 ```
 
-当每次有客户端创建房间的请求进来时，我们要通过负载均衡将请求转发给 `GameManager`。在下面的示例代码中，当负载均衡对象 `redisLB` 调用 `consume()` 方法时，最终执行的逻辑是 `gameManager` 中的 `consume()` 方法。在  `gameManager` 的 `consume()` 方法中我们使用了 `makeReservation()` 来创建房间。
+##### 设置负载均衡
+Client Engine 提供多实例负载均衡，所以这里还需要对入口处的逻辑方法进行配置，使多个实例共同分担压力，详情请参考[负载均衡](#负载均衡)。
+
+在这里我们创建一个[负载均衡](#负载均衡)对象，然后将上面的 `gameManager` 绑定到负载均衡对象中，这样当每次客户端请求 Web API 执行 `gameManager` 中的逻辑时，会通过负载均衡在负载最低的实例上来运行相关逻辑：
 
 ```js
-const roomName = await redisLB.consume(playerId, createGameOptions);
-```
-#### 创建房间
-在 [GameManager 实例化](#GameManager 实例化)这一节中，我们使用了 `GameManager` 的 `makeReservation()` 来创建房间。
+import { ICreateGameOptions,LoadBalancerFactory } from "@leancloud/client-engine";
 
-`makeReservation()` 接受以下参数：
+// 创建负责负载均衡的对象，请不要更改，使用时复制粘贴即可
+const loadBalancerFactory = new LoadBalancerFactory({
+  poolId: `${APP_ID.slice(0, 5)}-${process.env.LEANCLOUD_APP_ENV || "development"}`,
+  redisUrl: process.env.REDIS_URL__CLIENT_ENGINE,
+});
+
+// 将 reception 及我们自定义的方法 makeReservation 配置负载均衡。
+const loadBalancer = loadBalancerFactory.bind(gameManager, ["createGameAndGetName"]);
+```
+
+`loadBalancerFactory` 的 `bind()` 方法中，第一个参数是 `gameManager` 对象，第二个参数是一个数组，传入在 GameManager 子类中自定义的方法 `createGameAndGetName()`。
+
+到这里，gameManager 的实例化就完成了，您可以在自己定义的 Web API 处通过 `gameManager.createGameAndGetName()` 来调用相关方法。 
+
+#### 创建房间
+在 [GameManager 实例化](#GameManager 实例化)这一节中，我们在子类中使用了 `GameManager` 的 `createGame()` 来创建房间。
+
+`createGame()` 接受以下参数：
 
 * playerId：发起请求的客户端在实时对战服务中的 [userId](multiplayer-guide-js.html#设置 userId)。
 * createGameOptions（可选）：创建指定条件的房间。
@@ -76,7 +96,7 @@ const roomName = await redisLB.consume(playerId, createGameOptions);
   * roomOptions（可选）：通过这个参数，客户端在请求 Client Engine 创建房间时，可以设置 `customRoomProperties`，`customRoomPropertyKeysForLobby`，`visible`，对这三个参数的说明请参考[创建房间](multiplayer-guide-js.html#创建房间)。
   * seatCount(可选)：创建房间时，指定本次游戏需要多少人，这个值需要在[设置房间内玩家数量](#设置房间内玩家数量)的 `minSeatCount` 和 `maxSeatCount` 之间，否则 Client Engine 会拒绝创建房间。如果不指定，则以 `defaultSeatCount` 为准。
 
-例如创建一个带有匹配条件的新房间时，可以这样调用 `makeReservation()`：
+例如创建一个带有匹配条件的新房间时，可以这样调用 `createGame()`：
 
 ```js
 // 您可以从客户端发来的请求中获得 playerId 和 createGameOptions 
@@ -93,10 +113,77 @@ const createGameOptions = {
   roomOptions
 };
 
-gameManager.makeReservation(playerId, createGameOptions);
+gameManager.createGame(playerId, createGameOptions);
 ```
 
-在[你的第一个 Client Engine 小游戏](client-engine-first-game-node.html)中，`index.ts` 的 `/reservation` 撰写了和 GameManager 相关的代码，如果没有自定义需求您可以直接使用示例 Demo 中的 `/reservation` 接口并传入以上参数。
+在[你的第一个 Client Engine 小游戏](client-engine-first-game-node.html)中，`reception.ts` 中使用 `createGame()` 撰写了两个自定义方法用于「快速开始」和「创建新游戏」，并通过 `index.ts` 中的 Web API `/reservation` 和 `/game` 来调用相关逻辑，如果没有自定义需求您可以直接使用示例 Demo 中的接口并传入以上参数。
+
+#### 获取当前可用的房间
+GameManager 提供了 `getAvailableGames()` 方法来获取当前 GameManager 对象所在的 Client Engine 实例中的可用游戏列表。这里的可用指的是房间还有空位。使用示例代码如下：
+
+```js
+var games = gameManager.getAvailableGames();
+```
+
+需要注意的是，这个方法获取的不是实时对战服务中所有的可用房间，**仅限于当前所在 Client Engine 实例中的可用房间**，Client Engine 多实例负载均衡请参考[负载均衡](#负载均衡)。
+
+#### 匹配
+`GameManager` 暂时没有提供匹配机制，如果客户端只需要随机加入某个房间，可以参考[示例项目](client-engine-first-game-node.html)中「快速开始」的实现方案。这个实现方案会在负载最低的实例中寻找可用房间或创建房间，最终返回给客户端一个可加入的房间名称。
+
+如果您希望实现有条件的匹配，可以这样实现：
+
+1. 客户端向实时对战服务请求[有条件的匹配](multiplayer-guide-js.html#随机加入房间)，如果有空余的房间，则会触发加入成功事件。
+2. 如果实时对战服务此时没有空余的房间，客户端会收到「加入房间失败」事件，在这个事件中，发现错误码是 [4301](multiplayer-error-code.html#4301)，则向 Client Engine 请求创建房间。
+3. Client Engine 收到请求后创建房间并返回 roomName 给客户端。这一部分的逻辑可以使用[示例项目]((client-engine-first-game-node.html)中的 `/game` 入口。
+4. 客户端拿到 Client Engine 返回的 roomName 后加入房间，等待其他人匹配加入。
+
+这个流程在客户端中的示例代码如下（**非 Client Engine**）：
+
+客户端首先向实时对战服务发起有条件的加入房间请求：
+
+```js
+const matchProps = {level: 2};
+play.joinRandomRoom({matchProperties: matchProps});
+```
+
+如果实时对战服务此时有可以加入的新房间，您会自动加入到新房间中，并触发加入房间成功事件：
+
+```js
+play.on(Event.ROOM_JOINED, () => {
+    // TODO 可以做跳转场景之类的操作
+});
+```
+
+如果没有可以加入的房间，会触发加入房间失败事件。在这个事件中，[4301](multiplayer-error-code.html#4301) 错误码代表着没有可以加入的空房间，此时我们向 Client Engine 请求创建一个新的房间，获得新房间的 roomName 后加入新房间：
+
+```js
+// 加入房间失败后请求 Client Engine 创建房间
+play.on(Event.ROOM_JOIN_FAILED, (error) => {
+  if (error.code === 4301) {
+    // 设置创建带有匹配属性的房间
+    const props = {level: 2};
+    const options = {customRoomPropertyKeysForLobby: ['level']};
+    // 这里通过 HTTP 调用在 Client Engine 中实现的 `/game` 接口
+    const { roomName } = await (await fetch(
+      `${CLIENT_ENGINE_SERVER}/game`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          playerId: play.userId,
+          options
+        })
+      }
+    )).json();
+    // 加入房间
+    return play.joinRoom(roomName);
+  } else {
+    console.log(error);
+  }
+});
+```
 
 ### Game
 
@@ -252,14 +339,13 @@ export default class SampleGame extends Game {
 }
 ```
 
-### 负载均衡
+## 负载均衡
 
-Client Engine 会根据整体实例负载的高低自动对实例数量进行调整，新的请求会均匀的分配给当前所有的实例。由于每局游戏一般都会需要持续一段时间，在新的实例启动后会将有一段时间各个实例的负载不均匀，为了让各实例的负载尽快达到均衡状态，Client Engine 提供了一个基于 Redis 的应用层负载均衡方案。
+Client Engine 会根据整体实例负载的高低自动对实例数量进行调整，客户端发起的 Web 请求会均匀的分配给当前所有的实例。接收 Web 请求的实例会与其他实例进行内部通信，找出负载 `Game` 数量最小的实例，并将相关的 `Game` 返回给客户端或创建新的 `Game。`
 
-这个特性是由 SDK 提供的 `RedisLoadBalancer` 类实现。在 [GameManager 实例化](#GameManager 实例化)及[创建房间](#创建房间)中我们可以看到， 实际处理客户端的请求时与 `GameManager` 之间使用了一个 `RedisLoadBalancer` 作为代理。这意味着客户端所有的创建房间请求会交给 `RedisLoadBalancer`，`RedisLoadBalancer` 会将请求转交给 Client Engine 中负载最低的实例所持有的 `GameManager` 去处理。
+这个特性由 SDK 提供的 `LoadBalancerFactory` 类实现。在 [GameManager 实例化](#GameManager 实例化)中我们可以看到，`LoadBalancerFactory` 通过绑定 `gameManager` 生成一个 `LoadBalancer` 的对象，每一个 Client Engine 实例中都会有这样一个对象，当外部调用 `gameManager` 中的方法时，会先通过当前接收请求的实例中的 `LoadBalancer` 找到负载最低的实例中的 `gameManager` 对象，然后在这个实例上执行相关逻辑。在这里，`LoadBalancer` 只负责请求的转发，不关心如何处理请求。
 
-需要特别指出的是，`RedisLoadBalancer` 只负责请求的转发，不关心如何处理请求。在 [GameManager 实例化](#GameManager 实例化)中可以看到，我们先写了一个子类 `SampleGameManager` 继承自 `GameManager`，并实现了它的 `consume()` 方法，然后将实例化的 `SampleGameManager` 传递给负载均衡 `RedisLoadBalancer`，当 `redisLB` 调用 `consume()` 方法时，会通过 `RedisLoadBalancer` 执行 `SampleGameManager` 中的 `consume()` 逻辑。
 
-### API 文档
+## API 文档
 
 您可以在 API 文档中找到更多 SDK 的类、方法及属性说明，[点击查看 Client Engine SDK API 文档](https://leancloud.github.io/client-engine-nodejs-sdk/)。
