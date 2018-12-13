@@ -7,7 +7,7 @@
 {% block sdk_lifecycle_statement %}
 
 #### SDK 维护期说明
-> 我们于 2018 年 9 月推出了新的 [Java Unified SDK](https://blog.leancloud.cn/6376/)，兼容纯 Java、云引擎和 Android 等多个平台，老的 Android SDK（所有 groupId 为`cn.leancloud.android` 的 libraries，即下文介绍的 SDK）进入维护状态，直到 2019 年 9 月底停止维护。
+我们于 2018 年 9 月推出了新的 [Java Unified SDK](https://blog.leancloud.cn/6376/)，兼容纯 Java、云引擎和 Android 等多个平台，老的 Android SDK（所有 groupId 为`cn.leancloud.android` 的 libraries，即下文介绍的 SDK）进入维护状态，直到 2019 年 9 月底停止维护。
 欢迎大家切换到新的 Unified SDK，具体使用方法详见 [Unified SDK Wiki](https://github.com/leancloud/java-sdk-all/wiki)。
 
 {% endblock %}
@@ -68,7 +68,7 @@ dependencies {
 }
 ```
 
-从 4.7.8 版本开始，我们已经把 SDK library 推送到了 maven central repository，推荐大家大家使用这种方式。
+从 4.7.8 版本开始，我们已经把 SDK library 推送到了 maven central repository，推荐大家使用这种方式。
 同时，我们也搭建了 LeanCloud 的 [maven 仓库](http://mvn.leancloud.cn/nexus/)，以便在中央仓库访问不了的时候备用，如果要访问我们的 maven 仓库，需要在项目根目录下的 `build.gradle` 进行如下标准配置：
 
 <pre><code>
@@ -97,7 +97,7 @@ allprojects {
 }
 </code></pre>
 
-同时请注意，同一个 library，在 LeanCloud maven 仓库里其版本号前面多了一个`v`。例如中央仓库里版本号为 `4.7.8` 的 SDK，在 LeanCloud maven 仓库里其版本号为 `v4.7.8`，这一点请大家注意。
+同时请注意，同一个 library，在 LeanCloud maven 仓库里其版本号前面多了一个 `v`。例如中央仓库里版本号为 `4.7.8` 的 SDK，在 LeanCloud maven 仓库里其版本号为 `v4.7.8`，这一点请大家注意。
 
 如果使用 maven 中央仓库，依赖声明如下：
 ```
