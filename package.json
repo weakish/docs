@@ -7,7 +7,7 @@
     "test": "grunt test --no-comments",
     "postinstall": "grunt build --no-comments",
     "start": "static dist -p $PORT -a 0.0.0.0",
-    "simulate":"grunt build --no-comments && static dist",
+    "simulate": "grunt build --no-comments && static dist",
     "preview": "grunt serve"
   },
   "repository": {

@@ -57,23 +57,6 @@ const client = new Client({
 ```
 {% endblock %}
 
-
-{% block set_userid %}
-`{{userId}}` 是作为客户端的唯一标识连接至服务器。在 Client 构造完成后，我们也可以单独修改。
-
-```javascript
-client.userId = 'leancloud';
-```
-{% endblock %}
-
-{% block set_game_version %}
-`{{gameVersion}}` 表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器。在 Client 构造完成后，我们也可以单独修改。
-
-```javascript
-client.gameVersion = '0.0.2';
-```
-{% endblock %}
-
 {% block connection %}
 ```javascript
 client.connect();

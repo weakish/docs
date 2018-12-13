@@ -56,6 +56,8 @@ play.Init(APP_ID, APP_KEY, APP_REGION);
 
 
 {% block set_userid %}
+## 设置玩家 ID
+
 ```cs
 var random = new System.Random();
 var randId = string.Format("{0}", random.Next(10000000));

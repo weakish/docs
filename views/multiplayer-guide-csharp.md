@@ -46,10 +46,18 @@ void Update () {
 
 
 {% block set_userid %}
+### 设置 `{{userId}}`
+
 我们需要设置一个 `{{userId}}` 作为客户端的唯一标识连接至服务器。
+
 ```cs
 play.UserId = "leancloud";
 ```
+
+需要注意，这个 `userId` 有如下限制：
+- 只允许英文、数字与下划线。
+- 长度不能超过 32 字符
+- 一个应用内全局唯一
 {% endblock %}
 
 
