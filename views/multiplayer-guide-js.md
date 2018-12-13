@@ -278,7 +278,7 @@ client.joinOrCreateRoom('room1');
 
 
 {% block join_or_create_room_api %}
-更多关于 `joinOrCreateRoom`，请参考[ API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#joinOrCreateRoom)。
+更多关于 `joinOrCreateRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#joinOrCreateRoom)。
 {% endblock %}
 
 
