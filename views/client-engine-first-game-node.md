@@ -14,37 +14,36 @@
 ```
 ├── configs.ts        // 配置文件
 ├── index.ts          // 项目入口
+├── reception.ts      // Reception 类实现文件，GameManager 的子类，负责管理 Game，在这个文件中撰写了创建 Game 的自定义方法
 └── rps-game.ts       // RPSGame 类实现文件，Game 的子类，在这个文件中撰写了具体猜拳游戏的逻辑
 ```
 
-您可以从 `index.ts` 文件入手来了解整个项目，该文件是项目启动的入口，它通过 express 框架定义了名为 `/reservation` 的 Web API，供客户端新开一局游戏时创建新的房间。
+该项目中的 `Game` 及 `GameManager` 使用的是 Client Engine SDK 的功能，关于 SDK 的详细用法请参考 [Client Engine 开发指南](client-engine-guide-node.html)。
 
-`rps-game.ts` 里面有本教程的全部代码。您可以选择备份一份 `rps-game.ts`，清空该文件后根据本文档撰写自己的代码，同时也可以查看已经写好的代码以做对比。
+您可以从 `index.ts` 文件入手来了解整个项目，该文件是项目启动的入口，它通过 express 框架定义了名为 `/reservation` 的 Web API，供客户端快速开始时为客户端下发新的房间名称。
 
+`reception.ts` 及 `rps-game.ts` 里面有本教程的全部代码。您可以选择备份这两个文件，清空这两个文件后根据本文档撰写自己的代码，同时也可以查看已经写好的代码以做对比。
 
 ### 客户端项目
-[点击下载客户端项目](https://github.com/leancloud/client-engine-demo-webapp)。**您需要在 `./src` 中的 `config.ts` 文件中配置自己的应用信息**，按照 README 启动应用后观察界面的变化。游戏相关的逻辑位于 `./src/components` 下的文件中，在有需要的时候您可以打开这里的文件查看代码。
-
+[点击下载客户端项目](https://github.com/leancloud/client-engine-demo-webapp)。**打开 `./src` 中的 `config.ts`，将 appId 和 appKey 修改为自己应用的信息**，按照 README 启动项目后观察界面的变化。游戏相关的逻辑位于 `./src/components` 下的文件中，在有需要的时候您可以打开这里的文件查看代码。
 
 ## 核心流程
-
 在实时对战服务中，房间的创建者为 MasterClient，因此在这个小游戏中，每一个房间都是由 Client Engine 管理的 MasterClient 调用实时对战服务相关的接口来创建的。Client Engine 中会有多个 MasterClient，每一个 MasterClient 管理着自己房间内的游戏逻辑。
 
-这个小游戏的核心逻辑为：Client Engine 中的 MasterClient 及客户端玩家 Client 加入到同一个房间，在通信过程中由 MasterClient 控制游戏内的逻辑。具体拆解步骤如下：
+这个小游戏的核心逻辑为：**Client Engine 中的 MasterClient 及客户端玩家 Client 加入到同一个房间，在通信过程中由 MasterClient 控制游戏内的逻辑。**具体拆解步骤如下：
 
-1. 玩家客户端连接[实时对战服务](multiplayer.html)，向实时对战服务请求[随机匹配房间](multiplayer-guide-js.html#随机加入房间)。
-2. 如果实时对战服务没有合适的房间，玩家客户端转而向 Client Engine 提供的 `/reservation` 接口请求房间。
-3. Client Engine 每次收到请求后会根据情况准备 MasterClient 并创建房间，返回 roomName 给客户端。客户端通过 Client Engine 返回的 roomName 加入房间。
+1. 玩家客户端连接[实时对战服务](multiplayer.html)，向 Client Engine 提供的 `/reservation` 接口请求快速开始游戏。
+2. Client Engine 每次收到请求后会检查是否有可用的房间，如果有则返回已有的 roomName 给客户端；如果没有则创建新的 MasterClient 并创建一个新的房间，返回 roomName 给客户端。
+3. 客户端通过 Client Engine 返回的 roomName 加入房间。
 4. MasterClient 和客户端在同一房间内，每次客户端出拳时会将消息发送给 MasterClient，MasterClient 将消息转发给其他客户端，并最终判定游戏结果。
 5. MasterClient 判定游戏结束，客户端离开房间，Client Engine 销毁游戏。
-
 
 ## 代码开发
 
 ### 自定义 Game
-我们的目标是让 MasterClient 和客户端 Client 进入同一个房间，第一步在 Client Engine 中我们先准备好房间实例。在 Client Engine SDK 中，每一个房间都对应一个 `Game` 实例对象，每一个 `Game` 对象都对应一个自己的 MasterClient。接下来我们创建一个继承 `Game` 的子类 `RPSGame` ，在 `RPSGame` 中撰写猜拳小游戏的房间内逻辑。
+我们的目标是让 MasterClient 和客户端 Client 进入同一个房间，第一步在 Client Engine 中我们先准备好房间。在 Client Engine SDK 中，每一个房间都对应一个 `Game` 对象，每一个 `Game` 对象都对应一个自己的 MasterClient。接下来我们创建一个继承 `Game` 的子类 `RPSGame` ，在 `RPSGame` 中撰写猜拳小游戏的房间内逻辑。
 
-在 `rpg-game.ts` 文件中初始化自定义的 RPSGame：
+在 `rpg-game.ts` 文件中初始化自定义的 `RPSGame`：
 
 ```js
 import { Game } from "@leancloud/client-engine";
@@ -57,20 +56,114 @@ export default class RPSGame extends Game {
 ```
 
 ### 管理 Game
-Client Engine SDK 中，`GameManger` 负责 `Game` 的创建及销毁，具体的原理及结构介绍请参考 [Client Engine 开发指南](client-engine-guide-node.html)。在这篇文档中，我们通过简单的配置就可以使用 `GameMnager` 的管理功能。在 `index.ts` 文件 new `gameManager` 的方法中可以看到，第一个参数已经传入了 `RPSGame`，如果您的自定义 `Game` 使用的是其他的名字，可以将 `RPSGame` 换成您自定义的 `Game` 类。
+Client Engine SDK 中，`GameManger` 负责 `Game` 的创建及销毁，具体的原理及结构介绍请参考 [Client Engine 开发指南](client-engine-guide-node.html)。在这篇文档中，我们通过简单的配置就可以使用 `GameMnager` 的管理功能。
+
+#### 自定义 GameManager
+首先创建一个子类 `Reception` 继承自 `GameManager`，在这个子类中我们就可以使用 `GameManager` 提供的方法来帮我们撰写自己的逻辑。
+
+在 `reception.ts` 文件中初始化自定义的 `Reception`：
+
+```js
+import { Game, GameManager, ICreateGameOptions } from "@leancloud/client-engine";
+export default class Reception<T extends Game> extends GameManager<T> {
+
+}
+```
+这个自定义的类`Reception` 用于管理 T 类型的 `Game` 对象，在实际游戏中会是您自定义的 `Game` 类型的实例。接下来，我们在 `reception` 中使用 `GameManager` 的方法来实现自己的自定义逻辑：快速开始。
+
+#### 实现逻辑：「快速开始」
+
+这里我们要实现的快速开始的逻辑是：随便找一个有空位的房间返回给客户端，如果当前的 Client Engine 实例没有可用的房间，那么就创建一个房间返回给客户端。我们在 `Reception` 类中撰写名为 `makeReservation()` 的自定义方法来实现这个逻辑并供[入口 API ](#入口 API：快速开始)调用。
+
+```js
+import { Game, GameManager, ICreateGameOptions } from "@leancloud/client-engine";
+export default class Reception<T extends Game> extends GameManager<T> {
+
+  /**
+   * 为指定玩家预约游戏，如果没有可用的游戏会创建一个新的游戏。
+   * @param playerId 预约的玩家 ID
+   * @return 预约成功的游戏的房间 name
+   */
+  public async makeReservation(playerId: string) {
+    let game: T;
+    const availableGames = this.getAvailableGames();
+    if (availableGames.length > 0) {
+      game = availableGames[0];
+      this.reserveSeats(game, playerId);
+    } else {
+      game = await this.createGame(playerId);
+    }
+    return game.room.name;
+  }
+
+}
+```
+
+在这段代码中，我们调用了 `GameManager` 的 `getAvailableGames()` 来获得当前 Client Engine 实例管理的 `Game`：
+
+* 如果有房间内还有空位的 `Game`，使用 `GameManager` 的 `reserveSeats()` 方法为玩家占位并返回 roomName。
+* 如果所有 `Game` 房间都已经满员了，使用 `GameManager` 的 `createGame()` 方法创建一个新的房间并返回 roomName。
+
+#### 实现逻辑：「创建新游戏」
+如果您希望自己先创建房间，再邀请朋友加入该房间，可以在 `reception` 中写一个创建新游戏的方法供供[入口 API ](#入口 API：创建新游戏)调用。同样我们自定义的 `createGameAndGetName()` 方法内用到的 `createGame()` 是由 SDK 中的 `GameManager` 提供的。
+
+```js
+export default class Reception<T extends Game> extends GameManager<T> {
+
+  public async makeReservation(playerId: string) {
+    ......
+  }
+
+  /**
+   * 创建一个新的游戏。
+   * @param playerId 预约的玩家 ID
+   * @param options 创建新游戏时可以指定的一些配置项
+   * @return 创建的游戏的房间 name
+   */
+  public async createGameAndGetName(playerId: string, options?: ICreateGameOptions) {
+    const game = await this.createGame(playerId, options);
+    return game.room.name;
+  }
+
+}
+```
+
+#### 绑定 GameManager 及 Game
+当 `GameManager` 的子类 `Reception` 及 `Game` 的子类 `RPSGame` 都准备好后，我们要在整个项目入口把 `RPSGame` 给到 `Reception`，由 `Reception` 来管理 `RPSGame`。
+
+在 `index.ts` 文件创建 `Reception` 对象的方法中可以看到，第一个参数已经传入了 `RPSGame`，如果您的自定义 `Game` 使用的是其他的名字，可以将 `RPSGame` 换成您自定义的 `Game` 类。
 
 ```js
 import PRSGame from "./rps-game";
-const gameManager = new SampleGameManager(
-  RPSGame,
+const reception = new Reception(
+  PRSGame,
   APP_ID,
   APP_KEY,
-  {concurrency: 2,},
-).on(RedisLoadBalancerConsumerEvent.LOAD_CHANGE, () => debug(`Load: ${gameManager.load}`));
+  {
+    concurrency: 2,
+  },
+);
 ```
 
-在这里配置完成后，`GameManager` 会在合适的时机创建并管理房间 `Game` 实例和对应的 MasterClient。
+在这里配置完成后，`reception` 会在合适的时机创建并管理 `PRSGame` 和对应的 MasterClient。
 
+#### 配置负载均衡
+由于 `GameManager` 中的逻辑会直接被外部请求所调用，因此需要为在入口处为 `GameManager` 配置负载均衡。关于负载均衡详细的介绍可以参考[Client Engine 开发指南](client-engine-guide-node.html#负载均衡)，在这里我们先简单的查看 `index.ts` 文件中的这些代码，了解如何配置即可：
+
+```js
+import { ICreateGameOptions,LoadBalancerFactory } from "@leancloud/client-engine";
+
+// 创建负责负载均衡的对象，此处代码不需要改动，只需要复制粘贴即可
+const loadBalancerFactory = new LoadBalancerFactory({
+  poolId: `${APP_ID.slice(0, 5)}-${process.env.LEANCLOUD_APP_ENV || "development"}`,
+  redisUrl: process.env.REDIS_URL__CLIENT_ENGINE,
+});
+
+// 将 reception 及我们自定义的方法 makeReservation 配置负载均衡。
+loadBalancerFactory.bind(reception, ["makeReservation", "createGameAndGetName"]) 
+```
+
+到这里，管理 `RPSGame` 的 `reception` 我们已经准备完成，接下来开始撰写具体的房间内游戏逻辑。
 
 ### 设定房间内玩家数量
 在这个猜拳小游戏中，我们设定只允许两个玩家玩，满两个玩家后就不允许新的玩家再进入房间，可以这样设置 `Game` 的静态属性 `defaultSeatCount`：
@@ -84,58 +177,62 @@ export default class RPSGame extends Game {
 
 对设置房间内玩家数量的详细讲解请参考 [Client Engine 开发指南](client-engine-guide-node.html#设置房间内玩家数量)。
 
-
 ### MasterClient 及客户端进入同一房间
+在完成 Game 的基础配置之后，MasterClient 和客户端就可以准备加入同一个房间了。
 
-在完成 Game 的基础配置之后，MasterClient 和客户端就可以准备加入同一个房间了。Client Engine 初始项目的 `/reservation` 接口使用 `GameManager` 提供了准备 MasterClient 及创建新房间的功能，当客户端没有可以加入的房间时，可以调用该接口获得一个可以加入的新房间。调用该接口的客户端示例代码如下：
-
-**客户端调用接口示例代码（非 Client Engine）：**
-
-客户端首先向实时对战服务发起[随机加入房间](multiplayer-guide-js.html#随机加入房间)请求：
+#### 入口 API：快速开始
+`index.ts` 文件的入口 API `/reservation` ，当客户端调用这个接口时，该接口会调用 `Reception` 自定义的 `makeReservation()` 方法来帮助客户端快速开始游戏。
 
 ```js
-// 匹配房间
-play.joinRandomRoom();
-```
-
-如果实时对战服务此时有可以加入的新房间，您会自动加入到新房间中，并触发加入房间成功事件：
-
-```js
-play.on(Event.ROOM_JOINED, () => {
-    // TODO 可以做跳转场景之类的操作
-});
-```
-
-如果没有可以加入的房间，会触发加入房间失败事件。在这个事件中，[4301](multiplayer-error-code.html#4301) 错误码代表着没有可以加入的空房间，此时我们向 Client Engine 请求创建一个新的房间，获得新房间的 roomName 后加入新房间：
-
-```js
-// 加入房间失败后请求 Client Engine 创建房间
-play.on(Event.ROOM_JOIN_FAILED, (error) => {
-  if (error.code === 4301) {
-    // 这里通过 HTTP 调用在 Client Engine 中实现的 `/reservation` 接口
-    const { roomName } = await (await fetch(
-      `${CLIENT_ENGINE_SERVER}/reservation`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          playerId: play.userId,
-        })
-      }
-    )).json();
-    // 加入房间
-    return play.joinRoom(roomName);
-  } else {
-    console.log(error);
+app.post("/reservation", async (req, res, next) => {
+  try {
+    const {
+      playerId,
+    } = req.body as {
+      playerId: any
+    };
+    if (typeof playerId !== "string") {
+      throw new Error("Missing playerId");
+    }
+    debug(`Making reservation for player[${playerId}]`);
+    // 调用我们在 Reception 类中准备好的 makeReservation() 方法
+    const roomName = await reception.makeReservation(playerId);
+    debug(`Seat reserved, room: ${roomName}`);
+    return res.json({
+      roomName,
+    });
+  } catch (error) {
+    next(error);
   }
 });
 ```
 
-在上面的代码中，当客户端加入房间成功后，意味着客户端 Client 及 MasterClient 进入了同一个房间内，当房间人数足够时，就可以开始游戏了。
+客户端可以调用这个 API 来快速开始，用该接口的示例代码如下 **（非 Client Engine 代码）**：
+
+```js
+// 这里在客户端通过 HTTP 调用在 Client Engine 中实现的 `/reservation` 接口
+const { roomName } = await (await fetch(
+  `${CLIENT_ENGINE_SERVER}/reservation`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      playerId: play.userId,
+    })
+  }
+)).json();
+// 加入房间
+return play.joinRoom(roomName);
+```
+
+当客户端调用 `/reservation` 并加入房间成功后，意味着客户端 Client 及 MasterClient 进入了同一个房间内，当房间人数足够时，就可以开始游戏了。
 
 客户端项目中已经帮您写好了调用 `/reservation` 的代码，无需您自己再写代码，您可以在 `/src/components/Lobby.vue` 中查看相关代码。
+
+#### 入口 API：创建新游戏
+该入口 API 撰写方式与「快速开始」相同，不再重复说明，可以参考 index.ts 文件中的 `/game` 方法。
 
 ### 宣布游戏开始
 
@@ -165,7 +262,7 @@ export default class RPSGame extends Game {
 
 在这段代码中，`watchRoomFull` 装饰器在人满时会使 `Game` 抛出 `AutomaticGameEvent.ROOM_FULL` 事件，在这个事件中我们选择调用自定义的 `start` 方法。在 `start` 方法中我们将房间关闭，然后向所有客户端广播游戏开始。
 
-到了这一步，您可以启动当前 Client Engine 项目，启动客户端并开启两个客户端 Web 页面，在界面上点击「开始匹配」，可以观察到第一个点击「开始匹配」的界面显示出了日志：`xxxx 加入了房间`。
+到了这一步，您可以启动当前 Client Engine 项目，启动客户端并开启两个客户端 Web 页面，在界面上点击「快速开始」，可以观察到第一个点击「快速开始」的界面显示出了日志：`xxxx 加入了房间`。
 
 ### 猜拳逻辑
 
@@ -215,7 +312,7 @@ protected start = async () => {
 }
 ```
 
-在这段代码中，Game 中的 MasterClient 实例对象注册了实时对战服务的自定义事件，当玩家 A 发送 `play` 事件给 MasterClient 时，这个事件会被触发。我们在这个事件中使用了 `Game` 的转发事件方法 `forwardToTheRests()`，这个方法第一个参数是原始的事件，第二个参数是原始事件的 eventData 数据处理，我们将原始的 eventData 数据，也就是玩家 A 发来的 `{index}`，修改为空数据 `{}`，这样当玩家 B 收到事件后无法获知玩家 A 的详细动作。
+在这段代码中，Game 中的 MasterClient 对象注册了实时对战服务的自定义事件，当玩家 A 发送 `play` 事件给 MasterClient 时，这个事件会被触发。我们在这个事件中使用了 `Game` 的转发事件方法 `forwardToTheRests()`，这个方法第一个参数是原始的事件，第二个参数是原始事件的 eventData 数据处理，我们将原始的 eventData 数据，也就是玩家 A 发来的 `{index}`，修改为空数据 `{}`，这样当玩家 B 收到事件后无法获知玩家 A 的详细动作。
 
 #### 玩家 B 收到 MasterClient 转发来的事件，界面展示：对方已选择
 

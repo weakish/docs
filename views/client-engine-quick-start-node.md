@@ -9,7 +9,6 @@
 ### 安装命令行工具
 请查看命令行工具**[安装部分](leanengine_cli.html#安装)**的文档，安装命令行工具，并执行**[登录](leanengine_cli.html#登录)**命令登录。
 
-
 ### 创建项目
 从 Github 迁出示例项目，请将该项目作为你的项目基础：
 
@@ -27,6 +26,8 @@ lean switch
 在第一步选择 App 中，选择您的游戏对应的 LeanCloud 应用。在第二步选择云引擎分组时，必须选择 `_client-engine` 分组，LeanCloud 仅对该分组提供专门针对 Client Engine 的优化维护及各种支持，如图所示：
 
 ![image](images/client-engine-lean-switch.png)
+
+注意，本分组只会在[控制台](/app.html?appid={{appid}})开启试用 Client Engine 后出现。
 
 
 ### 本地运行
@@ -46,7 +47,7 @@ npm install leancloud-storage
 启动应用时打开调试日志：
 
 ```
-DEBUG=ClientEngine*,RPS*,Play  lean up
+DEBUG=ClientEngine*,RPS*,Play lean up
 ```
 
 如果您不需要调试日志，可以直接使用以下命令启动：
