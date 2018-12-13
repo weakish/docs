@@ -4,8 +4,8 @@
 
 Client Engine 初始项目依赖了专门的 Client Engine SDK， Client Engine SDK 在实时对战 Play SDK 的基础上进行了封装，帮助您更好的撰写服务端游戏逻辑。您可以通过[快速入门](client-engine-quick-start-node.html)安装依赖。
 
-## 角色
-SDK 提供以下角色：
+## 组件
+SDK 提供以下组件：
 
 * **`Game` ：**负责房间内游戏的具体逻辑。Client Engine 维护了许多游戏房间，每一个游戏房间都是一个 Game 实例，即每个 Game 实例对应一个唯一的 Play Room 与 MasterClient。游戏房间内的逻辑由 Game 中的代码来控制，因此**房间内的游戏逻辑必须继承自该类**。
 * **`GameManager` ：**负责创建、管理及分配具体的 Game 对象。Game 的管理及销毁由 SDK 负责，不需要您再自己额外写代码。
