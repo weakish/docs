@@ -199,13 +199,6 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         qcloudShow: true
       }],
       'node': [{
-        name: '云引擎与 SDK 交互数据',
-        desc: '此项目主要展示了在云引擎中如何将 AVObject 对象传递给客户端，以及如何定义云函数、处理云函数错误回调以及 Hook 函数用法。',
-        downPath: '',
-        mdPath: 'https://github.com/leancloud/sdk-demo-engine',
-        type: 'node',
-        qcloudShow: true
-      },{
         name: '微信机器人',
         desc: '演示了如何利用云引擎，快速接入微信，搭建微信服务号的后端。',
         downPath: '',
@@ -213,17 +206,10 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         type: 'node',
         qcloudShow: true
       },{
-        name: '云引擎 Todo',
-        desc: '该项目是 LeanCloud 云引擎示例项目，使用 Node.js 和 Express 实现。',
+        name: 'Node.js 小 Demo 合集',
+        desc: '该项目包括了推荐的最佳实践和常用的代码片段，每个文件中都有较为详细的注释，适合云引擎的开发者来阅读和参考，所涉及的代码片段也可以直接复制到项目中使用。',
         downPath: '',
-        mdPath: 'https://github.com/leancloud/leanengine-todo-demo',
-        type: 'node',
-        qcloudShow: true
-      },{
-        name: '云引擎 + Websocket',
-        desc: 'LeanCloud 云引擎支持使用 Websocket 协议，实现由服务器主动向浏览器发送通知。',
-        downPath: '',
-        mdPath: 'https://github.com/leancloud/leanengine-websocket-demo',
+        mdPath: 'https://github.com/leancloud/leanengine-nodejs-demos',
         type: 'node',
         qcloudShow: true
       },{
@@ -247,7 +233,7 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         $scope.displayDemos = $scope.demos[$scope.currentSDKType]
       }
     })
-    
+
     $scope.setCurrentType = function(type) {
       $scope.currentSDKType = type;
     }
