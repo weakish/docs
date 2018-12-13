@@ -10,7 +10,7 @@
 {% set setCustomProperties = "SetCustomProperties" %}
 {% set playerTtl = "PlayerTtl" %}
 {% set api_url = "https://leancloud.github.io/Play-SDK-CSharp/html/" %}
-{% set gameversion = "这个参数" %}
+{% set gameVersion = "这个参数" %}
 
 
 {% block import %}
@@ -46,6 +46,7 @@ void Update () {
 
 
 {% block set_userid %}
+我们需要设置一个 `{{userId}}` 作为客户端的唯一标识连接至服务器。
 ```cs
 play.UserId = "leancloud";
 ```
@@ -60,9 +61,13 @@ play.Connect();
 
 
 {% block connection_with_gameversion %}
+如果需要通过版本号隔离玩家，可以通过以下接口连接。
+
 ```cs
 play.Connect("0.0.1");
 ```
+
+{{gameVersion}} 表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器。
 {% endblock %}
 
 
@@ -85,12 +90,6 @@ play.On(Event.CONNECT_FAILED, (error) => {
 
 
 {% block join_lobby %}
-```cs
-play.AutoJoinLobby = true;
-```
-
-或手动加入
-
 ```cs
 play.JoinLobby();
 ```

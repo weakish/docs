@@ -15,16 +15,14 @@ CocosCreator：Mac、Web、微信小游戏、Facebook Instant Game、iOS、Andro
 
 LayaAir：微信小游戏
 
+Egret：Web
+
 
 ### Cocos Creator
 
-下载 `play.js` 并拖拽至 Cocos Creator 项目中即可。**注意不要选择「插件方式」**。
+下载 `play.js` 并拖拽至 Cocos Creator 工程中，选择「插件」模式导入。
 
-如果你通过浏览器调试，可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到浏览器的 console 中。请打开浏览器的控制台，运行以下命令：
-
-```shell
-localStorage.debug = 'Play'
-```
+可参考 [Cocos Creator 插件脚本](https://docs.cocos.com/creator/manual/zh/scripting/plugin-scripts.html)。
 
 ### LayaAir
 
@@ -41,6 +39,56 @@ localStorage.debug = 'Play'
   <!--jsfile--Custom-->
   <!--IDE 生成的 UI 文件-->
   <script src="../src/ui/layaUI.max.all.js"></script>
+```
+
+### Egret
+
+下载 `play-egret.zip` 并解压至 Egret 工程的 libs 目录下。
+
+在 Egret 工程中的 egretProperties.json 文件中添加 SDK 配置：
+
+```diff
+{
+  "engineVersion": "5.2.13",
+  "compilerVersion": "5.2.13",
+  "template": {},
+  "target": {
+    "current": "web"
+  },
+  "modules": [
+    {
+      "name": "egret"
+    },
+    ...
++    {
++      "name": "Play",
++      "path": "./libs/play"
++    }
+  ]
+}
+```
+
+在 Egret 工程下，执行 `Egret build -e` 命令，如果在 manifest.json 中生成了 SDK 引用，说明 SDK 安装成功。
+
+```diff
+{
+  "initial": [
+    "libs/modules/egret/egret.js",
+    ...
++    "libs/play/Play.js"
+  ],
+  "game": [
+    ...
+  ]
+}
+```
+
+可参考 [Egret 第三方库使用方法](http://developer.egret.com/cn/github/egret-docs/extension/threes/instructions/index.html)。
+
+如果你通过浏览器调试，可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到浏览器的 console 中。请打开浏览器的控制台，运行以下命令：
+
+```shell
+localStorage.debug = 'Play'
 ```
 
 ### 微信小程序
@@ -68,26 +116,11 @@ set DEBUG=Play lean up
 
 
 {% block import %}
-在微信小程序、Cocos、Node.js 中，按以下方法导入需要的类和变量：
+导入 SDK
 
 ```javascript
-import {
-  play,
-  Region,
-  Event,
-} from '../play';
+const { Client, Region, Event, ReceiverGroup, setAdapters, LogLevel, setLogger } = Play;
 ```
-其中 `play` 是 SDK 实例化并导出的 Play 的对象，并不是 Play 类。
-
-在 Laya 中，由于引擎负责加载模块，需要这样导入：
-
-```javascript
-const { play: p,
-  Region, Event, ReceiverGroup, setAdapters, LogLevel, setLogger } = play;
-```
-
-**注意：由于 Laya 加载时将 play 作为了模块名，所以对于全局 play 对象，需要 alias。这里使用 p 表示。
-如果您使用的是 Laya，请将下方示例代码中的 play 替换为 p**
 
 ```javascript
 const opts = {
@@ -100,18 +133,22 @@ const opts = {
   // Region.NorthChina：华北节点
   // Region.NorthAmerica：美国节点
   region: YOUR_APP_REGION,
+  // 用户 id
+  userId: USER_ID,
+  // 游戏版本号
+  gameVersion: GAME_VERSION,
 }
-play.init(opts);
+
+const client = new Play(opts);
 ```
 {% endblock %}
 
 
-
 {% block set_userid %}
 ```javascript
-// 这里使用随机数作为 userId
+// 也可以修改 userId 和 gameVersion，这里使用随机数作为用户 id
 const randId = parseInt(Math.random() * 1000000, 10);
-play.userId = randId.toString();
+client.userId = randId.toString();
 ```
 {% endblock %}
 
@@ -119,7 +156,7 @@ play.userId = randId.toString();
 
 {% block connection %}
 ```javascript
-play.connect();
+client.connect();
 ```
 {% endblock %}
 
@@ -128,10 +165,10 @@ play.connect();
 {% block connectio_event %}
 ```javascript
 // 注册连接成功事件
-play.on(Event.CONNECTED, () => {
+client.on(Event.CONNECTED, () => {
   console.log('on joined lobby');
   const roomName = 'cocos_creator_room';
-  play.joinOrCreateRoom(roomName);
+  client.joinOrCreateRoom(roomName);
 });
 ```
 
@@ -143,12 +180,12 @@ play.on(Event.CONNECTED, () => {
 {% block join_room %}
 ```javascript
 // 注册新玩家加入房间事件
-play.on(Event.PLAYER_ROOM_JOINED, (data) => {
+client.on(Event.PLAYER_ROOM_JOINED, (data) => {
   const { newPlayer } = data;
   console.log(`new player: ${newPlayer.userId}`);
-  if (play.player.isMaster()) {
+  if (client.player.isMaster()) {
     // 获取房间内玩家列表
-    const playerList = play.room.playerList;
+    const playerList = client.room.playerList;
     for (let i = 0; i < playerList.length; i++) {
       const player = playerList[i];
       // 判断如果是房主，则设置 10 分，否则设置 5 分
@@ -173,7 +210,7 @@ play.on(Event.PLAYER_ROOM_JOINED, (data) => {
 {% block player_custom_props_event %}
 ```javascript
 // 注册「玩家属性变更」事件
-play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
+client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
   const { player } = data;
   // 解构得到玩家的分数
   const { point } = player.getCustomProperties();
@@ -190,9 +227,9 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
 
 {% block win %}
 ```javascript
-if (play.player.isMaster()) {
-  play.sendEvent('win', 
-    { winnerId: play.room.masterId }, 
+if (client.player.isMaster()) {
+  client.sendEvent('win', 
+    { winnerId: client.room.masterId }, 
     { receiverGroup: ReceiverGroup.All });
 }
 ```
@@ -203,7 +240,7 @@ if (play.player.isMaster()) {
 {% block custom_event %}
 ```javascript
 // 注册自定义事件
-play.on(Event.CUSTOM_EVENT, event => {
+client.on(Event.CUSTOM_EVENT, event => {
   // 解构事件参数
   const { eventId, eventData } = event;
   if (eventId === 'win') {
@@ -211,12 +248,12 @@ play.on(Event.CUSTOM_EVENT, event => {
     const { winnerId } = eventData;
     console.log(`winnerId: ${winnerId}`);
     // 如果胜利者是自己，则显示胜利 UI；否则显示失败 UI
-    if (play.player.actorId === winnerId) {
+    if (client.player.actorId === winnerId) {
       this.resultLabel.string = 'win';
     } else {
       this.resultLabel.string = 'lose';
     }
-    play.disconnect();
+    client.disconnect();
   }
 });
 ```
@@ -225,7 +262,7 @@ play.on(Event.CUSTOM_EVENT, event => {
 
 
 {% block demo %}
-我们通过 Cocos Creator 完成了这个 Demo，供大家运行参考。
+我们在 Cocos Creator、LayaAir、Egret Wing 中都完成了这个 Demo，供大家运行和参考。
 
 [QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)。
 
