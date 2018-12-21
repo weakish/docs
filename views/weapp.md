@@ -183,10 +183,10 @@ AV.User.loginWithAuthDataAndUnionId({
 
 为确保同一个 uid 只存在一条记录，你还需要为 `authData.weapp_union.uid` 加上唯一索引。进入 **控制台** > **存储** > 选择 `_User` 表 > **其他** > **索引**，勾选 **authData** 然后在出现的输入框中键入 `authData.weapp_union.uid`，点击 **创建**。
 
-{{ 
+{{
   docs.note(
     data.limitationsOnCreatingClassIndex()
-  ) 
+  )
 }}
 
 #### 启用其他登录方式
@@ -291,7 +291,7 @@ const realtime = new Realtime({
   - `WEIXIN_APPID`：小程序 AppId
   - `WEIXIN_MCHID`：微信支付商户号
   - `WEIXIN_PAY_SECRET`：微信支付 API 密钥（[微信商户平台](https://pay.weixin.qq.com) - 账户设置 - API安全 - 密钥设置）
-  - `WEIXIN_NOTIFY_URL`：`https://{{yourdomain}}.leanapp.cn/weixin/pay-callback`，其中 `yourdomain` 是第二步中设置的二级域名
+  - `WEIXIN_NOTIFY_URL`：`https://{{yourdomain}}.{{engineDomain}}/weixin/pay-callback`，其中 `yourdomain` 是第二步中设置的二级域名
 
 <details>
 <summary>查看示例</summary>

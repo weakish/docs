@@ -62,7 +62,7 @@ lean up
 
 #### 感受游戏
 
-服务端项目启动完成后，如果希望体验 Demo 游戏，需要额外同时打开两个[客户端示例 Demo](https://client-engine-app.leanapp.cn/)页面，在这两个页面中做如下配置：
+服务端项目启动完成后，如果希望体验 Demo 游戏，需要额外同时打开两个[客户端示例 Demo](https://client-engine-app.{{engineDomain}}/)页面，在这两个页面中做如下配置：
 
 点击 Configs，APP_ID 和 APP_KEY 填入之前选择的应用的 App ID 及 App Key：
 
@@ -91,13 +91,12 @@ lean up
 lean deploy
 ```
 
-在浏览器中登录 LeanCloud 控制台，进入 Play - Client Engine - 设置，在「Web 主机域名」中设置二级域名，通过 `http://stg-<YOUR-APP-DOMAIN>.leanapp.cn` 访问预备环境。
+在浏览器中登录 LeanCloud 控制台，进入 Play - Client Engine - 设置，在「Web 主机域名」中设置二级域名，通过 `http://stg-<YOUR-APP-DOMAIN>.{{engineDomain}}` 访问预备环境。
 
-例如填写 `myapp`，设置成功后通过 `http://stg-myapp.leanapp.cn`访问，此时可以看到 Client Engine 服务端正在运行的文本。
+例如填写 `myapp`，设置成功后通过 `http://stg-myapp.{{engineDomain}}`访问，此时可以看到 Client Engine 服务端正在运行的文本。
 
 其他详细的部署方式请参考命令行工具文档中的[部署](leanengine_cli.html#部署)及[发布到生产环境](leanengine_cli.html#发布到生产环境)。
 
 ## 你的第一个 Client Engine 小游戏
 
 接下来请查看文档[你的第一个 Client Engine 小游戏](client-engine-first-game-node.html)，了解如何根据该初始项目一步一步开发出来一个剪刀石头布小游戏。
-

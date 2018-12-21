@@ -30,7 +30,7 @@ $app->get('/time', function($req, $res) {
 {"currentTime":"2016-02-01T09:43:26.223Z"}
 ```
 
-部署到云端后，你可以通过 `http://{{var_app_domain}}.leanapp.cn/time` 来访问该 API。你的 iOS 或者 Android 的程序就可以构建一个 HTTP 请求获取服务端时间了。当然还是建议使用各 SDK 内置的获取服务器时间的 API，这里的例子只是演示。
+部署到云端后，你可以通过 `http://{{var_app_domain}}.{{engineDomain}}/time` 来访问该 API。你的 iOS 或者 Android 的程序就可以构建一个 HTTP 请求获取服务端时间了。当然还是建议使用各 SDK 内置的获取服务器时间的 API，这里的例子只是演示。
 {% endblock %}
 
 {% block getting_started %}

@@ -260,7 +260,7 @@ $ lean deploy
 $ lean deploy -m 'Be more awesome! 这是定制的部署备注'
 ```
 
-部署之后可以通过 curl 命令来测试你的云引擎代码，或者访问你已设置的二级域名的测试地址 `stg-${应用的域名}.leanapp.cn`。
+部署之后可以通过 curl 命令来测试你的云引擎代码，或者访问你已设置的二级域名的测试地址 `stg-${应用的域名}.{{engineDomain}}`。
 
 #### 部署时忽略部分文件
 

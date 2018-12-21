@@ -49,8 +49,9 @@ lean deploy
 
 你可以在 [云引擎 > 设置](/cloud.html?appid={{appid}}#/conf) 的「Web 主机域名」部分，填写一个自定义的二级域名，例如你设置了 `myapp`，那么你就可以通过我们的二级域名来访问你的网站了：
 
-- `http://myapp.leanapp.cn`（中国区）
-- `http://myapp.avosapps.us`（美国区）
+- `http://myapp.leanapp.cn`（中国华北节点）
+- `http://myapp.cn-e1.leanapp.cn`（中国华东节点）
+- `http://myapp.avosapps.us`（美国节点）
 
 <div class="callout callout-info">DNS 可能需要等待几个小时后才能生效。</div>
 
@@ -141,7 +142,7 @@ lean deploy
 
 为了安全性，我们可能会为网站加上 HTTPS 加密传输。我们的 {{productName}} 支持网站托管，同样会有这样的需求。
 
-因此我们在 {{productName}} 中提供了一个新的 middleware 来强制让你的 `{{var_app_domain}}.leanapp.cn` 的网站通过 https 访问，你只要这样：
+因此我们在 {{productName}} 中提供了一个新的 middleware 来强制让你的 `{{var_app_domain}}.{{engineDomain}}` 的网站通过 https 访问，你只要这样：
 
 {% block https_redirect %}{% endblock %}
 
@@ -192,9 +193,9 @@ git push -u origin master
 设置好之后，今后需要部署代码时就可以在云引擎的部署界面直接点击「部署」了，默认会部署 master 分支的代码，你也可以在部署时填写分支、标签或具体的 Commit。
 
 ### 预备环境和生产环境
-默认情况，云引擎只有一个「生产环境」，对应的域名是 `{{var_app_domain}}.leanapp.cn`。在生产环境中有一个「体验实例」来运行应用。
+默认情况，云引擎只有一个「生产环境」，对应的域名是 `{{var_app_domain}}.{{engineDomain}}`。在生产环境中有一个「体验实例」来运行应用。
 
-当生产环境的体验实例升级到「标准实例」后会有一个额外的「预备环境」，对应域名 `stg-{{var_app_domain}}.leanapp.cn`，两个环境所访问的都是同样的数据，你可以用预备环境测试你的云引擎代码，每次修改先部署到预备环境，测试通过后再发布到生产环境；如果你希望有一个独立数据源的测试环境，建议单独创建一个应用。
+当生产环境的体验实例升级到「标准实例」后会有一个额外的「预备环境」，对应域名 `stg-{{var_app_domain}}.{{engineDomain}}`，两个环境所访问的都是同样的数据，你可以用预备环境测试你的云引擎代码，每次修改先部署到预备环境，测试通过后再发布到生产环境；如果你希望有一个独立数据源的测试环境，建议单独创建一个应用。
 
 <div class="callout callout-info">如果访问云引擎遇到「Application not Found」的错误，通常是因为对应的环境还没有部署代码。例如应用可能没有预备环境，或应用尚未发布代码到生产环境。</div>
 

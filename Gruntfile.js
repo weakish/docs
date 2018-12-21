@@ -21,6 +21,13 @@ module.exports = function(grunt) {
     'cn': "{{domainN1}}",
     'qcloud': '{{domainE1}}'
   }
+
+  var engineDomainMap = {
+    'us': 'avosapps.us',
+    'cn': 'leanapp.cn',
+    'qcloud': 'cn-e1.leanapp.cn'
+  }
+
   console.log('current theme --- '+grunt.option('theme'))
 
   // Project configuration.
@@ -266,7 +273,8 @@ module.exports = function(grunt) {
             masterkey: '{{masterkey}}',
             sign_masterkey: "{{sign_masterkey}}",
             sign_appkey: '{{sign_appkey}}',
-            host: hostMap[grunt.option('theme')] || hostMap['cn']
+            host: hostMap[grunt.option('theme')] || hostMap['cn'],
+            engineDomain: engineDomainMap[grunt.option('theme')] || engineDomainMap['cn']
           }
         }
       }
@@ -362,7 +370,7 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
           }
       }
     }
-    
+
     const formatAnchor = function (str) {
       // replace underscore with dash too
       return String(str).replace(/[^a-zA-Z0-9\u4e00-\u9fa5]{1,}/g, '-').toLowerCase()
@@ -426,7 +434,7 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
         let newValue = attrValue
         let temp = null
         let suffix = ''
-        
+
         if ( $el.data('target') === undefined
           && $el.attr('escape-hash') === undefined) {
 
@@ -435,10 +443,10 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
               // remove http(s)://leancloud.cn/docs/ if any
               // https://us.leancloud.cn/docs/a.html#中文 => a.html#中文
               .replace(/(http(s)*:\/\/)*(us\.)*(leancloud\.cn\/docs\/)(([^#\s])*#.+$)/i, '$5')
-            
+
             // href="./rest_api.html#角色-1" suffix: -1
             temp = newValue.match(/(.+)(\-[0-9]$)/)
-            
+
             if (temp) {
               // remove suffix before hashing
               newValue = temp[1]
@@ -449,13 +457,13 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
             temp = newValue.split('#')
             // file.html# (SKIPPED)
             if ( /*temp.length > 1
-              && temp[temp.length-1] !== '' 
+              && temp[temp.length-1] !== ''
               && */newValue !== ''
               && !newValue.match('^hash(\-)*[0-9]+$')
               && !newValue.match(/^(http|https|ftp):/i)
-              || newValue.substring(0,6) === '/docs/') 
+              || newValue.substring(0,6) === '/docs/')
             {
-              newValue = temp[0] + '#' + 
+              newValue = temp[0] + '#' +
                 formatId(
                   // chars after #
                   temp[1]
@@ -468,17 +476,17 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
             headingCounts[newValue] = headingCounts[newValue]
               ? headingCounts[newValue] + 1
               : 1
-            
+
             newValue = headingCounts[newValue] === 1
               ? newValue
               : newValue.concat('-', headingCounts[newValue] - 1)
-            
+
             newValue = formatId(
               legacyFormatId(newValue)
             )
             counter.id++
           }
-          
+
           if (attrValue !== newValue) {
             grunt.log.writeln(($el.prop('tagName') + '.' + attrName +':').padStart(10) + attrValue[color].bold)
             grunt.log.writeln('=>'.padStart(10)  + newValue)
@@ -486,7 +494,7 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
           }
         }
       });
- 
+
       // 首页：内容分类导航 scrollspy
       if ( file.base.toLowerCase() === 'index.html' ){
         let $sectionNav = $('#section-nav').find('ul');
@@ -508,10 +516,10 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
             return h1.first().text() + ' - ' + $(this).text();
           });
           changes.push('title');
-        } 
+        }
       }
 
-      // 文档修改日期 ----------------------  
+      // 文档修改日期 ----------------------
       // 例如 dist/realtime_guide-js.html => views/realtime_guide-js.md
       const sourceFilePath = sourceDir + file.name + '.md';
       var modifiedTime = "";

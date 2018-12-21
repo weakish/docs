@@ -10,7 +10,7 @@
 
 ## 云引擎支持 HTTPS 吗
 
-- 对于 `.leanapp.cn` 的二级域名我们默认支持 HTTPS，如需配置自动跳转，请看 [重定向到 HTTPS](leanengine_webhosting_guide-node.html#重定向到_HTTPS)。
+- 对于 `.{{engineDomain}}` 的二级域名我们默认支持 HTTPS，如需配置自动跳转，请看 [重定向到 HTTPS](leanengine_webhosting_guide-node.html#重定向到_HTTPS)。
 - 自定义的域名需要在进行 [域名绑定](leanengine_webhosting_guide-node.html#备案和自定义域名) 时上传证书才可以支持 HTTPS。
 
 ## 为什么 Class Hook 没有被运行？
@@ -60,7 +60,7 @@ lean -p 3002
 访问云引擎服务时，服务端返回错误「Application not found」或在云引擎日志中出现同一错误。
 
 - 调用错了环境。最常见的情况是，免费的体验实例是没有预备环境，开发者却主动设置去调用预备环境。
-- `???.leanapp.cn` 二级域名填错了，比如微信回调地址。请确认与 `???` 的拼写完全一致。
+- `???.{{engineDomain}}` 二级域名填错了，比如微信回调地址。请确认与 `???` 的拼写完全一致。
 
 ## 云函数有哪些限制？
 

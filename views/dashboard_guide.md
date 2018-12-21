@@ -244,7 +244,7 @@ LeanCloud 不会把大家强制绑定到自己平台上，所以我们也提供�
 云引擎实例运行状态的统计信息，则可以在 **存储 > 云引擎 > 统计** 看到，这里包含了云引擎运行过程中的调用次数、页面展现次数等核心指标的统计结果，你需要密切关注这里的指标，已决定是否需要对云引擎进行扩容。
 
 #### 云引擎中自定义二级域名
-云引擎默认为每个应用提供了一个二级域名 `<应用的域名>.leanapp.cn`{% if node != 'qcloud' %}（美国节点则为 `<应用的域名>.avosapps.us`）{% endif %}，允许开发者将 web 应用部署到该域名之下运行，支持静态资源和动态请求服务。这个二级域名是可以修改的，你可以到 **存储 > 云引擎 > 设置** 里面设置自定义的子域名。
+云引擎默认为每个应用提供了一个二级域名 `<应用的域名>.{{engineDomain}}`，允许开发者将 web 应用部署到该域名之下运行，支持静态资源和动态请求服务。这个二级域名是可以修改的，你可以到 **存储 > 云引擎 > 设置** 里面设置自定义的子域名。
 
 同时，我们也支持绑定到你自己的独立域名，请进入 [应用控制台 > 账号设置 > 域名绑定](/settings.html#/setting/domainbind)，按照步骤提示操作即可。
 
@@ -454,7 +454,7 @@ function encrypt(password,salt) {
   var value = hash.digest();
 
   for (var i = 0; i < 512; i++) {
-      var hash = crypto.createHash('sha512'); 
+      var hash = crypto.createHash('sha512');
       hash.update(value);
       value = hash.digest();
   }
@@ -509,4 +509,3 @@ function encrypt(password,salt) {
 
 ### 发票
 请参考 [如何申请发票](./faq.html#如何申请开具发票)。
-
