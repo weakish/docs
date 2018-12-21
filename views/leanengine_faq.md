@@ -100,17 +100,59 @@ lean -p 3002
 
 我们在 [JavaScript 指南 - 构建对象](./leanstorage_guide-js.html#构建对象) 章节中也进行了描述。
 
-## 如何排查云引擎 Node.js 内存泄漏
+## 如何排查云引擎 Node.js 内存使用过高（内存泄漏）？
 
-如果对内存增长有疑问，可以在 `package.json` 中添加如下配置，开启 GC 日志来调试：
+首先建议检查云引擎日志，检查每分钟请求数、响应时间、CPU、内存统计，查看是否存在其他异常情况，如果有的话，先解决其他的问题。如果是从某个时间点开始内存使用变高，建议检查这个时间点之前是否有部署新版本，然后检查新版本的代码改动或尝试回滚版本。
 
-```json
-···
-"start": "node --trace_gc server.js",
-···
-```
+然后这里有一些常见的原因可供对照检查：
 
-增加参数 `--trace_gc`，这样每次 GC 会在本地的 Console 或在控制台的云引擎日志中输出。
+- 如果使用 cluster 多进程运行，内存使用会成倍增加（取决于运行几个 Worker）。
+- 如果在代码中不断地向一个全局对象（或生命周期较长的对象）上添加新的对象或闭包的引用（例如某种缓存），那么在运行过程中内存使用会逐渐增加（即内存泄漏）。
+- 如果响应时间增加（例如对请求的处理卡在慢查询、第三方网络请求），那么程序同时处理的请求数量会增加（即请求堆积），会占用很多内存。
+- 也有可能是业务本身在增加，确实需要这么多内存。
+
+如果还不能找到原因，可以尝试一些更高级的工具：
+
+- [heapdump](https://github.com/bnoordhuis/node-heapdump) 或 [v8-profiler](https://github.com/node-inspector/v8-profiler)：可以导出一份内存快照，快照文件可以被下载到本地，通过 Chrome 打开，可以看到内存被哪些对象占用。如果能在本地复现的话，建议尽量在本地运行，如需线上运行则你需要自己编码实现发送信号、下载快照文件等功能。
+- `--trace_gc`：可以在 GC 时在标准输出打印简要的日志，包括 GC 的类型、耗时，GC 前后的堆体积和对象数量（在 `package.json` 的 `scripts.start` 里改成 `node --trace_gc server.js` 来开启）。
+
+其他参考资料（第三方）：
+
+- [Node.js 调试 GC 以及内存暴涨的分析](https://blog.devopszen.com/node-js_gc)
+- [Node.js Performance Tip: Managing Garbage Collection](https://strongloop.com/strongblog/node-js-performance-garbage-collection/)
+- [Node.JS Profile 1.2 V8 GC详解](https://xenojoshua.com/2018/01/node-v8-gc/)
+
+## 如何排查云引擎 Node.js CPU 使用过高（响应缓慢）？
+
+首先建议检查云引擎日志，检查每分钟请求数、响应时间、CPU、内存统计，查看是否存在其他异常情况，如果有的话，先解决其他的问题。如果是从某个时间点开始 CPU 使用变高，建议检查这个时间点之前是否有部署新版本，然后检查新版本的代码改动或尝试回滚版本。
+
+然后这里有一些常见的原因可供对照检查：
+
+- 如果内存使用率较高、或频繁分配和释放大量对象，那么 GC 会占用一些 CPU 也会导致卡顿，可以用 `--trace_gc` 打开 GC 日志来确认 GC 的影响。
+- 程序中有死循环或失去控制（数量不断增加）的 setTimeout 或 setInterval。
+- 也有可能是业务本身在增加，确实需要这么多 CPU。
+
+因为 Node.js 是基于单线程的事件循环模型，如果事件循环中新的任务一直得不到执行（即事件循环被「阻塞」），那么就会造成 CPU 不高，但响应缓慢或不响应的情况。导致事件循环被阻塞的场景情况包括：
+
+- 密集的纯计算，例如执行时间非常长的同步循环、序列化（JSON 等）、复杂的数学（密码学）运算、复杂度非常高的正则表达式
+- 同步的 IO 操作，例如 `fs.readFileSync`、`child_process.execSync` 或含有这些同步操作的第三方包（例如 `sync-request`）。
+- 不断向事件循环中添加新的任务，例如 `process.nextTick` 或 `setImmediate`，导致事件队列中的任务一直执行不完。
+
+其他会导致 Node.js 响应慢或不响应的情况：
+
+- 使用了 Node.js 中底层采用线程数实现的 API，包括 `dns.lookup`（多数 HTTP 客户端间接使用了该函数）、所有文件系统 API，如果大量使用这些 API 或这些操作非常慢，则会产生额外的等待。
+
+如果能不能找到原因，可以尝试一些更高级的工具：
+
+- `node --prof`：可以统计程序中每一个函数的执行耗时和调用关系，导出一份日志文件，可以用 `node --prof-process` 来生成一份报告，包括占用 CPU 时间最多的函数（包括 JavaScript 和 C++ 部分）列表。`node --prof` 对性能本身的影响很大，长时间运行生成的日志也很大，建议尽量在本地运行，如需在线上运行则需要你自己编码实现生成报告、下载报告等功能。
+- [v8-profiler](https://github.com/node-inspector/v8-profiler)：可以生成一份 CPU 日志，可以下载到本地后通过 Chrome 打开，可以看到每个函数的执行时间和调用关系。v8-profiler 对性能本身的影响很大，长时间运行生成的日志也很大，建议尽量在本地运行，如需在线上运行则需要你自己编码实现开始生成日志、下载报告等功能。
+
+其他参考资料（第三方）：
+
+- [不要阻塞你的事件循环](https://nodejs.org/zh-cn/docs/guides/dont-block-the-event-loop/)
+- [Node.JS Profile 4.1 Profile实践](https://xenojoshua.com/2018/02/node-profile-practice/)
+- [手把手测试你的JS代码性能](https://cnodejs.org/topic/58b562f97872ea0864fee1a7)
+- [Speed Up JavaScript Execution](https://developers.google.com/web/tools/chrome-devtools/rendering-tools/js-execution)
 
 ## 如何进行域名备案和域名绑定？
 
