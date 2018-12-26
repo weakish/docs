@@ -753,6 +753,12 @@ fetchAllInBackground()
 ```
 {% endblock %}
 
+{% block code_query_with_part_contains_keyword %}
+```java
+        query.whereContainedIn("reminders", Arrays.asList(reminder1, reminder2));
+```
+{% endblock %}
+
 {% block code_query_with_not_contains_keyword %}
 ```java
         query.whereNotContainedIn("reminders", Arrays.asList(reminder1, reminder2));

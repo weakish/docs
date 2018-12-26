@@ -780,6 +780,12 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 ```
 {% endblock %}
 
+{% block code_query_with_part_contains_keyword %}
+```objc
+    [query whereKey:@"reminders" containedIn:reminders];
+```
+{% endblock %}
+
 {% block code_query_with_not_contains_keyword %}
 ```objc
     [query whereKey:@"reminders" notContainedIn:reminders];

@@ -829,6 +829,12 @@ file.save({
 ```
 {% endblock %}
 
+{% block code_query_with_part_contains_keyword %}
+```js
+  query.containedIn('reminders', reminderFilter);
+```
+{% endblock %}
+
 {% block code_query_with_not_contains_keyword %}
 ```js
   query.notContainedIn('reminders', reminderFilter);

@@ -756,6 +756,12 @@ query.equal_to('reminders', [reminder1, reminder2])
 ```
 {% endblock %}
 
+{% block code_query_with_part_contains_keyword %}
+```python
+query.contained_in('reminders', [reminder1, reminder2])
+```
+{% endblock %}
+
 {% block code_query_with_not_contains_keyword %}
 ```python
 query.not_contained_in('reminders', [reminder1, reminder2])
