@@ -2844,7 +2844,7 @@ https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
 
 ## 即时通讯 API
 
-请参考 [即时通讯 REST API](./realtime_rest_api.html)。
+请参考 [即时通讯 REST API](./realtime_rest_api_v2.html)。
 
 ## 统计数据 API
 
