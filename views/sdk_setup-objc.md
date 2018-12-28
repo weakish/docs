@@ -58,18 +58,6 @@ git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 
 上图选择了支持 iOS 平台的 AVOSCloud 与 AVOSCloudIM 两个 frameworks 用来举例。请根据实际需要来选择支持的平台以及要使用的模块。
 
-#### 编译 framework
-
-我们提供了一键编译脚本将 SDK 编译成 framework，在 SDK 所在的根目录执行：
-
-```sh
-ruby build-framework.rb
-```
-
-待命令执行完毕，在 `AVOS/AVOS.xcodeproj/build` 目录下找到编译好的 framework 文件。
-
-{{ docs.alert("为了区分平台，frameworks 添加了平台后缀，例如 `AVOSCloud-iOS.framework`。请<u>先删掉平台后缀</u>再将其加入项目，否则会产生编译错误。") }}
-
 ### 添加系统依赖
 
 然后添加 SDK 依赖的系统 framework 和 library：
