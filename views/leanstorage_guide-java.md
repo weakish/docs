@@ -630,6 +630,18 @@
 ```
 {% endblock %}
 
+{% block code_query_with_containedIn_keyword %}
+```java
+    query.whereContainedIn("location", Arrays.asList("Office", "CoffeeShop"));
+```
+{% endblock %}
+
+{% block code_query_with_part_contains_keyword %}
+```java
+    query.whereContainedIn("reminders", Arrays.asList(reminder1, reminder2));
+```
+{% endblock %}
+
 {% block code_query_with_not_contains_keyword %}
 ```java
     query.whereNotContainedIn("reminders", Arrays.asList(reminder1, reminder2));

@@ -603,6 +603,18 @@ $query->find();
 ```
 {% endblock %}
 
+{% block code_query_with_containedIn_keyword %}
+```php
+    $query->containedIn("location", array("Office", "CoffeeShop"));
+```
+{% endblock %}
+
+{% block code_query_with_part_contains_keyword %}
+```php
+$query->containedIn("reminders", array($date1, $date2));
+```
+{% endblock %}
+
 {% block code_query_with_not_contains_keyword %}
 ```php
 $query->notContainedIn("reminders", array($date1, $date2));

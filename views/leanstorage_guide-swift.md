@@ -924,6 +924,19 @@ func testArrayContainsAll() {
 ```
 {% endblock %}
 
+{% block code_query_with_containedIn_keyword %}
+```swift
+    query.whereKey("location", .ContainedIn(["Office", "CoffeeShop"]))
+```
+{% endblock %}
+
+{% block code_query_with_part_contains_keyword %}
+```swift
+    query.whereKey("reminders", .ContainedIn([reminder1, reminder2]))
+```
+{% endblock %}
+
+
 {% block code_query_with_not_contains_keyword %}
 ```swift
     query.whereKey("reminders", .NotContainedIn([reminder1, reminder2]))
