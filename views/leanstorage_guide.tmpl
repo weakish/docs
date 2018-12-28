@@ -559,6 +559,14 @@ LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地�
 
 {% block code_query_greaterThanOrEqualTo %}{% endblock %}
 
+#### 查询备选范围内满足条件的值
+
+当我们要查询的属性值，存在一个可选集合的时候，可以使用 `containedIn` 来进行查询。
+
+例如每一个 `Todo` 条目，有一个名为 `location` 的字符串属性，指示完成的地点。我们要查询在 `Office` 或者 `CoffeeShop` 完成的待办事项，则可以：
+
+{% block code_query_with_containedIn_keyword %}containedIn{% endblock %}
+
 #### 多个查询条件
 
 当多个查询条件并存时，它们之间默认为 AND 关系，即查询只返回满足了全部条件的结果。建立 OR 关系则需要使用 [组合查询](#组合查询)。
@@ -568,6 +576,7 @@ LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地�
 {% block code_priority_equalTo_zero_and_one_wrong_example %}{% endblock %}
 
 正确作法是使用 [组合查询 · OR 关系](#OR_查询) 来构建这种条件。
+
 
 ### 字符串查询
 
@@ -604,14 +613,15 @@ LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地�
 
 注意这里是包含关系，假如有一个 Todo 会在 8:30、9:30 和 10:30 响起闹钟，它仍然是会被查询出来的。
 
-查询「部分包含」的情况：
-
-{% block code_query_with_part_contains_keyword %}containedIn{% endblock %}
-
 
 查询「全不包含」的情况：
 
 {% block code_query_with_not_contains_keyword %}notContainedIn{% endblock %}
+
+查询「部分包含（指查询的数组属性中，包含有目标集合的部分元素）」的情况：
+
+{% block code_query_with_part_contains_keyword %}partialContainedIn{% endblock %}
+
 
 ### 空值查询
 
