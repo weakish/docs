@@ -578,7 +578,7 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
   });
 
   grunt.registerTask("localBuild",[
-    "clean", "ensureSDKVersion", "nunjucks", "copy:md", "markdown", "assemble",
+    "clean", "nunjucks", "copy:md", "markdown", "assemble",
     "less:dist", "postcss", "copy:asset","docmeta"
   ]);
 
