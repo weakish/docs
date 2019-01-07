@@ -82,6 +82,8 @@ git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 
 ## 初始化 SDK
 
+一般在 AppDelegate.m 文件的 `application:didFinishLaunchingWithOptions:` 方法中进行初始化的工作。
+
 打开 AppDelegate 文件，导入基础模块：
 
 ```objc
@@ -94,19 +96,19 @@ git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 [AVOSCloud setApplicationId:@"{{appid}}" clientKey:@"{{appkey}}"];
 ```
 
-使用 **美国节点** 需要增加以下代码：
+创建应用后，可以在 {% if node=='qcloud' %}**控制台 > 应用设置 > 应用 Key**{% else %}[控制台 > 应用设置 > 应用 Key](/app.html?appid={{appid}}#/key){% endif %} 中找到应用对应的 id 和 key。
+
+在 **v11.4.0 版本以前** 使用 **美国节点** 需要增加以下代码：
 
 ```objc
 [AVOSCloud setServiceRegion:AVServiceRegionUS];
 ```
 
-如果想跟踪统计应用的打开情况，后面还可以添加下列代码：
+在 **v11.4.0 版本及之后** 使用 **美国节点** 无需增加上述代码，SDK 会自动判断 Region 。
 
-```objc
-[AVAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
-```
+{{ docs.alert("在使用 SDK 的 API 时，请确保进行了 Application 的 ID, Key 以及 Region 的初始化。") }}
 
-创建应用后，可以在 {% if node=='qcloud' %}**控制台 > 应用设置 > 应用 Key**{% else %}[控制台 > 应用设置 > 应用 Key](/app.html?appid={{appid}}#/key){% endif %} 中找到应用对应的 id 和 key。
+### 运行示例
 
 确保项目源文件中包含了 SDK 库文件：
 
@@ -127,9 +129,9 @@ AVObject *testObject = [AVObject objectWithClassName:@"TestObject"];
 
 {{ include.debuglog('objc') }}
 
-## 查看服务器返回的错误
+## 处理返回的错误
 
-某个请求出错，SDK 会返回对应的错误信息。错误信息格式如下：
+在处理某些逻辑时，服务端或 SDK 会返回对应的 `NSError` 错误。错误信息格式如下：
  
 - **error.code**：错误码，详见 [文档](error_code.html)。
 - **error.domain**：错误域名，只有当 `error.domain` = `kLeanCloudErrorDomain` 时，才是 LeanCloud 返回的错误。
@@ -143,18 +145,12 @@ AVUser *user = [AVUser user];
 user.username = @"Tom";
 user.password =  @"cat!@#123";
 [user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-
-   // 获取 RESTAPI 返回的错误信息详情（SDK 11.0.0 及以上的版本适用）
+    // 获取 RESTAPI 返回的错误信息详情（SDK 11.0.0 及以上的版本适用）
     if ([error.domain isEqualToString:kLeanCloudErrorDomain] && error.code == 202) {
-    
     	NSString *errorMessage = error.localizedFailureReason;
     	if (errorMessage) {
-        // handle error message
+            // handle error message
+        }
     }
-}
 }];
 ```
-
-## 社交组件
-
-如果需要使用社交组件功能，可以使用我们的开源组件：[leancloud-social-ios](https://github.com/leancloud/leancloud-social-ios)。
