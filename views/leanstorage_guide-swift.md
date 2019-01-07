@@ -55,8 +55,6 @@ LCCQLClient.execute("insert into TodoFolder(name, priority) values('工作', 1)"
         print(error)
     }
 }
-
-//https://github.com/leancloud/Swift-Sample-Code/blob/master/Swift-Sample-CodeTests/LCObject%23saveByCQL.swift
 ```
 {% endblock %}
 
@@ -119,21 +117,25 @@ todoFolder.save { result in
 }
 ```
 {% endblock %}
-{% block section_saveOptions %}{% endblock %}
+
 {% block code_saveoption_query_example %}
+```swift
 // 暂不支持
+```
 {% endblock %}
 
 {% macro code_get_todo_by_objectId() %}
 ```swift
 let query = LCQuery(className: "Todo")
-
-query.get("575cf743a3413100614d7d75") { result in
+let _ = query.get("558e20cbe4b060308e3eb36c") { (result) in
     switch result {
-    case .success(let todo):
-        print(todo.get("title"))
-    case .failure(let error):
-        print(error)
+    case .success(object: let object):
+        // handle object
+        print(String(describing: object.objectId?.stringValue))
+        break
+    case .failure(error: let error):
+        // handle error
+        break
     }
 }
 ```
@@ -141,15 +143,15 @@ query.get("575cf743a3413100614d7d75") { result in
 
 {% block code_fetch_todo_by_objectId %}
 ```swift
-let todo = LCObject(className: "Todo", objectId: "575cf743a3413100614d7d75")
-
-todo.fetch { result in
+let object = LCObject(className: "Todo", objectId: "558e20cbe4b060308e3eb36c")
+let _ = object.fetch { (result) in
     switch result {
     case .success:
-        print(todo.get("title"))
-        print(todo.get("content"))
-    case .failure(let error):
-        print(error)
+        // handle object
+        break
+    case .failure(error: let error):
+        // handle error
+        break
     }
 }
 ```
@@ -158,19 +160,24 @@ todo.fetch { result in
 {% block code_save_callback_get_objectId %}
 
 ```swift
-let todo = LCObject(className: "Todo")
-
-todo.set("title", value: "工程师周会")
-todo.set("content", value: "每周工程师会议，周一下午 2 点")
-todo.set("location", value: "会议室")
-
-todo.save { result in
-    switch result {
-    case .success:
-        print(todo.objectId)
-    case .failure(let error):
-        print(error)
+do {
+    let todo = LCObject(className: "Todo")
+    try todo.set("title", value: "meeting")
+    try todo.set("content", value: "monday,14:00")
+    try todo.set("location", value: "room")
+    let _ = todo.save { (result) in
+        switch result {
+        case .success:
+            // handle object
+            print(String(describing: todo.objectId?.stringValue))
+            break
+        case .failure(error: let error):
+            // handle error
+            break
+        }
     }
+} catch {
+    // handle error
 }
 ```
 {% endblock %}
@@ -179,76 +186,73 @@ todo.save { result in
 
 ```swift
 let query = LCQuery(className: "Todo")
-
-query.get("558e20cbe4b060308e3eb36c") { result in
+let _ = query.get("5c25b986808ca4565ceb5de8") { (result) in
     switch result {
-    case .success(let todo):
-        // 使用 get 方法访问非预定义属性
-        let title    = todo.get("title") as! LCString
-        let content  = todo.get("content") as! LCString
-        let location = todo.get("location") as! LCString
-
-        // 预定义属性可以使用 dot 语法访问
-        let objectId  = todo.objectId
-        let updatedAt = todo.updatedAt
-        let createdAt = todo.createdAt
-    case .failure(let error):
-        print(error)
+    case .success(object: let object):
+        // get value by string key
+        let title = object.get("title")
+        // get property
+        let objectId = object.objectId
+        let updatedAt = object.updatedAt
+        let createdAt = object.createdAt
+    case .failure(error: let error):
+        // handle error
+        break
     }
 }
 ```
 {% endblock %}
 
-{% block text_refresh_object %}{% endblock %}
-
 {% block code_object_fetch %}
-
-> TODO
-
+```swift
+let object = LCObject(className: "Todo", objectId: "558e20cbe4b060308e3eb36c")
+let _ = object.fetch { (result) in
+    switch result {
+    case .success:
+        // handle object
+        break
+    case .failure(error: let error):
+        // handle error
+        break
+    }
+}
+```
 {% endblock %}
 
 {% block code_object_fetchWhenSave %}
-
-> TODO
-
+```swift
+// 暂不支持
+```
 {% endblock %}
 
 
 {% block code_object_fetch_with_keys %}
 
-let query = LCQuery(className: "Todo")
-
-query.whereKey("objectId", .equalTo("5735aae7c4c9710060fbe8b0"))
-query.whereKey("todoFolder", .included)
-
-if
-    let todo = query.getFirst().object,
-    let todoFolder = todo["todoFolder"] as? LCObject
-{
-    // Todo folder did fetch.
-}
-
+```swift
+// 暂不支持
+```
 {% endblock %}
 
 {% block code_update_todo_location %}
 
 ```swift
-let todo = LCObject(className: "Todo")
-
-todo.set("title", value: "工程师周会")
-todo.set("content", value: "每周工程师会议，周一下午 2 点")
-todo.set("location", value: "会议室")
-
-todo.save { result in
-    switch result {
-    case .success:
-        // 修改 location 属性
-        todo.set("location", value: "二楼大会议室")
-        // 异步保存修改
-        todo.save { _ in }
-    case .failure(let error):
-        print(error)
+do {
+    let todo = LCObject(className: "Todo")
+    try todo.set("title", value: "meeting")
+    try todo.set("content", value: "monday,14:00")
+    try todo.set("location", value: "room")
+    let _ = todo.save { (result) in
+        switch result {
+        case .success:
+            // handle object
+            break
+        case .failure(error: let error):
+            // handle error
+            break
+        }
     }
+} catch {
+    // handle error
 }
 ```
 {% endblock %}
@@ -256,17 +260,21 @@ todo.save { result in
 {% block code_update_todo_content_with_objectId %}
 
 ```swift
-let todo = LCObject(className: "Todo", objectId: "575cf743a3413100614d7d75")
-
-todo.set("content", value: "每周工程师会议，本周改为周三下午 3 点半")
-
-todo.save { result in
-    switch result {
-    case .success:
-        break // 保存成功
-    case .failure(let error):
-        print(error)
+do {
+    let todo = LCObject(className: "Todo", objectId: "5c25b986808ca4565ceb5de8")
+    try todo.set("content", value: "wednesday,15:30")
+    let _ = todo.save { (result) in
+        switch result {
+        case .success:
+            // handle success
+            break
+        case .failure(error: let error):
+            // handle error
+            break
+        }
     }
+} catch {
+    // handle error
 }
 ```
 
@@ -365,20 +373,46 @@ func testSetArray() {
 }
 ```
 {% endblock %}
-{% block text_batch_operation %}{% endblock %}
-{% block code_batch_operation %}
 
+{% block code_batch_operation %}
 ```swift
-暂不支持                    
+let objects: [LCObject] = []
+// save
+let _ = LCObject.save(objects)
+let _ = LCObject.save(objects, completion: { (result) in
+    // handle result
+})
+// delete
+let _ = LCObject.delete(objects)
+let _ = LCObject.delete(objects) { (result) in
+    // handle result
+}
+// fetch
+let _ = LCObject.fetch(objects)
+let _ = LCObject.fetch(objects) { (result) in
+    // handle result
+}
 ```
 {% endblock %}
 
 {% block code_batch_set_todo_completed %}
-
 ```swift
-暂不支持
+let query = LCQuery(className: "Todo")
+let _ = query.find { (result) in
+    switch result {
+    case .success(objects: let objects):
+        for _ in objects {
+            // handle item
+        }
+        let _ = LCObject.save(objects, completion: { (result) in
+            // handle result
+        })
+    case .failure(error: let error):
+        // handle error
+        break
+    }
+}
 ```
-
 {% endblock %}
 
 {% block text_work_in_background %}
@@ -431,9 +465,6 @@ LCCQLClient.execute("delete from Todo where objectId='558e20cbe4b060308e3eb36c'"
 }
 ```
 {% endblock %}
-
-{% block save_eventually %}{% endblock %}
-
 
 {% block code_relation_todoFolder_one_to_many_todo %}
 
@@ -500,6 +531,24 @@ comment.save()
 ```
 {% endblock %}
 
+{% block code_data_type %}
+
+```swift
+let number     : LCNumber     = 42
+let bool       : LCBool       = true
+let string     : LCString     = "foo"
+let object     : LCObject     = LCObject()
+let dictionary : LCDictionary = LCDictionary(["name": string, "count": number])
+let array      : LCArray      = LCArray([number, bool, string])
+let relation   : LCRelation   = object.relationForKey("elements")
+let acl        : LCACL        = LCACL()
+let point      : LCGeoPoint   = LCGeoPoint(latitude: 45, longitude: -45)
+let date       : LCDate       = LCDate()
+let data       : LCData       = LCData()
+let null       : LCNull       = LCNull()
+```
+{% endblock %}
+
 {% block code_create_geoPoint %}
 
 ```swift
@@ -541,24 +590,7 @@ let newTodoFolder = NSKeyedUnarchiver.unarchiveObjectWithData(data) as! LCObject
 ```
 {% endblock %}
 
-{% block code_data_protocol_save_date %}{% endblock %}
-
-{% block code_data_type %}
-
-```swift
-let number     : LCNumber     = 42
-let bool       : LCBool       = true
-let string     : LCString     = "foo"
-let object     : LCObject     = LCObject()
-let dictionary : LCDictionary = LCDictionary(["name": string, "count": number])
-let array      : LCArray      = LCArray([number, bool, string])
-let relation   : LCRelation   = object.relationForKey("elements")
-let acl        : LCACL        = LCACL()
-let point      : LCGeoPoint   = LCGeoPoint(latitude: 45, longitude: -45)
-let date       : LCDate       = LCDate()
-let data       : LCData       = LCData()
-let null       : LCNull       = LCNull()
-```
+{% block code_data_protocol_save_date %}
 {% endblock %}
 
 {% block section_dataType_largeData %}
