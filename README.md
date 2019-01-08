@@ -10,7 +10,7 @@ LeanCloud 开发者文档
 
 ## 说明
 
-这个项目是 [LeanCloud 文档](http://leancloud.cn/docs/) 上的所有文档的 Markdown 格式的源码，通过转换最终被渲染成 HTML 文档]。因此 Markdown 文件里部分链接写的是最终渲染后的链接，如果直接点击会出现 404 错误。
+这个项目是 [LeanCloud 文档](http://leancloud.cn/docs/) 上的所有文档的 Markdown 格式的源码，通过转换最终被渲染成 HTML 文档。因此 Markdown 文件里部分链接写的是最终渲染后的链接，如果直接点击会出现 404 错误。
 
 ## 贡献
 
