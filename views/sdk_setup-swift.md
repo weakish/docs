@@ -34,7 +34,7 @@ https://ruby.taobao.org
 ```ruby
 use_frameworks!
 
-target 'YOUR_APP_TARGET' do # Replace YOUR_APP_TARGET with your app target name.
+target 'YOUR_APP_TARGET' do # 替换 YOUR_APP_TARGET 为你的应用名称。
     pod 'LeanCloud', '~> 13.0.0'
 end
 ```
@@ -65,8 +65,8 @@ import LeanCloud
 
 ```swift
 LCApplication.default.set(
-    id:  "{{appid}}", /* Your app ID */
-    key: "{{appkey}}" /* Your app key */
+    id:  "{{appid}}",
+    key: "{{appkey}}"
 )
 ```
 {% endblock %}
