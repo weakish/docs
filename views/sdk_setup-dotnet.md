@@ -86,13 +86,13 @@ Install-Package LeanCloud.Analytics
 
 ```cs
 // 如果只使用存储可以使用如下初始化代码 
-AVClient.Initialize("此处填写应用的 appId", "此处填写应用的 appKey");
+AVClient.Initialize("{{appid}}", "{{appkey}}");
 ```
 
 假设还需要使用聊天，请使用如下代码：
 
 ```cs
-var realtime = new AVRealtime("此处填写应用的 appId", "此处填写应用的 appKey");
+var realtime = new AVRealtime("{{appid}}", "{{appkey}}");
 ```
 
 如果使用了即时通讯初始化的代码，就不需要再次调用 `AVClient.Initialize`，因为在聊天初始化的时候会调用它。
@@ -132,8 +132,8 @@ RealtimeServer|最终的 WebSocket 地址|wss://abc-wss.xyz.com
 ```cs
 AVClient.Initialize(new AVClient.Configuration
 {
-    ApplicationId = "你的 app id",
-    ApplicationKey = "你的 app key",
+    ApplicationId = "{{appid}}",
+    ApplicationKey = "{{appkey}}",
     ApiServer = new Uri("https://abc-api.xyz.com") // 告知 SDK 所有的数据存储服务请求都发往这个地址
 });
 ```
@@ -142,8 +142,8 @@ AVClient.Initialize(new AVClient.Configuration
 ```cs
 var realtime = new AVRealtime(new AVRealtime.Configuration
 {
-    ApplicationId = "你的 app id",
-    ApplicationKey = "你的 app key",
+    ApplicationId = "{{appid}}",
+    ApplicationKey = "{{appkey}}",
     RTMRouter = new Uri("https://abc-rtmrouter.xyz.com") // 告知 SDK 去这个地址请求动态的 WebSocket 地址
 });
 ```
@@ -158,8 +158,8 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
 ```cs
 var realtime = new AVRealtime(new AVRealtime.Configuration
 {
-    ApplicationId = "你的 app id",
-    ApplicationKey = "你的 app key",
+    ApplicationId = "{{appid}}",
+    ApplicationKey = "{{appkey}}",
     RealtimeServer = new Uri("wss://abc-wss.xyz.com") // 告知 SDK 直接连这个地址的 WebSocket 服务，不用再去请求 RTMRouter 了
 });
 ```
@@ -173,7 +173,7 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
 假设还需要使用即时通讯，请在任意一个 `MonoBehaviour` 启动的时候调用如下代码：
 
 ```cs
-var realtime = new AVRealtime("此处填写应用的 appId", "此处填写应用的 appKey");
+var realtime = new AVRealtime("{{appid}}", "{{appkey}}");
 ```
 
 {{ docs.alert("在 Unity 中使用即时通讯，一定先要先初始化存储模块，然后初始化即时通讯模块，**这两步都必须做。**") }}

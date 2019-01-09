@@ -149,7 +149,7 @@ user.password =  @"cat!@#123";
     if ([error.domain isEqualToString:kLeanCloudErrorDomain] && error.code == 202) {
     	NSString *errorMessage = error.localizedFailureReason;
     	if (errorMessage) {
-            // handle error message
+            // 处理错误信息
         }
     }
 }];

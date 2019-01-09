@@ -29,9 +29,9 @@ import leancloud
 
 leancloud.init("{{appid}}", "{{appkey}}")
 # 或者使用 masterKey
-# leancloud.init("appId", master_key="masterKey")
+# leancloud.init("{{appid}}", master_key="{{masterKey}}")
 ```
-将上述代码中的 App ID 以及 App Key 替换成从控制台复制粘贴的对应的数据即可。
+
 {% endblock %}
 
 {% block sdk_switching_node %}
