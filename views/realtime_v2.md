@@ -473,8 +473,9 @@ sourceIP | 消息发送者的 IP
 
 参数 |约束| 说明
 ---|---|---
-drop |可选|如果返回真值消息将被丢弃
-code | 可选 | 当 drop 为 true 时可以下发一个应用自定义的整型错误码
+drop |可选|如果返回真值消息将被丢弃。
+code | 可选 | 当 drop 为 true 时可以下发一个应用自定义的整型错误码。
+detail | 可选 | 当 drop 为 true 时可以下发一个应用自定义的错误说明字符串。
 content |可选|修改后的 content，如果不提供则保留原消息。
 toPeers |可选|数组，修改后的收件人，如果不提供则保留原收件人。
 
@@ -570,6 +571,7 @@ attr | 创建对话时的额外属性
 --- | ---|---
 reject |可选|是否拒绝，默认为 **false**。
 code | 可选 | 当 reject 为 true 时可以下发一个应用自定义的整型错误码。
+detail | 可选 | 当 reject 为 true 时可以下发一个应用自定义的错误说明字符串。
 
 ### `_conversationStarted`
 
@@ -603,6 +605,7 @@ convId | 对话 id
 ---|---|---
 reject | 可选 | 是否拒绝，默认为 **false**。
 code | 可选 | 当 reject 为 true 时可以下发一个应用自定义的整型错误码。
+detail | 可选 | 当 reject 为 true 时可以下发一个应用自定义的错误说明字符串。
 
 ### `_conversationRemove`
 
@@ -622,6 +625,7 @@ convId | 对话 id
 ---|---|---
 reject | 可选 | 是否拒绝，默认为 **false**。
 code | 可选 | 当 reject 为 true 时可以下发一个应用自定义的整型错误码。
+detail | 可选 | 当 reject 为 true 时可以下发一个应用自定义的错误说明字符串。
 
 ### `_conversationUpdate`
 
@@ -644,6 +648,7 @@ mute 和 attr 参数互斥，不会同时传递。
 ---|---|---
 reject | 可选 | 是否拒绝，默认为 **false**。
 code | 可选 | 当 reject 为 true 时可以下发一个应用自定义的整型错误码。
+detail | 可选 | 当 reject 为 true 时可以下发一个应用自定义的错误说明字符串。
 attr | 可选 | 修改后的待设置对话属性，如果不提供则保持原参数中的对话属性。
 mute | 可选 | 修改后的关闭对话提醒设置，如果不提供则保持原参数中的关闭提醒设置。
 
