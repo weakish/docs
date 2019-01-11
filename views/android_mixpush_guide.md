@@ -182,6 +182,10 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 ```
 这里 intent-filter 的内容不能修改，在目标 activity 的 `onCreate` 函数中可以从 bundle 中通过 `content` key 可以获得推送内容（JSON 格式）。
 
+> 注意：这需要在华为控制台发送推送消息的时候指定 intentUri 才可行，在 LeanCloud 控制台还无法发送类似的推送请求，我们会尽快完善这部分功能。
+
+![image](/images/HMS-pushData.png)
+
 ### 参考 demo
 我们提供了一个 [最新的华为推送 demo](https://github.com/leancloud/mixpush-demos/tree/master/huawei)，可供你在接入过程中参考。
 
