@@ -1,7 +1,6 @@
 'use strict';
 var axios = require('axios');
 var serveStatic = require('serve-static');
-var lrSnippet = require('grunt-contrib-livereload/lib/utils').livereloadSnippet;
 var proxySnippet = require("grunt-connect-proxy/lib/utils").proxyRequest;
 var mountFolder = function(connect, dir) {
     return serveStatic(require('path').resolve(dir));
@@ -129,15 +128,7 @@ module.exports = function(grunt) {
       md: {
         src: ['dist/*.html','!dist/md/*.html'],
         dest: 'dist/'
-      },/*
-      kb: {
-        options: {
-          layoutdir: 'templates/layouts/',
-          layout: 'kb.swig'
-        },
-        src: ['dist/kb/*.html'],
-        dest: 'dist/'
-      },*/
+      },
       html: {
         src: ['templates/pages/*'],
         dest: 'dist/'
@@ -157,14 +148,7 @@ module.exports = function(grunt) {
           src: '*.md',
           dest: 'dist/start',
           ext: '.html'
-        },/*
-        {
-          expand: true,
-          cwd: "dist/md/kb",
-          src: '*.md',
-          dest: 'dist/kb',
-          ext: '.html'
-        }*/],
+        }],
         options: {
           template: 'templates/md.jst'
         }
@@ -330,8 +314,6 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
     const crypto = require('crypto');
     const moment = require('moment');
     moment.locale('zh-cn');
-    //require('moment/locale/zh-cn');
-    //const done = this.async();
     const sourceDir = 'views/';
     const files = this.filesSrc;
 

@@ -40,8 +40,7 @@ LeanCloud 开发者文档
 
 为避免在所提交 PR 中出现与修改内容无关的 Merge pull request 的 commits，推荐使用以下流程提交 PR：
 
-1. 本地切换到 master 分支
-1. rebase
+1. 本地切换到 master 分支并同步至主 repo 的最新版本。
 1. 新建分支 new branch 进行修改
 1. 提交 PR，如有相关的 issue 在注释中增加 `Fixes #???`。问号为 issue 的编号。
 
@@ -54,7 +53,6 @@ PR 合并后，要让改动最终生效还需要通过 Jenkins 执行 `cn-avoscl
 
 ```
 ├── README.md                          // 说明文档
-├── archive                            // 已下线存档的文档，请勿更新
 ├── custom                             // 文档页面样式及 JavaScript 代码
 ├── images                             // 文档中引用的所有图片
 ├── md                                 // 临时目录（文档均为自动生成，因为不要修改）
