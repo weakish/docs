@@ -229,7 +229,6 @@ module.exports = function(grunt) {
           middleware: function(connect) {
             return [
             proxySnippet,
-            // require('connect-livereload')(), // <--- here
             mountFolder(connect, 'dist')];
           }
         }
