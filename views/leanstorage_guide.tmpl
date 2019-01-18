@@ -56,7 +56,7 @@
 
 {% block code_data_type %}{% endblock %}
 
-注意，时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会做转化成本地时间。
+注意，时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
 
 {% block section_dataType_largeData %}
 我们**不推荐**在 `{{baseObjectName}}` 中使用 `{{byteType}}` 来储存大块的二进制数据，比如图片或整个文件。**每个 `{{baseObjectName}}` 的大小都不应超过 128 KB**。如果需要储存更多的数据，建议使用 [`{{fileObjectName}}`](#文件)。
