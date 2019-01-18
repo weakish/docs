@@ -50,6 +50,7 @@ var { Realtime, TextMessage } = require('leancloud-realtime');
 
 ```js
 var AV = require('leancloud-storage/live-query');
+// 有了这一行，无需另外 require('leancloud-storage')
 ```
 
 #### CDN
@@ -67,6 +68,7 @@ var AV = require('leancloud-storage/live-query');
 
 ```html
 <script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-live-query-min.js"></script>
+<!-- 有了这一行，无需另外引入 av-min.js  -->
 ```
 
 通过这种方式引入的 SDK 可以通过全局变量 `AV` 获得引用：
