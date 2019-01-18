@@ -726,6 +726,18 @@ public void QueryMessageHistory()
 
 除了关心实时在线消息，还要关心消息状态（已读/未读），**则必须将 AutoRead 设置为 false**，即「手动发送消息已读回执」。
 
+示例代码：
+
+```cs
+avRealtime.CreateClient("liubei").ContinueWith(t =>
+{
+    avIMClient = t.Result;
+    avIMClient.CurrentConfiguration = new AVIMClient.Configuration {
+        AutoRead = false
+    };
+})
+```
+
 用户可根据会话的 `AVIMConversation.Unread` 获得未读消息数据，这时的未读消息包含三部分：
 * 上次在线收到，但是「未手动发送消息已读回执」的消息
 * 上次离线之后收到的「离线消息」
