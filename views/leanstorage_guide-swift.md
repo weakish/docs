@@ -1616,29 +1616,7 @@ let query = LCQuery(className: "_User")
 {% block text_subclass %}
 ## 子类化
 
-子类化推荐给进阶的开发者在进行代码重构的时候做参考。 你可以用 `LCObject` 访问到所有的数据，用 `get` 方法获取任意字段。 在成熟的代码中，子类化有很多优势，包括降低代码量，具有更好的扩展性，和支持自动补全。
-
-子类化是可选的，请对照下面的例子来加深理解：
-
-```swift
-let student = LCObject(className: "Student")
-
-student.set("name", value: "小明")
-
-student.save()
-```
-
-可改写成:
-
-```swift
-let student = Student()
-
-student.name = "小明"
-
-student.save()
-```
-
-这样代码看起来是不是更简洁呢？
+子类化推荐给进阶的开发者在进行代码重构的时候做参考。 你可以用 `LCObject` 访问到所有的数据，用 `get` 方法获取任意字段，用 `set` 方法给任意字段赋值；你也可以使用子类化来封装 `get` 以及 `set` 方法，增强编码体验。 子类化有很多优势，包括减少代码的编写量，具有更好的扩展性，和支持自动补全等等。
 
 ### 子类化的实现
 
@@ -1650,36 +1628,35 @@ student.save()
 下面是实现 Student 子类化的例子：
 
 ```swift
-import LeanCloud
-
 class Student: LCObject {
-    dynamic var name: LCString?
-
+    @objc dynamic var name: LCString?
     override static func objectClassName() -> String {
         return "Student"
     }
 }
 ```
 
-### 属性
+### 将 Set-Get 方法封装成属性
 
-为 `LCObject` 的子类添加自定义的属性和方法，可以更好地将这个类的逻辑封装起来。
+可以将 `LCObject` 的 Set-Get 方法封装成属性，需使用 `@objc dynamic var` 来声明。
 
-自定义属性必须使用 `dynamic var` 来声明，请看下面的例子是怎么添加一个「年龄」属性：
-
+如下所示，两段代码对 name 字段的赋值方式等价。
 
 ```swift
-import LeanCloud
-
-class Student: LCObject {
-    dynamic var age: LCNumber?
+// set name from LCObject
+let student = LCObject(className: "Student")
+do {
+    try student.set("name", value: "小明")
+} catch {
+    // handle error
 }
+let _ = student.save()
 ```
-
-这样就可以通过 `student.age = 19` 这样的方式来读写 `age` 字段了，当然也可以写成：
-
 ```swift
-student.set("age", value: 19)
+// set name from Student
+let student = Student()
+student.name = "小明"
+let _ = student.save()
 ```
 {% endblock %}
 
