@@ -4,7 +4,7 @@
 {% set code_import_sdk_core = "import LeanCloud" %}
 
 {% block libs_tool_automatic %}
-[CocoaPods](http://www.cocoapods.org/) 是开发 macOS 和 iOS 应用程序的一个第三方库的依赖管理工具，通过它可以定义自己的依赖关系（称作 pods），并且随着时间的推移，它会让整个开发环境中对第三方库的版本管理变得非常方便。具体可以参考 [CocoaPods 安装和使用教程](http://code4app.com/article/cocoapods-install-usage)。
+[CocoaPods](https://cocoapods.org) 是开发 macOS 和 iOS 应用程序的一个第三方库的依赖管理工具，通过它可以定义自己的依赖关系（称作 pods），并且随着时间的推移，它会让整个开发环境中对第三方库的版本管理变得非常方便。具体可以参考 [Using CocoaPods](https://guides.cocoapods.org/using/index.html)。
 
 首先确保开发环境中已经安装了 Ruby（macOS 系统自带 Ruby，建议安装 Xcode，Xcode 附带的 Ruby 版本较新），然后执行以下命令安装 cocoapods：
 
@@ -12,22 +12,16 @@
 {{command_install_cocoapods}}
 ```
 
-如果遇到网络问题无法从国外主站上直接下载，我们推荐一个国内的镜像：[RubyGems 镜像](https://gems.ruby-china.com/)，具体操作步骤如下：
-
-```sh
-$ gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
-$ gem sources -l
-https://gems.ruby-china.com
-# 确保只有 gems.ruby-china.com
-```
+如果遇到网络问题无法从国外主站上直接下载，我们推荐一个国内的镜像：[RubyGems 镜像](https://gems.ruby-china.com/)。
 
 在项目根目录下创建一个名为 `Podfile` 的文件（无扩展名），并添加以下内容：
 
 ```ruby
+platform :ios, '10.0'
 use_frameworks!
 
 target 'YOUR_APP_TARGET' do # 替换 YOUR_APP_TARGET 为你的应用名称。
-    pod 'LeanCloud', '~> 13.0.0'
+    pod 'LeanCloud'
 end
 ```
 
@@ -38,15 +32,15 @@ pod install --repo-update
 ```
 
 在 Xcode 中关闭所有与该项目有关的窗口，以后就使用项目根目录下 **`<项目名称>.xcworkspace`** 来打开项目。
-
 {% endblock %}
 
-{% block text_manual_setup %}{% endblock %}
+{% block text_manual_setup %}
+{% endblock %}
+
 {% block import_sdk %}
 {% endblock %}
 
 {% block init_with_app_keys %}
-
 打开 `AppDelegate.swift` 文件，添加下列导入语句到头部：
 
 ```swift
@@ -64,11 +58,10 @@ LCApplication.default.set(
 {% endblock %}
 
 {% block save_a_hello_world %}
-
 ```swift
 let post = LCObject(className: "Post")
 
-post.set("words", value: "Hello World!")
+try? post.set("words", value: "Hello World!")
 
 _ = post.save { result in
     switch result {
@@ -83,7 +76,8 @@ _ = post.save { result in
 然后，点击 `Run` 运行调试，真机和虚拟机均可。
 {% endblock %}
 
-{% block permission_access_network_config %}{% endblock %}
+{% block permission_access_network_config %}
+{% endblock %}
 
 {% block platform_specific_faq %}
 {% endblock %}
