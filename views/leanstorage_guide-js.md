@@ -1711,7 +1711,7 @@ var authData = {
     scope: 'SCOPE',
 };
 
-AV.User.signUpOrlogInWithAuthData(authData, 'weixin').then(function (s) {
+AV.User.loginWithAuthData(authData, 'weixin').then(function (s) {
     //登录成功
 }, function (error) {
     // 登录失败
@@ -1804,7 +1804,7 @@ var authData = {
     scope: 'SCOPE',
 };
 
-AV.User.signUpOrlogInWithAuthData(authData, 'weixin',{ failOnNotExist:true }).then(function (s) {
+AV.User.loginWithAuthData(authData, 'weixin',{ failOnNotExist: true }).then(function (s) {
     // 登录成功
 }, function (error) {
     // 登录失败
