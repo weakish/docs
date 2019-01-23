@@ -424,13 +424,13 @@ appid:client_id:convid:nonce:signature_ts
 云引擎 Hook 允许你通过自定义的云引擎函数处理即时通讯中的某些事件，修改默认的流程等等。目前开放的 hook 云函数包括：
 
 * **_messageReceived**<br/>
-  消息达到服务器，群组成员已解析完成之后，发送给消息接收人之前调用。
+  消息达到服务器，群组成员已解析完成之后，发送给收件人之前调用。
 * **_receiversOffline**<br/>
-  消息发送完成，存在离线的消息接收人，在发推送给消息接收人之前调用。
+  消息发送完成，存在离线的收件人，在发推送给收件人之前调用。
 * **_messageSent**<br/>
   消息发送完成后调用。
 * **_messageUpdate**<br/>
-  收到消息修改请求，发送修改后的消息给消息接收人之前调用。
+  收到消息修改请求，发送修改后的消息给收件人之前调用。
 * **_conversationStart**<br/>
   创建对话，在签名校验（如果开启）之后，实际创建之前调用。
 * **_conversationStarted**<br/>
@@ -466,7 +466,8 @@ fromPeer | 消息发送者的 ID
 convId   | 消息所属对话的 ID
 toPeers | 解析出的对话相关的 Client ID
 transient | 是否是 transient 消息
-content | 消息体字符串
+bin | 原始消息内容是否为二进制消息
+content | 消息体字符串。如果 bin 为 true，则该字段为原始消息内容做 Base64 转码后的结果。
 receipt | 是否要求回执
 timestamp | 服务器收到消息的时间戳（毫秒）
 system | 是否属于系统对话消息
@@ -479,7 +480,8 @@ sourceIP | 消息发送者的 IP
 drop |可选|如果返回真值消息将被丢弃。
 code | 可选 | 当 drop 为 true 时可以下发一个应用自定义的整型错误码。
 detail | 可选 | 当 drop 为 true 时可以下发一个应用自定义的错误说明字符串。
-content |可选|修改后的 content，如果不提供则保留原消息。
+bin | 可选 | 返回的 content 内是否为二进制消息，如果不提供则为请求中的 bin 值。
+content |可选| 修改后的 content，如果不提供则保留原消息。如果 bin 为 true，则 content 需要是二进制消息内容做 Base64 转码后的结果。
 toPeers |可选|数组，修改后的收件人，如果不提供则保留原收件人。
 
 ### `_receiversOffline`
@@ -558,9 +560,9 @@ sourceIP	| 消息发送者的 IP
 
 ### `_messageUpdate`
 
-这个 hook 发生在修改消息请求到达 LeanCloud 云端之后，正式修改消息并发送修改后消息通知给消息接收者之前。
+这个 hook 发生在修改消息请求到达 LeanCloud 云端，LeanCloud 云端正式修改消息之前。
 
-你可以通过返回参数控制修改消息请求是否需要被丢弃，删除个别收件人，还可以再次修改这个修改消息请求中的消息内容。
+你可以通过返回参数控制修改消息请求是否需要被丢弃，删除个别收件人，或再次修改这个修改消息请求中的消息内容。
 
 <div class="callout callout-info">请注意，在这个 hook 的代码实现的任何分支上**请确保最终会调用 response.success 返回结果**，使得修改消息可以尽快投递给收件人。这个 hook 将**阻塞发送流程**，因此请尽量减少无谓的代码调用，提升效率。</div>
 
@@ -573,7 +575,8 @@ sourceIP	| 消息发送者的 IP
 fromPeer | 消息发送者的 ID
 convId   | 消息所属对话的 ID
 toPeers | 解析出的对话相关的 Client ID
-content | 消息体字符串
+bin | 原始消息内容是否为二进制消息
+content | 消息体字符串。如果 bin 为 true，则该字段为原始消息内容做 Base64 转码后的结果。
 timestamp | 服务器收到消息的时间戳（毫秒）
 msgId | 被修改的消息 ID
 sourceIP | 消息发送者的 IP
@@ -587,7 +590,8 @@ system | 是否属于系统对话消息
 drop | 可选 | 如果返回真值修改消息请求将被丢弃。
 code | 可选 | 当 drop 为 true 时可以下发一个应用自定义的整型错误码。
 detail | 可选 | 当 drop 为 true 时可以下发一个应用自定义的错误说明字符串。
-content |可选| 修改后的 content，如果不提供则保留原消息。
+bin | 可选 | 返回的 content 内是否为二进制消息，如果不提供则为请求中的 bin 值。
+content |可选| 修改后的 content，如果不提供则保留原消息。如果 bin 为 true，则 content 需要是二进制消息内容做 Base64 转码后的结果。
 toPeers |可选| 数组，修改后的收件人，如果不提供则保留原收件人。
 
 ### `_conversationStart`
