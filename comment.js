@@ -5,7 +5,7 @@ var request = require('request-promise');
 
 var sessionToken = process.env.DOC_COMMENT_TOKEN
 var commentServer = process.env.COMMENT_SERVER || 'https://comment.leanapp.cn'
-var commentDoms = 'p,pre';
+var commentDoms = 'p';
 
 exports.release = function(docSite) {
   return request({
