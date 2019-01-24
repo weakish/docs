@@ -4,10 +4,8 @@
   "description": "LeanCloud Documentation",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test --no-comments",
-    "postinstall": "grunt build --no-comments",
-    "start": "static dist -p $PORT -a 0.0.0.0",
-    "simulate": "grunt build --no-comments && static dist",
+    "build": "grunt build",
+    "build:no-comments": "grunt build --no-comments",
     "preview": "grunt serve"
   },
   "repository": {
@@ -64,7 +62,6 @@
     "underscore": "^1.8.3"
   },
   "dependencies": {
-    "node-static": "^0.7.7"
   },
   "contributors": [
     "dennis zhuang <killme2008@gmail.com>",
