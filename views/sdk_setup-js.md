@@ -119,7 +119,7 @@ set DEBUG=leancloud*,LC* lean up
 
 #### 存储服务
 
-<a id="weapp" name="weapp"></a>前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-weapp-min.js`，移动到 `libs` 目录。如果需要使用 [LiveQuery][livequery] 功能，需要下载 `av-weapp-live-query-min.js`。
+<a id="weapp" name="weapp"></a>前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-weapp-min.js`，移动到 `libs` 目录。如果需要使用 [LiveQuery][livequery] 功能，需要下载 `av-live-query-weapp-min.js`。
 
 在 `app.js` 中使用 `const AV = require('./libs/av-weapp-min.js');` 获得 `AV` 的引用。在其他文件中使用时请将路径替换成对应的相对路径。 
 
