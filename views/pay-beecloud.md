@@ -26,17 +26,13 @@ $ cd python-getting-started
 1. [注册 BeeCloud 账号](http://beecloud.cn/register/) ，并完成企业认证。
 1. 在 BeeCloud 中创建应用，填写支付渠道所需参数，可以参考 [BeeCloud 文档 &middot; 微信 APP 支付](http://beecloud.cn/doc/payapply)。
 1. 申请渠道参数，并配置 BeeCloud 各个支付渠道的参数，此处请参考 [BeeCloud 文档 &middot; 渠道参数帮助页](https://beecloud.cn/doc/payapply/?index=0)。BeeCloud 中配置参数需要<u>完成企业认证</u>后才能填写！
-1. 激活「秒支付 Button」功能，进入 APP > **设置**  > **秒支付 Button**：
-  
-  ![](http://beeclouddoc.qiniudn.com/jsbutton_leancloud1.png)
-
-  拖动 **支付渠道** 开启该支付渠道。同时还可以调整你需要的渠道菜单的显示顺序，点击 **保存** 后会生成 appid 对应的 script 标签。需要将此 script 标签放到<u>任何需要使用秒支付 Button 的网页里</u>。
+1. 激活「秒支付 Button」功能，进入 APP > **设置**  > **秒支付 Button**。拖动 **支付渠道** 开启该支付渠道。同时还可以调整你需要的渠道菜单的显示顺序，点击 **保存** 后会生成 appid 对应的 script 标签。需要将此 script 标签放到<u>任何需要使用秒支付 Button 的网页里</u>。
 
 ## 接入秒支付 Button 实现收款
 
 创建新页面 `templates/jsbutton.html` 和 `views/jsbutton.py`，如下图：
 
-![](http://beeclouddoc.qiniudn.com/wendang01.png)  
+![](https://lc-lhzo7z96.cn-n1.lcfile.com/ffa3a36dbf7d647e7382.jpg)  
 
 在 `jsbutton.html` 页面的 `<head></head>` 中插入上一节中我们获得的 script 标签：
 

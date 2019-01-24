@@ -793,7 +793,7 @@ onUnreadMessagesCountUpdated(AVIMClient client, AVIMConversation conversation) {
 {% block message_Relation_intro %}
 消息类型之间的关系
 
-![消息的类图](http://ac-lhzo7z96.clouddn.com/1440485935481)
+![消息的类图](https://lc-lhzo7z96.cn-n1.lcfile.com/1440485935481)
 
 {% endblock %}
 
