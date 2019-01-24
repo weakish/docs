@@ -81,6 +81,8 @@ string appId = "{{appid}}";
 string appKey = "{{appkey}}";
 Websockets.Net.WebsocketConnection.Link();
 var realtime = new AVRealtime(appId, appKey);
+AVLiveQuery.Channel = realtime;
+// 打开调试日志
 AVRealtime.WebSocketLog(Console.WriteLine);
 AVClient.HttpLog(Console.WriteLine);
 ```

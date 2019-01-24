@@ -1,65 +1,104 @@
 {% import "views/_storage.md" as storagePartial %}
+{% import "views/_data.njk" as data %}
+{% import "views/_helper.njk" as docs %}
+{% import "views/_data.njk" as data %}
+{% import "views/_sms.njk" as sms %}
+{% import "views/_parts.html" as include %}
+{% set segment_code ="dotnet" %}
+{% set middot = '·' %}
+{% set link_to_blog_password_reset = '关于自定义邮件模板和验证链接，请参考《[自定义应用内用户重设密码和邮箱验证页面](https://blog.leancloud.cn/607/)》。' %}
+{% set app_permission_link = "[控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)" %}
+{% set query_result_limit = "每次查询默认最多返回 100 条符合条件的结果，要更改这一数值，请参考 [限定结果返回数量](#限定返回数量)。" %}
+{% set tutorial_restaurant = '[《教程 · 开发餐厅座位预订系统》](app-sample-restaurant.html)'%}
+
+{% set query_result_limit = "每次查询默认最多返回 100 条符合条件的结果，要更改这一数值，请参考 [限定结果返回数量](#限定返回数量)。" %}
 
 #  数据存储开发指南 &middot; Unity
 
-如果还没有安装 LeanCloud Unity SDK，请阅读 [SDK 下载](./sdk_down.html) 来获得该 SDK。我们的 SDK 兼容 Unity 5 及更高版本，支持使用 Unity 开发的 iOS、Android、Windows Phone 8、Windows Store、Windows Desktop，以及网页游戏。
+数据存储（LeanStorage）是 LeanCloud 提供的核心功能之一。下面我们用一个简单的示例来说明它的基本用法。
 
-如果希望从演示项目中学习，请访问我们的 GitHub 资源库，下载 [Unity SDK Demos](https://github.com/leancloud/unity-sdk-demos) 。
+下面这段代码在创建了一个 `GameEquip` 类型的对象，并将它保存到云端：
 
-## 介绍
+```cs
+AVObject equip = new AVObject("GameEquip");
+equip["name"] = "短剑";
+equip["attackValue"] = 5;
+await equip.SaveAsync();
+Debug.Log(equip.ObjectId);
+```
 
-Unity 支持 Mono 使用 .NET 语言来实现跨平台开发的解决方案，所以 LeanCloud 采用了 C# 来实现客户端的 SDK。如果你有 .NET 方面的编程经验，就很容易掌握 LeanCloud Unity SDK 接口的风格和用法。
+如果你熟悉关系型数据库的话，需要注意 LeanStorage 的不同点。在 LeanStorage 里不需要事先建立表结构（schema），并且可以随时增加新的属性。通常这被称为无模式（schema-free）。例如，为上面的 `GameEquip` 类型新增一个表示等级的 `level` 属性，只需做如下变动：
 
-LeanCloud Unity SDK 在很多重要的功能点上都采用了微软提供的 [基于任务的异步模式 (TAP)](http://msdn.microsoft.com/zh-cn/library/hh873175.aspx)，所以如果你具备 .NET Framework 4.5 的开发经验，或对 .NET Framework 4.5 的 新 API  有所了解，将有助于快速上手。
+```cs
+AVObject equip = new AVObject("GameEquip");
+equip["name"] = "短剑";
+equip["attackValue"] = 5;
+// 只要添加这一行代码，服务端就会自动添加这个字段
+equip["level"] = 1;
+await equip.SaveAsync();
+Debug.Log(equip.ObjectId);
+```
 
-## 快速入门
+- 我们为各个平台或者语言开发的 SDK 在底层都是通过 HTTPS 协议调用统一的 [REST API](rest_api.html)，提供完整的接口对数据进行各类操作。
 
-建议在阅读本文之前，先阅读 [SDK 安装指南](start.html)，了解如何配置和使用 LeanCloud。
+LeanStorage 在结构化数据存储方面，与 MySQL、Postgres、MongoDB 等数据库的区别在于：
 
-## 应用
+1. 数据库是面向服务器端的，用户自己开发的服务器端程序以用户名和密码登录到数据库。用户需要在服务器端程序里自己实现应用层的权限管理并向客户端提供接口。LeanStorage 是面向客户端的存储服务，通过 ACL 机制在 API 层面提供了完整的权限管理功能。很多开发者都选择通过在客户端集成 {{productName}} SDK 来直接访问数据，而不再开发服务端的程序。
+2. 与关系型数据库（MySQL、Postgres等）相比，LeanStorage 对多表查询（join）和事务等功能的支持较弱，所以在有些应用场景中会需要以有一定冗余的方式存储数据，以此换来的是良好的可扩展性，更有利于支撑起大流量的互联网应用。
 
-部署在 LeanCloud 云端的每个应用都有自己的 ID 和客户端密钥，客户端代码应该使用它们来初始化 SDK。
+## SDK 安装
 
-LeanCloud 的每一个账户都可以创建多个应用。同一个应用可分别在测试环境和生产环境，部署不同的版本。
-
-### 初始化
-
-在 `LeanCloud.Core.dll` 中有一个 `AVInitializeBehaviour` 把它拖拽到任意一个 `GameObject` 上然后根据下图填写 Application ID 以及 Application Key：
-
-  ![unity-init](images/unity-init.png)
-
-
-默认中国大陆节点对应的 `Region` 是 `Public_CN`,如果是北美节点请选择 `Public_US`。
-
-目前 Unity 的初始化**只允许**用 `GameObject` 绑定 `AVInitializeBehaviour` 脚本的方法，**不可以**使用其他方式显式调用 `AVClient.Initialize` 的方法。
+请阅读 [ Unity 安装指南](sdk_setup-{{segment_code}}.html)。
 
 ## 对象
 
-### AVObject
+`AVObject` 是 LeanStorage 对复杂对象的封装，每个 AVObject 包含若干属性值对，也称键值对（key-value）。属性的值是与 JSON 格式兼容的数据。通过 REST API 保存对象需要将对象的数据通过 JSON 来编码。这个数据是无模式化的（Schema Free），这意味着你不需要提前标注每个对象上有哪些 key，你只需要随意设置 key-value 对就可以，云端会保存它。
 
-在 LeanCloud 上，数据存储是围绕 `AVObject` 进行的。每个 `AVObject` 都包含与 JSON 兼容的键值对（key-value）数据。该数据不需要定义结构（schema），因此不用提前指定 `AVObject` 都有哪些键，只要直接设定键值对即可。
+### 数据类型
+`AVObject` 支持以下数据类型：
 
-例如，记录游戏玩家的分数，直接创建一个独立的 `AVObject` 即可：
+```cs
+int testNumber = 2018;
+float testFloat = 1.23f;
+double testDouble = 3.2D;
 
-```json
-score: 1337, playerName: "Steve", cheatMode: false
+bool testBool = true;
+string testString = testNumber + " 年度音乐排行";
+DateTime testDate = DateTime.Today;
+byte[] testData = System.Text.Encoding.UTF8.GetBytes("短篇小说");
+
+List<int> testNumbers = new List<int>();
+testNumbers.Add(testNumber);
+
+var testDictionary = new Dictionary<string, object>();
+testDictionary.Add("number", testNumber);
+testDictionary.Add("string", testString);
+
+AVObject testObject = new AVObject("DataTypes");
+testObject["testInteger"] = testNumber;
+testObject["testFloat"] = testFloat;
+testObject["testDouble"] = testDouble;
+testObject["testBoolean"] = testBool;
+testObject["testDate"] = testDate;
+testObject["testData"] = testData;
+testObject["testArrayList"] = testNumbers;
+testObject["testDictionary"] = testDictionary;
+await testObject.SaveAsync();
+Debug.Log(testObject.ObjectId);
 ```
 
-键，必须是由字母、数字或下划线组成的字符串；自定义的键，不能以 `_`（下划线）开头。值，可以是字符串、数字、布尔值，或是数组和字典。
-
-每个 `AVObject` 都必须有一个类（Class）名称，以便区分不同类型的数据。例如，游戏分数这个对象可取名为 `GameScore`。
-
-我们建议将类和键分别按照 `NameYourClassesLikeThis` 和 `nameYourKeysLikeThis` 这样的惯例来命名，即区分第一个字母的大小写，这样可以提高代码的可读性和可维护性。
+其中 `int`、`float`、`double` 类型的数据，服务端统一为 `Number` 类型来做处理，SDK 会在开发者获取相关值时自动做类型转换。
 
 ### 保存对象
 
-接下来，需要将上文中的 `GameScore` 存储到 LeanCloud 的服务。LeanCloud 的相关接口和 `IDictionary<string, object>` 类似，但只有在调用 `SaveAsync` 方法时，数据才会被真正保存下来。
+现在我们保存一个道具背包 `GameEquipBag`，背包中可以有多个道具 `GameEquip`。我们并不需要提前去后台创建这个名为 `GameEquipBag` 的 Class 类，而仅需要执行如下代码，云端就会自动创建这个类：
 
 ```c#
-AVObject gameScore = new AVObject("GameScore");
-gameScore["score"] = 1337;
-gameScore["playerName"] = "Neal Caffrey";
-Task saveTask = gameScore.SaveAsync();
+AVObject equipBag = new AVObject("GameEquipBag");
+equipBag["scale"] = 20;
+equipBag["name"] = "装备背包";
+await equipBag.SaveAsync();
+Debug.Log(equipBag.ObjectId);
 ```
 
 {% if node=='qcloud' %}
@@ -68,1155 +107,1279 @@ Task saveTask = gameScore.SaveAsync();
 运行以上代码后，要想确认保存动作是否已经生效，可以到 LeanCloud 应用管理平台的 [数据管理](/data.html?appid={{appid}})  页面来查看数据的存储情况。
 {% endif %}
 
-如果保存成功，`GameScore` 的数据列表应该显示出以下记录：
+除了 scale、name 之外，其他字段都是数据表的内置属性。
 
-```json
-objectId: "53706cd1e4b0d4bef5eb32ab", score: 1337, playerName: "Neal Caffrey",
-createdAt:"2014-05-12T14:40:17.706Z", updatedAt:"2014-05-12T14:40:17.706Z"
+内置属性|类型|描述
+---|---|---
+`objectId`| String |该对象唯一的 Id 标识
+`ACL`| ACL |该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。
+`createdAt`| Date |该对象被创建的 UTC 时间
+`updatedAt` | Date |该对象最后一次被修改的时间
+
+<dl>
+  <dt>属性名</dt>
+  <dd>也叫键或 key，必须是由字母、数字或下划线组成的字符串。<br/>自定义的属性名，{{ docs.alertInline("不能以双下划线 `__` 开头，也不能与以下系统保留字段和内置属性重名（不区分大小写）") }}。
+  <div class="callout callout-danger monospace" style="margin-top:1em;color:#999;">{{ data.preservedWords() }}</div></dd>
+  <dt>属性值</dt>
+  <dd>可以是字符串、数字、布尔值、数组或字典。</dd>
+</dl>
+
+为提高代码的可读性和可维护性，建议使用驼峰式命名法（CamelCase）为类和属性来取名。类，采用大驼峰法，如 `CustomData`。属性，采用小驼峰法，如 `imageUrl`。
+
+
+### 获取对象
+
+每个被成功保存在云端的对象会有一个唯一的 Id 标识 `objectId`，因此获取对象的最基本的方法就是根据 `objectId` 来查询：
+
+```cs
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip");
+AVObject equipment = await query.GetAsync("5c4147887565716f2485fc89");
+Debug.Log(equipment.ObjectId);
 ```
 
-在此要特别说明两点：
+#### 获取 objectId
+每一次对象存储成功之后，云端都会返回 objectId，它是一个全局唯一的属性。
 
-1. 运行此代码前，不用配置或设置 `GameScore` 类，LeanCloud 会自动创建这个类。
-2. 为更方便地使用 LeanCloud，以下字段不需要提前指定：
-  * `objectId` 是为每个对象自动生成的唯一的标识符。
-  * `createdAt` 和 `updatedAt` 分别代表每个对象在 LeanCloud 中创建和最后修改的时间，它们会被自动赋值。
-
-  在执行保存操作之前，这些字段不会被自动保存到 `AVObject` 中。
-
-### 检索对象
-
-将数据保存到 LeanCloud 上实现起来简单而直观，获取数据也是如此。如果已知 `objectId`，用 `AVQuery` 就可以得到对应的 `AVObject` ：
-
-```c#
-AVQuery<AVObject> query=new AVQuery<AVObject>("GameScore");
-query.GetAsync("53706cd1e4b0d4bef5eb32ab").ContinueWith(t =>
-{
-	AVObject gameScore = t.Result;//如果成功获取，t.Result将是一个合法有效的AVObject
-});
+```cs
+AVObject equipBag = new AVObject("GameEquipBag");
+equipBag["scale"] = 20;
+equipBag["name"] = "装备背包";
+await equipBag.SaveAsync();
+Debug.Log(equipBag.ObjectId);
 ```
-要从检索到的 `AVObject` 对象中获取值，可以使用相应数据类型的 `Get<T>范型` 方法：
 
-```c#
-int score = gameScore.Get<int>("score");
-string playerName = gameScore.Get<string>("playerName");
+#### 访问对象的属性
+objectId、createdAt、updatedAt 三个特殊属性可以直接获取，其他的自定义属性可以使用相应数据类型的 `Get<T>` 泛型方法：
+
+```cs
+AVObject equipBag = new AVObject("GameEquipBag");
+equipBag["scale"] = 20;
+equipBag["name"] = "装备背包";
+await equipBag.SaveAsync();
+
+// 获取自定义属性
+int bagScale = equipBag.Get<int>("scale");
+string bagName = equipBag.Get<string>("name");
+// 三个特殊属性
+string objectId = equipBag.ObjectId;
+DateTime? createdAt = equipBag.CreatedAt;
+DateTime? updatedAt = equipBag.UpdatedAt;
+
+Debug.Log(bagScale);
+Debug.Log(bagName);
+Debug.Log(objectId);
+Debug.Log(createdAt);
+Debug.Log(updatedAt);
 ```
-### 在后台运行
 
-要想用 Unity 打造一款有良好用户体验，并能实时响应的游戏，应该遵循一个最基本的原则：不应该在主线程上进行耗时较长的操作，尤其是网络访问类的操作。这些操作应该使用后台进程来处理。
+如果访问的属性不存在，SDK 会抛出异常，如果您不确认某个属性是否有值，可以这样获取属性：
+```cs
+if (equipBag.TryGetValue("name", out string bagName)) {
+    Debug.Log(bagName);
+}
+```
 
-为了让代码简洁而优雅，我们在  Unity 上实现了与 .NET Framework 4.5 所采用的 [基于任务的异步模式 (TAP)](http://msdn.microsoft.com/zh-cn/library/hh873175.aspx) 相同的异步操作。我们添加了一个 `Task` 类，一个 `Task` 代表一个异步的操作。
+#### 默认属性
+默认属性是所有对象都会拥有的属性，它包括 `objectId`、`createdAt`、`updatedAt`。
 
-`Task` 的典型用法，是从一个方法返回一个 `Task`，并且它提供了一个接口，可以在执行 `Task` 之前，传入要处理 `Task` 执行结果的方法代理。
+**createdAt**：对象第一次保存到云端的时间戳。该时间一旦被云端创建，在之后的操作中就不会被修改。
+**updatedAt**：对象最后一次被修改（或最近一次被更新）的时间。
 
-当一个 `Task` 被返回，说明这个 `Task` 已经开始执行。这种基于 `Task` 的编程模型并不等同于多线程编程模型，它仅仅代表这项操作正在执行，但并未指明它运行在哪个线程之中。
+注：应用控制台对 `createdAt` 和 `updatedAt` 做了在展示优化，它们会依据用户操作系统时区而显示为本地时间；客户端 SDK 获取到这些时间后也会将其转换为本地时间；而通过 REST API 获取到的则是原始的 UTC 时间，开发者可能需要根据情况做相应的时区转换。
 
-[基于任务的异步模式 (TAP)](http://msdn.microsoft.com/zh-cn/library/hh873175.aspx) 的编程模式，相对于回调模型和事件模型，有很多可取之处，具体还需要开发者对 TAP 编程模型有更深入的了解。
-
-基于上述观点，在 LeanCloud Unity SDK 中，所有异步操作都会返回一个 `Task`。关于 `Task` 的具体介绍，可以参考 [任务](#任务) 一节。
-
-<!--TODO: ###离线存储对象 ?-->
 
 ### 更新对象
+LeanStorage 上的更新对象都是针对单个对象，云端会根据有没有 objectId 来决定是新增还是更新一个对象。
 
-更新对象和保存对象有点相似，只是更新对象会覆盖同名属性的值，在调用 `SaveAsync` 之后，数据会发送到服务端来让修改生效。
+假如 objectId 已知，则可以通过如下接口从本地构建一个 AVObject 来更新这个对象：
 
-```c#
-var gameScore = new AVObject("GameScore")
-{
-	{ "score", 1338 },
-	{ "playerName", "Peter Burke" },
-	{ "cheatMode", false },
-	{ "skills", new List<string> { "FBI", "Agent Leader" } },
-};//创建一个全新的 GameScore 对象
-gameScore.SaveAsync().ContinueWith(t =>//第一次调用 SaveAsync 是为了增加这个全新的对象
-{
-	// 保存成功之后，修改一个已经在服务端生效的数据，这里我们修改 cheatMode 和 score
-	// LeanCloud 只会针对指定的属性进行覆盖操作，本例中的 playerName 不会被修改
-	gameScore["cheatMode"] = true;
-	gameScore["score"] = 9999;
-	gameScore.SaveAsync();//第二次调用是为了把刚才修改的2个属性发送到服务端生效。
-});
+```cs
+// 第一个参数是 className，第二个参数是 objectId
+var equipBag = AVObject.CreateWithoutData("GameEquipBag", "5372d119e4b0d4bef5f036ae");
+// 修改其中一个属性
+equipBag["scale"] = 30;
+// 保存到云端
+await equipBag.SaveAsync();
 ```
 
+更新操作是覆盖式的，云端会根据最后一次提交到服务器的有效请求来更新数据。更新是字段级别的操作，未更新的字段不会产生变动，这一点请不用担心。
+
 <!--TODO:
-### 计数器
-### 数组
+#### 计数器
 -->
 
-{{ storagePartial.avobjectSubclass() }}
+#### 更新数组
+使用以下方法可以方便地维护数组类型的数据：
+
+将指定对象附加到数组末尾：
+- `AddToList`
+- `AddRangeToList`
+
+如果数组中不包含指定对象，将该对象加入数组，对象的插入位置是随机的:
+- `AddUniqueToList`
+- `AddRangeUniqueToList`
+
+从数组字段中删除指定的对象：
+- `RemoveAllFromList`
+
+例如 `GameEquip` 有一个字段 `repairTime` 是数组类型，记录着装备的维修时间，可以这样存储数据。
+
+```cs
+var equip = AVObject.CreateWithoutData("GameEquip", "5c4147887565716f2485fc89");
+equip.AddToList("repairTime", DateTime.Today);
+await equip.SaveAsync();
+var repairTimes = equip.Get<List<object>>("repairTime");
+foreach (object repairTime in repairTimes)
+{
+    Debug.Log(((DateTime)repairTime).ToString());
+}
+```
 
 ### 删除对象
 
 要删除某个对象，使用 `AVObject` 的 `DeleteAsync` 方法。
 
-```c#
-Task deleteTask = myObject.DeleteAsync();
+```cs
+await myObject.DeleteAsync();
 ```
+
+<div class="callout callout-danger">删除对象是一个较为敏感的操作。在控制台创建对象的时候，默认开启了权限保护，关于这部分的内容请阅读《[ACL 权限管理指南](acl-guide.html)》。</div>
+
+#### 删除某一个属性
 如果仅仅想删除对象的某一个属性，使用 `Remove` 方法。
 
-```c#
-//执行下面的语句会将 playerName 字段置为空
-myObject.Remove("playerName");
+```cs
+//执行下面的语句会将 repairTime 字段置为空
+equip.Remove("repairTime");
 
 // 将删除操作发往服务器生效。
-Task saveTask = myObject.SaveAsync();
+await equip.SaveAsync();
 ```
-### 关系
 
-软件程序，就是在抽象现实中，对象之间的关系在计算机世界里的解释和展现。有对象必然就会有对象之间的关系，LeanCloud 为这种传统的关系型数据提供了解决方案，减少了代码量，让代码变得简洁且易于维护。
+### 批量操作
+为了减少网络交互的次数太多带来的时间浪费，你可以在一个请求中对多个对象进行创建、更新、删除、获取。接口都在 `AVObject` 这个类下面：
 
-假设这样一种场景：做一款时髦的相亲社交软件，男孩会在自己的资料里面标明自己喜欢的女生类型，于是有如下代码：
+```cs
+List<AVObject> objects = new List<AVObject>(); // 构建一个本地的 AV.Object 对象数组
 
-```c#
-AVObject girlType = new AVObject("GirType");
-girlType["typeName"] = "Hot";
-AVObject beckham = new AVObject("Boy");
-beckham["name"]= "David Beckham";
-beckham["age"] = 38;
-beckham["focusType"] = girlType;
-Task saveTask =	beckham.SaveAsync();//保存 beckham 的时候会自动将 girlType 也保存到服务器。
+// 批量创建（更新）
+await AVObject.SaveAllAsync(objects);
+
+// 批量删除
+await AVObject.DeleteAllAsync(objects);
+
+// 批量获取
+await AVObject.FetchAllAsync(objects);
 ```
-当然，已存在的对象可以通过 `ObjectId` 来与目标对象进行关联：
 
-```c#
-beckham["focusType"] = AVObject.CreateWithoutData("GirType", "5372d119e4b0d4bef5f036ae");
-```
-需要注意，当从 LeanCloud 上读取某一对象的数据时，默认的 `Fetch` 方法不会加载与之相关联的对象的字段，只有执行以下代码后，这些关联数据字段（如上例中 Boy 的 focusType 字段）才会被实例化。
+不同类型的批量操作所引发不同数量的 API 调用，具体请参考 [API 调用次数的计算](faq.html#API_调用次数的计算)。
 
-```c#
-AVObject focusType = beckham.Get<AVObject>("focusType");
-Task<AVObject> fetchTask = focusType.FetchIfNeededAsync();
+### 关联数据
+#### Pointer
+一个道具背包中会有许多种道具，这是一种典型的一对多关系。下面我们使用 Pointers 来存储这种一对多的关系。
+
+```cs
+// 装备背包
+AVObject equipBag = new AVObject("GameEquipBag");
+equipBag["scale"] = 20;
+equipBag["name"] = "装备背包";
+
+// 道具
+AVObject equip = new AVObject("GameEquip");
+equip["name"] = "短剑";
+equip["attackValue"] = 5;
+
+// 设置该道具在装备背包中
+equip["gameEquipBag"] = equipBag;
+await equip.SaveAsync();
 ```
+
+##### 获取 Pointer 对象
+假如已知一个道具背包，要找出背包中所有的道具，可以这样做：
+
+```cs
+var gameEquipBag = AVObject.CreateWithoutData("GameEquipBag", "5c41937c44d904006a538a2b");
+var query = new AVQuery<AVObject>("GameEquip");
+query = query.WhereEqualTo("gameEquipBag", gameEquipBag);
+var equipments = (await query.FindAsync()).ToList();
+equipments.ForEach((equip) =>
+{
+    var name = equip.Get<string>("name");
+    Debug.Log(name);
+});
+```
+
+更多内容可参考 [关联数据查询](relation-guide.html#Pointers_查询)。
+
+
+## 子类化
+LeanCloud 希望设计成能让人尽快上手并使用。你可以通过 `avobject.get<T>` 方法访问所有的数据。但是在很多现有成熟的代码中，子类化能带来更多优点，诸如简洁、可扩展性以及 IDE 提供的代码自动完成的支持等等。子类化不是必须的，你可以将下列代码转化：
+
+```cs
+var equip = new AVObject("GameEquip");
+equip["name"] = "短剑";
+equip["attackValue"] = 5;
+await equip.SaveAsync();
+```
+
+可以写成：
+
+```cs
+var equip = new GameEquip();
+equip.Name = "短剑";
+equip.AttackValue = 5;
+await equip.SaveAsync();
+```
+
+### 子类化 AVObject
+
+要实现子类化，需要下面几个步骤：
+
+1. 首先声明一个子类继承自 AVObject；
+2. 为 `class` 添加 `[AVClassName("xxx")]`。它的值必须是一个字符串，也就是你过去传入 AVObject 构造函数的类名。这样以来，后续就不需要再在代码中出现这个字符串类名；
+3. 实现自定义属性的 `get` 及 `set` 方法;
+4. 在应用初始化的地方，在系统启动时注册子类 `AVObject.RegisterSubclass<yourClassName>();`。
+
+下面是实现 `GameEquip` 子类化的例子:
+
+```cs
+[AVClassName("GameEquip")]
+public class GameEquip : AVObject
+{
+    [AVFieldName("name")]
+    public string Name
+    {
+        get { return GetProperty<string>("Name"); }
+        set { SetProperty<string>(value, "Name"); }
+    }
+
+    [AVFieldName("attackValue")]
+    public int AttackValue
+    {
+        get { return GetProperty<int>("AttackValue"); }
+        set { SetProperty<int>(value, "AttackValue"); }
+    }
+}
+```
+`[AVFieldName("name")]` 中的 `name` 为存储后台中对应的「列名」；`public string Name` 中的 `Name` 为自定义属性名。
+
+然后在系统启动时，注册子类:
+
+```cs
+AVObject.RegisterSubclass<GameEquip>();
+```
+
+### 使用子类
+
+#### 新增和修改
+
+```cs
+var knife = new GameEquip();
+var className = knife.ClassName;
+Debug.Log(className);
+knife.Name = "小刀";
+knife.AttackValue = 1;
+await knife.SaveAsync();
+```
+
+#### 查询
+
+```cs
+var query = new AVQuery<GameEquip>();
+await query.FindAsync();
+```
+
+#### 删除
+
+```cs
+await knife.DeleteAsync();
+```
+
+## 文件
+
+文件存储也是数据存储的一种方式，图像、音频、视频、通用文件等等都是数据的载体。很多开发者也习惯把复杂对象序列化之后保存成文件，比如 JSON 或 XML 文件。文件存储在 LeanStorage 中被单独封装成一个 `AVFile` 来实现文件的上传、下载等操作。
+
+### 上传文件
+
+文件上传是指开发者调用接口将文件存储在云端，并且返回文件最终的 URL 的操作。
+
+文件上传成功后会在系统表 _File 中生成一条记录，此后该记录无法被再次修改，包括 metaData 字段 中的数据。所以如需更新该文件的记录内容，只能重新上传文件，得到新的 id 和 URL。
+
+如果 `_File` 表打开了 删除权限，该记录才可以被删除。
+
+#### 从数据流构建文件
+
+`AVFile` 支持图片、视频、音乐等常见的文件类型，以及其他任何二进制数据，在构建的时候，传入对应的数据流即可：
+
+```cs    
+byte[] data = System.Text.Encoding.UTF8.GetBytes("Hi LeanCloud!");
+AVFile file = new AVFile("resume.txt", data, new Dictionary<string, object>()
+{
+    {"author","LeanCloud"}
+});
+await file.SaveAsync();
+Debug.Log(file.ObjectId);
+```
+
+AVFile构造函数的第一个参数指定文件名称，第二个构造函数接收一个byte数组，也就是将要上传文件的二进制，第三个参数是自定义元数据的字典，比如你可以把文件的作者的名字当做元数据存入这个字典，LeanCloud 的服务端会把它保留起来，这样在以后获取的时候，这种类似的自定义元数据都会被获取。
+
+上例将文件命名为 `resume.txt`，这里需要注意两点：
+
+- 不必担心文件名冲突。每一个上传的文件都有惟一的 ID，所以即使上传多个文件名为 resume.txt 的文件也不会有问题。
+- 给文件添加扩展名非常重要。云端通过扩展名来判断文件类型，以便正确处理文件。所以要将一张 PNG 图片存到 AV.File 中，要确保使用 .png 扩展名。
+
+#### 从本地路径构建文件
+
+在 Unity 中，如果很清楚地知道某一个文件所存在的路径，比如在游戏中上传一张游戏截图，可以通过SDK直接获取指定的文件，上传到LeanCloud 中。
+
+```cs
+AVFile file = new AVFile("screenshot.png", Path.Combine(Application.persistentDataPath, "screenshot.PNG"));
+await file.SaveAsync();
+Debug.Log(file.ObjectId);
+```
+
+#### 从网络路径构建文件
+从一个已知的 URL 构建文件也是很多应用的需求。例如，从网页上拷贝了一个图像的链接，代码如下：
+
+```cs
+AVFile file = new AVFile("Satomi_Ishihara.gif", "http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif");
+await file.SaveAsync();
+Debug.Log(file.ObjectId);
+```
+
+从 [本地路径构建文件](#从本地路径构建文件) 会产生实际上传的流量，并且文件最后是存在云端，而本处从网络路径构建的文件实体并不存储在云端，只是会把文件的物理地址作为一个字符串保存在云端。
+
+#### 上传进度监听
+
+一般来说，上传文件都会有一个上传进度条显示用以提高用户体验：
+
+```cs
+async Task SaveFile() {
+    byte[] data = System.Text.Encoding.UTF8.GetBytes("Hi LeanCloud!");
+    AVFile file = new AVFile("resume.txt", data, new Dictionary<string, object>()
+    {
+        {"author","LeanCloud"}
+    });
+    await file.SaveAsync(new ProgressListener());
+}
+
+class ProgressListener : System.IProgress<AVUploadProgressEventArgs> {
+    public void Report(AVUploadProgressEventArgs value) {
+        Debug.Log(value.Progress);
+    }
+}
+
+```
+
+### 文件元数据
+
+AV.File 的 metaData 属性，可以用来保存和获取该文件对象的元数据信息。metaData 一旦保存到云端就无法再次修改。
+
+```cs
+// 保存 metaData
+AVFile file = new AVFile("mytxtFile.txt", data, new Dictionary<string, object>()
+{
+    {"author","LeanCloud"}
+});
+
+// 获取 metaData
+var metadata = file.MetaData;
+```
+
+### 关联文件
+
+使用 `Pointer` 字段类型将 `AVFile` 关联到 `AVObject` 对象的一个字段上：
+```cs
+AVFile file = new AVFile("picture.png", data);
+
+AVObject equip = new AVObject("GameEquip");
+equip["image"] = file;
+await equip.SaveAsync();
+```
+
+查询的时候需要额外的 `include` 一下：
+
+```cs
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").Include("image");
+var equipments = (await query.FindAsync()).ToList();
+equipments.ForEach((equip) =>
+{
+    if (equip.TryGetValue("image", out AVFile image))
+    {
+        var url = image.Url;
+        Debug.Log(url);
+    }
+});
+```
+
+#### 文件下载
+因为多平台适配会造成困扰，因此 Unity SDK 不提供直接下载文件的方式。我们推荐拿到 `avFile.Url` 这个属性后，用 Unity 自带的 WWW 类或者 UnityWebRequest 类实现文件下载。
+
+### 文件删除
+
+**删除文件就意味着，执行之后在数据库中立刻删除记录，并且原始文件也会从存储仓库中删除（所有涉及到物理级别删除的操作请谨慎使用）**
+
+<div class="callout callout-danger">默认情况下，文件的删除权限是关闭的，需要进入 {% if node == 'qcloud' %}**控制台** > **存储** > `_File`{% else %}[控制台 > 存储 > **`_File`**](/data.html?appid={{appid}}#/_File){% endif %}，选择菜单 **其他** > **权限设置** > **delete** 来开启。</div>
+
+```cs
+AVFile file = await AVFile.GetFileWithObjectIdAsync("538ed669e4b0e335f6102809");
+await file.DeleteAsync();
+```
+
+### 启用 HTTPS 域名
+
+如果希望使用 HTTPS 域名来访问文件，需要进入 [控制台 > 存储 > 设置 > 文件](/dashboard/storage.html?appid={{appid}}#/storage/conf)，勾选 **启用 https 域名**。HTTPS 文件流量无免费的使用额度，收费标准将在该选项开启时显示。
+
+{{ docs.alert("「启用 https 域名」会影响到 API 返回的文件地址是 HTTPS 还是 HTTP 类型的 URL。需要注意的是，即使没有启用这一选项，终端仍然可以选择使用 HTTPS URL 来访问文件，但由此会产生 HTTPS 流量扣费。") }}
+
+在启用文件 HTTPS 域名之后，之前已保存在 `_File` 表中的文件的 URL 会自动被转换为以 HTTPS 开头。如果取消 HTTPS 域名，已经改为 HTTPS 域名的文件不会变回到 HTTP。
+
+<a id="rtm-http-urls" name="rtm-http-urls"></a>LeanCloud 即时通讯组件也使用 `AVFile` 来保存消息的图片、音频等文件，并且把文件的地址写入到了消息内容中。当文件 HTTPS 域名被开启后，之前历史消息中的文件地址不会像 `_File` 表那样被自动转换，而依然保持 HTTP。
+
+{% block text_http_access_for_ios9andup %}{% endblock %}
+
+### 设置自定义文件域名
+
+LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地访问到存储在云端的文件。但由于受网络法规的管控与限制，我们无法 100% 保证该公用域名随时可用。因此，强烈建议开发者**使用自定义域名来访问自己的文件**，以避免公用域名不可用之时应用的体验会受到影响。请前往 [存储 > 设置 > 文件](/dashboard/storage.html?appid={{appid}}#/storage/conf) 设置自定义域名。
+
+### CDN 加速
+{{ data.cdn(true) }}
+
+
 ## 查询
 
-通过 `objectId` 来检索数据，显然无法满足需求，所以 LeanCloud Unity SDK 还提供了更多的查询方法来简化操作。
+LeanCloud Unity SDK 提供了许多查询方法来简化操作。
 
 首先需要明确最核心的一点，在我们的 SDK 中，`AVQuery` 对象的所有以 `Where` 开头的方法，以及限定查询范围类的方法（`Skip`、 `Limit`、 `ThenBy`、 `Include` 等）都会返回一个全新的对象，它并不是在原始的 `AVQuery` 对象上修改内部属性。比如:
 
 ```c#
-AVQuery<AVObject> query = new AVQuery<AVObject>("GameScore");
-query.WhereEqualTo("score", 999);//注意：这是错误的！！！
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip");
+query.WhereEqualTo("name", "短剑"); //注意：这是错误的！！！
 query.FindAsync();
 ```
 **以上代码是用户经常会犯的错误案例，请勿拷贝到项目中使用！**
 
-上面那段代码会返回 `GameScore` 中所有的数据，而不是所设想的只有 score 等于 999 的数据。正确的写法是：
+上面那段代码会返回 `GameEquip` 中所有的数据，而不是所设想的只有 `name` 等于 `短剑` 的数据。正确的写法是：
 
 ```c#
-AVQuery<AVObject> query = new AVQuery<AVObject>("GameScore").WhereEqualTo("score", 999);
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereEqualTo("name", "短剑");
 ```
-以此类推，`AVQuery<T>` 的所有复合查询条件都应该使用 `.` 这个符号来创建链式表达式。例如，查找所有 score 等于 999，且 name 包含 neal 的 `GameScore`：
+以此类推，`AVQuery<T>` 的所有复合查询条件都应该使用 `.` 这个符号来创建链式表达式。例如，查找所有 `name` 等于 `短剑`，且 `attackValue` 大于 `5` 的 `GameEquip`：
 
 ```c#
-AVQuery<AVObject> query = new AVQuery<AVObject> ("GameScore").WhereEqualTo("score", 999).WhereContains("playerName","neal");
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereEqualTo("name", "短剑").WhereGreaterThan("attackValue",5);
 ```
 
 ### 基本查询
 
-`AVQuery<T>.WhereEqualTo`， 逻辑上可以理解为类似于 SQL 语句中的 `=` 操作。
+最基础的用法是根据 objectId 来查询对象：
 
-```sql
-SELECT * FROM Persons WHERE FirstName = 'Bush'
+```cs
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip");
+AVObject gameEquip = await query.GetAsync("53706cd1e4b0d4bef5eb32ab");
+Debug.Log(gameEquip.ObjectId);
 ```
 
+### 比较查询
+逻辑操作 | AVQuery 方法|
+---|---
+等于 | `WhereEqualTo`
+不等于 |  `WhereNotEqualTo`
+大于 | `WhereGreaterThan`
+大于等于 | `WhereGreaterThanOrEqualTo`
+小于 | `WhereLessThan`
+小于等于 | `WhereLessThanOrEqualTo`
+
+利用上述表格介绍的逻辑操作的接口，我们可以很快地构建条件查询。
+
+例如，查询攻击力大于 4 的所有装备 ：
+
 ```c#
-AVQuery<AVObject> query = new AVQuery<AVObject>("GameScore").WhereEqualTo("score", 999);
-query.FindAsync().ContinueWith(t => {
-	IEnumerable<AVObject> avObjects = t.Result;
-	//获取返回记录数
-	int sum = avObjects.Count();
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereGreaterThan("attackValue", 4);
+var equipments = (await query.FindAsync()).ToList();
+equipments.ForEach((equip) =>
+{
+    var equipName = equip.Get<string>("name");
+    Debug.Log(equipName);
+});
+```
+<div class="callout callout-info">{{query_result_limit}}</div>
+
+查询攻击力大于等于 4 的 GameEquip：
+
+```cs
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereGreaterThanOrEqualTo("attackValue", 4);
+var equipments = (await query.FindAsync()).ToList();
+equipments.ForEach((equip) =>
+{
+    var equipName = equip.Get<string>("name");
+    Debug.Log(equipName);
 });
 ```
 
-### 查询条件
+### 查询备选范围内满足条件的值
 
-要过滤掉特定键的值时，可以使用 `whereNotEqualTo` 方法。比如检索 playerName 不等于 steve 的数据，可以这样写：
+当我们要查询的属性值，存在一个可选集合的时候，可以使用 `containedIn` 来进行查询。
 
-```c#
-query = query.WhereNotEqualTo("playerName", "steve");
-```
-同时包含多个约束条件的查询：
+例如我们要查出来名字为 `短剑` 或 `长刀` 的所有装备：
 
-```c#
-query = query.WhereNotEqualTo("playerName", "steve");
-query = query.WhereGreaterThan("age", 18);//这样书写是为了文档阅读方便，但是我们还是比较推荐上一节介绍的链式表达式去创建 AVQuery
+```cs
+var names = new[] { "短剑", "长刀"};
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereContainedIn("name", names);
+var equipments = (await query.FindAsync()).ToList();
 ```
 
-约束条件可以设置多个，它们彼此是 `AND` 的关系。
+如果想查询排除 `短剑` 或 `长刀` 的所有装备，可以使用 `WhereNotContainedIn` 方法来实现。
 
-当仅需要查询返回较少的结果时，可以使用 `Limit` 方法来限定数量：
-
-```c#
-query = query.Limit(10);
+```cs
+var names = new[] { "短剑", "长刀"};
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereNotContainedIn("name", names);
+var equipments = (await query.FindAsync()).ToList();
 ```
 
-在数据较多的情况下，分页显示数据是比较合理的解决办法，limit 默认 100，最大1000，在 0 到 1000 范围之外的都强制转成默认的 100。
-Skip 方法可以做到跳过首次查询的多少条数据来实现分页的功能。比如，一页显示10条数据，那么跳过前10个查询结果的方法就是：
+### 多个查询条件
+当多个查询条件并存时，它们之间默认为 AND 关系，即查询只返回满足了全部条件的结果。建立 OR 关系则需要使用[组合查询](#组合查询)。
 
-```javascript
-query = query.Skip (10);
-```
-对应数据的排序，如数字或字符串，你可以使用升序或降序的方式来控制查询数据的结果顺序：
+在简单查询中，如果对一个对象的同一属性设置多个条件，那么先前的条件会被覆盖，查询只返回满足最后一个条件的结果。例如要找出攻击力为 5 和 6 的所有装备，**错误**写法是：
 
-```javascript
-// 根据score字段升序显示数据
-query = query.OrderBy("score");
-
-// 根据score字段降序显示数据
-query = query.OrderByDescending("score");
-
-//各种不同的比较查询：
-// 分数 < 50
-query = query.WhereLessThan("score", 50);
-
-//分数 <= 50
-query = query.WhereLessThanOrEqualTo("score", 50);
-
-//分数 > 50
-query.WhereGreaterThan("score", 50);
-
-//分数 >= 50
-query = query.WhereGreaterThanOrEqualTo("score", 50);
-```
-如果你想查询匹配几个不同值的数据，如：要查询“steve”，“chard”，“vj”三个人的成绩时，你可以使用 WhereContainedIn（类似 SQL 中的 in 查询）方法来实现。
-
-```javascript
-var names = new[] { "steve", "chard", "vj" };
-query = query.WhereContainedIn("playerName", names);
+```cs
+// 如果这样写，第二个条件将覆盖第一个条件，查询只会返回 attackValue = 6 的结果
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereEqualTo("attackValue", 5).WhereEqualTo("attackValue", 6);
 ```
 
-相反，你想查询排除“steve”，“chard”，“vj”这三个人的其他同学的信息（类似 SQL 中的 not in 查询），你可以使用 WhereNotContainedIn 方法来实现。
+正确作法是使用 [组合查询 · OR 关系](#组合查询) 来构建这种条件。
 
-```javascript
-query = query.WhereNotContainedIn ("playerName", names);
-```
-对字符串值的查询 查询包含字符串的值，有几种方法。你可以使用任何正确的正则表达式来检索相匹配的值，使用 WhereMatches 方法：
+### 字符串查询
 
-```javascript
-query = query.WhereMatches("playerName", "^[A-Z]\\d");
-```
-查询字符串中包含“XX“内容，可用如下方法：
+**前缀查询**类似于 SQL 的 LIKE 'keyword%' 条件。因为支持索引，所以该操作对于大数据集也很高效。
 
-```javascript
-// 查询playerName字段的值中包含“ste“字的数据
-query = query.WhereContains("playerName", "ste");
-
-// 查询playerName字段的值是以“cha“字开头的数据
-query = query.WhereStartsWith("playerName", "cha");
-
-// 查询playerName字段的值是以“vj“字结尾的数据
-query = query.WhereEndsWith("playerName", "vj");
+```cs
+// 查询 name 字段的值是以"短"字开头的数据
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereStartsWith("name", "短");
 ```
 
-### 数组值的查询
+**包含查询**类似于 SQL 的 LIKE '%keyword%' 条件，比如查询标题包含「剑」的 `GameEquip`：
+
+```cs
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereContains("name", "剑");
+```
+
+### 数组查询
+
 如果一个 Key 对应的值是一个数组，你可以查询 key 的数组包含了数字 2 的所有对象:
 
-```javascript
+```cs
 // 查找出所有arrayKey对应的数组同时包含了数字2的所有对象
-query = query.WhereEqualTo("arrayKey", 2);
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereEqualTo("arrayKey", 2);
 ```
 
 同样，你可以查询出 Key 的数组同时包含了 2,3 和 4 的所有对象：
 
-```javascript
+```cs
 //查找出所有arrayKey对应的数组同时包含了数字2,3,4的所有对象。
 List<int> numbers = new List<int>();
 numbers.Add(2);
 numbers.Add(3);
 numbers.Add(4);
-query = query.WhereContainsAll("arrayKey", numbers);
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereContainsAll("arrayKey", numbers);
 ```
 
-### 查询对象个数
-如果你只是想统计有多少个对象满足查询，你并不需要获取所有匹配的对象，可以直接使用 `CountAsync` 替代 `FindAsync`。例如，查询一个特定玩家玩了多少场游戏：
+查询「全不包含」的情况：
 
-```javascript
-query = query.WhereNotEqualTo ("playerName", "steve");
-query.CountAsync().ContinueWith(t =>
-{
-    int count = t.Result;
-});
+```cs
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereNotContainedIn("arrayKey", numbers);
 ```
-`对于超过 1000 个对象的查询，这种计数请求可能被超时限制。他们可能遇到超时错误或者返回一个近似的值。因此，请仔细设计你的应用架构来避免依赖这种计数查询。`
 
-*查询数量限定的方法'Limit(int)'在CountAsync中不会生效。*
+查询「部分包含（指查询的数组属性中，包含有目标集合的部分元素）」的情况：
+
+```cs
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquip").WhereContainedIn("arrayKey", numbers);
+```
+
+### 空值查询
+
+假设用户可以有选择地为背包自己命名，要想找出那些已经有自定义命名的背包：
+
+```cs
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquipBag").WhereExists("name");
+```
+
+找出所有没有命名的背包：
+```cs
+AVQuery<AVObject> query = new AVQuery<AVObject>("GameEquipBag").WhereDoesNotExist("name");
+```
+
 ### 关系查询
-LeanCloud支持用关系`AVRelation`关联2个对象，当然也支持用关系查询来获取相关联的对象。
+#### Pointer 查询
 
-```javascript
-AVObject girlType = new AVObject ("GirType");
-girlType ["typeName"] = "Hot";
-girlType ["ageMax"] = 27;
-girlType ["ageMin"] = 18;
-AVObject beckham = new AVObject ("Boy");
-beckham["name"]="David Beckham";
-beckham ["age"] = 38;
-beckham ["focusType"] = girlType;
-//保存beckham的时候会自动将girlType也保存到服务器。
-Task saveTask = beckham.SaveAsync ().ContinueWith (t =>
-	{
-		AVQuery<AVObject> boyQuery=new AVQuery<AVObject>("Boy");
-		boyQuery = boyQuery.WhereEqualTo("focusType", girlType);
-		boyQuery.FindAsync().ContinueWith(s=>
-		{
-			IEnumerable<AVObject> boys = s.Result;
-		});
-	});
-```
-关系的内嵌查询可以帮助开发者用简洁的代码处理复杂的关系内嵌查询，比如要查询`查询所有关注了年龄小于27岁女生类型的那些男生们`：
+基于在 [Pointer](#Pointer) 小节介绍的存储方式：一个道具背包 `GameEquipBag` 中会有许多种道具 `GameEquip`，这是一种典型的一对多关系。现在已知一个 `GameEquipBag`，想查询所有的 `GameEquip` 对象，可以使用如下代码：
 
-```javascript
-AVQuery<AVObject> girlTypeQuery=new AVQuery<AVObject>("GirType");//
-girlTypeQuery = girlTypeQuery.WhereLessThan ("ageMax", 27);//年龄小于27的萌妹纸
-AVQuery<AVObject> query = new AVQuery<AVObject>("Boy");
-query = query.WhereMatchesQuery ("focusType", girlTypeQuery);//找出喜欢这些类型的男生们
-```
-
-请注意，默认的 limit 限制 100 也同样作用在内嵌查询上。因此如果是大规模的数据查询，你可能需要仔细构造你的查询对象来获取想要的行为。反之，不想匹配某个子查询，你可以使用 `WhereDoesNotMatchQuery` 方法，代码不再敖述。
-
-查询已经选择了喜欢的类型的男生，并且是限定在最近10个加入系统的男生，可以如此做：
-
-```javascript
-AVQuery<AVObject> query = new AVQuery<AVObject>("Boy");
-query = query.OrderByDescending("createdAt");
-query = query.Limit(10);
-query = query.Include("focusType");
-```
-你可以使用 dot（英语句号:"."）操作符来多层 Include 内嵌的对象。比如，你还想进一步获取`GirType`所关联的女生（就是那些标明了自己隶属于这个类型的女生）：
-
-```javascript
-query = query.Include("focusType.girls");
-```
-
-## 任务
-
-### 延续任务
-
-每一个`Task`都会包含一个叫做`ContinueWith`的方法，它表示`Task`执行完毕之后的`延续任务`的代理。你可以获得`Task`的执行结果，或者通过访问`Task`自带的属性，判断任务是否执行完毕，或者任务是否有异常：
-
-```javascript
-gameScore.SaveAsync().ContinueWith(t=>
+```cs
+var gameEquipBag = AVObject.CreateWithoutData("GameEquipBag", "5c41937c44d904006a538a2b");
+var query = new AVQuery<AVObject>("GameEquip").WhereEqualTo("gameEquipBag", gameEquipBag).Include("gameEquipBag");
+var equipments = (await query.FindAsync()).ToList();
+equipments.ForEach((equip) =>
 {
-	if(t.IsCanceled)
-	{
-		//保存因为某些原因取消了
-	}
-	else if(t.IsFaulted)
-	{
-		//有异常,获取出来以便处理
-		AggregateException exception = t.Exception;
-	}
-	else
-	{
-		//保存成功了
-	}
+    var equipName = equip.Get<string>("name");
+    Debug.Log(equipName);
 });
 ```
 
-### 任务的链式串联
+#### 关联属性查询
 
-如果您有JavaScript上jQuery的编程经验，链式写法不会陌生。`延续任务`也会返回一个`Task<T>`，这个泛型`T`就是`xxxxAsync()`这类命名方法的实际方法的返回值，所以`ContinueWith`的参数就是`xxxxAsync()`方法的返回值，这跟传统回调模型又很相似了（注：只是形似，本质不一样），这样在`xxxxAsync()`方法执行完毕之后，你可以在`ContinueWith`中拿到执行结果。我们提供了一个`Unwrap`方法，它返回的是一个`Task`，它能保证前一个`Task`完成之后，再执行`ContinueWith`里面的`Task`，这样就能保证可以在一个链式的任务里面起到逐步执行并且能很好的区分模块。例如下面这段实例代码：
-它要实现的功能是：
-* 给排名第一的玩家添加“一周之星”的次数；
-* 给排名第一的玩家奖励100个金币，给第二名的玩家奖励80个金币；
-（算法不值得参考，只是提供`链式任务`的写法参考）
+正如在 Pointer 中保存 `GameEquip` 的 `GameEquipBag` 属性一样，假如查询到了一些 `GameEquip` 对象，想要一并查询出每一个 `GameEquip` 对应的 `GameEquipBag` 对象的时候，可以加上 include 关键字查询条件。同理，假如 `GameEquipBag` 表里还有 pointer 型字段 `user` 时，再加上一个递进的查询条件，形如 include(b.c)，即可一并查询出每一条 `GameEquipBag` 对应的 AVUser 对象。代码如下：
 
-```javascript
-AVQuery<AVObject> query =AVObject.GetQuery("GameScore").OrderByDescending("score");
-query.FindAsync().ContinueWith(t =>
-{
-	var players = t.Result;
-	IEnumerator<AVObject> enumerator = players.GetEnumerator();
-	enumerator.MoveNext();
-	var golden_player = enumerator.Current;//获取目前得分排名第一的玩家
-	int currentweeklyStar = golden_player.Get<int>("weeklyStar");
-	int currentAward=golden_player.Get<int>("gold");
-	golden_player["weeklyStar"] =currentweeklyStar + 1;//本周之星 次数加1
-	golden_player["gold"] = currentAward + 100;//奖励他（她）100个金币
-	return golden_player.SaveAsync();
-	}).Unwrap().ContinueWith(t =>
-	{
-		return query.FindAsync();//为了保证数据正确可以再查一遍
-	}).Unwrap().ContinueWith(t =>
-	{
-		var players = t.Result;
-		IEnumerator<AVObject> enumerator = players.GetEnumerator();
-		enumerator.MoveNext();
-		enumerator.MoveNext();
-		var second_player=enumerator.Current;//获取排名第二的玩家
-		int currentAward=second_player.Get<int>("gold");
-		second_player["gold"]=currentAward + 80;//奖励第二名80个金币
-		return second_player.SaveAsync();
-	}).Unwrap().ContinueWith(t=>
-	{
-       //这里还能继续添加持续的业务逻辑
-       //......
-	});//这种风格可以使业务逻辑变得层次鲜明
-```
-
-### 自定义任务
-以上实例提供了基于`Task`用法，实际需求很有可能需要自定义`Task`，在`Task`中包含了`3`个最基本的方法：
-* SetResult
-* SetException
-* SetCancelled
-
-在自定义任务时，根据实际需要需要显示调用这`3`方法中任意一个，否则会出现意外的情况。
-
-实例如下：
-
-```javascript
-public Task<string> SucceedAsync()
-{
-	var successful = new TaskCompletionSource<string> ();
-	successful.SetResult ("An expected result");
-	return successful.Task;
-}
-public Task<string> failAsync()
-{
-	var failed = new TaskCompletionSource<string>();
-	failed.SetException(new Exception("An error message."));
-	return failed.Task;
-}
-```
-如果在创建任务时就已经知道该任务的结果，你也可以简化的用下面这种方法：
-
-```javascript
-Task<string> successful = Task.FromResult("An expected result.");
-```
-### 自定义异步方法
-
-有了以上的机制，就会很方便的打造自定义的异步方法(`asynchronous functions`)。每一个异步方法都应该返回一个`Task`，例如你可以定义一个如下`Sleep`的方法：
-
-```javascript
-public Task SleepAsync(TimeSpan duration)
-{
-    var tcs = new TaskCompletionSource<int>();
-	var timer = new Timer(_ =>
-	{
-		tcs.SetResult(0);
-	});
-	timer.Change ((long)duration.TotalMilliseconds, Timeout.Infinite);
-	return tcs.Task;
-}
-//使用的时候传入一个延迟执行的时间间隔
-SleepAsync(TimeSpan.FromSeconds(1)).ContinueWith(task =>
-{
-    // 这里的内容就会在1s之后执行。
-});
-```
-### 顺序任务
-
-使用`Task`可以很方便地用简洁地代码调用一些按照一定顺序执行的方法或者函数。这里说的`按照一定顺序`指的是 `直到上一个任务执行完毕下一个任务才会开始`，实例如下：
-
-```javascript
-var query = new AVQuery<AVObject>("GameScore").WhereGreaterThanOrEqualTo("score", 100000);
-query.FindAsync().ContinueWith(t =>
-	{
-      // 创建一个基础的Task。
-      Task task = Task.FromResult(0);
-      foreach (AVObject result in t.Result)
-	  {
-	  AVObject toStared = result;
-	  toStared["Stared"]=true;／／为每一个总分超过100000添加“星玩家”的称号。
-	  // 针对每一个AVObject,task都去调用SaveAsync这个方法。
-	  task = task.ContinueWith(_ =>
-	  {
-	    // 返回一个Task。当保存完毕之后这个Task就会标记为完成。
-		 return result.SaveAsync();
-	  }).Unwrap();
-	  };
-	  return task;
-	}).Unwrap().ContinueWith(_ =>
-	  {
-		// 每个加星玩家的信息都更新完毕。
-	  });
+```cs
+var gameEquipBag = AVObject.CreateWithoutData("GameEquipBag", "56545c5b00b09f857a603632");
+// 关键代码，用 include 告知服务端需要返回的关联属性对应的对象的详细信息，而不仅仅是 objectId。这里会返回 gameEquipBag 和 user 的详细信息。
+var query = new AVQuery<AVObject>("GameEquip").WhereEqualTo("gameEquipBag", gameEquipBag).Include("gameEquipBag").Include("gameEquipBag.user");
 ```
 
 
-### 平行任务
+此外需要格外注意的是，假设对象有一个 Array 类型的字段 `arrayKey` 内部是 Pointer 类型：
 
-当然在编程世界里有顺序的就必然存在平行的。`平行任务`指的是定义一系列`同时开始执行的任务`。`Task`内部定义了一个静态方法`WhenAll`，调用它需要传入一个`Task`的集合，然后它就帮助同时启动集合里面的`Task`，它返回的`Task`的`IsCompleted`属性会在集合中所有`Task`都完成之后才会被置为`true`，实例如下：
-
-```javascript
-var query = new AVQuery<AVObject>("GameScore").WhereEqualTo("score", 1000000000);
-query.FindAsync().ContinueWith(t =>
-	{
-		// 把系统里面所有得分超过1000000000的这种开发数据从库中删除。
-		var tasks = new List<Task>();
-		Task task = Task.FromResult(0);
-		foreach (AVObject result in t.Result)
-		{
-			// 往任务集合里面添加DeleteAsync任务。
-			tasks.Add(result.DeleteAsync());
-		}
-		// 返回的Task.WhenAll(tasks)的IsCompleted属性会在所有的任务都执行完毕之后置为true。
-		return Task.WhenAll(tasks);
-	 }
-	).Unwrap().ContinueWith(_ =>
-	 {
-		// 最后就是所有的开发数据都被删除了。
-	 });
+```cs
+[pointer1, pointer2, pointer3]
 ```
+
+可以用 include 方法获取数组中的 pointer 数据，例如：
+
+```cs
+var query = new AVQuery<AVObject>("GameEquip").Include('pointerArrayKey');
+```
+
+但是 Array 类型的 include 操作只支持到第一层，不支持 include(b.c) 这种递进关联查询。
+
+
+#### 内嵌查询
+道具表 `GameEquip` 中有一个所属背包字段 `gameEquipBag` 指向 `GameEquipBag` 表。查询容量为 20 的背包 `GameEquipBag` 中的所有道具 `GameEquip`（注意查询针对的是 `GameEquip`），使用内嵌查询接口就可以通过一次查询来达到目的
+
+```cs
+var innerQuery = new AVQuery<AVObject>("GameEquipBag").WhereEqualTo("scale", 20);
+var query = new AVQuery<AVObject>("GameEquip").WhereMatchesQuery("gameEquipBag", innerQuery);
+```
+与普通查询一样，内嵌查询默认也最多返回 100 条记录，想修改这一默认请参考 [限定结果返回数量](#限定返回数量)。
+
+**如果所有返回的记录没有匹配到外层的查询条件，那么整个查询也查不到结果**。
+
+LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌/子查询（和普通查询一样，limit 默认为 100，最大 1000），然后将子查询的结果填入主查询的对应位置，再执行主查询。
+
+如果子查询匹配到了 100 条以上的记录（性别等区分度低的字段重复值往往较多），且主查询有其他查询条件（region = 'cn'），那么可能会出现没有结果或结果不全的情况，其本质上是子查询查出的 100 条记录没有满足主查询的其他条件。
+
+我们建议采用以下方案进行改进：
+
+- 确保子查询的结果在 100 条以下，如果在 100 - 1000 条的话请在子查询末尾添加 limit 1000。
+- 将需要查询的字段冗余到主查询所在的表上；例如将 score 冗余到 Player 表上，或者将 region 添加到 GameScore 上然后只查 GameScore 表。
+- 进行多次查询，每次在子查询上添加 skip 来遍历所有记录（注意 skip 的值较大时可能会引发性能问题，因此不是很推荐）。
+
+
+### 组合查询
+组合查询就是把诸多查询条件合并成一个查询，再交给 SDK 去云端查询。方式有两种：OR 和 AND。
+
+#### OR 查询
+
+OR 操作表示多个查询条件符合其中任意一个即可。 例如，查询攻击力是 5 ，或等级为 1 的道具：
+
+```cs
+var attackQuery = new AVQuery<AVObject>("GameEquip").WhereEqualTo("attackValue", 5);
+var levelQuery = new AVQuery<AVObject>("GameEquip").WhereEqualTo("level", 1);
+var query = attackQuery.Or(levelQuery);
+```
+
+
+<!-- 
+// SDK 还不支持，等支持了再说
+
+#### AND 查询
+
+如果需要对同一个字段进行两种约束，需要用到 AND 查询，例如，寻找攻击力大于 4 小于 10 的道具：
+
+```cs
+var lowAttackQuery = new AVQuery<AVObject>("GameEquip").WhereLessThan('attackValue', 10);
+var highAttackQuery = new AVQuery<AVObject>("GameEquip").WhereGreaterThan('attackValue', 4);
+var query = lowAttackQuery.And(highAttackQuery); 
+```
+-->
+
+### 查询结果数量和排序
+
+#### 获取第一条结果
+在很多应用场景下，只要获取满足条件的一个结果即可，例如获取满足条件的第一条 `GameEquip`：
+
+```cs
+var query = new AVQuery<AVObject>("GameEquip");
+var equipment = await query.FirstAsync();
+```
+
+#### 限定返回数量
+为了防止查询出来的结果过大，云端默认针对查询结果有一个数量限制，即 limit，它的默认值是 100。比如一个查询会得到 10000 个对象，那么一次查询只会返回符合条件的 100 个结果。limit 允许取值范围是 1 ~ 1000。例如设置返回 10 条结果：
+
+```cs
+var query = new AVQuery<AVObject>("GameEquip").Limit(10);
+```
+
+#### 跳过数量
+设置 skip 这个参数可以告知云端本次查询要跳过多少个结果。将 skip 与 limit 搭配使用可以实现翻页效果。例如，在翻页中每页显示数量为 10，要获取第 3 页的对象：
+
+```cs
+// 在此处代码中，跳过了符合条件的前 20 个对象，并限定只返回 10 个对象
+var query = new AVQuery<AVObject>("GameEquip").Skip(20).Limit(10);
+```
+
+上述方法的执行效率比较低，因此不建议广泛使用。建议选用 createdAt 或者 updatedAt 这类的时间戳进行 [分段查询](faq.html#查询结果默认最多只能返回 1000 条数据，当我需要的数据量超过了-1000-该怎么办？)。
+
+#### 返回指定属性/字段
+
+通常列表展现的时候并不是需要展现某一个对象的所有属性，这样既满足需求又节省流量，还可以提高一部分的性能。例如只返回道具 `GameEquip` 的名字：
+
+```cs
+var query = new AVQuery<AVObject>("GameEquip").Select("name");
+// 如果有多个 select 字段时，可以这样写：
+var query = new AVQuery<AVObject>("GameEquip").Select("name").Select("attackValue")
+```
+
+所指定的属性或字段也支持 Pointer 类型。例如，获取 `GameEquip` 这个对象的所属背包（`gameEquipBag` 属性，Pointer 类型），仅展示这个背包的容量：
+
+```cs
+var query = new AVQuery<AVObject>("GameEquip").Include("gameEquipBag").Select("gameEquipBag.scale");
+```
+
+#### 统计总数量
+通常用户在执行完搜索后，结果页面总会显示出诸如「搜索到符合条件的结果有 1020 条」这样的信息。例如，查询一下攻击力为 5 的道具有多少个：
+
+```cs
+var query = new AVQuery<AVObject>("GameEquip").WhereEqualTo("attackValue", 5);
+var count = await query.CountAsync();
+```
+
+#### 排序
+对于数字、字符串、日期类型的数据，可对其进行升序或降序排列。
+
+```cs
+// 根据 attackValue 升序排列
+var query = new AVQuery<AVObject>("GameEquip").OrderBy("attackValue");
+// 根据 attackValue 降序排列
+var query = new AVQuery<AVObject>("GameEquip").OrderByDescending("attackValue");
+```
+
+一个查询可以附加多个排序条件，如按 attackValue 升序、createdAt 降序排列：
+
+```cs
+var query = new AVQuery<AVObject>("GameEquip").OrderBy("attackValue").OrderByDescending("createdAt");
+```
+
+### 查询性能优化
+影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
+
+- 不等于和不包含查询（无法使用索引）
+- 通配符在前面的字符串查询（无法使用索引）
+- 有条件的 count（需要扫描所有数据）
+- skip 跳过较多的行数（相当于需要先查出被跳过的那些行）
+- 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
+- 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
 
 ## 用户
-游戏中的用户既是游戏本身的玩家也是带有统计意义和社交意义的载体。例如，在游戏中最基本关于用户的应用场景就是用户所获得分数以及排名，LeanCloud已经在SDK中内嵌了关于用户这个较为特殊的对象的一些最基本的操作和数据服务。
+用户系统几乎是每款应用都要加入的功能。除了基本的注册、登录和密码重置，移动端开发还会使用手机号一键登录、短信验证码登录等功能。LeanStorage 提供了一系列接口来帮助开发者快速实现各种场景下的需求。
+
+`AVUser` 是用来描述一个用户的特殊对象，与之相关的数据都保存在 `_User` 数据表中。
+
+### 用户的属性
+
+#### 默认属性
+
+用户名、密码、邮箱是默认提供的三个属性，访问方式如下：
+
+```cs
+var user = await AVUser.LogInAsync("demoUser", "xxxx");
+var uid = user.ObjectId;
+var username = user.Username;
+var email = user.Email;
+```
+
+请注意代码中，密码是仅仅是在注册的时候可以设置的属性（这部分代码可参照[用户名和密码注册](#用户名和密码注册)），它在注册完成之后并不会保存在本地（SDK 不会以明文保存密码这种敏感数据），所以在登录之后，再访问密码这个字段是为空的。
+
+#### 自定义属性
+
+用户对象和普通对象一样也支持添加自定义属性。例如，为当前用户添加年龄属性 age：
+
+```cs
+var user = AVUser.CurrentUser;
+user["age"] = 25;
+await user.SaveAsync();
+var age = user.Get<int>("age");
+Debug.Log(age);
+```
+
+#### 修改属性
+很多开发者会有这样的疑问：「为什么我不能修改任意一个用户的属性？」
+
+> 因为很多时候，就算是开发者也不要轻易修改用户的基本信息，例如用户的手机号、社交账号等个人信息都比较敏感，应该由用户在 App 中自行修改。所以为了保证用户的数据仅在用户自己已登录的状态下才能修改，云端对所有针对 AV.User 对象的数据操作都要做验证。
+
+例如，先为当前用户增加一个 age 属性，登录后再更改它的值：
+
+```cs
+var user = await AVUser.LogInAsync("demoUser", "xxxxx");
+user["age"] = 25;
+await user.SaveAsync();
+var age = user.Get<int>("age");
+Debug.Log(age);
+```
+
+`AVUser` 的自定义属性在使用上与 `AVObject` 没有本质区别。
+
 
 ### 注册
-注册用户在LeanCloud SDK中极为简单，看如下实例代码：
+#### 手机号注册或登录
 
-```javascript
-var userName = "demoUser";
-var pwd = "leancloud";
-var email = "xxx@xxx.com";
+很多网站为了简化注册及登录流程，都使用了「手机号 + 验证码」的方式来登录，这种方式这种方式会为没有注册过的用户自动创建账号。
+
+首先调用发送验证码的接口：
+
+```cs
+await AVCloud.RequestSMSCodeAsync("18611111111");
+```
+
+然后在 UI 上给与用户输入验证码的输入框，用户点击登录的时候调用如下接口：
+
+```cs
+var user = await AVUser.SignUpOrLoginByMobilePhoneAsync("18611111111", "6位短信验证码");
+Debug.Log(user.Username);
+```
+
+#### 用户名和密码注册
+
+采用「用户名 + 密码」注册时需要注意：密码是以明文方式通过 HTTPS 加密传输给云端，云端会以密文存储密码，并且我们的加密算法是无法通过所谓「彩虹表撞库」获取的，这一点请开发者放心。换言之，用户的密码只可能用户本人知道，开发者不论是通过控制台还是 API 都是无法获取。另外我们需要强调<u>在客户端，应用切勿再次对密码加密，这会导致重置密码等功能失效</u>。
+
+例如，注册一个用户的示例代码如下（用户名 `Tom` 密码 `cat!@#123`）：
+
+```cs
 var user = new AVUser();
-user.Username = userName;
-user.Password = pwd;
-user.Email = email;
-user.SignUpAsync().ContinueWith(t =>
-{
-   var uid = user.ObjectId;
-});
+user.Username = "Tom";
+user.Password = "cat!@#123";
+user.Email = "tom@leancloud.cn";
+await user.SignUpAsync();
+Debug.Log(user.Username);
 ```
 
-以上代码就可以很快的注册为当前的应用注册一个用户，并且这个用户也会有一个唯一的`ObjectId`。
-**用户的密码在数据管理界面是无法显示的，这是因为服务端存储的并不是明文，是通过不可逆的特殊算法加密后的字符串**
-{% if node != 'qcloud' and node != 'us' %}
-### 手机号注册
-{% if node=='qcloud' %}
-> 注意： TAB 上短信功能暂未开放，所以下面所有与短信相关的 API 都还不可用。
-{% endif %}
+如果注册不成功，请检查一下返回的错误对象。最有可能的情况是用户名已经被另一个用户注册，错误代码 [202](error_code.html#_202)，即 `_User` 表中的 `username` 字段已存在相同的值，此时需要提示用户尝试不同的用户名来注册。同样，邮件 `email` 和手机号码 `mobilePhoneNumber` 字段也要求在各自的列中不能有重复值出现，否则会出现 [203](error_code.html#_203)、[214](error_code.html#_214) 错误。
 
-为了适应移动互联时代的需求，我们特地增加了手机号注册的功能，当然前提是会进行短信认证，就如同微信一样，注册的时候会发送6位数字的验证码到用户输入的手机上，然后再回调我们的验证接口就可以完成一次手机号的注册。
+开发者也可以要求用户使用 Email 做为用户名注册，即在用户提交信息后将 `_User` 表中的 `username` 和 `email` 字段都设为相同的值，这样做的好处是用户在忘记密码的情况下可以直接使用「[邮箱重置密码](#重置密码)」功能，无需再额外绑定电子邮件。
 
-{% if node=='qcloud' %}
-在 `应用设置` 可以开启这一个功能。
-{% else %}
-在[应用设置](/app.html?appid={{appid}}#/permission)可以开启这一个功能。
-{% endif %}
+#### 设置手机号码
 
-```javascript
-验证注册用户手机号码
-允许用户使用手机短信登录
+如果一开始没有选择用手机号码注册，之后要求用户绑定并验证手机号，可以调用「延迟验证」的接口。首先更新用户的手机号：
+
+```cs
+var currentUser = AVUser.CurrentUser;
+// 更新 mobilePhoneNumber 字段
+currentUser["mobilePhoneNumber"] = "186xxxxxxxx";
+await currentUser.SaveAsync();
 ```
-如下一个简单的案例：
+如果在 {{app_permission_link}} 中勾选了 **用户注册或更新手机号时，向注册手机号码发送验证短信**，更新用户手机号成功后会自动发送一条验证短信到用户的手机中，此时可以调用以下接口验证手机号。
 
-```javascript
-//第一步先注册
-var user = new AVUser();
-user.Username = "UnityUser";
-user.Password = "leancloud";
-user.MobilePhoneNumber = "18688888888";
-var task= user.SignUpAsync ();
-//如此做，短信就会发送到指定的手机号
+```cs
+await AVUser.VerifyMobilePhoneAsync("6位数字验证码");
 ```
-以上完成之后，需要给用户一个输入界面，让用户输入收到的6位数字的验证码，然后再运行如下代码：
 
-```javascript
-//第二步回调认证
-var task = AVUser.VerifyMobilePhoneAsync(code);//code代表6位数字的验证码
-task.ContinueWith(t =>
-{
-	var success= t.Result;
-});
+如果用户没有收到验证短信，可以调用以下接口重发短信：
+
+```cs
+await AVUser.RequestMobilePhoneVerifyAsync("186xxxxxxxx");
 ```
-以上两步，就是一个完整的手机号注册流程。
-{% endif %}
+
+#### 验证邮箱
+
+如果在 {{app_permission_link}} 中勾选了 **用户注册时，发送验证邮件**，那么当一个 `AVUser` 在注册时设置了邮箱，云端就会向该邮箱**自动发送**一封包含了激活链接的验证邮件，用户打开该邮件并点击激活链接后便视为通过了验证。
+
+有些用户可能在注册之后并没有点击激活链接，而在未来某一个时间又有验证邮箱的需求，这时需要调用如下接口让云端重新发送验证邮件：
+
+```cs
+await AVUser.RequestEmailVerifyAsync("tom@leancloud.cn");
+```
+
+当用户通过更新用户属性的方式更新新邮箱并成功 save 后，云端会自动向新邮箱发一封验证邮件，此时开发者不需要再单独调用 `requestEmailVerify` 接口来发送验证邮件。
 
 ### 登录
-登录是一个`AVUser`的静态方法，通过如下`三种`方式可以实现登录，登录之后，SDK会默认将此次登录的用户设置为`AVUser.CurrentUser`：
+我们提供了多种登录方式，以满足不同场景的应用。
 
 #### 用户名和密码登录
-
-```javascript
-var userName = "demoUser";
-var pwd = "leancloud";
-AVUser.LogInAsync(userName, pwd).ContinueWith(t =>
-{
-    if (t.IsFaulted || t.IsCanceled)
-    {
-       var error = t.Exception.Message; // 登录失败，可以查看错误信息。
-    }
-    else
-    {
-       //登录成功
-    }
-});
+```cs
+var user = await AVUser.LogInAsync("tom", "password");
+Debug.Log(user.Username);
 ```
-{% if node != 'qcloud' and node != 'us' %}
+
 #### 手机号和密码登录
-在短信服务上线之后，只要是`通过认证`的手机号可以当做用户名在 LeanCloud 服务端进行登录，自然SDK里面也加入了相应的支持(Unity SDK 自V1.1.0以及以后的版本都有支持)。它的调用与用户名登录一样，只是方法名字不一样，代码如下:
 
-```javascript
-AVUser.LogInByMobilePhoneNumberAsync (mobilePhone, password).ContinueWith (t =>
-        {
-			AVUser user=t.Result;
-			//这里可以拿到登录之后的AVUser，但是实际上AVUser.CurrentUser已经是当前登录的用户了。
-			//这里提供返回值是为了使链式表达式脱离对全局变量的依赖，当然大部分情况下AVUser.CurrentUser应该已经可以满足一般的需求。
-		});
+如果该用户的 `mobilePhoneNumber` 字段设置了手机号，可以使用「手机号 + 密码」的方式登录：
+
+```cs
+var user = await AVUser.LogInByMobilePhoneNumberAsync("186xxxxxxxx", "password");
 ```
-#### 手机号和短信验证码登录
-在对客户端验证要求比较高的应用里面，也许有些应用要求支持短信随机的验证码作为临时的密码登录，这个应用场景在现在已经被普遍的采用了，这种验证机制被认为是安全性高的一种机制，自然 LeanCloud 也给予了支持。它比前2种静态登录的方法多了`发送短信验证码`这一步，具体代码如下：
+以上的手机号码即使没有经过验证，只要密码正确也可以成功登录。如果希望阻止未验证的手机号码用于登录，则需要在 {{app_permission_link}} 中勾选 **未验证手机号码的用户，禁止登录**。这种方式也提高了用户账号的合法性与安全性。
 
-第一步，请求服务端发送6为数字的验证码到指定mobilePhoneNumber上。
-```javascript
-try
-{
-	AVUser.RequestLoginSmsCodeAsync(mobilePhoneNumber).ContinueWith(t =>
-       {
-			var success=t.Result;
-			//判断返回值可以判断是否发送成功，不成功会抛出带有error的AVException，并且t.Result会被置为false.
-			//在处理这种容易因为用户输入不合法而产生的异常的时候，为了保证程序的正常运行，建议使用try/catch机制进行提前的异常处理。
-		});
-}
-catch(AVException avException)
-{
-}
+#### 手机号和验证码登录
+
+详见[手机号注册或登录](#手机号注册或登录)
+
+#### 测试用的手机号和固定验证码
+
+对于使用「手机号 + 验证码」登录的应用来说，在上架前提交至 Apple Store 进行审核的过程中，可能会面临 Apple 人员因没有有效的手机号码而无法登录来进行评估审核，或者开发者也无法提供固定手机号和验证码的尴尬情况。
+
+另外，开发者在开发测试过程中也会面临在短时间内需要多次登录或注销的操作，由于验证码有时间间隔与总次数限制，这样就会带来种种不便。
+
+为解决这些问题，我们允许为每个应用设置一个用于测试目的的手机号码，LeanCloud 平台会为它生成一个固定的验证码，每次使用这一对号码组合进行验证都会得到成功的结果。请进入 **应用控制台 > 消息 > 短信 > 设置 > 其他** 来设置测试手机号。
+
+注意：测试手机号同样无法突破运营商的[短信限制](rest_sms_api.html#短信有什么限制吗？)，所以测试手机号的使用方式是：不发送短信，直接使用固定的手机号和验证码测试注册或登录。
+
+#### 游客登录
+有时你不希望强制用户在一开始就进行注册，例如先使用游客身份玩游戏，可以用以下接口匿名创建一个用户并登录：
+
+```cs
+var user = await AVUser.LogInAnonymouslyAsync();
 ```
 
-第二步，直接使用验证码登录，如果验证码输入错误也会抛出异常。
+但以这种方式登录的用户，一旦[登出](#登出)就无法再次以该用户身份登录，与该用户关联的数据也将无法访问，此时可以通过以下方式转化为普通用户。
 
-```javascript
+- 设置用户名及密码
+- [关联第三方平台](#第三方账户登录)
 
-try
-{
-	AVUser.LoginBySmsCodeAsync (mobilePhoneNumber, code).ContinueWith(t=>
-		{
-			var success=t.Result;
-		});
-}
-catch(AVException avException)
-{
-}
+以设置用户名、密码后注册为例：
+
+```cs
+var currentUser = AVUser.CurrentUser;
+currentUser.Username = "username";
+currentUser.Password = "password";
+await currentUser.SaveAsync();
 ```
-{% endif %}
-### 邮箱认证
 
-在移动互联时代，任何一个用户信息都是必须在双方统一认证之后才会被视为一种安全机制，比如邮箱的认证，同样，在`AVUser`这个特殊的 `AVObject` 拥有一个特殊字段 `email`，可以在 {% if node=='qcloud' %}**数据管理**{% else %}[数据管理](/data.html?appid={{appid}}){% endif %} 的 `_User` 表看到这个默认的字段，这就是在注册是提供的邮箱，当在 {% if node=='qcloud' %}**应用设置**{% else %}[应用设置](/app.html?appid={{appid}}#/permission){% endif %} 中勾选了 **启用注册用户邮箱验证**。
-{% if node=='qcloud' %}
-这样在注册用户的时候，LeanCloud默认就会发送一封邮件，进行验证，邮件的模板也可以在 `邮件模板` 中进行设置。
-{% else %}
-这样在注册用户的时候，LeanCloud默认就会发送一封邮件，进行验证，邮件的模板也可以在[邮件模板](/app.html?appid={{appid}}#/email)中进行设置。
-{% endif %}
+判断一个用户是否是匿名用户：
 
-注意，验证过的用户，TA的`emailVerified`将会置成`true`，反之`false`，但是如果**未启用注册用户邮箱验证**，这个字段会为空。
-
-用户邮箱验证后，会调用`AV.Cloud.onVerified('email',function)`的云引擎回调函数，方便您做一些后处理。
-{% if node != 'qcloud' and node != 'us' %}
-### 手机号认证
-相对于邮箱认证，手机号认证的过程稍微需要多一点代码，如果当您的应用在注册的时候没有开启短信验证，伴随业务发展，发现需要验证用户的手机，LeanCloud正好提供了这一接口。
-
-```javascript
-//调用的前提是，改手机号已经与已存在的用户有关联(_User表中的mobilePhoneNumber即可关联手机，至于如何关联取决于客户端的业务逻辑)
-AVUser.RequestMobilePhoneVerifyAsync ("18688888888").ContinueWith(t=>
-		{
-		   //这样就成功的发送了验证码
-		});
-```
-回调认证的接口与`手机号注册`小节的第二步一样。
-
-验证成功后，用户的`mobilePhoneVerified`属性变为true，并且调用云引擎的`AV.Cloud.onVerifed('sms', function)`方法。
-
-**以上只是针对_User表的一个属性mobilePhoneNumber进行验证，但是存在另一种需求，类似于支付宝在进行交易的时候会要求进行实时的短信认证，这一机制现在已经普遍存在于各种应用中进行敏感操作的首选，LeanCloud 也提供了这一机制。**
-
-
-#### 手机短信针对应用自定义操作的验证
-`AVCloud`类包含了相关的静态方法，实例如下：
-
-```javascript
-//第一步，先请求发送，如果手机号无效则会发送失败。
-public void RequestSMSCode()
-{
-	var task=AVCloud.RequestSMSCode ("18688888888").ContinueWith(t=>
-	{
-		if(t.Result)
-		{
-			msg="sent!";
-		}
-	});
+```cs
+var currentUser = AVUser.CurrentUser;
+if (currentUser.IsAnonymous) {
+    // disableLogOutButton();
 }
 ```
-如果开发者想简单地自定义短信的内容，可以调用另外一个版本，如下：
 
-```javascript
-public void RequestSMSCodeWithCustomParameters()
-{
-   var task=AVCloud.RequestSMSCode ("18688888888","PP打车","叫车服务",8).ContinueWith(t=>
-   {
-       if(t.Result)
-	    {
-	      msg="sent!";
-       }
-	});
-}
+#### 当前用户
+
+常见的应用不会每次都要求用户都登录，这是因为它将用户数据缓存在了客户端。 同样，只要是调用了登录相关的接口，LeanCloud SDK 都会自动缓存登录用户的数据。 例如，判断当前用户是否为空，为空就跳转到登录页面让用户登录，如果不为空就跳转到首页：
+
+```cs
+var currentUser = AVUser.CurrentUser;
+ if (currentUser) {
+     // 跳转到首页
+  } else {
+     //currentUser 为空时，可打开用户登录界面
+  }
 ```
-用户就会收到如下短信：
+#### SessionToken
+所有登录接口调用成功之后，云端会返回一个 SessionToken 给客户端，客户端在发送 HTTP 请求的时候，Unity SDK 会在 HTTP 请求的 Header 里面自动添加上当前用户的 SessionToken 作为这次请求发起者 `AVUser` 的身份认证信息。
 
-<samp class="bubble">您正在使用 PP打车 服务进行 叫车服务，您的验证码是012345，请在8分钟之内完成验证。</samp>
+如果在 {{app_permission_link}} 中勾选了 **密码修改后，强制客户端重新登录**，那么当用户密码再次被修改后，已登录的用户对象就会失效，开发者需要使用更改后的密码重新调用登录接口，使 SessionToken 得到更新，否则后续操作会遇到 [403 (Forbidden)](error_code.html#_403) 的错误。
 
-以上是调用发送，下一步就是验证。
-
-```javascript
-public void VerifySMSCode(string code)
-{
-	var task=AVCloud.VerifySmsCode (code).ContinueWith(t=>
-	{
-		if(t.Result)
-		{
-			msg="verified";
-		}
-		else
-		{
-			msg="valid code";
-		}
-	});
-}
+##### 验证 SessionToken 是否在有效期内
+```cs
+var currentUser = AVUser.CurrentUser;
+var IsAuthenticatedAsync = await currentUser.IsAuthenticatedAsync();
 ```
-{% endif %}
 
-### 当前用户
-诚如所有移动应用一样当前用户一直是被在客户端视作持久化存储处理，比如手机QQ等流行的App，LeanCloud必然也会如此为开发者解决持久化存储当前用户，只要调用了`登录`相关的接口，当前用户就会被持久化存储在客户端。
+##### 使用 SessionToken 登录
 
-```javascript
-var user = AVUser.CurrentUser;
+在没有用户名密码的情况下，客户端可以使用 SessionToken 来登录。常见的使用场景有：
+
+* 应用内根据以前缓存的 SessionToken 登录
+* 应用内的某个页面使用 WebView 方式来登录 LeanCloud
+* 在服务端登录后，返回 SessionToken 给客户端，客户端根据返回的 SessionToken 登录。
+
+登录后可以调用 `user.SessionToken` 方法得到当前登录用户的 sessionToken。
+
+使用 sessionToken 登录：
+
+```cs
+var user = await AVUser.BecomeAsync("cwqrvy34wkvicp87ui4783dcq");
 ```
-如果调用了登出接口，那么当前用户就会被清除，并置为`null`：
 
-```javascript
-AVUser.LogOut();
-var user = AVUser.CurrentUser;	//如此做就会抛出异常，因为登出之后，CurrentUser已经为空。
-```
+{{ docs.alert("请避免在外部浏览器使用 URL 来传递 SessionToken，以防范信息泄露风险。") }}
+
+#### 账户锁定
+
+输入错误的密码或验证码会导致用户登录失败。如果在 15 分钟内，同一个用户登录失败的次数大于 6 次，该用户账户即被云端暂时锁定，此时云端会返回错误码 `{"code":1,"error":"登录失败次数超过限制，请稍候再试，或者通过忘记密码重设密码。"}`，开发者可在客户端进行必要提示。
+
+锁定将在最后一次错误登录的 15 分钟之后由云端自动解除，开发者无法通过 SDK 或 REST API 进行干预。在锁定期间，即使用户输入了正确的验证信息也不允许登录。这个限制在 SDK 和云引擎中都有效。
+
 
 ### 重置密码
-#### 邮箱重置
-密码管理一直是移动应用的比较通用又比较繁琐的事情，LeanCloud也为开发者提供了一套通用的解决方案，将开发者从繁琐中解脱出来。
-当用户忘记密码的时候，开发者完全可以在客户端做一个简单的按钮，然后做一些友好的页面，但是真正实现重置密码的功能只需要如下一段代码：
 
-```javascript
-AVUser.RequestPasswordResetAsync(user.Email);
+#### 邮箱重置密码
+
+如果用户忘记了密码，可以调用以下接口发送重置密码的邮件：
+```cs
+await AVUser.RequestPasswordResetAsync("myemail@example.com");
 ```
-这样服务端就会再次发送重置密码的邮件，开发者只要引导用户登录邮箱，进行操作就完成了。
 
-{% if node != 'qcloud' and node != 'us' %}
-#### 短信验证码重置
-如果用户的手机是有效地，并且已经通过了验证码验证手机的有效性，那么开发者可以提供另一种在手机上体验较好的方式：通过短信验证码重置密码。具体实例如下：
-首先，需要发送一个请求到服务端去发送6位数的验证码：
+密码重置流程如下：
 
-```javascript
-var smsCodeResetPasswordTask =	AVUser.RequestPasswordResetBySmsCodeAsync ("138012345678");//只需要手机号即可，服务端会自动寻找与之匹配的用户，如果没有用户与此手机号绑定，将会提示错误信息。
+1. 用户输入注册的电子邮件，请求重置密码；
+2. {{productName}} 向该邮箱发送一封包含重置密码的特殊链接的电子邮件；
+3. 用户点击重置密码链接后，一个特殊的页面会打开，让他们输入新密码；
+4. 用户的密码已被重置为新输入的密码。
+
+{{link_to_blog_password_reset}}
+
+#### 手机号码重置密码
+用户需要先绑定手机号码才能使用这个功能。首先获取短信验证码：
+
+```cs
+await AVUser.RequestPasswordResetBySmsCode("186xxxxxxxx");
 ```
-发送之后，再给一个界面给用户，让用户输入6位数的短信验证码，并且同时输入新的密码，然后如下调用：
+然后使用短信验证码来重置密码：
 
-```javascript
-var resetTask = AVUser.ResetPasswordBySmsCodeAsync(NewPassword,SMSCode);//第一个参数是新密码（明文传递，请放心我们传输的时候做了加密，并且在服务端也绝不可能明文存储），第二个参数是上一步发送到用户手机的6位数验证码。
+```cs
+await AVUser.ResetPasswordBySmsCodeAsync("newPassword", "smsCode");
 ```
-这样2步就可以重置密码，这项功能我们建议在一些应用内操作比较频繁的应用使用，邮箱重置的话可能需要用户去单独打开一个邮箱应用或者用浏览器跳转。
-{% endif %}
 
-### 查询用户
-用户既然是个特殊的`AVObject`，它当然也具备了`AVObject`的一些共同特性，很多场景下，关于用户的操作，首先就是通过条件查询，把符合特定条件的用户查询到客户端进行展现或者一些修改之类的操作。
+#### 登出
 
-```javascript
-AVUser.Query.WhereEqualTo("gender", "female").FindAsync().ContinueWith(t =>
+用户登出系统时，SDK 会自动清理当前用户的缓存。
+
+```cs
+AVUser.LogOut();
+var user = AVUser.CurrentUser;
+Debug.Log(user); //此时打印出来为 Null
+```
+
+### 用户的查询
+
+为了安全起见，**新创建的应用的 `_User` 表默认关闭了 find 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 find 查询权限。
+
+设置数据表权限的方法，请参考 [数据与安全 {{middot}} Class 级别的权限](data_security.html#Class_级别的_ACL)。我们推荐开发者在 [云引擎](leanengine_overview.html) 中封装用户查询，只查询特定条件的用户，避免开放 `_User` 表的全部查询权限。
+
+查询用户代码如下：
+
+```cs
+var query = AVUser.Query.WhereEqualTo("gender", "female");
+await query.FindAsync();
+```
+
+## 第三方账户登录
+
+第三方登录是应用常见的功能。它直接使用第三方平台（如微信、QQ）已有的账户信息来完成新用户注册，这样不但简化了用户注册流程的操作，还提升了用户体验。
+
+开发此功能的主要步骤有：
+
+1. 配置平台账号
+2. 开发者从第三方获取账户的授权信息 authData；
+3. 把 authData 和 LeanCloud 的用户体系 AVUser 进行绑定。
+
+### 常规开发流程介绍
+
+#### 配置平台账号
+
+在 [LeanCloud 应用控制台 > 组件 > 社交](/dashboard/devcomponent.html?appid={{appid}}#/component/sns) 配置相应平台的 **应用 ID** 和 **应用 Secret Key** 。点击保存，自动生成 **回调 URL** 和 **登录 URL**。
+
+以微博开放平台举例，它需要单独配置 **回调 URL**。 在微博开放平台的 **应用信息** > **高级信息** > **OAuth2.0 授权设置** 里的「授权回调页」中绑定生成的 **回调 URL**。测试阶段，在微博开放平台的 **应用信息** > **测试信息** 添加微博账号，在腾讯开放平台的 **QQ 登录** > **应用调试者** 里添加 QQ 账号即可。在应用通过审核后，可以获取公开的第三方登录能力。
+
+配置平台账号的目的在于创建 AVUser 时，LeanCloud 云端会使用相关信息去校验 authData 的合法性，确保 AVUser 实际对应着一个合法真实的用户，确保平台安全性。如果想关闭自动校验 authData 的功能，需要在 [应用控制台 > 组件 > 社交](/dashboard/devcomponent.html?appid={{appid}}#/component/sns)中**取消勾选**「第三方登录时，验证用户 AccessToken 合法性」。
+
+#### 获取 authData 并创建 AVUser
+
+LeanCloud **暂不提供** 获取第三方 authData 的 SDK。开发者需要调用微信、QQ 等官方的 SDK，并根据其文档进行获取，也可以使用其他服务商提供的社交登录组件。
+
+开发者在获取了第三方的完整 authData 后，就可以使用我们提供的 AVUser 类的 `LoginWithAuthDataAsync()` 或 `AssociateAuthDataAsync()` 两个接口，传入 authData，进行用户数据的绑定了。在操作成功之后，这部分第三方账户数据会存入 `_User` 表的 `authData` 字段里。
+
+LeanCloud 后端要求 authData 至少含有 `openid 或 uid`、`access_token` 和 `expires_in` 三个字段。微信和 QQ 使用 `openid`，其他平台使用 `uid`。
+
+如果是新用户，则生成一个新的 AVUser 并登录。示例代码如下：
+
+```cs
+var authData = new Dictionary<string, object> {
+        { "access_token", "ACCESS_TOKEN" },
+        { "expires_in", 7200 },
+        { "openid", "OPENID" },
+    };
+var user = await AVUser.LogInWithAuthDataAsync(authData, "weixin");
+```
+
+成功后，在你的控制台的 _User 表里会生成一条新的 AVUser，它的数据格式如下：
+
+```cs
 {
-     IEnumerable<AVUser> women = t.Result;
-});
-```
-当然，也可以通过 `GetAsync` 方法通过 `objectId` 获取特定的一个`AVUser`。
-
-
-### 用户安全数据的认证规则
-很多时候，就算是开发者也不要轻易修改用户的基本信息，比如用户的一些比较敏感的个人信息，例如手机号，社交账号等，这些都应该让用户在App中自行修改，所以为了用户数据的数据有且仅有自己在登录的情况下得以修改，LeanCloud服务端对所有针对`AVUser`对象的数据做了验证。
-
-```javascript
-AVUser user = null;
-AVUser.LogInAsync("demoUser", "asvscloud").ContinueWith(t =>
-{
-    user = t.Result;
-    user.Username = "testUser"; // 修改用户名
-    return user.SaveAsync();
-}).Unwrap().ContinueWith(t =>
-{
-    if (!t.IsFaulted)
-    {
-        // 在登录之后，提交修改用户相关字段（密码除外），都会成功。
-        AVUser.LogOut();
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
     }
-}).ContinueWith(t =>
-{
-    // 通过Id获取这个用户，注：如此做并未使当前用户登录。
-    return AVUser.Query.GetAsync(user.ObjectId);
-}).Unwrap().ContinueWith(t =>
-{
-    user = t.Result;
-    user.Username = "devUser";
-    return user.SaveAsync();
-}).Unwrap().ContinueWith(t =>
-{
-    if (t.IsFaulted)
-    {
-        // 显然，如此做就会失败，因为单单从Id获取用户，当前的请求不具备权限去修改这个用户的相关属性。
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "access_token": "11_gaS_CfX47PH3n6g33zwONEyUsFRmiWJPIEcmWVzqS48JeZjpII6uRkTD6g36GY7_5pxKciSM-v8OGnYR26DC-VBffwMHaVx5_ik8FVQdE5Y"
     }
-});
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-05T10:13:26.310Z"
+}
 ```
+如果是已有用户，则返回对应 authData 的 AVUser 实例并登录。
 
-## ACL 权限控制
+用户已经有了 AVUser 并登录成功后，可以用这个接口绑定新的第三方账号信息。绑定成功后，新的第三方账户信息会被添加到 AVUser 的 authData 字段里。示例代码如下：
 
-任何一个成熟的并且可控的系统中，必然会存在权限控制的问题，经典的案例就是论坛的斑竹可以删帖而普通游客只能看帖，如此一来，发展出来的[基于角色的访问控制](http://zh.wikipedia.org/wiki/%E4%BB%A5%E8%A7%92%E8%89%B2%E7%82%BA%E5%9F%BA%E7%A4%8E%E7%9A%84%E5%AD%98%E5%8F%96%E6%8E%A7%E5%88%B6)被普遍应用于各类传统的软件中，即便是互联网时代的今天，它依然是可以很简便地帮助开发者以及使用者理解和应用。
-
-{% if node=='qcloud' %}
-基于以上这一点，LeanCloud在开发者创建一个应用的时候，默认地在服务端为该应用添加了一张`_Role`的表，开发者可以在 `数据管理` 中看到这张表。
-{% else %}
-基于以上这一点，LeanCloud在开发者创建一个应用的时候，默认地在服务端为该应用添加了一张`_Role`的表，开发者可以在[数据管理](/data.html?appid={{appid}})中看到这张表。
-{% endif %}
-
-### 默认访问权限
-在没有显式指定的情况下，LeanCloud 中的每一个对象都会有一个默认的 ACL 值。这个值代表了，所有的用户，对这个对象都是可读可写的。此时你可以在数据管理的表中 ACL 属性中看到这样的值:
-
-```javascript
-  {"*":{"read":true,"write":true}}
-```
-在Unity中创建符合默认的开放读写权限的`AVACL`的代码如下：
-
-```javascript
-var defaultACL = new AVACL();
-defaultACL.PublicWriteAccess = true;
-defaultACL.PublicReadAccess = true;
-```
-
-### 指定用户访问权限
-
-当一个用户在实现一个网盘类应用时，针对不同文件的私密性，用户就需要不同的文件访问权限。 譬如公开的文件，每一个其他用户都有读的权限，然后仅仅只有创建者才拥有更改和删除的权限。
-
-
-```javascript
-byte[] data = System.Text.Encoding.UTF8.GetBytes("LeanCloud is a great cloud service!");
-AVFile file = new AVFile("mytxtFile.txt", data, new Dictionary<string, object>()
-    {
-        {"author","LeanCloud"}
-    });
-AVObject book = new AVObject("book");
-book["content"] = file;
-
-AVACL acl = new AVACL();
-acl.PublicReadAccess = true;
-acl.SetWriteAccess(AVUser.CurrentUser, true);
-book.ACL = acl;
-var saveTask = book.SaveAsync();
-```
-
-
-### 指定角色访问权限
-
-#### 角色
-
-`AVRole`拥有一些默认的属性，当然它也是一个`AVObject`，自然开发者也可以为角色添加业务逻辑所需的字段。
-
-*  `name`: `string`类型，角色的名称，并且这是创建角色的`必须字段`，并且`唯一`，并且只在创建时赋值，不能被`修改`，命名必须由字母，连接符，下划线组成，这个字段可视为主键。
-*  `users`:`AVACL`类型，它指向所有拥有（即`单用户可以拥有多角色`的系统）这个`角色`的用户。
-*  `roles`:`AVACL`类型，它指向所有该角色的子角色，`子角色自动继承父角色的所有权限`。关于这一点下一节会做详细阐述。
-
-#### AVUser 与 AVRole 的从属关系
-
-指定用户访问权限虽然很方便，但是依然会有局限性。 以工资系统为例，一家公司的工资系统，工资最终的归属者和公司的出纳们只拥有工资的读权限，而公司的人事和老板才拥有全部的读写权限。当然你可以通过多次设置指定用户的访问权限来实现这一功能（多个用户的 ACL 设置是追加的而非覆盖）。
-
-```javascript
-AVObject salary = new AVObject("salary");
-salary["value"] = 2000000;
-
-AVUser boss=new AVUser();//假设此处为老板
-AVUser hrWang=new AVUser();  //人事小王
-AVUser me = new AVUser(); //我们就在文档里爽一爽吧
-AVUser cashierZhou = new AVUser(); //出纳老周
-
-AVACL acl = new AVACL();
-acl.SetReadAccess(boss, true);
-acl.SetReadAccess(hrWang, true);
-acl.SetReadAccess(me, true);
-acl.SetReadAccess(cashierZhou, true);
-
-acl.SetWriteAccess(boss, true);
-acl.SetWriteAccess(hrWang, true);
-salary.ACL = acl;
-var saveTask = salary.SaveAsync();
-```
-
-但是这些涉及其中的人可能不止一个，也有离职换岗新员工的问题存在。这样的代码既不优雅，也太啰嗦, 同样会很难维护。 这个时候我们就引入了 `AVRole` 来解决这个问题。 公司的员工可以成百上千，然而一个公司组织里的角色却能够在很长一段时间时间内相对稳定。
-
-
-```javascript
-AVObject salary = new AVObject("salary");
-salary["value"] = 2000000;
-
-var roleACL = new AVACL();
-roleACL.PublicReadAccess = true;//AVRole本身在创建之后，就尽量避免它被修改，这里是为了设定AVRole自身的ACL访问限制。
-
-//以下这些角色只为示意，如要正确执行本段代码，以下这些AVUser必须是已经存在于服务端的数据。
-AVUser boss = new AVUser();//假设此处为老板
-AVUser hrWang = new AVUser();  //人事小王
-AVUser me = new AVUser(); //我们就在文档里爽一爽吧
-AVUser cashierZhou = new AVUser(); //出纳老周
-AVUser cashierGe = new AVUser();//出纳小葛
-
-AVRole hr = new AVRole("hr", roleACL);
-AVRole cashier = new AVRole("cashier", roleACL);
-
-hr.Users.Add(hrWang);
-
-cashier.Users.Add(cashier);
-cashier.Users.Add(cashierGe);
-
-var saveUsersTask = new List<Task>()
-{
-    {hr.SaveAsync()},
-    {cashier.SaveAsync()}
+```cs
+var facebookAuthData = new Dictionary<string, object> {
+    { "access_token", "FACEBOOK_ACCESS_TOKEN" },
+    { "expires_in", 7200 },
+    { "uid", "FACEBOOK_UID" },
 };
-var saveTask = Task.WhenAll(saveUsersTask).ContinueWith(t =>
-{
-    AVACL acl = new AVACL();
-    acl.SetReadAccess(boss, true);
-    acl.SetReadAccess(me, true);
 
-    acl.SetRoleReadAccess(hr, true);
-    acl.SetRoleReadAccess(cashier,true);
-
-    acl.SetWriteAccess(boss, true);
-    acl.SetRoleWriteAccess(hr, true);
-
-    salary.ACL = acl;
-
-    return salary.SaveAsync();
-});
-
+await user.AssociateAuthDataAsync(facebookAuthData, "facebook");
 ```
 
-#### AVRole 之间的从属关系
+`_User` 表的对应 AVUser 数据的 authData 字段会新增一个 facebook 的数据，如下：
 
-在讲清楚了用户与角色的关系后，我们还有一层角色与角色之间的关系。用下面的例子来理解可能会对我们有所帮助：
-
-一家创业公司有移动部门，部门下面有不同的小组，Android 和 iOS。而每个小组只拥有自己组的代码的读写权限。但是他们同时拥有核心库代码的读取权限。
-
-```javascript
-        var roleACL = new AVACL();
-        roleACL.PublicReadAccess = true;//AVRole本身在创建之后，就尽量避免它被修改，这里是为了设定AVRole自身的ACL访问限制。
-
-        AVRole androidTeam = new AVRole("androidTeam", roleACL);
-        AVRole iOSTeam = new AVRole("iOSTeam", roleACL);
-        AVRole mobileDep = new AVRole("mobileDep", roleACL);
-
-        AVObject androidCode = new AVObject("code");
-        androidCode["name"] = "android";
-
-        AVObject iOSCode = new AVObject("code");
-        iOSCode["name"] = "ios";
-
-        AVObject coreCode = new AVObject("code");
-        coreCode["name"] = "core";
-
-        var saveTeamTasks = new List<Task>()
-            {
-                {androidTeam.SaveAsync()},
-                {iOSTeam.SaveAsync()},
-            };
-
-        var saveTask = Task.WhenAll(saveTeamTasks).ContinueWith(t =>
-         {
-             mobileDep.Roles.Add(androidTeam);
-             mobileDep.Roles.Add(iOSTeam);
-             return mobileDep.SaveAsync();
-         }).Unwrap().ContinueWith(s =>
-         {
-             var saveCodeTasks = new List<Task>()
-             {
-                 {androidCode.SaveAsync()},
-                 {iOSCode.SaveAsync()},
-                 {coreCode.SaveAsync()},
-             };
-             return Task.WhenAll(saveCodeTasks);
-
-         }).Unwrap().ContinueWith(x =>
-         {
-
-             //androidCode的读写权限对androidTeam开放
-             androidCode.ACL.SetRoleReadAccess(androidTeam, true);
-             androidCode.ACL.SetRoleWriteAccess(androidTeam, true);
-
-             //iOSCode的读写权限对iOSTeam开放
-             iOSCode.ACL.SetRoleReadAccess(iOSTeam, true);
-             iOSCode.ACL.SetRoleWriteAccess(iOSTeam, true);
-
-             //coreCode对mobileDep开放读取权限，注意，mobileDep本身就已经包含了iOSTeam和androidTeam作为它的子角色
-             coreCode.ACL.SetRoleReadAccess(mobileDep, true);
-
-             var saveCodeTasks = new List<Task>()
-             {
-                 {androidCode.SaveAsync()},
-                 {iOSCode.SaveAsync()},
-                 {coreCode.SaveAsync()},
-             };
-             return Task.WhenAll(saveCodeTasks);
-         }).Unwrap().ContinueWith(y =>
-         {
-             //所有操作全部完成。
-         });
-
-```
-
-## 文件
-
-### 上传文件
-
-AVFile可以让你的应用程序将文件存储到服务器中，比如常见的文件类型图像文件、影像文件、音乐文件和任何其他二进制数据都可以使用。
-在这个例子中，我们将一段文本保存到服务器端：
-
-```javascript
-private string fildId;
-void OnGUI()
+```cs
 {
-    GUI.Label(new Rect(260, 50, 160, 50), fildId);
-    if (GUI.Button(new Rect(50, 50, 200, 50), "Create a txt file"))
-    {
-       byte[] data = System.Text.Encoding.UTF8.GetBytes("LeanCloud is a great cloud service!");
-       AVFile file = new AVFile("mytxtFile.txt", data, new Dictionary<string, object>()
-       {
-          {"author","LeanCloud"}
-       });
-       file.SaveAsync().ContinueWith(t =>
-       {
-          Debug.Log(t.IsFaulted);
-          if (!t.IsFaulted)
-          {
-             fildId = file.ObjectId;
-          }
-          else
-          {
-             Debug.Log(t.Exception.Message);
-             Debug.LogException(t.Exception);
-          }
-       });
-     }
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "access_token": "11_U4Nuh9PGpfuBJqtm7KniWn48rkJ7vBTCVN2beHcVvceswua2sLU_5Afq26ZJrRF0vpSX0xcDwI-zxeo3qcf-cMftjqEvWh7Vpp05bgxeWtc",
+      "expires_in": 7200,
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk"
+    },
+    "facebook": {
+      "uid": "facebookUid",
+      "expires_in": 7200,
+      "access_token": "facebookToken"
+    }
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-06T07:46:58.097Z"
 }
 ```
 
-AVFile构造函数的第一个参数指定文件名称，第二个构造函数接收一个byte数组，也就是将要上传文件的二进制，第三个参数是自定义元数据的字典，比如你可以把文件的作者的名字当做元数据存入这个字典，LeanCloud 的服务端会把它保留起来，这样在以后获取的时候，这种类似的自定义元数据都会被获取。
+以上就是一个第三方登录开发的基本流程。
 
-### 本地文件
+### 扩展需求
 
-在Unity中，如果很清楚地知道某一个文件所存在的路径，比如在游戏中上传一张游戏截图到LeanCloud中，可以通过SDK直接获取指定的文件，上传到LeanCloud中。
+#### 接入 UnionId 体系
+方平台的账户体系变得日渐复杂，它们的 authData 出现了一些较大的变化。下面我们以最典型的微信开放平台为例来进行说明。
 
-```javascript
-GUI.Label(new Rect(260, 50, 160, 50), fildId);
-if (GUI.Button(new Rect(50, 50, 200, 50), "Upload a screenshot"))
+当一个用户在移动应用内登录微信账号时，会被分配一个 OpenID；在微信小程序内登录账号时，又会被分配另一个不同的 OpenID。这样的架构会导致的问题是，使用同一个微信号的用户，也无法在微信开发平台下的移动应用和小程序之间互通。
+
+微信官方为了解决这个问题，引入 UnionID 的体系，即：**同一微信号，对同一个微信开放平台账号下的不同应用，不管是移动 App、网站应用还是小程序，UnionID 都是相同的**。也就是说，UnionID 可以作为用户的唯一标识。
+
+其他平台，如 QQ 的 UnionID 体系，和微信的设计保持一致。
+
+LeanCloud 支持 UnionID 体系。你只需要给 `LogInWithAuthDataAndUnionIdAsync` 和 `AssociateAuthDataAndUnionIdAsync` 接口传入更多的参数，即可完成新 UnionID 体系的集成。
+
+要使用到的关键参数列表：
+
+参数名 | 类型 | 意义
+---- | ----- | ----
+`platform` | String | 平台，命名随意，如 `weixinapp`、`wxminiprogram`、`qqapp1` 等。
+`unionIdPlatform` | String | UnionID 平台，目前仅支持 `weixin`、`weibo` 和 `qq` 。
+`unionId` | String | 由 UnionID 平台提供。**需配合 `asMainAccount`、`unionIdPlatform` 一起使用**。
+`asMainAccount` | boolean | true 代表将 UnionID 绑定入当前 authData 并作为主账号，之后以该 UnionID 来识别。**需配合 `unionId`、`unionIdPlatform` 一起使用**。
+
+接入新 UnionID 系统时，每次传入的 authData 必须包含成对的平台 `uid 或 openid` 和平台 `unionid`。示例代码如下：
+
+```cs
+var authData = new Dictionary<string, object> {
+    { "access_token", "ACCESS_TOKEN" },
+    { "expires_in", 7200 },
+    { "openid", "OPENID" },
+};
+
+AVUserAuthDataLogInOption options = new AVUserAuthDataLogInOption
 {
-   AVFile file = AVFile.CreateFileWithLocalPath("screenshot.PNG", Path.Combine(Application.persistentDataPath, "screenshot.PNG"));
-   file.SaveAsync().ContinueWith(t =>
-   {
-       Debug.Log(t.IsFaulted);
-       if (!t.IsFaulted)
-       {
-           fildId = file.ObjectId;
-       }
-       else
-       {
-           Debug.Log(t.Exception.Message);
-           Debug.LogException(t.Exception);
-       }
-    });
-}
+    UnionIdPlatform = "weixin",
+    AsMainAccount = true
+};
+
+var user = await AVUser.LogInWithAuthDataAndUnionIdAsync(authData, "weixinapp1", "ox7NLs06ZGfdxbLiI0e0F1po78qE", options);
 ```
 
-### 文件元信息
+然后让我们来看看生成的 authData 的数据格式：
 
-AVFile默认会存储文件大小和文件上传者objectId作为元信息。同样的，我们提供了一个字典接口帮助开发者可以未任意文件添加任意符合字典命名规则的自定义元数据。在本小节的第一个例子了已经为文件添加了一个自定义的元数据：
-
-```javascript
- AVFile file = new AVFile("mytxtFile.txt", data, new Dictionary<string, object>()
- {
-     {"author","LeanCloud"}
- });
-```
-这个就是简单的用法，在创建文件的时候，可以指定一组字典去保留文件的自定义元数据。
-
-你还可以在上传前自动一些元信息保存起来，以便后续获取，例如我们还保存图片的高度和宽度：
-
-```javascript
- file.MetaData.Add("width", 100);
- file.MetaData.Add("height", 100);
-```
-
-#### 文件下载
-因为多平台适配会造成困扰，因此 Unity SDK 不提供直接下载文件的方式。
-
-对 Unity 有经验的开发者，我们推荐用  Unity 自带的 WWW 类或者 UnityWebRequest 类解决文件下载的问题，如下：
-
-```javascript
-var req = new WWW(file.Url.AbsoluteUri);
-yield return req;
-string text = req.text;
-```
-以上是针对纯文件文件的操作。
-其他文件的下载，还是建议开发者自行利用 `AVFile.Url` 这个属性进行如上操作。
-
-### 删除文件
-
-**删除文件就意味着，执行之后在数据库中立刻删除记录，并且原始文件也会从存储仓库中删除（所有涉及到物理级别删除的操作请谨慎使用）**
-
-```javascript
-if (GUI.Button(new Rect(50, 50, 200, 50), "Delete file"))
-{
-   AVFile.GetFileWithObjectIdAsync("538ed669e4b0e335f6102809").ContinueWith(t =>
-   {
-      var file = t.Result;
-      file.DeleteAsync();
-   });
-}
+```cs
+"authData": {
+    "weixinapp1": {
+      "platform": "weixin",
+      "openid": "oTY851axxxgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+      "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+  }
 ```
 
-## 调用云引擎
-云引擎是 LeanCloud 提供给开发者自定义服务端逻辑的解决方案，例如想在用户注册的时候，服务端统一给用户分配随机的昵称，这一操作就可以用云引擎实现。具体关于云引擎的一些相关概念和操作可以先查看 [云引擎指南](leanengine_cloudfunction_guide-node.html)。
+当你想加入该 UnionID 下的一个新平台，比如 miniprogram1 时，再次登录后生成的数据为：
 
-调用云引擎在 SDK 中比较方便，它是 `AVCloud` 的静态方法，全局均可调用。
+```cs
+"authData": {
+    "weixinapp1": {
+      "platform": "weixin",
+      "openid": "oTY851axxxgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+      "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "miniprogram1": {
+      "platform": "weixin",
+      "openid": "ohxoK3ldpsGDGGSaniEEexxx",
+      "expires_in": 7200,
+      "main_account": true,
+      "access_token": "10_QfDeXVp8fUKMBYC_d4PKujpuLo3sBV_pxxxxIZivS77JojQPLrZ7OgP9PC9ZvFCXxIa9G6BcBn45wSBebsv9Pih7Xdr4-hzr5hYpUoSA",
+      "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+  }
 
-```javascript
-var dic = new Dictionary<string, object>();
-dic.Add("name", "Justin");
-//...
-//增加参数
-//...
-//...
-var callTask = AVCloud.CallFunctionAsync<string>("TestFunctionName", dic);
 ```
-只需要传入云引擎中函数的名字和这个函数需要参数即可，如果是无参的函数，直接传入`null`即可。
 
-## 消息推送
-在Unity中消息的推送只需要掌握`AVPush`的用法就可以在客户端推送消息发给服务端，再由 LeanCloud 的服务端将消息都推送各个客户端，但要注意**Unity想实现接受消息，最好依赖于当前操作系统的本地的API**，换言之，因为接受消息这一操作在各个移动操作系统最好使用当前系统的API去实现，当然，开发者也可以自己去实现。考虑到这一点，LeanCloud 暂时不考虑在Unity 做过多的强制性，如何展现消息接受，应该是客户端开发者自己去掌控。另外，我们也推荐在Unity开发中，针对不同平台搭配使用我们针对这个平台的SDK（iOS,Android,Windows Phone等）去调用带有平台特征性的一些功能和API。
+可以看到，最终该 authData 实际包含了来自 `weixin` 这个 `unionId` 体系内的两个不同平台，`weixinapp1` 代表来自移动应用，`miniprogram1` 来自小程序。`_weixin_unionid ` 这个字段的值就是用户在 `weixin` 这个 `unionId` 平台的唯一标识 UnionID 值。
 
-### 推送给所有的设备
+当一个用户以来自 `weixinapp1` 的 OpenID `oTY851axxxgujsEl0f36Huxk` 和 UnionID `ox7NLs06ZGfdxxxxxe0F1po78qE` 一起传入生成新的 AVUser 后，接下来这个用户以来自 miniprogram 不同的 OpenID `ohxoK3ldpsGDGGSaniEEexxx` 和同样的 UnionID `ox7NLs06ZGfdxxxxxe0F1po78qE` 一起传入时，LeanCloud 判定是同样的 UnionID，就直接把来自 `miniprogram` 的新用户数据加入到已有 authData 里了，不会再创建新的用户。
 
-```javascript
-AVPush push = new AVPush();
-push.Alert = "message to all devices.";
-var task = push.SendAsync();
-```
-以上这段代码就可以实现向所有安装了当前App的设备推送消息。
+这样一来，LeanCloud 后台通过识别平台性的用户唯一标识 UnionID，让来自同一个 UnionID 体系内的应用程序、小程序等不同平台的用户都绑定到了一个 AVUser 上，实现互通。
 
-### 发送给特定的用户
-发送给public频道的用户：
+### 已有 authData 应用接入 UnionID
 
-```javascript
- AVPush push = new AVPush();
- push.Alert = "message to public channel.";
+先梳理一遍业务，看看是否在过去开发过程集成了移动应用程序、小程序等多个平台的 authData，导致同一个用户的数据已经被分别保存为不同的 AVUser：
 
- push.Query = new AVQuery<AVInstallation>().WhereEqualTo("channels", "public");
- var task = push.SendAsync();
-```
+如果没有的话，直接按前面 [接入 UnionID 体系](#接入-UnionID-体系) 小节的代码集成即可。
+
+如果有的话，需要确认自身的业务需要，确定要以哪个已有平台的账号为主。比如决定使用某个移动应用上生成的账号，则在该移动应用程序更新版本时，使用 `asMainAccount` 参数。这个移动应用带着 UnionID 登录匹配或创建的账号将作为主账号，之后所有这个 UnionID 的登录都会匹配到这个账号。
+
+**请注意**，在第二种情况下 `_User` 表里会剩下一些用户数据，也就是没有被选为主账号的、其他平台的同一个用户的旧账号数据。这部分数据会继续服务于已经发布的但仍然使用 OpenID 登录的旧版应用。
+
 
 ## Unity SDK 注意事项
 
 1. 基于 Unity 自身的 WWW 类发送 Http 请求的限制，单个请求的大小不能超过 2MB，所以在使用 Unity SDK 时，开发者需要注意存储数据，构建查询等操作时，需要做到简洁高效。
 2. Unity 中请将 `Optimization` 中的 `Stripping Level` 设置为 `Disabled`。
-3. 从官网上下载的 SDK，在 Unity 4.3 以后的版本都需要重命名，把版本号去掉，例如下载的文件叫做 `AVOSCloud.Unity-v1.1.5.dll`，请重命名为 `AVOSCloud.Unity.dll`，否则会出现引入脚本失败的错误。
-4. Unity 自从升级到 5.0 之后就会出现一个 iOS 上访问 HTTPS 请求时的 SSL 证书访问错误：**NSURLErrorDomain error -1012**。解决方案是：在 Unity 构建完成 iOS 项目之后，使用 XCode 打开项目，找到 `Classes/Unity/WWWConnection.mm` 文件，找到这个方法：
+3. Unity 自从升级到 5.0 之后就会出现一个 iOS 上访问 HTTPS 请求时的 SSL 证书访问错误：**NSURLErrorDomain error -1012**。解决方案是：在 Unity 构建完成 iOS 项目之后，使用 XCode 打开项目，找到 `Classes/Unity/WWWConnection.mm` 文件，找到这个方法：
 
   ```objc
   -(void)connection:(NSURLConnection*)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge*)challenge

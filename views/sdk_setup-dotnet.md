@@ -1,8 +1,37 @@
 {% import "views/_helper.njk" as docs %}
+[unity-storage]: https://releases.leanapp.cn/#/leancloud/unity-sdk/releases
+[unity-im]: https://releases.leanapp.cn/#/leancloud/realtime-SDK-dotNET/releases
+
 # C# SDK 安装指南
 
 ## 安装
-### .NET Framework
+
+### Unity
+
+- 支持 Unity 5.3+。
+<!-- 等升级 Unity 即时通讯的文档后再增加这句话 -->
+<!-- - 支持 .NET 4.x。SDK 在 .NET 3.x 版本下仅做 Bug 维护，不再增加新版本，请大家尽快升级到 4.x 版本。 -->
+
+支持使用 Unity 开发的 iOS、Android、Windows Phone 8、Windows Store、Windows Desktop，以及网页游戏。
+
+#### 安装数据存储
+请下载 [Unity Storage][unity-storage] 最新版本的 zip 包，解压之后导入到你的 Unity 项目中。
+
+#### 安装即时通讯
+请下载 [Unity Realtime][unity-im] 最新版本的 zip 包，解压之后导入到你的 Unity 项目中。
+
+#### 依赖详解
+
+安装包解压之后，每一个依赖的详细说明如下：
+
+名称|模块描述|必选
+--|---|---
+`AssemblyLister.dll`|LeanCloud 依赖检测模块，它负责检查相关依赖是否正确加载|是
+`LeanCloud.Core.dll`|核心库，里面包含了 AVObject 和 AVUser 等所有内置类型的定义和序列化相关操作的功能|是
+`LeanCloud.Storage.dll`|存储库，里面包含本地缓存以及 HTTP 请求发送的实现|是
+`LeanCloud.Realtime.dll`|即时通讯库，里面包含了即时通讯协议的实现以及相关接口|否
+
+### .NET Framework & Xamarin
 
 .NET Framework 支持以下运行时：
 
@@ -12,74 +41,52 @@
 - UWP 4.5+
 - .NET Core 2.0+
 
-在 Visual Studio 执行安装 nuget 依赖：
-
-```sh
-PM> Install-Package LeanCloud
-```
-
-### Xamarin
-
-请确保你的项目至少满足如下版本需求：
+Xamarin 请确保你的项目至少满足如下版本需求：
 
 - [Xamarin.Android 4.7+](https://developer.xamarin.com/releases/ios/xamarin.ios_6/xamarin.ios_6.3/)
 - [Xamarin.iOS 6.3](https://developer.xamarin.com/releases/android/xamarin.android_4/xamarin.android_4.7/)
 
-在 Xamarin Studio 或者 Visual Studio for Mac 上执行如下 nuget 指令：
+在 Visual Studio 执行安装 nuget 依赖：
 
 ```sh
-PM> Install-Package LeanCloud
-```
-
-### Mono for Unity
-
-- Unity 5.3+
-
-不支持 Unity 5.3 以下版本的原因是：Unity 官方在 5.3 之后支持了 [UnityWebRequest](https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest.html) 类，并且建议开发者都使用此类进行 HTTP 请求的发送，因此我们遵照官方设定，摒弃原来的 WWW，改用新的 UnityWebRequest 来实现底层的 HTTP Client。
-
-请前往 [Unity Storage][unity-storage] 以及 [Unity Realtime][unity-im] 下载最新版本的 zip 包，解压之后导入到你的 Unity 项目中。
-
-{{ docs.note("[Unity Storage][unity-storage] 和 [Unity Realtime][unity-im] 本质上只相差一个 DLL 文件：`LeanCloud.Realtime.dll`，因此如果你不需要使用即时通讯模块，可以只下载 [Unity Storage][unity-storage]。") }}
-
-### 依赖详解
-
-安装之后，你的项目会依赖如下内容：
-
-名称|模块描述|必选
---|---|---
-`AssemblyLister.dll`|LeanCloud 依赖检测模块，它负责检查相关依赖是否正确加载|是
-`LeanCloud.Core.dll`|核心库，里面包含了 AVObject 和 AVUser 等所有内置类型的定义和序列化相关操作的功能|是
-`LeanCloud.Storage.dll`|存储库，里面包含本地缓存以及 HTTP 请求发送的实现|是
-`LeanCloud.Realtime.dll`|即时通讯库，里面包含了即时通讯协议的实现以及相关接口|否
-`LeanCloud.LiveQuery.dll`|LiveQuery 库，里面包含实时数据同步的实现和相关接口|否
-`LeanCloud.Analytics.dll`|数据统计库，里面包含了实现数据统计分析的实现和相关接口|否
-
-如果你的项目不需要使用即时通讯，就可以删除对 `LeanCloud.Realtime.dll` 的依赖，或者在引入的时候在 nuget 里面执行如下指令，则 IDE 只会加载核心和存储模块，并不会导入即时通讯模块：
-
-```sh
+# 安装存储，必选
 PM> Install-Package LeanCloud.Storage
-```
-
-另外我们也提供了指定安装即时通讯模块的 nuget 包：
-
-```sh
+# 安装 LiveQuery，可选，如果需要实时数据同步功能则需要安装
+PM> Install-Package LeanCloud.LiveQuery
+# 安装即时通讯，可选，如果需要接入聊天则需要安装
 PM> Install-Package LeanCloud.Realtime
 ```
 
-如果希望使用实时数据同步功能（[LiveQuery](livequery-guide.html)），请执行如下 nuget 命令行来自动安装所有必要的依赖（例如即时通讯模块）：
+## 初始化 SDK
 
-```sh
-Install-Package LeanCloud.LiveQuery
+### 导入 SDK
+导入基础模块
+
+```cs
+// 导入存储模块
+using LeanCloud;
+// 如果需要，导入聊天模块
+using LeanCloud.Realtime;
 ```
 
-安装数据统计分析库需要执行如下命令行：
+### Unity
 
-```sh
-Install-Package LeanCloud.Analytics
+#### 数据存储初始化
+
+初始化**必须**在 Unity Editor 上将 `AVInitializeBehaviour` 挂载在某一个 GameObject 下，如下图：
+
+![AVInitializeBehaviour](images/unity/avinitializebehaviour.png)
+
+#### 即时通讯初始化
+初始化**必须**在 Unity Editor 上将 `AVRealtimeInitializeBehavior` 挂载在某一个 GameObject 下，如下图：
+
+![AVRealtimeInitializeBehavior](images/unity/realtime-unity-setup.png)
+
+然后在任意一个 `MonoBehaviour` 启动的时候调用如下代码：
+
+```cs
+var realtime = new AVRealtime("{{appid}}", "{{appkey}}");
 ```
-
-
-## 配置 SDK
 
 ### .NET Framework & Xamarin
 在应用程序入口函数添加如下代码：
@@ -95,9 +102,20 @@ AVClient.Initialize("{{appid}}", "{{appkey}}");
 var realtime = new AVRealtime("{{appid}}", "{{appkey}}");
 ```
 
-如果使用了即时通讯初始化的代码，就不需要再次调用 `AVClient.Initialize`，因为在聊天初始化的时候会调用它。
+### 开启调试日志
+在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口。
 
-#### 私有部署
+```cs
+AVClient.HttpLog(Debug.Log);
+```
+
+{{ docs.alert("在应用发布之前，请关闭调试日志，以免暴露敏感数据。") }}
+
+
+
+
+
+<!-- #### 私有部署
 
 针对私有部署的服务器地址是根据部署之后的域名而对应生成的，因此在初始化 SDK 的时候需要单独配置服务器地址。
 
@@ -162,21 +180,4 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
     ApplicationKey = "{{appkey}}",
     RealtimeServer = new Uri("wss://abc-wss.xyz.com") // 告知 SDK 直接连这个地址的 WebSocket 服务，不用再去请求 RTMRouter 了
 });
-```
-
-### Unity
-
-初始化**必须**在 Unity Editor 上将 `AVInitializeBehaviour` 挂载在某一个 GameObject 下，如下图：
-
-![AVInitializeBehaviour](images/unity/avinitializebehaviour.png)
-
-假设还需要使用即时通讯，请在任意一个 `MonoBehaviour` 启动的时候调用如下代码：
-
-```cs
-var realtime = new AVRealtime("{{appid}}", "{{appkey}}");
-```
-
-{{ docs.alert("在 Unity 中使用即时通讯，一定先要先初始化存储模块，然后初始化即时通讯模块，**这两步都必须做。**") }}
-
-[unity-storage]: https://releases.leanapp.cn/#/leancloud/unity-sdk/releases
-[unity-im]: https://releases.leanapp.cn/#/leancloud/realtime-SDK-dotNET/releases
+``` -->
