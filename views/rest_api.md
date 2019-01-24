@@ -309,12 +309,12 @@ REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 
   </thead>
   <tbody>
     <tr>
-      <td>/1.1/functions</td>
+      <td>/1.1/functions/&lt;functionName&gt;</td>
       <td>POST</td>
       <td>调用云函数</td>
     </tr>
     <tr>
-      <td>/1.1/call</td>
+      <td>/1.1/call/&lt;functionName&gt;</td>
       <td>POST</td>
       <td>调用云函数，支持 AVObject 作为参数和结果</td>
     </tr>
