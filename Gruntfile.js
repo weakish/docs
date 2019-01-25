@@ -386,7 +386,7 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
       let $ = cheerio.load(content, { decodeEntities: false });
       const version = crypto.createHash('md5').update($.html(), 'utf8').digest('hex');
 
-      grunt.log.writeln('--------'.padStart(10) + ' ' + filePath['grey'].bold)
+      grunt.verbose.writeln('--------'.padStart(10) + ' ' + filePath['grey'].bold)
       let headingCounts = {}
       // replace all in-page IDs with their numeric representations
       $('h1,h2,h3,h4,h5,:not(#toc) a[href*="#"]:not([href="#"]):not([href*="#/"]):not([href*="&#"])').each(function(index, el){
@@ -469,8 +469,8 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
           }
 
           if (attrValue !== newValue) {
-            grunt.log.writeln(($el.prop('tagName') + '.' + attrName +':').padStart(10) + attrValue[color].bold)
-            grunt.log.writeln('=>'.padStart(10)  + newValue)
+            grunt.verbose.writeln(($el.prop('tagName') + '.' + attrName +':').padStart(10) + attrValue[color].bold)
+            grunt.verbose.writeln('=>'.padStart(10)  + newValue)
             $el.attr( attrName, newValue)
           }
         }
