@@ -15,12 +15,6 @@ module.exports = function(grunt) {
 
   require("time-grunt")(grunt);
 
-  var hostMap = {
-    'us': 'us-api.leancloud.cn',
-    'cn': "{{domainN1}}",
-    'qcloud': '{{domainE1}}'
-  }
-
   var engineDomainMap = {
     'us': 'avosapps.us',
     'cn': 'leanapp.cn',
@@ -130,6 +124,7 @@ module.exports = function(grunt) {
         layoutdir: 'templates/layouts/',
         layout: ['template.swig'],
         node: grunt.option('theme'),
+        region: grunt.option('theme'),
         flatten: true
       },
       md: {
@@ -256,7 +251,7 @@ module.exports = function(grunt) {
             masterkey: '{{masterkey}}',
             sign_masterkey: "{{sign_masterkey}}",
             sign_appkey: '{{sign_appkey}}',
-            host: hostMap[grunt.option('theme')] || hostMap['cn'],
+            host: '{{domain}}',
             engineDomain: engineDomainMap[grunt.option('theme')] || engineDomainMap['cn']
           }
         }

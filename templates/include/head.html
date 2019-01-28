@@ -51,5 +51,11 @@
       })();
   </script>
 
+<script>
+angular.module("app").run(['$rootScope', function($rootScope) {
+  $rootScope.region = '<%= region %>';
+}]);
+</script>
+
 <link rel="stylesheet" type="text/css" href="custom/css/app-docs.css?githubv1">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />

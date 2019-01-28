@@ -11,8 +11,13 @@ angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout', '$co
         $scope.sign_masterkey = "{{sign_masterkey}}";
         $scope.sign_appkey = "{{sign_appkey}}";
         var service = $scope.service || 'api';
-        $scope.domainN1 = '{{appid 前八位}}.' + service + '.lncld.net';
-        $scope.domainE1 = '{{appid 前八位}}.' + service + '.lncldapi.com';
+        var domains = {
+          n1: 'lncld.net',
+          qcloud: 'lncldapi.com',
+          us: 'lncldglobal.com',
+        };
+        var domain = domains[$rootScope.region] || domains['n1'];
+        $scope.domain = '{{appid 前八位}}.' + service + '.' + domain;
         $rootScope.pageState = {};
         var sdkversion = 'unknown';
         if (typeof $sdk_versions != 'undefined') {
@@ -36,8 +41,7 @@ angular.module("app").controller("AppCtrl", ['$scope', '$http', '$timeout', '$co
                             $scope.sign_masterkey = $filter('signify')($scope.pageState.currentApp.master_key, 'master');
                             $scope.sign_appkey = $filter('signify')($scope.pageState.currentApp.app_key);
                             var prefix = $scope.appid.slice(0, 8).toLowerCase();
-                            $scope.domainN1 = prefix + '.' + service + '.lncld.net';
-                            $scope.domainE1 = prefix + '.' + service + '.lncldapi.com';
+                            $scope.domain = prefix + '.' + service + '.' + domain;
                         }
                     });
                     $scope.apps = data;
