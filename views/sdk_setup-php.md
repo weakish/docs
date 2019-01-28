@@ -10,6 +10,14 @@ composer 是推荐的 PHP 包管理工具。安装 leancloud-sdk 只需执行以
 composer require leancloud/leancloud-sdk
 ```
 
+注意：
+
+- leancloud-sdk 依赖 PHP 的 curl 扩展（常见 Linux 系统下一般需要安装 `php-curl` 这个包）
+
+
+- 如果 composer 访问 packagist 仓库有问题，需要[设置镜像][packagist-mirror]或者通过代理（设置 `http_proxy` 环境变量）访问。
+[packagist-mirror]: https://pkg.phpcomposer.com/
+
 {% endblock %}
 
 {% block init_with_app_keys %}
@@ -47,7 +55,10 @@ Client::useRegion(Region::CN_E1);
 ```php
 // test.php
 
-require 'vendor/autoload.php';
+// 通过 composer 安装
+require_once 'vendor/autoload.php';
+// 手动安装
+// require_once("vendor/leancloud/src/autoload.php");
 
 use \LeanCloud\Client;
 use \LeanCloud\LeanObject;
