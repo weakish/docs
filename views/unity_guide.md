@@ -20,7 +20,7 @@
 下面这段代码在创建了一个 `GameEquip` 类型的对象，并将它保存到云端：
 
 ```cs
-AVObject equip = new AVObject("GameEquip");
+var equip = new AVObject("GameEquip");
 equip["name"] = "短剑";
 equip["attackValue"] = 5;
 await equip.SaveAsync();
@@ -30,7 +30,7 @@ Debug.Log(equip.ObjectId);
 如果你熟悉关系型数据库的话，需要注意 LeanStorage 的不同点。在 LeanStorage 里不需要事先建立表结构（schema），并且可以随时增加新的属性。通常这被称为无模式（schema-free）。例如，为上面的 `GameEquip` 类型新增一个表示等级的 `level` 属性，只需做如下变动：
 
 ```cs
-AVObject equip = new AVObject("GameEquip");
+var equip = new AVObject("GameEquip");
 equip["name"] = "短剑";
 equip["attackValue"] = 5;
 // 只要添加这一行代码，服务端就会自动添加这个字段
@@ -74,7 +74,7 @@ var testDictionary = new Dictionary<string, object>();
 testDictionary.Add("number", testNumber);
 testDictionary.Add("string", testString);
 
-AVObject testObject = new AVObject("DataTypes");
+var testObject = new AVObject("DataTypes");
 testObject["testInteger"] = testNumber;
 testObject["testFloat"] = testFloat;
 testObject["testDouble"] = testDouble;
@@ -94,7 +94,7 @@ Debug.Log(testObject.ObjectId);
 现在我们保存一个道具背包 `GameEquipBag`，背包中可以有多个道具 `GameEquip`。我们并不需要提前去后台创建这个名为 `GameEquipBag` 的 Class 类，而仅需要执行如下代码，云端就会自动创建这个类：
 
 ```c#
-AVObject equipBag = new AVObject("GameEquipBag");
+var equipBag = new AVObject("GameEquipBag");
 equipBag["scale"] = 20;
 equipBag["name"] = "装备背包";
 await equipBag.SaveAsync();
@@ -141,7 +141,7 @@ Debug.Log(equipment.ObjectId);
 每一次对象存储成功之后，云端都会返回 objectId，它是一个全局唯一的属性。
 
 ```cs
-AVObject equipBag = new AVObject("GameEquipBag");
+var equipBag = new AVObject("GameEquipBag");
 equipBag["scale"] = 20;
 equipBag["name"] = "装备背包";
 await equipBag.SaveAsync();
@@ -152,7 +152,7 @@ Debug.Log(equipBag.ObjectId);
 objectId、createdAt、updatedAt 三个特殊属性可以直接获取，其他的自定义属性可以使用相应数据类型的 `Get<T>` 泛型方法：
 
 ```cs
-AVObject equipBag = new AVObject("GameEquipBag");
+var equipBag = new AVObject("GameEquipBag");
 equipBag["scale"] = 20;
 equipBag["name"] = "装备背包";
 await equipBag.SaveAsync();
@@ -280,12 +280,12 @@ await AVObject.FetchAllAsync(objects);
 
 ```cs
 // 装备背包
-AVObject equipBag = new AVObject("GameEquipBag");
+var equipBag = new AVObject("GameEquipBag");
 equipBag["scale"] = 20;
 equipBag["name"] = "装备背包";
 
 // 道具
-AVObject equip = new AVObject("GameEquip");
+var equip = new AVObject("GameEquip");
 equip["name"] = "短剑";
 equip["attackValue"] = 5;
 
@@ -492,7 +492,7 @@ var metadata = file.MetaData;
 ```cs
 AVFile file = new AVFile("picture.png", data);
 
-AVObject equip = new AVObject("GameEquip");
+var equip = new AVObject("GameEquip");
 equip["image"] = file;
 await equip.SaveAsync();
 ```
