@@ -851,7 +851,9 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 {% endblock %}
 
 #### 条件查询
-
+{% if platform_name == "Objective-C" %}
+当没有添加任何 where 查询条件时，query 会使用默认查询条件 `where={"m":{"$in":["client ID"]}}`，即查询成员含有此 client ID 的对话；当添加了任意 where 查询条件时，query 会严格按 where 条件来查询，即覆盖默认的 where 查询条件。使用条件查询时，如果想查询含有此 client ID 的对话，使用 `[query whereKey:@"m" containedIn:@[@"client ID"]]` 增加一个查询条件即可。
+{% endif %}
 ##### 构建查询
 
 对话的条件查询需要注意的对话属性的存储结构，在对话的属性一章节我们介绍的对话的几个基本属性，这些属性都是 SDK 提供的默认属性，根据默认属性查询的构建如下：
