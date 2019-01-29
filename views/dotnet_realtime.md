@@ -87,7 +87,7 @@ public async void JerryReceiveMessageFromTom()
 * m：Array，对话中成员的列表。
 * lm：Date，对话中最后一条消息发送的时间。
 * c：String，对话的创建者的 ClientId
-* mu：Array，对话中设置了静音的成员，仅针对 iOS 以及 Windows Phone 用户有效
+* mu：Array，仅 iOS、Windows Phone 及启用混合推送的 Android 用户有效。
 * attr：Object，开发者设置的对话的自定义属性。
 
 ## 群聊
@@ -748,7 +748,7 @@ public async void MuteConversationAsync()
 }
 ```
 
-**设置静音之后，针对 iOS 以及 Windows Phone 用户就不会收到推送消息**
+**设置静音之后，iOS、Windows Phone 及启用混合推送的 Android 用户就不会收到推送消息。**
 
 此操作修改的是服务端 `_Conversation` 里面的 `mu` 属性。
 与之对应的就是 `UnmuteAsync`操作，就是取消静音，示例代码参照静音操作。

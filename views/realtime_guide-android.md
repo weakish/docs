@@ -770,7 +770,7 @@ jerry.open(new AVIMClientCallback() {
 {% endblock %}
 
 {% block offlineMessage %}
-{{ docs.note("**Android 聊天服务是和后台的推送服务共享连接的，所以只要有网络就永远在线，不需要专门做推送。**消息达到后，你可以根据用户的设置来判断是否需要弹出通知。网络断开时，我们为每个对话保存 20 条离线消息。") }}
+{{ docs.note("**未启用混合推送的情况下，Android 聊天服务是和后台的推送服务共享连接的，所以只要有网络就永远在线，不需要专门做推送。**消息达到后，你可以根据用户的设置来判断是否需要弹出通知。网络断开时，我们为每个对话保存 20 条离线消息。而在启用混合推送的情况下，Android 同样支持类似 iOS 的即时通讯离线推送。") }}
 {% endblock %}
 
 {% block message_unread_message_count %}

@@ -136,7 +136,7 @@ realtime.createIMClient('Tom').then(function(tom) {
 | m    | Array  | 对话中成员的列表                                 |
 | lm   | Date   | 对话中最后一条消息发送的时间                           |
 | c    | String | 对话的创建者的 ClientId                         |
-| mu   | Array  | 对话中设置了静音的成员，仅针对 iOS 以及 Windows Phone 用户有效。 |
+| mu   | Array  | 对话中设置了静音的成员，仅 iOS、Windows Phone 及启用混合推送的 Android 用户有效。 |
 
 {{ docs.note("每次调用 `createConversation()` 方法，都会生成一个新的 Conversation 实例，即便使用相同 members 和 name 也是如此。如果想要不重复创建相同成员的对话，请参阅 [常见问题](#常见问题) 。") }}
 
@@ -1147,7 +1147,7 @@ black.getConversation(CONVERSATION_ID).then(function(conversation) {
 ```
 
 
->设置静音之后，iOS 和 Windows Phone 的用户就不会收到推送消息了。
+>设置静音之后，iOS、Windows Phone 及启用混合推送的 Android 用户就不会收到推送消息了。
 
 与之对应的就是取消静音的操作，即取消免打扰模式。此操作会修改云端 `_Conversation` 里面的 `mu` 属性。**切勿在控制台中对 `mu` 进行修改**。
 
