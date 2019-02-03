@@ -282,7 +282,7 @@ def upload():
 {% block leancache %}
 首先添加相关依赖到云引擎应用的 `requirements.txt` 中：
 
-``` python
+```python
 Flask>=0.10.1,<1.0.0
 leancloud>=2.0.0,<3.0.0
 ...
@@ -291,7 +291,7 @@ redis>=2.10.5,<3.0.0
 
 然后可以使用下列代码获取 Redis 连接：
 
-``` python
+```python
 import os
 import redis
 

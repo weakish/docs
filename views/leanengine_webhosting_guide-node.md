@@ -424,13 +424,13 @@ app.get('/', function(req, res) {
 {% block upload_file_special_middleware %}
 然后配置应用使用 [multiparty](https://www.npmjs.com/package/multiparty) 中间件：
 
-```nodejs
+```js
 var multiparty = require('multiparty');
 ```
 {% endblock %}
 
 {% block code_upload_file_sdk_function %}
-```nodejs
+```js
 var fs = require('fs');
 app.post('/upload', function(req, res){
   var form = new multiparty.Form();
@@ -543,7 +543,7 @@ if (cluster.isMaster) {
 {% endblock %}
 
 {% block code_calling_custom_variables %}
-```nodejs
+```js
 // 在云引擎 Node.js 环境中使用自定义的环境变量
 var MY_CUSTOM_VARIABLE = process.env.MY_CUSTOM_VARIABLE;
 console.log(MY_CUSTOM_VARIABLE);
@@ -551,7 +551,7 @@ console.log(MY_CUSTOM_VARIABLE);
 {% endblock %}
 
 {% block loggerExample %}
-```nodejs
+```js
 console.log('hello');
 console.error('some error!');
 ```

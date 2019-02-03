@@ -202,42 +202,33 @@ git push -u origin master
 
 {% block get_env %}{% endblock %}
 
-{% if platformName === "Node.js" %}
-你还可以指定客户端将请求所发往的环境：
+你还可以在 SDK 中指定客户端将请求所发往的环境：
 
+```objc
+[AVCloud setProductionMode:YES]; // 生产环境（默认）
+
+[AVCloud setProductionMode:NO]; // 预备环境
+```
 ```js
 AV.setProduction(true); // 生产环境（默认）
 
 AV.setProduction(false); // 预备环境
 ```
-{% endif %}
-{% if platformName === "Python" %}
-你还可以指定客户端将请求所发往的环境：
-
 ```python
 leancloud.use_production(True) # 生产环境（默认）
 
 leancloud.use_production(False) # 预备环境
 ```
-{% endif %}
-{% if platformName === "PHP" %}
-你还可以指定客户端将请求所发往的环境：
-
 ```php
 LeanClient::useProduction(true); // 生产环境（默认）
 
 LeanClient::useProduction(false); // 预备环境
 ```
-{% endif %}
-{% if platformName === "Java" %}
-你还可以指定客户端将请求所发往的环境：
-
 ```java
 AVCloud.setProductionMode(true); // 生产环境（默认）
 
 AVCloud.setProductionMode(false); // 预备环境
 ```
-{% endif %}
 
 ## 云端环境
 
