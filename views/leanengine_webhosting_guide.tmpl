@@ -1,7 +1,6 @@
 {% set var_app_domain = '{应用的域名}' %}
 {% import "views/_helper.njk" as docs %}
 
-{% raw %}<script>$(window).load(function() {$('.do-expand-all').click();})</script>{% endraw %}
 # 网站托管开发指南 &middot; {{platformName}}
 
 网站托管是云引擎的一个子模块，允许你用 {{platformName}} 开发一个 Web 程序，提供云函数和 Hook，还可以提供静态文件的托管和自定义的路由、绑定你自己的域名。你可以用它为你的移动应用提供一个介绍和下载页、开发一个管理员控制台或完整的网站，或者运行一些必须在服务器端运行的自定义逻辑。
@@ -16,11 +15,11 @@
 
 这篇文档以 {{platformName}} 为例，但云引擎还支持其他多种语言，你可以选择自己熟悉的技术栈进行开发：
 
-- [Node.js](leanengine_webhosting_guide-node.html)
-- [Python](leanengine_webhosting_guide-python.html)
-- [PHP](leanengine_webhosting_guide-php.html)
-- [Java](leanengine_webhosting_guide-java.html)
-- [.NET](leanengine_webhosting_guide-dotnet.html)
+- [Node.js](leanengine_webhosting_guide-node.html){% if platformName === "Node.js" %}（当前）{% endif %}
+- [Python](leanengine_webhosting_guide-python.html){% if platformName === "Python" %}（当前）{% endif %}
+- [PHP](leanengine_webhosting_guide-php.html){% if platformName === "PHP" %}（当前）{% endif %}
+- [Java](leanengine_webhosting_guide-java.html){% if platformName === "Java" %}（当前）{% endif %}
+- [.NET](leanengine_webhosting_guide-dotnet.html){% if platformName === ".NET" %}（当前）{% endif %}
 
 
 ## 从示例项目开始
@@ -177,7 +176,7 @@ lean deploy --no-cache
 
 ### Git 部署
 
-除此之外，还可以使用 git 仓库部署。你需要将项目提交到一个 git 仓库，我们并不提供源码的版本管理功能，而是借助于 git 这个优秀的分布式版本管理工具。我们推荐你使用 [GitHub](https://github.com/)、[Coding](https://coding.net/) 或者 [码云](https://gitee.com/) 这样第三方的源码托管网站，也可以使用你自己搭建的 git 仓库（比如 [Gitlab](http://gitlab.org/)）。
+除此之外，还可以使用 git 仓库部署。你需要将项目提交到一个 git 仓库，我们并不提供源码的版本管理功能，而是借助于 git 这个优秀的分布式版本管理工具。我们推荐你使用 [GitHub](https://github.com/)、[Coding](https://coding.net/) 或者 [码云](https://gitee.com/) 这样第三方的源码托管网站，也可以使用你自己搭建的 git 仓库（比如 [GitLab](https://about.gitlab.com/)）。
 
 你需要先在这些平台上创建一个项目（如果已有代码，请不需要选择「Initialize this repository with a README」），在网站的个人设置中填写本地机器的 SSH 公钥（以 GitHub 为例，在 Settings => SSH and GPG keys 中点击 New SSH key），然后在项目目录执行：
 
@@ -203,7 +202,42 @@ git push -u origin master
 
 {% block get_env %}{% endblock %}
 
-客户端 SDK 都有类似于 `setProduction` 的方法，比如 [JavaScript SDK API 的 AV.setProduction(production)](leanengine_cloudfunction_guide-node.html#hash1210911107)，其中 `production` 设置为 `0` 则该 SDK 将请求预备环境；设置为 `1` 将请求生产环境，默认为 `1`。
+{% if platformName === "Node.js" %}
+你还可以指定客户端将请求所发往的环境：
+
+```js
+AV.setProduction(true); // 生产环境（默认）
+
+AV.setProduction(false); // 预备环境
+```
+{% endif %}
+{% if platformName === "Python" %}
+你还可以指定客户端将请求所发往的环境：
+
+```python
+leancloud.use_production(True) # 生产环境（默认）
+
+leancloud.use_production(False) # 预备环境
+```
+{% endif %}
+{% if platformName === "PHP" %}
+你还可以指定客户端将请求所发往的环境：
+
+```php
+LeanClient::useProduction(true); // 生产环境（默认）
+
+LeanClient::useProduction(false); // 预备环境
+```
+{% endif %}
+{% if platformName === "Java" %}
+你还可以指定客户端将请求所发往的环境：
+
+```java
+AVCloud.setProductionMode(true); // 生产环境（默认）
+
+AVCloud.setProductionMode(false); // 预备环境
+```
+{% endif %}
 
 ## 云端环境
 
@@ -272,7 +306,7 @@ systemDependencies:
 
 ### 日志
 
-在控制台的 [云引擎 / 日志](/cloud.html?appid={{appid}}#/log) 中可以查看云引擎的部署和运行日志，还可以通过日志级别进行筛选。
+在控制台的 [云引擎 > 日志](/cloud.html?appid={{appid}}#/log) 中可以查看云引擎的部署和运行日志，还可以通过日志级别进行筛选。
 
 你还可以 [通过命令行工具来导出](leanengine_cli.html#查看日志) 最近七天的日志到本地文件，方便进行进一步的分析和统计。
 

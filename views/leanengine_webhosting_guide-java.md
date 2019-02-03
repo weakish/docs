@@ -183,36 +183,36 @@ Java 云引擎支持 1.8 运行环境。
 
 * 配置依赖：在 pom.xml 中增加依赖配置来增加 {{leanengine_middleware}} 的依赖：
 
-```xml
-<dependencies>
-	<dependency>
-		<groupId>cn.leancloud</groupId>
-		<artifactId>leanengine</artifactId>
-		<version>{{leanengine_java_sdk_latest_version}}</version>
-	</dependency>
-</dependencies>
-```
+  ```xml
+  <dependencies>
+    <dependency>
+      <groupId>cn.leancloud</groupId>
+      <artifactId>leanengine</artifactId>
+      <version>{{leanengine_java_sdk_latest_version}}</version>
+    </dependency>
+  </dependencies>
+  ```
 
 * 初始化：在正式使用数据存储之前，你需要使用自己的应用 key 进行初始化中间件：
 
-```java
-import com.avos.avoscloud.internal.impl.JavaRequestSignImplementation;
-import cn.leancloud.LeanEngine;
+  ```java
+  import com.avos.avoscloud.internal.impl.JavaRequestSignImplementation;
+  import cn.leancloud.LeanEngine;
 
-// 从 LEANCLOUD_APP_ID 这个环境变量中获取应用 app id 的值
-String appId = System.getenv("LEANCLOUD_APP_ID");
+  // 从 LEANCLOUD_APP_ID 这个环境变量中获取应用 app id 的值
+  String appId = System.getenv("LEANCLOUD_APP_ID");
 
-// 从 LEANCLOUD_APP_KEY 这个环境变量中获取应用 app key 的值                
-String appKey = System.getenv("LEANCLOUD_APP_KEY");
+  // 从 LEANCLOUD_APP_KEY 这个环境变量中获取应用 app key 的值                
+  String appKey = System.getenv("LEANCLOUD_APP_KEY");
 
-// 从 LEANCLOUD_APP_MASTER_KEY 这个环境变量中获取应用 master key 的值        
-String appMasterKey = System.getenv("LEANCLOUD_APP_MASTER_KEY");   
+  // 从 LEANCLOUD_APP_MASTER_KEY 这个环境变量中获取应用 master key 的值        
+  String appMasterKey = System.getenv("LEANCLOUD_APP_MASTER_KEY");   
 
-LeanEngine.initialize(appId, appKey, appMasterKey);
+  LeanEngine.initialize(appId, appKey, appMasterKey);
 
-// 如果不希望使用 masterKey 权限，可以将下面一行删除
-JavaRequestSignImplementation.instance().setUseMasterKey(true);
-```
+  // 如果不希望使用 masterKey 权限，可以将下面一行删除
+  JavaRequestSignImplementation.instance().setUseMasterKey(true);
+  ```
 {% endblock %}
 
 {% block custom_api_random_string %}
@@ -397,9 +397,9 @@ public class ProfileServlet extends HttpServlet {
   <body>
     <form method="post" action="/login">
       <label>Username</label>
-      <input name="username"></input>
+      <input name="username">
       <label>Password</label>
-      <input name="password" type="password"></input>
+      <input name="password" type="password">
       <input class="button" type="submit" value="Login">
     </form>
   </body>

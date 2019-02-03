@@ -346,9 +346,11 @@ app.get('/logout', function(req, res) {
 例如在前端：
 
 ```javascript
-AV.User.login(user, pass).then( user => {
-  return fetch('/profile', headers: {
-    'X-LC-Session': user.getSessionToken()
+AV.User.login(user, pass).then(user => {
+  return fetch('/profile', {
+    headers: {
+      'X-LC-Session': user.getSessionToken()
+    }
   });
 });
 ```
