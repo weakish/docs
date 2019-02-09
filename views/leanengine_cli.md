@@ -423,7 +423,7 @@ $ lean info
 
 ### 切换应用
 
-如果需要将当前项目切换到其他 LeanCloud 应用，可以通过 `checkout` 命令来添加一个应用：
+如果需要将当前项目切换到其他 LeanCloud 应用，可以使用 `switch` 命令：
 
 ```sh
 $ lean switch
@@ -431,7 +431,7 @@ $ lean switch
 
 之后运行向导会给出可供切换的应用列表。
 
-另外还可以直接执行 `$ lean checkout 其他应用的id` 来快速切换关联应用。
+另外还可以直接执行 `$ lean switch 其他应用的id` 来快速切换关联应用。
 
 
 ## 上传文件
