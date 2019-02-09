@@ -50,7 +50,7 @@ AV.Cloud.beforeSave('Post', function(request, response) {
 });
 ```
 
-第二步，部署代码到云端（[如何部署](leanengine_webhosting_guide-node.html#部署)）。
+第二步，部署代码到云端（[如何部署](leanengine_webhosting_guide-node.html#部署与发布)）。
 
 第三步，在客户端保存一个 `Post` 对象：
 
