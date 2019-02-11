@@ -209,7 +209,7 @@ EngineRequestContext 则可以获取额外的一些 metaData 信息
 {% block onLoginExample %}
 
 ```java
-  @EngineHook(className = "_User", type = EngineHookType.onVerified)
+  @EngineHook(className = "_User", type = EngineHookType.onLogin)
   public static AVUser userOnLoginHook(AVUser user) throws Exception {
     if ("noLogin".equals(user.getUsername())) {
       throw new Exception("Forbidden");

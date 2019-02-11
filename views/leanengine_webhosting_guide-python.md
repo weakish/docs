@@ -123,7 +123,7 @@ APP_KEY = os.environ['LEANCLOUD_APP_KEY']              # 从 LEANCLOUD_APP_KEY �
 MASTER_KEY = os.environ['LEANCLOUD_APP_MASTER_KEY']    # 从 LEANCLOUD_APP_MASTER_KEY 这个环境变量中获取应用 master key 的值
 
 leancloud.init(APP_ID, app_key=APP_KEY, master_key=MASTER_KEY)
-# 如果需要使用 master key 权限访问 LeanCLoud 服务，请将这里设置为 True
+# 如果需要使用 master key 权限访问 LeanCloud 服务，请将这里设置为 True
 leancloud.use_master_key(False)
 ```
 
@@ -282,7 +282,7 @@ def upload():
 {% block leancache %}
 首先添加相关依赖到云引擎应用的 `requirements.txt` 中：
 
-``` python
+```python
 Flask>=0.10.1,<1.0.0
 leancloud>=2.0.0,<3.0.0
 ...
@@ -291,7 +291,7 @@ redis>=2.10.5,<3.0.0
 
 然后可以使用下列代码获取 Redis 连接：
 
-``` python
+```python
 import os
 import redis
 

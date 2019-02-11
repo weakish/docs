@@ -24,11 +24,11 @@
 
 云引擎支持多种语言的运行环境，你可以选择自己熟悉的语言开发应用：
 
-- [Node.js](leanengine_cloudfunction_guide-node.html)
-- [Python](leanengine_cloudfunction_guide-python.html)
-- [PHP](leanengine_cloudfunction_guide-php.html)
-- [Java](leanengine_cloudfunction_guide-java.html)
-- [.NET](leanengine_cloudfunction_guide-dotnet.html)
+- [Node.js](leanengine_cloudfunction_guide-node.html){% if platformName === "Node.js" %}<span class="text-muted">（当前）</span>{% endif %}
+- [Python](leanengine_cloudfunction_guide-python.html){% if platformName === "Python" %}<span class="text-muted">（当前）</span>{% endif %}
+- [PHP](leanengine_cloudfunction_guide-php.html){% if platformName === "PHP" %}<span class="text-muted">（当前）</span>{% endif %}
+- [Java](leanengine_cloudfunction_guide-java.html){% if platformName === "Java" %}<span class="text-muted">（当前）</span>{% endif %}
+- [.NET](leanengine_cloudfunction_guide-dotnet.html){% if platformName === ".NET" %}<span class="text-muted">（当前）</span>{% endif %}
 
 {% block initialize %}
 {% endblock %}
@@ -367,7 +367,7 @@ Hook 函数的超时时间为 3 秒。如果 Hook 函数被其他的云函数调
 一个定时器如果在 24 小时内收到了超过 30 次的 400 (Bad Request) 或 502 (Bad Gateway) 的应答，它将会被云引擎禁用，同时系统会向开发者发出相关的禁用通知邮件。在控制台的日志中，对应的错误信息为 [`{{ errorMessage_shortCircuited }}`](#short-circuited)。
 {% endcall %}
 
-部署云引擎之后，进入 {% if node=='qcloud' %}**控制台** > **存储** > **云引擎** > **定时任务**{% else %}[控制台 > 存储 > 云引擎 > 定时任务](/cloud.html?appid={{appid}}#/task){% endif %}，点击 **创建定时器**，然后设定执行的函数名称、执行环境等等。例如定义一个打印循环打印日志的任务 `log_timer`：
+部署云引擎之后，进入 {% if node=='qcloud' %}**控制台** > **云引擎** > **定时任务**{% else %}[控制台 > 云引擎 > 定时任务](/cloud.html?appid={{appid}}#/task){% endif %}，点击 **创建定时器**，然后设定执行的函数名称、执行环境等等。例如定义一个打印循环打印日志的任务 `log_timer`：
 
 {% block timerExample %}{% endblock %}
 
@@ -429,7 +429,7 @@ Cron 表达式的基本语法为：
 
 ### 错误信息
 
-定时器执行后的日志会记录在 {% if node=='qcloud' %}`控制台 > 存储 > 云引擎 > 其它 > 日志`{% else %}[控制台 > 存储 > 云引擎 > 其它 > 日志](/cloud.html?appid={{appid}}#/log){% endif %} 中，以下为常见的错误信息及原因。
+定时器执行后的日志会记录在 {% if node=='qcloud' %}`控制台 > 云引擎 > 日志`{% else %}[控制台 > 云引擎 > 日志](/cloud.html?appid={{appid}}#/log){% endif %} 中，以下为常见的错误信息及原因。
 
 - **timerAction timed-out and no fallback available**<br/>
   某个定时器触发的云函数，因 15 秒内没有响应而超时（可参考 [对云函数调用超时的处理](#超时的处理方案)）。

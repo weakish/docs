@@ -123,24 +123,24 @@ $app->get('/', function($req, $res) {
 
 * 配置依赖：在项目根目录下执行以下命令来增加 {{leanengine_middleware}} 的依赖：
 
-```
-composer require leancloud/leancloud-sdk
-```
+  ```
+  composer require leancloud/leancloud-sdk
+  ```
 
 * 初始化：在正式使用数据存储之前，你需要使用自己的应用 key 进行初始化中间件：
 
-```php
-use \LeanCloud\Client;
+  ```php
+  use \LeanCloud\Client;
 
-Client::initialize(
-    getenv("LEANCLOUD_APP_ID"),          // 从 LEANCLOUD_APP_ID 这个环境变量中获取应用 app id 的值
-    getenv("LEANCLOUD_APP_KEY"),         // 从 LEANCLOUD_APP_KEY 这个环境变量中获取应用 app key 的值
-    getenv("LEANCLOUD_APP_MASTER_KEY")   // 从 LEANCLOUD_APP_MASTER_KEY 这个环境变量中获取应用 master key 的值
-);
+  Client::initialize(
+      getenv("LEANCLOUD_APP_ID"),          // 从 LEANCLOUD_APP_ID 这个环境变量中获取应用 app id 的值
+      getenv("LEANCLOUD_APP_KEY"),         // 从 LEANCLOUD_APP_KEY 这个环境变量中获取应用 app key 的值
+      getenv("LEANCLOUD_APP_MASTER_KEY")   // 从 LEANCLOUD_APP_MASTER_KEY 这个环境变量中获取应用 master key 的值
+  );
 
-// 如果不希望使用 masterKey 权限，可以将下面一行删除
-Client::useMasterKey(true);
-```
+  // 如果不希望使用 masterKey 权限，可以将下面一行删除
+  Client::useMasterKey(true);
+  ```
 {% endblock %}
 
 {% block http_client %}
@@ -244,17 +244,17 @@ $app->get('/logout', function($req, $res) {
 
 ```html
 <html>
-    <head></head>
-    <body>
-      <form method="post" action="/login">
-        <label>Username</label>
-        <input name="username"></input>
-        <label>Password</label>
-        <input name="password" type="password"></input>
-        <input class="button" type="submit" value="登录">
-      </form>
-    </body>
-  </html>
+  <head></head>
+  <body>
+    <form method="post" action="/login">
+      <label>Username</label>
+      <input name="username">
+      <label>Password</label>
+      <input name="password" type="password">
+      <input class="button" type="submit" value="登录">
+    </form>
+  </body>
+</html>
 ```
 
 {% endblock %}

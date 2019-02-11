@@ -1,6 +1,5 @@
 {% import "views/_leanengine.njk" as leanengine %}
 {% set release = "[Github releases 页面](https://releases.leanapp.cn/#/leancloud/lean-cli/releases)" %}
-{% set login = "lean login" %}
 
 # 命令行工具 CLI 使用指南
 
@@ -10,7 +9,7 @@
 
 ### macOS
 
-使用 [Homebrew](http://brew.sh/) 进行安装：
+使用 [Homebrew](https://brew.sh) 进行安装：
 
 ```sh
 brew update
@@ -27,7 +26,7 @@ Windows 用户可以在 {{release}} 根据操作系统版本下载最新的 32 �
 
 ### Linux
 
-从 {{release}} 下载预编译好的二进制文件 `lean_linux_x64`，重命名为 `lean` 并放到已经在 PATH 环境变量中声明的任意目录中即可。
+从 {{release}} 下载预编译好的二进制文件 `lean-linux-x64`，重命名为 `lean` 并放到已经在 PATH 环境变量中声明的任意目录中即可。
 
 #### Arch Linux
 
@@ -106,7 +105,7 @@ lean version 0.20.0
 安装完命令行工具之后，首先第一步需要登录 LeanCloud 账户。
 
 ```sh
-$ {{ login }}
+$ lean login
 ```
 
 然后按照提示选择区域并输入 LeanCloud 用户名和密码完成登录。
@@ -115,7 +114,7 @@ $ {{ login }}
 
 ### 切换账户
 
-要切换到另一账户，重新执行 `{{ login }}` 即可。
+要切换到另一账户，重新执行 `lean login` 即可。
 
 ## 初始化项目
 
@@ -356,11 +355,11 @@ $ lean logs --from=2017-07-01 --to=2017-07-07 --format=json > leanengine.logs
 
 ## 查看 LeanStorage 状态报告
 
-使用 `metrics` 命令可以查看 LeanStorage 的状态报告：
+使用 `metric` 命令可以查看 LeanStorage 的状态报告：
 
 ```sh
-$ lean metrics --from 2017-09-07
-[INFO] 正在获取 xxxx 储存报告
+$ lean metric --from 2017-09-07
+[INFO] Retrieving xxxxxx storage report
 Date                 2017-09-07   2017-09-08   2017-09-09
 API Requests         49           35           14
 Max Concurrent       2            2            2
@@ -387,7 +386,7 @@ Mean Duration Time   9ms          21ms         7ms
 	<tr><td>`95% Duration Time`</td><td>95% 响应时间</td></tr>
 </table>
 
-`metrics` 接收参数与 `logs` 类似，具体介绍如下：
+`metric` 接收参数与 `logs` 类似，具体介绍如下：
 
 ```sh
 $ lean metric -h
@@ -424,7 +423,7 @@ $ lean info
 
 ### 切换应用
 
-如果需要将当前项目切换到其他 LeanCloud 应用，可以通过 `checkout` 命令来添加一个应用：
+如果需要将当前项目切换到其他 LeanCloud 应用，可以使用 `switch` 命令：
 
 ```sh
 $ lean switch
@@ -432,7 +431,7 @@ $ lean switch
 
 之后运行向导会给出可供切换的应用列表。
 
-另外还可以直接执行 `$ lean checkout 其他应用的id` 来快速切换关联应用。
+另外还可以直接执行 `$ lean switch 其他应用的id` 来快速切换关联应用。
 
 
 ## 上传文件

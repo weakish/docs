@@ -7,12 +7,13 @@
 * [云引擎 PHP 环境](leanengine_cloudfunction_guide-php.html)
 * [云引擎 Java 环境](leanengine_cloudfunction_guide-java.html)
 
-提到以上这个需求是为了让开发者更好的理解一下的需求描述：
+提到以上这个需求是为了让开发者更好地理解以下的需求描述：
 
-假如开发者的应用有 iOS、Android、Web（JavaScript）各种版本，针对权限管理的逻辑代码会遍布各个客户端，开发者会重复书写逻辑极其类似的代码，只不过是不同语言的版本而已。因此，假如有一个云端的接口，让开发者可以在创建对象或者更新对象的时候，为其添加 ACL 相关的代码，而各个客户端就无需再重复编码。
+假如开发者的应用有 iOS、Android、Web（JavaScript）各种版本，针对权限管理的逻辑代码会遍布各个客户端，开发者会重复书写逻辑极其类似的代码，只不过是不同语言的版本而已。因此，假如有一个云端的接口，让开发者可以在创建对象或者更新对象的时候，为其添加 ACL 相关的代码，那么各个客户端就无需再重复编码。
 
 我们从一个简单的实例入手：
-我们希望每发一篇帖子，不管是从 iOS 还是 Android，还是任意客户端发出的，都希望 Administrator 具备对它有读写权限。
+
+我们希望每发一篇帖子，不管是从 iOS 还是 Android，还是任意客户端发出的，都希望 Administrator 具备对它读写的权限。
 
 第一步，我们需要编写我们的云引擎 Hook 函数（关于云引擎 Hook 函数介绍请查看 [Save AVObject 前执行操作](leanengine_cloudfunction_guide-node.html#beforeSave)）：
 
@@ -49,9 +50,9 @@ AV.Cloud.beforeSave('Post', function(request, response) {
 });
 ```
 
-第二步，部署代码到云端（[如何部署](leanengine_webhosting_guide-node.html#部署)）。
+第二步，部署代码到云端（[如何部署](leanengine_webhosting_guide-node.html#部署与发布)）。
 
-第三步，在客户端客户端保存一个 `Post` 对象：
+第三步，在客户端保存一个 `Post` 对象：
 
 **iOS**
 
