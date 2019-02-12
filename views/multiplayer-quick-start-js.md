@@ -5,7 +5,7 @@
 
 
 {% block installation %}
-实时对战客户端 SDK 是开源的，源码地址请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。
+实时对战客户端 SDK 是开源的，您可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。源码请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。
 
 ## 支持开发平台
 
@@ -20,13 +20,22 @@ Egret：Web
 
 ### Cocos Creator
 
-下载 `play.js` 并拖拽至 Cocos Creator 工程中，选择「插件」模式导入。
+[下载 `play.js`](https://github.com/leancloud/Play-SDK-JS/releases) 并拖拽至 Cocos Creator 工程中，选择「插件」模式导入。可参考 [Cocos Creator 插件脚本](https://docs.cocos.com/creator/manual/zh/scripting/plugin-scripts.html)。
 
-可参考 [Cocos Creator 插件脚本](https://docs.cocos.com/creator/manual/zh/scripting/plugin-scripts.html)。
+在 Cocos Creator 中选中刚刚导入的 play.js 文件，在「属性检查器」选中以下所有选项：
+* 导入为插件
+* 允许 Web 平台加载
+* 允许编辑器加载
+* 允许 Native 平台加载
+
+如图所示：
+
+![image](images/cocos-creator-multiplayer-install.png)
+
 
 ### LayaAir
 
-下载 `play-laya.js` 至 Laya 工程的 bin/libs 目录下。
+[下载 `play-laya.js`](https://github.com/leancloud/Play-SDK-JS/releases) 至 Laya 工程的 bin/libs 目录下。
 
 在 bin/index.html 中项目「IDE 生成的 UI 文件」之前引入刚下载的 SDK 文件：
 
@@ -43,7 +52,7 @@ Egret：Web
 
 ### Egret
 
-下载 `play-egret.zip` 并解压至 Egret 工程的 libs 目录下。
+[下载 `play-egret.zip`](https://github.com/leancloud/Play-SDK-JS/releases) 并解压至 Egret 工程的 libs 目录下。
 
 在 Egret 工程中的 egretProperties.json 文件中添加 SDK 配置：
 
@@ -87,7 +96,7 @@ Egret：Web
 
 ### 微信小程序
 
-下载 `play-weapp.js` 并拖拽至微信小程序的工程目录下即可。
+[下载 `play-weapp.js`](https://github.com/leancloud/Play-SDK-JS/releases) 并拖拽至微信小程序的工程目录下即可。
 
 ### Node.js 安装
 
