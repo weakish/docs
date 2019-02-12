@@ -44,11 +44,11 @@ LeanCloud 的每一个账户都可以创建多个应用。同一个应用可以�
 在 .NET Portable 运行时中，可以在程序初始化的时候执行如下代码：
 
 ```c#
-  AVClient.Initialize(string applicationId, string appKey);
+  AVClient.Initialize({{appid}}, {{appkey}});
   传入您的 `App ID` 以及 `App Key`，默认访问的是 LeanCloud 的中国节点。
 
-  AVClient.Initialize(AVClient.Configuration config);
-  除了传入您的 `App ID` 以及 `App Key`之外，指定 LeanCloud 的服务节点，现在 AVClient.AVRegion 仅支持 CN 以及 US 节点。
+  AVClient.Initialize(config);
+  在 config （AVClient.Configuration） 中可以指定您的 `App ID` 以及 `App Key`，还可以指定 LeanCloud 的服务节点（AVRegion），目前仅支持 CN 以及 US 节点。
 ```
 
 #### Unity

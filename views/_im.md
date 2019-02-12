@@ -408,8 +408,8 @@ public class LeanEngineSignatureFactory : ISignatureFactory
 ```cs
 var config = new AVRealtime.Configuration()
 {
-    ApplicationId = "{{appId}}",
-    ApplicationKey = "{{appKey}}",
+    ApplicationId = "{{appid}}",
+    ApplicationKey = "{{appkey}}",
     SignatureFactory = new LeanEngineSignatureFactory()
 };
 var realtime = new AVRealtime(config);
@@ -670,8 +670,8 @@ public class ChatTest : MonoBehaviour
     {
         var config = new AVRealtime.Configuration()
         {
-            ApplicationId = "应用 appId",
-            ApplicationKey = "应用 appKey",
+            ApplicationId = "{{appid}}",
+            ApplicationKey = "{{appkey}}",
             WebSocketClient = new MyWebSocketClient()// 这里可以换成开发者自己的实现
         };
         realtime = new AVRealtime(config);
@@ -854,8 +854,8 @@ public class UnityWebSocketClient : MonoBehaviour, WebSocketUnityDelegate, IWebS
 void Start () {
     var config = new AVRealtime.Configuration ()
     {
-        ApplicationId ="你的 app Id",
-        ApplicationKey ="你的 app Id",
+        ApplicationId ="{{appid}}",
+        ApplicationKey ="{{appkey}}",
         WebSocketClient = this // 使用已经初始化的 WebSocketClient 实例作为 AVRealtime 初始化的配置参数
     };
     avRealtime = new AVRealtime (config);
