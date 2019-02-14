@@ -581,6 +581,8 @@ if (!error) {
         // filePath 是文件下载到本地的地址
     }];
 ```
+
+`filePath` 是一个相对路径，文件存储在缓存目录（使用缓存功能）或系统临时目录（不使用缓存功能）中。
 {% endblock %}
 
 {% block code_file_delete %}
