@@ -30,7 +30,7 @@ cp -r "dist/*" "$DIST"
 
 pushd "$DIST"
 git add -A :/  # `:/` is a pathspec matching the root of working tree
-git commit -a -m "Updated at $(date -R)" || true
+git commit -a -m "Updated at $(date -R)"
 git push origin +master
 popd
 
