@@ -8,10 +8,10 @@ TARGET="$2"
 DOC_COMMENT_TOKEN="$3"
 
 git clone "$GIT_REPO" "$DIST"
-rm -rf "$DIST/*"
+rm -rf "$DIST"/*
 
-rm -rf "dist/*"
-rm -rf "md/*"
+rm -rf dist/*
+rm -rf md/*
 
 npm install
 
@@ -26,7 +26,7 @@ else
     grunt build
 fi
 
-cp -r "dist/*" "$DIST"
+cp -r dist/* "$DIST"
 
 pushd "$DIST"
 git add -A :/  # `:/` is a pathspec matching the root of working tree
