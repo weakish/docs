@@ -948,14 +948,17 @@ todo_count = query.count()  # 获取输出计数
 ```python
 import leancloud
 
+# 设置内置查询条件
+Tag = leancloud.Object.extend('Tag')
+tag = Tag.create_without_data('573573aec4c9710060f9a575')
 inner_query = leancloud.Query('TodoFolder')
-inner_query.greater_than('likes', 20)  # 设置内置查询条件
+inner_query.equal_to('tags', tag)
 
 query = leancloud.Query('Comment')
 query.matches_query('targetTodoFolder', inner_query)  # 将内嵌查询赋予目标查询
+query.find()
 # query.does_not_match_query('targetTodoFolder', inner_query)
 # 也可以查询不包含内嵌查询的目标查询
-query.find()  # 返回符合超过 20 个赞的 TodoFolder 这一条件的 Comment 对象集合
 ```
 {% endblock %}
 

@@ -695,7 +695,7 @@ query.select(['targetTodoFolder.targetAVUser.username']);
 
 #### 内嵌查询
 
-查询点赞超过 20 次的 TodoFolder 的 Comment 评论（注意查询针对的是 [Comment](#Comment_待办事项分组的评论_)），使用内嵌查询接口就可以通过一次查询来达到目的。
+查询被打上某一个 Tag 的 TodoFolder 的所有 Comment 评论（注意查询针对的是 [Comment](#Comment_待办事项分组的评论_)），使用内嵌查询接口就可以通过一次查询来达到目的。
 
 {% block code_query_comment_match_query_todoFolder %}{% endblock %}
 

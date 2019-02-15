@@ -904,19 +904,20 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 
 ```objc
     // 构建内嵌查询
+    AVObject *tag = [AVObject objectWithClassName:@"Tag" objectId:@"5661031a60b204d55d3b7b89"];
     AVQuery *innerQuery = [AVQuery queryWithClassName:@"TodoFolder"];
-    [innerQuery whereKey:@"likes" greaterThan:@20];
+    [innerQuery whereKey:@"tags" equalTo:tag];
+
     // 将内嵌查询赋予目标查询
     AVQuery *query = [AVQuery queryWithClassName:@"Comment"];
     // 执行内嵌操作
     [query whereKey:@"targetTodoFolder" matchesQuery:innerQuery];
     [query findObjectsInBackgroundWithBlock:^(NSArray *comments, NSError *error) {
-        // comments 就是符合超过 20 个赞的 TodoFolder 这一条件的 Comment 对象集合
+
     }];
 
     // 注意如果要做相反的查询可以使用
     [query whereKey:@"targetTodoFolder" doesNotMatchQuery:innerQuery];
-    // 如此做将查询出 likes 小于或者等于 20 的 TodoFolder 的 Comment 对象
 ```
 {% endblock %}
 

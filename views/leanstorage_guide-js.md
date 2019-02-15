@@ -970,8 +970,9 @@ file.save({
 
 ```js
   // 构建内嵌查询
+  var targetTag = AV.Object.createWithoutData('Tag', '5655729900b0bf3785ca8192');
   var innerQuery = new AV.Query('TodoFolder');
-  innerQuery.greaterThan('likes', 20);
+  innerQuery.equalTo('tags', targetTag);
 
   // 将内嵌查询赋予目标查询
   var query = new AV.Query('Comment');
@@ -979,12 +980,12 @@ file.save({
   // 执行内嵌操作
   query.matchesQuery('targetTodoFolder', innerQuery);
   query.find().then(function (results) {
-     // results 就是符合超过 20 个赞的 TodoFolder 这一条件的 Comment 对象集合
+     
   }, function (error) {
   });
 
+  // 注意如果要做相反的查询可以使用
   query.doesNotMatchQuery('targetTodoFolder', innerQuery);
-  // 如此做将查询出 likes 小于或者等于 20 的 TodoFolder 的 Comment 对象
 ```
 {% endblock %}
 

@@ -831,7 +831,7 @@ let query = LCQuery(className: "Todo")
 let query = LCQuery(className: "Todo")
 
 // 查询所有 priority 等于 0 的 Todo
-query.whereKey("priority", .EqualTo(0))
+query.whereKey("priority", .equalTo(0))
 
 // 执行查找
 query.find { result in
@@ -850,8 +850,8 @@ query.find { result in
 ```swift
 let query = LCQuery(className: "Todo")
 
-query.whereKey("priority", .EqualTo(0))
-query.whereKey("priority", .EqualTo(1))
+query.whereKey("priority", .equalTo(0))
+query.whereKey("priority", .equalTo(1))
 
 // 如果这样写，第二个条件将覆盖第一个条件，查询只会返回 priority = 1 的结果
 query.find { result in
@@ -869,25 +869,25 @@ query.find { result in
 
 逻辑操作 | AVQuery 方法|
 ---|---
-等于 | `whereKey("drink", .EqualTo("Pepsi"))`
-不等于 |  `whereKey("hasFood", .NotEqualTo(true))`
-大于 | `whereKey("expirationDate", .GreaterThan(NSDate()))`
-大于等于 | `whereKey("age", .GreaterThanOrEqualTo(18))`
-小于 | `whereKey("pm25", .LessThan(75))`
-小于等于 | `whereKey("count", .LessThanOrEqualTo(10))`
+等于 | `whereKey("drink", .equalTo("Pepsi"))`
+不等于 |  `whereKey("hasFood", .notEqualTo(true))`
+大于 | `whereKey("expirationDate", .greaterThan(NSDate()))`
+大于等于 | `whereKey("age", .greaterThanOrEqualTo(18))`
+小于 | `whereKey("pm25", .lessThan(75))`
+小于等于 | `whereKey("count", .lessThanOrEqualTo(10))`
 {% endblock %}
 
 {% block code_query_lessThan %}
 
 ```swift
-query.whereKey("priority", .LessThan(2))
+query.whereKey("priority", .lessThan(2))
 ```
 {% endblock %}
 
 {% block code_query_greaterThanOrEqualTo %}
 
 ```swift
-query.whereKey("priority", .GreaterThanOrEqualTo(2))
+query.whereKey("priority", .greaterThanOrEqualTo(2))
 ```
 {% endblock %}
 
@@ -896,7 +896,7 @@ query.whereKey("priority", .GreaterThanOrEqualTo(2))
 ```swift
 let query = LCQuery(className: "Todo")
 
-query.whereKey("title", .MatchedPattern("[\\u4e00-\\u9fa5]", option:nil))
+query.whereKey("title", .matchedPattern("[\\u4e00-\\u9fa5]", option:nil))
 ```
 {% endblock %}
 
@@ -905,14 +905,14 @@ query.whereKey("title", .MatchedPattern("[\\u4e00-\\u9fa5]", option:nil))
 ```swift
 let query = LCQuery(className: "Todo")
 
-query.whereKey("title", .MatchedSubstring("李总"))
+query.whereKey("title", .matchedSubstring("李总"))
 ```
 {% endblock %}
 
 {% block code_query_with_not_contains_keyword_using_regex %}
 <pre><code class="lang-swift">let query = LCQuery(className: "Todo")
 
-query.whereKey("title", .MatchedPattern("{{ data.regex() | safe }}, option: nil))
+query.whereKey("title", .matchedPattern("{{ data.regex() | safe }}, option: nil))
 </code></pre>
 {% endblock %}
 <!-- 2016-12-29 故意忽略最后一行中字符串的结尾引号，以避免渲染错误。不要使用 markdown 语法来替代 <pre><code> -->
@@ -931,7 +931,7 @@ func queryRemindersContains() {
     let query = LCQuery(className: "Todo")
 
     // 查询 reminders 数组中有与 reminder 相等的 Todo 对象
-    query.whereKey("reminders", .EqualTo(reminder))
+    query.whereKey("reminders", .equalTo(reminder))
 }
 ```
 {% endblock %}
@@ -951,27 +951,27 @@ func testArrayContainsAll() {
     let query = LCQuery(className: "Todo")
 
     // 查询 reminders 数组中同时包含 reminder1 和 reminder2 的 Todo 对象
-    query.whereKey("reminders", .ContainedAllIn([reminder1, reminder2]))
+    query.whereKey("reminders", .containedAllIn([reminder1, reminder2]))
 }
 ```
 {% endblock %}
 
 {% block code_query_with_containedIn_keyword %}
 ```swift
-    query.whereKey("location", .ContainedIn(["Office", "CoffeeShop"]))
+    query.whereKey("location", .containedIn(["Office", "CoffeeShop"]))
 ```
 {% endblock %}
 
 {% block code_query_with_part_contains_keyword %}
 ```swift
-    query.whereKey("reminders", .ContainedIn([reminder1, reminder2]))
+    query.whereKey("reminders", .containedIn([reminder1, reminder2]))
 ```
 {% endblock %}
 
 
 {% block code_query_with_not_contains_keyword %}
 ```swift
-    query.whereKey("reminders", .NotContainedIn([reminder1, reminder2]))
+    query.whereKey("reminders", .notContainedIn([reminder1, reminder2]))
 ```
 {% endblock %}
 
@@ -981,7 +981,7 @@ func testArrayContainsAll() {
 // 找出开头是「早餐」的 Todo
 let query = LCQuery(className: "Todo")
 
-query.whereKey("content", .PrefixedBy("早餐"))
+query.whereKey("content", .prefixedBy("早餐"))
 ```
 {% endblock %}
 
@@ -992,7 +992,7 @@ let query = LCQuery(className: "Comment")
 
 let targetTodoFolder = LCObject(className: "TodoFolder", objectId: "5590cdfde4b00f7adb5860c8")
 
-query.whereKey("targetTodoFolder", .EqualTo(targetTodoFolder))
+query.whereKey("targetTodoFolder", .equalTo(targetTodoFolder))
 ```
 {% endblock %}
 
@@ -1057,7 +1057,7 @@ let query = LCQuery(className: "TodoFolder")
 
 let tag = LCObject(className: "Tag", objectId: "5661031a60b204d55d3b7b89")
 
-query.whereKey("tags", .EqualTo(tag))
+query.whereKey("tags", .equalTo(tag))
 
 query.find { result in
     switch result {
@@ -1076,12 +1076,12 @@ query.find { result in
 let query = LCQuery(className: "Comment")
 
 // 关键代码，指定云端返回 `targetTodoFolder` 字段所指向的对象的全部数据，而不仅仅是 pointer
-query.whereKey("targetTodoFolder", .Included)
+query.whereKey("targetTodoFolder", .included)
 
 // 关键代码，同上，指定云端返回 `targetTodoFolder.targetAVUser` 所指向的对象的全部数据，而不仅仅是 pointer
-query.whereKey("targetTodoFolder.targetAVUser", .Included)
+query.whereKey("targetTodoFolder.targetAVUser", .included)
 
-query.whereKey("createdAt", .Descending)
+query.whereKey("createdAt", .descending)
 
 query.limit = 10
 
@@ -1106,15 +1106,15 @@ query.find { result in
 {% block code_query_comment_match_query_todoFolder %}
 
 ```swift
+// 构建内嵌查询
+let tag = LCObject(className: "Tag", objectId: "5661031a60b204d55d3b7b89")
+let innerQuery = LCQuery(className: "TodoFolder")
+innerQuery.whereKey("tags", .equalTo(tag))
+
 // 将内嵌查询赋予目标查询
 let query = LCQuery(className: "Comment")
-
-// 构建内嵌查询
-let innerQuery = LCQuery(className: "TodoFolder")
-innerQuery.whereKey("likes", .GreaterThan(20))
-
 // 执行内嵌操作
-query.whereKey("targetTodoFolder", .MatchedQuery(innerQuery))
+query.whereKey("targetTodoFolder", .matchedQuery(innerQuery))
 
 query.find { result in
     switch result {
@@ -1125,8 +1125,8 @@ query.find { result in
     }
 }
 
-// 注意如果要做相反的查询可以使用（查询 likes 小于等于 20 的 Comment 对象）：
-query.whereKey("targetTodoFolder", .NotMatchedQuery(innerQuery))
+// 注意如果要做相反的查询可以使用
+query.whereKey("targetTodoFolder", .notMatchedQuery(innerQuery))
 
 query.find { result in
     switch result {
@@ -1144,7 +1144,7 @@ query.find { result in
 ```swift
 let query = LCQuery(className: "Todo")
 
-query.whereKey("priority", .EqualTo(0))
+query.whereKey("priority", .equalTo(0))
 
 query.getFirst { result in
     switch result {
@@ -1162,7 +1162,7 @@ query.getFirst { result in
 ```swift
 let query = LCQuery(className: "Todo")
 
-query.whereKey("priority", .EqualTo(0))
+query.whereKey("priority", .equalTo(0))
 query.limit = 10
 
 query.find { result in
@@ -1181,7 +1181,7 @@ query.find { result in
 ```swift
 let query = LCQuery(className: "Todo")
 
-query.whereKey("priority", .EqualTo(0))
+query.whereKey("priority", .equalTo(0))
 
 query.limit = 10 // 返回 10 条数据
 query.skip = 20 // 跳过 20 条数据
@@ -1204,10 +1204,10 @@ query.find { result in
 let query = LCQuery(className: "Todo")
 
 // 指定返回 title 属性
-query.whereKey("title", .Selected)
+query.whereKey("title", .selected)
 
 // 指定返回 content 属性
-query.whereKey("content", .Selected)
+query.whereKey("content", .selected)
 
 query.find { result in
     switch result {
@@ -1233,7 +1233,7 @@ query.find { result in
 ```swift
 let query = LCQuery(className: "Todo")
 
-query.whereKey("status", .EqualTo(1))
+query.whereKey("status", .equalTo(1))
 
 query.count()
 ```
@@ -1243,18 +1243,18 @@ query.count()
 
 ```swift
 // 按时间，升序排列
-query.whereKey("createdAt", .Ascending)
+query.whereKey("createdAt", .ascending)
 
 // 按时间，降序排列
-query.whereKey("createdAt", .Descending)
+query.whereKey("createdAt", .descending)
 ```
 {% endblock %}
 
 {% block code_query_orderby_on_multiple_keys %}
 
 ```swift
-query.whereKey("priority", .Ascending)
-query.whereKey("createdAt", .Descending)
+query.whereKey("priority", .ascending)
+query.whereKey("createdAt", .descending)
 ```
 {% endblock %}
 
@@ -1262,13 +1262,13 @@ query.whereKey("createdAt", .Descending)
 
 ```swift
 let priorityQuery = LCQuery(className: "Todo")
-priorityQuery.whereKey("priority", .GreaterThanOrEqualTo(3))
+priorityQuery.whereKey("priority", .greaterThanOrEqualTo(3))
 
 let statusQuery = LCQuery(className: "Todo")
-statusQuery.whereKey("status", .EqualTo(1))
+statusQuery.whereKey("status", .equalTo(1))
 
 let titleQuery = LCQuery(className: "Todo")
-titleQuery.whereKey("title", .MatchedSubstring("李总"))
+titleQuery.whereKey("title", .matchedSubstring("李总"))
 
 let query = priorityQuery.or(statusQuery).or(titleQuery)
 
@@ -1293,10 +1293,10 @@ let dateFromString: (String) -> Date? = { string in
 }
 
 let startDateQuery = LCQuery(className: "Todo")
-startDateQuery.whereKey("createdAt", .GreaterThanOrEqualTo(dateFromString("2016-11-13")!)
+startDateQuery.whereKey("createdAt", .greaterThanOrEqualTo(dateFromString("2016-11-13")!)
 
 let endDateQuery = LCQuery(className: "Todo")
-endDateQuery.whereKey("status", .LessThan(dateFromString("2016-12-03")!)
+endDateQuery.whereKey("status", .lessThan(dateFromString("2016-12-03")!)
 
 let query = startDateQuery.and(endDateQuery)
 
@@ -1315,10 +1315,10 @@ query.find { result in
 
 ```swift
 // 使用非空值查询获取有图片的 Todo
-query.whereKey("images", .Existed)
+query.whereKey("images", .existed)
 
 // 使用空值查询获取没有图片的 Todo
-query.whereKey("images", .NotExisted)
+query.whereKey("images", .notExisted)
 ```
 {% endblock %}
 
@@ -1375,7 +1375,7 @@ LCCQLClient.execute(cql, parameters: pvalues) { result in
 let query = LCQuery(className: "Todo")
 let point = LCGeoPoint(latitude: 39.9, longitude: 116.4)
 
-query.whereKey("whereCreated", .LocatedWithin(point))
+query.whereKey("whereCreated", .locatedWithin(point))
 query.limit = 10
 
 query.find { result in
@@ -1406,7 +1406,7 @@ let from  = LCGeoPoint.Distance(value: 1.0, unit: .Kilometer)
 let to    = LCGeoPoint.Distance(value: 2.0, unit: .Kilometer)
 
 // 查询离指定 point 距离在 1.0 和 2.0 公里的 Todo
-query.whereKey("whereCreated", .LocatedNear(origin: point, from: from, to: to))
+query.whereKey("whereCreated", .locatedNear(origin: point, from: from, to: to))
 ```
 {% endblock %}
 
