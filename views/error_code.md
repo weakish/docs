@@ -286,6 +286,14 @@
 * 信息 - `登录失败次数超过限制，请稍候再试，或者通过忘记密码重设密码。`
 * 含义 -如果在 15 分钟内，同一个用户登录失败的次数大于 6 次，该用户账户即被云端暂时锁定。锁定将在最后一次错误登录的 15 分钟之后由云端自动解除。如果需要立刻解锁，可以先重置密码再登录。
 
+## 220
+* 信息 - `The number of your followees has reached limit.`
+* 含义 - 用户关注的好友数量达到限制。
+
+## 221
+* 信息 - `Friendship not found.`
+* 含义 - 用户的关注关系并不存在，请先尝试关注。
+
 ## 250
 
 * 信息 - `Linked id missing from request`
@@ -442,6 +450,26 @@
 
 * 信息 - `Nonexistent query keys`
 * 含义 - 无效的查询或者排序字段，请确认查询或者排序的字段在表中存在。
+
+## 2100
+
+* 信息 - `statisticName not found.`
+* 含义 - 榜单不存在，请先创建。
+
+## 2101
+
+* 信息 - `Leaderboard closed.`
+* 含义 - 榜单已经过期且关闭。
+
+## 2102
+
+* 信息 - `Leaderboard archive not found.`
+* 含义 - 榜单存档不存在。
+
+## 2103
+
+* 信息 - `Invalid Leaderboard object.`
+* 含义 - 不合法的 LeaderBoard 对象。
 
 {{ im.errorCodes() }}
 
