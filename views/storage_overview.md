@@ -53,7 +53,7 @@ LeanCloud 对大部分场景下的后端需求进行了抽象和统一，我们�
 
 你可以把 LeanCloud 云端看成是一个面向对象的海量数据库，它与传统的关系型数据库的差异有：
 
-* 访问方式不一样，不需要任何 JDBC/ODBC 的驱动，直接通过 HTTP 协议来传输 JSON Object 即可，所以不光服务端可以使用，在客户端也可以直接访问。我们既提供各种平台原生 SDK（iOS、 Android、JavaScript、PHP、Python、Java、Windows Phone、.Net、Unity3D、C++，以及社区贡献的其他语言 SDK）来帮助开发者简单集成数据存储服务，也提供开放的 REST API 供大家直接使用。
+* 访问方式不一样，不需要任何 JDBC/ODBC 的驱动，直接通过 HTTP 协议来传输 JSON Object 即可，所以不光服务端可以使用，在客户端也可以直接访问。我们既提供各种平台原生 SDK（iOS、Android、JavaScript、PHP、Python、Java、Windows Phone、.Net、Unity3D、C++，以及社区贡献的其他语言 SDK）来帮助开发者简单集成数据存储服务，也提供开放的 REST API 供大家直接使用。
 * LeanCloud 对于数据的唯一格式要求是满足 JSON Object 的形式，存储新的对象类型时不需要预先在云端定义任何「表结构」，而且同一种数据类型里的键值也是允许随时增加的。这种 schema free 的设计，会给开发者带来最大的便利。
 * AVObject 之间没有了主键、外键的概念，也不支持跨表的 join 查询，取而代之的，我们提供另一种数据关联的机制，详见下文 [数据关联](#数据关联)。
 * 既然 AVObject 是面向对象设计的，它的查询就与传统 SQL 不一样，详见下文 [数据查询 AVQuery](#数据查询_AVQuery)。不过为了照顾已经习惯了传统关系型数据库查询的开发者，我们也提供了类 SQL 查询的 [Cloud Query Language 查询语法](./cql_guide.html)（简称：CQL）。请注意：LeanCloud 的 CQL 查询语法是 SQL 查询语法的子集和变种，目的是降低大家学习 LeanCloud 查询的 API 的成本，并不是所有 SQL 中可以执行的查询都会在 CQL 中产生相同的结果。
@@ -72,7 +72,7 @@ AVObject 中的 **键**，必须是由字母、数字或下划线组成的字符
 * `File` 文件
 * `Null` 空值
 
-Object 类型简单地表示每个字段的值都可以由能 JSON 编码的内嵌对象组合而成。对象的 Key（键）包含 `$` 或者 `.`，或者同时有 `__type` 的键，都是系统保留用来做一些额外处理的特殊键，因此请不要在你的对象中使用这样的 Key。另外，`{{ data.preservedWords() }}` 这些属性名是保留字段，不能作为自定义的 **键** 来使用。
+`Object` 类型简单地表示每个字段的值都可以由能 JSON 编码的内嵌对象组合而成。对象的 Key（键）包含 `$` 或者 `.`，或者同时有 `__type` 的键，都是系统保留用来做一些额外处理的特殊键，因此请不要在你的对象中使用这样的 Key。另外，`{{ data.preservedWords() }}` 这些属性名是保留字段，不能作为自定义的 **键** 来使用。
 
 我们的 SDK 会处理原生的 Objective-C 和 Java 类型到 JSON 之间的转换。例如，当你保存一个 `NSString` 对象的时候，它在我们的系统中会被自动转换成 `String` 类型。
 
@@ -164,9 +164,9 @@ LeanCloud 平台保证 99.9% 的高可用性，并且数据访问方面保证了
 
 详细请参看 [Android 数据存储开发指南](./leanstorage_guide-android.html)。
 
-### Javascript 开发指南
+### JavaScript 开发指南
 
-详细请参看 [Javascript 数据存储开发指南](./leanstorage_guide-js.html)。
+详细请参看 [JavaScript 数据存储开发指南](./leanstorage_guide-js.html)。
 
 ### .Net/Unity3D 开发指南
 
