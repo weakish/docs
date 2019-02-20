@@ -1,4 +1,5 @@
 {% import "views/_data.njk" as data %}
+
 # 数据存储服务总览
 
 感谢你选用 LeanCloud 数据存储服务。你可以通过使用我们提供的 SDK，一行后端代码都不用写，而快速完成一个产品（网站或应用）的开发和发布。
@@ -36,15 +37,15 @@ LeanCloud 对大部分场景下的后端需求进行了抽象和统一，我们�
 我们将客户端与服务端交互的纷繁芜杂的数据，统一抽象成「对象」，在我们的数据模型里面，对应的就是「AVObject」。每个 AVObject 都包含与 JSON 相兼容的键值对（key-value）数据，并有一个类别名（Class Name）。LeanCloud 云端对于 AVObject 里面「键」的数量并没有限制，也不要求每一个 AVObject 里面都包含所有的「键」。譬如在一个游戏里面，我们有多种数据需要保存：
 
 * 账户相关的数据，包含用户名、密码、性别等
-* 游戏分数相关的数据，包含用户、得分、关联关卡等
+* 游戏得分相关的数据，包含玩家、分数、模式、关卡等
 
 我们可以全部存放在一种 AVObject 对象里面（假定类别名为 `AllInOne`）：
 
 ```
-// 玩家信息，包括姓名、密码、性别等
-{"username":"steve", "password":"xxxxx", "gender":"Male"}
-// 游戏得分数据，包括分数、玩家、模式、关卡等
-{"score":1337, "playerName":"steve", "cheatMode":false, "scene":4}
+// 账户信息，包括用户名、密码、性别等
+{ "username": "steve", "password": "xxxxxx", "gender": "Male" }
+// 游戏得分信息，包括玩家、分数、模式、关卡等
+{ "playerName": "steve", "score": 1337, "cheatMode": false, "scene": 4 }
 ```
 
 你可以把这两条记录都保存到一种 AVObject 里面，这在 LeanCloud 云端是被允许的。但是我们**强烈建议开发者将不同类型的数据根据用途进行分类，形成不同种类的 「AVObject」**。譬如上面的例子，我们可以抽象出 `User` 这种对象来保存账户信息，抽象出 `GameScore` 这种对象来保存得分信息。
@@ -56,7 +57,7 @@ LeanCloud 对大部分场景下的后端需求进行了抽象和统一，我们�
 * 访问方式不一样，不需要任何 JDBC/ODBC 的驱动，直接通过 HTTP 协议来传输 JSON Object 即可，所以不光服务端可以使用，在客户端也可以直接访问。我们既提供各种平台原生 SDK（iOS、Android、JavaScript、PHP、Python、Java、Windows Phone、.Net、Unity3D、C++，以及社区贡献的其他语言 SDK）来帮助开发者简单集成数据存储服务，也提供开放的 REST API 供大家直接使用。
 * LeanCloud 对于数据的唯一格式要求是满足 JSON Object 的形式，存储新的对象类型时不需要预先在云端定义任何「表结构」，而且同一种数据类型里的键值也是允许随时增加的。这种 schema free 的设计，会给开发者带来最大的便利。
 * AVObject 之间没有了主键、外键的概念，也不支持跨表的 join 查询，取而代之的，我们提供另一种数据关联的机制，详见下文 [数据关联](#数据关联)。
-* 既然 AVObject 是面向对象设计的，它的查询就与传统 SQL 不一样，详见下文 [数据查询 AVQuery](#数据查询_AVQuery)。不过为了照顾已经习惯了传统关系型数据库查询的开发者，我们也提供了类 SQL 查询的 [Cloud Query Language 查询语法](./cql_guide.html)（简称：CQL）。请注意：LeanCloud 的 CQL 查询语法是 SQL 查询语法的子集和变种，目的是降低大家学习 LeanCloud 查询的 API 的成本，并不是所有 SQL 中可以执行的查询都会在 CQL 中产生相同的结果。
+* 既然 AVObject 是面向对象设计的，它的查询就与传统 SQL 不一样，详见下文 [数据查询 AVQuery](#数据查询_AVQuery)。不过为了照顾已经习惯了传统关系型数据库查询的开发者，我们也提供了类 SQL 查询的 [Cloud Query Language 查询语法](cql_guide.html)（简称：CQL）。请注意：LeanCloud 的 CQL 查询语法是 SQL 查询语法的子集和变种，目的是降低大家学习 LeanCloud 查询的 API 的成本，并不是所有 SQL 中可以执行的查询都会在 CQL 中产生相同的结果。
 
 ### 有效的数据类型
 
@@ -111,7 +112,7 @@ LeanCloud 中有 4 种方式来构建对象之间的关系：
 - **AVRelation**——这是一个专门的关联类，用来建立两种对象之间的关联关系，适合多对多的场景。
 - **中间表**——使用专门的类，来为两种对象建立关联关系，与 AVRelation 相比它还可以添加更多的附加信息。譬如我们为用户之间关注/被关注的关系建模，就像流行的社交网络那样，一个用户可以关注别的用户。在这里，我们不仅想知道用户 A 是否关注了用户 B，我们还想知道什么时候用户 A 开始关注的用户 B，这时候就适合建立专门的中间表。中间表适合多对多的关联关系。
 
-详细内容请参考《[数据模型设计指南](relation-guide.html)》。
+详细内容请参考 [数据模型设计指南](relation-guide.html)。
 
 ## 数据查询 AVQuery
 
@@ -123,7 +124,7 @@ AVObject 保存到 LeanCloud 云端之后，如何再次获取到它们呢？这
 * 支持复合查询；
 * 支持自动缓存查询结果，保证在网络异常的情况下 UI 也有历史数据可供展现。
 
-除了 AVQuery 之外，我们也提供类 SQL 查询的 [Cloud Query Language 查询语法](./cql_guide.html)（简称：CQL）。请注意：LeanCloud 的 CQL 查询语法是 SQL 查询语法的子集和变种，目的是降低大家学习 LeanCloud 查询的 API 的成本，并不是所有 SQL 中可以执行的查询都会在 CQL 中产生相同的结果。
+除了 AVQuery 之外，我们也提供类 SQL 查询的 [Cloud Query Language 查询语法](cql_guide.html)（简称：CQL）。请注意：LeanCloud 的 CQL 查询语法是 SQL 查询语法的子集和变种，目的是降低大家学习 LeanCloud 查询的 API 的成本，并不是所有 SQL 中可以执行的查询都会在 CQL 中产生相同的结果。
 
 ## 文件存储 AVFile
 
@@ -156,29 +157,45 @@ LeanCloud 平台保证 99.9% 的高可用性，并且数据访问方面保证了
 
 如果你是某个特定平台的开发者，想查看我们原生的 SDK 开发指南，请移步到具体页面：
 
-### iOS 开发指南
-
-详细请参看 [iOS 数据存储开发指南](./leanstorage_guide-objc.html)。
-
 ### Android 开发指南
 
-详细请参看 [Android 数据存储开发指南](./leanstorage_guide-android.html)。
+详细请参看 [数据存储开发指南 · Android](leanstorage_guide-android.html)。
+
+### Objective-C 开发指南
+
+详细请参看 [数据存储开发指南 · Objective-C](leanstorage_guide-objc.html)。
 
 ### JavaScript 开发指南
 
-详细请参看 [JavaScript 数据存储开发指南](./leanstorage_guide-js.html)。
-
-### .Net/Unity3D 开发指南
-
-详细请参看 [.Net 数据存储开发指南](./dotnet_guide.html)。
+详细请参看 [数据存储开发指南 · JavaScript](leanstorage_guide-js.html)。
 
 ### Python 开发指南
 
-详细请参看 [Python 数据存储开发指南](./python_guide.html)。
+详细请参看 [数据存储开发指南 · Python](leanstorage_guide-python.html)。
+
+### PHP 开发指南
+
+详细请参看 [数据存储开发指南 · PHP](leanstorage_guide-php.html)。
+
+### .NET 开发指南
+
+详细请参看 [数据存储开发指南 · .NET](dotnet_guide.html)。
+
+### Unity 开发指南
+
+详细请参看 [数据存储开发指南 · Unity](unity_guide.html)。
+
+### Java 开发指南
+
+详细请参看 [数据存储开发指南 · Java](leanstorage_guide-java.html)。
+
+### Swift 开发指南
+
+详细请参看 [数据存储开发指南 · Swift](leanstorage_guide-swift.html)。
 
 ### REST API 说明
 
-详细请参看 [REST API 详细说明](./rest_api.html)。
+详细请参看 [REST API 使用详解](rest_api.html)。
 
 ## 常见问题
 
@@ -197,7 +214,7 @@ LeanCloud 重视数据安全，因此提供如下技术手段来保证用户的�
 * 列级别的访问控制权限。与上面「行」级别的访问权限控制类似，我们还允许你为某张表的部分「列」设定单独的访问控制权限。
 * Class 级别的访问控制权限。在一些情况下，设置整个 Class 允许的权限是一种更自然的方式。例如，你可能想设置整个 Class 只读，或者只写。LeanCloud 也允许你设置每个 Class 允许的操作。
 
-具体请参考文档[数据和安全](./data_security.html)。
+具体请参考文档 [数据和安全](data_security.html)。
 
 ### 我会被绑定在 LeanCloud 平台吗
 
