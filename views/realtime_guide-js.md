@@ -117,6 +117,7 @@ realtime.createIMClient('Tom').then(function(tom) {
   return tom.createConversation({
     members: ['Jerry'],
     name: 'Tom & Jerry',
+    unique: true
   });
 }).then(function(conversation) {
   // 发送消息
@@ -176,6 +177,7 @@ realtime.createIMClient('Tom').then(function(tom) {
   return tom.createConversation({
     members: ['Jerry', 'Bob', 'Harry', 'William'],
     name: 'Tom & Jerry & friends',
+    unique: true
   })
 }).then(function(conversation) {
   // 发送消息
@@ -422,7 +424,8 @@ realtime.createIMClient('host').then(function (host) {
     return host.createConversation({
         members: ['broadcast'],
         name: '2094 世界杯决赛梵蒂冈对阵中国比赛直播间',
-        transient: true
+        transient: true,
+        unique: true
     });
 }).then(function (conversation) {
     console.log(conversation.id);
@@ -456,6 +459,7 @@ class OperationMessage extends TypedMessage {}
 realtime.createIMClient('tom').then(function(tom) {
   return tom.createConversation({
     members: ['bob'],
+    unique: true
   });
 }).then(function(conversation) {
   var message = new OperationMessage();
@@ -876,6 +880,7 @@ conversation.on(Event.MESSAGE_UPDATE, function(newMessage) {
 realtime.createIMClient('Jerry').then(function(jerry) {
   return jerry.createConversation({
     members: ['Bob', 'Harry', 'William'],
+    unique: true
   });
 }).then(function(conversation) {
   var CONVERSATION_ID = conversation.id;
@@ -893,7 +898,7 @@ jerry.createConversation({
   name: '周末滑雪',
   location: '42.86335,140.6843287',
   transient: false,
-  unique: false,
+  unique: true,
 });
 ```
 参数说明：
@@ -1105,6 +1110,7 @@ Tom 想建立一个名字叫「喵星人」 对话并且邀请了好友 Black �
 tom.createConversation({
   members: ['Black'],
   name: '喵星人',
+  unique: true
 }).then(function(conversation) {
   console.log('创建成功。id: ' + conversation.id + ' name: ' + conversation.name);
 }).catch(console.error.bind(console));
@@ -1170,6 +1176,7 @@ tom.createConversation({
   name: '猫和老鼠',
   type: 'private',
   pinned: true,
+  unique: true
 }).then(function(conversation) {
   console.log('创建成功。id: ' + conversation.id);
 }).catch(console.error.bind(console));
