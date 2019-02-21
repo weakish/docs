@@ -74,6 +74,7 @@ BitXor | 异或运算 | `{{prefix}}op('BitXor', {'value': 0x0000000000000004})`
 {% set list = [
    'all'
   ,'objc'
+  ,'swift'
   ,'java'
   ,'android'
   ,'javascript'
@@ -92,6 +93,12 @@ BitXor | 异或运算 | `{{prefix}}op('BitXor', {'value': 0x0000000000000004})`
 ```objc
 // 放在 SDK 初始化语句 [AVOSCloud setApplicationId:] 后面，只需要调用一次即可
 [AVOSCloud setAllLogsEnabled:YES];
+```
+{%- endif -%}
+{% if segment == "all" or segment == "swift" -%}
+```swift
+// 放在 SDK 初始化语句 LCApplication.default.set 后面，只需要调用一次即可
+LCApplication.default.logLevel = .debug
 ```
 {%- endif -%}
 {% if segment == "all" or segment == "java"  or segment == "android" -%}
