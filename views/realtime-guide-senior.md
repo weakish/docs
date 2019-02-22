@@ -3,15 +3,11 @@
 
 {{ docs.defaultLang('js') }}
 
-# 即时通讯开发指南 &middot; 高阶技巧
+# 即时通讯开发指南：解决权限管理、敏感词过滤、多端同步等需求的方法
 
-## 阅前准备
+## 本章导读
 
-建议先按照顺序阅读如下文档之后，再阅读本文效果最佳：
-
-- [即时通讯服务总览](realtime_v2.html)
-- [即时通讯开发指南 &middot; 基础入门](realtime-guide-beginner.html)
-- [即时通讯开发指南 &middot; 进阶功能](realtime-guide-intermediate.html)
+在[前一章](realtime-guide-intermediate.html)的基础之上，本文档演示了对话的权限管理、多端登录以及敏感词过滤等功能的使用方法，自此开发者应该可以基于 LeanCloud 即时通讯服务完成一个相对复杂的社交产品。
 
 ## 敏感词过滤和掉线通知
 
@@ -546,20 +542,30 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 > 如果不设置 Tag，则默认允许用户可以多端登录，并且消息会实时同步。
 
 
-## 实时音视频
+## 高级功能
 
-目前即时通讯服务还不支持，我们推荐如下几个产品结合即时通讯服务可以实现一个企业级的即时通讯应用：
+### 对话权限
 
-1. [声网](https://www.agora.io/cn/)
-2. [ZEGO 即构科技](https://www.zego.im)
+「对话权限」功能作为即时通讯的一项补充，可以将对话内成员划分成不同角色，实现类似 QQ 群管理员的效果。使用这个功能需要在控制台 即时通讯-设置 中开启「对话成员属性功能（成员角色管理功能）」。
 
-相关的产品在市场上还有很多，都可以很方便地与 LeanCloud 即时通讯结合起来。
+目前系统内的角色与功能对应关系：
 
-{{ docs.relatedLinks("更多文档",[
-  { title: "服务总览", href: "realtime_v2.html" },
-  { title: "基础入门", href: "realtime-guide-beginner.html" }, 
-  { title: "进阶功能", href: "realtime-guide-intermediate.html"}])
-}}
+| 角色 | 功能列表 |
+| ---------|--------- |
+| Owner | 永久性禁言、踢人、加人、拉黑、更新他人权限 |
+| Manager | 永久性禁言、踢人、加人、拉黑、更新他人权限 |
+| Member | 加人 |
+
+需要注意一点，目前不支持 Owner 的变更。
+
+### 黑名单
+
+「黑名单」功能可以实现类似微信 屏蔽 的效果，目前分为两大类
+
+- 对话 --> 成员
+- 成员 --> 对话
+
+使用这个功能需要在控制台 即时通讯-设置 中开启「黑名单功能」。
 
 
 ## REST API
