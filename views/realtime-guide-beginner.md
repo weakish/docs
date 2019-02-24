@@ -9,7 +9,15 @@
 
 ## 本章导读
 
-在这里我们会以实现简单的单聊/群聊开始，演示一个简单的创建/加入对话、发送/接收多媒体消息的流程，同时让大家了解历史消息云端保存与拉取的机制，希望可以满足大部分产品集成一个简单的聊天页面的需求。
+在很多产品里面，都存在实时沟通的需求，例如：
+- 员工与客户之间的实时信息交流，如房地产行业经理人与客户的沟通，商业产品客服与客户的沟通，等等。
+- 企业内部沟通协作，如内部的工作流系统、文档/知识库系统，如果能支持实时讨论可能就会让工作效率和效果都得到极大提升。
+- 直播互动，不论是文体行业的大型电视节目互动、重大赛事直播，娱乐行业的游戏现场直播、网红直播，还是教育行业的在线课程直播、KOL 知识分享，在吸引超大规模用户参与的同时，做好内容审核管理，也总是存在很多的技术挑战。
+- 应用内社交，社交产品要能长时间吸引住用户，除了实时性之外，还需要更多的创新玩法，对于标准化通讯服务会存在更多的功能扩展需求。
+
+我们计划根据需求的共通性和技术实现的难易程度不同，分为多篇文档来逐层深入地讲解如何利用 LeanCloud 即时通讯服务实现上述场景需求，希望开发者最终顺利完成产品开发的同时，也对我们服务的体系结构有一个清楚的了解，以便于后期的产品维护和功能扩展。
+
+在第一篇文档里，我们会从实现简单的单聊/群聊开始，演示创建和加入对话、发送和接收富媒体消息的流程，同时让大家了解历史消息云端保存与拉取的机制，希望可以满足在大部分成熟产品中集成一个简单的聊天页面的需求。
 
 在阅读本章之前，如果您还不太了解 LeanCloud 即时通讯服务的总体架构，建议先阅读[即时通讯服务总览](realtime_v2.html)。
 
@@ -17,17 +25,15 @@
 
 ## 一对一单聊
 
-我们从最基本的一对一私聊开始接入即时通讯模块，首先我们需要明确一个需求：
-
-> 假设我们正在制作一个社交聊天的应用，第一步要实现一个用户向另一个用户发起聊天的功能
-
-首先我们需要介绍一下在即时通讯服务中的 `IMClient` 对象：
+在开始讨论聊天之前，我们需要介绍一下在即时通讯服务中的 `IMClient` 对象：
 
 > `IMClient` 对应实体的是一个用户，它代表着一个用户以客户端的身份登录到了即时通讯的系统。
 
-### 1.创建 `IMClient`
+具体可以参考[服务总览中的说明](realtime_v2.html#hash933999344)。
 
-在 iOS 和 Android SDK 中使用如下代码创建出一个 `IMClient`:
+### 1. 创建 `IMClient`
+
+假设我们产品中有一个叫「Tom」的用户，首先我们在 SDK 中创建出一个与之一一对应的 `IMClient`:
 
 ```js
 var realtime = new Realtime({
@@ -40,35 +46,29 @@ realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
 }).catch(console.error);
 ```
+
 ```objc
 @property (nonatomic, strong) AVIMClient *tom;
 // clientId 为 Tom
 tom = [[AVIMClient alloc] initWithClientId:@"Tom"]
 ```
+
 ```java
 // clientId 为 Tom
 AVIMClient tom = AVIMClient.getInstance("Tom");
 ```
+
 ```cs
 var realtime = new AVRealtime('your-app-id','your-app-key');
 var tom = await realtime.CreateClientAsync('Tom');
 ```
 
-示例代码中 `clientId` 被设置为 Tom, 这里我们需要明确一下 `clientId` 的约束：
 
-1. 它必须为一个字符串
-2. 在一个应用内全局唯一
-3. 长度不能超过 64 个字符
+### 2. 登录 LeanCloud 即时通讯服务器
 
-注： JavaScript 和 C#(Unity3D) SDK 创建 `IMClient` 成功同时意味着连接也已经建立，而 iOS 和 Android SDK 则需要额外下一步[2.建立连接](#2.建立连接)
+创建好了「Tom」这个用户对应的 `IMClient` 实例之后，我们接下来需要让该实例登录 LeanCloud 云端（建立连接），只有登录之后客户端才能开始正常的收发消息，也才能接收到 LeanCloud 云端下发的各种事件通知。
 
-### 2.建立连接
-
-建立连接的含义是：
-
-> `IMClient` 建立一个于云端的长连接，然后就可以开始收发消息了，并且可以监听事件。
-
-对应的 SDK 方法如下：
+这里需要说明一点，JavaScript 和 C#(Unity3D) SDK 创建 `IMClient` 成功同时意味着连接已经建立，而 iOS 和 Android SDK 则需要调用开发者手动按照如下方法进行登录：
 
 ```js
 // Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
@@ -76,6 +76,7 @@ realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
 }).catch(console.error);
 ```
+
 ```objc
 // Tom 创建了一个 client，用自己的名字作为 clientId
 AVIMClient *tom = [[AVIMClient alloc] initWithClientId:@"Tom"];
@@ -86,6 +87,7 @@ AVIMClient *tom = [[AVIMClient alloc] initWithClientId:@"Tom"];
   }
 }];
 ```
+
 ```java
 // Tom 创建了一个 client，用自己的名字作为 clientId
 AVIMClient tom = AVIMClient.getInstance("Tom");
@@ -99,34 +101,30 @@ tom.open(new AVIMClientCallback() {
   }
 }
 ```
+
 ```cs
 var realtime = new AVRealtime('your-app-id','your-app-key');
 var tom = await realtime.CreateClientAsync('Tom');
 ```
 
-注：JavaScript 和 C#(Unity3D) SDK 建立连接成功之后，会返回一个 `IMClient`。
+### 3. 创建对话 `Conversation`
 
-推荐使用的方式：在用户登录之后用当前的用户名当做 `clientId` 来创建 `IMClient` 并建立连接。
-
-我们推荐在连接创建成功之后订阅[客户端事件与网络状态响应](#客户端事件与网络状态响应)，针对网络的异常情况作出应有的 UI 展示，以确保应用的健壮性。
-
-### 3.创建对话 `Conversation`
-
-对话(`Conversation`) 是即时通讯抽象出来的概念，它是客户端之间互发消息的载体，可以理解为一个通道，所有在这个对话内的成员都可以在这个对话内收发消息:
+用户登录之后，要开始与其他人聊天，需要先创建一个「对话」。
 
 > 对话(`Conversation`)对话是消息的载体，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
 
-Tom 已经建立了连接，因此他需要创建一个 `Conversation` 来发送消息给 Jerry：
+假设 Tom 已经完成了即时通讯服务登录，他要给 Jerry 发送消息，他需要创建一个 `Conversation` 来发送消息给 Jerry：
 
 ```js
 // 创建与 Jerry 之间的对话
 return tom.createConversation({
-  // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
+  // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
   members: ['Jerry'],
   // 对话名称
   name: 'Tom & Jerry',
 });.catch(console.error);
 ```
+
 ```objc
 // 创建与 Jerry 之间的对话
 [tom createConversationWithName:@"Tom & Jerry" clientIds:@[@"Jerry"] callback:^(AVIMConversation *conversation, NSError *error) {
@@ -144,11 +142,12 @@ tom.createConversation(Arrays.asList("Jerry"), "Tom & Jerry", null,
         }
 });
 ```
+
 ```cs
 var tom = await realtime.CreateClientAsync('Tom');
 var conversation = await tom.CreateConversationAsync("Jerry",name:"Tom & Jerry");
 ```
-
+
 `createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开控制台->存储查看数据。
 
 `createConversation` 的参数详解:
@@ -202,6 +201,7 @@ var conversation = await tom.CreateConversationAsync("Jerry",name:"Tom & Jerry")
 ### 4.发送消息
 
 对话已经创建成功了，接下来 Tom 可以发出第一条文本消息了：
+
 
 ```js
 var { TextMessage } = require('leancloud-realtime');
@@ -209,6 +209,7 @@ conversation.send(new TextMessage('Jerry，起床了！')).then(function(message
   console.log('Tom & Jerry', '发送成功！');
 }).catch(console.error);
 ```
+
 ```objc
 [conversation sendMessage:[AVIMTextMessage messageWithText:@"耗子，起床！" attributes:nil] callback:^(BOOL succeeded, NSError *error) {
   if (succeeded) {
@@ -216,6 +217,7 @@ conversation.send(new TextMessage('Jerry，起床了！')).then(function(message
   }
 }];
 ```
+
 ```java
 AVIMTextMessage msg = new AVIMTextMessage();
 msg.setText("Jerry，起床了！");
@@ -229,18 +231,19 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
   }
 });
 ```
+
 ```cs
 var textMessage = new AVIMTextMessage("Jerry，起床了！");
 await conversation.SendAsync(textMessage);
 ```
 
-`conversation.send` 接口实现的功能就是向对话中发送一条消息。
+`conversation.send` 接口实现的功能就是向对话中发送一条消息，同一对话中其他在线成员会立刻收到此消息。
 
-Jerry 只要在线他就会收到消息，至此 Jerry 还没有登场，那么他怎么接收消息呢？
-
-### 5.接收消息
+从 Jerry 的角度来看，如果他希望在界面上展示出来这一条新消息，那么他那一端该怎么来处理呢？
 
-我们在另一个设备上启动应用，然后使用 Jerry 当做 `clientId` 创建 `AVIMClient` 和 建立连接（参照前两章节 Tom 的示例代码）:
+### 5. 接收消息
+
+在另一个设备上，我们使用 Jerry 当做 `clientId` 创建一个 `AVIMClient` 并登录即时通讯服务（与前两节 Tom 的处理流程一样）:
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -248,10 +251,12 @@ var { Event } = require('leancloud-realtime');
 realtime.createIMClient('Jerry').then(function(jerry) {
 }).catch(console.error);
 ```
+
 ```objc
 jerry = [[AVIMClient alloc] initWithClientId:@"Jerry"];
 [jerry openWithCallback:^(BOOL succeeded, NSError *error) {}];
 ```
+
 ```java
 //Jerry登录
 AVIMClient jerry = AVIMClient.getInstance("Jerry");
@@ -265,12 +270,19 @@ jerry.open(new AVIMClientCallback(){
   }
 });
 ```
+
 ```cs
 var realtime = new AVRealtime('your-app-id','your-app-key');
 var jerry = await realtime.CreateClientAsync('Jerry');
 ```
 
-紧接着让 Jerry 开始订阅对话加入的事件通知：
+Jerry 是消息的被动接收方，他不需要再次主动创建与 Tom 的对话，可能也无法知道要提前加入 Tom 前面创建的对话，Jerry 端需要通过设置即时通讯客户端事件的回调函数，才能获取到 Tom 那边操作的通知。
+
+即时通讯客户端事件回调能处理多种服务端通知，这里我们先关注这里会出现的两个事件：
+- 用户被邀请进入某个对话的通知事件。Tom 在创建和 Jerry 的单聊对话的时候，Jerry 这边就能立刻收到一条通知，显示类似于「Tom 邀请你加入了一个对话」的信息。
+- 用户收到新消息的通知。在 Tom 发出「Jerry，起床了！」这条消息之后，Jerry 这边也能立刻收到一条新消息到达的通知，能获悉消息的具体数据以及对话、发送者等上下文信息。
+
+现在，我们看看具体应该如何响应服务端发过来的通知。Jerry 端首先处理对话加入的事件通知：
 
 ```js
 // 当前用户被添加至某个对话
@@ -278,12 +290,14 @@ jerry.on(Event.INVITED, function invitedEventHandler(payload, conversation) {
     console.log(payload.invitedBy, conversation.id);
 });
 ```
+
 ```objc
 jerry.delegate = self;
 -(void)conversation:(AVIMConversation *)conversation invitedByClientId:(NSString *)clientId{
     NSLog(@"%@", [NSString stringWithFormat:@"当前 ClientId(Jerry) 被 %@ 邀请，加入了对话",clientId]);
 }
 ```
+
 ```java
 public class CustomConversationEventHandler extends AVIMConversationEventHandler {
   @Override
@@ -293,6 +307,7 @@ public class CustomConversationEventHandler extends AVIMConversationEventHandler
 }
 AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
 ```
+
 ```cs
 var jerry =await realtime.CreateClientAsync("Jerry");
 jerry.OnInvited += (sender, args) =>
@@ -302,19 +317,20 @@ jerry.OnInvited += (sender, args) =>
 };
 ```
 
-为 Jerry 添加了加入对话的事件订阅之后，继续为 Jerry 订阅消息接收的事件：
+然后处理新消息到达的事件通知：
 
 ```js
 var { Event } = require('leancloud-realtime');
 // Jerry 登录
 realtime.createIMClient('Jerry').then(function(jerry) {
 
-    // 当前用户收到了某一条消息
+    // 当前用户收到了某一条消息，可以通过响应 Event.MESSAGE 这一事件来处理。
     jerry.on(Event.MESSAGE, function(message, conversation) {
         console.log('Message received: ' + message.text);
     });
 }).catch(console.error);
 ```
+
 ```objc
 jerry.delegate = self;
 #pragma mark - AVIMClientDelegate
@@ -323,6 +339,7 @@ jerry.delegate = self;
     NSLog(@"%@", message.text); // Jerry，起床了！
 }
 ```
+
 ```java
 public static class CustomMessageHandler extends AVIMMessageHandler{
    //接收到消息后的处理逻辑 
@@ -336,6 +353,7 @@ public static class CustomMessageHandler extends AVIMMessageHandler{
 
 AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
 ```
+
 ```cs
 jerry.OnMessageReceived += Jerry_OnMessageReceived;
 private void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
@@ -350,10 +368,7 @@ private void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
 }
 ```
 
-而当 Tom 创建了对话之后，Jerry 会这一端会立即触发 `INVITED`（更多关于 `INVITED` 的描述在[成员变更的事件通知总结](#成员变更的事件通知总结)），此时客户端可以做出一些 UI 展示，引导用户加载聊天的界面，紧接着 Tom 发送了消息，则会触发 Jerry `MESSAGE`，这个时候就可以直接在聊天界面的消息列表里面渲染这条消息了。
-
-对应的时序图如下:
-
+Jerry 端实现了上面两个事件通知函数之后，就可以顺利完成消息接收方的开发了。我们现在可以回顾一下 Tom 和 Jerry 发送第一条消息的过程中，两方完整的处理时序图：
 
 ```seq
 Tom->Cloud: 1.Tom 将 Jerry 加入对话
@@ -364,21 +379,22 @@ Cloud-->Jerry: 5.下发通知：接收到有新消息
 Jerry-->UI: 6.显示收到的消息内容
 ```
 
+在聊天过程中，接收方除了响应新消息到达通知之外，还需要响应多种对话成员变动通知，例如「新用户 XX 被 XX 邀请加入了对话」、「用户 XX 主动退出了对话」、「用户 XX 被管理员剔除出对话」，等等。LeanCloud 云端会实时下发这些事件通知给客户端，具体细节可以参考后续章节：[成员变更的事件通知总结](#成员变更的事件通知总结)。
+
+
 ## 多人群聊
 
-多人群聊与单聊十分接近，在一个现有对话上加入更多的成员即可转化为群聊：
-
-### 1.创建多人群聊对话
+上面我们讨论了一对一单聊的实现流程，假设我们还需要实现一个「同学群」、「朋友群」、「同事群」的多人聊天。接下来我们就看看怎么完成这一功能的集成。
+多人群聊与单聊的流程十分接近，主要差别在于对话内成员数量的多少。
 
 多人群聊的对话可以通过如下两种方式实现：
 
-1. **向现有对话中添加更多成员**
-2. **重新创建一个对话，并在创建的时候指定至少 2 名成员**
+1. **在创建对话的时候初始指定更多的成员**
+2. **在一个现有对话上邀请加入更多的成员**
 
+### 1. 创建多人群聊对话
 
-首先我们实现第一种方式： **向现有对话中添加更多成员**，将其转化成一个群聊。
-
-Tom 继续添加 Mary 到对话中：
+在 Tom 和 Jerry 的对话中，假设后来 Tom 又希望把 Mary 也拉进来，他可以使用如下的办法：
 
 ```js
 tom.getConversation(CONVERSATION_ID).then(function(conversation) {
@@ -388,6 +404,7 @@ tom.getConversation(CONVERSATION_ID).then(function(conversation) {
   // 此时对话成员为: ['Mary', 'Tom', 'Jerry']
 }).catch(console.error.bind(console));
 ```
+
 ```objc
 AVIMConversationQuery *query = [self.client conversationQuery];
 [query getConversationById:@"CONVERSATION_ID" callback:^(AVIMConversation *conversation, NSError *error) {
@@ -399,6 +416,7 @@ AVIMConversationQuery *query = [self.client conversationQuery];
     }];
 }];
 ```
+
 ```java
 AVIMClient jerry = AVIMClient.getInstance("Jerry");
 final AVIMConversation conv = client.getConversation("CONVERSATION_ID");
@@ -409,13 +427,14 @@ conv.addMembers(Arrays.asList("Mary"), new AVIMConversationCallback() {
     }
 });
 ```
+
 ```cs
 var tom = await realtime.CreateClientAsync();
 var conversation = await tom.GetConversationAsync("CONVERSATION_ID");
 await tom.InviteAsync(conversation, "Mary");
 ```
 
-而 Jerry 添加如下代码也能随时知道当前对话还有谁加进来了：
+而 Jerry 端增加「新成员加入」的事件通知处理函数，就可以及时获知 Mary 被 Tom 邀请加入当前对话了：
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -428,6 +447,7 @@ realtime.createIMClient('Jerry').then(function(jerry) {
   });
 }).catch(console.error);
 ```
+
 ```objc
 -(void)maryNoticedWhenJerryInviteMary{
     // Mary 创建一个 client，用自己的名字作为 clientId
@@ -444,6 +464,7 @@ realtime.createIMClient('Jerry').then(function(jerry) {
     NSLog(@"%@", [NSString stringWithFormat:@"%@ 加入到对话，操作者为：%@",[clientIds objectAtIndex:0],clientId]);
 }
 ```
+
 ```java
 public static class CustomMessageHandler extends AVIMMessageHandler {
     @Override
@@ -457,6 +478,7 @@ public static class CustomMessageHandler extends AVIMMessageHandler {
 }
 AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
 ```
+
 ```cs
 jerry.OnMembersJoined += OnMembersJoined;
 private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
@@ -484,7 +506,7 @@ private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
 
 {{ docs.langSpecEnd('cs') }}
 
-如下时序图可以简单的概括上述流程：
+这一流程的时序图如下：
 
 ```seq
 Tom->Cloud: 1.添加 Mary
@@ -493,9 +515,9 @@ Cloud-->Mary: 2.下发通知：你被 Tom 邀请加入对话
 Cloud-->Jerry: 2.下发通知: Mary 被 Tom 邀请加入了对话
 ```
 
-而 Mary 如果在另一台设备上登录了，Ta 可以参照[一对一单聊](#一对一单聊)中 Jerry 的做法监听 `INVITED` 事件，就可以自己被邀请到了一个对话当中。
+而 Mary 端如果要能加入到 Tom 和 Jerry 的对话中来，Ta 可以参照[一对一单聊](#一对一单聊) 中 Jerry 侧的做法监听 `INVITED` 事件，就可以自己被邀请到了一个对话当中。
 
-而**重新创建一个对话，并在创建的时候指定至少为 2 的成员数量**的方式如下：
+而**重新创建一个对话，并在创建的时候指定至少为 2 的成员数量**的方式如下：
 
 ```js
 tom.createConversation({
@@ -505,6 +527,7 @@ tom.createConversation({
   name: 'Tom & Jerry & friends',
 }).catch(console.error);
 ```
+
 ```objc
 // Jerry 建立了与朋友们的会话
 NSArray *friends = @[@"Jerry", @"Mary"];
@@ -514,6 +537,7 @@ NSArray *friends = @[@"Jerry", @"Mary"];
     }
 }];
 ```
+
 ```java
 tom.createConversation(Arrays.asList("Jerry","Mary"), "Tom & Jerry & friends", null,
    new AVIMConversationCreatedCallback() {
@@ -525,18 +549,19 @@ tom.createConversation(Arrays.asList("Jerry","Mary"), "Tom & Jerry & friends", n
       }
    });
 ```
+
 ```cs
 var conversation = await tom.CreateConversationAsync(new string[]{ "Jerry","Mary" },"Tom & Jerry & friends");
 ```
 
-### 2.群发消息
+### 2. 群发消息
 
-群聊和单聊一样，对话中的成员都会接收到对话内产生的消息。
+多人群聊中一个成员发送的消息，会实时同步到所有其他在线成员，其处理流程与单聊中 Jerry 接收消息的过程是一样的。
 
-Tom 向群聊对话发送了消息：
+例如，Tom 向群聊对话发送了消息：
 
 ```js
-conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对话'));
+conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对话'));
 ```
 ```objc
 [conversation sendMessage:[AVIMTextMessage messageWithText:@"大家好，欢迎来到我们的群聊对话！" attributes:nil] callback:^(BOOL succeeded, NSError *error) {
@@ -545,6 +570,7 @@ conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对�
     }
 }];
 ```
+
 ```java
 AVIMTextMessage msg = new AVIMTextMessage();
 msg.setText("大家好，欢迎来到我们的群聊对话！");
@@ -559,24 +585,25 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
   }
 });
 ```
+
 ```cs
 await conversation.SendAsync("大家好，欢迎来到我们的群聊对话！");
 ```
 
-而 Jerry 和 Mary 都会有 `Event.MESSAGE` 事件触发，利用它来接收群聊消息，这一点与一对一单聊没区别。
+而 Jerry 和 Mary 都会有 `Event.MESSAGE` 事件触发，利用它来接收群聊消息，并更新产品 UI。
 
 
-### 将他人踢出对话
+### 3. 将他人踢出对话
 
-刚才的代码演示的是添加新成员，而对应的删除成员的代码如下：
-
-Tom 又把 Mary 踢出对话了:
+假设后来 Mary 出言不逊，惹恼了群主 Tom，Tom 直接把 Mary 踢出对话群了。
+踢人的方法也很简单，其函数如下:
 
 ```js
 conversation.remove(['Mary']).then(function(conversation) {
   console.log('移除成功', conversation.members);
 }).catch(console.error.bind(console));
 ```
+
 ```objc
 [conversation removeMembersWithClientIds:@[@"Mary"] callback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
@@ -584,6 +611,7 @@ conversation.remove(['Mary']).then(function(conversation) {
     }
 }];
 ```
+
 ```java
  conv.kickMembers(Arrays.asList("Mary"),new AVIMConversationCallback(){
       @Override
@@ -591,11 +619,12 @@ conversation.remove(['Mary']).then(function(conversation) {
       }
  });
 ```
+
 ```cs
 await conversation.RemoveMembersAsync("Mary");
 ```
 
-执行了这段代码之后会触发如下流程：
+Tom 端执行了这段代码之后会触发如下流程：
 
 ```seq
 Tom->Cloud: 1. 对话中移除 Mary
@@ -604,14 +633,10 @@ Cloud-->Jerry: 2. 下发通知：Mary 被 Tom 移除
 Cloud-->Tom: 2. 下发通知：Mary 被移除了对话 
 ```
 
-### 加入对话
+### 4. 用户主动加入对话
 
-紧接着 William 通过 `Conversation.id` 他自己主动加入对话：
+假设 Tom 告诉了 William，说他和 Jerry 有一个很好玩的聊天群，并且把群的 id（或名称）告知给了 William。William 也很想进入这个群看看他们究竟在聊什么，他也可以自己主动加入对话：
 
-注意，如下代码运行的前提有几个前提：
-
-1. William 需要参照前面章节里面的创建了一个 `IMClient` 的实例，并且确保已经与云端建立连接。
-2. `590aa654fab00f41dda86f51` 是一个在 `_Conversation` 表里面真是存在的对话 Id。
 
 ```js
 william.getConversation('590aa654fab00f41dda86f51').then(function(conversation) {
@@ -687,9 +712,15 @@ private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
     Debug.Log(string.Format("{0} 加入了 {1} 对话，操作者是 {2}",e.JoinedMembers, e.ConversationId, e.InvitedBy));
 }
 ```
-### 退出对话
 
-Jerry 不想继续呆在这个对话里面了，他选择退出对话:
+注意，如下代码运行的前提有几个前提：
+
+1. William 需要参照前面章节里面的创建了一个 `IMClient` 的实例，并且确保已经与云端建立连接。
+2. `590aa654fab00f41dda86f51` 是一个在 `_Conversation` 表里面真是存在的对话 Id，也就是 Tom 主动告诉 William 的对话 id。当然，实际场景中 Tom 也可以通过告知 William 其他对话属性，让 William 找到对话并加入其中。关于对话的条件查询，可以参看后续章节。
+
+### 5. 用户主动退出对话
+
+假如随着 Tom 邀请进来的人越来越多，Jerry 觉得跟这些人都说不到一块去，他不想继续呆在这个对话里面了，所以选择自己主动退出对话，这时候可以通过如下方式达到目的:
 
 ```js
 conversation.quit().then(function(conversation) {
@@ -697,6 +728,7 @@ conversation.quit().then(function(conversation) {
   // 退出成功 ['William', 'Tom']
 }).catch(console.error.bind(console));
 ```
+
 ```objc
 [conversation quitWithCallback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
@@ -704,6 +736,7 @@ conversation.quit().then(function(conversation) {
     }
 }];
 ```
+
 ```java
 conversation.quit(new AVIMConversationCallback(){
     @Override
@@ -714,13 +747,14 @@ conversation.quit(new AVIMConversationCallback(){
     }
 });
 ```
+
 ```cs
 jerry.LeaveAsync(conversation);
 // 或者传入 conversation id
 jerry.LeaveAsync("590aa654fab00f41dda86f51");
 ```
 
-执行了这段代码之后会触发如下流程：
+执行了这段代码 Jerry 就离开了这个聊天群，此后群里所有的事件 Jerry 都不会再知晓。各个成员接收到的事件通知流程如下：
 
 ```seq
 Jerry->Cloud: 1. 离开对话
@@ -736,6 +770,7 @@ mary.on(Event.MEMBERS_LEFT, function membersLeftEventHandler(payload, conversati
     console.log(payload.members, payload.invitedBy, conversation.id);
 });
 ```
+
 ```objc
 // mary 登录之后，jerry 退出了对话，在 mary 所在的客户端就会激发以下回调
 -(void)conversation:(AVIMConversation *)conversation membersRemoved:(NSArray *)clientIds byClientId:(NSString *)clientId{
@@ -758,7 +793,7 @@ private void OnMembersLeft(object sender, AVIMOnMembersLeftEventArgs e)
 }
 ```
 
-### 成员变更的事件通知总结
+### 6. 成员变更的事件通知总结
 
 前面的时序图和代码针对成员变更的操作做了逐步的分析和阐述，为了确保开发者能够准确的使用事件通知，如下表格做了一个统一的归类和划分:
 
@@ -772,18 +807,17 @@ William 加入|`MEMBERS_JOINED`|`MEMBERS_JOINED`|/|`MEMBERS_JOINED`
 Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
 
 
-### 其他对话类型（聊天模式）
+### 7. 更多「对话」类型
 
 即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外,即时通讯也支持但不限于如下中流行的通讯模式：
 
 - 唯一聊天室
 - 开放聊天室，例如直播中的弹幕聊天室。
 - 服务号，例如公众号，游戏 GM 在线群发通知
-
 
 关于上述的几种场景对应的实现，请参阅[进阶功能#对话类型](realtime-guide-intermediate.html#对话类型)。
 
-## 对话
+## 更多对话相关的操作
 
 一个聊天应用在首页往往会展示当前用户加入的，最活跃的几个对话。
 
@@ -858,7 +892,7 @@ query.WhereContains("name", "NBA");
 
 关于上述的几种场景对应的实现，请参阅[进阶功能#对话的查询](realtime-guide-intermediate.html#对话的查询)
 
-## 消息
+## 文本之外的聊天消息
 
 消息的类型有很多种，使用最多的就是文本消息，其次是图像消息，还有一些短语音/短视频消息，文本消息和其他消息类型有本质的区别:
 
@@ -1069,7 +1103,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 更多消息类型请点击[进阶功能#消息类型](realtime-guide-intermediate.html#消息类型)。
 
-## 消息记录
+## 聊天历史记录
 
 消息记录默认会在云端保存 **180** 天， SDK 提供了多种方式来获取到本地。开发者可以付费来延长这一期限，请联系 support@leancloud.rocks。另外可以参考 对话的有效期。你也随时可以通过 REST API 将聊天记录同步到自己的服务器上。
 
@@ -1275,13 +1309,9 @@ realtime.on(Event.RECONNECT, function() {
 
 {{ docs.langSpecEnd('cs') }}
 
-### 断线重连
+## 退出登录与自动重连
 
-目前 SDK 默认内置了断线重连的功能，从客户端与云端建立连接成功开始，只要没有调用退出登录的接口，SDK 会一直尝试和云端保持长连接，此时 `IMClient` 的状态可以通过 网络状态响应接口得到。
-
-**注意：用户如果自行实现了重连逻辑可能会报出 1001 错误。**
-
-## 退出登录与断开连接
+如果产品层面设计了用户退出登录或者切换账号的接口，对于即时通讯服务来说，也是需要完全注销当前用户的登录状态的。在 SDK 中，开发者可以通过调用 `AVIMClient` 的 `close` 系列方法完成即时通讯服务的「退出」： 
 
 ```js
 tom.close().then(function() {
@@ -1308,6 +1338,12 @@ tom.close(new AVIMClientCallback(){
 ```cs
 await tom.CloseAsync();
 ```
+
+调用该接口之后，客户端就与即时通讯服务云端断开连接了，从云端查询前一 clientId 的状态，会显示「离线」状态。
+
+### 自动重连
+
+如果开发者没有明确调用退出登录的接口，但是客户端网络存在抖动或者切换（对于移动网络来说，这是比较常见的情况），我们 iOS 和 Android SDK 默认内置了断线重连的功能，会在网络恢复的时候自动建立连接，此时 `IMClient` 的网络状态可以通过底层的网络状态响应接口得到回调。
 
 {{ docs.relatedLinks("更多文档",[
   { title: "服务总览", href: "realtime_v2.html" },
