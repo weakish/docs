@@ -424,8 +424,7 @@ realtime.createIMClient('host').then(function (host) {
     return host.createConversation({
         members: ['broadcast'],
         name: '2094 世界杯决赛梵蒂冈对阵中国比赛直播间',
-        transient: true,
-        unique: true
+        transient: true
     });
 }).then(function (conversation) {
     console.log(conversation.id);
