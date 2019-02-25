@@ -379,7 +379,7 @@ Cloud-->Jerry: 5.下发通知：接收到有新消息
 Jerry-->UI: 6.显示收到的消息内容
 ```
 
-在聊天过程中，接收方除了响应新消息到达通知之外，还需要响应多种对话成员变动通知，例如「新用户 XX 被 XX 邀请加入了对话」、「用户 XX 主动退出了对话」、「用户 XX 被管理员剔除出对话」，等等。LeanCloud 云端会实时下发这些事件通知给客户端，具体细节可以参考后续章节：[成员变更的事件通知总结](#成员变更的事件通知总结)。
+在聊天过程中，接收方除了响应新消息到达通知之外，还需要响应多种对话成员变动通知，例如「新用户 XX 被 XX 邀请加入了对话」、「用户 XX 主动退出了对话」、「用户 XX 被管理员剔除出对话」，等等。LeanCloud 云端会实时下发这些事件通知给客户端，具体细节可以参考后续章节：[6. 成员变更的事件通知总结](#6.成员变更的事件通知总结)。
 
 
 ## 多人群聊
@@ -564,7 +564,7 @@ var conversation = await tom.CreateConversationAsync(new string[]{ "Jerry","Mary
 conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对话'));
 ```
 ```objc
-[conversation sendMessage:[AVIMTextMessage messageWithText:@"大家好，欢迎来到我们的群聊对话！" attributes:nil] callback:^(BOOL succeeded, NSError *error) {
+[conversation sendMessage:[AVIMTextMessage messageWithText:@"大家好，欢迎来到我们的群聊对话！" attributes:nil] callback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
         NSLog(@"发送成功！");
     }
@@ -793,7 +793,7 @@ private void OnMembersLeft(object sender, AVIMOnMembersLeftEventArgs e)
 }
 ```
 
-### 6. 成员变更的事件通知总结
+### 6.成员变更的事件通知总结
 
 前面的时序图和代码针对成员变更的操作做了逐步的分析和阐述，为了确保开发者能够准确的使用事件通知，如下表格做了一个统一的归类和划分:
 
@@ -809,19 +809,21 @@ Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
 
 ### 7. 更多「对话」类型
 
-即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外,即时通讯也支持但不限于如下中流行的通讯模式：
+即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外，我们也支持其他形式的「对话」模型：
 
-- 唯一聊天室
-- 开放聊天室，例如直播中的弹幕聊天室。
-- 服务号，例如公众号，游戏 GM 在线群发通知
+- 开放聊天室，例如直播中的弹幕聊天室，它与普通的「多人群聊」的主要差别是允许的成员人数以及消息到达的保证程度不一样。
+- 服务号，例如在微信里面常见的公众号/服务号，系统全局的广播账号，游戏公会等形式的「群组」，与普通「多人群聊」的主要差别，在于「服务号」是以订阅的形式加入的，也没有成员限制，并且订阅用户和服务号的消息交互是一对一的，一个用户的上行消息不会群发给其他订阅用户。
+- 临时对话，例如客服系统中用户和客服人员之间建立的临时通道，它与普通的「一对一单聊」的主要差别在于对话总是临时创建并且不会长期存在，在提升实现便利性的同时，还能降低服务使用成本（能有效减少存储空间方面的花费）。
 
-关于上述的几种场景对应的实现，请参阅[进阶功能#对话类型](realtime-guide-intermediate.html#对话类型)。
+关于上述的几种场景对应的实现，有兴趣的开发者可以参考下篇文档：[进阶功能#对话类型](realtime-guide-intermediate.html#对话类型)。
 
-## 更多对话相关的操作
+## 更多「对话」相关的操作
 
-一个聊天应用在首页往往会展示当前用户加入的，最活跃的几个对话。
+在一个商业产品里面，终端用户对于聊天「对话」的操作，除了上面所示的加入、退出、监听成员变更通知之外，我们可能还需要实现其他的功能，例如在用户的消息页面展示当前用户加入的、最活跃的几个对话。
 
 ### 获取对话列表
+
+`AVIMConversation` 是支持按照各种条件来查询的，要获取当前用户参与的所有对话，我们可以根据成员列表中包含当前用户这一条件来进行查询，代码示例如下：
 
 ```js
 tom.getQuery().containsMembers(['Tom']).find().then(function(conversations) {
@@ -831,6 +833,7 @@ tom.getQuery().containsMembers(['Tom']).find().then(function(conversations) {
   });
 }).catch(console.error.bind(console));
 ```
+
 ```objc
 // Tom 构建一个查询
 AVIMConversationQuery *query = [tom conversationQuery];
@@ -839,6 +842,7 @@ AVIMConversationQuery *query = [tom conversationQuery];
     NSLog(@"找到 %ld 个对话！", [conversations count]);
 }];
 ```
+
 ```java
 AVIMConversationsQuery query = client.getConversationsQuery();
 query.findInBackground(new AVIMConversationQueryCallback(){
@@ -851,6 +855,7 @@ query.findInBackground(new AVIMConversationQueryCallback(){
     }
 });      
 ```
+
 ```cs
 var query = tom.GetQuery().WhereContainedIn("m","Tom");
 await query.FindAsync();
@@ -861,6 +866,7 @@ await query.FindAsync();
 ```js
 query.limit(20);
 ```
+
 ```objc
 query.limit = 20;
 ```
@@ -873,44 +879,55 @@ query.Limit(20);
 
 ### 根据关键字查询
 
-在某些场景下，我们需要根据对话的一些特性来做查找，比如我要查找名字里包含 NBA 的对话:
+对于某些产品来讲，还需要让终端用户看到很多 TA 根本没有参与的「对话」，例如展示热门的聊天室，或者允许主动查询某些特征的聊天室，并加入其中。
+AVIMConversation 的 Query 也是支持组合各种条件的，比如要查找名字里包含 NBA 的对话，示例代码如下:
 
 ```js
 query.contains('name', 'NBA');
 ```
+
 ```objc
 [query whereKey:@"name" containsString:@"NBA"];
 ```
+
 ```java
 query.whereContains("name", "NBA");
 ```
+
 ```cs
 query.WhereContains("name", "NBA");
 ```
 
-### 更多查询方式
+与对话查询相关的更多细节，可参考下一篇文档：[进阶功能#对话的查询](realtime-guide-intermediate.html#对话的查询)
 
-关于上述的几种场景对应的实现，请参阅[进阶功能#对话的查询](realtime-guide-intermediate.html#对话的查询)
+### 如何根据活跃度来展示对话列表
+
+不管是当前用户参与的「对话」列表，还是全局热门的开放聊天室列表展示出来了，我们下一步要考虑的就是如何把最活跃的对话展示在前面，这里我们把「活跃」定义为最近有新消息发出来。我们希望有最新消息的对话可以展示在对话列表的最前面，甚至可以把最新的那条消息也附带显示出来，这时候该怎么实现呢？
+
+我们专门为 `AVIMConversation` 增加了一个动态的属性`lastMessageAt`（对应 `_Conversation` 表里的 `lm` 字段），记录了对话中最后一条消息到达即时通讯云端的时间戳，这一数字是服务器端的时间（精确到秒），所以不用担心客户端时间对结果造成影响。另外，`AVIMConversation`还提供了一个方法可以直接获取最新的一条消息。这样在界面展现的时候，开发者就可以自己决定展示内容与顺序了。
 
 ## 文本之外的聊天消息
 
-消息的类型有很多种，使用最多的就是文本消息，其次是图像消息，还有一些短语音/短视频消息，文本消息和其他消息类型有本质的区别:
+上面的示例都是发送文本消息，但是实际上可能图片、视频、位置等消息也是非常常见的消息格式，接下来我们就看看如何发送这些富媒体类型的消息。
 
-<div class="callout callout-info">文本消息发送的就是本身的内容，而其他多媒体消息，例如一张图片实际上发送的是一个指向图像的链接，而图像本身的物理文件内容会被 SDK 持久化存储在云端文件存储服务中</div>
+LeanCloud 即时通讯服务默认支持文本、文件、图像、音频、视频、位置、二进制等不同格式的消息，除了二进制消息之外，普通消息的收发接口都是字符串，但是文本消息和文件、图像、音视频消息有一点区别:
+
+<div class="callout callout-info">文本消息发送的就是本身的内容，而其他的多媒体消息，例如一张图片，实际上即时通讯 SDK 会首先调用 LeanCloud 存储服务的 AVFile 接口，将图像的二进制文件上传到存储服务云端，再把图像下载的 url 放入即时通讯消息结构体中，所以图像消息不过是包含了图像下载链接的固定格式文本消息。</div>
+
+图像等二进制数据不随即时通讯消息直接下发的主要原因在于，LeanCloud 的文件存储服务默认都是开通了 CDN 加速选项的，通过文件下载对于终端用户来说可以有更快的展现速度，同时对于开发者来说也能获得更低的存储成本。
 
 ### 图像消息
 
 #### 发送图像文件
 
-我们从发送一张图片消息的生命周期的时序图来了解整个过程：
+即时通讯 SDK 支持直接通过二进制数据，或者本地图像文件的路径，来构造一个图像消息并发送到云端。其流程如下：
 
 ```seq
 Tom-->source: 1. 获取图像实体内容
-Tom->Cloud: 2. 调用发送图像消息的接口
-Cloud-->AVFile: 3. SDK 后台上传文件到 AVFile 表
-AVFile-->Tom: 4. 返回图像的云端地址
-Tom-->Cloud: 5. SDK 将图像消息发送给云端
-Cloud->Jerry: 6. 收到图像消息，根据接口获取图像的云端地址，在对话框里面做 UI 展现
+Tom-->存储服务: 2. SDK 后台上传文件（AVFile）到云端
+存储服务-->Tom: 3. 返回图像的云端地址
+Tom-->Cloud: 4. SDK 将图像消息发送给云端
+Cloud->Jerry: 5. 收到图像消息，根据接口获取图像的云端地址，在对话框里面做 UI 展现
 ```
 
 图解：
@@ -934,6 +951,7 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
+
 ```objc
 NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -947,6 +965,7 @@ AVIMImageMessage *message = [AVIMImageMessage messageWithText:@"萌妹子一枚"
     }
 }];
 ```
+
 ```java
 AVFile file = AVFile.withAbsoluteLocalPath("San_Francisco.png", Environment.getExternalStorageDirectory() + "/San_Francisco.png");
 // 创建一条图片消息
@@ -961,6 +980,7 @@ conv.sendMessage(m, new AVIMConversationCallback() {
   }
 });
 ```
+
 ```cs
 // 假设在程序运行目录下有一张图片，Unity/Xamarin 可以参照这种做法通过路径获取图片
 // 以下是发送图片消息的快捷用法
@@ -975,7 +995,6 @@ imageMessage.File = new AVFile("San_Francisco.png", fileStream);
 imageMessage.TextContent = "发自我的 Windows";
 await conversation.SendAsync(imageMessage);
 ```
-
 
 #### 发送图像链接
 
@@ -994,6 +1013,7 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
+
 ```objc
 // Tom 发了一张图片给 Jerry
 AVFile *file = [AVFile fileWithURL:[self @"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"]];
@@ -1004,6 +1024,7 @@ AVIMImageMessage *message = [AVIMImageMessage messageWithText:@"萌妹子一枚"
     }
 }];
 ```
+
 ```java
 AVFile file =new AVFile("萌妹子","http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", null);
 AVIMImageMessage m = new AVIMImageMessage(file);
@@ -1018,13 +1039,14 @@ conv.sendMessage(m, new AVIMConversationCallback() {
     }
 });
 ```
+
 ```cs
 await conversation.SendImageAsync("http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", "Satomi_Ishihara", "萌妹子一枚");
 ```
 
 #### 接收图像消息
 
-对话中的其他成员修改一下接收消息的事件订阅逻辑，根据消息类型来做不同的 UI 展现：
+图像消息的接收机制和之前是一样的，只需要修改一下接收消息的事件回调逻辑，根据消息类型来做不同的 UI 展现即可，例如：
 
 ```js
 var { Event, TextMessage } = require('leancloud-realtime');
@@ -1040,6 +1062,7 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
    }
 }
 ```
+
 ```objc
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
     AVIMImageMessage *imageMessage = (AVIMImageMessage *)message;
@@ -1052,6 +1075,7 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
     NSString *fromClientId = message.clientId;
 }
 ```
+
 ```java
 AVIMMessageManager.registerMessageHandler(AVIMImageMessage.class,
     new AVIMTypedMessageHandler<AVIMImageMessage>() {
@@ -1080,6 +1104,7 @@ AVIMMessageManager.registerMessageHandler(AVIMImageMessage.class,
         }
 });
 ```
+
 ```cs
 private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 {
@@ -1091,27 +1116,372 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 }
 ```
 
-### 多媒体消息
+### 发送音频消息/视频/文件
 
-与图像消息一样，其他多媒体消息都拥有如下两种用法：
+#### 发送流程
 
-- 如果发送的是多媒体消息本身的物理文件，那么它的的内容会先试用 `AVFile` 存储在云端，然后发送云端链接到对话当中，而在接收方的客户端只要对链接做一些处理，根据消息的类型不同做不同的 UI 展现，例如语音消息可以做成一个小按钮，用户点击之后就播放语音，而视频消息则是一张视频截图，用户点击之后播放视频，诸如此类。
-- 如果是一个网络连接地址，它的物理内容并不会被存放于 `AVFile` 表内，而是直接将其转化成一个消息，发送出去
+对于图像、音频、视频和文件这四种类型的消息，SDK 均采取如下的发送流程：
 
+如果文件是从**客户端 API 读取的数据流 (Stream)**，步骤为：
 
-### 其他类型消息
+1. 从本地构造 `AVFile`
+2. 调用 `AVFile` 的上传方法将文件上传到云端，并获取文件元信息（MetaData）
+3. 把 `AVFile` 的 objectId、URL、文件元信息都封装在消息体内
+4. 调用接口发送消息
 
-更多消息类型请点击[进阶功能#消息类型](realtime-guide-intermediate.html#消息类型)。
+如果文件是**外部链接的 URL**，则：
+
+1. 直接将 URL 封装在消息体内，不获取元信息，不包含 objectId
+1. 调用接口发送消息
+
+以发送音频消息为例，基本流程是：读取音频文件（或者录制音频）> 构建音频消息 > 消息发送。
+
+```js
+var AV = require('leancloud-storage');
+var { AudioMessage } = require('leancloud-realtime-plugin-typed-messages');
+
+var fileUploadControl = $('#photoFileUpload')[0];
+var file = new AV.File('忐忑.mp3', fileUploadControl.files[0]);
+file.save().then(function() {
+  var message = new AudioMessage(file);
+  message.setText('听听人类的神曲');
+  return conversation.send(message);
+}).then(function() {
+  console.log('发送成功');
+}).catch(console.error.bind(console));
+```
+```objc
+NSString *path = [[NSBundle mainBundle] pathForResource:@"忐忑" ofType:@"mp3"];
+AVFile *file = [AVFile fileWithName:@"忐忑.mp3" contentsAtPath:path];
+AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"听听人类的神曲" file:file attributes:nil];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"发送成功！");
+    }
+}];
+```
+```java
+AVFile file = AVFile.withAbsoluteLocalPath("忐忑.mp3",localFilePath);
+AVIMAudioMessage m = new AVIMAudioMessage(file);
+m.setText("听听人类的神曲");
+// 创建一条音频消息
+conv.sendMessage(m, new AVIMConversationCallback() {
+    @Override
+    public void done(AVIMException e) {
+      if (e == null) {
+        // 发送成功
+      }
+    }
+});
+```
+```cs
+// 假设在程序运行目录下有一张图片，Unity/Xamarin 可以参照这种做法通过路径获取音频文件
+// 以下是发送音频消息的快捷用法
+using (FileStream fileStream = new FileStream(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "忐忑.mp3"), FileMode.Open, FileAccess.Read))
+{
+    await conversation.SendAudioAsync("忐忑.mp3", fileStream);
+}
+
+// 或者如下比较常规的用法
+var audioMessage = new AVIMAudioMessage();
+audioMessage.File = new AVFile("忐忑.mp3", fileStream);
+audioMessage.TextContent = "听听人类的神曲";
+await conversation.SendAsync(audioMessage);
+```
+
+与图像消息类似，音频消息也支持从 URL 构建：
+
+```js
+var AV = require('leancloud-storage');
+var { AudioMessage } = require('leancloud-realtime-plugin-typed-messages');
+
+var file = new AV.File.withURL('apple.acc', 'https://some.website.com/apple.acc');
+file.save().then(function() {
+  var message = new AudioMessage(file);
+  message.setText('来自苹果发布会现场的录音');
+  return conversation.send(message);
+}).then(function() {
+  console.log('发送成功');
+}).catch(console.error.bind(console));
+```
+```objc
+AVFile *file = [AVFile fileWithURL:[self @"https://some.website.com/apple.acc"]];
+AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"来自苹果发布会现场的录音" file:file attributes:nil];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"发送成功！");
+    }
+}];
+```
+```java
+AVFile file =new AVFile("apple.acc","来自苹果发布会现场的录音", null);
+AVIMAudioMessage m = new AVIMAudioMessage(file);
+m.setText("来自苹果发布会现场的录音");
+conv.sendMessage(m, new AVIMConversationCallback() {
+    @Override
+    public void done(AVIMException e) {
+      if (e == null) {
+        // 发送成功
+      }
+    }
+});
+```
+```cs
+await conversation.SendAudioAsync("https://some.website.com/apple.acc", "apple.acc", "来自苹果发布会现场的录音");
+```
+
+### 发送地理位置消息
+
+地理位置消息构建方式如下：
+
+```js
+var AV = require('leancloud-storage');
+var { LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
+
+var location = new AV.GeoPoint(31.3753285,120.9664658);
+var message = new LocationMessage(location);
+message.setText('蛋糕店的位置');
+conversation.send(message).then(function() {
+  console.log('发送成功');
+}).catch(console.error.bind(console));
+```
+```objc
+AVIMLocationMessage *message = [AVIMLocationMessage messageWithText:@"蛋糕店的位置" latitude:31.3753285 longitude:120.9664658 attributes:nil];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"发送成功！");
+    }
+}];
+```
+```java
+final AVIMLocationMessage locationMessage=new AVIMLocationMessage();
+// 开发者更可以通过具体的设备的 API 去获取设备的地理位置，此处仅设置了 2 个经纬度常量仅做演示
+locationMessage.setLocation(new AVGeoPoint(31.3753285,120.9664658));
+locationMessage.setText("蛋糕店的位置");
+conversation.sendMessage(locationMessage, new AVIMConversationCallback() {
+    @Override
+    public void done(AVIMException e) {
+        if (null != e) {
+          e.printStackTrace();
+        } else {
+          // 发送成功
+        }
+    }
+});
+```
+```cs
+await conv.SendLocationAsync(new AVGeoPoint(31.3753285, 120.9664658));
+```
+
+### 接收消息
+
+从前面的例子可以看到，不管消息类型如何，接收消息的流程都是一样的，我们可以在接收消息的事件回调中对于不同类型的消息使用不同处理方式，示例代码如下：
+
+```js
+// 在初始化 Realtime 时，需加载 TypedMessagesPlugin
+// var realtime = new Realtime({
+//   appId: appId,
+//   plugins: [TypedMessagesPlugin]
+// });
+var { Event, TextMessage } = require('leancloud-realtime');
+var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
+// 注册 message 事件的 handler
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  // 请按自己需求改写
+  var file;
+  switch (message.type) {
+    case TextMessage.TYPE:
+      console.log('收到文本消息， text: ' + message.getText() + ', msgId: ' + message.id);
+      break;
+    case FileMessage.TYPE:
+      file = message.getFile(); // file 是 AV.File 实例
+      console.log('收到文件消息，url: ' + file.url() + ', size: ' + file.metaData('size'));
+      break;
+    case ImageMessage.TYPE:
+      file = message.getFile();
+      console.log('收到图片消息，url: ' + file.url() + ', width: ' + file.metaData('width'));
+      break;
+    case AudioMessage.TYPE:
+      file = message.getFile();
+      console.log('收到音频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
+      break;
+    case VideoMessage.TYPE:
+      file = message.getFile();
+      console.log('收到视频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
+      break;
+    case LocationMessage.TYPE:
+      var location = message.getLocation();
+      console.log('收到位置消息，latitude: ' + location.latitude + ', longitude: ' + location.longitude);
+      break;
+    default:
+      console.warn('收到未知类型消息');
+  }
+});
+
+// 同时，对应的 conversation 上也会派发 `MESSAGE` 事件：
+conversation.on(Event.MESSAGE, function messageEventHandler(message) {
+  // 这里补充业务逻辑
+});
+```
+```objc
+// handle  built-in typed message
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    // for example: received image message
+    if (message.mediaType == kAVIMMessageMediaTypeImage) {
+        AVIMImageMessage *imageMessage = (AVIMImageMessage *)message;
+        // handle image message.
+    } else if(message.mediaType == kAVIMMessageMediaTypeAudio){
+        // handle audio message
+    } else if(message.mediaType == kAVIMMessageMediaTypeVideo){
+        // handle video message
+    } else if(message.mediaType == kAVIMMessageMediaTypeLocation){
+        // handle location message
+    } else if(message.mediaType == kAVIMMessageMediaTypeFile){
+        // handle file message
+    } else if(message.mediaType == kAVIMMessageMediaTypeText){
+        // handle text message
+    }
+}
+
+// handle customize typed message
+
+// 1. register subclass
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [AVIMCustomMessage registerSubclass];
+}
+// 2. received message
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    if (message.mediaType == 1) {
+        AVIMCustomMessage *imageMessage = (AVIMCustomMessage *)message;
+        // handle image message.
+    }
+}
+```
+```java
+// 1. register default handler
+AVIMMessageManager.registerDefaultMessageHandler(new AVIMMessageHandler(){
+    public void onMessage(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
+      // receive new-coming message
+    }
+
+    public void onMessageReceipt(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
+      // do something responding of message receipt event.
+    }
+});
+// 2. register typed message handler
+AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, new AVIMTypedMessageHandler<AVIMTypedMessage>(){
+    public void onMessage(AVIMTypedMessage message, AVIMConversation conversation, AVIMClient client) {
+    switch (message.getMessageType()) {
+        case AVIMMessageType.TEXT_MESSAGE_TYPE:
+        // do something
+        AVIMTextMessage textMessage = (AVIMTextMessage)message;
+        break;
+        case AVIMMessageType.IMAGE_MESSAGE_TYPE:
+        // do something
+        AVIMImageMessage imageMessage = (AVIMImageMessage)message;
+        break;
+        case AVIMMessageType.AUDIO_MESSAGE_TYPE:
+        // do something
+        AVIMAudioMessage audioMessage = (AVIMAudioMessage)message;
+        break;
+        case AVIMMessageType.VIDEO_MESSAGE_TYPE:
+        // do something
+        AVIMVideoMessage videoMessage = (AVIMVideoMessage)message;
+        break;
+        case AVIMMessageType.LOCATION_MESSAGE_TYPE:
+        // do something
+        AVIMLocationMessage locationMessage = (AVIMLocationMessage)message;
+        break;
+        case AVIMMessageType.FILE_MESSAGE_TYPE:
+        // do something
+        AVIMFileMessage fileMessage = (AVIMFileMessage)message;
+        break;
+        case AVIMMessageType.RECALLED_MESSAGE_TYPE:
+        // do something
+        AVIMRecalledMessage recalledMessage = (AVIMRecalledMessage)message;
+        break;
+        default:
+        // UnsupportedMessageType
+        break;
+    }
+    }
+
+    public void onMessageReceipt(AVIMTypedMessage message, AVIMConversation conversation, AVIMClient client) {
+    // do something responding of message receipt event.
+    }
+});
+
+public class CustomMessage extends AVIMMessage {
+  
+    AVIMMessageManager.registerMessageHandler(CustomMessage.class, new MessageHandler<CustomMessage>(){
+      public void onMessage(CustomMessage message, AVIMConversation conversation, AVIMClient client) {
+        // receive new-coming message
+      }
+
+      public void onMessageReceipt(CustomMessage message, AVIMConversation conversation, AVIMClient client){
+        // do something responding of message receipt event.
+      }
+    });
+}
+```
+```cs
+// 这里使用的是简单的演示，推荐使用 switch/case 搭配模式匹配来判断类型
+private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
+{
+    if (e.Message is AVIMImageMessage imageMessage)
+    {
+
+    }
+    else if (e.Message is AVIMAudioMessage audioMessage)
+    {
+
+    }
+    else if (e.Message is AVIMVideoMessage videoMessage)
+    {
+
+    }
+    else if (e.Message is AVIMFileMessage fileMessage)
+    {
+
+    }
+    else if (e.Message is AVIMLocationMessage locationMessage)
+    {
+
+    }
+    else if (e.Message is AVIMTypedMessage baseTypedMessage)
+    {
+
+    }// 这里可以继续添加自定义类型的判断条件
+}
+```
+
+### 内置消息类型与自定义消息
+
+即时通讯服务内置了如下消息类型用来满足常见的需求：
+
+- `TextMessage` 文本消息
+- `ImageMessage` 图像消息
+- `AudioMessage` 音频消息
+- `VideoMessage` 视频消息
+- `FileMessage` 普通文件消息(.txt/.doc/.md 等各种)
+- `LocationMessage` 地理位置消息
+
+如果内建的这些消息类型不够用，我们也支持开发者根据自己业务需要增加更多自定义的消息，推荐按照如下需求分级，来选择自定义的方式：
+
+- 通过设置简单 key-value 的自定义属性实现一个消息类型
+- 通过继承内置的消息类型添加一些属性
+- 完全自由实现一个全新的消息类型
+
 
 ## 聊天历史记录
 
-消息记录默认会在云端保存 **180** 天， SDK 提供了多种方式来获取到本地。开发者可以付费来延长这一期限，请联系 support@leancloud.rocks。另外可以参考 对话的有效期。你也随时可以通过 REST API 将聊天记录同步到自己的服务器上。
+消息记录默认会在云端保存 **180** 天， 开发者可以通过额外付费来延长这一期限（有需要的用户请联系 support@leancloud.rocks），也可以通过 REST API 将聊天记录同步到自己的服务器上。
 
-iOS 和 Android SDK 分别提供了内置的消息缓存机制，减少客户端对云端消息记录的查询次数，并且在离线情况下，也能查询到准确的消息记录。
+SDK 提供了多种方式来拉取历史记录，iOS 和 Android SDK 还提供了内置的消息缓存机制，以减少客户端对云端消息记录的查询次数，并且在设备离线情况下，也能展示出部分数据保障产品体验不会中断。
 
-### 获取对话的消息记录
+### 从新到旧获取对话的消息记录
 
-如下代码可以获取一个对话最近的 10 条消息，注意，返回结果是按照时间**由新到旧**排序的：
+在终端用户进入一个对话的时候，最常见的需求就是由新到旧、以翻页的方式拉取并展示历史消息，这可以通过如下代码实现：
 
 ```js
 conversation.queryMessages({
@@ -1142,7 +1512,7 @@ conv.queryMessages(10, new AVIMMessagesQueryCallback() {
 var messages = await conversation.QueryMessageAsync(limit: 10);
 ```
 
-而如果想继续拉取更早的消息记录，可以使用如下代码：
+如果想继续拉取更早的消息记录，`queryMessage` 接口也是支持翻页的。LeanCloud 即时通讯云端通过消息的 messageId 和发送时间戳来唯一定位一条消息，因此要从某条消息起拉取后续的 N 条记录，只需要指定起始消息的 `messageId` 和 `发送时间戳` 就可以了，示例代码如下：
 
 ```js
 // 创建一个迭代器，每次获取 10 条历史消息
@@ -1155,6 +1525,7 @@ messageIterator.next().then(function(result) {
   // }
 }).catch(console.error.bind(console));
 // 第二次调用 next 方法，获得第 11 ~ 20 条消息，还有更多消息，done 为 false
+// 迭代器内部会记录起始消息的数据，无需开发者显示指定
 messageIterator.next().then(function(result) {
   // result: {
   //   value: [message11, ..., message20],
@@ -1162,6 +1533,7 @@ messageIterator.next().then(function(result) {
   // }
 }).catch(console.error.bind(console));
 ```
+
 ```objc
 // 查询对话中最后 10 条消息
 [conversation queryMessagesWithLimit:10 callback:^(NSArray *messages, NSError *error) {
@@ -1173,6 +1545,7 @@ messageIterator.next().then(function(result) {
     }];
 }];
 ```
+
 ```java
 //  limit 取值范围 1~1000，默认 20
 conv.queryMessages(10, new AVIMMessagesQueryCallback() {
@@ -1197,6 +1570,7 @@ conv.queryMessages(10, new AVIMMessagesQueryCallback() {
   }
 });
 ```
+
 ```cs
 // limit 取值范围 1~1000，默认 20
 var messages = await conversation.QueryMessageAsync(limit: 10);
@@ -1206,13 +1580,16 @@ var messagesInPage = await conversation.QueryMessageAsync(beforeMessageId: oldes
 
 ### 按照消息类型获取
 
-如下代码的功能是：获取所有的图像消息：
+除了按照时间先后顺序拉取历史消息之外，即时通讯服务云端也支持按照消息的类型来拉去历史消息，这一功能可能对某些产品来说非常有用，例如我们需要展现某一个聊天群组里面所有的图像。
+
+`queryMessage` 接口还支持指定特殊的消息类型，其示例代码如下：
 
 ```js
 conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
   console.log(messages);
 }).catch(console.error);
 ```
+
 ```objc
 [conversation queryMediaMessagesFromServerWithType:kAVIMMessageMediaTypeImage limit:10 fromMessageId:nil fromTimestamp:0 callback:^(NSArray *messages, NSError *error) {
     if (!error) {
@@ -1220,6 +1597,7 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
     }
 }];
 ```
+
 ```java
 int msgType = .AVIMMessageType.TEXT_MESSAGE_TYPE;
 conversation.queryMessagesByType(msgType, limit, new AVIMMessagesQueryCallback() {
@@ -1228,22 +1606,210 @@ conversation.queryMessagesByType(msgType, limit, new AVIMMessagesQueryCallback()
     }
 });
 ```
+
 ```cs
 // 传入泛型参数，SDK 会自动读取类型的信息发送给服务端，用作筛选目标类型的消息
 var imageMessages = await conversation.QueryMessageAsync<AVIMImageMessage>();
 ```
 
-如要获取更多图像消息，可以效仿前一章节中的示例代码，继续查询可以获取更多的图像消息。
+如要获取更多图像消息，可以效仿前一章节中的示例代码，继续翻页查询即可。
 
-### 更多的获取方式
+### 从旧到新反向获取历史消息
 
-更多消息类型请点击[进阶功能#消息记录](realtime-guide-intermediate.html#消息记录)
+即时通讯云端支持的历史消息查询方式是非常多的，除了上面列举的两个最常见需求之外，还可以支持按照由旧到新的方向进行查询。如下代码演示从对话创建的时间点开始，从前往后查询消息记录：
+
+```js
+var { MessageQueryDirection } = require('leancloud-realtime');
+conversation.queryMessages({
+  direction: MessageQueryDirection.OLD_TO_NEW,
+}).then(function(messages) {
+  // handle result
+}.catch(function(error) {
+  // handle error
+});
+```
+```objc
+[conversation queryMessagesInInterval:nil direction:AVIMMessageQueryDirectionFromOldToNew limit:20 callback:^(NSArray<AVIMMessage *> * _Nullable messages, NSError * _Nullable error) {
+    if (messages.count) {
+        // handle result.
+    }
+}];
+```
+```java
+AVIMMessageInterval internal = new AVIMMessageInterval(null, null);
+conversation.queryMessages(internal, AVIMMessageQueryDirectionFromOldToNew, limit,
+  new AVIMMessagesQueryCallback(){
+    public void done(List<AVIMMessage> messages, AVIMException exception) {
+      // handle result
+    }
+});
+```
+```cs
+var earliestMessages = await conversation.QueryMessageFromOldToNewAsync();
+```
+
+为了实现翻页，请配合下一节[从某一时间戳往某一方向查询](#从某一时间戳往某一方向查询)
+
+### 从某一时间戳往某一方向查询
+
+LeanCloud 即时通讯服务云端支持以某一条消息的 Id 和 时间戳为准，往一个方向查：
+
+- 从新到旧：以某一条消息为基准，查询它之**前**产生的消息
+- 从旧到新：以某一条消息为基准，查询它之**后**产生的消息
+
+这样我们就可以在不同方向上实现消息翻页了。
+
+```js
+var { MessageQueryDirection } = require('leancloud-realtime');
+conversation.queryMessages({
+  startTime: timestamp,
+  startMessageId: messageId,
+startClosed: false,
+  direction: MessageQueryDirection.OLD_TO_NEW,
+}).then(function(messages) {
+  // handle result
+}.catch(function(error) {
+  // handle error
+});
+```
+```objc
+AVIMMessageIntervalBound *start = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:timestamp closed:false];
+AVIMMessageInterval *interval = [[AVIMMessageInterval alloc] initWithStartIntervalBound:start endIntervalBound:nil];
+[conversation queryMessagesInInterval:interval direction:direction limit:20 callback:^(NSArray<AVIMMessage *> * _Nullable messages, NSError * _Nullable error) {
+    if (messages.count) {
+        // handle result.
+    }
+}];
+```
+```java
+AVIMMessageIntervalBound start = AVIMMessageInterval.createBound(messageId, timestamp, false);
+AVIMMessageInterval internal = new AVIMMessageInterval(start, null);
+AVIMMessageQueryDirection direction;
+conversation.queryMessages(internal, direction, limit,
+  new AVIMMessagesQueryCallback(){
+    public void done(List<AVIMMessage> messages, AVIMException exception) {
+      // handle result
+    }
+});
+```
+```cs
+var earliestMessages = await conversation.QueryMessageFromOldToNewAsync();
+// get some messages after earliestMessages.Last()
+var nextPageMessages = await conversation.QueryMessageAfterAsync(earliestMessages.Last());
+```
+
+### 获取指定区间内的消息
+
+假设已知 2 条消息，这 2 条消息以较早的一条为起始点，而较晚的一条为终点，这个区间内产生的消息可以用如下方式查询：
+
+注意：**每次查询也有 100 条限制，如果想要查询区间内所有产生的消息，替换区间起始点的参数即可。**
+
+```js
+conversation.queryMessages({
+  startTime: timestamp,
+  startMessageId: messageId,
+  endTime: endTimestamp,
+  endMessageId: endMessageId,
+}).then(function(messages) {
+  // handle result
+}.catch(function(error) {
+  // handle error
+});
+```
+```objc
+AVIMMessageIntervalBound *start = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:startTimestamp closed:false];
+    AVIMMessageIntervalBound *end = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:endTimestamp closed:false];
+AVIMMessageInterval *interval = [[AVIMMessageInterval alloc] initWithStartIntervalBound:start endIntervalBound:end];
+[conversation queryMessagesInInterval:interval direction:direction limit:100 callback:^(NSArray<AVIMMessage *> * _Nullable messages, NSError * _Nullable error) {
+    if (messages.count) {
+        // handle result.
+    }
+}];
+```
+```java
+AVIMMessageIntervalBound start = AVIMMessageInterval.createBound(messageId, timestamp, false);
+AVIMMessageIntervalBound end = AVIMMessageInterval.createBound(endMessageId, endTimestamp, false);
+AVIMMessageInterval internal = new AVIMMessageInterval(start, end);
+AVIMMessageQueryDirection direction;
+conversation.queryMessages(internal, direction, limit,
+  new AVIMMessagesQueryCallback(){
+    public void done(List<AVIMMessage> messages, AVIMException exception) {
+      // handle result
+    }
+});
+```
+```cs
+var earliestMessage = await conversation.QueryMessageFromOldToNewAsync(limit: 1);
+var latestMessage = await conversation.QueryMessageAsync(limit: 1);
+// mex count for messagesInInterval is 100
+var messagesInInterval = await conversation.QueryMessageInIntervalAsync(earliestMessage.FirstOrDefault(), latestMessage.FirstOrDefault());
+```
+
+### 客户端消息缓存
+
+iOS 和 Android SDK 针对移动设备的特殊性，实现了客户端消息的缓存（JavaScript 和 C# 暂不支持）。开发者无需进行特殊设置，只要接收或者查询到的新消息，默认都会进入被缓存起来，该机制给开发者提供了如下便利：
+
+1. 客户端可以在未联网的情况下进入对话列表之后，可以获取聊天记录，提升用户体验
+2. 减少查询的次数和流量的消耗
+3. 极大地提升了消息记录的查询速度和性能
+
+客户端缓存是默认开启的，如果开发者有特殊的需求，SDK 也支持关闭缓存功能。例如有些产品在应用层进行了统一的消息缓存，无需 SDK 层再进行冗余存储，可以通过如下接口来关闭消息缓存：
+
+```js
+// 暂不支持
+```
+
+```objc
+// 需要在调用 [avimClient openWithCallback:callback] 函数之前设置，关闭历史消息缓存开关。
+avimClient.messageQueryCacheEnabled = false;
+```
+
+```java
+// 需要在调用 AVIMClient.open(callback) 函数之前设置，关闭历史消息缓存开关。
+AVIMClient.setMessageQueryCacheEnable(false);
+```
+
+```cs
+// 暂不支持
+```
+
+## 用户退出登录
+
+如果产品层面设计了用户退出登录或者切换账号的接口，对于即时通讯服务来说，也是需要完全注销当前用户的登录状态的。在 SDK 中，开发者可以通过调用 `AVIMClient` 的 `close` 系列方法完成即时通讯服务的「退出」： 
+
+```js
+tom.close().then(function() {
+  console.log('Tom 退出登录');
+}).catch(console.error.bind(console));
+```
+```objc
+[tom closeWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"退出即时通讯服务");
+    }
+}];
+```
+```java
+tom.close(new AVIMClientCallback(){
+    @Override
+    public void done(AVIMClient client,AVIMException e){
+        if(e==null){
+        //登出成功
+        }
+    }
+});
+```
+```cs
+await tom.CloseAsync();
+```
+
+调用该接口之后，客户端就与即时通讯服务云端断开连接了，从云端查询前一 clientId 的状态，会显示「离线」状态。
 
 ## 客户端事件与网络状态响应
 
-{{ docs.note("注意：在网络中断的情况下，所有的消息收发和对话操作都会失败。开发者应该监听与网络状态相关的事件并更新 UI，以免影响用户的使用体验。") }}
+即时通讯服务与终端设备的网络连接状态休戚相关，如果网络中断，那么所有的消息收发和对话操作都会失败，这时候产品层面需要在 UI 上给予用户足够的提示，以免影响使用体验。
 
-当网络连接出现中断、恢复等状态变化时，SDK 会派发以下事件：
+我们的 SDK 内部和即时通讯云端会维持一个「心跳」机制，能够及时感知到客户端的网络变化，同时将底层网络变化事件通知到应用层。具体来讲，当网络连接出现中断、恢复等状态变化时，SDK 会派发以下事件：
 
 {{ docs.langSpecStart('js') }}
 
@@ -1308,38 +1874,6 @@ realtime.on(Event.RECONNECT, function() {
 - `OnReconnectFailed` 指重连失败，此时聊天服务不可用。
 
 {{ docs.langSpecEnd('cs') }}
-
-## 退出登录与自动重连
-
-如果产品层面设计了用户退出登录或者切换账号的接口，对于即时通讯服务来说，也是需要完全注销当前用户的登录状态的。在 SDK 中，开发者可以通过调用 `AVIMClient` 的 `close` 系列方法完成即时通讯服务的「退出」： 
-
-```js
-tom.close().then(function() {
-  console.log('Tom 退出登录');
-}).catch(console.error.bind(console));
-```
-```objc
-[tom closeWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
-    if (succeeded) {
-        NSLog(@"退出即时通讯服务");
-    }
-}];
-```
-```java
-tom.close(new AVIMClientCallback(){
-    @Override
-    public void done(AVIMClient client,AVIMException e){
-        if(e==null){
-        //登出成功
-        }
-    }
-});
-```
-```cs
-await tom.CloseAsync();
-```
-
-调用该接口之后，客户端就与即时通讯服务云端断开连接了，从云端查询前一 clientId 的状态，会显示「离线」状态。
 
 ### 自动重连
 
