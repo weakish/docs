@@ -357,6 +357,46 @@ private void Tom_OnMessageModified(object sender, AVIMMessagePatchEventArgs e)
 
 对于 Android 和 iOS SDK 来说，如果消息缓存的选项是打开的时候，SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可。
 
+### 发送暂态消息
+
+暂态消息不会被自动保存，以后在历史消息中无法找到它，也不支持延迟接收，离线用户更不会收到推送通知，所以适合用来做控制协议。譬如聊天过程中「某某正在输入...」这样的状态信息就适合通过暂态消息来发送；或者当群聊的名称修改以后，也可以用暂态消息来通知该群的成员「群名称被某某修改为...」。
+
+发送暂态消息与普通消息类似：
+
+```js
+const message = new TextMessage('Tom is typing...');
+```
+```objc
+AVIMMessage *message = [AVIMTextMessage messageWithText:@"Tom is typing..." attributes:nil];
+AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
+option.transient = true;
+[conversation sendMessage:message option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    /* A message which will mention all members has been sent. */
+}];
+```
+```java
+String content = "Tom is typing...";
+AVIMTextMessage  message = new AVIMTextMessage();
+message.setText(content);
+
+AVIMMessageOption option = new AVIMMessageOption();
+option.setTransient(true);
+
+imConversation.sendMessage(message, option, new AVIMConversationCallback() {
+   @Override
+   public void done(AVIMException e) {
+   }
+});
+```
+```cs
+var textMessage = new AVIMTextMessage("Tom is typing...")
+{
+    MentionAll = true
+};
+await conv.SendAsync(textMessage);
+```
+
+暂态消息的接收逻辑和普通消息一样，开发者可以按照消息类型进行判断和处理，这里不再赘述。
 
 ### 消息回执
 
@@ -451,24 +491,18 @@ conversaion.OnMessageDeliverd += (s, e) =>
 await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
 ```
 
-#### 接收方标记已读和发送者响应回执
+#### 已读回执
 
-对方阅读了消息之后，云端会向发送方发出一个回执通知，表明消息已被阅读。已读回执目前**仅支持单聊**。
+对方「阅读」了消息之后，云端会向发送方发出一个回执通知，表明消息已被阅读。和送达回执一样，已读回执目前也**仅支持单聊**。
+
+> 注意：要使用已读回执，应用需要先开启[未读消息数更新通知](#未读消息数更新通知)选项。
 
 例如 Tom 和 Jerry 聊天，Tom 想知道 Jerry 是否阅读了自己发去的消息：
 
-1. 首先，Tom 和 Jerry 都要开启「未读消息」，即在 SDK 初始化语句后面加上：
+1. Tom 向 Jerry 发送一条消息，且标记为「需要回执」：
   
-    ```java
-    AVIMClient.setUnreadNotificationEnabled(true);
+    ```js
     ```
-    ```objc
-    [AVIMClient setUnreadNotificationEnabled:YES];
-    ```
-
-2. Tom 向 Jerry 发送一条消息，要标记好「需要回执」：
-  
-
     ```java
     AVIMClient tom = AVIMClient.getInstance("Tom");
     AVIMConversation conv = client.getConversation("551260efe4b01608686c3e0f");
@@ -500,18 +534,26 @@ await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
         }
     }];
     ```
+    ```cs
+    ```
 
-3. Jerry 收到 Tom 发的消息后，SDK 调用对话上的方法把「对话中最近的消息」标记为已读：
+2. Jerry 阅读 Tom 发的消息后，调用对话上的方法把「对话中最近的消息」标记为已读：
   
+    ```js
+    ```
     ```java
     conv.read();
     ```
     ```objc
     [conversation readInBackground];
     ```
+    ```cs
+    ```
 
-4. Jerry 读完消息后，Tom 将收到一个已读回执，此时对话的 `lastReadAt` 属性会更新。此时可以更新 UI，把时间戳小于 lastReadAt 的消息都标记为已读。
+3. Tom 将收到一个已读回执，对话的 `lastReadAt` 属性会更新。此时可以更新 UI，把时间戳小于 lastReadAt 的消息都标记为已读。
   
+    ```js
+    ```
     ```java
     onLastReadAtUpdated(AVIMClient client, AVIMConversation conversation) {
       /* Jerry 阅读了你的消息。可以通过调用 conversation.getLastReadAt() 来获得对方已经读取到的时间点
@@ -526,10 +568,151 @@ await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
         }
     }
     ```
+    ```cs
+    ```
+
+
+## 离线状态下的消息同步
+
+对于移动设备来说，在聊天的过程中总会有部分客户端临时下线。LeanCloud 提供了两种机制来应对这种场景：
+1. 一种是**离线推送通知**。这是即时通讯云端在客户端下线的时候，主动通过 Push Notification 这种外部方式来通知客户端新消息到达事件，以促使客户端尽快打开应用查看新消息。
+  ![image](images/realtime_ios_push.png)
+2. 另一种是**未读消息更新通知**。客户端如果长时间下线，会导致大量消息无法下发，这时候即时通讯云端会记录下该客户端在参与的每一个对话中拉取的最后一条消息的时间戳，当客户端重新联网并登录上来的时候，云端会实时计算下线时间段内其参与过的对话中的新消息数量，以「未读消息数更新」的事件通知到客户端，然后客户端可在需要的时候来拉取这些消息。
 
 ### 离线推送通知
 
-离线消息推送通知是 SDK 默认的未读消息处理方式。不管是单聊还是群聊，当用户 A 发出消息后，如果目标对话的部分用户当前不在线，LeanCloud 云端可以提供离线推送的方式将消息提醒发送至客户端。
+离线消息推送通知是即时通讯服务默认提供的外部通知方式。不管是单聊还是群聊，当用户 A 发出消息后，如果目标对话的部分用户当前不在线，而且这些用户使用的是 iOS、Windows Phone 设备，或者有效开通了混合推送的 Android 设备的话，LeanCloud 云端可以提供离线推送的方式将消息提醒发送至客户端。
+
+要想使用本功能，用户需要指定 **自定义推送的内容**，目前有三种方式可以做到：
+
+1. 静态配置提醒消息
+  由于不同平台的不同限制，且用户的消息正文可能还包含上层协议，所以我们允许用户在控制台中为应用设置一个静态的 JSON，推送一条内容固定的通知。
+
+  进入 [控制台 > 消息 > 实时消息 > 设置 > 离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
+  ```
+  {"alert":"您有新的消息", "badge":"Increment"}
+  ```
+  注意，`badge` 参数为 iOS 设备专用，且 `Increment` 大小写敏感，表示自动增加应用 badge 上的数字计数。清除 badge 的操作请参考 [iOS 推送指南 &middot; 清除 badge](ios_push_guide.html#清除_Badge)。
+  
+  此外，对于 iOS 设备您还可以设置声音等推送属性，具体的字段可以参考[推送 &middot; 消息内容 Data](./push_guide.html#消息内容_Data)。
+
+2. 客户端发送消息的时候额外指定推送信息
+  第一种方法虽然发出去了通知，但是因为通知文本与实际消息内容完全无关，所以可能也不太完美。即时通讯服务允许客户端在发送消息的时候，指定附加的推送信息，以便在部分接收者离线的时候转为动态内容将消息推送到用户设备上，其示例代码如下：
+
+  ```js
+  var { Realtime, TextMessage } = require('leancloud-realtime');
+  var realtime = new Realtime({ appId: '', region: 'cn' });
+  realtime.createIMClient('Tom').then(function (host) {
+      return host.createConversation({
+          members: ['Jerry'],
+          name: 'Tom & Jerry',
+          unique: true
+      });
+  }).then(function (conversation) {
+      console.log(conversation.id);
+      return conversation.send(new TextMessage('Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！'), {
+          pushData: {
+              "alert": "您有一条未读的消息",
+              "category": "消息",
+              "badge": 1,
+              "sound": "声音文件名，前提在应用里存在",
+              "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
+          }
+      });
+  }).then(function (message) {
+      console.log(message);
+  }).catch(console.error);
+  ```
+  ```objc
+  AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
+  option.pushData = @{@"alert" : @"您有一条未读消息", @"sound" : @"message.mp3", @"badge" : @1, @"custom-key" : @"由用户添加的自定义属性，custom-key 仅是举例，可随意替换"};
+  [conversation sendMessage:[AVIMTextMessage messageWithText:@"Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+      // 在这里处理发送失败或者成功之后的逻辑
+  }];
+  ```
+  ```java
+  AVIMTextMessage msg = new AVIMTextMessage();
+  msg.setText("Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！");
+
+  AVIMMessageOption messageOption = new AVIMMessageOption();
+  messageOption.setPushData("自定义离线消息推送内容");
+  conv.sendMessage(msg, messageOption, new AVIMConversationCallback() {
+      @Override
+      public void done(AVIMException e) {
+          if (e == null) {
+          // 发送成功
+          }
+      }
+  });
+  ```
+  ```cs
+  var message = new AVIMTextMessage()
+  {
+      TextContent = "Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！"
+  };
+
+  AVIMSendOptions sendOptions = new AVIMSendOptions()
+  {
+      PushData = new Dictionary<string, object>()
+      {
+          { "alert", "您有一条未读的消息"},
+          { "category", "消息"},
+          { "badge", 1},
+          { "sound", "message.mp3//声音文件名，前提在应用里存在"},
+          { "custom-key", "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"}
+      }
+  };
+  ```
+
+3. 服务端动态生成通知内容
+  第二种方法虽然动态，但是需要在客户端发送消息的时候提前准备好推送内容，这对于开发阶段的要求比较高，并且在灵活性上有比较大的限制，所以我们还提供了一种方式，可以让开发者在推送动态内容的时候，也不失灵活性。
+  这种方式需要在云引擎中使用 Hook 函数统一设置离线推送消息内容，感兴趣的开发者可以参阅下述文档：
+
+  - [云引擎 Hook `_receiversOffline`](#_receiversOffline) 
+  - [云引擎 PHP 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-php.html#_receiversOffline)
+  - [云引擎 NodeJS 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-node.html#_receiversOffline)
+  - [云引擎 Python 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-python.html#_receiversOffline)
+
+
+三种方式之间的优先级如下：
+**服务端动态生成通知 > 客户端发送消息的时候额外指定推送信息 > 静态配置提醒消息**
+也就是说如果开发者同时采用了多种方式来指定消息推送，那么有服务端动态生成的通知的话，最后以它为准进行推送。其次是客户端发送消息的时候额外指定推送内容，最后是静态配置的提醒消息。
+
+##### 限制
+
+通知的过期时间是 7 天，也就是说，如果一个设备 7 天内没有连接到 APNs、MPNs 或设备对应的混合推送平台，系统将不会再给这个设备推送通知。
+
+##### 实现原理
+
+这部分平台的用户，在完成登录时，SDK 会自动关联当前的 Client ID 和设备。关联的方式是通过设备**订阅**名为 Client ID 的 Channel 实现的。开发者可以在数据存储的 `_Installation` 表中的 `channels` 字段查到这组关联关系。在实际离线推送时，系统根据用户 Client ID 找到对应的关联设备进行推送。由于即时通讯触发的推送量比较大，内容单一， 所以云端不会保留这部分记录，在 **控制台 > 消息 > 推送记录** 中也无法找到这些记录。
+
+##### 其他设置
+
+推送默认使用**生产证书**，你也可以在 JSON 中增加一个 `_profile` 内部属性来选择实际推送的证书，如：
+
+```json
+{
+  "alert":    "您有一条未读消息",
+  "_profile": "dev"
+}
+```
+
+Apple 不支持在一次推送中向多个从属于不同 Team Id 的设备发推送。在使用 iOS Token Authentication 的鉴权方式后，如果应用配置了多个不同 Team Id 的 Private Key，请确认目标用户设备使用的 APNs Team ID 并将其填写在 `_apns_team_id` 参数内，以保证推送正常进行，只有指定 Team ID 的设备能收到推送。如：
+
+```json
+{
+  "alert":    "您有一条未读消息",
+  "_apns_team_id": "my_fancy_team_id"
+}
+```
+
+`_profile` 和 `_apns_team_id` 属性均不会实际推送。
+
+目前，设置界面的推送内容支持部分内置变量，你可以将上下文信息直接设置到推送内容中：
+
+* `${convId}` 推送相关的对话 ID
+* `${timestamp}` 触发推送的时间戳（Unix 时间戳）
+* `${fromClientId}` 消息发送者的 Client ID
 
 iOS 和 Android 分别提供了内置的离线消息推送通知服务，但是使用的前提是按照推送文档配置 iOS 的推送证书和 Android 开启推送的开关，详细请阅读如下文档：
 
@@ -537,86 +720,88 @@ iOS 和 Android 分别提供了内置的离线消息推送通知服务，但是�
 2. [Android 消息推送开发指南](android_push_guide.html)/[iOS 消息推送开发指南](ios_push_guide.html)
 3. [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)
 
-#### 自定义离线推送的内容
+### 未读消息数更新通知
 
-如下代码实现的是在**发送消息时**指定离线推送的内容：
+对于 js SDK 来说，未读消息数量通知是默认的未读消息处理方式。对于 Android 和 iOS SDK 来说，则需要在 AVOSCloud 初始化语句后面加上：
 
 ```js
-var { Realtime, TextMessage } = require('leancloud-realtime');
-var realtime = new Realtime({ appId: '', region: 'cn' });
-realtime.createIMClient('Tom').then(function (host) {
-    return host.createConversation({
-        members: ['Jerry'],
-        name: 'Tom & Jerry',
-        unique: true
-    });
-}).then(function (conversation) {
-    console.log(conversation.id);
-    return conversation.send(new TextMessage('Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！'), {
-        pushData: {
-            "alert": "您有一条未读的消息",
-            "category": "消息",
-            "badge": 1,
-            "sound": "声音文件名，前提在应用里存在",
-            "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
-        }
-    });
-}).then(function (message) {
-    console.log(message);
-}).catch(console.error);
+// 默认支持，无需额外设置
 ```
 ```objc
-AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
-option.pushData = @{@"alert" : @"您有一条未读消息", @"sound" : @"message.mp3", @"badge" : @1, @"custom-key" : @"由用户添加的自定义属性，custom-key 仅是举例，可随意替换"};
-[conversation sendMessage:[AVIMTextMessage messageWithText:@"Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 在这里处理发送失败或者成功之后的逻辑
-}];
+[AVIMClient setUnreadNotificationEnabled:YES];
 ```
 ```java
-AVIMTextMessage msg = new AVIMTextMessage();
-msg.setText("Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！");
-
-AVIMMessageOption messageOption = new AVIMMessageOption();
-messageOption.setPushData("自定义离线消息推送内容");
-conv.sendMessage(msg, messageOption, new AVIMConversationCallback() {
-    @Override
-    public void done(AVIMException e) {
-        if (e == null) {
-        // 发送成功
-        }
-    }
-});
+AVIMClient.setUnreadNotificationEnabled(true);
 ```
 ```cs
-var message = new AVIMTextMessage()
-{
-    TextContent = "Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！"
-};
-
-AVIMSendOptions sendOptions = new AVIMSendOptions()
-{
-    PushData = new Dictionary<string, object>()
-    {
-        { "alert", "您有一条未读的消息"},
-        { "category", "消息"},
-        { "badge", 1},
-        { "sound", "message.mp3//声音文件名，前提在应用里存在"},
-        { "custom-key", "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"}
-    }
-};
+// 尚不支持
 ```
 
-另外一种方式是，在云引擎使用 Hook 的方式统一设置离线推送消息内容，这种方式更为推荐，当客户端平台较多的时候（例如同时有 iOS 和 Android），在服务端统一设置可以减少客户端的重复代码逻辑，可以根据所需语言选择对应的云引擎即时通讯 Hook 文档：
+所有 SDK 都会在 `AVIMConversation` 上维护 `unreadMessagesCount` 字段，这个字段在变化时 `IMClient` 会派发 `未读消息数量更新（UNREAD_MESSAGES_COUNT_UPDATE）` 事件。这个字段会在下面这些情况下发生变化：
 
-- [云引擎 PHP 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-php.html#_receiversOffline)
-- [云引擎 NodeJS 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-node.html#_receiversOffline)
-- [云引擎 Python 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-python.html#_receiversOffline)
+- 登录时，服务端通知对话的未读消息数
+- 收到在线消息
+- 用户将对话标记为已读
 
+开发者应当监听 UNREAD_MESSAGES_COUNT_UPDATE 事件，在对话列表界面上更新这些对话的未读消息数量。
 
-### 发送暂态消息
+```js
+var { Event } = require('leancloud-realtime');
+client.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, function(conversations) {
+  for(let conv of conversations) {
+    console.log(conv.id, conv.name, conv.unreadMessagesCount);
+  }
+});
+```
+```objc
+// 使用代理方法 conversation:didUpdateForKey: 来观察对话的 unreadMessagesCount 属性
+- (void)conversation:(AVIMConversation *)conversation didUpdateForKey:(NSString *)key {
+    if ([key isEqualToString:@"unreadMessagesCount"]) {
+        NSUInteger unreadMessagesCount = conversation.unreadMessagesCount;
+        /* 有未读消息产生，请更新 UI，或者拉取对话。 */
+    }
+}
+```
+```java
+// 实现 AVIMConversationEventHandler 的代理方法 onUnreadMessagesCountUpdated 来得到未读消息的数量变更的通知
+onUnreadMessagesCountUpdated(AVIMClient client, AVIMConversation conversation) {
+    // conversation.getUnreadMessagesCount() 即该 conversation 的未读消息数量
+}
+```
+```cs
+// 尚不支持
+```
 
-暂态消息不会被自动保存，以后在历史消息中无法找到它，没有 未读消息 通知，也不支持延迟接收，离线用户更不会收到推送通知，所以适合用来做控制协议。譬如聊天过程中「某某正在输入...」这样的状态信息就适合通过暂态消息来发送；或者当群聊的名称修改以后，也可以用暂态消息来通知该群的成员「群名称被某某修改为...」。
+清除对话未读消息数的唯一方式是调用 Conversation#read 方法将对话标记为已读，一般来说开发者至少需要在下面两种情况下将对话标记为已读：
 
+- 在对话列表点击某对话进入到对话页面时
+- 用户正在某个对话页面聊天，并在这个对话中收到了消息时
+
+示例代码如下：
+
+```js
+// 进入到对话页面时标记其为已读
+conversation.read().then(function(conversation) {
+  console.log('对话已标记为已读');
+}).catch(console.error.bind(console));
+
+// 当前聊天的对话收到了消息立即标记为已读
+var { Event } = require('leancloud-realtime');
+currentConversation.on(Event.MESSAGE, function() {
+  currentConversation.read().catch(console.error.bind(console));
+})
+```
+```objc
+// todo
+```
+```java
+// todo
+```
+```cs
+// 尚不支持
+```
+
+> 注意：开启未读消息数后，即使客户端在线收到了消息，未读消息数量也会增加，因此开发者需要在合适时机重置未读消息数。
 
 ## 群组、开放聊天室、系统对话、临时对话的选择
 
