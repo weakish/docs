@@ -699,10 +699,15 @@ conversation.sendMessage(message, option, new AVIMConversationCallback() {
 });
 ```
 ```cs
-var textMessage = new AVIMTextMessage("我是一条 will 消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员");
-conversation.SendMessageAsync(textMessage, will: true).OnSuccess(tag =>
+var message = new AVIMTextMessage()
 {
-});
+    TextContent = "我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员"
+};
+var sendOptions = new AVIMSendOptions()
+{
+    Will = true
+};
+await conversation.SendAsync(message, sendOptions);
 ```
 
 客户端发送完毕之后就完全不用再关心这条消息了，云端会自动在发送方掉线后通知其他成员。
@@ -1092,11 +1097,39 @@ var query = tom.GetChatRoomQuery();
 
 ## 使用临时对话
 
+临时对话是一个全新的概念，它解决的是一种特殊的聊天场景：
+
+- 对话存续时间短
+- 聊天参与的人数较少（最多为 10 个 Client Id）
+- 聊天记录的存储不是强需求
+
+这种对话场景，我们推荐使用临时对话，比较能够说明这种对话场景的现实需求就是：电商售前和售后的在线聊天的客服系统，可以对比京东或者淘宝的客服。
+
+临时对话的使用可以减少对普通对话的查询压力（因为它并不会直接占用服务端 _Conversation 表的持久化存储的记录），天生的与传统的群聊，单聊做了隔离，这一点对于对话量大的应用来说是很有好处的。
+
+
+临时对话与普通对话（群聊/单聊）的功能点区别如下表：
+
+功能点|临时对话|普通对话
+--|--|--
+消息发送/消息接收|√|√
+查询历史消息|√|√
+接收离线消息|√|√
+修改与撤回消息|√|√
+查询在线成员|√|√
+已读回执|√|√
+订阅成员在线状态|√|√
+对话成员数量查询|√|√
+遗愿消息|√|√
+加人/删人|✘|√
+静音或者取消静音|✘|√
+更新对话属性|✘|√
+
 临时对话最大的特点是**较短的有效期**，这个特点可以解决对话的持久化存储在服务端占用的存储资源越来越大、开发者需要支付的成本越来越高的问题，也可以应对一些临时聊天的场景。
 
 ### 临时对话实例
 
-买家询问商品的详情，可以发起一个临时对话：
+`AVIMConversation` 有专门的 `createTemporaryConversation` 方法用于创建临时对话：
 
 ```js
 realtime.createIMClient('Tom').then(function(tom) {
@@ -1146,7 +1179,73 @@ tom.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversati
 var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 ```
 
-其他操作与普通对话无异，更多功能请查看[即时通讯 - 临时对话开发指南](realtime-temporary-conversation.html)。
+与其他对话类型不同的是，临时对话有一个**重要**的属性：TTL，它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天，如果您的需求是一定要超过 30 天，请使用普通对话，传入 TTL 创建临时对话的代码如下：
+
+```js
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.createTemporaryConversation({
+    members: ['Jerry', 'William'],
+    ttl: 3600,
+  });
+}).then(function(conversation) {
+  return conversation.send(new AV.TextMessage('这里是临时对话，一小时之后，这个对话就会消失'));
+}).catch(console.error);
+```
+```objc
+AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+[client openWithCallback:^(BOOL success, NSError *error) {
+    
+    if (success) {
+        
+        [client createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
+                                                timeToLive:3600
+                                                callback:
+            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
+                
+                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这里是临时对话，一小时之后，这个对话就会消失"
+                                                                    attributes:nil];
+                
+                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+                    
+                    if (success) {
+                        // send message success.
+                    }
+                }];
+            }];
+    }
+}];
+```
+```java
+AVIMClient client = AVIMClient.getInstance("Tom");
+client.open(new AVIMClientCallback() {
+    @Override
+    public void done(AVIMClient avimClient, AVIMException e) {
+    if (null == e) {
+        String[] members = {"Jerry", "William"};
+        avimClient.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
+        @Override
+        public void done(AVIMConversation conversation, AVIMException e) {
+            if (null == e) {
+            AVIMTextMessage msg = new AVIMTextMessage();
+            msg.setText("这里是临时对话，一小时之后，这个对话就会消失");
+            conversation.sendMessage(msg, new AVIMConversationCallback(){
+                @Override
+                public void done(AVIMException e) {
+                }
+            });
+            }
+        }
+        });
+    }
+    }
+});
+```
+```cs
+var temporaryConversation = await tom.CreateTemporaryConversationAsync();
+```
+
+临时对话的其他操作与普通对话无异。
 
 ## 扩展对话：支持自定义属性
 
