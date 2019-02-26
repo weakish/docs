@@ -131,7 +131,7 @@ public void jerryReceiveMsgFromTom(){
       public void done(AVIMClient client, AVIMException e) {
         if (e == null) {
           // 创建与 Jerry，Bob,Harry,William 之间的对话
-          client.createConversation(Arrays.asList("Jerry","Bob","Harry","William"), "Tom & Jerry & friedns", null,
+          client.createConversation(Arrays.asList("Jerry","Bob","Harry","William"), "Tom & Jerry & friends", null,
               new AVIMConversationCreatedCallback() {
 
                 @Override
