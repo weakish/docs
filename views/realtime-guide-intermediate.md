@@ -5,15 +5,18 @@
 
 {{ docs.useIMLangSpec()}}
 
-# 更多消息收发的需求，开放聊天室以及内容实时过滤
+# 二，特殊消息的处理，多端同步与单点登录，玩转直播聊天室
 
 ## 本章导读
 
-在前一章[从简单的单聊、群聊、收发图文消息开始](realtime-guide-beginner.html)里面，我们说明了如何在产品中增加一个基本的单聊/群聊页面，并响应服务端实时事件通知。接下来，在本篇文档中我们会讲解如何实现一些更复杂的业务需求，例如：
-- 如何处理消息的已读状态
-- 如何发送带有成员提示的消息
-- 如何支持消息的撤回和修改
-- 如何解决成员离线状态下的消息通知
+在前一章 [从简单的单聊、群聊、收发图文消息开始](realtime-guide-beginner.html) 里面，我们说明了如何在产品中增加一个基本的单聊/群聊页面，并响应服务端实时事件通知。接下来，在本篇文档中我们会讲解如何实现一些更复杂的业务需求，例如：
+
+- 支持消息被接收和阅读的状态回执，实现「Ding」一下的效果
+- 发送带有成员提醒的消息（@ 某人），在多人群组里面这能显著提升目标用户的响应积极性
+- 支持消息的撤回和修改
+- 解决成员离线状态下的消息通知与重新上线后的同步，确保不丢消息
+- 支持多设备登录，或者强制用户单点登录
+- 扩展新的消息类型
 - 如何实现一个不限人数的直播聊天室
 - 如何对大型聊天室中的消息进行实时内容过滤
 
@@ -988,7 +991,98 @@ currentConversation.on(Event.MESSAGE, function() {
 
 > 注意：开启未读消息数后，即使客户端在线收到了消息，未读消息数量也会增加，因此开发者需要在合适时机重置未读消息数。
 
-## 扩展消息类型
+## 多端消息同步与单点登录
+
+一个用户可以使用相同的账号在不同的客户端上登录（例如网页版和手机客户端可以同时接收到消息和回复消息，实现多端消息同步），而有一些场景下，需要禁止一个用户同时在不同客户端登录（单点登录），而即时通讯服务也提供了这样的接口，来应对不同的需求：
+
+下面我们来详细说明：如何使用 LeanCloud SDK 去实现单点登录
+
+### 设置登录标记 Tag
+
+假设开发者想实现 QQ 这样的功能，那么需要在登录到云端的时候，也就是打开与云端长连接的时候，标记一下这个链接是从什么类型的客户端登录到云端的：
+
+```js
+realtime.createIMClient('Tom', { tag: 'Mobile' }).then(function(tom) {
+  console.log('Tom 登录');
+});
+```
+```objc
+AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile"];
+[currentClient openWithCallback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // 与云端建立连接成功
+    }
+}];
+```
+```java
+// 第二个参数：登录标记 Tag
+AVIMClient currentClient = AVIMClient.getInstance(clientId,"Mobile");
+currentClient.open(new AVIMClientCallback() {
+  @Override
+  public void done(AVIMClient avimClient, AVIMException e) {
+    if(e == null){
+      // 与云端建立连接成功
+    }
+  }
+});
+```
+```cs
+AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile", deviceId: "your-device-id");
+```
+
+上述代码可以理解为 LeanCloud 版 QQ 的登录，而另一个带有同样 Tag 的客户端打开连接，则较早前登录系统的客户端会被强制下线。
+
+### 处理登录冲突
+
+我们可以看到上述代码中，登录的 Tag 是 `Mobile`。当存在与其相同的 Tag 登录的客户端，较早前登录的设备会被云端强行下线，而且他会收到被云端下线的通知：
+
+```js
+var { Event } = require('leancloud-realtime');
+tom.on(Event.CONFLICT, function() {
+  // 弹出提示，告知当前用户的 Client Id 在其他设备上登陆了
+});
+```
+```objc
+-(void)client:(AVIMClient *)client didOfflineWithError:(NSError *)error{
+    if ([error code]  == 4111) {
+        //适当的弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
+    }
+};
+```
+```java
+public class MyApplication extends Application{
+  public void onCreate(){
+   ...
+   AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
+   // 自定义实现的 AVIMClientEventHandler 需要注册到 SDK 后，SDK 才会通过回调 onClientOffline 来通知开发者
+   AVIMClient.setClientEventHandler(new AVImClientManager());
+   ...
+  }
+}
+
+public class AVImClientManager extends AVIMClientEventHandler {
+  ...
+  @Override
+  public void onClientOffline(AVIMClient avimClient, int i) {
+    if(i == 4111){
+      // 适当地弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
+    }
+  }
+  ...
+}
+```
+```cs
+tom.OnSessionClosed += Tom_OnSessionClosed;
+private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
+{
+}
+```
+
+如上述代码中，被动下线的时候，云端会告知原因，因此客户端在做展现的时候也可以做出类似于 QQ 一样友好的通知。
+
+> 如果不设置 Tag，则默认允许用户可以多端登录，并且消息会实时同步。
+
+## 扩展自己的消息类型
 
 尽管即时通讯服务默认已经包含了丰富的消息类型，但是我们依然支持开发者根据业务需要扩展自己的消息类型，例如允许用户之间发送名片、红包等等。这里「名片」和「红包」就可以是应用层定义的自己的消息类型。
 
@@ -1122,158 +1216,6 @@ var query = tom.GetChatRoomQuery();
 在 [控制台 > 消息 > 实时消息 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中开启「消息敏感词实时过滤功能」，上传敏感词文件即可。
 
 如果开发者有较为复杂的过滤需求，我们推荐使用 [云引擎 hook _messageReceived](realtime-guide-systemconv.html#_messageReceived) 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
-
-## 使用临时对话
-
-临时对话是一个全新的概念，它解决的是一种特殊的聊天场景：
-
-- 对话存续时间短
-- 聊天参与的人数较少（最多为 10 个 Client Id）
-- 聊天记录的存储不是强需求
-
-这种对话场景，我们推荐使用临时对话，比较能够说明这种对话场景的现实需求就是：电商售前和售后的在线聊天的客服系统，可以对比京东或者淘宝的客服。
-
-临时对话的使用可以减少对普通对话的查询压力（因为它并不会直接占用服务端 _Conversation 表的持久化存储的记录），天生的与传统的群聊，单聊做了隔离，这一点对于对话量大的应用来说是很有好处的。
-
-
-临时对话与普通对话（群聊/单聊）的功能点区别如下表：
-
-功能点|临时对话|普通对话
---|--|--
-消息发送/消息接收|√|√
-查询历史消息|√|√
-接收离线消息|√|√
-修改与撤回消息|√|√
-查询在线成员|√|√
-已读回执|√|√
-订阅成员在线状态|√|√
-对话成员数量查询|√|√
-遗愿消息|√|√
-加人/删人|✘|√
-静音或者取消静音|✘|√
-更新对话属性|✘|√
-
-临时对话最大的特点是**较短的有效期**，这个特点可以解决对话的持久化存储在服务端占用的存储资源越来越大、开发者需要支付的成本越来越高的问题，也可以应对一些临时聊天的场景。
-
-### 临时对话实例
-
-`AVIMConversation` 有专门的 `createTemporaryConversation` 方法用于创建临时对话：
-
-```js
-realtime.createIMClient('Tom').then(function(tom) {
-  return tom.createTemporaryConversation({
-    members: ['Jerry', 'William'],
-  });
-}).then(function(conversation) {
-  return conversation.send(new AV.TextMessage('这里是临时对话'));
-}).catch(console.error);
-```
-
-```objc
-[tom createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
-                                                timeToLive:3600
-                                                callback:
-            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
-
-                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这里是临时对话，一小时之后，这个对话就会消失"
-                                                                    attributes:nil];
-                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
-
-                    if (success) {
-                        // send message success.
-                    }
-                }];
-            }];
-```
-
-```java
-tom.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
-    @Override
-    public void done(AVIMConversation conversation, AVIMException e) {
-        if (null == e) {
-        AVIMTextMessage msg = new AVIMTextMessage();
-        msg.setText("这里是临时对话，一小时之后，这个对话就会消失");
-        conversation.sendMessage(msg, new AVIMConversationCallback(){
-            @Override
-            public void done(AVIMException e) {
-            }
-        });
-        }
-    }
-});
-```
-
-```cs
-var temporaryConversation = await tom.CreateTemporaryConversationAsync();
-```
-
-与其他对话类型不同的是，临时对话有一个**重要**的属性：TTL，它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天，如果您的需求是一定要超过 30 天，请使用普通对话，传入 TTL 创建临时对话的代码如下：
-
-```js
-realtime.createIMClient('Tom').then(function(tom) {
-  return tom.createTemporaryConversation({
-    members: ['Jerry', 'William'],
-    ttl: 3600,
-  });
-}).then(function(conversation) {
-  return conversation.send(new AV.TextMessage('这里是临时对话，一小时之后，这个对话就会消失'));
-}).catch(console.error);
-```
-```objc
-AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
-
-[client openWithCallback:^(BOOL success, NSError *error) {
-    
-    if (success) {
-        
-        [client createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
-                                                timeToLive:3600
-                                                callback:
-            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
-                
-                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这里是临时对话，一小时之后，这个对话就会消失"
-                                                                    attributes:nil];
-                
-                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
-                    
-                    if (success) {
-                        // send message success.
-                    }
-                }];
-            }];
-    }
-}];
-```
-```java
-AVIMClient client = AVIMClient.getInstance("Tom");
-client.open(new AVIMClientCallback() {
-    @Override
-    public void done(AVIMClient avimClient, AVIMException e) {
-    if (null == e) {
-        String[] members = {"Jerry", "William"};
-        avimClient.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
-        @Override
-        public void done(AVIMConversation conversation, AVIMException e) {
-            if (null == e) {
-            AVIMTextMessage msg = new AVIMTextMessage();
-            msg.setText("这里是临时对话，一小时之后，这个对话就会消失");
-            conversation.sendMessage(msg, new AVIMConversationCallback(){
-                @Override
-                public void done(AVIMException e) {
-                }
-            });
-            }
-        }
-        });
-    }
-    }
-});
-```
-```cs
-var temporaryConversation = await tom.CreateTemporaryConversationAsync();
-```
-
-临时对话的其他操作与普通对话无异。
 
 
 {{ docs.relatedLinks("进一步阅读",[

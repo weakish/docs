@@ -3,15 +3,15 @@
 
 {{ docs.defaultLang('js') }}
 
-# 安全与签名、黑名单和权限管理、实现单点登录与多端同步的方法
+# 三，安全与签名、黑名单和权限管理、使用临时对话
 
 ## 本章导读
 
-在前一章[更多消息收发的需求，开放聊天室以及内容实时过滤](realtime-guide-intermediate.html)中，我们演示了与消息相关的更多特殊需求的实现方法，以及直播聊天室和实时消息过滤的功能，现在，我们会更进一步，从系统安全的角度，给大家详细说明：
+在前一章[特殊消息的处理，多端同步与单点登录，玩转直播聊天室](realtime-guide-intermediate.html)中，我们演示了与消息相关的更多特殊需求的实现方法，以及直播聊天室和实时消息过滤的功能，现在，我们会更进一步，从系统安全的角度，给大家详细说明：
 
 - 如何通过第三方鉴权来控制客户端登录与操作
 - 如何对成员权限进行限制，以保证聊天流程能被运营人员很好管理起来
-- 如何支持用户在多个设备同时登录，并保证消息同步
+- 如何使用临时对话
 
 ## 安全与签名
 
@@ -329,6 +329,9 @@ var realtime = new AVRealtime(config);
 
 {{ docs.alert("需要强调的是：开发者切勿在客户端直接使用 MasterKey 进行签名操作，因为 MaterKey 一旦泄露，会造成应用的数据处于高危状态，后果不容小视。因此，强烈建议开发者将签名的具体代码托管在安全性高稳定性好的云端服务器上（例如 LeanCloud 云引擎）。") }}
 
+### 内建账户系统（AVUser）的签名机制
+
+
 ## 权限管理与黑名单
 
 第三方鉴权是一种服务端对全局进行控制的机制，具体到单个对话的群组，例如开放聊天室，出于产品运营的需求，我们还需要对成员权限进行区分，以及允许管理员来限时/永久屏蔽部分用户。下面我们详细说明一下这样的需求该如何实现。
@@ -337,7 +340,7 @@ var realtime = new AVRealtime(config);
 
 「成员权限」是指将对话内成员划分成不同角色，实现类似 QQ 群管理员的效果。使用这个功能需要在控制台 即时通讯-设置 中开启「对话成员属性功能（成员角色管理功能）」。
 
-目前系统内的角色与功能对应关系：
+目前系统内的角色与管理功能的对应关系：
 
 | 角色 | 功能列表 |
 | ---------|--------- |
@@ -345,7 +348,9 @@ var realtime = new AVRealtime(config);
 | Manager | 永久性禁言、踢人、加人、拉黑、更新他人权限 |
 | Member | 加人 |
 
-一个对话的 `Owner` 是不可变更的，我们 SDK 允许一个终端用户在 `Manager` 和 `Member` 之间切换角色，示例代码如下：
+角色的操作权限大小是按照 `Owner` -> `Manager` -> `Member` 的顺序逐级递减的，高级别的角色可以修改低级别角色的权限，但反过来的修改是不允许的。同时，对于加人和踢人的操作，在前面文档中我们可以看到，是所有成员都可以执行的操作，在成员角色管理功能开启之后，就变成 `Owner` 和 `Manager` 专属的功能的，普通成员发起这两种请求都会报错（错误码：）。
+
+一个对话的 `Owner` 是不可变更的，我们 SDK 可以把一个终端用户在 `Manager` 和 `Member` 之间切换角色，示例代码如下：
 
 ```js
 ```
@@ -355,6 +360,14 @@ var realtime = new AVRealtime(config);
 ```
 ```cs
 ```
+
+### 让部分用户禁言
+
+`Owner` 和 `Manager` 作为聊天群组管理员的权限之一，就是能够让部分用户禁言。
+被禁言的用户，只能接收群组里面的消息，而不能再往外发送消息，否则会报错（错误码：）。
+
+#### 禁言的通知事件
+管理员把部分用户禁言之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
 
 ### 黑名单
 
@@ -376,96 +389,164 @@ SDK 操作黑名单的示例代码为：
 ```cs
 ```
 
-## 多端消息同步与单点登录
+用户被加入黑名单之后，就被从对话的成员中移除出去了，以后都无法再接受到对话里面的新消息，并且除非解除黑名单，其他人都无法再把 ta 加为对话成员了。
 
-一个用户可以使用相同的账号在不同的客户端上登录（例如网页版和手机客户端可以同时接收到消息和回复消息，实现多端消息同步），而有一些场景下，需要禁止一个用户同时在不同客户端登录（单点登录），而即时通讯服务也提供了这样的接口，来应对不同的需求：
+#### 黑名单的通知事件
+管理员把部分用户加入黑名单之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
 
-下面我们来详细说明：如何使用 LeanCloud SDK 去实现单点登录
 
-### 设置登录标记 Tag
+## 使用临时对话
 
-假设开发者想实现 QQ 这样的功能，那么需要在登录到云端的时候，也就是打开与云端长连接的时候，标记一下这个链接是从什么类型的客户端登录到云端的：
+临时对话是一个全新的概念，它解决的是一种特殊的聊天场景：
+
+- 对话存续时间短
+- 聊天参与的人数较少（最多为 10 个 Client Id）
+- 聊天记录的存储不是强需求
+
+这种对话场景，我们推荐使用临时对话，比较能够说明这种对话场景的现实需求就是：电商售前和售后的在线聊天的客服系统，可以对比京东或者淘宝的客服。
+
+临时对话的使用可以减少对普通对话的查询压力（因为它并不会直接占用服务端 _Conversation 表的持久化存储的记录），天生的与传统的群聊，单聊做了隔离，这一点对于对话量大的应用来说是很有好处的。
+
+
+临时对话与普通对话（群聊/单聊）的功能点区别如下表：
+
+功能点|临时对话|普通对话
+--|--|--
+消息发送/消息接收|√|√
+查询历史消息|√|√
+接收离线消息|√|√
+修改与撤回消息|√|√
+查询在线成员|√|√
+已读回执|√|√
+订阅成员在线状态|√|√
+对话成员数量查询|√|√
+遗愿消息|√|√
+加人/删人|✘|√
+静音或者取消静音|✘|√
+更新对话属性|✘|√
+
+临时对话最大的特点是**较短的有效期**，这个特点可以解决对话的持久化存储在服务端占用的存储资源越来越大、开发者需要支付的成本越来越高的问题，也可以应对一些临时聊天的场景。
+
+### 临时对话实例
+
+`AVIMConversation` 有专门的 `createTemporaryConversation` 方法用于创建临时对话：
 
 ```js
-realtime.createIMClient('Tom', { tag: 'Mobile' }).then(function(tom) {
-  console.log('Tom 登录');
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.createTemporaryConversation({
+    members: ['Jerry', 'William'],
+  });
+}).then(function(conversation) {
+  return conversation.send(new AV.TextMessage('这里是临时对话'));
+}).catch(console.error);
+```
+
+```objc
+[tom createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
+                                                timeToLive:3600
+                                                callback:
+            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
+
+                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这里是临时对话，一小时之后，这个对话就会消失"
+                                                                    attributes:nil];
+                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+
+                    if (success) {
+                        // send message success.
+                    }
+                }];
+            }];
+```
+
+```java
+tom.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
+    @Override
+    public void done(AVIMConversation conversation, AVIMException e) {
+        if (null == e) {
+        AVIMTextMessage msg = new AVIMTextMessage();
+        msg.setText("这里是临时对话，一小时之后，这个对话就会消失");
+        conversation.sendMessage(msg, new AVIMConversationCallback(){
+            @Override
+            public void done(AVIMException e) {
+            }
+        });
+        }
+    }
 });
 ```
+
+```cs
+var temporaryConversation = await tom.CreateTemporaryConversationAsync();
+```
+
+与其他对话类型不同的是，临时对话有一个**重要**的属性：TTL，它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天，如果您的需求是一定要超过 30 天，请使用普通对话，传入 TTL 创建临时对话的代码如下：
+
+```js
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.createTemporaryConversation({
+    members: ['Jerry', 'William'],
+    ttl: 3600,
+  });
+}).then(function(conversation) {
+  return conversation.send(new AV.TextMessage('这里是临时对话，一小时之后，这个对话就会消失'));
+}).catch(console.error);
+```
 ```objc
-AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile"];
-[currentClient openWithCallback:^(BOOL succeeded, NSError *error) {
-    if (succeeded) {
-        // 与云端建立连接成功
+AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+[client openWithCallback:^(BOOL success, NSError *error) {
+    
+    if (success) {
+        
+        [client createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
+                                                timeToLive:3600
+                                                callback:
+            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
+                
+                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这里是临时对话，一小时之后，这个对话就会消失"
+                                                                    attributes:nil];
+                
+                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+                    
+                    if (success) {
+                        // send message success.
+                    }
+                }];
+            }];
     }
 }];
 ```
 ```java
-// 第二个参数：登录标记 Tag
-AVIMClient currentClient = AVIMClient.getInstance(clientId,"Mobile");
-currentClient.open(new AVIMClientCallback() {
-  @Override
-  public void done(AVIMClient avimClient, AVIMException e) {
-    if(e == null){
-      // 与云端建立连接成功
+AVIMClient client = AVIMClient.getInstance("Tom");
+client.open(new AVIMClientCallback() {
+    @Override
+    public void done(AVIMClient avimClient, AVIMException e) {
+    if (null == e) {
+        String[] members = {"Jerry", "William"};
+        avimClient.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
+        @Override
+        public void done(AVIMConversation conversation, AVIMException e) {
+            if (null == e) {
+            AVIMTextMessage msg = new AVIMTextMessage();
+            msg.setText("这里是临时对话，一小时之后，这个对话就会消失");
+            conversation.sendMessage(msg, new AVIMConversationCallback(){
+                @Override
+                public void done(AVIMException e) {
+                }
+            });
+            }
+        }
+        });
     }
-  }
+    }
 });
 ```
 ```cs
-AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile", deviceId: "your-device-id");
+var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 ```
 
-上述代码可以理解为 LeanCloud 版 QQ 的登录，而另一个带有同样 Tag 的客户端打开连接，则较早前登录系统的客户端会被强制下线。
+临时对话的其他操作与普通对话无异。
 
-### 处理登录冲突
-
-我们可以看到上述代码中，登录的 Tag 是 `Mobile`。当存在与其相同的 Tag 登录的客户端，较早前登录的设备会被云端强行下线，而且他会收到被云端下线的通知：
-
-```js
-var { Event } = require('leancloud-realtime');
-tom.on(Event.CONFLICT, function() {
-  // 弹出提示，告知当前用户的 Client Id 在其他设备上登陆了
-});
-```
-```objc
--(void)client:(AVIMClient *)client didOfflineWithError:(NSError *)error{
-    if ([error code]  == 4111) {
-        //适当的弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
-    }
-};
-```
-```java
-public class MyApplication extends Application{
-  public void onCreate(){
-   ...
-   AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
-   // 自定义实现的 AVIMClientEventHandler 需要注册到 SDK 后，SDK 才会通过回调 onClientOffline 来通知开发者
-   AVIMClient.setClientEventHandler(new AVImClientManager());
-   ...
-  }
-}
-
-public class AVImClientManager extends AVIMClientEventHandler {
-  ...
-  @Override
-  public void onClientOffline(AVIMClient avimClient, int i) {
-    if(i == 4111){
-      // 适当地弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
-    }
-  }
-  ...
-}
-```
-```cs
-tom.OnSessionClosed += Tom_OnSessionClosed;
-private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
-{
-}
-```
-
-如上述代码中，被动下线的时候，云端会告知原因，因此客户端在做展现的时候也可以做出类似于 QQ 一样友好的通知。
-
-> 如果不设置 Tag，则默认允许用户可以多端登录，并且消息会实时同步。
 
 {{ docs.relatedLinks("进一步阅读",[
   { title: "详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
