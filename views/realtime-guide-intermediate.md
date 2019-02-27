@@ -563,6 +563,10 @@ await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
 1. Tom 向 Jerry 发送一条消息，且标记为「需要回执」：
   
     ```js
+    var message = new TextMessage('very important message');
+    conversation.send(message, {
+      receipt: true,
+    });
     ```
     ```objc
     AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
@@ -596,24 +600,36 @@ await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
     });
     ```
     ```cs
+    var textMessage = new AVIMTextMessage("very important message");
+    var option = new AVIMSendOptions(){Receipt = true};
+    await conv.SendAsync(textMessage, option);
     ```
 
 2. Jerry 阅读 Tom 发的消息后，调用对话上的 `read` 方法把「对话中最近的消息」标记为已读：
   
     ```js
+    conversation.read().then(function(conversation) {
+      ;
+    }).catch(console.error.bind(console));
     ```
     ```objc
     [conversation readInBackground];
     ```
     ```java
-    conv.read();
+    conversation.read();
     ```
     ```cs
+    // not support yet.
     ```
 
 3. Tom 将收到一个已读回执，对话的 `lastReadAt` 属性会更新。此时可以更新 UI，把时间戳小于 lastReadAt 的消息都标记为已读。
   
     ```js
+    var { Event } = require('leancloud-realtime');
+    conversation.on(Event.LAST_READ_AT_UPDATE, function() {
+      console.log(conversation.lastDeliveredAt);
+      // 在 UI 中将早于 lastDeliveredAt 的消息都标记为「已送达」
+    });
     ```
     ```objc
     // Tom 可以在 client 的 delegate 方法中捕捉到 lastReadAt 的更新
@@ -638,6 +654,7 @@ await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
     AVIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
     ```
     ```cs
+    // not support yet.
     ```
 
 ### Will（遗愿）消息
@@ -705,7 +722,7 @@ Will 消息有**如下限制**：
 
 接收到遗愿消息的客户端需要根据自己的消息内容来做 UI 的展现。
 
-### 发送失败消息的处理
+### 本地发送失败消息的处理
 
 有时你可能需要将发送失败的消息临时保存到客户端本地的缓存中，等到合适时机再进行处理。例如，将由于网络突然中断而发送失败的消息先保留下来，待网络恢复后再由用户选择是否重发。
 即时通讯 Android 和 iOS SDK 默认提供了消息本地缓存的功能，消息缓存中保存的都是已经成功上行到云端的消息，并且能够保证和云端的数据同步。为了方便开发者，SDK 也支持将一时失败的消息加入到缓存中，以后从缓存中取出来还能再次发送（且多次发送也不会造成服务端消息重复）。
@@ -747,6 +764,7 @@ UI 上可以根据 message.status 的属性值来做不同的展现，例如当 
 对于移动设备来说，在聊天的过程中总会有部分客户端临时下线，如何保证离线用户也能收到消息，并且长时间离线也不会丢失消息，LeanCloud 提供了两种机制来应对这种挑战：
 
 1. 一种是**离线推送通知**。这是即时通讯云端在客户端下线的时候，主动通过 Push Notification 这种外部方式来通知客户端新消息到达事件，以促使客户端尽快打开应用查看新消息。
+
   ![image](images/realtime_ios_push.png)
 2. 另一种是**未读消息更新通知**。客户端如果长时间下线，会导致大量消息无法下发，这时候即时通讯云端会记录下该客户端在参与的每一个对话中拉取的最后一条消息的时间戳，当客户端重新联网并登录上来的时候，云端会实时计算下线时间段内其参与过的对话中的新消息数量，以「未读消息数更新」的事件通知到客户端，然后客户端可在需要的时候来拉取这些消息。
 
