@@ -10,18 +10,24 @@
 ## 本章导读
 
 在很多产品里面，都存在实时沟通的需求，例如：
-- 员工与客户之间的实时信息交流，如房地产行业经理人与客户的沟通，商业产品客服与客户的沟通，等等。
-- 企业内部沟通协作，如内部的工作流系统、文档/知识库系统，如果能支持实时讨论可能就会让工作效率和效果都得到极大提升。
-- 直播互动，不论是文体行业的大型电视节目互动、重大赛事直播，娱乐行业的游戏现场直播、网红直播，还是教育行业的在线课程直播、KOL 知识分享，在吸引超大规模用户参与的同时，做好内容审核管理，也总是存在很多的技术挑战。
+- 员工与客户之间的实时信息交流，如房地产行业经纪人与客户的沟通，商业产品客服与客户的沟通，等等。
+- 企业内部沟通协作，如内部的工作流系统、文档/知识库系统，增加实时互动的方式可能就会让工作效率得到极大提升。
+- 直播互动，不论是文体行业的大型电视节目中的观众互动、重大赛事直播，娱乐行业的游戏现场直播、网红直播，还是教育行业的在线课程直播、KOL 知识分享，在支持超大规模用户积极参与的同时，也需要做好内容审核管理。
 - 应用内社交，社交产品要能长时间吸引住用户，除了实时性之外，还需要更多的创新玩法，对于标准化通讯服务会存在更多的功能扩展需求。
 
-我们计划根据需求的共通性和技术实现的难易程度不同，分为多篇文档来逐层深入地讲解如何利用 LeanCloud 即时通讯服务实现上述场景需求，希望开发者最终顺利完成产品开发的同时，也对我们服务的体系结构有一个清楚的了解，以便于后期的产品维护和功能扩展。
+根据功能需求的层次性和技术实现的难易程度不同，我们分为多篇文档来逐层深入地讲解如何利用 LeanCloud 即时通讯服务实现不同业务场景需求：
 
-在第一篇文档里，我们会从实现简单的单聊/群聊开始，演示创建和加入对话、发送和接收富媒体消息的流程，同时让大家了解历史消息云端保存与拉取的机制，希望可以满足在大部分成熟产品中集成一个简单的聊天页面的需求。
+- 本篇文档，我们会从实现简单的单聊/群聊开始，演示创建和加入「对话」、发送和接收富媒体「消息」的流程，同时让大家了解历史消息云端保存与拉取的机制，希望可以满足在成熟产品中快速集成一个简单的聊天页面的需求。
+- [第二篇文档](realtime-guide-intermediate.html)，我们会介绍更多的消息功能，例如 @ 成员提醒、撤回和修改、消息送达和被阅读的回执通知等，同时我们也会介绍开放聊天室的用法，希望可以满足一个社交类产品的多方面需求。
+- [第三篇文档](realtime-guide-senior.html)，我们会介绍一下系统的安全机制，包括第三方的操作签名，以及「对话」成员的权限管理和黑名单机制，同时也会介绍同一账号多端登录和消息同步的方案，希望可以帮助开发者提升产品的安全性和易用性。
+- [第四篇文档](realtime-guide-systemconv.html)，我们会介绍即时通讯服务端 Hook 机制，系统对话的用法，以及给出一个基于这两个功能打造一个属于自己的聊天机器人的方案，希望可以满足业务层多种多样的扩展需求。
 
-在阅读本章之前，如果您还不太了解 LeanCloud 即时通讯服务的总体架构，建议先阅读[即时通讯服务总览](realtime_v2.html)。
+希望开发者最终顺利完成产品开发的同时，也对即时通讯服务的体系结构有一个清晰的了解，以便于产品的长期维护和定制化扩展。
 
-另外，如果您还没有下载对应开发环境（语言）的 SDK，请参考[SDK 安装指南](start.html)完成 SDK 安装与初始化。
+> 阅读准备
+>
+> 在阅读本章之前，如果您还不太了解 LeanCloud 即时通讯服务的总体架构，建议先阅读[即时通讯服务总览](realtime_v2.html)。
+> 另外，如果您还没有下载对应开发环境（语言）的 SDK，请参考[SDK 安装指南](start.html)完成 SDK 安装与初始化。
 
 ## 一对一单聊
 
@@ -29,11 +35,11 @@
 
 > `IMClient` 对应实体的是一个用户，它代表着一个用户以客户端的身份登录到了即时通讯的系统。
 
-具体可以参考[服务总览中的说明](realtime_v2.html#hash933999344)。
+具体可以参考[服务总览中的说明](realtime_v2.html#Client、用户和登录)。
 
 ### 1. 创建 `IMClient`
 
-假设我们产品中有一个叫「Tom」的用户，首先我们在 SDK 中创建出一个与之一一对应的 `IMClient`:
+假设我们产品中有一个叫「Tom」的用户，首先我们在 SDK 中创建出一个与之对应的 `IMClient` 实例:
 
 ```js
 var realtime = new Realtime({
@@ -41,57 +47,53 @@ var realtime = new Realtime({
   appKey: 'your-app-key',
   plugins: [TypedMessagesPlugin], // 注册富媒体消息插件
 });
-// Tom 用自己的名字作为 clientId
+// Tom 用自己的名字作为 clientId 来登录即时通讯服务
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
 }).catch(console.error);
 ```
-
 ```objc
 @property (nonatomic, strong) AVIMClient *tom;
 // clientId 为 Tom
 tom = [[AVIMClient alloc] initWithClientId:@"Tom"]
 ```
-
 ```java
 // clientId 为 Tom
 AVIMClient tom = AVIMClient.getInstance("Tom");
 ```
-
 ```cs
 var realtime = new AVRealtime('your-app-id','your-app-key');
 var tom = await realtime.CreateClientAsync('Tom');
 ```
 
+注意这里一个 `IMClient` 实例就代表一个终端用户，我们需要把它全局保存起来，因为后续该用户在即时通讯上的所有操作都需要直接或者间接使用这个实例。
 
-### 2. 登录 LeanCloud 即时通讯服务器
+### 2. 登录即时通讯服务器
 
-创建好了「Tom」这个用户对应的 `IMClient` 实例之后，我们接下来需要让该实例登录 LeanCloud 云端（建立连接），只有登录之后客户端才能开始正常的收发消息，也才能接收到 LeanCloud 云端下发的各种事件通知。
+创建好了「Tom」这个用户对应的 `IMClient` 实例之后，我们接下来需要让该实例「登录」 LeanCloud 即时通讯服务器。只有登录成功之后客户端才能开始与其他用户聊天，也才能接收到 LeanCloud 云端下发的各种事件通知。
 
-这里需要说明一点，JavaScript 和 C#(Unity3D) SDK 创建 `IMClient` 成功同时意味着连接已经建立，而 iOS 和 Android SDK 则需要调用开发者手动按照如下方法进行登录：
+这里需要说明一点，JavaScript 和 C#(Unity3D) SDK 在创建 `IMClient` 实例的同时会自动进行登录，而 iOS（Objective-C/Swift） 和 Android SDK 则需要调用开发者手动执行 `open` 方法进行登录：
 
 ```js
-// Tom 用自己的名字作为 clientId, 建立长连接，并且获取 IMClient 对象实例
+// Tom 用自己的名字作为 clientId 登录，并且获取 IMClient 对象实例
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
 }).catch(console.error);
 ```
-
 ```objc
 // Tom 创建了一个 client，用自己的名字作为 clientId
 AVIMClient *tom = [[AVIMClient alloc] initWithClientId:@"Tom"];
-// Tom 创建连接
+// Tom 登录
 [tom openWithCallback:^(BOOL succeeded, NSError *error) {
   if(succeeded) {
     // 成功打开连接
   }
 }];
 ```
-
 ```java
-// Tom 创建了一个 client，用自己的名字作为 clientId
+// Tom 创建了一个 client，用自己的名字作为 clientId 登录
 AVIMClient tom = AVIMClient.getInstance("Tom");
-// Tom 创建连接
+// Tom 登录
 tom.open(new AVIMClientCallback() {
   @Override
   public void done(AVIMClient client, AVIMException e) {
@@ -101,7 +103,6 @@ tom.open(new AVIMClientCallback() {
   }
 }
 ```
-
 ```cs
 var realtime = new AVRealtime('your-app-id','your-app-key');
 var tom = await realtime.CreateClientAsync('Tom');
@@ -111,28 +112,29 @@ var tom = await realtime.CreateClientAsync('Tom');
 
 用户登录之后，要开始与其他人聊天，需要先创建一个「对话」。
 
-> 对话(`Conversation`)对话是消息的载体，所有消息的目标都是对话，而所有在对话中的成员都会接收到对话内产生的消息。
+> [对话(`Conversation`)](/realtime_v2.html#对话（Conversation）)对话是消息的载体，所有消息都是发送给对话，即时通讯服务端会把消息下发给所有在对话中的成员。
 
-假设 Tom 已经完成了即时通讯服务登录，他要给 Jerry 发送消息，他需要创建一个 `Conversation` 来发送消息给 Jerry：
+Tom 完成了登录之后，就可以选择用户聊天了。现在他要给 Jerry 发送消息，所以需要先创建一个只有他们两个成员的 `Conversation`：
 
 ```js
 // 创建与 Jerry 之间的对话
-return tom.createConversation({
+return tom.CreateConversationAsync({
   // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
   members: ['Jerry'],
   // 对话名称
   name: 'Tom & Jerry',
+  unique: true
 });.catch(console.error);
 ```
-
 ```objc
 // 创建与 Jerry 之间的对话
-[tom createConversationWithName:@"Tom & Jerry" clientIds:@[@"Jerry"] callback:^(AVIMConversation *conversation, NSError *error) {
+[tom createConversationWithName:@"Tom & Jerry" clientIds:@[@"Jerry"] attributes:nil options:AVIMConversationOptionUnique
+                       callback:^(AVIMConversation *conversation, NSError *error) {
 
 }];
 ```
 ```java
-tom.createConversation(Arrays.asList("Jerry"), "Tom & Jerry", null, 
+tom.createConversation(Arrays.asList("Jerry"), "Tom & Jerry", null, false, true,
     new AVIMConversationCreatedCallback() {
         @Override
         public void done(AVIMConversation conversation, AVIMException e) {
@@ -142,82 +144,163 @@ tom.createConversation(Arrays.asList("Jerry"), "Tom & Jerry", null,
         }
 });
 ```
-
 ```cs
 var tom = await realtime.CreateClientAsync('Tom');
-var conversation = await tom.CreateConversationAsync("Jerry",name:"Tom & Jerry");
+var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry", isUnique:true);
 ```
 
-`createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开控制台->存储查看数据。
+`createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开 控制台->存储 查看数据。不同 SDK 提供的创建对话接口如下：
 
-`createConversation` 的参数详解:
+```js
+/**
+ * 创建一个对话
+ * @param {Object} options 除了下列字段外的其他字段将被视为对话的自定义属性
+ * @param {String[]} options.members 对话的初始成员列表，必要参数，默认包含当前 client
+ * @param {String} [options.name] 对话的名字，可选参数，如果不传默认值为 null
+ * @param {Boolean} [options.transient=false] 是否为聊天室，可选参数
+ * @param {Boolean} [options.unique=false] 是否唯一对话，当其为 true 时，如果当前已经有相同成员的对话存在则返回该对话，否则会创建新的对话
+ * @param {Boolean} [options.tempConv=false] 是否为临时对话，可选参数
+ * @param {Integer} [options.tempConvTTL=0] 可选参数，如果 tempConv 为 true，这里可以指定临时对话的生命周期。
+ * @return {Promise.<Conversation>}
+ */
+async createConversation({
+  members: m,
+  name,
+  transient,
+  unique,
+  tempConv,
+  tempConvTTL,
+  ...properties
+});
+```
+```objc
+/*!
+ 创建一个新的用户对话。
+ 在单聊的场合，传入对方一个 clientId 即可；群聊的时候，支持同时传入多个 clientId 列表
+ @param name - 会话名称。
+ @param clientIds - 聊天参与者（发起人除外）的 clientId 列表。
+ @param callback － 对话建立之后的回调
+ */
+- (void)createConversationWithName:(NSString * _Nullable)name
+                         clientIds:(NSArray<NSString *> *)clientIds
+                          callback:(void (^)(AVIMConversation * _Nullable conversation, NSError * _Nullable error))callback;
+/*!
+ 创建一个新的用户对话。
+ 在单聊的场合，传入对方一个 clientId 即可；群聊的时候，支持同时传入多个 clientId 列表
+ @param name - 会话名称。
+ @param clientIds - 聊天参与者（发起人除外）的 clientId 列表。
+ @param attributes - 会话的自定义属性。
+ @param options － 可选参数，可以使用或 “|” 操作表示多个选项
+ @param callback － 对话建立之后的回调
+ */
+- (void)createConversationWithName:(NSString * _Nullable)name
+                         clientIds:(NSArray<NSString *> *)clientIds
+                        attributes:(NSDictionary * _Nullable)attributes
+                           options:(AVIMConversationOption)options
+                          callback:(void (^)(AVIMConversation * _Nullable conversation, NSError * _Nullable error))callback;
 
-{{ docs.langSpecStart('js') }}
+```
+```java
+/**
+ * 创建或查询一个已有 conversation
+ *
+ * @param members 对话的成员
+ * @param name 对话的名字
+ * @param attributes 对话的额外属性
+ * @param isTransient 是否是暂态会话
+ * @param isUnique 如果已经存在符合条件的会话，是否返回已有回话
+ *                 为 false 时，则一直为创建新的回话
+ *                 为 true 时，则先查询，如果已有符合条件的回话，则返回已有的，否则，创建新的并返回
+ *                 为 true 时，仅 members 为有效查询条件
+ * @param callback 结果回调函数
+ */
+public void createConversation(final List<String> members, final String name,
+    final Map<String, Object> attributes, final boolean isTransient, final boolean isUnique,
+    final AVIMConversationCreatedCallback callback);
+/**
+ * 创建一个聊天对话
+ *
+ * @param members 对话参与者
+ * @param attributes 对话的额外属性
+ * @param isTransient 是否为暂态对话
+ * @param callback  结果回调函数
+ */
+public void createConversation(final List<String> members, final String name,
+                               final Map<String, Object> attributes, final boolean isTransient,
+                               final AVIMConversationCreatedCallback callback);
+/**
+ * 创建一个聊天对话
+ *
+ * @param conversationMembers 对话参与者
+ * @param name       对话名字
+ * @param attributes 对话属性
+ * @param callback   结果回调函数
+ * @since 3.0
+ */
+public void createConversation(final List<String> conversationMembers, String name,
+    final Map<String, Object> attributes, final AVIMConversationCreatedCallback callback);
+/**
+ * 创建一个聊天对话
+ * 
+ * @param conversationMembers 对话参与者
+ * @param attributes 对话属性
+ * @param callback   结果回调函数
+ * @since 3.0
+ */
+public void createConversation(final List<String> conversationMembers,
+    final Map<String, Object> attributes, final AVIMConversationCreatedCallback callback);
+```
+```cs
+/// <summary>
+/// 创建与目标成员的对话.
+/// </summary>
+/// <returns>返回对话实例.</returns>
+/// <param name="member">目标成员.</param>
+/// <param name="members">目标成员列表.</param>
+/// <param name="name">对话名称.</param>
+/// <param name="isSystem">是否是系统对话。注意：在客户端无法创建系统对话，所以这里设置为 true 会导致创建失败。</param>
+/// <param name="isTransient">是否为暂态对话（聊天室）.</param>
+/// <param name="isUnique">是否是唯一对话.</param>
+/// <param name="options">自定义属性.</param>
+public Task<AVIMConversation> CreateConversationAsync(string member = null,
+    IEnumerable<string> members = null,
+    string name = "",
+    bool isSystem = false,
+    bool isTransient = false,
+    bool isUnique = true,
+    IDictionary<string, object> options = null);
+```
 
-1. `members` : 字符串数组，必要参数，对话的初始成员(clientId)列表，默认包含当前 clientId
-2. `name`: 字符串，可选参数，对话的名字，如果不传默认值为 null
-3. `unique`： bool 类型，可选参数，是否唯一对话，当其为 true 时，如果当前已经有相同成员的对话存在则返回该对话，否则会创建新的对话
+虽然不同语言/平台接口声明有所不同，但是支持的参数是基本一致的。在创建一个对话的时候，我们主要可以指定：
+1. `members`：必要参数，包含对话的初始成员列表，请注意当前用户作为对话的创建者，是默认包含在成员里面的，所以 members 数组中可以不包含当前用户的 clientId。
+2. `name`：对话名字，可选参数，上面代码指定为了「Tom & Jerry」。
+3. `attributes`：对话的自定义属性，可选。上面示例代码没有指定额外属性，开发者如果指定了额外属性的话，以后其他成员可以通过 AVIMConversation 的接口获取到这些属性值。附加属性在 `_Conversation` 表中被保存在 `attr` 列中。
+5. `unique/isUnique` 或者是 `AVIMConversationOptionUnique`：唯一对话标志位，可选。
+  - 如果设置为唯一对话，云端会根据完整的成员列表先进行一次查询，如果已经有正好包含这些成员的对话存在，那么就返回已经存在的对话，否则才创建一个新的对话。
+  - 如果不指定 unique 标志为，那么每次调用 `createConversation` 接口都会创建一个新的对话。
+  - 从通用的聊天场景来看，不管是 Tom 发出创建和 Jerry 单聊对话的请求，还是从 Jerry 发出创建和 Tom 单聊对话的请求，或者 Tom 以后再次发出创建和 Jerry 单聊对话的请求，都应该是同一个对话才是合理的，否则可能因为聊天记录的不同导致用户混乱。所以我们***建议开发者明确指定 unique 标志为 true***。
+4. 对话类型的其他标志，可选参数，例如 `transient/isTransient` 表示「聊天室」，`tempConv/tempConvTTL` 和 `AVIMConversationOptionTemporary` 用来创建「临时对话」等等。什么都不指定就表示创建普通对话，对于这些标志位的含义我们先不管，以后会有说明。
 
-{{ docs.langSpecEnd('js') }}
-
-{{ docs.langSpecStart('objc') }}
-
-1. name － 表示对话名字，可以指定任意有意义的名字，也可不填。
-2. clientIds － 表示对话初始成员，可不填。如果填写了初始成员，则 LeanCloud 云端会直接给这些成员发出邀请，省掉再专门发一次邀请请求。
-3. attributes － 表示额外属性，Dictionary，支持任意的 key/value，可不填。
-4. options － 对话选项：
-  - AVIMConversationOptionTransient：聊天室，具体可以参见创建聊天室；
-  - AVIMConversationOptionNone：普通对话；
-  - AVIMConversationOptionTemporary：临时对话；
-  - AVIMConversationOptionUnique：根据成员（clientIds）创建原子对话。如果没有这个选项，服务端会为相同的 clientIds 创建新的对话。clientIds 即 _Conversation 表的 m 字段。
-  - callback － 结果回调，在操作结束之后调用，通知开发者成功与否。
-
-{{ docs.langSpecEnd('objc') }}
-
-{{ docs.langSpecStart('java') }}
-
-1. members - 对话的成员
-2. name - 对话的名字
-3. attributes - 对话的额外属性
-4. isTransient - 是否是暂态会话
-5. isUnique - 如果已经存在符合条件的会话，是否返回已有回话 为 false 时，则一直为创建新的回话 为 true 时，则先查询，如果已有符合条件的回话，则返回已有的，否则，创建新的并返回 为 true      时，仅 members 为有效查询条件
-6. callback - 结果回调函数
-
-{{ docs.langSpecEnd('java') }}
-
-{{ docs.langSpecStart('cs') }}
-
-1. `members` : 字符串数组，必要参数，对话的初始成员(clientId)列表，默认包含当前 clientId
-2. `name`: 字符串，可选参数，对话的名字，如果不传默认值为 null
-3. `isSystem`: bool 值，可选参数，是否是服务号
-4. `isTransient`:bool 值，可选参数，是否为聊天室
-5. `isUnique`： bool 类型，可选参数，是否唯一对话，当其为 true 时，如果当前已经有相同成员的对话存在则返回该对话，否则会创建新的对话
-6. `options`：字典类型，可选参数，额外的自定义属性
-
-{{ docs.langSpecEnd('cs') }}
-
-创建对话之后，可以获取对话的内置属性，云端会为每一个对话生成一个全局唯一的 ID 属性： `Conversation.id`，它是查询对话和获取对话时常用的匹配字段。
+创建对话之后，可以获取对话的内置属性，云端会为每一个对话生成一个全局唯一的 ID 属性： `Conversation.id`，它是其他用户查询对话时常用的匹配字段。
 
 ### 4.发送消息
 
-对话已经创建成功了，接下来 Tom 可以发出第一条文本消息了：
+对话已经创建成功了，接下来 Tom 可以在这个对话中发出第一条文本消息了：
 
-
 ```js
 var { TextMessage } = require('leancloud-realtime');
 conversation.send(new TextMessage('Jerry，起床了！')).then(function(message) {
   console.log('Tom & Jerry', '发送成功！');
 }).catch(console.error);
 ```
-
 ```objc
-[conversation sendMessage:[AVIMTextMessage messageWithText:@"耗子，起床！" attributes:nil] callback:^(BOOL succeeded, NSError *error) {
+AVIMTextMessage *message = [AVIMTextMessage messageWithText:@"耗子，起床！" attributes:nil];
+[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
   if (succeeded) {
     NSLog(@"发送成功！");
   }
 }];
 ```
-
 ```java
 AVIMTextMessage msg = new AVIMTextMessage();
 msg.setText("Jerry，起床了！");
@@ -231,19 +314,18 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
   }
 });
 ```
-
 ```cs
 var textMessage = new AVIMTextMessage("Jerry，起床了！");
-await conversation.SendAsync(textMessage);
+await conversation.SendMessageAsync(textMessage);
 ```
 
 `conversation.send` 接口实现的功能就是向对话中发送一条消息，同一对话中其他在线成员会立刻收到此消息。
 
-从 Jerry 的角度来看，如果他希望在界面上展示出来这一条新消息，那么他那一端该怎么来处理呢？
+现在 Tom 发出了消息，那么接收者 Jerry 他要在界面上展示出来这一条新消息，该怎么来处理呢？
 
 ### 5. 接收消息
 
-在另一个设备上，我们使用 Jerry 当做 `clientId` 创建一个 `AVIMClient` 并登录即时通讯服务（与前两节 Tom 的处理流程一样）:
+在另一个设备上，我们用 `Jerry` 作为 `clientId` 来创建一个 `AVIMClient` 并登录即时通讯服务（与前两节 Tom 的处理流程一样）:
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -251,17 +333,16 @@ var { Event } = require('leancloud-realtime');
 realtime.createIMClient('Jerry').then(function(jerry) {
 }).catch(console.error);
 ```
-
 ```objc
 jerry = [[AVIMClient alloc] initWithClientId:@"Jerry"];
-[jerry openWithCallback:^(BOOL succeeded, NSError *error) {}];
-```
+[jerry openWithCallback:^(BOOL succeeded, NSError *error) {
 
+}];
+```
 ```java
 //Jerry登录
 AVIMClient jerry = AVIMClient.getInstance("Jerry");
 jerry.open(new AVIMClientCallback(){
-
   @Override
   public void done(AVIMClient client,AVIMException e){
       if(e==null){
@@ -270,79 +351,82 @@ jerry.open(new AVIMClientCallback(){
   }
 });
 ```
-
 ```cs
 var realtime = new AVRealtime('your-app-id','your-app-key');
 var jerry = await realtime.CreateClientAsync('Jerry');
 ```
 
-Jerry 是消息的被动接收方，他不需要再次主动创建与 Tom 的对话，可能也无法知道要提前加入 Tom 前面创建的对话，Jerry 端需要通过设置即时通讯客户端事件的回调函数，才能获取到 Tom 那边操作的通知。
+Jerry 作为消息的被动接收方，他不需要主动创建与 Tom 的对话，可能也无法知道 Tom 创建好的对话信息，Jerry 端需要通过设置即时通讯客户端事件的回调函数，才能获取到 Tom 那边操作的通知。
 
 即时通讯客户端事件回调能处理多种服务端通知，这里我们先关注这里会出现的两个事件：
-- 用户被邀请进入某个对话的通知事件。Tom 在创建和 Jerry 的单聊对话的时候，Jerry 这边就能立刻收到一条通知，显示类似于「Tom 邀请你加入了一个对话」的信息。
-- 用户收到新消息的通知。在 Tom 发出「Jerry，起床了！」这条消息之后，Jerry 这边也能立刻收到一条新消息到达的通知，能获悉消息的具体数据以及对话、发送者等上下文信息。
+- 用户被邀请进入某个对话的通知事件。Tom 在创建和 Jerry 的单聊对话的时候，Jerry 这边就能立刻收到一条通知，获知到类似于「Tom 邀请你加入了一个对话」的信息。
+- 已加入对话中新消息到达的通知。在 Tom 发出「Jerry，起床了！」这条消息之后，Jerry 这边也能立刻收到一条新消息到达的通知，通知中带有消息具体数据以及对话、发送者等上下文信息。
 
-现在，我们看看具体应该如何响应服务端发过来的通知。Jerry 端首先处理对话加入的事件通知：
+现在，我们看看具体应该如何响应服务端发过来的通知。Jerry 端会分别处理对话加入的事件通知和新消息到达的事件通知：
 
 ```js
+// js SDK 通过在 IMClient 实例上监听事件回调来响应服务端通知
+
 // 当前用户被添加至某个对话
 jerry.on(Event.INVITED, function invitedEventHandler(payload, conversation) {
     console.log(payload.invitedBy, conversation.id);
 });
-```
 
+// 当前用户收到了某一条消息，可以通过响应 Event.MESSAGE 这一事件来处理。
+jerry.on(Event.MESSAGE, function(message, conversation) {
+    console.log('Message received: ' + message.text);
+});
+```
 ```objc
+// Objective-C SDK 通过实现 AVIMClientDelegate 代理来处理服务端通知
 jerry.delegate = self;
+
+/*!
+ 当前用户被邀请加入对话的通知。
+ @param conversation － 所属对话
+ @param clientId - 邀请者的 id
+ */
 -(void)conversation:(AVIMConversation *)conversation invitedByClientId:(NSString *)clientId{
     NSLog(@"%@", [NSString stringWithFormat:@"当前 ClientId(Jerry) 被 %@ 邀请，加入了对话",clientId]);
 }
-```
 
+/*!
+ 接收到新消息（使用内置消息格式）。
+ @param conversation － 所属对话
+ @param message - 具体的消息
+ */
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    NSLog(@"%@", message.text); // Jerry，起床了！
+}
+```
 ```java
+// Java/Android SDK 通过定制自己的对话事件 Handler 处理服务端下发的对话事件通知
 public class CustomConversationEventHandler extends AVIMConversationEventHandler {
+  /**
+   * 实现本方法来处理当前用户被邀请到某个聊天对话事件
+   *
+   * @param client
+   * @param conversation 被邀请的聊天对话
+   * @param operator 邀请你的人
+   * @since 3.0
+   */
   @Override
   public void onInvited(AVIMClient client, AVIMConversation conversation, String invitedBy) {
     // 当前 ClientId(Jerry) 被邀请到对话，执行此处逻辑
   }
 }
-AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
-```
+// 设置全局的对话事件处理 handler
+AVIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
 
-```cs
-var jerry =await realtime.CreateClientAsync("Jerry");
-jerry.OnInvited += (sender, args) =>
-{
-  var invitedBy = args.InvitedBy;
-  var conversationId = args.ConversationId;
-};
-```
-
-然后处理新消息到达的事件通知：
-
-```js
-var { Event } = require('leancloud-realtime');
-// Jerry 登录
-realtime.createIMClient('Jerry').then(function(jerry) {
-
-    // 当前用户收到了某一条消息，可以通过响应 Event.MESSAGE 这一事件来处理。
-    jerry.on(Event.MESSAGE, function(message, conversation) {
-        console.log('Message received: ' + message.text);
-    });
-}).catch(console.error);
-```
-
-```objc
-jerry.delegate = self;
-#pragma mark - AVIMClientDelegate
-// 接收消息的回调函数
-- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
-    NSLog(@"%@", message.text); // Jerry，起床了！
-}
-```
-
-```java
+// Java/Android SDK 通过定制自己的消息事件 Handler 处理服务端下发的消息通知
 public static class CustomMessageHandler extends AVIMMessageHandler{
-   //接收到消息后的处理逻辑 
+  /**
+   * 重载此方法来处理接收消息
+   * 
+   * @param message
+   * @param conversation
+   * @param client
+   */
    @Override
    public void onMessage(AVIMMessage message,AVIMConversation conversation,AVIMClient client){
      if(message instanceof AVIMTextMessage){
@@ -350,12 +434,18 @@ public static class CustomMessageHandler extends AVIMMessageHandler{
      }
    }
  }
-
+// 设置全局的消息处理 handler
 AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
 ```
-
 ```cs
-jerry.OnMessageReceived += Jerry_OnMessageReceived;
+// SDK 通过在 IMClient 实例上监听事件回调来响应服务端通知
+var jerry =await realtime.CreateClientAsync("Jerry");
+jerry.OnInvited += (sender, args) =>
+{
+  var invitedBy = args.InvitedBy;
+  var conversationId = args.ConversationId;
+};
+
 private void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
 {
     if (e.Message is AVIMTextMessage)
@@ -366,9 +456,12 @@ private void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
         // textMessage.FromClientId 是消息发送者的 client Id
     }
 }
+jerry.OnMessageReceived += Jerry_OnMessageReceived;
 ```
 
-Jerry 端实现了上面两个事件通知函数之后，就可以顺利完成消息接收方的开发了。我们现在可以回顾一下 Tom 和 Jerry 发送第一条消息的过程中，两方完整的处理时序图：
+Jerry 端实现了上面两个事件通知函数之后，就顺利收到 Tom 发送的消息了。之后 Jerry 也可以回复消息给 Tom，而 Tom 端实现类似的接收流程，那么他们两就可以开始愉快的聊天了。
+
+我们现在可以回顾一下 Tom 和 Jerry 发送第一条消息的过程中，两方完整的处理时序：
 
 ```seq
 Tom->Cloud: 1.Tom 将 Jerry 加入对话
@@ -384,31 +477,29 @@ Jerry-->UI: 6.显示收到的消息内容
 
 ## 多人群聊
 
-上面我们讨论了一对一单聊的实现流程，假设我们还需要实现一个「同学群」、「朋友群」、「同事群」的多人聊天。接下来我们就看看怎么完成这一功能的集成。
-多人群聊与单聊的流程十分接近，主要差别在于对话内成员数量的多少。
+上面我们讨论了一对一单聊的实现流程，假设我们还需要实现一个「同学群」、「朋友群」、「同事群」的多人聊天，接下来我们就看看怎么完成这一功能。
 
-多人群聊的对话可以通过如下两种方式实现：
-
-1. **在创建对话的时候初始指定更多的成员**
-2. **在一个现有对话上邀请加入更多的成员**
+多人群聊与单聊的流程十分接近，主要差别在于对话内成员数量的多少。群聊对话支持在创建对话的时候一次性指定全部成员，也允许在创建之后通过邀请的方式来增加新的成员。
 
 ### 1. 创建多人群聊对话
 
-在 Tom 和 Jerry 的对话中，假设后来 Tom 又希望把 Mary 也拉进来，他可以使用如下的办法：
+在 Tom 和 Jerry 的对话中（假设对话 id 为 `CONVERSATION_ID`），后来 Tom 又希望把 Mary 也拉进来，他可以使用如下的办法：
 
 ```js
-tom.getConversation(CONVERSATION_ID).then(function(conversation) {
+// 首先根据 id 获取 Conversation 实例
+tom.getConversation(‘CONVERSATION_ID’).then(function(conversation) {
+  // 邀请 Mary 加入对话
   return conversation.add(['Mary']);
 }).then(function(conversation) {
   console.log('添加成功', conversation.members);
   // 此时对话成员为: ['Mary', 'Tom', 'Jerry']
 }).catch(console.error.bind(console));
 ```
-
 ```objc
+// 首先根据 id 获取 Conversation 实例
 AVIMConversationQuery *query = [self.client conversationQuery];
 [query getConversationById:@"CONVERSATION_ID" callback:^(AVIMConversation *conversation, NSError *error) {
-    // Jerry 邀请 Mary 到会话中
+    // Jerry 邀请 Mary 到对话中
     [conversation addMembersWithClientIds:@[@"Mary"] callback:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
             NSLog(@"邀请成功！");
@@ -416,10 +507,10 @@ AVIMConversationQuery *query = [self.client conversationQuery];
     }];
 }];
 ```
-
 ```java
-AVIMClient jerry = AVIMClient.getInstance("Jerry");
+// 首先根据 id 获取 Conversation 实例
 final AVIMConversation conv = client.getConversation("CONVERSATION_ID");
+// 邀请 Mary 加入对话
 conv.addMembers(Arrays.asList("Mary"), new AVIMConversationCallback() {
     @Override
     public void done(AVIMException e) {
@@ -427,46 +518,46 @@ conv.addMembers(Arrays.asList("Mary"), new AVIMConversationCallback() {
     }
 });
 ```
-
 ```cs
-var tom = await realtime.CreateClientAsync();
+// 首先根据 id 获取 Conversation 实例
 var conversation = await tom.GetConversationAsync("CONVERSATION_ID");
+// 邀请 Mary 加入对话
 await tom.InviteAsync(conversation, "Mary");
 ```
 
 而 Jerry 端增加「新成员加入」的事件通知处理函数，就可以及时获知 Mary 被 Tom 邀请加入当前对话了：
 
 ```js
-var { Event } = require('leancloud-realtime');
-// Jerry 登录
-realtime.createIMClient('Jerry').then(function(jerry) {
-    // 有用户被添加至某个对话
-    jerry.on(Event.MEMBERS_JOINED, function membersjoinedEventHandler(payload, conversation) {
-        console.log(payload.members, payload.invitedBy, conversation.id);
-    });
-  });
-}).catch(console.error);
+// 有用户被添加至某个对话
+jerry.on(Event.MEMBERS_JOINED, function membersjoinedEventHandler(payload, conversation) {
+    console.log(payload.members, payload.invitedBy, conversation.id);
+});
 ```
-
 ```objc
--(void)maryNoticedWhenJerryInviteMary{
-    // Mary 创建一个 client，用自己的名字作为 clientId
-    self.client = [[AVIMClient alloc] initWithClientId:@"Mary"];
-    self.client.delegate = self;
+jerry.delegate = self;
 
-    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
-        // 登录成功
-    }];
-}
 #pragma mark - AVIMClientDelegate
-
+/*!
+ 对话中有新成员加入时所有成员都会收到这一通知。
+ @param conversation － 所属对话
+ @param clientIds - 加入的新成员列表
+ @param clientId - 邀请者的 id
+ */
 - (void)conversation:(AVIMConversation *)conversation membersAdded:(NSArray *)clientIds byClientId:(NSString *)clientId {
     NSLog(@"%@", [NSString stringWithFormat:@"%@ 加入到对话，操作者为：%@",[clientIds objectAtIndex:0],clientId]);
 }
 ```
-
 ```java
-public static class CustomMessageHandler extends AVIMMessageHandler {
+public class CustomConversationEventHandler extends AVIMConversationEventHandler {
+  /**
+   * 实现本方法以处理聊天对话中的参与者加入事件
+   *
+   * @param client
+   * @param conversation
+   * @param members 加入的参与者
+   * @param invitedBy 加入事件的邀请人，有可能是加入的参与者本身
+   * @since 3.0
+   */
     @Override
     public void onMemberJoined(AVIMClient client, AVIMConversation conversation,
         List<String> members, String invitedBy) {
@@ -476,29 +567,27 @@ public static class CustomMessageHandler extends AVIMMessageHandler {
               + invitedBy, Toast.LENGTH_SHORT).show();
     }
 }
-AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
+// 设置全局的对话事件处理 handler
+AVIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
 ```
-
 ```cs
-jerry.OnMembersJoined += OnMembersJoined;
 private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
 {
     // e.InvitedBy 是该项操作的发起人, e.ConversationId 是该项操作针对的对话 Id
     Debug.Log(string.Format("{0} 邀请了 {1} 加入了 {2} 对话", e.InvitedBy,e.JoinedMembers, e.ConversationId));
 }
+jerry.OnMembersJoined += OnMembersJoined;
 ```
 
 {{ docs.langSpecStart('js') }}
 
 其中 payload 参数包含如下内容：
-
 1. `members`: 字符串数组, 被添加的用户 clientId 列表
 2. `invitedBy`	字符串, 邀请者 clientId
 
 {{ docs.langSpecEnd('js') }}
 
 {{ docs.langSpecStart('cs') }}
-
 其中 `AVIMOnInvitedEventArgs` 参数包含如下内容：
 1. `InvitedBy`: 改操作的发起者
 2. `JoinedMembers`：此次加入对话的包含的成员列表
@@ -517,7 +606,7 @@ Cloud-->Jerry: 2.下发通知: Mary 被 Tom 邀请加入了对话
 
 而 Mary 端如果要能加入到 Tom 和 Jerry 的对话中来，Ta 可以参照[一对一单聊](#一对一单聊) 中 Jerry 侧的做法监听 `INVITED` 事件，就可以自己被邀请到了一个对话当中。
 
-而**重新创建一个对话，并在创建的时候指定至少为 2 的成员数量**的方式如下：
+而**重新创建一个对话，并在创建的时候指定全部成员**的方式如下：
 
 ```js
 tom.createConversation({
@@ -527,7 +616,6 @@ tom.createConversation({
   name: 'Tom & Jerry & friends',
 }).catch(console.error);
 ```
-
 ```objc
 // Jerry 建立了与朋友们的会话
 NSArray *friends = @[@"Jerry", @"Mary"];
@@ -537,7 +625,6 @@ NSArray *friends = @[@"Jerry", @"Mary"];
     }
 }];
 ```
-
 ```java
 tom.createConversation(Arrays.asList("Jerry","Mary"), "Tom & Jerry & friends", null,
    new AVIMConversationCreatedCallback() {
@@ -549,7 +636,6 @@ tom.createConversation(Arrays.asList("Jerry","Mary"), "Tom & Jerry & friends", n
       }
    });
 ```
-
 ```cs
 var conversation = await tom.CreateConversationAsync(new string[]{ "Jerry","Mary" },"Tom & Jerry & friends");
 ```
@@ -558,7 +644,7 @@ var conversation = await tom.CreateConversationAsync(new string[]{ "Jerry","Mary
 
 多人群聊中一个成员发送的消息，会实时同步到所有其他在线成员，其处理流程与单聊中 Jerry 接收消息的过程是一样的。
 
-例如，Tom 向群聊对话发送了消息：
+例如，Tom 向好友群发送了一条欢迎消息：
 
 ```js
 conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对话'));
@@ -570,13 +656,11 @@ conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对话
     }
 }];
 ```
-
 ```java
 AVIMTextMessage msg = new AVIMTextMessage();
-msg.setText("大家好，欢迎来到我们的群聊对话！");
+msg.setText("大家好，欢迎来到我们的群聊对话！");
 // 发送消息
 conversation.sendMessage(msg, new AVIMConversationCallback() {
-
   @Override
   public void done(AVIMException e) {
     if (e == null) {
@@ -585,25 +669,21 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
   }
 });
 ```
-
 ```cs
-await conversation.SendAsync("大家好，欢迎来到我们的群聊对话！");
+await conversation.SendMessageAsync("大家好，欢迎来到我们的群聊对话！");
 ```
 
-而 Jerry 和 Mary 都会有 `Event.MESSAGE` 事件触发，利用它来接收群聊消息，并更新产品 UI。
-
+而 Jerry 和 Mary 端都会有 `Event.MESSAGE` 事件触发，利用它来接收群聊消息，并更新产品 UI。
 
 ### 3. 将他人踢出对话
 
-假设后来 Mary 出言不逊，惹恼了群主 Tom，Tom 直接把 Mary 踢出对话群了。
-踢人的方法也很简单，其函数如下:
+三个好友的群其乐融融不久，后来 Mary 出言不逊，惹恼了群主 Tom，Tom 直接把 Mary 踢出了对话群。Tom 端想要踢人，该怎么实现呢？
 
 ```js
 conversation.remove(['Mary']).then(function(conversation) {
   console.log('移除成功', conversation.members);
 }).catch(console.error.bind(console));
 ```
-
 ```objc
 [conversation removeMembersWithClientIds:@[@"Mary"] callback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
@@ -611,15 +691,13 @@ conversation.remove(['Mary']).then(function(conversation) {
     }
 }];
 ```
-
 ```java
- conv.kickMembers(Arrays.asList("Mary"),new AVIMConversationCallback(){
-      @Override
-      public void done(AVIMException e){
-      }
- });
+conv.kickMembers(Arrays.asList("Mary"),new AVIMConversationCallback(){
+    @Override
+    public void done(AVIMException e){
+    }
+});
 ```
-
 ```cs
 await conversation.RemoveMembersAsync("Mary");
 ```
@@ -633,13 +711,96 @@ Cloud-->Jerry: 2. 下发通知：Mary 被 Tom 移除
 Cloud-->Tom: 2. 下发通知：Mary 被移除了对话 
 ```
 
-### 4. 用户主动加入对话
-
-假设 Tom 告诉了 William，说他和 Jerry 有一个很好玩的聊天群，并且把群的 id（或名称）告知给了 William。William 也很想进入这个群看看他们究竟在聊什么，他也可以自己主动加入对话：
-
+这里出现了两个新的事件：当前用户被踢出对话 `KICKED`（Mary 收到的），成员 XX 被踢出对话 `MEMBERS_LEFT`（Jerry 和 Tom 收到的）。其处理方式与邀请人的流程类似：
 
 ```js
-william.getConversation('590aa654fab00f41dda86f51').then(function(conversation) {
+// 有成员被从某个对话中移除
+jerry.on(Event.MEMBERS_LEFT, function membersjoinedEventHandler(payload, conversation) {
+    console.log(payload.members, payload.kickedBy, conversation.id);
+});
+// 有用户被踢出某个对话
+jerry.on(Event.KICKED, function membersjoinedEventHandler(payload, conversation) {
+    console.log(payload.kickedBy, conversation.id);
+});
+```
+```objc
+jerry.delegate = self;
+
+#pragma mark - AVIMClientDelegate
+/*!
+ 对话中有成员离开时所有剩余成员都会收到这一通知。
+ @param conversation － 所属对话
+ @param clientIds - 离开的成员列表
+ @param clientId - 操作者的 id
+ */
+- (void)conversation:(AVIMConversation *)conversation membersRemoved:(NSArray<NSString *> * _Nullable)clientIds byClientId:(NSString * _Nullable)clientId {
+  ;
+}
+/*!
+ 当前用户被踢出对话的通知。
+ @param conversation － 所属对话
+ @param clientId - 操作者的 id
+ */
+- (void)conversation:(AVIMConversation *)conversation kickedByClientId:(NSString * _Nullable)clientId {
+  ;
+}
+```
+```java
+public class CustomConversationEventHandler extends AVIMConversationEventHandler {
+  /**
+   * 实现本方法以处理聊天对话中的参与者离开事件
+   *
+   * @param client
+   * @param conversation
+   * @param members 离开的参与者
+   * @param kickedBy 离开事件的发动者，有可能是离开的参与者本身
+   * @since 3.0
+   */
+  @Override
+  public abstract void onMemberLeft(AVIMClient client,
+    AVIMConversation conversation, List<String> members, String kickedBy) {
+    Toast.makeText(AVOSCloud.applicationContext,
+      members + " 离开对话：" + conversation.getConversationId() + "；操作者为： "
+          + kickedBy, Toast.LENGTH_SHORT).show();
+  }
+  /**
+   * 实现本方法来处理当前用户被踢出某个聊天对话事件
+   *
+   * @param client
+   * @param conversation
+   * @param kickedBy 踢出你的人
+   * @since 3.0
+   */
+  @Override
+  public abstract void onKicked(AVIMClient client, AVIMConversation conversation,
+    String kickedBy) {
+    Toast.makeText(AVOSCloud.applicationContext,
+      "你已离开对话：" + conversation.getConversationId() + "；操作者为： "
+          + kickedBy, Toast.LENGTH_SHORT).show();
+  }
+}
+// 设置全局的对话事件处理 handler
+AVIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
+```
+```cs
+private void OnMembersLeft(object sender, AVIMOnInvitedEventArgs e)
+{
+    Debug.Log(string.Format("{0} 把 {1} 移出了 {2} 对话", e.KickedBy, e.JoinedMembers, e.ConversationId));
+}
+private void OnKicked(object sender, AVIMOnInvitedEventArgs e)
+{
+    Debug.Log(string.Format("你被 {1} 移出了 {2} 对话", e.KickedBy, e.ConversationId));
+}
+jerry.OnMembersLeft += OnMembersLeft;
+jerry.OnKicked += OnKicked;
+```
+
+### 4. 用户主动加入对话
+
+把 Mary 踢走之后，Tom 嫌人少不好玩，所以他找到了 William，说他和 Jerry 有一个很好玩的聊天群，并且把群的 id（或名称）告知给了 William。William 也很想进入这个群看看他们究竟在聊什么，他自己主动加入了对话：
+
+```js
+william.getConversation('CONVERSATION_ID').then(function(conversation) {
   return conversation.join();
 }).then(function(conversation) {
   console.log('加入成功', conversation.members);
@@ -648,7 +809,7 @@ william.getConversation('590aa654fab00f41dda86f51').then(function(conversation) 
 ```
 ```objc
 AVIMConversationQuery *query = [william conversationQuery];
-[query getConversationById:@"590aa654fab00f41dda86f51" callback:^(AVIMConversation *conversation, NSError *error) {
+[query getConversationById:@"CONVERSATION_ID" callback:^(AVIMConversation *conversation, NSError *error) {
     [conversation joinWithCallback:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
             NSLog(@"加入成功！");
@@ -657,19 +818,18 @@ AVIMConversationQuery *query = [william conversationQuery];
 }];
 ```
 ```java
-AVIMClient william = AVIMClient.getInstance("William");
-AVIMConversation conv = client.getConversation("590aa654fab00f41dda86f51");
+AVIMConversation conv = william.getConversation("CONVERSATION_ID");
 conv.join(new AVIMConversationCallback(){
     @Override
     public void done(AVIMException e){
         if(e==null){
-        //加入成功
+          //加入成功
         }
     }
 });
 ```
 ```cs
-await william.JoinAsync("590aa654fab00f41dda86f51");
+await william.JoinAsync("CONVERSATION_ID");
 ```
 
 执行了这段代码之后会触发如下流程：
@@ -694,41 +854,35 @@ jerry.on(Event.MEMBERS_JOINED, function membersJoinedEventHandler(payload, conve
 }
 ```
 ```java
-@Override
-public void onMemberJoined(AVIMClient client, AVIMConversation conversation,
-    List<String> members, String invitedBy) {
-    // 手机屏幕上会显示一小段文字：Tom 加入到 551260efe4b01608686c3e0f ；操作者为：Tom
-    Toast.makeText(AVOSCloud.applicationContext,
-      members + "加入到" + conversation.getConversationId() + "；操作者为： "
-          + invitedBy, Toast.LENGTH_SHORT).show();
+public class CustomConversationEventHandler extends AVIMConversationEventHandler {
+  @Override
+  public void onMemberJoined(AVIMClient client, AVIMConversation conversation,
+      List<String> members, String invitedBy) {
+      // 手机屏幕上会显示一小段文字：Tom 加入到 551260efe4b01608686c3e0f ；操作者为：Tom
+      Toast.makeText(AVOSCloud.applicationContext,
+        members + " 加入到" + conversation.getConversationId() + "；操作者为： "
+            + invitedBy, Toast.LENGTH_SHORT).show();
+  }
 }
-
 ```
 ```cs
-jerry.OnMembersJoined += OnMembersJoined;
 private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
 {
     // e.InvitedBy 是该项操作的发起人, e.ConversationId 是该项操作针对的对话 Id
     Debug.Log(string.Format("{0} 加入了 {1} 对话，操作者是 {2}",e.JoinedMembers, e.ConversationId, e.InvitedBy));
 }
+jerry.OnMembersJoined += OnMembersJoined;
 ```
-
-注意，如下代码运行的前提有几个前提：
-
-1. William 需要参照前面章节里面的创建了一个 `IMClient` 的实例，并且确保已经与云端建立连接。
-2. `590aa654fab00f41dda86f51` 是一个在 `_Conversation` 表里面真是存在的对话 Id，也就是 Tom 主动告诉 William 的对话 id。当然，实际场景中 Tom 也可以通过告知 William 其他对话属性，让 William 找到对话并加入其中。关于对话的条件查询，可以参看后续章节。
 
 ### 5. 用户主动退出对话
 
-假如随着 Tom 邀请进来的人越来越多，Jerry 觉得跟这些人都说不到一块去，他不想继续呆在这个对话里面了，所以选择自己主动退出对话，这时候可以通过如下方式达到目的:
+随着 Tom 邀请进来的人越来越多，Jerry 觉得跟这些人都说不到一块去，他不想继续呆在这个对话里面了，所以选择自己主动退出对话，这时候可以调用 `Conversation#quit` 方法完成退群的操作:
 
 ```js
 conversation.quit().then(function(conversation) {
   console.log('退出成功', conversation.members);
-  // 退出成功 ['William', 'Tom']
 }).catch(console.error.bind(console));
 ```
-
 ```objc
 [conversation quitWithCallback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
@@ -736,18 +890,16 @@ conversation.quit().then(function(conversation) {
     }
 }];
 ```
-
 ```java
 conversation.quit(new AVIMConversationCallback(){
     @Override
     public void done(AVIMException e){
       if(e==null){
-      //退出成功
+        //退出成功
       }
     }
 });
 ```
-
 ```cs
 jerry.LeaveAsync(conversation);
 // 或者传入 conversation id
@@ -770,7 +922,6 @@ mary.on(Event.MEMBERS_LEFT, function membersLeftEventHandler(payload, conversati
     console.log(payload.members, payload.invitedBy, conversation.id);
 });
 ```
-
 ```objc
 // mary 登录之后，jerry 退出了对话，在 mary 所在的客户端就会激发以下回调
 -(void)conversation:(AVIMConversation *)conversation membersRemoved:(NSArray *)clientIds byClientId:(NSString *)clientId{
@@ -778,10 +929,12 @@ mary.on(Event.MEMBERS_LEFT, function membersLeftEventHandler(payload, conversati
 }
 ```
 ```java
-@Override
-public void onMemberLeft(AVIMClient client, AVIMConversation conversation, List<String> members,
-    String kickedBy) {
-    // 有其他成员离开时，执行此处逻辑
+public class CustomConversationEventHandler extends AVIMConversationEventHandler {
+  @Override
+  public void onMemberLeft(AVIMClient client, AVIMConversation conversation, List<String> members,
+      String kickedBy) {
+      // 有其他成员离开时，执行此处逻辑
+  }
 }
 ```
 ```cs
@@ -806,105 +959,6 @@ Tom 剔除 Mary|`MEMBERS_LEFT`|`MEMBERS_LEFT`|`KICKED`|/
 William 加入|`MEMBERS_JOINED`|`MEMBERS_JOINED`|/|`MEMBERS_JOINED`
 Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
 
-
-### 7. 更多「对话」类型
-
-即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外，我们也支持其他形式的「对话」模型：
-
-- 开放聊天室，例如直播中的弹幕聊天室，它与普通的「多人群聊」的主要差别是允许的成员人数以及消息到达的保证程度不一样。
-- 服务号，例如在微信里面常见的公众号/服务号，系统全局的广播账号，游戏公会等形式的「群组」，与普通「多人群聊」的主要差别，在于「服务号」是以订阅的形式加入的，也没有成员限制，并且订阅用户和服务号的消息交互是一对一的，一个用户的上行消息不会群发给其他订阅用户。
-- 临时对话，例如客服系统中用户和客服人员之间建立的临时通道，它与普通的「一对一单聊」的主要差别在于对话总是临时创建并且不会长期存在，在提升实现便利性的同时，还能降低服务使用成本（能有效减少存储空间方面的花费）。
-
-关于上述的几种场景对应的实现，有兴趣的开发者可以参考下篇文档：[进阶功能#对话类型](realtime-guide-intermediate.html#对话类型)。
-
-## 更多「对话」相关的操作
-
-在一个商业产品里面，终端用户对于聊天「对话」的操作，除了上面所示的加入、退出、监听成员变更通知之外，我们可能还需要实现其他的功能，例如在用户的消息页面展示当前用户加入的、最活跃的几个对话。
-
-### 获取对话列表
-
-`AVIMConversation` 是支持按照各种条件来查询的，要获取当前用户参与的所有对话，我们可以根据成员列表中包含当前用户这一条件来进行查询，代码示例如下：
-
-```js
-tom.getQuery().containsMembers(['Tom']).find().then(function(conversations) {
-  // 默认按每个对话的最后更新日期（收到最后一条消息的时间）倒序排列
-  conversations.map(function(conversation) {
-    console.log(conversation.lastMessageAt.toString(), conversation.members);
-  });
-}).catch(console.error.bind(console));
-```
-
-```objc
-// Tom 构建一个查询
-AVIMConversationQuery *query = [tom conversationQuery];
-// 执行查询
-[query findConversationsWithCallback:^(NSArray *conversations, NSError *error) {
-    NSLog(@"找到 %ld 个对话！", [conversations count]);
-}];
-```
-
-```java
-AVIMConversationsQuery query = client.getConversationsQuery();
-query.findInBackground(new AVIMConversationQueryCallback(){
-    @Override
-    public void done(List<AVIMConversation> conversations,AVIMException e){
-      if(e==null){
-      //conversations 就是获取到的 conversation 列表
-      //注意：按每个对话的最后更新日期（收到最后一条消息的时间）倒序排列
-      }
-    }
-});      
-```
-
-```cs
-var query = tom.GetQuery().WhereContainedIn("m","Tom");
-await query.FindAsync();
-```
-
-上述代码默认返回最近活跃的 10 个对话，若要更改返回对话的数量，请设置 limit 值。
-
-```js
-query.limit(20);
-```
-
-```objc
-query.limit = 20;
-```
-```java
-query.limit(20);
-```
-```cs
-query.Limit(20);
-```
-
-### 根据关键字查询
-
-对于某些产品来讲，还需要让终端用户看到很多 TA 根本没有参与的「对话」，例如展示热门的聊天室，或者允许主动查询某些特征的聊天室，并加入其中。
-AVIMConversation 的 Query 也是支持组合各种条件的，比如要查找名字里包含 NBA 的对话，示例代码如下:
-
-```js
-query.contains('name', 'NBA');
-```
-
-```objc
-[query whereKey:@"name" containsString:@"NBA"];
-```
-
-```java
-query.whereContains("name", "NBA");
-```
-
-```cs
-query.WhereContains("name", "NBA");
-```
-
-与对话查询相关的更多细节，可参考下一篇文档：[进阶功能#对话的查询](realtime-guide-intermediate.html#对话的查询)
-
-### 如何根据活跃度来展示对话列表
-
-不管是当前用户参与的「对话」列表，还是全局热门的开放聊天室列表展示出来了，我们下一步要考虑的就是如何把最活跃的对话展示在前面，这里我们把「活跃」定义为最近有新消息发出来。我们希望有最新消息的对话可以展示在对话列表的最前面，甚至可以把最新的那条消息也附带显示出来，这时候该怎么实现呢？
-
-我们专门为 `AVIMConversation` 增加了一个动态的属性`lastMessageAt`（对应 `_Conversation` 表里的 `lm` 字段），记录了对话中最后一条消息到达即时通讯云端的时间戳，这一数字是服务器端的时间（精确到秒），所以不用担心客户端时间对结果造成影响。另外，`AVIMConversation`还提供了一个方法可以直接获取最新的一条消息。这样在界面展现的时候，开发者就可以自己决定展示内容与顺序了。
 
 ## 文本之外的聊天消息
 
@@ -1472,8 +1526,460 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 - 通过继承内置的消息类型添加一些属性
 - 完全自由实现一个全新的消息类型
 
+## 扩展对话：支持自定义属性
 
-## 聊天历史记录
+对话(`Conversation`)是即时通讯的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。
+
+默认提供的**内置**属性的对应关系如下：
+
+{{ docs.langSpecStart('js') }}
+
+| Conversation 属性名   | _Conversation 字段 | 含义                                               |
+| --------------------- | ------------------ | -------------------------------------------------- |
+| `id`                  | `objectId`         | 全局唯一的 Id                                      |
+| `name`                | `name`             | 成员共享的统一的名字                               |
+| `members`             | `m`                | 成员列表                                           |
+| `creator`             | `c`                | 对话创建者                                         |
+| `transient`           | `tr`               | 是否为聊天室（暂态对话）                           |
+| `system`              | `sys`              | 是否为服务号（系统对话）                           |
+| `mutedMembers`        | `mu`               | 静音该对话的成员                                   |
+| `muted`               | N/A                | 当前用户是否静音该对话                             |
+| `createdAt`           | `createdAt`        | 创建时间                                           |
+| `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
+| `lastMessageAt`       | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
+| `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
+| `unreadMessagesCount` | N/A                | 未读消息数                                         |
+| `lastDeliveredAt`     | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `lastReadAt`          | N/A                | （仅限单聊）最后一条对方已读的消息时间             |
+
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('objc') }}
+
+| AVIMConversation 属性名 | _Conversation 字段 | 含义                                               |
+| ----------------------- | ------------------ | -------------------------------------------------- |
+| `conversationId`        | `objectId`         | 全局唯一的 Id                                      |
+| `name`                  | `name`             | 成员共享的统一的名字                               |
+| `members`               | `m`                | 成员列表                                           |
+| `creator`               | `c`                | 对话创建者                                         |
+| `attributes`            | `attr`             | 自定义属性                                         |
+| `transient`             | `tr`               | 是否为聊天室（暂态对话）                           |
+| `createdAt`             | `createdAt`        | 创建时间                                           |
+| `updatedAt`             | `updatedAt`        | 最后更新时间                                       |
+| `system`                | `sys`              | 是否为系统对话                                     |
+| `lastMessageAt`         | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
+| `lastMessage`           | N/A                | 最后一条消息，可能会空                             |
+| `muted`                 | N/A                | 当前用户是否静音该对话                             |
+| `unreadMessagesCount`   | N/A                | 未读消息数                                         |
+| `lastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `lastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间             |
+
+{{ docs.langSpecEnd('objc') }}
+
+{{ docs.langSpecStart('java') }}
+
+| AVIMConversation 属性名 | _Conversation 字段 | 含义                                             |
+| ----------------------- | ------------------ | ------------------------------------------------ |
+| `conversationId`        | `objectId`         | 全局唯一的 Id                                    |
+| `name`                  | `name`             | 成员共享的统一的名字                             |
+| `members`               | `m`                | 成员列表                                         |
+| `creator`               | `c`                | 对话创建者                                       |
+| `attributes`            | `attr`             | 自定义属性                                       |
+| `isTransient`           | `tr`               | 是否为聊天室（暂态对话）                         |
+| `lastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
+| `lastMessage`           | N/A                | 最后一条消息，可能会空                           |
+| `muted`                 | N/A                | 当前用户是否静音该对话                           |
+| `unreadMessagesCount`   | N/A                | 未读消息数                                       |
+| `lastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间         |
+| `lastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间           |
+| `createdAt`             | `createdAt`        | 创建时间                                         |
+| `updatedAt`             | `updatedAt`        | 最后更新时间                                     |
+| `system`                | `sys`              | 是否为系统对话                                   |
+
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('cs') }}
+
+| AVIMConversation 属性名 | _Conversation 字段 | 含义                                             |
+| ----------------------- | ------------------ | ------------------------------------------------ |
+| `Id`                    | `objectId`         | 全局唯一的 Id                                    |
+| `Name`                  | `name`             | 成员共享的统一的名字                             |
+| `MemberIds`             | `m`                | 成员列表                                         |
+| `MuteMemberIds`         | `mu`               | 静音该对话的成员                                 |
+| `Creator`               | `c`                | 对话创建者                                       |
+| `IsTransient`           | `tr`               | 是否为聊天室（暂态对话）                         |
+| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话（暂态对话）             |
+| `IsSystem`              | `sys`              | 是否为系统对话                                   |
+| `LastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
+| `LastMessage`           | N/A                | 最后一条消息，可能会空                           |
+| `LastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间         |
+| `LastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间           |
+| `CreatedAt`             | `createdAt`        | 创建时间                                         |
+| `UpdatedAt`             | `updatedAt`        | 最后更新时间                                     |
+
+{{ docs.langSpecEnd('cs') }}
+
+### 创建自定义属性
+
+创建时可以指定一些自定义属性：
+
+```js
+tom.createConversation({
+  members: ['Jerry'],
+  name: '猫和老鼠',
+  type: 'private',
+  pinned: true,
+}).then(function(conversation) {
+  console.log('创建成功。id: ' + conversation.id);
+}).catch(console.error.bind(console));
+```
+```objc
+// Tom 创建名称为「猫和老鼠」的会话，并附加会话属性
+NSDictionary *attributes = @{ 
+    @"type": @"private",
+    @"pinned": @(YES) 
+};
+[tom createConversationWithName:@"猫和老鼠" clientIds:@[@"Jerry"] attributes:attributes options:AVIMConversationOptionNone callback:^(AVIMConversation *conversation, NSError *error) {
+    if (succeeded) {
+        NSLog(@"创建成功！");
+    }
+}];
+```
+```java
+HashMap<String,Object> attr = new HashMap<String,Object>();
+attr.put("type","private");
+attr.put("pinned",true);
+client.createConversation(Arrays.asList("Jerry"),"猫和老鼠",attr,
+    new AVIMConversationCreatedCallback(){
+        @Override
+        public void done(AVIMConversation conv,AVIMException e){
+          if(e==null){
+            //创建成功
+          }
+        }
+    });
+}
+```
+```cs
+// 推荐使用 Builder 模式来构建对话
+var conversationBuilder = tom.GetConversationBuilder().SetProperty("type", "private").SetProperty("pinned", true);
+var conversation = await tom.CreateConversationAsync(conversationBuilder);
+```
+
+**自定义属性在 SDK 级别是对所有成员可见的**。我们也支持通过自定义属性来查询对话，请参见[对话的查询](#对话的查询)
+
+### 修改和使用属性
+
+以 `conversation.name` 为例，对话的 `conversation.name` 的属性是所有成员共享的，可以通过如下代码修改：
+
+```js
+conversation.name = '聪明的喵星人';
+conversation.save();
+```
+```objc
+AVIMConversationUpdateBuilder *updateBuilder = [conversation newUpdateBuilder];
+updateBuilder.name = @"聪明的喵星人";
+[conversation update:[updateBuilder dictionary] callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"修改成功！");
+    }
+}];
+```
+```java
+AVIMConversation conversation = client.getConversation("55117292e4b065f7ee9edd29");
+conversation.setName("聪明的喵星人");
+conversation.updateInfoInBackground(new AVIMConversationCallback(){
+  @Override
+  public void done(AVIMException e){        
+    if(e==null){
+    //更新成功
+    }
+  }
+});
+```
+```cs
+conversation.Name = "聪明的喵星人";
+await conversation.SaveAsync();
+```
+
+以 `conversation.type` 为例来演示自定义属性，读取、使用、修改的操作如下：
+
+```js
+// 获取自定义属性
+var type = conversation.get('type');
+conversation.set('pinned',false);
+conversation.save();
+```
+```objc
+// 获取自定义属性
+NSString *type = [conversation objectForKey:@"type"];
+// 设置 boolean 属性值
+[conversation setObject:@(NO) forKey:@"pinned"];
+[conversation updateWithCallback:];
+```
+```java
+// 获取自定义属性
+String type = conversation.get("type");
+conversation.set("pinned",false);
+conversation.updateInfoInBackground(new AVIMConversationCallback(){
+  @Override
+  public void done(AVIMException e){        
+    if(e==null){
+    //更新成功
+    }
+  }
+});
+```
+```cs
+// 获取自定义属性
+var type = conversation["type"];
+conversation["pinned"] = false;
+await conversation.SaveAsync();
+```
+
+
+## 对话查询：使用复杂条件来查询对话
+
+### 根据 id 查询
+
+`id` 对应就是 `_Conversation` 表中的 `objectId` 的字段值:
+
+```js
+tom.getConversation('551260efe4b01608686c3e0f').then(function(conversation) {
+  console.log(conversation.id);
+}).catch(console.error.bind(console));
+```
+```objc
+AVIMConversationQuery *query = [tom conversationQuery];
+[query getConversationById:@"551260efe4b01608686c3e0f" callback:^(AVIMConversation *conversation, NSError *error) {
+    if (succeeded) {
+        NSLog(@"查询成功！");
+    }
+}];
+```
+```java
+AVIMConversationsQuery query = tom.getConversationsQuery();
+query.whereEqualTo("objectId","551260efe4b01608686c3e0f");
+query.findInBackground(new AVIMConversationQueryCallback(){
+    @Override
+    public void done(List<AVIMConversation> convs,AVIMException e){
+      if(e==null){
+      if(convs!=null && !convs.isEmpty()){
+        //convs.get(0) 就是想要的conversation
+      }
+      }
+    }
+});
+```
+```cs
+var query = tom.GetQuery();
+var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
+```
+
+{{ docs.langSpecStart('java') }}
+由于历史原因，AVIMConversationQuery 只能检索 _Conversation 表中 attr 列中的属性，而不能完整检索 _Conversation 表的其他自定义属性，所以在 v4.1.1 版本之后被废弃。v4.1.1 后请使用 AVIMConversation**s**Query 来完成相关查询。AVIMConversationsQuery 在查询属性时不会再自动添加 attr 前缀，如果开发者需要查询 _Conversation 表中 attr 列中具体属性，请自行添加 attr 前缀。
+{{ docs.langSpecEnd('java') }}
+
+### 基础的条件查询
+
+> 对云存储熟悉的开发者可以更容易理解对话的查询构建，因为对话查询和云存储的对象查询在接口上是十分接近的。
+
+SDK 提供了各种条件查询方式，可以满足各种对话查询的需求，首先从最简单的 `equalTo` 开始。
+
+有如下需求：需要查询所有对话的一个自定义属性 `type`(字符串类型) 为 `private` 的对话需要如下代码：
+
+```js
+query.equalTo('type','private')
+```
+```objc
+[query whereKey:@"type" equalTo:@"private"];
+```
+```java
+query.whereEqualTo("type","private");
+```
+```cs
+query.WhereEqualTo("type","private");
+```
+
+与 `equalTo` 类似，针对 number 和 date 类型的属性还可以使用大于、大于等于、小于、小于等于等，详见下表：
+
+{{ docs.langSpecStart('js') }}
+
+| 逻辑比较 | ConversationQuery 方法 |     |
+| -------- | ---------------------- | --- |
+| 等于     | `equalTo`              |     |
+| 不等于   | `notEqualTo`           |     |
+| 大于     | `greaterThan`          |     |
+| 大于等于 | `greaterThanOrEqualTo` |     |
+| 小于     | `lessThan`             |     |
+| 小于等于 | `lessThanOrEqualTo`    |     |
+
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('objc') }}
+| 逻辑比较 | AVIMConversationQuery 方法 |     |
+| -------- | -------------------------- | --- |
+| 等于     | `equalTo`                  |     |
+| 不等于   | `notEqualTo`               |     |
+| 大于     | `greaterThan`              |     |
+| 大于等于 | `greaterThanOrEqualTo`     |     |
+| 小于     | `lessThan`                 |     |
+| 小于等于 | `lessThanOrEqualTo`        |     |
+{{ docs.langSpecEnd('objc') }}
+
+{{ docs.langSpecStart('java') }}
+| 逻辑比较 | AVIMConversationQuery 方法   |     |
+| -------- | ---------------------------- | --- |
+| 等于     | `whereEqualTo`               |     |
+| 不等于   | `whereNotEqualsTo`           |     |
+| 大于     | `whereGreaterThan`           |     |
+| 大于等于 | `whereGreaterThanOrEqualsTo` |     |
+| 小于     | `whereLessThan`              |     |
+| 小于等于 | `whereLessThanOrEqualsTo`    |     |
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('cs') }}
+| 逻辑比较 | AVIMConversationQuery 方法   |     |
+| -------- | ---------------------------- | --- |
+| 等于     | `WhereEqualTo`               |     |
+| 不等于   | `WhereNotEqualsTo`           |     |
+| 大于     | `WhereGreaterThan`           |     |
+| 大于等于 | `WhereGreaterThanOrEqualsTo` |     |
+| 小于     | `WhereLessThan`              |     |
+| 小于等于 | `WhereLessThanOrEqualsTo`    |     |
+{{ docs.langSpecEnd('cs') }}
+
+### 正则匹配查询
+
+匹配查询是指在 `ConversationsQuery` 的查询条件中使用正则表达式来匹配数据。
+
+比如要查询所有 language 是中文的对话：
+
+```js
+query.matches('language',/[\\u4e00-\\u9fa5]/);
+```
+```objc
+[query whereKey:@"language" matchesRegex:@"[\u4e00-\u9fa5]"];
+```
+```java
+query.whereMatches("language","[\\u4e00-\\u9fa5]"); //language 是中文字符 
+```
+```cs
+query.WhereMatches("language","[\\u4e00-\\u9fa5]"); //language 是中文字符 
+```
+
+### 包含查询
+
+例如查询关键字包含「教育」的对话：
+
+```js
+query.contains('keywords','教育');
+```
+```objc
+[query whereKey:@"keywords" containsString:@"教育"];
+```
+```java
+query.whereContains("keywords","教育"); 
+```
+```cs
+query.WhereContains("keywords","教育"); 
+```
+
+### 空值查询
+
+空值查询是指查询相关列是否为空值的方法，例如要查询 lm 列为空值的对话：
+
+```js
+query.doesNotExist('lm')
+```
+```objc
+[query whereKeyDoesNotExist:@"lm"];
+```
+```java
+query.whereDoesNotExist("lm");
+```
+```cs
+query.WhereDoesNotExist("lm");
+```
+
+如果要查询 lm 列不为空的对话，则替换为如下：
+
+```js
+query.exists('lm')
+```
+```objc
+[query whereKeyExists:@"lm"];
+```
+```java
+query.whereExists("lm");
+```
+```cs
+query.WhereExists("lm");
+```
+
+### 组合查询
+
+查询年龄小于 18 岁，并且关键字包含「教育」的对话：
+
+```js
+// 查询 keywords 包含「教育」且 age 小于 18 的对话
+query.contains('keywords', '教育').lessThan('age', 18);
+```
+```objc
+[query whereKey:@"keywords" containsString:@"教育"];
+[query whereKey:@"age" lessThan:@(18)];
+```
+```java
+query.whereContains("keywords", "教育");
+query.whereLessThan("age", 18);
+```
+```cs
+query.WhereContains("keywords", "教育");
+query.WhereLessThan("age", 18);
+```
+
+另外一种组合的方式是，两个查询采用 Or 或者 And 的方式构建一个新的查询。
+
+查询年龄小于 18 或者关键字包含「教育」的对话：
+
+```js
+JavaScript SDK 暂不支持
+```
+```objc
+AVIMConversationQuery *ageQuery = [tom conversationQuery];
+[ageQuery whereKey:@"age" greaterThan:@(18)];
+AVIMConversationQuery *keywordsQuery = [tom conversationQuery];
+[keywordsQuery whereKey:@"keywords" containsString:@"教育"];
+AVIMConversationQuery *query = [AVIMConversationQuery orQueryWithSubqueries:[NSArray arrayWithObjects:ageQuery,keywordsQuery,nil]];
+```
+```java
+AVIMConversationsQuery ageQuery = tom.getConversationsQuery();
+ageQuery.whereLessThan('age', 18);
+
+AVIMConversationsQuery keywordsQuery = tom.getConversationsQuery();
+keywordsQuery.whereContains('keywords', '教育').
+AVIMConversationsQuery query = AVIMConversationsQuery.or(Arrays.asList(priorityQuery, statusQuery));
+```
+```cs
+var ageQuery = tom.GetQuery();
+ageQuery.WhereLessThan('age', 18);
+
+var keywordsQuery = tom.GetQuery();
+keywordsQuery.WhereContains('keywords', '教育').
+
+var query = AVIMConversationQuery.or(new AVIMConversationQuery[] { ageQuery, keywordsQuery});
+```
+
+### 性能优化建议
+
+在一些常见的需求中，进入对话列表界面的时候，客户端需要展现一个当前用户所参与的所有对话，一般情况下是按照活跃时间逆序排列在首页，因此给出一个查询优化的建议：
+
+- 查询的时候可以尽量提供了一个 `updatedAt` 或者 `lastMessageAt` 的参数来限定返回结果，原因是 skip 搭配 limit 的查询性能相对较低。
+- 使用 `m` 列的 `contains` 查询来查找包含某人的对话时，也尽量使用默认的 limit 大小 10，再配合 `updatedAt` 或者 `lastMessageAt` 来做条件约束，性能会提升较大
+- 整个应用对话如果数量太多，可以考虑在云引擎封装一个云函数，用定时任务启动之后，周期性地做一些清理，例如可以归档一些不活跃的对话，直接删除即可。
+
+
+## 聊天记录查询
 
 消息记录默认会在云端保存 **180** 天， 开发者可以通过额外付费来延长这一期限（有需要的用户请联系 support@leancloud.rocks），也可以通过 REST API 将聊天记录同步到自己的服务器上。
 
@@ -1879,8 +2385,24 @@ realtime.on(Event.RECONNECT, function() {
 
 如果开发者没有明确调用退出登录的接口，但是客户端网络存在抖动或者切换（对于移动网络来说，这是比较常见的情况），我们 iOS 和 Android SDK 默认内置了断线重连的功能，会在网络恢复的时候自动建立连接，此时 `IMClient` 的网络状态可以通过底层的网络状态响应接口得到回调。
 
-{{ docs.relatedLinks("更多文档",[
-  { title: "服务总览", href: "realtime_v2.html" },
-  { title: "进阶功能", href: "realtime-guide-intermediate.html"}, 
-  { title: "高阶技巧", href: "/realtime-guide-senior.html"}])
+## 开发建议
+
+### 如何根据活跃度来展示对话列表
+
+不管是当前用户参与的「对话」列表，还是全局热门的开放聊天室列表展示出来了，我们下一步要考虑的就是如何把最活跃的对话展示在前面，这里我们把「活跃」定义为最近有新消息发出来。我们希望有最新消息的对话可以展示在对话列表的最前面，甚至可以把最新的那条消息也附带显示出来，这时候该怎么实现呢？
+
+我们专门为 `AVIMConversation` 增加了一个动态的属性`lastMessageAt`（对应 `_Conversation` 表里的 `lm` 字段），记录了对话中最后一条消息到达即时通讯云端的时间戳，这一数字是服务器端的时间（精确到秒），所以不用担心客户端时间对结果造成影响。另外，`AVIMConversation`还提供了一个方法可以直接获取最新的一条消息。这样在界面展现的时候，开发者就可以自己决定展示内容与顺序了。
+
+### 更多「对话」类型
+
+即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外，我们也支持其他形式的「对话」模型：
+
+- 开放聊天室，例如直播中的弹幕聊天室，它与普通的「多人群聊」的主要差别是允许的成员人数以及消息到达的保证程度不一样。有兴趣的开发者可以参考文档：[第二篇：直播场景下的开放聊天室](realtime-guide-intermediate.html#直播场景下的开放聊天室)。
+- 临时对话，例如客服系统中用户和客服人员之间建立的临时通道，它与普通的「一对一单聊」的主要差别在于对话总是临时创建并且不会长期存在，在提升实现便利性的同时，还能降低服务使用成本（能有效减少存储空间方面的花费）。有兴趣的开发者可以参考下篇文档：[第二篇：使用临时对话](realtime-guide-intermediate.html#使用临时对话)
+- 系统对话，例如在微信里面常见的公众号/服务号，系统全局的广播账号，与普通「多人群聊」的主要差别，在于「服务号」是以订阅的形式加入的，也没有成员限制，并且订阅用户和服务号的消息交互是一对一的，一个用户的上行消息不会群发给其他订阅用户。有兴趣的开发者可以参考下篇文档：[第四篇：系统对话](realtime-guide-systemconv.html#系统对话)
+
+{{ docs.relatedLinks("进一步阅读",[
+  { title: "更多消息收发的需求，开放聊天室", href: "realtime-guide-intermediate.html"}, 
+  { title: "安全与签名，黑名单和权限管理", href: "/realtime-guide-senior.html"}])
+  { title: "详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
 }}

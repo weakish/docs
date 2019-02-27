@@ -466,3 +466,7 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 如上述代码中，被动下线的时候，云端会告知原因，因此客户端在做展现的时候也可以做出类似于 QQ 一样友好的通知。
 
 > 如果不设置 Tag，则默认允许用户可以多端登录，并且消息会实时同步。
+
+{{ docs.relatedLinks("进一步阅读",[
+  { title: "详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
+}}
