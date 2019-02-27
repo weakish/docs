@@ -992,6 +992,22 @@ currentConversation.on(Event.MESSAGE, function() {
 
 尽管即时通讯服务默认已经包含了丰富的消息类型，但是我们依然支持开发者根据业务需要扩展自己的消息类型，例如允许用户之间发送名片、红包等等。这里「名片」和「红包」就可以是应用层定义的自己的消息类型。
 
+即时通讯服务内置了如下消息类型用来满足常见的需求：
+
+- `TextMessage` 文本消息
+- `ImageMessage` 图像消息
+- `AudioMessage` 音频消息
+- `VideoMessage` 视频消息
+- `FileMessage` 普通文件消息(.txt/.doc/.md 等各种)
+- `LocationMessage` 地理位置消息
+
+如果内建的这些消息类型不够用，我们也支持开发者根据自己业务需要增加更多自定义的消息，推荐按照如下需求分级，来选择自定义的方式：
+
+- 通过设置简单 key-value 的自定义属性实现一个消息类型
+- 通过继承内置的消息类型添加一些属性
+- 完全自由实现一个全新的消息类型
+
+
 ### 扩展机制说明
 
 ### 实现自己的「名片」消息
@@ -1261,6 +1277,6 @@ var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 
 
 {{ docs.relatedLinks("进一步阅读",[
-  { title: "安全与签名，黑名单和权限管理", href: "/realtime-guide-senior.html"}])
+  { title: "安全与签名，黑名单和权限管理", href: "/realtime-guide-senior.html"},
   { title: "详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
 }}

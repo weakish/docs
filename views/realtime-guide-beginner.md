@@ -1005,7 +1005,6 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
-
 ```objc
 NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -1019,7 +1018,6 @@ AVIMImageMessage *message = [AVIMImageMessage messageWithText:@"萌妹子一枚"
     }
 }];
 ```
-
 ```java
 AVFile file = AVFile.withAbsoluteLocalPath("San_Francisco.png", Environment.getExternalStorageDirectory() + "/San_Francisco.png");
 // 创建一条图片消息
@@ -1034,7 +1032,6 @@ conv.sendMessage(m, new AVIMConversationCallback() {
   }
 });
 ```
-
 ```cs
 // 假设在程序运行目录下有一张图片，Unity/Xamarin 可以参照这种做法通过路径获取图片
 // 以下是发送图片消息的快捷用法
@@ -1043,11 +1040,10 @@ using (FileStream fileStream = new FileStream(Path.Combine(Path.GetDirectoryName
     await conversation.SendImageAsync("San_Francisco.png", fileStream);
 }
 // 或者如下比较常规的用法
-
 var imageMessage = new AVIMImageMessage();
 imageMessage.File = new AVFile("San_Francisco.png", fileStream);
 imageMessage.TextContent = "发自我的 Windows";
-await conversation.SendAsync(imageMessage);
+await conversation.SendMessageAsync(imageMessage);
 ```
 
 #### 发送图像链接
@@ -1067,7 +1063,6 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
-
 ```objc
 // Tom 发了一张图片给 Jerry
 AVFile *file = [AVFile fileWithURL:[self @"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"]];
@@ -1078,7 +1073,6 @@ AVIMImageMessage *message = [AVIMImageMessage messageWithText:@"萌妹子一枚"
     }
 }];
 ```
-
 ```java
 AVFile file =new AVFile("萌妹子","http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", null);
 AVIMImageMessage m = new AVIMImageMessage(file);
@@ -1093,7 +1087,6 @@ conv.sendMessage(m, new AVIMConversationCallback() {
     }
 });
 ```
-
 ```cs
 await conversation.SendImageAsync("http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", "Satomi_Ishihara", "萌妹子一枚");
 ```
@@ -1116,7 +1109,6 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
    }
 }
 ```
-
 ```objc
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
     AVIMImageMessage *imageMessage = (AVIMImageMessage *)message;
@@ -1129,7 +1121,6 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
     NSString *fromClientId = message.clientId;
 }
 ```
-
 ```java
 AVIMMessageManager.registerMessageHandler(AVIMImageMessage.class,
     new AVIMTypedMessageHandler<AVIMImageMessage>() {
@@ -1158,7 +1149,6 @@ AVIMMessageManager.registerMessageHandler(AVIMImageMessage.class,
         }
 });
 ```
-
 ```cs
 private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 {
@@ -1240,7 +1230,7 @@ using (FileStream fileStream = new FileStream(Path.Combine(Path.GetDirectoryName
 var audioMessage = new AVIMAudioMessage();
 audioMessage.File = new AVFile("忐忑.mp3", fileStream);
 audioMessage.TextContent = "听听人类的神曲";
-await conversation.SendAsync(audioMessage);
+await conversation.SendMessageAsync(audioMessage);
 ```
 
 与图像消息类似，音频消息也支持从 URL 构建：
@@ -1467,16 +1457,17 @@ AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, new AVIMTypedM
 
 public class CustomMessage extends AVIMMessage {
   
-    AVIMMessageManager.registerMessageHandler(CustomMessage.class, new MessageHandler<CustomMessage>(){
-      public void onMessage(CustomMessage message, AVIMConversation conversation, AVIMClient client) {
-        // receive new-coming message
-      }
-
-      public void onMessageReceipt(CustomMessage message, AVIMConversation conversation, AVIMClient client){
-        // do something responding of message receipt event.
-      }
-    });
 }
+
+AVIMMessageManager.registerMessageHandler(CustomMessage.class, new MessageHandler<CustomMessage>(){
+  public void onMessage(CustomMessage message, AVIMConversation conversation, AVIMClient client) {
+    // receive new-coming message
+  }
+
+  public void onMessageReceipt(CustomMessage message, AVIMConversation conversation, AVIMClient client){
+    // do something responding of message receipt event.
+  }
+});
 ```
 ```cs
 // 这里使用的是简单的演示，推荐使用 switch/case 搭配模式匹配来判断类型
@@ -1508,23 +1499,6 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
     }// 这里可以继续添加自定义类型的判断条件
 }
 ```
-
-### 内置消息类型与自定义消息
-
-即时通讯服务内置了如下消息类型用来满足常见的需求：
-
-- `TextMessage` 文本消息
-- `ImageMessage` 图像消息
-- `AudioMessage` 音频消息
-- `VideoMessage` 视频消息
-- `FileMessage` 普通文件消息(.txt/.doc/.md 等各种)
-- `LocationMessage` 地理位置消息
-
-如果内建的这些消息类型不够用，我们也支持开发者根据自己业务需要增加更多自定义的消息，推荐按照如下需求分级，来选择自定义的方式：
-
-- 通过设置简单 key-value 的自定义属性实现一个消息类型
-- 通过继承内置的消息类型添加一些属性
-- 完全自由实现一个全新的消息类型
 
 ## 扩展对话：支持自定义属性
 
@@ -1621,12 +1595,14 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 ### 创建自定义属性
 
-创建时可以指定一些自定义属性：
+在最开始介绍[创建单聊对话](#创建对话 Conversation)的时候，我们提到过 `IMClient#createConversation` 接口支持附加自定义属性，现在我们就来演示一下如何使用自定义属性。
+假如在创建对话的时候，我们需要添加两个额外的属性值对 `{"type": "private","pinned": true}`，那么在调用 `IMClient#createConversation` 方法时可以把附加属性传进去：
 
 ```js
 tom.createConversation({
   members: ['Jerry'],
   name: '猫和老鼠',
+  unique: true,
   type: 'private',
   pinned: true,
 }).then(function(conversation) {
@@ -1639,7 +1615,7 @@ NSDictionary *attributes = @{
     @"type": @"private",
     @"pinned": @(YES) 
 };
-[tom createConversationWithName:@"猫和老鼠" clientIds:@[@"Jerry"] attributes:attributes options:AVIMConversationOptionNone callback:^(AVIMConversation *conversation, NSError *error) {
+[tom createConversationWithName:@"猫和老鼠" clientIds:@[@"Jerry"] attributes:attributes options:AVIMConversationOptionUnique callback:^(AVIMConversation *conversation, NSError *error) {
     if (succeeded) {
         NSLog(@"创建成功！");
     }
@@ -1649,7 +1625,7 @@ NSDictionary *attributes = @{
 HashMap<String,Object> attr = new HashMap<String,Object>();
 attr.put("type","private");
 attr.put("pinned",true);
-client.createConversation(Arrays.asList("Jerry"),"猫和老鼠",attr,
+client.createConversation(Arrays.asList("Jerry"),"猫和老鼠", attr, false, true,
     new AVIMConversationCreatedCallback(){
         @Override
         public void done(AVIMConversation conv,AVIMException e){
@@ -1658,19 +1634,19 @@ client.createConversation(Arrays.asList("Jerry"),"猫和老鼠",attr,
           }
         }
     });
-}
 ```
 ```cs
-// 推荐使用 Builder 模式来构建对话
-var conversationBuilder = tom.GetConversationBuilder().SetProperty("type", "private").SetProperty("pinned", true);
-var conversation = await tom.CreateConversationAsync(conversationBuilder);
+IDictionary<string, object> options = new Dictionary<string, object>();
+options.Add("type", "private");
+options.Add("pinned",true);
+var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry", isUnique:true, options:options);
 ```
 
 **自定义属性在 SDK 级别是对所有成员可见的**。我们也支持通过自定义属性来查询对话，请参见[对话的查询](#对话的查询)
 
 ### 修改和使用属性
 
-以 `conversation.name` 为例，对话的 `conversation.name` 的属性是所有成员共享的，可以通过如下代码修改：
+在 Conversation 对象中，系统默认提供的属性，例如对话的「名字（name）」，如果业务层没有限制的话，所有成员都是可以修改的，示例代码如下：
 
 ```js
 conversation.name = '聪明的喵星人';
@@ -1702,25 +1678,34 @@ conversation.Name = "聪明的喵星人";
 await conversation.SaveAsync();
 ```
 
-以 `conversation.type` 为例来演示自定义属性，读取、使用、修改的操作如下：
+而 Conversation 对象中自定义的属性，即时通讯服务本身也是允许对话内所有成员来读取、使用和修改的，示例代码如下：
 
 ```js
 // 获取自定义属性
 var type = conversation.get('type');
+// 为 pinned 属性设置新的值
 conversation.set('pinned',false);
+// 保存
 conversation.save();
 ```
 ```objc
 // 获取自定义属性
 NSString *type = [conversation objectForKey:@"type"];
-// 设置 boolean 属性值
+// 为 pinned 属性设置新的值
 [conversation setObject:@(NO) forKey:@"pinned"];
-[conversation updateWithCallback:];
+// 保存
+[conversation updateWithCallback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"修改成功！");
+    }
+}];
 ```
 ```java
 // 获取自定义属性
 String type = conversation.get("type");
+// 为 pinned 属性设置新的值
 conversation.set("pinned",false);
+// 保存
 conversation.updateInfoInBackground(new AVIMConversationCallback(){
   @Override
   public void done(AVIMException e){        
@@ -1733,16 +1718,19 @@ conversation.updateInfoInBackground(new AVIMConversationCallback(){
 ```cs
 // 获取自定义属性
 var type = conversation["type"];
+// 为 pinned 属性设置新的值
 conversation["pinned"] = false;
+// 保存
 await conversation.SaveAsync();
 ```
 
+## 使用复杂条件来查询对话
 
-## 对话查询：使用复杂条件来查询对话
+除了在事件通知接口中获得 Conversation 实例之外，开发者也可以根据不同的属性和条件来查询 Conversation 对象。例如有些产品允许终端用户根据名字或地理位置来匹配感兴趣聊天室，也有些业务场景允许查询成员列表中包含特定用户的所有对话，这些都可以通过对话查询的接口实现。
 
 ### 根据 id 查询
 
-`id` 对应就是 `_Conversation` 表中的 `objectId` 的字段值:
+`id` 对应就是 `_Conversation` 表中的 `objectId` 的字段值，这是一种最简单也最高效的查询（因为云端会对 id 建立索引）:
 
 ```js
 tom.getConversation('551260efe4b01608686c3e0f').then(function(conversation) {
@@ -1764,9 +1752,9 @@ query.findInBackground(new AVIMConversationQueryCallback(){
     @Override
     public void done(List<AVIMConversation> convs,AVIMException e){
       if(e==null){
-      if(convs!=null && !convs.isEmpty()){
-        //convs.get(0) 就是想要的conversation
-      }
+        if(convs!=null && !convs.isEmpty()){
+          //convs.get(0) 就是想要的conversation
+        }
       }
     }
 });
@@ -1776,30 +1764,51 @@ var query = tom.GetQuery();
 var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
 ```
 
-{{ docs.langSpecStart('java') }}
-由于历史原因，AVIMConversationQuery 只能检索 _Conversation 表中 attr 列中的属性，而不能完整检索 _Conversation 表的其他自定义属性，所以在 v4.1.1 版本之后被废弃。v4.1.1 后请使用 AVIMConversation**s**Query 来完成相关查询。AVIMConversationsQuery 在查询属性时不会再自动添加 attr 前缀，如果开发者需要查询 _Conversation 表中 attr 列中具体属性，请自行添加 attr 前缀。
-{{ docs.langSpecEnd('java') }}
-
 ### 基础的条件查询
 
-> 对云存储熟悉的开发者可以更容易理解对话的查询构建，因为对话查询和云存储的对象查询在接口上是十分接近的。
+即时通讯 SDK 提供了丰富的条件查询方式，可以满足各种复杂的业务需求。
 
-SDK 提供了各种条件查询方式，可以满足各种对话查询的需求，首先从最简单的 `equalTo` 开始。
-
-有如下需求：需要查询所有对话的一个自定义属性 `type`(字符串类型) 为 `private` 的对话需要如下代码：
+我们首先从最简单的 `equalTo` 开始。例如查询所有自定义属性 `type`(字符串类型) 为 `private` 的对话，需要如下代码：
 
 ```js
-query.equalTo('type','private')
+var query = client.getQuery();
+query.equalTo('type','private');
+query.find().then(function(conversations) {
+  // convs 就是想要的结果
+}).catch(console.error.bind(console));
 ```
 ```objc
+AVIMConversationQuery *query = [tom conversationQuery];
 [query whereKey:@"type" equalTo:@"private"];
+// 执行查询
+[query findConversationsWithCallback:^(NSArray *objects, NSError *error) {
+    NSLog(@"找到 %ld 个对话！", [objects count]);
+}];
 ```
 ```java
+AVIMConversationsQuery query = tom.getConversationsQuery();
 query.whereEqualTo("type","private");
+// 执行查询
+query.findInBackground(new AVIMConversationQueryCallback(){
+  @Override
+  public void done(List<AVIMConversation> convs,AVIMException e){
+    if(e == null){
+      //convs 就是想要的结果
+    }
+  }
+});
 ```
 ```cs
+var query = tom.GetQuery();
 query.WhereEqualTo("type","private");
+await query.FindAsync();
 ```
+
+对 LeanCloud 数据存储服务熟悉的开发者可以更容易理解对话的查询构建，因为对话查询和数据存储服务的对象查询在接口上是十分接近的：
+- 可以通过 `find` 获取当前结果页数据
+- 支持通过 `count` 获取结果数
+- 支持通过 `first` 获取第一个结果
+- 支持通过 `skip` 和 `limit` 对结果进行分页
 
 与 `equalTo` 类似，针对 number 和 date 类型的属性还可以使用大于、大于等于、小于、小于等于等，详见下表：
 
@@ -1851,9 +1860,7 @@ query.WhereEqualTo("type","private");
 
 ### 正则匹配查询
 
-匹配查询是指在 `ConversationsQuery` 的查询条件中使用正则表达式来匹配数据。
-
-比如要查询所有 language 是中文的对话：
+`ConversationsQuery` 也支持在查询条件中使用正则表达式来匹配数据。比如要查询所有 language 是中文的对话：
 
 ```js
 query.matches('language',/[\\u4e00-\\u9fa5]/);
@@ -1902,7 +1909,7 @@ query.whereDoesNotExist("lm");
 query.WhereDoesNotExist("lm");
 ```
 
-如果要查询 lm 列不为空的对话，则替换为如下：
+反过来，如果要查询 lm 列不为空的对话，则替换为如下条件即可：
 
 ```js
 query.exists('lm')
@@ -1943,13 +1950,15 @@ query.WhereLessThan("age", 18);
 查询年龄小于 18 或者关键字包含「教育」的对话：
 
 ```js
-JavaScript SDK 暂不支持
+// JavaScript SDK 暂不支持
 ```
 ```objc
 AVIMConversationQuery *ageQuery = [tom conversationQuery];
 [ageQuery whereKey:@"age" greaterThan:@(18)];
+
 AVIMConversationQuery *keywordsQuery = [tom conversationQuery];
 [keywordsQuery whereKey:@"keywords" containsString:@"教育"];
+
 AVIMConversationQuery *query = [AVIMConversationQuery orQueryWithSubqueries:[NSArray arrayWithObjects:ageQuery,keywordsQuery,nil]];
 ```
 ```java
@@ -1957,7 +1966,8 @@ AVIMConversationsQuery ageQuery = tom.getConversationsQuery();
 ageQuery.whereLessThan('age', 18);
 
 AVIMConversationsQuery keywordsQuery = tom.getConversationsQuery();
-keywordsQuery.whereContains('keywords', '教育').
+keywordsQuery.whereContains('keywords', '教育');
+
 AVIMConversationsQuery query = AVIMConversationsQuery.or(Arrays.asList(priorityQuery, statusQuery));
 ```
 ```cs
@@ -1972,12 +1982,12 @@ var query = AVIMConversationQuery.or(new AVIMConversationQuery[] { ageQuery, key
 
 ### 性能优化建议
 
-在一些常见的需求中，进入对话列表界面的时候，客户端需要展现一个当前用户所参与的所有对话，一般情况下是按照活跃时间逆序排列在首页，因此给出一个查询优化的建议：
+Conversation 数据是存储在 LeanCloud 云端数据库中的，与存储服务中的对象查询类似，我们需要尽可能利用索引来提升查询效率，这里有一些优化查询的建议：
 
-- 查询的时候可以尽量提供了一个 `updatedAt` 或者 `lastMessageAt` 的参数来限定返回结果，原因是 skip 搭配 limit 的查询性能相对较低。
-- 使用 `m` 列的 `contains` 查询来查找包含某人的对话时，也尽量使用默认的 limit 大小 10，再配合 `updatedAt` 或者 `lastMessageAt` 来做条件约束，性能会提升较大
+- Conversation 的 id、updatedAt、createdAt 等属性上是默认建了索引的，所以通过这些条件来查询会比较快。
+- 虽然 `skip` 搭配 `limit` 的方式可以翻页，但是在结果集较大的时候不建议使用，因为数据库端计算翻页距离是一个非常低效的操作，取而代之的是尽量通过 `updatedAt` 或 `lastMessageAt` 等属性来限定返回结果集大小，并以此进行翻页。
+- 使用 `m` 列的 `contains` 查询来查找包含某人的对话时，也尽量使用默认的 limit 大小 10，再配合 `updatedAt` 或者 `lastMessageAt` 来做条件约束，性能会提升较大。
 - 整个应用对话如果数量太多，可以考虑在云引擎封装一个云函数，用定时任务启动之后，周期性地做一些清理，例如可以归档一些不活跃的对话，直接删除即可。
-
 
 ## 聊天记录查询
 
@@ -2018,9 +2028,10 @@ conv.queryMessages(10, new AVIMMessagesQueryCallback() {
 var messages = await conversation.QueryMessageAsync(limit: 10);
 ```
 
-如果想继续拉取更早的消息记录，`queryMessage` 接口也是支持翻页的。LeanCloud 即时通讯云端通过消息的 messageId 和发送时间戳来唯一定位一条消息，因此要从某条消息起拉取后续的 N 条记录，只需要指定起始消息的 `messageId` 和 `发送时间戳` 就可以了，示例代码如下：
+`queryMessage` 接口也是支持翻页的。LeanCloud 即时通讯云端通过消息的 messageId 和发送时间戳来唯一定位一条消息，因此要从某条消息起拉取后续的 N 条记录，只需要指定起始消息的 `messageId` 和 `发送时间戳` 作为锚定就可以了，示例代码如下：
 
 ```js
+// js sdk 通过迭代器隐藏了翻页的实现细节，开发者通过不断的调用 next 方法即可获得后续数据。
 // 创建一个迭代器，每次获取 10 条历史消息
 var messageIterator = conversation.createMessagesIterator({ limit: 10 });
 // 第一次调用 next 方法，获得前 10 条消息，还有更多消息，done 为 false
@@ -2039,19 +2050,17 @@ messageIterator.next().then(function(result) {
   // }
 }).catch(console.error.bind(console));
 ```
-
 ```objc
 // 查询对话中最后 10 条消息
 [conversation queryMessagesWithLimit:10 callback:^(NSArray *messages, NSError *error) {
-    NSLog(@"查询成功！");
+    NSLog(@"第一次查询成功！");
     // 以第一页的最早的消息作为开始，继续向前拉取消息
     AVIMMessage *oldestMessage = [messages firstObject];
     [conversation queryMessagesBeforeId:oldestMessage.messageId timestamp:oldestMessage.sendTimestamp limit:10 callback:^(NSArray *messagesInPage, NSError *error) {
-        NSLog(@"查询成功！");
+        NSLog(@"第二次查询成功！");
     }];
 }];
 ```
-
 ```java
 //  limit 取值范围 1~1000，默认 20
 conv.queryMessages(10, new AVIMMessagesQueryCallback() {
@@ -2068,7 +2077,7 @@ conv.queryMessages(10, new AVIMMessagesQueryCallback() {
             public void done(List<AVIMMessage> messagesInPage,AVIMException e){
               if(e== null){
                 //查询成功返回
-                Log.d("Tom & Jerry","got "+messagesInPage.size()+" messages ");
+                Log.d("Tom & Jerry", "got " + messagesInPage.size()+" messages ");
               }
           }
       });
@@ -2076,7 +2085,6 @@ conv.queryMessages(10, new AVIMMessagesQueryCallback() {
   }
 });
 ```
-
 ```cs
 // limit 取值范围 1~1000，默认 20
 var messages = await conversation.QueryMessageAsync(limit: 10);
@@ -2095,7 +2103,6 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
   console.log(messages);
 }).catch(console.error);
 ```
-
 ```objc
 [conversation queryMediaMessagesFromServerWithType:kAVIMMessageMediaTypeImage limit:10 fromMessageId:nil fromTimestamp:0 callback:^(NSArray *messages, NSError *error) {
     if (!error) {
@@ -2103,7 +2110,6 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
     }
 }];
 ```
-
 ```java
 int msgType = .AVIMMessageType.TEXT_MESSAGE_TYPE;
 conversation.queryMessagesByType(msgType, limit, new AVIMMessagesQueryCallback() {
@@ -2112,7 +2118,6 @@ conversation.queryMessagesByType(msgType, limit, new AVIMMessagesQueryCallback()
     }
 });
 ```
-
 ```cs
 // 传入泛型参数，SDK 会自动读取类型的信息发送给服务端，用作筛选目标类型的消息
 var imageMessages = await conversation.QueryMessageAsync<AVIMImageMessage>();
@@ -2154,7 +2159,7 @@ conversation.queryMessages(internal, AVIMMessageQueryDirectionFromOldToNew, limi
 var earliestMessages = await conversation.QueryMessageFromOldToNewAsync();
 ```
 
-为了实现翻页，请配合下一节[从某一时间戳往某一方向查询](#从某一时间戳往某一方向查询)
+这种情况下要实现翻页，接口会稍微复杂一点，请继续阅读下一节。
 
 ### 从某一时间戳往某一方向查询
 
@@ -2206,7 +2211,7 @@ var nextPageMessages = await conversation.QueryMessageAfterAsync(earliestMessage
 
 ### 获取指定区间内的消息
 
-假设已知 2 条消息，这 2 条消息以较早的一条为起始点，而较晚的一条为终点，这个区间内产生的消息可以用如下方式查询：
+除了顺序查找之外，我们也支持获取特定时间区间内的消息。假设已知 2 条消息，这 2 条消息以较早的一条为起始点，而较晚的一条为终点，这个区间内产生的消息可以用如下方式查询：
 
 注意：**每次查询也有 100 条限制，如果想要查询区间内所有产生的消息，替换区间起始点的参数即可。**
 
@@ -2264,22 +2269,21 @@ iOS 和 Android SDK 针对移动设备的特殊性，实现了客户端消息的
 ```js
 // 暂不支持
 ```
-
 ```objc
 // 需要在调用 [avimClient openWithCallback:callback] 函数之前设置，关闭历史消息缓存开关。
 avimClient.messageQueryCacheEnabled = false;
 ```
-
 ```java
 // 需要在调用 AVIMClient.open(callback) 函数之前设置，关闭历史消息缓存开关。
 AVIMClient.setMessageQueryCacheEnable(false);
 ```
-
 ```cs
 // 暂不支持
 ```
 
-## 用户退出登录
+## 用户退出与网络状态变化
+
+### 用户退出即时通讯服务
 
 如果产品层面设计了用户退出登录或者切换账号的接口，对于即时通讯服务来说，也是需要完全注销当前用户的登录状态的。在 SDK 中，开发者可以通过调用 `AVIMClient` 的 `close` 系列方法完成即时通讯服务的「退出」： 
 
@@ -2311,7 +2315,7 @@ await tom.CloseAsync();
 
 调用该接口之后，客户端就与即时通讯服务云端断开连接了，从云端查询前一 clientId 的状态，会显示「离线」状态。
 
-## 客户端事件与网络状态响应
+### 客户端事件与网络状态响应
 
 即时通讯服务与终端设备的网络连接状态休戚相关，如果网络中断，那么所有的消息收发和对话操作都会失败，这时候产品层面需要在 UI 上给予用户足够的提示，以免影响使用体验。
 
@@ -2381,11 +2385,8 @@ realtime.on(Event.RECONNECT, function() {
 
 {{ docs.langSpecEnd('cs') }}
 
-### 自动重连
 
-如果开发者没有明确调用退出登录的接口，但是客户端网络存在抖动或者切换（对于移动网络来说，这是比较常见的情况），我们 iOS 和 Android SDK 默认内置了断线重连的功能，会在网络恢复的时候自动建立连接，此时 `IMClient` 的网络状态可以通过底层的网络状态响应接口得到回调。
-
-## 开发建议
+## 其他开发建议
 
 ### 如何根据活跃度来展示对话列表
 
@@ -2393,9 +2394,13 @@ realtime.on(Event.RECONNECT, function() {
 
 我们专门为 `AVIMConversation` 增加了一个动态的属性`lastMessageAt`（对应 `_Conversation` 表里的 `lm` 字段），记录了对话中最后一条消息到达即时通讯云端的时间戳，这一数字是服务器端的时间（精确到秒），所以不用担心客户端时间对结果造成影响。另外，`AVIMConversation`还提供了一个方法可以直接获取最新的一条消息。这样在界面展现的时候，开发者就可以自己决定展示内容与顺序了。
 
+### 自动重连
+
+如果开发者没有明确调用退出登录的接口，但是客户端网络存在抖动或者切换（对于移动网络来说，这是比较常见的情况），我们 iOS 和 Android SDK 默认内置了断线重连的功能，会在网络恢复的时候自动建立连接，此时 `IMClient` 的网络状态可以通过底层的网络状态响应接口得到回调。
+
 ### 更多「对话」类型
 
-即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景除去刚才前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外，我们也支持其他形式的「对话」模型：
+即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景，除了前两章节介绍的[一对一单聊](#一对一单聊)和[多人群聊](#多人群聊)之外，我们也支持其他形式的「对话」模型：
 
 - 开放聊天室，例如直播中的弹幕聊天室，它与普通的「多人群聊」的主要差别是允许的成员人数以及消息到达的保证程度不一样。有兴趣的开发者可以参考文档：[第二篇：直播场景下的开放聊天室](realtime-guide-intermediate.html#直播场景下的开放聊天室)。
 - 临时对话，例如客服系统中用户和客服人员之间建立的临时通道，它与普通的「一对一单聊」的主要差别在于对话总是临时创建并且不会长期存在，在提升实现便利性的同时，还能降低服务使用成本（能有效减少存储空间方面的花费）。有兴趣的开发者可以参考下篇文档：[第二篇：使用临时对话](realtime-guide-intermediate.html#使用临时对话)
@@ -2403,6 +2408,6 @@ realtime.on(Event.RECONNECT, function() {
 
 {{ docs.relatedLinks("进一步阅读",[
   { title: "更多消息收发的需求，开放聊天室", href: "realtime-guide-intermediate.html"}, 
-  { title: "安全与签名，黑名单和权限管理", href: "/realtime-guide-senior.html"}])
+  { title: "安全与签名，黑名单和权限管理", href: "/realtime-guide-senior.html"},
   { title: "详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
 }}
