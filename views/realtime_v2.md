@@ -219,9 +219,9 @@ TextMessage  ImageMessage  AudioMessage  VideoMessage  LocationMessage   。。�
 #### 离线消息
 
 {% if node=='qcloud' %}
-开发者可以通过 `**控制台** > **消息** > **即时消息** > **帮助**]` 界面查询某个 Client ID 的在线状态和离线消息数。
+开发者可以通过 `**控制台** > **消息** > **即时通讯** > **帮助**]` 界面查询某个 Client ID 的在线状态和离线消息数。
 {% else %}
-开发者可以通过 [**控制台** > **消息** > **即时消息** > **帮助**](/messaging.html?appid={{appid}}#/message/realtime/tool) 界面查询某个 Client ID 的在线状态和离线消息数。
+开发者可以通过 [**控制台** > **消息** > **即时通讯** > **帮助**](/messaging.html?appid={{appid}}#/message/realtime/tool) 界面查询某个 Client ID 的在线状态和离线消息数。
 {% endif %}
 
 当用户重新登录后，LeanCloud 提供两种方式进行下发离线消息：
@@ -248,9 +248,9 @@ TextMessage  ImageMessage  AudioMessage  VideoMessage  LocationMessage   。。�
 
   由于不同平台的不同限制，且用户的消息正文可能还包含上层协议，所以我们允许用户在控制台中为应用设置一个静态的 JSON，推送一条内容固定的通知。
   {% if node=='qcloud' %}
-  进入 `控制台 > 消息 > 即时消息 > 设置 > 离线推送设置`，填入：
+  进入 `控制台 > 消息 > 即时通讯 > 设置 > 离线推送设置`，填入：
   {% else %}
-  进入 [控制台 > 消息 > 即时消息 > 设置 > 离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
+  进入 [控制台 > 消息 > 即时通讯 > 设置 > 离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
   {% endif %}
   ```
   {"alert":"您有新的消息", "badge":"Increment"}
@@ -303,7 +303,7 @@ Apple 不支持在一次推送中向多个从属于不同 Team Id 的设备发�
 
 过滤的词库由 LeanCloud 提供，命中的敏感词将会被替换为 `***`。
 
-支持用户自定义敏感词过滤文件。在 [控制台 > 消息 > 即时消息 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中开启「消息敏感词实时过滤功能」，上传敏感词文件即可。
+支持用户自定义敏感词过滤文件。在 [控制台 > 消息 > 即时通讯 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中开启「消息敏感词实时过滤功能」，上传敏感词文件即可。
 
 如果开发者有较为复杂的过滤需求，我们推荐使用 [云引擎 hook _messageReceived](#_messageReceived) 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
 
@@ -322,7 +322,7 @@ Apple 不支持在一次推送中向多个从属于不同 Team Id 的设备发�
 
 ## 权限和认证
 
-使用签名可以保证聊天通道的安全，这一功能默认是关闭的，可以在 [控制台 > 消息 > 即时消息 > 设置 > 即时消息选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中进行开启：
+使用签名可以保证聊天通道的安全，这一功能默认是关闭的，可以在 [控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中进行开启：
 
 - **登录启用签名认证**，用于控制所有的用户登录
 - **对话操作启用签名认证**，用于控制新建或加入对话、邀请/踢出对话成员等操作
@@ -765,9 +765,9 @@ timestamp | 消息创建的时间
 
 #### Web Hook
 {% if node=='qcloud' %}
-需要开发者自行在 `控制台> **消息** > **即时消息** > **设置** > **系统对话消息回调设置**`定义，来实时接收用户发给系统对话的消息，消息的数据结构与上文所述的 `_SysMessage` 一致。
+需要开发者自行在 `控制台> **消息** > **即时通讯** > **设置** > **系统对话消息回调设置**`定义，来实时接收用户发给系统对话的消息，消息的数据结构与上文所述的 `_SysMessage` 一致。
 {% else %}
-需要开发者自行在 [控制台> **消息** > **即时消息** > **设置** > **系统对话消息回调设置**](/messaging.html?appid={{appid}}#/message/realtime/conf) 定义，来实时接收用户发给系统对话的消息，消息的数据结构与上文所述的 `_SysMessage` 一致。
+需要开发者自行在 [控制台> **消息** > **即时通讯** > **设置** > **系统对话消息回调设置**](/messaging.html?appid={{appid}}#/message/realtime/conf) 定义，来实时接收用户发给系统对话的消息，消息的数据结构与上文所述的 `_SysMessage` 一致。
 {% endif %}
 
 当有用户向系统对话发送消息时，我们会通过 HTTP POST 请求将 JSON 格式的数据发送到用户设置的 Web Hook 上。请注意，我们调用 Web Hook 时并不是一次调用只发送一条消息，而是会以批量的形式将消息发送过去。从下面的发送消息格式中能看到，JSON 的最外层是个 Array。
@@ -872,19 +872,19 @@ LeanCloud 即时通讯服务是完全独立的即时通讯业务抽象，专注�
 * 调用消息记录 API 查看消息是否到达了云端
 * 如果只有一个消息接收者，可以检查消息记录中对应条目的 `ack-at` 字段判断消息是否到达了客户端
 {% if node =='qcloud' %}
-* 在 `控制台 > **消息** > **即时消息** > **用户**` 页面的文本框里输入对应的 Client ID，查看是否在线，以及是否有离线消息。
+* 在 `控制台 > **消息** > **即时通讯** > **用户**` 页面的文本框里输入对应的 Client ID，查看是否在线，以及是否有离线消息。
 {% else %}
-* 在 [控制台 > **消息** > **即时消息** > **用户**](/messaging.html?appid={{appid}}#/message/realtime/client) 页面的文本框里输入对应的 Client ID，查看是否在线，以及是否有离线消息。
+* 在 [控制台 > **消息** > **即时通讯** > **用户**](/messaging.html?appid={{appid}}#/message/realtime/client) 页面的文本框里输入对应的 Client ID，查看是否在线，以及是否有离线消息。
 {% endif %}
 {% if node != 'qcloud' %}
-* 在 `控制台 > **消息** > **即时消息** > **对话**` 页面的文本框里输入消息所属对话 ID，在 `消息与日志` 一栏里选日志，根据消息发送时间查看消息发送日志，看服务器是否有收到消息请求，消息是否有转发记录，转发消息时目标用户是否在线等信息。
+* 在 `控制台 > **消息** > **即时通讯** > **对话**` 页面的文本框里输入消息所属对话 ID，在 `消息与日志` 一栏里选日志，根据消息发送时间查看消息发送日志，看服务器是否有收到消息请求，消息是否有转发记录，转发消息时目标用户是否在线等信息。
 {% endif %}
 
 ### 为什么我收不到离线消息推送
 
 首先请参考 [聊天消息没有收到](#聊天消息没有收到) 一节内容查看聊天消息是否有正常送达服务器。
 
-其次请利用控制台即时消息页的用户状态查询页面来确认消息接收者是否真的处于离线状态，是否有未读消息产生，是否在 `_Installation` 表内有关联的设备，如下图所示。如果接收者处于在线状态能正常接收消息则不会有未读消息计数，也不会触发推送，请先让接收者离线后再测试离线消息推送。如果用户在 `_Installation` 表内没有关联的设备也无法触发推送，对于 iOS 设备请确认接收者设备是否正常从 APNs 申请到 Device Token，是否正常存储设备记录在 `_Installation` 表中，对于 Android 设备请确认是否开启了混合推送，是否正常存储了设备记录在 `_Installation` 表中。
+其次请利用控制台即时通讯页的用户状态查询页面来确认消息接收者是否真的处于离线状态，是否有未读消息产生，是否在 `_Installation` 表内有关联的设备，如下图所示。如果接收者处于在线状态能正常接收消息则不会有未读消息计数，也不会触发推送，请先让接收者离线后再测试离线消息推送。如果用户在 `_Installation` 表内没有关联的设备也无法触发推送，对于 iOS 设备请确认接收者设备是否正常从 APNs 申请到 Device Token，是否正常存储设备记录在 `_Installation` 表中，对于 Android 设备请确认是否开启了混合推送，是否正常存储了设备记录在 `_Installation` 表中。
 
 ![image](images/realtime_faq_console.png)
 
