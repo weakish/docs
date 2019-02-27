@@ -35,20 +35,31 @@
 
 ### @ 成员提醒消息
 
-LeanCloud 即时通讯 SDK 在发送消息的时候，允许显式地指定这条消息是否会提醒一部分或者全部成员。我们可以在 AVIMMessage 实例上通过设置 `mentionList` 属性值来添加被提醒的成员列表，示例如下:
+在一些多人聊天群里面，因为消息量较大，很容易就导致某一条重要的消息被刷下去了，所以在消息中「@成员」是一种提醒接收者注意的有效办法。在微信这样的聊天工具里面，甚至会在对话列表页对有提醒的消息进行特别展示，用来通知消息目标高优先级查看和处理。
+
+一般提醒消息都使用「@ +人名」来表示目标用户，但是这里「人名」是一个由应用层决定的属性，可能有的产品使用全名，有的使用昵称，并且这个名字和即时通讯服务里面标识一个用户使用的 `ClientId` 可能根本不一样（毕竟一个是给人看的，一个是给机器读的）。使用「人名」来圈定用户，还存在一种例外就是，聊天群组里面的用户名是可以改变的，如果消息发送的时候「王五」还叫「王五」，等发送出来之后他恰好同步改成了「王大麻子」，这时候接收方的处理就比较麻烦了。还有另外一个原因，就是「提醒全部成员」的表示方式，可能「@all」、「@group」、「@所有人」都会被选择。
+
+所以「@ 提醒消息」并不能简单在文本消息中加入「@ +人名」来解决。LeanCloud 的方案是给普通消息（AVIMMessage）增加两个额外的属性：
+- `mentionList`，是一个字符串的数组，用来单独记录被提醒的 ClientId 列表；
+- `mentionAll`，是一个 Bool 型的标志位，用来表示是否要提醒全部成员。
+
+带有提醒信息的消息，有可能既有提醒全部成员的标志，也还单独设置了 `mentionList`，这由应用层去控制。发送方在发送「@ 提醒消息」的时候，如何输入、选择成员名称，这是业务方 UI 层面需要解决的问题，即时通讯 SDK 不关心其实现逻辑，SDK 只要求开发者在发送一条「@ 提醒」消息的时候调用，调用 `mentionList` 和 `mentionAll` 的 setter 方法，设置正确的成员列表即可。示例代码如下：
 
 ```js
-const message = new TextMessage(`@Tom`).setMentionList('Tom');
+const message = new TextMessage(`@Tom 早点回家`).setMentionList('Tom');
+conversation.send(message).then(function(message) {
+  console.log('发送成功！');
+}).catch(console.error);
 ```
 ```objc
-AVIMMessage *message = [AVIMTextMessage messageWithText:@"@Tom" attributes:nil];
+AVIMMessage *message = [AVIMTextMessage messageWithText:@"@Tom 早点回家" attributes:nil];
 message.mentionList = @[@"Tom"];
 [conversation sendMessage:message callback:^(BOOL succeeded, NSError * _Nullable error) {
     /* A message which will mention Tom has been sent. */
 }];
 ```
 ```java
-String content = "@Tom";
+String content = "@Tom 早点回家";
 AVIMTextMessage  message = new AVIMTextMessage();
 message.setText(content);
 List<String> list = new ArrayList<>(); // 部分用户的 mention list，你可以向下面代码这样来填充
@@ -61,17 +72,20 @@ imConversation.sendMessage(message, new AVIMConversationCallback() {
 });
 ```
 ```cs
-var textMessage = new AVIMTextMessage("@Tom")
+var textMessage = new AVIMTextMessage("@Tom 早点回家")
 {
     MentionList = new List<string>() { "Tom" }
 };
-await conversation.SendAsync(textMessage);
+await conversation.SendMessageAsync(textMessage);
 ```
 
 或者也可以通过设置 `mentionAll` 属性值提醒所有人：
 
 ```js
 const message = new TextMessage(`@all`).mentionAll();
+conversation.send(message).then(function(message) {
+  console.log('发送成功！');
+}).catch(console.error);
 ```
 ```objc
 AVIMMessage *message = [AVIMTextMessage messageWithText:@"@all!" attributes:nil];
@@ -99,10 +113,10 @@ var textMessage = new AVIMTextMessage("@all")
 {
     MentionAll = true
 };
-await conv.SendAsync(textMessage);
+await conv.SendMessageAsync(textMessage);
 ```
 
-消息的接收方，可以通过读取消息的提醒列表来获取哪些 client Id 被提醒了：
+对于消息的接收方来说，可以通过调用 `mentionList` 和 `mentionAll` 的 getter 方法来获得提醒目标用户的信息，示例代码如下：
 
 ```js
 client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
@@ -133,12 +147,16 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 }
 ```
 
-此外，AVIMMessage 实例提供了两个标识位，用来显示被提醒的状体。
-其中一个是 `mentionedAll` 标识位，用来表示该消息是否提醒了当前对话的全体成员:
+此外，并且为了方便 UI 处理，我们特意为 `AVIMMessage` 增加了两个标识位，用来显示被提醒的状态：
+- 一个是 `mentionedAll` 标识位，用来表示该消息是否提醒了当前对话的全体成员。只有 `mentionAll` 属性为 true，这个标识位才为 true，否则就为 false。
+- 另一个是 `mentioned` 标识位，用来快速判断该消息是否提醒了当前登录用户。如果 `mentionList` 属性列表中包含有当前登录用户的 `ClientId`，或者 `mentionAll` 属性为 true，那么 `mentioned` 方法都会返回 true，否则返回 false。
+
+调用示例如下：
 
 ```js
 client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   var mentionedAll = receivedMessage.mentionedAll;
+  var mentionedMe = receivedMessage.mentioned;
 });
 ```
 ```objc
@@ -146,6 +164,7 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
     // get this message mentioned all members of this conversion.
     BOOL mentionAll = message.mentionAll;
+    BOOL mentionedMe = message.mentioned;
 }
 ```
 ```java
@@ -153,36 +172,6 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
 public void onMessage(AVIMAudioMessage msg, AVIMConversation conv, AVIMClient client) {
   // 读取消息是否 @ 了对话的所有成员
   boolean currentMsgMentionAllUsers = message.isMentionAll();
-}
-```
-```cs
-private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
-{
-    if (e.Message is AVIMImageMessage imageMessage)
-    {
-         var mentionedAll = e.Message.MentionAll;
-    }
-}
-```
-
-AVIMMessage 的另一个标识位 `mentioned` 则用来标识当前用户是否被提醒（该标识位是 SDK 内部动态生成的，SDK 通过读取消息是否提醒了全体成员和当前 client id 是否在被提醒的列表里这两个条件计算出来当前用户是否被提醒）：
-
-```js
-client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
-  var mentioned = receivedMessage.mentioned;
-});
-```
-```objc
-  // 示例代码演示 AVIMTypedMessage 接收时，获取该条消息是否 @ 了当前 client id，同理可以用类似的代码操作 AVIMMessage 的其他子类
-- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
-    // get if current client id mentioned by this message
-    BOOL mentioned = message.mentioned;
-}
-```
-```java
-@Override
-public void onMessage(AVIMAudioMessage msg, AVIMConversation conv, AVIMClient client) {
-  // 读取消息是否 @ 了当前 client id
   boolean currentMsgMentionedMe = message.mentioned();
 }
 ```
@@ -191,7 +180,8 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 {
     if (e.Message is AVIMImageMessage imageMessage)
     {
-         // 判断当前用户是否被 @
+         var mentionedAll = e.Message.MentionAll;
+         // 判断当前用户是否被 @，dotNet SDK 还需要自己计算
          var mentioned = e.Message.MentionAll || e.Message.MentionList.Contains("Tom");
     }
 }
@@ -201,7 +191,9 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 > 需要在 控制台 > 消息 > 设置 中启用「聊天服务，对消息启用撤回功能」。
 
-终端用户可以在消息发送之后，对自己发送的消息再进行修改或撤回。例如 Tom 要撤回一条已发送的消息：
+终端用户在消息发送之后，还可以对自己已经发送的消息进行修改（`Conversation#updateMessage` 方法）或撤回（`Conversation#recallMessage` 方法），目前即时通讯服务端并没有在时效性上进行限制，不过只允许用户修改或撤回自己发出去的消息，对别人的消息进行修改或撤回是会返回错误的（错误码：）。
+
+例如 Tom 要撤回一条自己之前发送过的消息，示例代码如下：
 
 ```js
 conversation.recall(oldMessage).then(function(recalledMessage) {
@@ -271,7 +263,7 @@ private void Tom_OnMessageRecalled(object sender, AVIMMessagePatchEventArgs e)
 }
 ```
 
-对于 Android 和 iOS SDK 来说，如果消息缓存的选项是打开的时候，SDK 内部会先从缓存中删除这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可。
+对于 Android 和 iOS SDK 来说，如果消息缓存的选项是打开的时候，SDK 内部需要保证数据的一致性，所以会先从缓存中删除这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（此时消息列表中的消息会直接变少）。
 
 Tom 除了直接删除出错消息之外，还可以修改那条消息，例如：
 
@@ -351,15 +343,13 @@ private void Tom_OnMessageModified(object sender, AVIMMessagePatchEventArgs e)
 }
 ```
 
-对于 Android 和 iOS SDK 来说，如果消息缓存的选项是打开的时候，SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可。
+对于 Android 和 iOS SDK 来说，如果消息缓存的选项是打开的时候，SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（这时候消息列表会出现内容变化）。
 
 ### 发送暂态消息
 
-有时候我们需要发送一些特殊的消息，譬如聊天过程中「某某正在输入...」这样的状态信息，或者当群聊的名称修改以后给该群成员的「群名称被某某修改为...」通知信息，这类消息与终端用户发送的消息不一样，它不要求保存到历史消息里面去，不要求一定会被送达（如果成员不在线或者现在网络异常，那么没有下发下去也无所谓），这种需求可以使用「暂态消息」来实现。
+有时候我们需要发送一些特殊的消息，譬如聊天过程中「某某正在输入...」这样的实时状态信息，或者当群聊的名称修改以后给该群成员的「群名称被某某修改为...」这样的通知信息，这类消息与终端用户发送的消息不一样，它不要求保存到历史消息里面去，不要求一定会被送达（如果成员不在线或者现在网络异常，那么没有下发下去也无所谓），这种需求可以使用「暂态消息」来实现。
 
-「暂态消息」是一种特殊的消息，它会被自动保存到云端，以后在历史消息中无法找到它，也不支持延迟接收，离线用户更不会收到推送通知，所以适合用来发送一些实时的、变化的状态信息，或者用来实现简单的控制协议。
-
-暂态消息的发送与普通消息有一些区别。到目前为止，我们演示的 `AVIMConversation` 发送消息接口都是这样的：
+「暂态消息」是一种特殊的消息，它不会被自动保存到云端，以后在历史消息中无法找到它，也不支持延迟接收，离线用户更不会收到推送通知，所以适合用来发送一些实时的、变化的状态信息，或者用来实现简单的控制协议。暂态消息的数据和构造方式与普通消息是一样的，只是其发送方式与普通消息有一些区别。到目前为止，我们演示的 `AVIMConversation` 发送消息接口都是这样的：
 
 ```js
 async send(message)
@@ -432,11 +422,11 @@ public Task<IAVIMMessage> SendMessageAsync(IAVIMMessage avMessage, AVIMSendOptio
 
 通过 `AVIMMessageOption` 参数我们可以指定：
 
-- 是否作为暂态消息发送（`transient` 属性）
-- 服务端是否需要通知该消息的接收状态（`receipt` 属性，消息回执，后续章节会进行说明）
-- 消息的优先级（`priority` 属性，后续章节会说明）
-- 是否为「遗愿消息」（`will` 属性，后续章节会说明）
-- 消息对应的离线推送内容（`pushData` 属性，后续章节会说明），如果消息接收方不在线，会推送指定的内容。
+- 是否作为暂态消息发送（设置 `transient` 属性）
+- 服务端是否需要通知该消息的接收状态（设置 `receipt` 属性，消息回执，后续章节会进行说明）
+- 消息的优先级（设置 `priority` 属性，后续章节会说明）
+- 是否为「遗愿消息」（设置 `will` 属性，后续章节会说明）
+- 消息对应的离线推送内容（设置 `pushData` 属性，后续章节会说明），如果消息接收方不在线，会推送指定的内容。
 
 例如我们需要让 Tom 在聊天页面的输入框获得焦点的时候，给群内成员同步一条「Tom is typing...」的状态信息，可以使用如下代码：
 
@@ -479,9 +469,11 @@ await conv.SendAsync(textMessage, option);
 
 ### 消息回执
 
-有一些偏重工作写作或者私密沟通的产品，消息发送者在发送一条消息之后，还希望能看到消息被送达和阅读的实时状态，甚至还要提醒未读成员。这样苛刻的需求，使用 LeanCloud 即时通讯服务也是可以实现的。
+LeanCloud 即时通讯服务端在进行消息投递的时候，内部协议上会要求 SDK 对收到的每一条消息进行确认（ack）。如果 SDK 收到了消息，但是在发送 ack 的过程中出现网络丢包，即时通讯服务端还是会认为消息没有投递下去，之后会再次投递，直到收到 SDK 的应答确认为止。与之对应，SDK 内部也进行了消息去重处理，保证在上面这种极端条件下应用层也不会收到重复的消息。所以我们的消息系统从协议上是可以保证不丢任何一条消息的。
 
-在对方收到消息以及对方阅读了消息之后，云端可以向发送方分别发送一个回执通知。要使用消息回执功能，需要在发送消息时标记「需要回执」选项：
+不过，有些业务场景会对消息投递的细节有更高的要求，例如消息的发送方要能知道什么时候接收方收到了这条消息，什么时候 ta 又点开阅读了这条消息。有一些偏重工作写作或者私密沟通的产品，消息发送者在发送一条消息之后，还希望能看到消息被送达和阅读的实时状态，甚至还要提醒未读成员。这样苛刻的需求，就依赖于我们的「消息回执」功能来实现。
+
+与上一节「暂态消息」的发送类似，要使用消息回执功能，需要在发送消息时标记「需要回执」选项：
 {{ docs.note("只有在发送时设置了「需要回执」的标记，云端才会发送回执，默认不发送回执。") }}
 
 ```js
@@ -516,7 +508,7 @@ await conv.SendAsync(textMessage, option);
 
 #### 送达回执
 
-当对方收到消息之后，云端会向发送方发出一个回执通知，表明消息已经送达，但这并**不代表用户已读**。送达回执**仅支持单聊**。
+当接收方收到消息之后，云端会向发送方发出一个回执通知，表明消息已经送达。**请注意与「已读回执」区别开**，另外送达回执**仅支持单聊**。
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -532,33 +524,17 @@ conversation.on(Event.LAST_DELIVERED_AT_UPDATE, function() {
 }
 ```
 ```java
-AVIMMessageHandler handler = new AVIMMessageHandler(){
-
-    public void onMessageReceipt(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
-     //此处就是对方收到消息以后的回调
-    Log.i("Tom & Jerry","msg received");
+public class CustomConversationEventHandler extends AVIMConversationEventHandler {
+  /**
+   * 实现本地方法来处理对方已经接收消息的通知
+   */
+  public void onLastDeliveredAtUpdated(AVIMClient client, AVIMConversation conversation) {
+    ;
   }
 }
 
-//注册对应的handler
-AVIMMessageManager.registerMessageHandler(AVIMMessage.class,handler);
-
-//发送消息
-
-AVIMClient jerry = AVIMClient.getInstance("Jerry");
-AVIMConversation conv = jerry.getConversation("551260efe4b01608686c3e0f");
-AVIMMessage msg = new AVIMMessage();
-msg.setContent("Ping");
-AVIMMessageOption messageOption = new AVIMMessageOption();
-messageOption.setReceipt(true);
-conv.sendMessage(msg, messageOption, new AVIMConversationCallback() {
-      @Override
-      public void done(AVIMException e) {
-        if (e == null) {
-          // 发送成功
-        }
-      }
-    });
+// 设置全局的对话事件处理 handler
+AVIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
 ```
 ```cs
 //Tom 用自己的名字作为 ClientId 建立了一个 AVIMClient
@@ -567,8 +543,6 @@ AVIMClient client = new AVIMClient("Tom");
 //Tom 登录到系统
 await client.ConnectAsync();
 
-//打开已存在的对话
-AVIMConversation conversaion = client.GetConversationById("551260efe4b01608686c3e0f");
 //设置送达回执
 conversaion.OnMessageDeliverd += (s, e) =>
 {
@@ -624,7 +598,7 @@ await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
     ```cs
     ```
 
-2. Jerry 阅读 Tom 发的消息后，调用对话上的方法把「对话中最近的消息」标记为已读：
+2. Jerry 阅读 Tom 发的消息后，调用对话上的 `read` 方法把「对话中最近的消息」标记为已读：
   
     ```js
     ```
@@ -651,9 +625,17 @@ await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
     }
     ```
     ```java
-    onLastReadAtUpdated(AVIMClient client, AVIMConversation conversation) {
-      /* Jerry 阅读了你的消息。可以通过调用 conversation.getLastReadAt() 来获得对方已经读取到的时间点
+    public class CustomConversationEventHandler extends AVIMConversationEventHandler {
+      /**
+       * 实现本地方法来处理对方已经阅读消息的通知
+       */
+      public void onLastReadAtUpdated(AVIMClient client, AVIMConversation conversation) {
+        /* Jerry 阅读了你的消息。可以通过调用 conversation.getLastReadAt() 来获得对方已经读取到的时间点 */
+      }
     }
+
+    // 设置全局的对话事件处理 handler
+    AVIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
     ```
     ```cs
     ```
@@ -692,6 +674,7 @@ message.setText("我是一条遗愿消息，当发送者意外下线的时候，
 
 AVIMMessageOption option = new AVIMMessageOption();
 option.setWill(true);
+
 conversation.sendMessage(message, option, new AVIMConversationCallback() {
   @Override
   public void done(AVIMException e) {
