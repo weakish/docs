@@ -94,10 +94,24 @@ GLOBAL OPTIONS:
 
 可以通过 `--version` 选项查看版本：
 
-
 ```sh
 $ lean --version
 lean version 0.20.0
+```
+
+`lean command -h` 可以查看子命令的帮助信息，例如：
+
+```sh
+NAME:
+   lean login - Log in to LeanCloud
+
+USAGE:
+   lean login [command options] [-u username -p password (--region <CN> | <US> | <TAB>)]
+
+OPTIONS:
+   --username value, -u value  Username
+   --password value, -p value  Password
+   --region value, -r value    The LeanCloud region to log in to (e.g., US, CN)
 ```
 
 下文中凡是以 `$ lean` 开头的文字即表示在终端里执行命令。
