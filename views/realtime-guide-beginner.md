@@ -2062,6 +2062,220 @@ keywordsQuery.WhereContains('keywords', '教育').
 var query = AVIMConversationQuery.or(new AVIMConversationQuery[] { ageQuery, keywordsQuery});
 ```
 
+### 结果排序
+
+可以指定查询结果按照部分属性值的升序 or 降序来返回。例如：
+
+```js
+// 对查询结果按照 name 升序，然后按照创建时间降序排序
+query.addAscending('name').addDescending('createdAt');
+```
+```objc
+AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+[client openWithCallback:^(BOOL succeeded, NSError *error) {
+    AVIMConversationQuery *query = [client conversationQuery];
+    /* 按创建时间降序排列 */
+    [query orderByDescending:@"createdAt"];
+    [query findConversationsWithCallback:^(NSArray *conversations, NSError *error) {
+        NSLog(@"找到 %ld 个对话！", [conversations count]);
+    }];
+}];
+```
+```java
+AVIMClient tom = AVIMClient.getInstance("Tom");
+
+tom.open(new AVIMClientCallback() {
+  @Override
+  public void done(AVIMClient client, AVIMException e) {
+    if (e == null) {
+      // 登录成功
+      AVIMConversationsQuery query = client.getConversationsQuery();
+
+      // 按对话的创建时间降序
+      query.orderByDescending("createdAt");
+
+      query.findInBackground(new AVIMConversationQueryCallback() {
+        @Override
+        public void done(List<AVIMConversation> convs, AVIMException e) {
+          if (e == null) {
+            if(convs != null && !convs.isEmpty()) {
+              // 获取符合查询条件的 conversation 列表
+            }
+          }
+        }
+      });
+    }
+  }
+});
+```
+```cs
+// not support yet？
+```
+
+
+### 不带成员信息的精简模式
+
+普通对话最多可以容纳 500 个成员，在有些业务逻辑不需要对话的成员列表的情况下，可以使用「精简模式」进行查询，这样返回结果中不会包含成员列表（`members` 字段为空数组），有助于提升应用的性能同时减少流量消耗。
+
+```js
+query.compact(true);
+```
+```objc
+AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+[client openWithCallback:^(BOOL succeeded, NSError *error) {
+    AVIMConversationQuery *query = [client conversationQuery];
+    /* 指定不返回对话的成员列表 */
+    query.option = AVIMConversationQueryOptionCompact;
+    [query findConversationsWithCallback:^(NSArray *conversations, NSError *error) {
+        NSLog(@"找到 %ld 个对话！", [conversations count]);
+    }];
+}];
+```
+```java
+public void queryConversationCompact() {
+  AVIMClient tom = AVIMClient.getInstance("Tom");
+  tom.open(new AVIMClientCallback() {
+    @Override
+    public void done(AVIMClient client, AVIMException e) {
+      if (e == null) {
+        //登录成功
+        AVIMConversationsQuery query = client.getConversationsQuery();
+        query.setCompact(true);
+        query.findInBackground(new AVIMConversationQueryCallback() {
+          @Override
+          public void done(List<AVIMConversation> convs, AVIMException e) {
+            if (e == null) {
+              //获取符合查询条件的 Conversation 列表
+            }
+          }
+        });
+      }
+    }
+  });
+}
+```
+```cs
+// not support yet
+```
+
+### 让查询结果附带一条最新消息
+
+对于一个聊天应用，一个典型的需求是在对话的列表界面显示最后一条消息，默认情况下，针对对话的查询结果是不带最后一条消息的，需要单独打开相关选项：
+
+```js
+// withLastMessagesRefreshed 方法可以指定让查询结果带上最后一条消息
+query.withLastMessagesRefreshed(true);
+```
+```objc
+AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+[client openWithCallback:^(BOOL succeeded, NSError *error) {
+    AVIMConversationQuery *query = [client conversationQuery];
+    /* 设置查询选项，指定返回对话的最后一条消息 */
+    query.option = AVIMConversationQueryOptionWithMessage;
+    [query findConversationsWithCallback:^(NSArray *conversations, NSError *error) {
+        NSLog(@"找到 %ld 个对话！", [conversations count]);
+    }];
+}];
+```
+```java
+public void queryConversationWithLastMessage() {
+  AVIMClient tom = AVIMClient.getInstance("Tom");
+  tom.open(new AVIMClientCallback() {
+    @Override
+    public void done(AVIMClient client, AVIMException e) {
+      if (e == null) {
+        //登录成功
+        AVIMConversationsQuery query = client.getConversationsQuery();
+        /* 设置查询选项，指定返回对话的最后一条消息 */
+        query.setWithLastMessagesRefreshed(true);
+        query.findInBackground(new AVIMConversationQueryCallback() {
+          @Override
+          public void done(List<AVIMConversation> convs, AVIMException e) {
+            if (e == null) {
+              //获取符合查询条件的 Conversation 列表
+            }
+          }
+        });
+      }
+    }
+  });
+}
+```
+```cs
+// not support yet.
+```
+
+需要注意的是，这个选项真正的意义是「刷新对话的最后一条消息」，这意味着由于 SDK 缓存机制的存在，将这个选项设置为 false 查询得到的对话也还是有可能会存在最后一条消息的。
+
+### 查询缓存
+
+{{ docs.langSpecStart('js') }}
+JavaScript SDK 会对按照对话 id 对对话进行内存字典缓存，但不会进行持久化的缓存。
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('objc') }}
+
+通常，将查询结果缓存到磁盘上是一种行之有效的方法，这样就算设备离线，应用刚刚打开，网络请求尚未完成时，数据也能显示出来。或者为了节省用户流量，在应用打开的第一次查询走网络，之后的查询可优先走本地缓存。
+
+值得注意的是，默认的策略是先走本地缓存的再走网络的，缓存时间是一小时。AVIMConversationQuery 中有如下方法：
+
+```objc
+// 设置缓存策略，默认是 kAVCachePolicyCacheElseNetwork
+@property (nonatomic) AVCachePolicy cachePolicy;
+
+// 设置缓存的过期时间，默认是 1 小时（1 * 60 * 60）
+@property (nonatomic) NSTimeInterval cacheMaxAge;
+```
+
+有时你希望先走网络查询，发生网络错误的时候，再从本地查询，可以这样：
+
+```objc
+AVIMConversationQuery *query = [[AVIMClient defaultClient] conversationQuery];
+query.cachePolicy = kAVCachePolicyNetworkElseCache;
+[query findConversationsWithCallback:^(NSArray *objects, NSError *error) {
+
+}];
+```
+
+各种查询缓存策略的行为可以参考 [存储指南 · AVQuery 缓存查询](leanstorage_guide-objc.html#缓存查询) 一节
+
+{{ docs.langSpecEnd('objc') }}
+
+{{ docs.langSpecStart('java') }}
+
+通常，将查询结果缓存到磁盘上是一种行之有效的方法，这样就算设备离线，应用刚刚打开，网络请求尚未完成时，数据也能显示出来。或者为了节省用户流量，在应用打开的第一次查询走网络，之后的查询可优先走本地缓存。
+
+值得注意的是，默认的策略是先走本地缓存的再走网络的，缓存时间是一小时。AVIMConversationsQuery 中有如下方法：
+
+```java
+// 设置 AVIMConversationsQuery 的查询策略
+public void setQueryPolicy(AVQuery.CachePolicy policy);
+```
+
+有时你希望先走网络查询，发生网络错误的时候，再从本地查询，可以这样：
+
+```java
+AVIMConversationsQuery query = client.getConversationsQuery();
+query.setQueryPolicy(AVQuery.CachePolicy.NETWORK_ELSE_CACHE);
+query.findInBackground(new AVIMConversationQueryCallback() {
+  @Override
+  public void done(List<AVIMConversation> conversations, AVIMException e) {
+
+  }
+});
+```
+
+各种查询缓存策略的行为可以参考 [存储指南 · AVQuery 缓存查询](leanstorage_guide-android.html#缓存查询) 一节
+
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('cs') }}
+dotNet SDK 暂不支持缓存功能。
+{{ docs.langSpecEnd('cs') }}
+
 ### 性能优化建议
 
 Conversation 数据是存储在 LeanCloud 云端数据库中的，与存储服务中的对象查询类似，我们需要尽可能利用索引来提升查询效率，这里有一些优化查询的建议：

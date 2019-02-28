@@ -1335,14 +1335,207 @@ var query = tom.GetChatRoomQuery();
 消息等级在发送接口的参数中设置。以下代码演示了如何发送一个高等级的消息：
 
 ```js
+var { Realtime, TextMessage, MessagePriority } = require('leancloud-realtime');
+var realtime = new Realtime({ appId: 'GDBz24d615WLO5e3OM3QFOaV-gzGzoHsz', appKey: 'dlCDCOvzMnkXdh2czvlbu3Pk' });
+realtime.createIMClient('host').then(function (host) {
+    return host.createConversation({
+        members: ['broadcast'],
+        name: '2094 世界杯决赛梵蒂冈对阵中国比赛直播间',
+        transient: true
+    });
+}).then(function (conversation) {
+    console.log(conversation.id);
+    return conversation.send(new TextMessage('现在比分是 0:0，下半场中国队肯定要做出人员调整'), { priority: MessagePriority.HIGH });
+}).then(function (message) {
+    console.log(message);
+}).catch(console.error);
 ```
 ```objc
+// Tom 创建了一个 client，用自己的名字作为 clientId
+self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+// Tom 打开 client
+[self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+    // Tom 建立了与 Jerry 的会话
+    [self.client createConversationWithName:@"猫和老鼠" clientIds:@[@"Jerry"] callback:^(AVIMConversation *conversation, NSError *error) {
+        // Tom 发了一条消息给 Jerry
+
+        AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
+        option.priority = AVIMMessagePriorityHigh;
+        [conversation sendMessage:[AVIMTextMessage messageWithText:@"耗子，起床！" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+            // 在这里处理发送失败或者成功之后的逻辑
+        }];
+
+    }];
+}];
 ```
 ```java
+AVIMClient tom = AVIMClient.getInstance("Tom");
+    tom.open(new AVIMClientCallback() {
+      @Override
+      public void done(AVIMClient client, AVIMException e) {
+        if (e == null) {
+          // 创建名为“猫和老鼠”的对话
+          client.createConversation(Arrays.asList("Jerry"), "猫和老鼠", null,
+            new AVIMConversationCreatedCallback() {
+              @Override
+              public void done(AVIMConversation conv, AVIMException e) {
+                if (e == null) {
+                  AVIMTextMessage msg = new AVIMTextMessage();
+                  msg.setText("耗子，起床！");
+
+                  AVIMMessageOption messageOption = new AVIMMessageOption();
+                  messageOption.setPriority(AVIMMessageOption.MessagePriority.High);
+                  conv.sendMessage(msg, messageOption, new AVIMConversationCallback() {
+                    @Override
+                    public void done(AVIMException e) {
+                      if (e == null) {
+                        // 发送成功
+                      }
+                    }
+                  });
+                }
+              }
+            });
+        }
+      }
+    });
+```
+```cs
+// 我还能说什么
+```
+
+### 消息免打扰
+
+假如某一用户不想再收到某对话的消息提醒，但又不想直接退出对话，可以使用静音操作，即开启「免打扰模式」。
+
+比如 Tom 工作繁忙，对某个对话设置了静音：
+
+```js
+black.getConversation(CONVERSATION_ID).then(function(conversation) {
+  return conversation.mute();
+}).then(function(conversation) {
+  console.log('静音成功');
+}).catch(console.error.bind(console));
+```
+```objc
+- (void)tomMuteConversation {
+    // Tom 创建了一个 client，用自己的名字作为 clientId
+    self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+    // Tom 打开 client
+    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+        // Tom 查询 id 为 551260efe4b01608686c3e0f 的会话
+        AVIMConversationQuery *query = [self.client conversationQuery];
+        [query getConversationById:@"551260efe4b01608686c3e0f" callback:^(AVIMConversation *conversation, NSError *error) {
+            // Tom 将会话设置为静音
+            [conversation muteWithCallback:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    NSLog(@"修改成功！");
+                }
+            }];
+        }];
+    }];
+}
+```
+```java
+AVIMClient tom = AVIMClient.getInstance("Tom");
+tom.open(new AVIMClientCallback(){
+
+    @Override
+    public void done(AVIMClient client,AVIMException e){
+      if(e==null){
+      //登录成功
+      AVIMConversation conv = client.getConversation("551260efe4b01608686c3e0f");
+      conv.mute(new AVIMConversationCallback(){
+
+        @Override
+        public void done(AVIMException e){
+          if(e==null){
+          //设置成功
+          }
+        }
+      });
+      }
+    }
+});
+```
+```cs
+// not support yet
+```
+
+> 设置静音之后，iOS、Windows Phone 及启用混合推送的 Android 用户就不会收到推送消息了。
+
+与之对应的就是取消静音的操作（`Conversation#unmute` 方法），即取消免打扰模式。`mute` 和 `unmute` 操作会修改云端 `_Conversation` 里面的 `mu` 属性。**强烈建议开发者切勿在控制台中对 `mu` 随意进行修改**，否则可能会引起即时通讯云端的离线推送功能失效。
+
+
+### 查询成员数量
+
+`AVIMConversation#memberCount` 方法可以用来查询普通对话的成员总数，在聊天室中，它返回的就是实时在线的人数：
+
+```js
+chatRoom.count().then(function(count) {
+  console.log('在线人数: ' + count);
+}).catch(console.error.bind(console));
+```
+```objc
+- (void)tomCountsChatroomMembers{
+    // Tom 创建了一个 client，用自己的名字作为 clientId
+    self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+    NSString *conversationId=@"55dd9d7200b0c86eb4fdcbaa";
+    // Tom 打开 client
+    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+        // Tom 创建一个对话的查询
+        AVIMConversationQuery *query = [self.client conversationQuery];
+        // 根据已知 Id 获取对话实例，当前实例为聊天室。
+        [query getConversationById:conversationId callback:^(AVIMConversation *conversation, NSError *error) {
+            // 查询在线人数
+            [conversation countMembersWithCallback:^(NSInteger number, NSError *error) {
+                NSLog(@"%ld",number);
+            }];
+        }];
+    }];
+}
+```
+```java
+private void TomQueryWithLimit() {
+  AVIMClient tom = AVIMClient.getInstance("Tom");
+  tom.open(new AVIMClientCallback() {
+
+    @Override
+    public void done(AVIMClient client, AVIMException e) {
+      if (e == null) {
+        //登录成功
+        AVIMConversationsQuery query = tom.getConversationsQuery();
+        query.setLimit(1);
+        //获取第一个对话
+        query.findInBackground(new AVIMConversationQueryCallback() {
+          @Override
+          public void done(List<AVIMConversation> convs, AVIMException e) {
+            if (e == null) {
+              if (convs != null && !convs.isEmpty()) {
+                AVIMConversation conv = convs.get(0);
+                //获取第一个对话的
+                conv.getMemberCount(new AVIMConversationMemberCountCallback() {
+
+                  @Override
+                  public void done(Integer count, AVIMException e) {
+                    if (e == null) {
+                      Log.d("Tom & Jerry", "conversation got " + count + " members");
+                    }
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+    }
+  });
+}
 ```
 ```cs
 ```
-
 
 ### 消息内容的实时过滤
 
