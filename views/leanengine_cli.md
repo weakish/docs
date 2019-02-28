@@ -522,22 +522,6 @@ LeanCache 用户可以使用命令行工具来连接线上的 LeanCache 实例�
 
 {{ leanengine.leancacheWithCli() }}
 
-## 其他命令
-
-使用 `search` 命令可以方便地查询文档和资料：
-
-```sh
-$ lean search AVObject
-```
-
-这将打开浏览器，显示 [搜索结果](/search.html?q=AVObject)。
-
-也可以查询多个关键字，空格隔开即可：
-
-```sh
-$ lean search 云引擎 命令行
-```
-
 ### 自定义命令
 
 有时我们需要对某个应用进行特定并且频繁的操作，比如查看应用 `_User` 表的记录总数，这样可以使用命令行工具的自定义命令来实现。
