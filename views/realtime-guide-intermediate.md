@@ -37,13 +37,13 @@
 
 在一些多人聊天群里面，因为消息量较大，很容易就导致某一条重要的消息被刷下去了，所以在消息中「@成员」是一种提醒接收者注意的有效办法。在微信这样的聊天工具里面，甚至会在对话列表页对有提醒的消息进行特别展示，用来通知消息目标高优先级查看和处理。
 
-一般提醒消息都使用「@ +人名」来表示目标用户，但是这里「人名」是一个由应用层决定的属性，可能有的产品使用全名，有的使用昵称，并且这个名字和即时通讯服务里面标识一个用户使用的 `ClientId` 可能根本不一样（毕竟一个是给人看的，一个是给机器读的）。使用「人名」来圈定用户，还存在一种例外就是，聊天群组里面的用户名是可以改变的，如果消息发送的时候「王五」还叫「王五」，等发送出来之后他恰好同步改成了「王大麻子」，这时候接收方的处理就比较麻烦了。还有另外一个原因，就是「提醒全部成员」的表示方式，可能「@all」、「@group」、「@所有人」都会被选择。
+一般提醒消息都使用「@ +人名」来表示目标用户，但是这里「人名」是一个由应用层决定的属性，可能有的产品使用全名，有的使用昵称，并且这个名字和即时通讯服务里面标识一个用户使用的 `ClientId` 可能根本不一样（毕竟一个是给人看的，一个是给机器读的）。使用「人名」来圈定用户，还存在一种例外就是，聊天群组里面的用户名是可以改变的，如果消息发送的时候「王五」还叫「王五」，等发送出来之后他恰好同步改成了「王大麻子」，这时候接收方的处理就比较麻烦了。还有第三个原因，就是「提醒全部成员」的表示方式，可能「@all」、「@group」、「@所有人」都会被选择。
 
-所以「@ 提醒消息」并不能简单在文本消息中加入「@ +人名」来解决。LeanCloud 的方案是给普通消息（AVIMMessage）增加两个额外的属性：
+所以「@ 提醒消息」并不能简单在文本消息中加入「@ +人名」来解决。LeanCloud 的方案是给普通消息（`AVIMMessage`）增加两个额外的属性：
 - `mentionList`，是一个字符串的数组，用来单独记录被提醒的 ClientId 列表；
 - `mentionAll`，是一个 Bool 型的标志位，用来表示是否要提醒全部成员。
 
-带有提醒信息的消息，有可能既有提醒全部成员的标志，也还单独设置了 `mentionList`，这由应用层去控制。发送方在发送「@ 提醒消息」的时候，如何输入、选择成员名称，这是业务方 UI 层面需要解决的问题，即时通讯 SDK 不关心其实现逻辑，SDK 只要求开发者在发送一条「@ 提醒」消息的时候调用，调用 `mentionList` 和 `mentionAll` 的 setter 方法，设置正确的成员列表即可。示例代码如下：
+带有提醒信息的消息，有可能既有提醒全部成员的标志，也还单独设置了 `mentionList`，这由应用层去控制。发送方在发送「@ 提醒消息」的时候，如何输入、选择成员名称，这是业务方 UI 层面需要解决的问题，即时通讯 SDK 不关心其实现逻辑，SDK 只要求开发者在发送一条「@ 提醒」消息的时候，调用 `mentionList` 和 `mentionAll` 的 setter 方法，设置正确的成员列表即可。示例代码如下：
 
 ```js
 const message = new TextMessage(`@Tom 早点回家`).setMentionList('Tom');
@@ -193,7 +193,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 终端用户在消息发送之后，还可以对自己已经发送的消息进行修改（`Conversation#updateMessage` 方法）或撤回（`Conversation#recallMessage` 方法），目前即时通讯服务端并没有在时效性上进行限制，不过只允许用户修改或撤回自己发出去的消息，对别人的消息进行修改或撤回是会返回错误的（错误码：）。
 
-例如 Tom 要撤回一条自己之前发送过的消息，示例代码如下：
+如果 Tom 要***撤回一条自己之前发送过的消息***，示例代码如下：
 
 ```js
 conversation.recall(oldMessage).then(function(recalledMessage) {
@@ -263,9 +263,9 @@ private void Tom_OnMessageRecalled(object sender, AVIMMessagePatchEventArgs e)
 }
 ```
 
-对于 Android 和 iOS SDK 来说，如果消息缓存的选项是打开的时候，SDK 内部需要保证数据的一致性，所以会先从缓存中删除这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（此时消息列表中的消息会直接变少）。
+对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部需要保证数据的一致性，所以会先从缓存中删除这条消息记录，然后再通知应用层。对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（此时消息列表中的消息会直接变少，或者显示撤回提示）。
 
-Tom 除了直接删除出错消息之外，还可以修改那条消息，例如：
+Tom 除了删除出错消息之外，还可以***直接修改原来的消息***。这时候不是直接在老的消息对象上修改，而是像发新消息一样创建一个消息实例，然后调用 `Conversation#updateMessage(oldMessage, newMessage)` 方法来向云端提交请求（dotNet SDK 接口例外），示例代码如下：
 
 ```js
 var newMessage = new TextMessage('new message');
@@ -280,11 +280,11 @@ AVIMMessage *oldMessage = <#MessageYouWantToUpdate#>;
 AVIMMessage *newMessage = [AVIMTextMessage messageWithText:@"Just a new message" attributes:nil];
 
 [conversation updateMessage:oldMessage
-                    toNewMessage:newMessage
-                        callback:^(BOOL succeeded, NSError * _Nullable error) {
-                            if (succeeded) {
-                                NSLog(@"Message has been updated.");
-                            }
+              toNewMessage:newMessage
+                  callback:^(BOOL succeeded, NSError * _Nullable error) {
+                      if (succeeded) {
+                          NSLog(@"Message has been updated.");
+                      }
 }];
 ```
 ```java
@@ -300,13 +300,13 @@ imConversation.updateMessage(oldMessage, textMessage, new AVIMMessageUpdatedCall
 });
 ```
 ```cs
-// 直接修改对应的内容
+// dotNot SDK 接口不太一样，允许直接修改对应的内容
 textMessage.TextContent = "修改之后的文本消息内容";
 // 将修改后的消息传入 ModifyAsync
 conversation.ModifyAsync(textMessage);
 ```
 
-Tom 成功调用 `updateMessage` 方法之后，对话内的其他成员会对应的是接收方会接收到 `MESSAGE_UPDATE` 事件：
+Tom 将消息修改成功之后，对话内的其他成员会立刻接收到 `MESSAGE_UPDATE` 事件：
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -343,15 +343,28 @@ private void Tom_OnMessageModified(object sender, AVIMMessagePatchEventArgs e)
 }
 ```
 
-对于 Android 和 iOS SDK 来说，如果消息缓存的选项是打开的时候，SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（这时候消息列表会出现内容变化）。
+对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（这时候消息列表会出现内容变化）。
 
-### 发送暂态消息
+### 发送「暂态消息」
 
-有时候我们需要发送一些特殊的消息，譬如聊天过程中「某某正在输入...」这样的实时状态信息，或者当群聊的名称修改以后给该群成员的「群名称被某某修改为...」这样的通知信息，这类消息与终端用户发送的消息不一样，它不要求保存到历史消息里面去，不要求一定会被送达（如果成员不在线或者现在网络异常，那么没有下发下去也无所谓），这种需求可以使用「暂态消息」来实现。
+有时候我们需要发送一些特殊的消息，譬如聊天过程中「某某正在输入...」这样的实时状态信息，或者当群聊的名称修改以后给该群成员发送「群名称被某某修改为...」这样的通知信息。这类消息与终端用户发送的消息不一样，发送者不要求把它保存到历史记录里，也不要求一定会被送达（如果成员不在线或者现在网络异常，那么没有下发下去也无所谓），这种需求可以使用「暂态消息」来实现。
 
-「暂态消息」是一种特殊的消息，它不会被自动保存到云端，以后在历史消息中无法找到它，也不支持延迟接收，离线用户更不会收到推送通知，所以适合用来发送一些实时的、变化的状态信息，或者用来实现简单的控制协议。暂态消息的数据和构造方式与普通消息是一样的，只是其发送方式与普通消息有一些区别。到目前为止，我们演示的 `AVIMConversation` 发送消息接口都是这样的：
+「暂态消息」是一种特殊的消息，与普通消息相比有以下几点不同：
+
+- 它不会被自动保存到云端，以后在历史消息中无法找到它
+- 只发送给当时在线的成员，不支持延迟接收，离线用户更不会收到推送通知
+- 对当时在线成员也不保证百分百送达，如果因为当时网络原因导致下发失败，服务端不会重试
+
+我们可以用「暂态消息」发送一些实时的、频繁变化的状态信息，或者用来实现简单的控制协议。
+
+暂态消息的数据和构造方式与普通消息是一样的，只是其发送方式与普通消息有一些区别。到目前为止，我们演示的 `AVIMConversation` 发送消息接口都是这样的：
 
 ```js
+/**
+ * 发送消息
+ * @param  {Message} message 消息，Message 及其子类的实例
+ * @return {Promise.<Message>} 发送的消息
+ */
 async send(message)
 ```
 ```objc
@@ -428,7 +441,7 @@ public Task<IAVIMMessage> SendMessageAsync(IAVIMMessage avMessage, AVIMSendOptio
 - 是否为「遗愿消息」（设置 `will` 属性，后续章节会说明）
 - 消息对应的离线推送内容（设置 `pushData` 属性，后续章节会说明），如果消息接收方不在线，会推送指定的内容。
 
-例如我们需要让 Tom 在聊天页面的输入框获得焦点的时候，给群内成员同步一条「Tom is typing...」的状态信息，可以使用如下代码：
+如果我们需要让 Tom 在聊天页面的输入框获得焦点的时候，给群内成员同步一条「Tom is typing...」的状态信息，可以使用如下代码：
 
 ```js
 const message = new TextMessage('Tom is typing...');
@@ -465,16 +478,16 @@ var option = new AVIMSendOptions(){Transient = true};
 await conv.SendAsync(textMessage, option);
 ```
 
-暂态消息的接收逻辑和普通消息一样，开发者可以按照消息类型进行判断和处理，这里不再赘述。
+暂态消息的接收逻辑和普通消息一样，开发者可以按照消息类型进行判断和处理，这里不再赘述。上面使用了内建的文本消息只是一种示例，从展现端来说，我们如果使用特定的类型来表示「暂态消息」，是一种更好的方案。LeanCloud 即时通讯 SDK 并没有提供固定的「暂态消息」类型，可以由开发者根据自己的业务需要来实现专门的自定义，具体可以参考后述章节：[扩展自己的消息类型](#扩展自己的消息类型)。
 
 ### 消息回执
 
-LeanCloud 即时通讯服务端在进行消息投递的时候，内部协议上会要求 SDK 对收到的每一条消息进行确认（ack）。如果 SDK 收到了消息，但是在发送 ack 的过程中出现网络丢包，即时通讯服务端还是会认为消息没有投递下去，之后会再次投递，直到收到 SDK 的应答确认为止。与之对应，SDK 内部也进行了消息去重处理，保证在上面这种极端条件下应用层也不会收到重复的消息。所以我们的消息系统从协议上是可以保证不丢任何一条消息的。
+LeanCloud 即时通讯服务端在进行消息投递的时候，会按照消息上行的时间先后顺序下发（先收到的消息先下发，保证顺序性），且内部协议上会要求 SDK 对收到的每一条消息进行确认（ack）。如果 SDK 收到了消息，但是在发送 ack 的过程中出现网络丢包，即时通讯服务端还是会认为消息没有投递下去，之后会再次投递，直到收到 SDK 的应答确认为止。与之对应，SDK 内部也进行了消息去重处理，保证在上面这种异常条件下应用层也不会收到重复的消息。所以我们的消息系统从协议上是可以保证不丢任何一条消息的。
 
-不过，有些业务场景会对消息投递的细节有更高的要求，例如消息的发送方要能知道什么时候接收方收到了这条消息，什么时候 ta 又点开阅读了这条消息。有一些偏重工作写作或者私密沟通的产品，消息发送者在发送一条消息之后，还希望能看到消息被送达和阅读的实时状态，甚至还要提醒未读成员。这样苛刻的需求，就依赖于我们的「消息回执」功能来实现。
+不过，有些业务场景会对消息投递的细节有更高的要求，例如消息的发送方要能知道什么时候接收方收到了这条消息，什么时候 ta 又点开阅读了这条消息。有一些偏重工作写作或者私密沟通的产品，消息发送者在发送一条消息之后，还希望能看到消息被送达和阅读的实时状态，甚至还要提醒未读成员。这样「苛刻」的需求，就依赖于我们的「消息回执」功能来实现。
 
-与上一节「暂态消息」的发送类似，要使用消息回执功能，需要在发送消息时标记「需要回执」选项：
-{{ docs.note("只有在发送时设置了「需要回执」的标记，云端才会发送回执，默认不发送回执。") }}
+与上一节「暂态消息」的发送类似，要使用消息回执功能，需要在发送消息时在 `AVIMMessageOption` 参数中标记「需要回执」选项：
+{{ docs.note("只有在发送时设置了「需要回执」的标记，云端才会发送回执，默认不发送回执，且目前消息回执只支持单聊对话（成员不超过 2 人）。") }}
 
 ```js
 var message = new TextMessage('very important message');
@@ -508,7 +521,7 @@ await conv.SendAsync(textMessage, option);
 
 #### 送达回执
 
-当接收方收到消息之后，云端会向发送方发出一个回执通知，表明消息已经送达。**请注意与「已读回执」区别开**，另外送达回执**仅支持单聊**。
+当接收方收到消息之后，云端会向发送方发出一个回执通知，表明消息已经送达。**请注意与「已读回执」区别开**。
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -552,13 +565,49 @@ conversaion.OnMessageDeliverd += (s, e) =>
 await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
 ```
 
+请注意这里送达回执的内容，不是某一条具体的消息，而是当前对话内最后一次送达消息的时间戳（`lastDeliveredAt`）。最开始我们有过解释，服务端在下发消息的时候，是能够保证顺序的，所以在送达回执的通知里面，我们不需要对逐条消息进行确认，只给出当前确认送达的最新消息的时间戳，那么在这之前的所有消息就都是已经送达的状态。在 UI 层展示的时候，可以将早于 `lastDeliveredAt` 的消息都标记为「已送达」。
+
 #### 已读回执
 
-对方「阅读」了消息之后，云端会向发送方发出一个回执通知，表明消息已被阅读。和送达回执一样，已读回执目前也**仅支持单聊**。
+消息送达只是即时通讯服务端和客户端之间的投递行为完成了，可能终端用户并没有进入对话聊天页面，或者根本没有激活应用（Android 平台应用在后台也是可以收到消息的），所以「送达」并不等于终端用户真正「看到」了这条消息。
+
+LeanCloud 即时通讯服务还支持「已读」消息的回执，不过这首先需要接收方显式完成消息「已读」的确认。
+
+由于即时通讯服务端是顺序下发新消息的，客户端不需要对每一条消息单独进行「已读」确认。我们设想的场景如下图所示，
+
+<img src="images/realtime_read_confirm.png" width="400" class="responsive">
+
+用户在进入一个对话的时候，一次性清除当前对话的所有未读消息即可。Conversation 的清除接口如下：
+
+```js
+/**
+ * 将该会话标记为已读
+ * @return {Promise.<this>} self
+ */
+async read();
+```
+```objc
+/*!
+ 将对话标记为已读。
+ 该方法将本地对话中其他成员发出的最新消息标记为已读，该消息的发送者会收到已读通知。
+ */
+- (void)readInBackground;
+```
+```java
+/**
+ * 清除未读消息
+ */
+public void read();
+```
+```cs
+// not support yet.
+```
+
+对方「阅读」了消息之后，云端会向发送方发出一个回执通知，表明消息已被阅读。
 
 > 注意：要使用已读回执，应用需要先开启[未读消息数更新通知](#未读消息数更新通知)选项。
 
-例如 Tom 和 Jerry 聊天，Tom 想知道 Jerry 是否阅读了自己发去的消息：
+Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的消息，这时候双方的处理流程是这样的：
 
 1. Tom 向 Jerry 发送一条消息，且标记为「需要回执」：
   
@@ -600,9 +649,7 @@ await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
     });
     ```
     ```cs
-    var textMessage = new AVIMTextMessage("very important message");
-    var option = new AVIMSendOptions(){Receipt = true};
-    await conv.SendAsync(textMessage, option);
+    // not support yet.
     ```
 
 2. Jerry 阅读 Tom 发的消息后，调用对话上的 `read` 方法把「对话中最近的消息」标记为已读：
@@ -659,11 +706,11 @@ await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
 
 ### Will（遗愿）消息
 
-LeanCloud 即时通讯服务还支持一类比较特殊的消息：Will（遗愿）消息。「Will 消息」是在一个用户突然掉线之后，系统自动通知对话的其他成员关于该成员已掉线的消息。好似在掉线后要给对话中的其他成员一个妥善的交待，所以被戏称为「遗愿」消息，如下图中的「Tom 已掉线，无法收到消息」。
+LeanCloud 即时通讯服务还支持一类比较特殊的消息：Will（遗愿）消息。「Will 消息」是在一个用户突然掉线之后，系统自动通知对话的其他成员关于该成员已掉线的消息，好似在掉线后要给对话中的其他成员一个妥善的交待，所以被戏称为「遗愿」消息，如下图中的「Tom 已掉线，无法收到消息」。
 
 <img src="images/lastwill-message.png" width="400" class="responsive">
 
-要发送 Will 消息，用户需要设定好消息内容（可能包含了一些业务逻辑相关的内容）发给云端，云端并不会将其马上发送给对话的成员，而是缓存下来，一旦检测到该用户掉线，云端立即将这条遗愿消息发送出去。开发者可以利用它来构建自己的断线通知的逻辑。
+要发送 Will 消息，用户需要设定好消息内容发给云端，云端并不会将其马上发送给对话的成员，而是缓存下来，一旦检测到该用户掉线，云端立即将这条遗愿消息发送出去。开发者可以利用它来构建自己的断线通知的逻辑。
 
 ```js
 var message = new TextMessage('我掉线了');
@@ -713,19 +760,20 @@ var sendOptions = new AVIMSendOptions()
 await conversation.SendAsync(message, sendOptions);
 ```
 
-客户端发送完毕之后就完全不用再关心这条消息了，云端会自动在发送方掉线后通知其他成员。
+客户端发送完毕之后就完全不用再关心这条消息了，云端会自动在发送方异常掉线后通知其他成员，接收端则根据自己的需求来做 UI 的展现。
 
 Will 消息有**如下限制**：
 
-- 同一时刻只对一个对话生效
-- 当 client 主动 close 时，遗愿消息不会下发，系统会认为这是计划性下线。
+- Will 消息是与当前用户绑定的，并且只对最后一次设置的「对话+消息」生效。如果用户在多个对话中设置了 Will 消息，那么只有最后一次设置有效；如果用户在同一个对话中设置了多条 Will 消息，也只有最后一次设置有效。
+- Will 消息不会进入目标对话的消息历史记录。
+- 当用户主动退出即时通讯服务时，系统会认为这是计划性下线，不会下发 Will 消息（如有）。
 
-接收到遗愿消息的客户端需要根据自己的消息内容来做 UI 的展现。
 
-### 本地发送失败消息的处理
+### 本地发送失败的消息
 
-有时你可能需要将发送失败的消息临时保存到客户端本地的缓存中，等到合适时机再进行处理。例如，将由于网络突然中断而发送失败的消息先保留下来，待网络恢复后再由用户选择是否重发。
-即时通讯 Android 和 iOS SDK 默认提供了消息本地缓存的功能，消息缓存中保存的都是已经成功上行到云端的消息，并且能够保证和云端的数据同步。为了方便开发者，SDK 也支持将一时失败的消息加入到缓存中，以后从缓存中取出来还能再次发送（且多次发送也不会造成服务端消息重复）。
+有时你可能需要将发送失败的消息临时保存到客户端本地的缓存中，等到合适时机再进行处理。例如，将由于网络突然中断而发送失败的消息先保留下来，在消息列表中展示这种消息时，额外添加出错的提示符号和重发按钮，待网络恢复后再由用户选择是否重发。
+
+即时通讯 Android 和 iOS SDK 默认提供了消息本地缓存的功能，消息缓存中保存的都是已经成功上行到云端的消息，并且能够保证和云端的数据同步。为了方便开发者，SDK 也支持将一时失败的消息加入到缓存中，
 
 将消息加入缓存的代码如下：
 
@@ -757,36 +805,32 @@ conversation.removeFromLocalCache(message);
 // 不支持
 ```
 
-UI 上可以根据 message.status 的属性值来做不同的展现，例如当 status 属性变为 `AVIMMessageStatusFailed` 时表示消息发送失败，这时可以在消息旁边显示一个重新发送的按钮。
+从缓存中取出来的消息，在 UI 展示的时候可以根据 message.status 的属性值来做不同的处理，status 属性为 `AVIMMessageStatusFailed` 时即表示是发送失败了的本地消息，这时可以在消息旁边显示一个重新发送的按钮。通过将失败消息加入到 SDK 缓存中，还有一个好处就是，消息从缓存中取出来再次发送，不会造成服务端消息重复，因为 SDK 有做专门的去重处理。
 
-## 离线状态时的消息同步
+## 离线推送通知
 
-对于移动设备来说，在聊天的过程中总会有部分客户端临时下线，如何保证离线用户也能收到消息，并且长时间离线也不会丢失消息，LeanCloud 提供了两种机制来应对这种挑战：
+对于移动设备来说，在聊天的过程中部分客户端难免会临时下线，如何保证离线用户也能及时收到消息，是我们需要考虑的重要问题。LeanCloud 即时通讯云端会在用户下线的时候，主动通过「Push Notification」这种外部方式来通知客户端新消息到达事件，以促使用户尽快打开应用查看新消息。
 
-1. 一种是**离线推送通知**。这是即时通讯云端在客户端下线的时候，主动通过 Push Notification 这种外部方式来通知客户端新消息到达事件，以促使客户端尽快打开应用查看新消息。
+![image](images/realtime_ios_push.png)
 
-  ![image](images/realtime_ios_push.png)
-2. 另一种是**未读消息更新通知**。客户端如果长时间下线，会导致大量消息无法下发，这时候即时通讯云端会记录下该客户端在参与的每一个对话中拉取的最后一条消息的时间戳，当客户端重新联网并登录上来的时候，云端会实时计算下线时间段内其参与过的对话中的新消息数量，以「未读消息数更新」的事件通知到客户端，然后客户端可在需要的时候来拉取这些消息。
+LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在将推送与即时通讯服务无缝结合起来，LeanCloud 云端会将用户的即时通讯 ClientId 与推送服务的设备数据 Installation 自动进行关联。当用户 A 发出消息后，如果对话中部分成员当前不在线，而且这些成员使用的是 iOS、Windows Phone 设备，或者是成功开通 [混合推送功能](android_mixpush_guide.html) 的 Android 设备的话，LeanCloud 云端会自动将即时通讯消息转成特定的推送通知发送至客户端，同时我们也提供扩展机制，允许开发者对接第三方的消息推送服务。
 
-### 离线推送通知
-
-离线消息推送通知是即时通讯服务默认提供的外部通知方式。不管是单聊还是群聊，当用户 A 发出消息后，如果目标对话的部分用户当前不在线，而且这些用户使用的是 iOS、Windows Phone 设备，或者有效开通了混合推送的 Android 设备的话，LeanCloud 云端可以提供离线推送的方式将消息提醒发送至客户端。
-
-要想使用本功能，用户需要指定 **自定义推送的内容**，目前有三种方式可以做到：
+要有效使用本功能，关键在于 **自定义推送的内容**。我们提供三种方式允许开发者来指定推送内容：
 
 1. 静态配置提醒消息
-  由于不同平台的不同限制，且用户的消息正文可能还包含上层协议，所以我们允许用户在控制台中为应用设置一个静态的 JSON，推送一条内容固定的通知。
 
-  进入 [控制台 > 消息 > 实时消息 > 设置 > 离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
+  用户可以在控制台中为应用设置一个全局的静态 JSON 字符串，指定固定内容来发送通知。例如，我们进入 [控制台 > 消息 > 实时消息 > 设置 > 离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
   ```
   {"alert":"您有新的消息", "badge":"Increment"}
   ```
-  注意，`badge` 参数为 iOS 设备专用，且 `Increment` 大小写敏感，表示自动增加应用 badge 上的数字计数。清除 badge 的操作请参考 [iOS 推送指南 &middot; 清除 badge](ios_push_guide.html#清除_Badge)。
-  
+  那么在有新消息到达的时候，符合条件的离线用户会收到一条「您有新消息」的通知栏消息。
+
+  注意，这里 `badge` 参数为 iOS 设备专用，且 `Increment` 大小写敏感，表示自动增加应用 badge 上的数字计数。清除 badge 的操作请参考 [iOS 推送指南 &middot; 清除 badge](ios_push_guide.html#清除_Badge)。
   此外，对于 iOS 设备您还可以设置声音等推送属性，具体的字段可以参考[推送 &middot; 消息内容 Data](./push_guide.html#消息内容_Data)。
 
 2. 客户端发送消息的时候额外指定推送信息
-  第一种方法虽然发出去了通知，但是因为通知文本与实际消息内容完全无关，所以可能也不太完美。即时通讯服务允许客户端在发送消息的时候，指定附加的推送信息，以便在部分接收者离线的时候转为动态内容将消息推送到用户设备上，其示例代码如下：
+
+  第一种方法虽然发出去了通知，但是因为通知文本与实际消息内容完全无关，存在一些不足。有没有办法让推送消息的内容与即时通讯消息动态相关呢？还记得我们发送「暂态消息」时的 `AVIMMessageOption`参数吗？即时通讯 SDK 允许客户端在发送消息的时候，指定附加的推送信息（在 `AVIMMessageOption` 中设置 `pushData` 属性），这样在需要离线推送的时候我们就会使用这里设置的内容来发出推送通知。示例代码如下：
 
   ```js
   var { Realtime, TextMessage } = require('leancloud-realtime');
@@ -854,30 +898,31 @@ UI 上可以根据 message.status 的属性值来做不同的展现，例如当 
   ```
 
 3. 服务端动态生成通知内容
-  第二种方法虽然动态，但是需要在客户端发送消息的时候提前准备好推送内容，这对于开发阶段的要求比较高，并且在灵活性上有比较大的限制，所以我们还提供了一种方式，可以让开发者在推送动态内容的时候，也不失灵活性。
-  这种方式需要在云引擎中使用 Hook 函数统一设置离线推送消息内容，感兴趣的开发者可以参阅下述文档：
 
-  - [云引擎 Hook `_receiversOffline`](#_receiversOffline) 
-  - [云引擎 PHP 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-php.html#_receiversOffline)
-  - [云引擎 NodeJS 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-node.html#_receiversOffline)
-  - [云引擎 Python 即时通讯 Hook#_receiversOffline](leanengine_cloudfunction_guide-python.html#_receiversOffline)
+  第二种方法虽然动态，但是需要在客户端发送消息的时候提前准备好推送内容，这对于开发阶段的要求比较高，并且在灵活性上有比较大的限制，所以看上去也不够完美。
+  我们还提供了第三种方式，让开发者在推送动态内容的时候，也不失实现上的灵活性。这种方式需要使用 [即时通讯 Hook 机制](realtime-guide-systemconv.html#万能的 Hook 机制)在服务端来统一指定离线推送消息内容，感兴趣的开发者可以参阅下述文档：
+
+  - [详解消息 hook 与系统对话的使用](realtime-guide-systemconv.html#_receiversOffline) 
+  - [即时通讯 Hook（云引擎 PHP 开发）](leanengine_cloudfunction_guide-php.html#_receiversOffline)
+  - [即时通讯 Hook（云引擎 NodeJS 开发）](leanengine_cloudfunction_guide-node.html#_receiversOffline)
+  - [即时通讯 Hook（云引擎 Python 开发）](leanengine_cloudfunction_guide-python.html#_receiversOffline)
 
 
-三种方式之间的优先级如下：
-**服务端动态生成通知 > 客户端发送消息的时候额外指定推送信息 > 静态配置提醒消息**
+三种方式之间的优先级如下：**服务端动态生成通知 > 客户端发送消息的时候额外指定推送信息 > 静态配置提醒消息**。
+
 也就是说如果开发者同时采用了多种方式来指定消息推送，那么有服务端动态生成的通知的话，最后以它为准进行推送。其次是客户端发送消息的时候额外指定推送内容，最后是静态配置的提醒消息。
 
-##### 限制
+### 实现原理与限制
 
-通知的过期时间是 7 天，也就是说，如果一个设备 7 天内没有连接到 APNs、MPNs 或设备对应的混合推送平台，系统将不会再给这个设备推送通知。
+同时使用了 LeanCloud 推送服务和即时通讯服务的应用，客户端在成功登录即时通讯服务时，SDK 会自动关联当前的 `ClientID` 和设备数据（推送服务中的 `Installation` 表）。关联的方式是通过让目标设备**订阅**名为 `ClientID` 的 Channel 实现的。开发者可以在数据存储的 `_Installation` 表中的 `channels` 字段查到这组关联关系。在实际离线推送时，云端系统会根据用户 ClientID 找到对应的关联设备进行推送。
 
-##### 实现原理
+由于即时通讯触发的推送量比较大，内容单一， 所以推送服务云端不会保留这部分记录，开发者在 **控制台 > 消息 > 推送记录** 中也无法找到这些记录。
 
-这部分平台的用户，在完成登录时，SDK 会自动关联当前的 Client ID 和设备。关联的方式是通过设备**订阅**名为 Client ID 的 Channel 实现的。开发者可以在数据存储的 `_Installation` 表中的 `channels` 字段查到这组关联关系。在实际离线推送时，系统根据用户 Client ID 找到对应的关联设备进行推送。由于即时通讯触发的推送量比较大，内容单一， 所以云端不会保留这部分记录，在 **控制台 > 消息 > 推送记录** 中也无法找到这些记录。
+LeanCloud 推送服务的通知过期时间是 7 天，也就是说，如果一个设备 7 天内没有连接到 APNs、MPNs 或设备对应的混合推送平台，系统将不会再给这个设备推送通知。
 
-##### 其他设置
+### 其他推送设置
 
-推送默认使用**生产证书**，你也可以在 JSON 中增加一个 `_profile` 内部属性来选择实际推送的证书，如：
+推送默认使用**生产证书**，开发者可以在 JSON 中增加一个 `_profile` 内部属性来选择实际推送的证书，如：
 
 ```json
 {
@@ -886,7 +931,7 @@ UI 上可以根据 message.status 的属性值来做不同的展现，例如当 
 }
 ```
 
-Apple 不支持在一次推送中向多个从属于不同 Team Id 的设备发推送。在使用 iOS Token Authentication 的鉴权方式后，如果应用配置了多个不同 Team Id 的 Private Key，请确认目标用户设备使用的 APNs Team ID 并将其填写在 `_apns_team_id` 参数内，以保证推送正常进行，只有指定 Team ID 的设备能收到推送。如：
+Apple 不允许在一次推送请求中向多个从属于不同 Team Id 的设备发推送。在使用 iOS Token Authentication 的鉴权方式后，如果应用配置了多个不同 Team Id 的 Private Key，请确认目标用户设备使用的 APNs Team ID 并将其填写在 `_apns_team_id` 参数内，以保证推送正常进行，只有指定 Team ID 的设备能收到推送。如：
 
 ```json
 {
@@ -897,7 +942,7 @@ Apple 不支持在一次推送中向多个从属于不同 Team Id 的设备发�
 
 `_profile` 和 `_apns_team_id` 属性均不会实际推送。
 
-目前，设置界面的推送内容支持部分内置变量，你可以将上下文信息直接设置到推送内容中：
+目前，[控制台 > 消息 > 实时消息 > 设置 > 离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)这里的推送内容也支持一些内置变量，你可以将上下文信息直接设置到推送内容中：
 
 * `${convId}` 推送相关的对话 ID
 * `${timestamp}` 触发推送的时间戳（Unix 时间戳）
@@ -909,9 +954,30 @@ iOS 和 Android 分别提供了内置的离线消息推送通知服务，但是�
 2. [Android 消息推送开发指南](android_push_guide.html)/[iOS 消息推送开发指南](ios_push_guide.html)
 3. [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)
 
+## 离线消息同步
+
+离线推送通知是一种提醒用户的非常有效手段，但是如果用户不上线，即时通讯的消息就总是无法下发，客户端如果长时间下线，会导致大量消息堆积在云端，此后如果用户再上线，我们该如何处理才能保证消息完全不丢失呢？
+
+LeanCloud 提供两种方式进来同步离线消息：
+- 一种是云端主动往客户端「推」的方式。云端会记录用户在每一个参与对话中接收消息的位置，在用户登录上线后，会以对话为单位来主动、多次推送离线消息（客户端按照新消息进行处理）。对每个对话，云端推送至多 20 条离线消息，更多消息则不会推送。
+- 另一种是客户端主动从云端「拉」的方式。云端会记录下用户在每一个参与对话中接收消息的位置，在用户登录上线后，实时计算出用户离线期间产生未读消息的对话列表及对应的未读消息数，以「未读消息数更新」的事件通知到客户端，然后客户端在需要的时候来主动拉取这些离线消息。
+
+第一种方式实现简单，但是因为云端对一个对话只主动推送 20 条离线消息，更多未读消息对客户端来说是透明的，所以只能满足一些轻量级的应用需求，如果产品层要在一个对话内显示消息阅读的进度，或者用精确的未读消息数来提示用户，就无法做到了。因此我们现在都切换到了第二种客户端主动「拉」的方式。
+
+由于历史原因，不同平台的 SDK 对两种方式的支持度是不一样的：
+1. Android、iOS SDK 同时支持这两种方式，且默认是「推」的方式
+2. JavaScript SDK 默认支持「拉」的方式
+3. dotNet SDK 目前还不支持第二种方式。
+
+> 注意，请不要混合使用上面两种方式，比如在 iOS 平台使用第一种方式获取离线消息，而 Android 平台使用第二种方式获取离线消息，可能导致所有离线消息无法正常获取。
+
+未读数量方式：云端会返回离线期间产生未读消息的对话列表及未读消息数，开发者可以根据这个通知拉取离线消息记录收取离线消息，这种方式下开发者对消息的数量可以完全的控制；
+
+这时候即时通讯云端会记录下该客户端在参与的每一个对话中拉取的最后一条消息的时间戳，当客户端重新联网并登录上来的时候，云端会实时计算下线时间段内其参与过的对话中的新消息数量，以「未读消息数更新」的事件通知到客户端，然后客户端可在需要的时候来拉取这些消息。
+
 ### 未读消息数更新通知
 
-对于 js SDK 来说，未读消息数量通知是默认的未读消息处理方式。对于 Android 和 iOS SDK 来说，则需要在 AVOSCloud 初始化语句后面加上：
+「未读消息数更新通知」是客户端主动拉取离线消息这一同步方案的主要变化点，客户端只有设置了主动拉取的方式，云端才会在必要的时候下发这一通知。如前所述，对于 JavaScript SDK 来说，默认就是客户端主动拉取未读消息，所以不需要再做什么设置。对于 Android 和 iOS SDK 来说，则需要在 AVOSCloud 初始化语句后面加上如下语句，明确切换到「拉取」的离线消息同步方式：
 
 ```js
 // 默认支持，无需额外设置
@@ -926,13 +992,14 @@ AVIMClient.setUnreadNotificationEnabled(true);
 // 尚不支持
 ```
 
-所有 SDK 都会在 `AVIMConversation` 上维护 `unreadMessagesCount` 字段，这个字段在变化时 `IMClient` 会派发 `未读消息数量更新（UNREAD_MESSAGES_COUNT_UPDATE）` 事件。这个字段会在下面这些情况下发生变化：
+> （？？待确认）
 
-- 登录时，服务端通知对话的未读消息数
-- 收到在线消息
-- 用户将对话标记为已读
+客户端 SDK 会在 `AVIMConversation` 上维护一个 `unreadMessagesCount` 字段，来统计当前对话中存在有多少未读消息。
+客户端用户登录之后，云端会以「未读消息数更新」事件的形式，将当前用户所在的多对 `<Conversation, unReadMessageCount>` 数据通知到客户端，这就是客户端维护的 `<Conversation, unReadMessageCount>` 初始值。之后 SDK 在收到新的在线消息的时候，会自动增加对应的 `unReadMessageCount` 计数。直到用户把某一个对话的未读消息清空，这时候云端和 SDK 的 `<Conversation, unReadMessageCount>` 计数都会清零。
 
-开发者应当监听 UNREAD_MESSAGES_COUNT_UPDATE 事件，在对话列表界面上更新这些对话的未读消息数量。
+> 注意：开启未读消息数后，即使客户端在线收到了消息，未读消息数量也会增加，因此开发者需要在合适时机重置未读消息数。
+
+客户端 SDK 在 `<Conversation, unReadMessageCount>` 数字变化的时候，会通过 `IMClient` 派发 `未读消息数量更新（UNREAD_MESSAGES_COUNT_UPDATE）` 事件到应用层。开发者应当监听 `UNREAD_MESSAGES_COUNT_UPDATE` 事件，在对话列表界面上更新这些对话的未读消息数量。
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -961,46 +1028,27 @@ onUnreadMessagesCountUpdated(AVIMClient client, AVIMConversation conversation) {
 // 尚不支持
 ```
 
-清除对话未读消息数的唯一方式是调用 Conversation#read 方法将对话标记为已读，一般来说开发者至少需要在下面两种情况下将对话标记为已读：
+清除对话未读消息数的唯一方式是调用 `Conversation#read` 方法将对话标记为已读，一般来说开发者至少需要在下面两种情况下将对话标记为已读：
 
 - 在对话列表点击某对话进入到对话页面时
 - 用户正在某个对话页面聊天，并在这个对话中收到了消息时
 
-示例代码如下：
-
-```js
-// 进入到对话页面时标记其为已读
-conversation.read().then(function(conversation) {
-  console.log('对话已标记为已读');
-}).catch(console.error.bind(console));
-
-// 当前聊天的对话收到了消息立即标记为已读
-var { Event } = require('leancloud-realtime');
-currentConversation.on(Event.MESSAGE, function() {
-  currentConversation.read().catch(console.error.bind(console));
-})
-```
-```objc
-// todo
-```
-```java
-// todo
-```
-```cs
-// 尚不支持
-```
-
-> 注意：开启未读消息数后，即使客户端在线收到了消息，未读消息数量也会增加，因此开发者需要在合适时机重置未读消息数。
 
 ## 多端消息同步与单点登录
 
-一个用户可以使用相同的账号在不同的客户端上登录（例如网页版和手机客户端可以同时接收到消息和回复消息，实现多端消息同步），而有一些场景下，需要禁止一个用户同时在不同客户端登录（单点登录），而即时通讯服务也提供了这样的接口，来应对不同的需求：
+一个用户可以使用相同的账号在不同的客户端上登录（例如 QQ 网页版和手机客户端可以同时接收到消息和回复消息，实现多端消息同步），而有一些场景下，需要禁止一个用户同时在不同客户端登录，例如我们不能用同一个微信账号在两个手机上同时登录。LeanCloud 即时通讯服务提供了灵活的机制，来满足***多端登录***和***单点登录***这两种完全相反的需求。
 
-下面我们来详细说明：如何使用 LeanCloud SDK 去实现单点登录
+> （？？待确认）
 
-### 设置登录标记 Tag
+即时通讯 SDK 在生成 `IMClient` 实例的时候，允许开发者在 `ClientId` 之外，增加一个额外的 `Tag` 标记。云端在用户登录的时候，会检查 `<ClientId, Tag>` 组合的唯一性。如果当前用户已经在其他设备上使用同样的 Tag 登录了，那么云端会强制让之前登录的设备下线。如果多个 `Tag` 不发生冲突，那么云端会把他们当初独立的设备进行处理，应该下发给该用户的消息会分别下发给所有设备，同时不同设备上的未读消息计数也是各自分开的；该用户在单个设备上发出来的上行消息，云端也会默认同步到其他设备。
 
-假设开发者想实现 QQ 这样的功能，那么需要在登录到云端的时候，也就是打开与云端长连接的时候，标记一下这个链接是从什么类型的客户端登录到云端的：
+> 如果不设置 Tag，则默认对用户的多端登录不作限制，并且消息会实时同步。
+
+以 QQ 那样的多端登录需求为例，我们可以设计三种 Tag：Mobile、Pad、Web，分别对应三种类型的设备：手机、平板和电脑，那么用户分别在三种设备上登录就都是允许的，但是却不能同时在两台电脑上登录。
+
+### 设置登录标记
+
+按照上面的方案，以手机端登录为例，在创建 `IMClient` 实例的时候，我们增加 `Tag: Mobile` 这样的标记：
 
 ```js
 realtime.createIMClient('Tom', { tag: 'Mobile' }).then(function(tom) {
@@ -1017,7 +1065,7 @@ AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mo
 ```
 ```java
 // 第二个参数：登录标记 Tag
-AVIMClient currentClient = AVIMClient.getInstance(clientId,"Mobile");
+AVIMClient currentClient = AVIMClient.getInstance(clientId, "Mobile");
 currentClient.open(new AVIMClientCallback() {
   @Override
   public void done(AVIMClient avimClient, AVIMException e) {
@@ -1031,11 +1079,11 @@ currentClient.open(new AVIMClientCallback() {
 AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile", deviceId: "your-device-id");
 ```
 
-上述代码可以理解为 LeanCloud 版 QQ 的登录，而另一个带有同样 Tag 的客户端打开连接，则较早前登录系统的客户端会被强制下线。
+之后如果同一个用户在另一个手机上再次登录，则较早前登录系统的客户端会被强制下线。
 
 ### 处理登录冲突
 
-我们可以看到上述代码中，登录的 Tag 是 `Mobile`。当存在与其相同的 Tag 登录的客户端，较早前登录的设备会被云端强行下线，而且他会收到被云端下线的通知：
+即时通讯云端在登录用户的 `<ClientId, Tag>` 相同的时候，总是踢掉较早登录的设备，这时候较早登录设备端会收到被云端下线（`CONFLICT`）的事件通知：
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -1051,26 +1099,24 @@ tom.on(Event.CONFLICT, function() {
 };
 ```
 ```java
-public class MyApplication extends Application{
-  public void onCreate(){
-   ...
-   AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
-   // 自定义实现的 AVIMClientEventHandler 需要注册到 SDK 后，SDK 才会通过回调 onClientOffline 来通知开发者
-   AVIMClient.setClientEventHandler(new AVImClientManager());
-   ...
-  }
-}
-
 public class AVImClientManager extends AVIMClientEventHandler {
-  ...
+  /**
+   * 实现本方法以处理当前登录被踢下线的情况
+   *
+   * 
+   * @param client
+   * @param code 状态码说明被踢下线的具体原因
+   */
   @Override
   public void onClientOffline(AVIMClient avimClient, int i) {
     if(i == 4111){
       // 适当地弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
     }
   }
-  ...
 }
+
+// 自定义实现的 AVIMClientEventHandler 需要注册到 SDK 后，SDK 才会通过回调 onClientOffline 来通知开发者
+AVIMClient.setClientEventHandler(new AVImClientManager());
 ```
 ```cs
 tom.OnSessionClosed += Tom_OnSessionClosed;
@@ -1080,8 +1126,6 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 ```
 
 如上述代码中，被动下线的时候，云端会告知原因，因此客户端在做展现的时候也可以做出类似于 QQ 一样友好的通知。
-
-> 如果不设置 Tag，则默认允许用户可以多端登录，并且消息会实时同步。
 
 ## 扩展自己的消息类型
 
@@ -1111,7 +1155,7 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 
 在即时通讯服务总览中，我们比较了不同的[业务场景与对话类型](realtime_v2.html#对话（Conversation）)，现在就来看看如何使用「聊天室」完成一个直播弹幕的需求。
 
-###  创建聊天室
+### 创建聊天室
 
 `AVIMClient` 提供了专门的方法来创建聊天室：
 
@@ -1209,7 +1253,7 @@ var query = tom.GetChatRoomQuery();
 ```
 
 
-### 聊天室消息的内容过滤
+### 消息内容的实时过滤
 
 对于开放聊天室来说，内容的审核和实时过滤是产品运营上一个基本的要求。我们即时通讯服务默认提供了敏感词过滤的功能，多人的普通对话、聊天室和系统对话里面的消息都会进行实时过滤。
 
