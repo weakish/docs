@@ -45,7 +45,7 @@ Key|Value|含义|来源
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  https://{{host}}/1.1/rtm/stats
+  https://{{host}}/1.2/rtm/stats
 ```
 
 返回
