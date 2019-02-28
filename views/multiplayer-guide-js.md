@@ -59,39 +59,23 @@ const client = new Client({
 
 {% block connection %}
 ```javascript
-client.connect();
-```
-{% endblock %}
-
-
-{% block connection_event %}
-```javascript
-// 注册连接成功事件
-client.on(Event.CONNECTED, () => {
-	// TODO 可以做跳转场景等操作
-
-});
-
-// 注册连接失败事件
-client.on(Event.CONNECT_FAILED, (error) => {
-	// TODO 可以根据 error 提示用户失败原因
-
+client.connect().then(()=> {
+  // 连接成功
+}).catch((error) => {
+  // 连接失败
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
-
 
 
 {% block join_lobby %}
 ```javascript
-client.joinLobby();
-```
-
-```javascript
-// 注册成功加入大厅事件
-client.on(Event.LOBBY_JOINED, () => {
-	// TODO 可以做房间列表展示的逻辑
-
+client.joinLobby().then(() => {
+	// 加入大厅成功
+}).catch((error) => {
+  // 加入大厅失败
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
@@ -100,16 +84,30 @@ client.on(Event.LOBBY_JOINED, () => {
 
 {% block room_list %}
 ```javascript
-// 返回 LobbyRoom[]
-client.lobbyRoomList;
+client.on(Event.LOBBY_ROOM_LIST_UPDATED, () => {
+	const roomList = client.lobbyRoomList;
+	// TODO 可以做房间列表展示的逻辑
+});
 ```
 {% endblock %}
 
+{% block lobby_event %}
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| LOBBY_LEFT   | 无  | 离开大厅 |
+| LOBBY_ROOM_LIST_UPDATED | 无 | 大厅房间列表更新                                  |
+{% endblock %}
 
 
 {% block create_default_room %}
 ```javascript
-client.createRoom();
+client.createRoom().then(() => {
+	// 创建房间成功也意味着自己已经成功加入了该房间
+}).catch((error) => {
+	console.error(error.code, error.detail);
+});
 ```
 {% endblock %}
 
@@ -141,7 +139,11 @@ const expectedUserIds = ['world'];
 client.createRoom({ 
 	roomName,
 	roomOptions: options, 
-	expectedUserIds: expectedUserIds });
+	expectedUserIds: expectedUserIds }).then(() => {
+	// 创建房间成功也意味着自己已经成功加入了该房间
+}).catch((error) => {
+	console.error(error.code, error.detail);
+});
 ```
 {% endblock %}
 
@@ -187,7 +189,12 @@ client.on(Event.ROOM_CREATE_FAILED, (error) => {
 {% block join_room %}
 ```javascript
 // 玩家在加入 'LiLeiRoom' 房间
-client.joinRoom('LiLeiRoom');
+client.joinRoom('LiLeiRoom').then(() => {
+	// 加入房间成功
+}).catch((error) => {
+	// 加入房间失败
+	console.error(errod.code, error.detail);
+});
 ```
 {% endblock %}
 
@@ -199,6 +206,11 @@ const expectedUserIds = ['LiLei', 'Jim'];
 // 玩家在加入 'game' 房间，并为 hello 和 world 玩家占位
 client.joinRoom('game', {
 	expectedUserIds
+}).then(() => {
+	// 加入房间成功
+}).catch((error) => {
+	// 加入房间失败
+	console.error(errod.code, error.detail);
 });
 ```
 {% endblock %}
@@ -209,29 +221,14 @@ client.joinRoom('game', {
 更多关于 `joinRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#joinRoom)。
 {% endblock %}
 
-
-
-{% block join_room_event %}
-```javascript
-// 注册加入房间成功事件
-client.on(Event.ROOM_JOINED, () => {
-	// TODO 可以做跳转场景之类的操作
-
-});
-
-// 注册加入房间失败事件
-client.on(Event.ROOM_JOIN_FAILED, () => {
-	// TODO 可以提示用户加入失败，请重新加入
-
-});
-```
-{% endblock %}
-
-
-
 {% block join_random_room %}
 ```javascript
-client.joinRandomRoom();
+client.joinRandomRoom().then(() => {
+	// 加入房间成功
+}).catch((error) => {
+	// 加入房间失败
+	console.error(errod.code, error.detail);
+});
 ```
 {% endblock %}
 
@@ -245,16 +242,25 @@ const matchProps = {
 };
 client.joinRandomRoom({
 	matchProperties: matchProps,
+}).then(() => {
+	// 加入房间成功
+}).catch((error) => {
+	// 加入房间失败
+	console.error(errod.code, error.detail);
 });
 ```
 {% endblock %}
 
 
-
 {% block join_or_create_room %}
 ```javascript
-// 例如，有 10 个玩家同时加入一个房间名称为 「room1」 的房间，如果不存在，则创建并加入
-client.joinOrCreateRoom('room1');
+// 例如，有 4 个玩家同时加入一个房间名称为 「room1」 的房间，如果不存在，则创建并加入
+client.joinOrCreateRoom('room1').then(() => {
+	// 加入或创建房间成功
+}).catch((error) => {
+	// 加入房间失败，也没有成功创建房间
+	console.error(errod.code, error.detail);
+});
 ```
 {% endblock %}
 
@@ -275,26 +281,16 @@ client.on(Event.PLAYER_ROOM_JOINED, (data) => {
 
 });
 ```
-
 可以通过 `client.room.playerList` 获取房间内的所有玩家。
 {% endblock %}
 
 
-
 {% block leave_room %}
 ```javascript
-client.leaveRoom();
-```
-{% endblock %}
-
-
-
-{% block leave_room_event %}
-```javascript
-// 注册离开房间事件
-client.on(Event.ROOM_LEFT, () => {
-	// TODO 可以执行跳转场景等逻辑
-
+client.leaveRoom().then(() => {
+	// 离开房间成功，可以执行跳转场景等逻辑
+}).catch((error) => {
+	console.error(errod.code, error.detail);
 });
 ```
 {% endblock %}
@@ -312,12 +308,25 @@ client.on(Event.PLAYER_ROOM_LEFT, (data) => {
 ```
 {% endblock %}
 
+{% block room_events %}
 
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| PLAYER_ROOM_JOINED    | { newPlayer } | 新玩家加入房间                         |
+| PLAYER_ROOM_LEFT   | { leftPlayer }  | 玩家离开房间 |
+
+{% endblock %}
 
 {% block open_room %}
 ```javascript
 // 设置房间关闭
-client.setRoomOpened(false);
+client.setRoomOpened(false).then(() => {
+	console.log(client.room.opened);
+}).catch((error) => {
+	console.error(errod.code, error.detail);
+});
 ```
 {% endblock %}
 
@@ -326,16 +335,52 @@ client.setRoomOpened(false);
 {% block visible_room %}
 ```javascript
 // 设置房间不可见
-client.setRoomVisible(false);
+client.setRoomVisible(false).then(() => {
+	console.log(client.room.visible);
+}).catch((error) => {
+	console.error(errod.code, error.detail);
+});
 ```
 {% endblock %}
 
+{% block kick_player %}
+#### 踢人
+MasterClient 可以把房间内的其他玩家踢出房间：
 
+```javascript
+// 可以传入一个 object 对象传递信息，该对象仅支持 code 和 msg 两个 key。
+var info = {code: 1, msg: "你已被踢出房间"};
+this.currentClient.kickPlayer(otherPlayer.actorId, info).then(() => {
+	console.log("成功踢出房间");
+})
+```
+
+踢出房间后，被踢的玩家会收到 `ROOM_KICKED` 事件。
+
+```javascript
+client.on(Event.ROOM_KICKED, (data) => {
+	// code 和 msg 就是 MasterClient 在踢人时传递的信息
+	const code = data.code;
+	var msg = data.msg
+});
+```
+
+同时 MasterClient 和其他还存在房间的玩家会收到 `PLAYER_ROOM_LEFT` 事件：
+
+```javascript
+client.on(Event.PLAYER_ROOM_LEFT, (data) => {
+	const player = data.leftPlayer;
+});
+```
+{% endblock %}
 
 {% block set_master %}
 ```javascript
 // 通过玩家的 Id 指定 MasterClient
-client.setMaster(newMasterId);
+client.setMaster(otherActorId).then(() => {
+	// 此时这里的值为 false
+	console.log(client.player.isMaster());
+}).catch(console.error);
 ```
 {% endblock %}
 
@@ -380,7 +425,7 @@ client.createRoom({
 
 
 {% block set_custom_props %}
-房间除了固有的属性外，还包括一个 `Object` 类型的自定义属性，比如战斗的回合数、所有棋牌等。
+可以给房间设置一个 `Object` 类型的自定义属性，比如战斗的回合数、所有棋牌等。
 
 ```javascript
 // 设置想要修改的自定义属性
@@ -388,7 +433,9 @@ const props = {
 	gold: 1000,
 };
 // 设置 gold 属性为 1000
-client.room.setCustomProperties(props);
+client.room.setCustomProperties(props).then(() => {
+	var newProperties = client.room.getCustomProperties();
+}).catch(console.error);
 ```
 {% endblock %}
 
@@ -398,14 +445,20 @@ client.room.setCustomProperties(props);
 ```javascript
 // 注册房间属性变化事件
 client.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (data) => {
-	const props = client.room.getCustomProperties();
-	const { gold } = props;
+	// 可以从 data 中拿到变化的属性
+	const changedProperties = data.changedProps;
+
+	// 可以从这个方法中获得房间的全部属性
+	const properties = client.room.getCustomProperties();
+	const gold = properties.gold;
+	
 	// TODO 可以做属性变化的界面展示
 
 });
 ```
 
 注意：`changedProps` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `client.room.getCustomProperties()` 获得。
+
 {% endblock %}
 
 {% block master_update_room_properties %}
@@ -415,7 +468,9 @@ client.createRoom({
   roomOptions: {
     flag: CreateRoomFlag.MasterUpdateRoomProperties
   },
-});
+}).then(() => {
+	// 创建房间成功
+}).catch(console.error);
 ```
 
 {% endblock %}
@@ -437,7 +492,9 @@ const props = {
 	poker: poker,
 };
 // 请求设置玩家属性
-client.player.setCustomProperties(props);
+client.player.setCustomProperties(props).then(() => {
+	// 设置属性成功
+}).catch(console.error);
 ```
 {% endblock %}
 
@@ -447,7 +504,7 @@ client.player.setCustomProperties(props);
 ```javascript
 // 注册玩家自定义属性变化事件
 client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
-	// 结构事件参数
+	// 从 data 中可以拿到是哪个 player 的属性被修改了
 	const { player } = data;
 	// 得到玩家所有自定义属性
 	const props = player.getCustomProperties();
@@ -468,7 +525,9 @@ const props = {
 const expectedValues = {
 	tulong: null // 屠龙刀当前拥有者
 };
-client.room.setCustomProperties(props, { expectedValues });
+client.room.setCustomProperties(props, { expectedValues }).then(() => {
+
+}).catch(console.error);
 ```
 
 这样，在「第一个玩家」获得屠龙刀之后，`tulong` 对应的值为「第一个玩家」，后续的请求（`const expectedValues = {tulong: null}`）将会失败。
@@ -479,7 +538,7 @@ client.room.setCustomProperties(props, { expectedValues });
 {% block send_event %}
 ```javascript
 const options = {
-	// 设置事件的接收组为 Master
+	// 设置事件的接收组为 MasterClient
 	receiverGroup: ReceiverGroup.MasterClient,
 	// 也可以指定接收者 actorId
 	// options.targetActorIds: [1],
@@ -489,11 +548,13 @@ const eventData = {
 	skillId: 123,
 };
 // 发送 eventId 为 skill 的事件
-client.sendEvent('skill', eventData, options);
+client.sendEvent('skill', eventData, options).then(() => {
+
+}).catch(console.error);
 ```
 
 其中 `options` 是指事件发送参数，包括「接收组」和「接收者 ID 数组」。
-- 接收组（ReceiverGroup）是接收事件的目标的枚举值，包括 Others（房间内除自己之外的所有人）、All（房间内的所有人）、MasterClient（主机）。
+- 接收组（ReceiverGroup）是接收事件的目标的枚举值，包括 Others（房间内除自己之外的所有人）、All（房间内的所有人）、MasterClient（房主）。
 - 接收者 ID 数组是指接收事件的目标的具体值，即玩家的 `actorId` 数组。`actorId` 可以通过 `player.actorId` 获得。
 {% endblock %}
 
@@ -516,12 +577,27 @@ client.on(Event.CUSTOM_EVENT, event => {
 {% endblock %}
 
 
+{% block disconnect %}
+## 断开连接
 
-{% block disconnect_event %}
+### 主动断开连接
+
+开发者也可以通过下面的接口自行断开连接，断开连接后，房间内的其他玩家会收到 `PLAYER_ACTIVITY_CHANGED` 事件。
+
+```javascript
+client.close().then(() => {
+	// 断开连接成功
+});
+```
+
+### 被动断开连接
+
+在网络不稳定的情况下，可能会被动断开连接，被动断开连接时 SDK 会向客户端派发 `DISCONNECTED`（断开连接）事件，开发者可以在这里在 UI 上对玩家进行提示：
+
 ```javascript
 // 注册断开连接事件
 client.on(Event.DISCONNECTED, () => {
-  // TODO 如果需要，可以选择重连
+  // TODO 如果需要，可以选择检测网络并重连
 
 });
 ```
@@ -529,24 +605,8 @@ client.on(Event.DISCONNECTED, () => {
 
 
 
-{% block disconnect %}
-```javascript
-client.disconnect();
-```
-{% endblock %}
+{% block player_activity_changed %}
 
-
-
-{% block player_activity %}
-```javascript
-const options = {
-	// 将 playerTtl 设置为 300 秒
-	playerTtl: 300,
-};
-client.createRoom({
-	roomOptions: options,
-});
-```
 
 ```javascript
 // 注册玩家掉线 / 上线事件
@@ -557,16 +617,30 @@ client.on(Event.PLAYER_ACTIVITY_CHANGED, (data) => {
   	// TODO 根据玩家的在线状态可以做显示和逻辑处理
 });
 ```
+
 {% endblock %}
 
+{% block set_player_ttl %}
 
+```javascript
+const options = {
+	// 将 playerTtl 设置为 300 秒
+	playerTtl: 300,
+};
+client.createRoom({
+	roomOptions: options,
+}).then(()=> {
+
+}).catch(console.error);
+```
+
+{% endblock %}
 
 {% block reconnect %}
 ```javascript
-client.on(Event.DISCONNECTED, () => {
-	// 重连
-	client.reconnect();
-});
+client.reconnect().then(() => {
+	// 重连成功，此时可以选择是否回到房间
+}).catch(console.error);
 ```
 {% endblock %}
 
@@ -574,60 +648,47 @@ client.on(Event.DISCONNECTED, () => {
 
 {% block rejoin_room %}
 ```javascript
-client.on(Event.DISCONNECTED, () => {
-	// 重连
-	client.reconnect();
-});
+client.reconnect().then(() => {
+	// 重连成功，回到之前的某房间
+	return client.rejoinRoom(roomName); // 房间的 roomName 需要自己缓存到客户端
+}).then(() => {
+	// 回到房间成功，房间内其他玩家会收到 `PLAYER_ACTIVITY_CHANGED` 事件。
+}).catch(console.error);
 
-client.on(Event.CONNECTED, () => {
-	// TODO 根据是否有缓存的之前的房间名，回到房间。
-
-	if (roomName) {
-		client.rejoinRoom(roomName);
-	}
-});
-```
-
-如果房间存在并且玩家的 `ttl` 没到期，则其他玩家将会收到 `PLAYER_ACTIVITY_CHANGED` 事件。
-
-```javascript
-// 注册玩家在线状态变化事件
-client.on(Event.PLAYER_ACTIVITY_CHANGED, (data) => {
-	const { player } = data;
-	// 获得用户是否「活跃」状态
-  	cc.log(player.isActive());
-	// TODO 根据玩家的在线状态可以做显示和逻辑处理
-
-});
 ```
 {% endblock %}
-
 
 
 {% block reconnect_and_rejoin %}
-```javascript
-client.on(Event.DISCONNECTED, () => {
-	// 重连并回到房间
-	client.reconnectAndRejoin();
-});
-
-// 在加入房间后，更新数据和界面
-client.on(Event.ROOM_JOINED, () => {
-	// TODO 根据房间和玩家最新数据进行界面重构
-
-});
-```
 
 这个接口相当于 `reconnect()` 和 `rejoinRoom()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
+
+```javascript
+// SDK 会维护上一个房间的 roomName，因此不需要再传入参数
+client.reconnectAndRejoin().then(() => {
+  // 回到房间成功，更新数据和界面
+
+}).catch(console.error);
+```
 {% endblock %}
 
-
+{% block promise_error %}
+## 错误处理
+在我们发起请求时，可以通过 Promise catch 具体的 error 信息，例如创建房间时：
+```javascript
+client.createRoom().then(() => {
+}).catch((error) => {
+    console.error(error.code, error.detail);
+});
+```
+{% endblock %}
 
 {% block error_event %}
+
 ```javascript
 client.on(Event.Error, (err) => {
 	const { code, detail } = err;
-	// TODO 处理错误事件
+	// 联系 LeanCloud
 
 });
 ```

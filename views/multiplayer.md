@@ -23,9 +23,20 @@
 ### 连接服务器
 
 ```js
-play.userId = 'leancloud';
-// 连接服务器时可以声明游戏版本，不同版本的玩家不会匹配到同一个房间
-play.connect({ gameVersion: '0.0.1' });
+const client = new Client({
+    // 设置 APP ID
+    appId: YOUR_APP_ID,
+    // 设置 APP Key
+    appKey: YOUR_APP_KEY,
+    // 设置用户 id
+    userId: 'leancloud'
+    // 设置游戏版本号，选填，默认 0.0.1，不同版本的玩家不会匹配到同一个房间
+    gameVersion: '0.0.1'
+});
+
+client.connect().then(()=> {
+  // 连接成功
+}).catch(console.error);
 ```
 
 ```cs
@@ -42,7 +53,9 @@ Play.Connect("0.0.1");
 1、调用 `JoinRandomRoom` 开始匹配。
 
 ```js
-play.joinRandomRoom();
+client.joinRandomRoom().then(() => {
+  // 成功加入房间
+}).catch(console.error);
 ```
 ```cs
 Play.JoinRandomRoom();
@@ -51,9 +64,7 @@ Play.JoinRandomRoom();
 2、在顺利情况下，会进入某个有空位的房间开始游戏。
 
 ```js
-play.on(Event.ROOM_JOINED, () => {
-  console.log('OnJoinedRoom')
-});
+// JavaScript SDK 通过 joinRandomRoom 的 Promise 判断是否加入房间成功
 ```
 
 ```cs
@@ -72,18 +83,22 @@ public override void OnJoinedRoom()
 * 设置 [玩家掉线后的保留时间](multiplayer-guide-csharp.html#玩家掉线之后被保留的时间)，在有效时间内如果该玩家加回房间，房间内依然保留该玩家的自定义属性。
 
 ```js
-play.on(Event.ROOM_JOIN_FAILED, () => {
-  const options = {
-    // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
-    maxPlayerCount: 4,
-    // 设置玩家掉线后的保留时间为 120 秒
-    playerTtl: 120, 
-  };
-  // 创建房间
-  play.createRoom({ 
-    roomOptions: options
-  });
-});
+client.joinRandomRoom().then().catch((error) =>
+  if (error.code === 4301) {
+    const options = {
+      // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+      maxPlayerCount: 4,
+      // 设置玩家掉线后的保留时间为 120 秒
+      playerTtl: 120, 
+    };
+    // 创建房间
+    client.createRoom({ 
+      roomOptions: options
+    }).then(()=> {
+      // 创建房间成功
+    });
+  }
+);
 
 ```
 
@@ -132,9 +147,10 @@ if (level < 10) {
 const matchProps = {
 	level: matchLevel,
 };
-play.joinRandomRoom({
-	matchProperties: matchProps,
-});
+
+client.joinRandomRoom({matchProperties: matchProps}).then(() => {
+  // 成功加入房间
+}).catch(console.error);
 ```
 
 ```cs
@@ -146,27 +162,28 @@ Play.JoinRandomRoom(matchProp);
 3、如果随机加入房间失败，则创建具有匹配属性的房间等待其他同水平的人加入。
 
 ```js
-play.on(Event.ROOM_JOIN_FAILED, () => {
-  const props = {
-    level: matchLevel,
-  };
-  
-  const options = {
-    // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
-    maxPlayerCount: 4,
-    // 设置玩家掉线后的保留时间为 120 秒
-    playerTtl: 120,
-    // 房间的自定义属性
-    customRoomProperties: props,
-    // 从房间的自定义属性中选择匹配用的 key
-    customRoomPropertyKeysForLobby: ['level'],
-  }
-  
-  play.createRoom({
-    roomOptions: options
-  });
-});
+const matchProps = {
+	level: matchLevel,
+};
 
+client.joinRandomRoom({matchProperties: matchProps}).then().catch((error) => {
+  if (error.code === 4301) {
+    const options = {
+      // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+      maxPlayerCount: 4,
+      // 设置玩家掉线后的保留时间为 120 秒
+      playerTtl: 120,
+      // 房间的自定义属性
+      customRoomProperties: matchProps,
+      // 从房间的自定义属性中选择匹配用的 key
+      customRoomPropertyKeysForLobby: ['level'],
+    }
+    
+    client.createRoom({
+      roomOptions: options
+    }).then().catch(console.error);
+  }
+});
 ```
 ```cs
 [PlayEvent]
@@ -200,9 +217,9 @@ const options = {
   // 房间不可见
   visible: false,
 };
-play.createRoom({ 
+client.createRoom({ 
 	roomOptions: options, 
-});
+}).then().catch(console.error);
 ```
 
 ```cs
@@ -218,7 +235,7 @@ Play.CreateRoom(config, roomName);
 3、PlayerB 根据房间名称加入到房间中。
 
 ```js
-play.joinRoom('LiLeiRoom');
+client.joinRoom('LiLeiRoom').then().catch(console.error);
 ```
 
 ```cs
@@ -231,7 +248,9 @@ PlayerA 通过某种通信方式（例如 [LeanCloud 即时通讯](realtime_v2.h
 1、PlayerA 和 PlayerB 一起组队进入某个房间
 
 ```js
-play.joinRandomRoom({expectedUserIds: ["playerB"]});
+client.joinRandomRoom({expectedUserIds: ["playerB"]}).then(() => {
+  // 加入成功
+}).catch(console.error);
 ```
 
 ```cs
@@ -241,9 +260,7 @@ Play.JoinRandomRoom(expectedUsers: new string[] {"playerB"});
 2、如果有足够空位的房间，加入成功。
 
 ```js
-play.on(Event.ROOM_JOINED, () => {
-  console.log('OnJoinedRoom')
-});
+// JavaScript SDK 通过 joinRandomRoom 的 Promise 判断是否加入房间成功
 ```
 
 ```cs
@@ -257,13 +274,15 @@ public override void OnJoinedRoom()
 3、如果没有合适的房间则创建并加入房间： 
 
 ```js
-play.on(Event.ROOM_JOIN_FAILED, () => {
-  const expectedUserIds = ['playerB'];
-  play.createRoom({  
-    expectedUserIds: expectedUserIds
-  });
+const expectedUserIds = ['playerB'];
+client.joinRandomRoom({expectedUserIds}).then().catch((error) => {
+   // 没有空房间或房间位置不够
+   if (error.code === 4301 || error.code === 4302) {
+    client.createRoom({  
+      expectedUserIds: expectedUserIds
+    }).then().catch(console.error);
+   }
 });
-
 ```
 
 ```cs
@@ -295,7 +314,9 @@ const props = {
 	ready: true,
 };
 // 请求设置玩家属性
-play.player.setCustomProperties(props);
+play.player.setCustomProperties(props).then(() => {
+  // 设置属性成功
+}).catch(console.error);
 ```
 
 ```cs
@@ -351,7 +372,7 @@ public override void OnPlayerCustomPropertiesChanged(Player player, Hashtable up
 
 具体发消息流程如下：
 
-1、Player A 调用 `follow` 方法发送自定义事件，通知 MasterClient 自己跟牌完成。
+1、Player A 发送自定义事件 `follow` ，通知 MasterClient 自己跟牌完成。
 
 ```js
 // 设置事件的接收组为 Master
@@ -436,13 +457,15 @@ public void rpcNext(int playerId)
 * [C# - 远程调用函数](multiplayer-guide-csharp.html#远程调用函数-RPC)。
 
 #### 游戏中断线重连
-MasterClient 断线后会重新挑选其他成员成为新的 MasterClient，原来的 MasterClient 重连后会成为一名普通成员。具体请参考 [断线重连](multiplayer-guide-js.html#断线重连)。
+如果 MasterClient 位于客户端，MasterClient 断线后，实时对战服务会重新挑选其他成员成为新的 MasterClient，原来的 MasterClient 重新返回房间后会成为一名普通成员。具体请参考 [断线重连](multiplayer-guide-js.html#断线重连)。
 
 
 #### 退出房间
 
 ```js
-play.leaveRoom();
+play.leaveRoom().then(() => {
+  // 成功退出房间
+}).catch(console.error);
 ```
 ```cs
 Play.LeaveRoom();
@@ -456,7 +479,6 @@ Play.LeaveRoom();
 ### `C#`
 * [快速入门](multiplayer-quick-start-csharp.html)：快速接入实时对战并运行一个小 Demo
 * [实时对战开发指南 · C#](multiplayer-guide-csharp.html)：对实时对战所有功能及接口的详细介绍。
-* [实现小游戏「炸金花」](multiplayer-csharp-demo.html)
 
 ## 价格及试用
 

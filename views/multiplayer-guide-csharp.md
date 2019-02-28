@@ -80,6 +80,8 @@ play.Connect("0.0.1");
 
 
 {% block connection_event %}
+在连接成功后，会收到 `CONNECTED`（连接成功）事件；否则，将会收到 `CONNECT_FAILED`（连接失败）事件，回调参数 `error` 将包含失败原因。
+
 ```cs
 // 注册连接成功事件
 play.On(Event.CONNECTED, (evtData) => {
@@ -93,6 +95,14 @@ play.On(Event.CONNECT_FAILED, (error) => {
 
 });
 ```
+
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| CONNECTED | 无 | 连接成功                                  |
+| CONNECT_FAILED    | error  | 连接失败                                 |
+
 {% endblock %}
 
 
@@ -105,8 +115,7 @@ play.JoinLobby();
 ```cs
 // 注册成功加入大厅事件
 play.On(Event.LOBBY_JOINED, (evtData) => {
-    // TODO 可以做房间列表展示的逻辑
-
+    // 加入大厅成功
 });
 ```
 {% endblock %}
@@ -115,9 +124,21 @@ play.On(Event.LOBBY_JOINED, (evtData) => {
 
 {% block room_list %}
 ```cs
-// 返回 List<LobbyRoom>
-play.LobbyRoomList;
+play.On(Event.LOBBY_ROOM_LIST_UPDATED, (evtData) => {
+    var roomList = play.LobbyRoomList; // 返回 List<LobbyRoom>
+    // TODO 可以做房间列表展示的逻辑
+});
 ```
+{% endblock %}
+
+{% block lobby_event %}
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| LOBBY_JOINED    | 无 | 加入大厅                         |
+| LOBBY_LEFT   | 无  | 离开大厅 |
+| LOBBY_ROOM_LIST_UPDATED | 无 | 大厅房间列表更新                                  |
 {% endblock %}
 
 
@@ -172,7 +193,10 @@ play.CreateRoom(roomName: roomName, roomOptions: options, expectedUserIds: expec
 
 
 
-{% block create_room_event %}
+{% block create_room_events %}
+
+当玩家请求创建房间后，将有可能接收到 `ROOM_CREATED`（房间创建成功）或 `ROOM_CREATE_FAILED`（房间创建失败）事件。
+
 ```cs
 // 注册创建房间成功事件
 play.On(Event.ROOM_CREATED, (evtData) => {
@@ -186,6 +210,8 @@ play.On(Event.ROOM_CREATE_FAILED, (error) => {
 
 });
 ```
+
+注意：当房主创建好房间后会自动加入房间，所以也会收到 `ROOM_JOINED`（加入房间成功）事件。
 {% endblock %}
 
 
@@ -216,6 +242,9 @@ play.JoinRoom("game", expectedUserIds);
 
 
 {% block join_room_event %}
+
+当玩家请求加入房间后，将有可能接收到 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
+
 ```cs
 // 注册加入房间成功事件
 play.On(Event.ROOM_JOINED, (evtData) => {
@@ -242,19 +271,23 @@ play.JoinRandomRoom();
 
 
 {% block join_random_room_with_condition %}
+
 ```cs
 // 设置匹配属性
 var matchProps = new Dictionary<string, object>();
 matchProps.Add("level", 2);
 play.JoinRandomRoom(matchProps);
 ```
+
+与[加入指定房间](#加入指定房间)一样，我们也有可能接收到 `ROOM_JOINED`（加入房间成功）或 `ROOM_JOIN_FAILED`（加入房间失败）事件。
+
 {% endblock %}
 
 
 
 {% block join_or_create_room %}
 ```cs
-// 例如，有 10 个玩家同时加入一个房间名称为 「room1」 的房间，如果不存在，则创建并加入
+// 例如，有 4 个玩家同时加入一个房间名称为 「room1」 的房间，如果不存在，则创建并加入
 play.JoinOrCreateRoom("room1");
 ```
 {% endblock %}
@@ -263,6 +296,16 @@ play.JoinOrCreateRoom("room1");
 
 {% block join_or_create_room_api %}
 更多关于 `JoinOrCreateRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1Play.htm#a3b98b509a36d489bd970c1052df67f38)。
+{% endblock %}
+
+{% block join_or_create_room_events %}
+
+当调用这个接口后，只有**第一个**调用这个接口的玩家的请求会执行「创建房间」逻辑，而其他玩家的请求将会执行「加入房间」逻辑。因此不同的场景下事件回调如下：
+* 如果创建房间成功，触发 `ROOM_CREATED` （创建房间成功）及 `ROOM_JOINED` （加入房间成功）事件。
+* 如果创建房间失败，触发 `ROOM_CREATE_FAILED` （创建房间失败）事件。
+* 如果加入房间成功，触发 `ROOM_JOINED` （加入房间成功）事件。
+* 如果加入房间失败，触发 `ROOM_JOIN_FAILED` （加入房间失败）事件。
+
 {% endblock %}
 
 
@@ -286,11 +329,9 @@ play.On(Event.PLAYER_ROOM_JOINED, (evtData) => {
 ```cs
 play.LeaveRoom();
 ```
-{% endblock %}
 
+当玩家离开房间成功后，客户端会接收到 `ROOM_LEFT`（离开房间）事件。
 
-
-{% block leave_room_event %}
 ```cs
 // 注册离开房间事件
 play.On(Event.ROOM_LEFT, (evtData) => {
@@ -298,8 +339,8 @@ play.On(Event.ROOM_LEFT, (evtData) => {
 
 });
 ```
-{% endblock %}
 
+{% endblock %}
 
 
 {% block player_room_left_event %}
@@ -313,6 +354,21 @@ play.On(Event.PLAYER_ROOM_LEFT, (evtData) => {
 ```
 {% endblock %}
 
+{% block room_events %}
+### 相关事件
+
+| 事件   | 参数     | 描述                                       |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| ROOM_CREATED    | 无  | 创建房间                                 |
+| ROOM_CREATE_FAILED   | error   | 创建房间失败                           |
+| ROOM_JOINED    | 无 | 加入房间                         |
+| ROOM_JOIN_FAILED   | error  | 加入房间失败 |
+| PLAYER_ROOM_JOINED    | { newPlayer } | 新玩家加入房间                         |
+| PLAYER_ROOM_LEFT   | { leftPlayer }  | 玩家离开房间 |
+| MASTER_SWITCHED    | { player }  | Master 更换                                 |
+| ROOM_LEFT   | 无   | 离开房间                           |
+
+{% endblock %}
 
 
 {% block open_room %}
@@ -396,7 +452,7 @@ play.On(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (changedProps) => {
 });
 ```
 
-注意：`changedProps` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `play.Room.CustomProperties` 获得。
+注意：`changedProps` 参数只表示当前修改的参数，不是「全部属性」。如需获得全部属性，请通过 `play.Room.CustomProperties` 获得。
 {% endblock %}
 
 
@@ -503,9 +559,11 @@ play.On(Event.CUSTOM_EVENT, (evtData) => {
 ```
 {% endblock %}
 
+{% block disconnect %}
+## 断开连接
 
+当游戏过程中，由于网络原因可能会断开连接，此时 SDK 会向客户端派发 `DISCONNECTED`（断开连接）事件，开发者可以根据需要注册并处理。
 
-{% block disconnect_event %}
 ```cs
 // 注册断开连接事件
 play.On(Event.DISCONNECTED, (evtData) => {
@@ -513,11 +571,9 @@ play.On(Event.DISCONNECTED, (evtData) => {
 
 });
 ```
-{% endblock %}
 
+开发者也可以通过下面的接口自行断开连接。
 
-
-{% block disconnect %}
 ```cs
 play.Disconnect();
 ```
@@ -525,15 +581,8 @@ play.Disconnect();
 
 
 
-{% block player_activity %}
 
-```cs
-var options = new RoomOptions() {
-    // 将 PlayerTtl 设置为 300 秒
-    PlayerTtl = 300
-}
-play.CreateRoom(roomOptions: options);
-```
+{% block player_activity_changed %}
 
 ```cs
 // 注册玩家掉线 / 上线事件
@@ -548,6 +597,17 @@ play.On(Event.PLAYER_ACTIVITY_CHANGED, (evtData) => {
 {% endblock %}
 
 
+{% block set_player_ttl %}
+
+```cs
+var options = new RoomOptions() {
+    // 将 PlayerTtl 设置为 300 秒
+    PlayerTtl = 300
+}
+play.CreateRoom(roomOptions: options);
+```
+
+{% endblock %}
 
 {% block reconnect %}
 ```cs
@@ -616,7 +676,7 @@ play.On(Event.ROOM_JOINED, (evtData) => {
 play.On(Event.Error, (err) => {
     var code = (int)err["code"];
     var detail = err["detail"] as string;
-    // TODO 处理错误事件
+    // 联系 LeanCloud
 
 });
 ```
