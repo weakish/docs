@@ -331,6 +331,55 @@ var realtime = new AVRealtime(config);
 
 ### 内建账户系统（AVUser）的签名机制
 
+`AVUser` 是 LeanCloud 存储服务提供的默认账户系统，对于使用了它来完成用户注册、登录的产品来说，终端用户通过 AVUser 账户系统的登录认证之后，转到即时通讯服务上，是无需再进行登录签名操作的。
+使用 `AVUser` 账号系统登录即时通讯服务的示例如下：
+
+```js
+var AV = require('leancloud-storage');
+// 以用户名和密码登录内建账户系统
+AV.User.logIn('username', 'password').then(function(user) {
+  // 直接使用 AVUser 实例登录即时通讯服务
+  return realtime.createIMClient(user);
+}).catch(console.error.bind(console));
+```
+```objc
+// 以 AVUser 的用户名和密码登录到 LeanCloud 内建账户系统
+[AVUser logInWithUsernameInBackground:username password:password block:^(AVUser * _Nullable user, NSError * _Nullable error) {
+    // 以 AVUser 实例创建了一个 client
+    AVIMClient *client = [[AVIMClient alloc] initWithUser:user];
+    // 登录即时通讯云端
+    [client openWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
+        // Do something you like.
+    }];
+}];
+```
+```java
+// 以 AVUser 的用户名和密码登录到 LeanCloud 内建账户系统
+AVUser.logInInBackground("username", "password", new LogInCallback<AVUser>() {
+    @Override
+    public void done(AVUser user, AVException e) {
+        if (null != e) {
+          return;
+        }
+        // 以 AVUser 实例创建了一个 client
+        AVIMClient client = AVIMClient.getInstance(user);
+        // 登录即时通讯云端
+        client.open(new AVIMClientCallback() {
+          @Override
+          public void done(final AVIMClient avimClient, AVIMException e) {
+            // do something as you need.
+          }
+       });
+    }
+});
+```
+```cs
+// not support yet
+```
+
+LeanCloud 内置账户系统与即时通讯服务可以共享登录签名信息，这里我们直接用 login 成功之后的 AVUser 实例来创建 IMClient，在即时通讯服务的用户登录环节，LeanCloud 云端会自动关联账户系统来确认用户身份的合法性，这样可以省掉 SDK 向第三方申请登录签名的操作，进一步简化开发流程。
+
+`IMClient` 完成即时通讯系统登录之后，其他功能的使用就和之前的介绍没有任何区别了。
 
 ## 权限管理与黑名单
 
