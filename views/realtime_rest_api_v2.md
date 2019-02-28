@@ -37,6 +37,25 @@ Key|Value|含义|来源
 
 ## 全局 API
 
+### 查询用户数
+
+本接口会返回应用当前在线用户总数，以及当天有登录记录的独立用户总数。本接口要求使用 master key。
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.1/rtm/stats
+```
+
+返回
+
+```
+{"result":{"online_user_count":10212,"user_count_today":1002324}}
+```
+
+其中 `online_user_count` 表示当前应用在线用户总数，`user_count_today` 表示当天有登录记录的独立用户总数。
+
 ### 查询所有对话
 
 本接口会返回所有的 单聊群聊/聊天室/服务号
