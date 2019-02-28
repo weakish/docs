@@ -570,7 +570,7 @@ SDK 会在 Conversation 上维护 `unreadMessagesCount` 字段，这个字段在
 
 {% block message_send_failed_remove_from_cache %}{% endblock %}
 
-你可以观察 [message.status 属性](#message-status) 的变化来更新 UI。例如，当 status 属性变为 `AVIMMessageStatusFailed` 时表示消息发送失败，这时可以在消息旁边显示一个重新发送的按钮。
+你可以观察 [message.status 属性](#消息类详解) 的变化来更新 UI。例如，当 status 属性变为 `AVIMMessageStatusFailed` 时表示消息发送失败，这时可以在消息旁边显示一个重新发送的按钮。
 
 {% endblock %}
 
