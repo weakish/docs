@@ -1131,6 +1131,104 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 
 尽管即时通讯服务默认已经包含了丰富的消息类型，但是我们依然支持开发者根据业务需要扩展自己的消息类型，例如允许用户之间发送名片、红包等等。这里「名片」和「红包」就可以是应用层定义的自己的消息类型。
 
+### 扩展机制说明
+
+{{ docs.langSpecStart('js') }}
+
+通过继承 TypedMessage，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
+
+* 申明新的消息类型，继承自 TypedMessage 或其子类，然后：
+  * 对 class 使用 `messageType(123)` 装饰器，具体消息类型的值（这里是 `123`）由开发者自己决定（LeanCloud 内建的 [消息类型使用负数](realtime-guide-beginner.html#内建消息类型)，所有正数都预留给开发者扩展使用）。
+  * 对 class 使用 `messageField(['fieldName'])` 装饰器来声明需要发送的字段。
+* 调用 `Realtime#register()` 函数注册这个消息类型。
+
+举个例子，实现一个在 [暂态消息](#发送「暂态消息」) 中提出的 OperationMessage：
+
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('objc') }}
+
+继承于 `AVIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
+
+* 实现 `AVIMTypedMessageSubclassing` 协议；
+* 子类将自身类型进行注册，一般可在子类的 `+load` 方法或者 UIApplication 的 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerSubclass]`。
+
+{{ docs.langSpecEnd('objc') }}
+
+{{ docs.langSpecStart('java') }}
+
+继承于 AVIMTypedMessage，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
+
+* 实现新的消息类型，继承自 AVIMTypedMessage。这里需要注意：
+  * 在 class 上增加一个 `@AVIMMessageType(type=123)` 的 Annotation<br/>具体消息类型的值（这里是 `123`）由开发者自己决定。LeanCloud 内建的消息类型使用负数，所有正数都预留给开发者扩展使用。
+  * 在消息内部声明字段属性时，要增加 `@AVIMMessageField(name="")` 的 Annotation<br/>name 为可选字段，同时自定义的字段要有对应的 getter/setter 方法。
+  * **请不要遗漏空的构造方法和 Creator 的代码**（参考下面的示例代码），否则会造成类型转换失败。
+* 调用 `AVIMMessageManager.registerAVIMMessageType()` 函数进行类型注册。
+* 调用 `AVIMMessageManager.registerMessageHandler()` 函数进行消息处理 handler 注册。
+
+AVIMTextMessage 的源码如下，可供参考：
+
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('cs') }}
+
+无可奉告。
+
+{{ docs.langSpecEnd('cs') }}
+
+```js
+// TypedMessage, messageType, messageField 都是由 leancloud-realtime 这个包提供的
+// 在浏览器中则是 var { TypedMessage, messageType, messageField } = AV;
+var { TypedMessage, messageType, messageField } = require('leancloud-realtime');
+var inherit = require('inherit');
+// 定义 OperationMessage 类，用于发送和接收所有的用户操作消息
+export const OperationMessage = inherit(TypedMessage);
+// 指定 type 类型，可以根据实际换成其他正整数
+messageType(1)(OperationMessage);
+// 申明需要发送 op 字段
+messageField('op')(OperationMessage);
+// 注册消息类，否则收到消息时无法自动解析为 OperationMessage
+realtime.register(OperationMessage);
+```
+```objc
+```
+```java
+@AVIMMessageType(type = AVIMMessageType.TEXT_MESSAGE_TYPE)
+public class AVIMTextMessage extends AVIMTypedMessage {
+  // 空的构造方法，不可遗漏
+  public AVIMTextMessage() {
+
+  }
+
+  @AVIMMessageField(name = "_lctext")
+  String text;
+  @AVIMMessageField(name = "_lcattrs")
+  Map<String, Object> attrs;
+
+  public String getText() {
+    return this.text;
+  }
+
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public Map<String, Object> getAttrs() {
+    return this.attrs;
+  }
+
+  public void setAttrs(Map<String, Object> attr) {
+    this.attrs = attr;
+  }
+  // Creator 不可遗漏
+  public static final Creator<AVIMTextMessage> CREATOR = new AVIMMessageCreator<AVIMTextMessage>(AVIMTextMessage.class);
+}
+```
+```cs
+```
+
+### 什么时候需要自定义消息
+
 即时通讯服务内置了如下消息类型用来满足常见的需求：
 
 - `TextMessage` 文本消息
@@ -1140,16 +1238,9 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 - `FileMessage` 普通文件消息(.txt/.doc/.md 等各种)
 - `LocationMessage` 地理位置消息
 
-如果内建的这些消息类型不够用，我们也支持开发者根据自己业务需要增加更多自定义的消息，推荐按照如下需求分级，来选择自定义的方式：
+这些内建消息类型还支持应用层设置若干 key-value 自定义属性来实现扩展。譬如有一条图像消息，除了文本之外，还需要附带地理位置信息，这时候开发者使用消息类中预留的 {{attributes}} 属性就可以保存额外信息了，并不需要去实现一个复杂的自定义消息。
 
-- 通过设置简单 key-value 的自定义属性实现一个消息类型
-- 通过继承内置的消息类型添加一些属性
-- 完全自由实现一个全新的消息类型
-
-
-### 扩展机制说明
-
-### 实现自己的「名片」消息
+我们建议只有在内建的消息类型完全无法满足需求的时候，才去使用自定义的消息类型。
 
 ## 直播场景下的开放聊天室
 

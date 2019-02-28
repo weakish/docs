@@ -970,6 +970,88 @@ LeanCloud 即时通讯服务默认支持文本、文件、图像、音频、视�
 
 图像等二进制数据不随即时通讯消息直接下发的主要原因在于，LeanCloud 的文件存储服务默认都是开通了 CDN 加速选项的，通过文件下载对于终端用户来说可以有更快的展现速度，同时对于开发者来说也能获得更低的存储成本。
 
+### 内建消息类型
+
+即时通讯服务内置了多种结构化消息用来满足常见的需求：
+
+- `TextMessage` 文本消息
+- `ImageMessage` 图像消息
+- `AudioMessage` 音频消息
+- `VideoMessage` 视频消息
+- `FileMessage` 普通文件消息（.txt/.doc/.md 等各种）
+- `LocationMessage` 地理位置消息
+
+所有消息均派生自 `AVIMMessage`，每种消息实例都具备如下属性：
+
+{{ docs.langSpecStart('js') }}
+
+| 属性          | 类型     | 描述                                       |
+| ----------- | ------ | ---------------------------------------- |
+| from        | String | 消息发送者的 clientId                          |
+| cid         | String | 消息所属对话 id                                |
+| id          | String | 消息发送成功之后，由 LeanCloud 云端给每条消息赋予的唯一 id     |
+| timestamp   | Date   | 消息发送的时间。消息发送成功之后，由 LeanCloud 云端赋予的全局的时间戳。 |
+| deliveredAt | Date   | 消息送达时间                                   |
+| status      | Symbol | 消息状态，其值为枚举 [`MessageStatus`](https://leancloud.github.io/js-realtime-sdk/docs/module-leancloud-realtime.html#.MessageStatus) 的成员之一：<br/><br/>`MessageStatus.NONE`（未知）<br/>`MessageStatus.SENDING`（发送中）<br/>`MessageStatus.SENT`（发送成功）<br/>`MessageStatus.DELIVERED`（已送达）<br/>`MessageStatus.FAILED`（失败） |
+
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('objc') }}
+
+| 属性                 | 类型                   | 描述                                       |
+| ------------------ | -------------------- | ---------------------------------------- |
+| content            | NSString             | 消息内容                                     |
+| clientId           | NSString             | 指消息发送者的 clientId                         |
+| conversationId     | NSString             | 消息所属对话 id                                |
+| messageId          | NSString             | 消息发送成功之后，由 LeanCloud 云端给每条消息赋予的唯一 id     |
+| sendTimestamp      | int64_t              | 消息发送的时间。消息发送成功之后，由 LeanCloud 云端赋予的全局的时间戳。 |
+| deliveredTimestamp | int64_t              | 消息被对方接收到的时间。消息被接收之后，由 LeanCloud 云端赋予的全局的时间戳。 |
+| status             | AVIMMessageStatus 枚举 | 消息状态，有五种取值：<br/><br/>`AVIMMessageStatusNone`（未知）<br/>`AVIMMessageStatusSending`（发送中）<br/>`AVIMMessageStatusSent`（发送成功）<br/>`AVIMMessageStatusDelivered`（被接收）<br/>`AVIMMessageStatusFailed`（失败） |
+| ioType             | AVIMMessageIOType 枚举 | 消息传输方向，有两种取值：<br/><br/>`AVIMMessageIOTypeIn`（发给当前用户）<br/>`AVIMMessageIOTypeOut`（由当前用户发出） |
+
+{{ docs.langSpecEnd('objc') }}
+
+{{ docs.langSpecStart('java') }}
+
+| 属性               | 描述                   | 类型                                       |
+| ---------------- | -------------------- | ---------------------------------------- |
+| content          | String               | 消息内容                                     |
+| clientId         | String               | 指消息发送者的 clientId                         |
+| conversationId   | String               | 消息所属对话 id                                |
+| messageId        | String               | 消息发送成功之后，由 LeanCloud 云端给每条消息赋予的唯一 id     |
+| timestamp        | long                 | 消息发送的时间。消息发送成功之后，由 LeanCloud 云端赋予的全局的时间戳。 |
+| receiptTimestamp | long                 | 消息被对方接收到的时间。消息被接收之后，由 LeanCloud 云端赋予的全局的时间戳。 |
+| status           | AVIMMessageStatus 枚举 | 消息状态，有五种取值：<br/><br/>`AVIMMessageStatusNone`（未知）<br/>`AVIMMessageStatusSending`（发送中）<br/>`AVIMMessageStatusSent`（发送成功）<br/>`AVIMMessageStatusReceipt`（被接收）<br/>`AVIMMessageStatusFailed`（失败） |
+| ioType           | AVIMMessageIOType 枚举 | 消息传输方向，有两种取值：<br/><br/>`AVIMMessageIOTypeIn`（发给当前用户）<br/>`AVIMMessageIOTypeOut`（由当前用户发出） |
+
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('cs') }}
+
+| 属性               | 描述                   | 类型                                       |
+| ---------------- | -------------------- | ---------------------------------------- |
+| content          | String               | 消息内容                                     |
+| clientId         | String               | 指消息发送者的 clientId                         |
+| conversationId   | String               | 消息所属对话 id                                |
+| messageId        | String               | 消息发送成功之后，由 LeanCloud 云端给每条消息赋予的唯一 id     |
+| timestamp        | long                 | 消息发送的时间。消息发送成功之后，由 LeanCloud 云端赋予的全局的时间戳。 |
+| receiptTimestamp | long                 | 消息被对方接收到的时间。消息被接收之后，由 LeanCloud 云端赋予的全局的时间戳。 |
+| status           | AVIMMessageStatus 枚举 | 消息状态，有五种取值：<br/><br/>`AVIMMessageStatusNone`（未知）<br/>`AVIMMessageStatusSending`（发送中）<br/>`AVIMMessageStatusSent`（发送成功）<br/>`AVIMMessageStatusReceipt`（被接收）<br/>`AVIMMessageStatusFailed`（失败） |
+| ioType           | AVIMMessageIOType 枚举 | 消息传输方向，有两种取值：<br/><br/>`AVIMMessageIOTypeIn`（发给当前用户）<br/>`AVIMMessageIOTypeOut`（由当前用户发出） |
+
+{{ docs.langSpecEnd('cs') }}
+
+我们为每一种富媒体消息定义了一个消息类型，即时通讯 SDK 自身使用的类型是负数（如下面列表所示），所有正数留给开发者自定义扩展类型使用，0 作为「没有类型」被保留起来。
+
+| 消息   | 类型   |
+| ---- | ---- |
+| 文本消息 | -1   |
+| 图像消息 | -2   |
+| 音频消息 | -3   |
+| 视频消息 | -4   |
+| 位置消息 | -5   |
+| 文件消息 | -6   |
+
 ### 图像消息
 
 #### 发送图像文件
