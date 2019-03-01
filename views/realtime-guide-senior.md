@@ -3,14 +3,16 @@
 
 {{ docs.defaultLang('js') }}
 
-# 三，安全与签名、黑名单和权限管理、使用临时对话
+# 三，安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话
 
 ## 本章导读
 
-在前一章[特殊消息的处理，多端同步与单点登录，玩转直播聊天室](realtime-guide-intermediate.html)中，我们演示了与消息相关的更多特殊需求的实现方法，以及直播聊天室和实时消息过滤的功能，现在，我们会更进一步，从系统安全的角度，给大家详细说明：
+在前一章[消息收发的更多方式，离线推送与消息同步，多设备登录](realtime-guide-intermediate.html)中，我们演示了与消息相关的更多特殊需求的实现方法，现在，我们会更进一步，从系统安全和成员权限管理的角度，给大家详细说明：
 
 - 如何通过第三方鉴权来控制客户端登录与操作
 - 如何对成员权限进行限制，以保证聊天流程能被运营人员很好管理起来
+- 如何实现一个不限人数的直播聊天室
+- 如何对大型聊天室中的消息进行实时内容过滤
 - 如何使用临时对话
 
 ## 安全与签名
@@ -444,6 +446,320 @@ SDK 操作黑名单的示例代码为：
 管理员把部分用户加入黑名单之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
 
 
+## 玩转直播聊天室
+
+在即时通讯服务总览中，我们比较了不同的[业务场景与对话类型](realtime_v2.html#对话（Conversation）)，现在就来看看如何使用「聊天室」完成一个直播弹幕的需求。
+
+### 创建聊天室
+
+`AVIMClient` 提供了专门的 `createChatRoom` 方法来创建聊天室：
+
+```js
+tom.createChatRoom({ name:'聊天室' }).catch(console.error);
+```
+```objc
+[client createChatRoomWithName:@"聊天室" attributes:nil callback:^(AVIMChatRoom *chatRoom, NSError *error) {
+    if (chatRoom && !error) {        
+        AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这是一条消息" attributes:nil];
+        [chatRoom sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+            if (success && !error) {
+
+            }
+        }];
+    }
+}];
+```
+```java
+tom.createChatRoom(null, "聊天室", null,
+    new AVIMConversationCreatedCallback() {
+        @Override
+        public void done(AVIMConversation conv, AVIMException e) {
+            if (e == null) {
+                // 创建成功
+            }
+        }
+});
+```
+```cs
+// 最直接的方式，传入 name 即可
+tom.CreateChatRoomAsync("聊天室");
+```
+
+在创建聊天室的时候，开发者可以指定聊天室的名字和附加属性（非必须），与[创建普通对话的接口](realtime-guide-beginner.html#创建对话 Conversation)相比，有如下差异：
+- 聊天室因为没有成员列表，所以创建的时候指定 `members` 是没有意义的
+- 同样的原因，创建聊天室的时候指定 `unique` 标志也是没有意义的（云端根据成员 id 来去重）
+
+> 尽管我们调用 `createConversation` 接口，通过传递合适的参数（`{transient: true}`），也可以创建一个聊天室，但是还是建议大家直接使用 `createChatRoom` 方法。
+
+### 查找聊天室
+
+在前面一章中，我们已经了解了 [构造复杂条件来查询对话](realtime-guide-beginner.html#使用复杂条件来查询对话) 的方法，`ConversationsQuery` 依然适用于查询聊天室，只需要添加 `transient = true` 的限制条件即可。
+
+```js
+var query = tom.getQuery().equalTo('tr',true);// 聊天室对象
+}).catch(console.error);
+```
+```objc
+AVIMConversationQuery *query = [tom conversationQuery];
+[query whereKey:@"tr" equalTo:@(YES)]; 
+```
+```java
+AVIMConversationsQuery query = tom.getChatRoomQuery();
+query.findInBackground(new AVIMConversationQueryCallback() {
+    @Override
+    public void done(List<AVIMConversation> conversations, AVIMException e) {
+        if (null != e) {
+            // 获取成功
+        } else {
+          // 获取失败
+        }
+    }
+});
+```
+```cs
+var query = tom.GetChatRoomQuery();
+```
+
+> Java / Android / dotNet SDK 专门提供了 `AVIMClient#getChatRoomQuery` 方法来生成聊天室查询对象，屏蔽了 `transient` 属性的细节，建议开发者优先使用这些高层 API。
+
+### 加入和离开聊天室
+
+查询到聊天室之后，加入和离开聊天室与普通对话的对应接口没有区别，详细请参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)。
+
+在成员管理与变更通知方面，聊天室与普通对话的最大区别就是：
+- 在聊天室内无法邀请或者踢出成员，只能由用户主动加入和退出；
+- 除了用户主动退出之外，客户端断线也会被认为是退出了聊天室。为了防止网络抖动，如果客户端临时异常断线，只要在半小时内重新上线，都会自动加入原聊天室（主动退出的除外）；
+- 云端不会下发成员加入、退出的变更通知；
+- 不支持查询成员列表，但提供专门的 API 来查询实时在线人数；
+
+另外，也请注意***聊天室也不支持离线推送通知、离线消息同步、消息回执等功能***。
+
+### 消息等级
+
+<div class="callout callout-info">此功能仅针对<u>聊天室消息</u>有效。普通对话的消息不需要设置等级，即使设置了也会被系统忽略，因为普通对话的消息不会被丢弃。</div>
+
+为了保证消息的时效性，当聊天室消息过多导致客户端连接堵塞时，服务器端会选择性地丢弃部分低等级的消息。目前支持的消息等级有：
+
+| 消息等级                 | 描述                                                               |
+| ------------------------ | ------------------------------------------------------------------ |
+| `MessagePriority.HIGH`   | 高等级，针对时效性要求较高的消息，比如直播聊天室中的礼物，打赏等。 |
+| `MessagePriority.NORMAL` | 正常等级，比如普通非重复性的文本消息。                             |
+| `MessagePriority.LOW`    | 低等级，针对时效性要求较低的消息，比如直播聊天室中的弹幕。         |
+
+消息等级在发送接口的参数中设置。以下代码演示了如何发送一个高等级的消息：
+
+```js
+var { Realtime, TextMessage, MessagePriority } = require('leancloud-realtime');
+var realtime = new Realtime({ appId: 'GDBz24d615WLO5e3OM3QFOaV-gzGzoHsz', appKey: 'dlCDCOvzMnkXdh2czvlbu3Pk' });
+realtime.createIMClient('host').then(function (host) {
+    return host.createConversation({
+        members: ['broadcast'],
+        name: '2094 世界杯决赛梵蒂冈对阵中国比赛直播间',
+        transient: true
+    });
+}).then(function (conversation) {
+    console.log(conversation.id);
+    return conversation.send(new TextMessage('现在比分是 0:0，下半场中国队肯定要做出人员调整'), { priority: MessagePriority.HIGH });
+}).then(function (message) {
+    console.log(message);
+}).catch(console.error);
+```
+```objc
+// Tom 创建了一个 client，用自己的名字作为 clientId
+self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+// Tom 打开 client
+[self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+    // Tom 建立了与 Jerry 的会话
+    [self.client createConversationWithName:@"猫和老鼠" clientIds:@[@"Jerry"] callback:^(AVIMConversation *conversation, NSError *error) {
+        // Tom 发了一条消息给 Jerry
+
+        AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
+        option.priority = AVIMMessagePriorityHigh;
+        [conversation sendMessage:[AVIMTextMessage messageWithText:@"耗子，起床！" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+            // 在这里处理发送失败或者成功之后的逻辑
+        }];
+
+    }];
+}];
+```
+```java
+AVIMClient tom = AVIMClient.getInstance("Tom");
+    tom.open(new AVIMClientCallback() {
+      @Override
+      public void done(AVIMClient client, AVIMException e) {
+        if (e == null) {
+          // 创建名为“猫和老鼠”的对话
+          client.createConversation(Arrays.asList("Jerry"), "猫和老鼠", null,
+            new AVIMConversationCreatedCallback() {
+              @Override
+              public void done(AVIMConversation conv, AVIMException e) {
+                if (e == null) {
+                  AVIMTextMessage msg = new AVIMTextMessage();
+                  msg.setText("耗子，起床！");
+
+                  AVIMMessageOption messageOption = new AVIMMessageOption();
+                  messageOption.setPriority(AVIMMessageOption.MessagePriority.High);
+                  conv.sendMessage(msg, messageOption, new AVIMConversationCallback() {
+                    @Override
+                    public void done(AVIMException e) {
+                      if (e == null) {
+                        // 发送成功
+                      }
+                    }
+                  });
+                }
+              }
+            });
+        }
+      }
+    });
+```
+```cs
+// 我还能说什么
+```
+
+### 消息免打扰
+
+假如某一用户不想再收到某对话的消息提醒，但又不想直接退出对话，可以使用静音操作，即开启「免打扰模式」。
+
+比如 Tom 工作繁忙，对某个对话设置了静音：
+
+```js
+black.getConversation(CONVERSATION_ID).then(function(conversation) {
+  return conversation.mute();
+}).then(function(conversation) {
+  console.log('静音成功');
+}).catch(console.error.bind(console));
+```
+```objc
+- (void)tomMuteConversation {
+    // Tom 创建了一个 client，用自己的名字作为 clientId
+    self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+    // Tom 打开 client
+    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+        // Tom 查询 id 为 551260efe4b01608686c3e0f 的会话
+        AVIMConversationQuery *query = [self.client conversationQuery];
+        [query getConversationById:@"551260efe4b01608686c3e0f" callback:^(AVIMConversation *conversation, NSError *error) {
+            // Tom 将会话设置为静音
+            [conversation muteWithCallback:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    NSLog(@"修改成功！");
+                }
+            }];
+        }];
+    }];
+}
+```
+```java
+AVIMClient tom = AVIMClient.getInstance("Tom");
+tom.open(new AVIMClientCallback(){
+
+    @Override
+    public void done(AVIMClient client,AVIMException e){
+      if(e==null){
+      //登录成功
+      AVIMConversation conv = client.getConversation("551260efe4b01608686c3e0f");
+      conv.mute(new AVIMConversationCallback(){
+
+        @Override
+        public void done(AVIMException e){
+          if(e==null){
+          //设置成功
+          }
+        }
+      });
+      }
+    }
+});
+```
+```cs
+// not support yet
+```
+
+> 设置静音之后，iOS、Windows Phone 及启用混合推送的 Android 用户就不会收到推送消息了。
+
+与之对应的就是取消静音的操作（`Conversation#unmute` 方法），即取消免打扰模式。`mute` 和 `unmute` 操作会修改云端 `_Conversation` 里面的 `mu` 属性。**强烈建议开发者切勿在控制台中对 `mu` 随意进行修改**，否则可能会引起即时通讯云端的离线推送功能失效。
+
+
+### 查询成员数量
+
+`AVIMConversation#memberCount` 方法可以用来查询普通对话的成员总数，在聊天室中，它返回的就是实时在线的人数：
+
+```js
+chatRoom.count().then(function(count) {
+  console.log('在线人数: ' + count);
+}).catch(console.error.bind(console));
+```
+```objc
+- (void)tomCountsChatroomMembers{
+    // Tom 创建了一个 client，用自己的名字作为 clientId
+    self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+    NSString *conversationId=@"55dd9d7200b0c86eb4fdcbaa";
+    // Tom 打开 client
+    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+        // Tom 创建一个对话的查询
+        AVIMConversationQuery *query = [self.client conversationQuery];
+        // 根据已知 Id 获取对话实例，当前实例为聊天室。
+        [query getConversationById:conversationId callback:^(AVIMConversation *conversation, NSError *error) {
+            // 查询在线人数
+            [conversation countMembersWithCallback:^(NSInteger number, NSError *error) {
+                NSLog(@"%ld",number);
+            }];
+        }];
+    }];
+}
+```
+```java
+private void TomQueryWithLimit() {
+  AVIMClient tom = AVIMClient.getInstance("Tom");
+  tom.open(new AVIMClientCallback() {
+
+    @Override
+    public void done(AVIMClient client, AVIMException e) {
+      if (e == null) {
+        //登录成功
+        AVIMConversationsQuery query = tom.getConversationsQuery();
+        query.setLimit(1);
+        //获取第一个对话
+        query.findInBackground(new AVIMConversationQueryCallback() {
+          @Override
+          public void done(List<AVIMConversation> convs, AVIMException e) {
+            if (e == null) {
+              if (convs != null && !convs.isEmpty()) {
+                AVIMConversation conv = convs.get(0);
+                //获取第一个对话的
+                conv.getMemberCount(new AVIMConversationMemberCountCallback() {
+
+                  @Override
+                  public void done(Integer count, AVIMException e) {
+                    if (e == null) {
+                      Log.d("Tom & Jerry", "conversation got " + count + " members");
+                    }
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+    }
+  });
+}
+```
+```cs
+```
+
+### 消息内容的实时过滤
+
+对于开放聊天室来说，内容的审核和实时过滤是产品运营上一个基本的要求。我们即时通讯服务默认提供了敏感词过滤的功能，多人的普通对话、聊天室和系统对话里面的消息都会进行实时过滤。
+
+过滤的词库由 LeanCloud 统一提供，命中的敏感词将会被替换为 `***`。同时我们也支持用户自定义敏感词过滤文件。
+在 [控制台 > 消息 > 实时消息 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中开启「消息敏感词实时过滤功能」，上传敏感词文件即可。
+
+如果开发者有较为复杂的过滤需求，我们推荐使用 [云引擎 hook _messageReceived](realtime-guide-systemconv.html#_messageReceived) 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
+
 ## 使用临时对话
 
 临时对话是一个全新的概念，它解决的是一种特殊的聊天场景：
@@ -598,5 +914,5 @@ var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 
 
 {{ docs.relatedLinks("进一步阅读",[
-  { title: "详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
+  { title: "四，详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
 }}
