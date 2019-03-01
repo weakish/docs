@@ -7,7 +7,7 @@
 
 ## 本章导读
 
-在前一章[安全与签名、黑名单和权限管理、使用临时对话](realtime-guide-senior.html)中，我们解释了一些第三方鉴权以及成员权限设置方面的问题，在这里我们会更进一步，给大家说明：
+在前一章[安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话](realtime-guide-senior.html)中，我们解释了一些第三方鉴权以及成员权限设置方面的问题，在这里我们会更进一步，给大家说明：
 
 - 即时通讯的消息 Hook 机制
 - 系统对话的使用方法
@@ -662,6 +662,10 @@ timestamp | 消息创建的时间
 ```
 
 ## 打造自己的聊天机器人
+
+![comingsoon](http://lc-lhzo7z96.cn-n1.lcfile.com/f7b50d5a7f04819bd1a6.jpg)
+
+> 这部分内容我们还在准备中，敬请期待。
 
 {{ docs.relatedLinks("即时通讯开发指南",[
   { title: "服务总览", href: "realtime-v2.html"}, 
