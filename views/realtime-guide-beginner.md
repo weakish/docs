@@ -472,7 +472,7 @@ Cloud-->Jerry: 5.下发通知：接收到有新消息
 Jerry-->UI: 6.显示收到的消息内容
 ```
 
-在聊天过程中，接收方除了响应新消息到达通知之外，还需要响应多种对话成员变动通知，例如「新用户 XX 被 XX 邀请加入了对话」、「用户 XX 主动退出了对话」、「用户 XX 被管理员剔除出对话」，等等。LeanCloud 云端会实时下发这些事件通知给客户端，具体细节可以参考后续章节：[6. 成员变更的事件通知总结](#6.成员变更的事件通知总结)。
+在聊天过程中，接收方除了响应新消息到达通知之外，还需要响应多种对话成员变动通知，例如「新用户 XX 被 XX 邀请加入了对话」、「用户 XX 主动退出了对话」、「用户 XX 被管理员剔除出对话」，等等。LeanCloud 云端会实时下发这些事件通知给客户端，具体细节可以参考后续章节：[成员变更的事件通知总结](#6. 成员变更的事件通知总结)。
 
 
 ## 多人群聊
@@ -946,7 +946,7 @@ private void OnMembersLeft(object sender, AVIMOnMembersLeftEventArgs e)
 }
 ```
 
-### 6.成员变更的事件通知总结
+### 6. 成员变更的事件通知总结
 
 前面的时序图和代码针对成员变更的操作做了逐步的分析和阐述，为了确保开发者能够准确的使用事件通知，如下表格做了一个统一的归类和划分:
 
@@ -1805,6 +1805,86 @@ conversation["pinned"] = false;
 // 保存
 await conversation.SaveAsync();
 ```
+
+### 对话属性同步
+
+对话的名字以及应用层附加的其他属性，一般都是需要全员共享的，一旦有人对这些数据进行了修改，那么就需要及时通知到全部成员。在前一个例子中，有一个用户将对话名字改为了「聪明的喵星人」，那其他成员怎么能知道这件事情呢？
+
+LeanCloud 即时通讯云端提供了实时同步的通知机制，会把单个用户对「对话」的修改同步下发到所有在线成员（对于非在线的成员，他们下次登录上线之后，自然会拉取到最新的对话数据）。对话属性更新的通知事件声明如下：
+
+```js
+/**
+ * 对话信息被更新
+ * @event IMClient#CONVERSATION_INFO_UPDATED
+ * @param {Object} payload
+ * @param {Object} payload.attributes 被更新的属性
+ * @param {String} payload.updatedBy 该操作的发起者 id
+ */
+var { Event } = require('leancloud-realtime');
+client.on(Event.CONVERSATION_INFO_UPDATED, function(payload) {
+});
+```
+```objc
+// 在 AVIMClientDelegate 中有如下定义
+/*!
+ Notification for conversation property update.
+ You can use this method to handle the properties that will be updated dynamicly during conversation's lifetime,
+ for example, unread message count, last message and receipt timestamp, etc.
+ 
+ @param conversation The updated conversation.
+ @param key          The property name of updated conversation.
+ */
+- (void)conversation:(AVIMConversation *)conversation didUpdateForKey:(AVIMConversationUpdatedKey)key;
+```
+```java
+// 在 AVIMConversationEventHandler 接口中有如下定义
+/**
+ * 对话自身属性变更通知
+ *
+ * @param client
+ * @param conversation
+ * @param attr
+ * @param operator
+ */
+public void onInfoChanged(AVIMClient client, AVIMConversation conversation, JSONObject attr,
+                          String operator)
+```
+```cs
+// not support yet.
+```
+
+> 思考：对于删除自定义属性，sdk 内部是如何处理的呢？
+
+### 获取群内成员列表
+
+群内成员列表是作为对话的属性持久化保存在云端的，所以要获取一个 Conversation 对象的成员列表，我们可以在调用这个对象的更新方法之后，直接获取成员属性即可。
+
+```js
+conversation.fetch().then(function(conversation) {
+  console.log('members: ', conversation.members);
+).catch(console.error.bind(console));
+```
+```objc
+[conversation fetchWithCallback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"", conversation.members);
+    }
+}];
+```
+```java
+conversation.fetchInfoInBackground(new AVIMConversationCallback() {
+  @Override
+  public void done(AVIMException e) {
+    if (e == null) {
+      conversation.getMembers();
+    }
+  }
+});
+```
+```cs
+```
+
+> 注意，成员列表是对***普通对话***而言的，对于像「聊天室」「系统对话」这样的特殊对话，并不存在「成员列表」属性。
 
 ## 使用复杂条件来查询对话
 

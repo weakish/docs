@@ -1245,7 +1245,7 @@ public class AVIMTextMessage extends AVIMTypedMessage {
 
 ### 创建聊天室
 
-`AVIMClient` 提供了专门的方法来创建聊天室：
+`AVIMClient` 提供了专门的 `createChatRoom` 方法来创建聊天室：
 
 ```js
 tom.createChatRoom({ name:'聊天室' }).catch(console.error);
@@ -1274,17 +1274,19 @@ tom.createChatRoom(null, "聊天室", null,
 });
 ```
 ```cs
-// 第一种是最直接间接的方式，传入 name 即可
+// 最直接的方式，传入 name 即可
 tom.CreateChatRoomAsync("聊天室");
-// 第二种是更为推荐的形式采用 Builder 模式
-var chatRoomBuilder = tom.GetConversationBuilder().SetName("聊天室")
-                              .SetTransient();
-var chatRoom = await tom.CreateConversationAsync(chatRoomBuilder);
 ```
+
+在创建聊天室的时候，开发者可以指定聊天室的名字和附加属性（非必须），与[创建普通对话的接口](realtime-guide-beginner.html#创建对话 Conversation)相比，有如下差异：
+- 聊天室因为没有成员列表，所以创建的时候指定 `members` 是没有意义的
+- 同样的原因，创建聊天室的时候指定 `unique` 标志也是没有意义的（云端根据成员 id 来去重）
+
+> 尽管我们调用 `createConversation` 接口，通过传递合适的参数（`{transient: true}`），也可以创建一个聊天室，但是还是建议大家直接使用 `createChatRoom` 方法。
 
 ### 查找聊天室
 
-构建聊天室的查询：
+在前面一章中，我们已经了解了 [构造复杂条件来查询对话](realtime-guide-beginner.html#使用复杂条件来查询对话) 的方法，`ConversationsQuery` 依然适用于查询聊天室，只需要添加 `transient = true` 的限制条件即可。
 
 ```js
 var query = tom.getQuery().equalTo('tr',true);// 聊天室对象
@@ -1311,11 +1313,17 @@ query.findInBackground(new AVIMConversationQueryCallback() {
 var query = tom.GetChatRoomQuery();
 ```
 
-### 加入/离开/邀请他人加入聊天室
+> Java / Android / dotNet SDK 专门提供了 `AVIMClient#getChatRoomQuery` 方法来生成聊天室查询对象，屏蔽了 `transient` 属性的细节，建议开发者优先使用这些高层 API。
 
-查询到聊天室之后，加入/离开/邀请他人加入聊天室与普通对话的对应接口没有区别，详细请参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)。最大的区别就是：
+### 加入和离开聊天室
 
-> 聊天室没有成员加入、成员离开的通知
+查询到聊天室之后，加入和离开聊天室与普通对话的对应接口没有区别，详细请参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)。
+
+在成员管理与变更通知方面，聊天室与普通对话的最大区别就是：
+- 在聊天室内无法邀请或者踢出成员，只能由用户主动加入和退出；
+- 除了用户主动退出之外，客户端断线也会被认为是退出了聊天室。为了防止网络抖动，如果客户端临时异常断线，只要在半小时内重新上线，都会自动加入原聊天室（主动退出的除外）；
+- 云端不会下发成员加入、退出的变更通知；
+- 不支持查询成员列表，但提供专门的 API 来查询实时在线人数；
 
 ### 消息等级
 
