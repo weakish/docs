@@ -191,15 +191,18 @@ git push -u origin master
 
 设置好之后，今后需要部署代码时就可以在云引擎的部署界面直接点击「部署」了，默认会部署 master 分支的代码，你也可以在部署时填写分支、标签或具体的 Commit。
 
-如果希望 push 到项目的 GitHub 仓库的特定分支后自动触发云引擎部署，可以设置 webhook。在云引擎设置界面 Webhooks 下指定自动部署的分支（默认为 `master`），然后点击「生成」按钮，云引擎会生成用于自动部署的 webhook 网址：
+如果希望 push 到项目的 Git 仓库的特定分支后自动触发云引擎部署，可以设置 webhook。在云引擎设置界面 Webhooks 下指定自动部署的分支（默认为 `master`），然后点击「生成」按钮，云引擎会生成用于自动部署的 webhook 网址：
 
 ```
 https://us.leancloud.cn/1.1/engine/groups/web/productionImage?token=YOURTOKEN&gitTag=master
 ```
 
-然后到项目的 GitHub 仓库的 Settings > Webhooks > Payload URL 填写生成的网址即可（Webhooks 的其他选项均使用默认值，不用修改）。
+这个 webhook 地址收到任意 POST 请求后，会部署指定分支的代码。
 
-设置完成后，下次 push 到项目仓库的 `master` 分支（如果在云引擎设置界面修改了分支默认值，则为指定的分支），云引擎会自动更新项目，重新部署。
+例如，在 GitHub 代码仓库的 Settings > Webhooks > Payload URL 填写生成的 webhook 后（其他选项均使用默认值，不用修改），
+下次 push 到项目仓库的 **任意** 分支，云引擎会自动根据 **指定** 分支更新代码，重新部署。
+之所以 push 到任意分支都会触发重新部署，是因为 GitHub 的 webhook 触发事件设置粒度较粗，不能指定仅在 push 到特定分支时触发 webhook。
+另一方面，云引擎也没有适配具体的托管平台，不会根据 GitHub 提交的 POST 内容中的分支信息决定是否重新部署。
 
 ### 预备环境和生产环境
 默认情况，云引擎只有一个「生产环境」，对应的域名是 `{{var_app_domain}}.{{engineDomain}}`。在生产环境中有一个「体验实例」来运行应用。
