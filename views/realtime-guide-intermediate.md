@@ -302,7 +302,7 @@ imConversation.updateMessage(oldMessage, textMessage, new AVIMMessageUpdatedCall
 // dotNot SDK 接口不太一样，允许直接修改对应的内容
 textMessage.TextContent = "修改之后的文本消息内容";
 // 将修改后的消息传入 ModifyAsync
-conversation.ModifyAsync(textMessage);
+await conversation.ModifyAsync(textMessage);
 ```
 
 Tom 将消息修改成功之后，对话内的其他成员会立刻接收到 `MESSAGE_UPDATE` 事件：
@@ -344,7 +344,7 @@ private void Tom_OnMessageModified(object sender, AVIMMessagePatchEventArgs e)
 
 对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（这时候消息列表会出现内容变化）。
 
-### 发送「暂态消息」
+### 暂态消息
 
 有时候我们需要发送一些特殊的消息，譬如聊天过程中「某某正在输入...」这样的实时状态信息，或者当群聊的名称修改以后给该群成员发送「群名称被某某修改为...」这样的通知信息。这类消息与终端用户发送的消息不一样，发送者不要求把它保存到历史记录里，也不要求一定会被送达（如果成员不在线或者现在网络异常，那么没有下发下去也无所谓），这种需求可以使用「暂态消息」来实现。
 
@@ -1138,7 +1138,7 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
   * 对 class 使用 `messageField(['fieldName'])` 装饰器来声明需要发送的字段。
 * 调用 `Realtime#register()` 函数注册这个消息类型。
 
-举个例子，实现一个在 [暂态消息](#发送「暂态消息」) 中提出的 OperationMessage：
+举个例子，实现一个在 [暂态消息](#暂态消息) 中提出的 OperationMessage：
 
 {{ docs.langSpecEnd('js') }}
 
@@ -1168,7 +1168,62 @@ AVIMTextMessage 的源码如下，可供参考：
 
 {{ docs.langSpecStart('cs') }}
 
-无可奉告。
+首先定义一个自定义的子类继承自 `AVIMTypedMessage`：
+```cs
+// 定义自定义消息类名
+[AVIMMessageClassName("InputtingMessage")]
+// 标记消息类型，仅允许使用正整数，LeanCloud 保留负数内部使用
+[AVIMTypedMessageTypeIntAttribute(2)]
+public class InputtingMessage : AVIMTypedMessage
+{
+    public InputtingMessage() { }
+    // 我们在发送消息时可以附带一个 Emoji 表情，这里用 Ecode 来表示表情编码
+    [AVIMMessageFieldName("Ecode")]
+    public string Ecode { get; set; }
+}
+```
+
+然后在初始化的时候注册这个子类：
+
+```cs
+realtime.RegisterMessageType<InputtingMessage>();
+```
+
+到这里，自定义消息的工作就完成了。
+
+现在我们发送一个自己定义的消息：
+
+```cs
+var inputtingMessage = new InputtingMessage();
+// 这里的 TextContent 继承自 AVIMTypedMessage
+inputtingMessage.TextContent = "对方正在输入...";
+// 这里的 Ecode 是我们刚刚自己定义的
+inputtingMessage.Ecode = "#e001";
+        
+// 执行此行代码前，用户已经登录并拿到了当前的 conversation 对象
+await conversation.SendMessageAsync(inputtingMessage);
+```
+
+在同一个 conversation 中的其他用户，接收该条自定义消息的方法为：
+
+```cs
+async void Start() 
+{   
+    var jerry = await realtime.CreateClientAsync("jerry");
+    // 接收消息事件
+    jerry.OnMessageReceived += Jerry_OnMessageReceived;
+}
+void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
+{
+    if (e.Message is InputtingMessage)
+    {
+        var inputtingMessage = (InputtingMessage)e.Message;
+        Debug.Log(string.Format("收到自定义消息 {0} {1}", inputtingMessage.TextContent, inputtingMessage.Ecode));
+    }
+}
+```
+
+在这个案例中，通过「对方正在输入...」这种场景，我们介绍了如何自定义消息，但要真正实现「对方正在输入...」这个完整的功能，我们还需要指定该条消息为「[暂态消息](#暂态消息)」。
 
 {{ docs.langSpecEnd('cs') }}
 

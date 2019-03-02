@@ -319,7 +319,7 @@ var textMessage = new AVIMTextMessage("Jerry，起床了！");
 await conversation.SendMessageAsync(textMessage);
 ```
 
-`conversation.send` 接口实现的功能就是向对话中发送一条消息，同一对话中其他在线成员会立刻收到此消息。
+`Conversation#send` 接口实现的功能就是向对话中发送一条消息，同一对话中其他在线成员会立刻收到此消息。
 
 现在 Tom 发出了消息，那么接收者 Jerry 他要在界面上展示出来这一条新消息，该怎么来处理呢？
 
@@ -439,7 +439,7 @@ AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
 ```
 ```cs
 // SDK 通过在 IMClient 实例上监听事件回调来响应服务端通知
-var jerry =await realtime.CreateClientAsync("Jerry");
+var jerry = await realtime.CreateClientAsync("Jerry");
 jerry.OnInvited += (sender, args) =>
 {
   var invitedBy = args.InvitedBy;
@@ -670,7 +670,8 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
 });
 ```
 ```cs
-await conversation.SendMessageAsync("大家好，欢迎来到我们的群聊对话！");
+var textMessage = new AVIMTextMessage("大家好，欢迎来到我们的群聊对话！");
+await conversation.SendMessageAsync(textMessage);
 ```
 
 而 Jerry 和 Mary 端都会有 `Event.MESSAGE` 事件触发，利用它来接收群聊消息，并更新产品 UI。
@@ -901,9 +902,7 @@ conversation.quit(new AVIMConversationCallback(){
 });
 ```
 ```cs
-jerry.LeaveAsync(conversation);
-// 或者传入 conversation id
-jerry.LeaveAsync("590aa654fab00f41dda86f51");
+await jerry.LeaveAsync(conversation);
 ```
 
 执行了这段代码 Jerry 就离开了这个聊天群，此后群里所有的事件 Jerry 都不会再知晓。各个成员接收到的事件通知流程如下：
@@ -1115,15 +1114,9 @@ conv.sendMessage(m, new AVIMConversationCallback() {
 });
 ```
 ```cs
-// 假设在程序运行目录下有一张图片，Unity/Xamarin 可以参照这种做法通过路径获取图片
-// 以下是发送图片消息的快捷用法
-using (FileStream fileStream = new FileStream(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "San_Francisco.png"), FileMode.Open, FileAccess.Read))
-{
-    await conversation.SendImageAsync("San_Francisco.png", fileStream);
-}
-// 或者如下比较常规的用法
+var image = new AVFile("screenshot.png", Path.Combine(Application.persistentDataPath, "screenshot.PNG"));
 var imageMessage = new AVIMImageMessage();
-imageMessage.File = new AVFile("San_Francisco.png", fileStream);
+imageMessage.File = image;
 imageMessage.TextContent = "发自我的 Windows";
 await conversation.SendMessageAsync(imageMessage);
 ```
@@ -1170,7 +1163,11 @@ conv.sendMessage(m, new AVIMConversationCallback() {
 });
 ```
 ```cs
-await conversation.SendImageAsync("http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", "Satomi_Ishihara", "萌妹子一枚");
+var image = new AVFile("Satomi_Ishihara.gif", "http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif");
+var imageMessage = new AVIMImageMessage();
+imageMessage.File = image;
+imageMessage.TextContent = "发自我的 Windows";
+await conversation.SendMessageAsync(imageMessage);
 ```
 
 #### 接收图像消息
@@ -1236,8 +1233,8 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 {
     if (e.Message is AVIMImageMessage imageMessage)
     {
-        Console.WriteLine(imageMessage.File.Url);
-        // imageMessage.File 是一个 AVFile 对象，更多操作可以参考数据存储里面的文件
+        AVFile file = imageMessage.File;
+        Debug.Log(file.Url);
     }
 }
 ```
@@ -1301,16 +1298,9 @@ conv.sendMessage(m, new AVIMConversationCallback() {
 });
 ```
 ```cs
-// 假设在程序运行目录下有一张图片，Unity/Xamarin 可以参照这种做法通过路径获取音频文件
-// 以下是发送音频消息的快捷用法
-using (FileStream fileStream = new FileStream(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "忐忑.mp3"), FileMode.Open, FileAccess.Read))
-{
-    await conversation.SendAudioAsync("忐忑.mp3", fileStream);
-}
-
-// 或者如下比较常规的用法
+var audio = new AVFile("tante.mp3", Path.Combine(Application.persistentDataPath, "tante.mp3"));
 var audioMessage = new AVIMAudioMessage();
-audioMessage.File = new AVFile("忐忑.mp3", fileStream);
+audioMessage.File = audio;
 audioMessage.TextContent = "听听人类的神曲";
 await conversation.SendMessageAsync(audioMessage);
 ```
@@ -1340,7 +1330,7 @@ AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"来自苹果发�
 }];
 ```
 ```java
-AVFile file =new AVFile("apple.acc","来自苹果发布会现场的录音", null);
+AVFile file =new AVFile("apple.acc", "https://some.website.com/apple.acc", null);
 AVIMAudioMessage m = new AVIMAudioMessage(file);
 m.setText("来自苹果发布会现场的录音");
 conv.sendMessage(m, new AVIMConversationCallback() {
@@ -1353,7 +1343,11 @@ conv.sendMessage(m, new AVIMConversationCallback() {
 });
 ```
 ```cs
-await conversation.SendAudioAsync("https://some.website.com/apple.acc", "apple.acc", "来自苹果发布会现场的录音");
+var audio = new AVFile("apple.acc", "https://some.website.com/apple.acc");
+var audioMessage = new AVIMAudioMessage();
+audioMessage.File = audio;
+audioMessage.TextContent = "来自苹果发布会现场的录音";
+await conversation.SendMessageAsync(audioMessage);
 ```
 
 ### 发送地理位置消息
@@ -1396,7 +1390,9 @@ conversation.sendMessage(locationMessage, new AVIMConversationCallback() {
 });
 ```
 ```cs
-await conv.SendLocationAsync(new AVGeoPoint(31.3753285, 120.9664658));
+var locationMessage = new AVIMLocationMessage();
+locationMessage.Location = new AVGeoPoint(31.3753285, 120.9664658);
+await conversation.SendMessageAsync(locationMessage);
 ```
 
 ### 接收消息
@@ -1718,7 +1714,7 @@ client.createConversation(Arrays.asList("Jerry"),"猫和老鼠", attr, false, tr
     });
 ```
 ```cs
-IDictionary<string, object> options = new Dictionary<string, object>();
+vars options = new Dictionary<string, object>();
 options.Add("type", "private");
 options.Add("pinned",true);
 var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry", isUnique:true, options:options);
@@ -1961,8 +1957,15 @@ query.findInBackground(new AVIMConversationQueryCallback(){
 });
 ```
 ```cs
-var query = tom.GetQuery();
-query.WhereEqualTo("type","private");
+// 由于 WhereXXX 设置条件的接口每次都是返回一个新的 Query 实例，所以下面这样组合查询条件是无效的：
+//   var query = tom.GetQuery();
+//   query.WhereEqualTo("type","private");
+// 您可以这样写：
+//   var query = tom.GetQuery();
+//   query = query.WhereEqualTo("type","private");
+// 我们更建议采用这样的方式：
+//   var query = tom.GetQuery().WhereEqualTo("type","private");
+var query = tom.GetQuery().WhereEqualTo("type","private");
 await query.FindAsync();
 ```
 
@@ -2133,11 +2136,9 @@ keywordsQuery.whereContains('keywords', '教育');
 AVIMConversationsQuery query = AVIMConversationsQuery.or(Arrays.asList(priorityQuery, statusQuery));
 ```
 ```cs
-var ageQuery = tom.GetQuery();
-ageQuery.WhereLessThan('age', 18);
+var ageQuery = tom.GetQuery().WhereLessThan('age', 18);
 
-var keywordsQuery = tom.GetQuery();
-keywordsQuery.WhereContains('keywords', '教育').
+var keywordsQuery = tom.GetQuery().WhereContains('keywords', '教育').
 
 var query = AVIMConversationQuery.or(new AVIMConversationQuery[] { ageQuery, keywordsQuery});
 ```
@@ -2402,6 +2403,13 @@ conv.queryMessages(10, new AVIMMessagesQueryCallback() {
 ```cs
 // limit 取值范围 1~1000，默认 20
 var messages = await conversation.QueryMessageAsync(limit: 10);
+foreach (var message in messages)
+{
+  if (message is AVIMTextMessage)
+  {
+    var textMessage = (AVIMTextMessage)message;
+  }
+}
 ```
 
 `queryMessage` 接口也是支持翻页的。LeanCloud 即时通讯云端通过消息的 messageId 和发送时间戳来唯一定位一条消息，因此要从某条消息起拉取后续的 N 条记录，只需要指定起始消息的 `messageId` 和 `发送时间戳` 作为锚定就可以了，示例代码如下：
@@ -2532,7 +2540,7 @@ conversation.queryMessages(internal, AVIMMessageQueryDirectionFromOldToNew, limi
 });
 ```
 ```cs
-var earliestMessages = await conversation.QueryMessageFromOldToNewAsync();
+var earliestMessages = await conversation.QueryMessageAsync(direction: 0);
 ```
 
 这种情况下要实现翻页，接口会稍微复杂一点，请继续阅读下一节。
@@ -2580,7 +2588,7 @@ conversation.queryMessages(internal, direction, limit,
 });
 ```
 ```cs
-var earliestMessages = await conversation.QueryMessageFromOldToNewAsync();
+var earliestMessages = await conversation.QueryMessageAsync(direction: 0, limit: 1);
 // get some messages after earliestMessages.Last()
 var nextPageMessages = await conversation.QueryMessageAfterAsync(earliestMessages.Last());
 ```
@@ -2626,7 +2634,7 @@ conversation.queryMessages(internal, direction, limit,
 });
 ```
 ```cs
-var earliestMessage = await conversation.QueryMessageFromOldToNewAsync(limit: 1);
+var earliestMessage = await conversation.QueryMessageAsync(direction: 0, limit: 1);
 var latestMessage = await conversation.QueryMessageAsync(limit: 1);
 // mex count for messagesInInterval is 100
 var messagesInInterval = await conversation.QueryMessageInIntervalAsync(earliestMessage.FirstOrDefault(), latestMessage.FirstOrDefault());

@@ -106,7 +106,11 @@ var realtime = new AVRealtime("{{appid}}", "{{appkey}}");
 在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口。
 
 ```cs
+// 开启存储日志
 AVClient.HttpLog(Debug.Log);
+
+// 开启即时通讯日志
+AVRealtime.WebSocketLog(Debug.Log);
 ```
 
 {{ docs.alert("在应用发布之前，请关闭调试日志，以免暴露敏感数据。") }}
