@@ -71,6 +71,8 @@ play.UserId = randId;
 ```cs
 play.Connect();
 ```
+连接完成后，会通过 `CONNECTED`（连接成功）或 `CONNECT_FAILED`（连接失败）事件来通知客户端。
+
 {% endblock %}
 
 
