@@ -9,13 +9,13 @@
 
 ## 本章导读
 
-在很多产品里面，都存在实时沟通的需求，例如：
-- 员工与客户之间的实时信息交流，如房地产行业经纪人与客户的沟通，商业产品客服与客户的沟通，等等。
+在很多产品里面，都存在让用户实时沟通的需求，例如：
+- 员工与客户之间的实时交流，如房地产行业经纪人与客户的沟通，商业产品客服与客户的沟通，等等。
 - 企业内部沟通协作，如内部的工作流系统、文档/知识库系统，增加实时互动的方式可能就会让工作效率得到极大提升。
 - 直播互动，不论是文体行业的大型电视节目中的观众互动、重大赛事直播，娱乐行业的游戏现场直播、网红直播，还是教育行业的在线课程直播、KOL 知识分享，在支持超大规模用户积极参与的同时，也需要做好内容审核管理。
-- 应用内社交，社交产品要能长时间吸引住用户，除了实时性之外，还需要更多的创新玩法，对于标准化通讯服务会存在更多的功能扩展需求。
+- 应用内社交，游戏公会嗨聊，等等。社交产品要能长时间吸引住用户，除了实时性之外，还需要更多的创新玩法，对于标准化通讯服务会存在更多的功能扩展需求。
 
-根据功能需求的层次性和技术实现的难易程度不同，我们分为多篇文档来逐层深入地讲解如何利用 LeanCloud 即时通讯服务实现不同业务场景需求：
+根据功能需求的层次性和技术实现的难易程度不同，我们分为多篇文档来一步步地讲解如何利用 LeanCloud 即时通讯服务实现不同业务场景需求：
 
 - 本篇文档，我们会从实现简单的单聊/群聊开始，演示创建和加入「对话」、发送和接收富媒体「消息」的流程，同时让大家了解历史消息云端保存与拉取的机制，希望可以满足在成熟产品中快速集成一个简单的聊天页面的需求。
 - [第二篇文档](realtime-guide-intermediate.html)，我们会介绍一些特殊消息的处理，例如 @ 成员提醒、撤回和修改、消息送达和被阅读的回执通知等，离线状态下的推送通知和消息同步机制，多设备登录的支持方案，以及如何扩展自定义消息类型，希望可以满足一个社交类产品的多方面需求。
@@ -31,13 +31,13 @@
 
 ## 一对一单聊
 
-在开始讨论聊天之前，我们需要介绍一下在即时通讯服务中的 `IMClient` 对象：
+在开始讨论聊天之前，我们需要介绍一下在即时通讯 SDK 中的 `IMClient` 对象：
 
 > `IMClient` 对应实体的是一个用户，它代表着一个用户以客户端的身份登录到了即时通讯的系统。
 
-具体可以参考[服务总览中的说明](realtime_v2.html#Client、用户和登录)。
+具体可以参考[服务总览中的说明](realtime_v2.html#ClientId、用户和登录)。
 
-### 1. 创建 `IMClient`
+### 创建 `IMClient`
 
 假设我们产品中有一个叫「Tom」的用户，首先我们在 SDK 中创建出一个与之对应的 `IMClient` 实例:
 
@@ -68,11 +68,11 @@ var tom = await realtime.CreateClientAsync('Tom');
 
 注意这里一个 `IMClient` 实例就代表一个终端用户，我们需要把它全局保存起来，因为后续该用户在即时通讯上的所有操作都需要直接或者间接使用这个实例。
 
-### 2. 登录即时通讯服务器
+### 登录即时通讯服务器
 
 创建好了「Tom」这个用户对应的 `IMClient` 实例之后，我们接下来需要让该实例「登录」 LeanCloud 即时通讯服务器。只有登录成功之后客户端才能开始与其他用户聊天，也才能接收到 LeanCloud 云端下发的各种事件通知。
 
-这里需要说明一点，JavaScript 和 C#(Unity3D) SDK 在创建 `IMClient` 实例的同时会自动进行登录，而 iOS（Objective-C/Swift） 和 Android SDK 则需要调用开发者手动执行 `open` 方法进行登录：
+这里需要说明一点，JavaScript 和 C#(Unity3D) SDK 在创建 `IMClient` 实例的同时会自动进行登录，而 iOS（包括 Objective-C 和 Swift） 和 Android（包括通用的 Java） SDK 则需要调用开发者手动执行 `open` 方法进行登录：
 
 ```js
 // Tom 用自己的名字作为 clientId 登录，并且获取 IMClient 对象实例
@@ -108,7 +108,7 @@ var realtime = new AVRealtime('your-app-id','your-app-key');
 var tom = await realtime.CreateClientAsync('Tom');
 ```
 
-### 3. 创建对话 `Conversation`
+### 创建对话 `Conversation`
 
 用户登录之后，要开始与其他人聊天，需要先创建一个「对话」。
 
@@ -149,7 +149,7 @@ var tom = await realtime.CreateClientAsync('Tom');
 var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry", isUnique:true);
 ```
 
-`createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开 控制台->存储 查看数据。不同 SDK 提供的创建对话接口如下：
+`createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开 [**控制台** > **存储** > **数据**](/data.html?appid={{appid}}#/) 查看数据。不同 SDK 提供的创建对话接口如下：
 
 ```js
 /**
@@ -278,12 +278,12 @@ public Task<AVIMConversation> CreateConversationAsync(string member = null,
 5. `unique/isUnique` 或者是 `AVIMConversationOptionUnique`：唯一对话标志位，可选。
   - 如果设置为唯一对话，云端会根据完整的成员列表先进行一次查询，如果已经有正好包含这些成员的对话存在，那么就返回已经存在的对话，否则才创建一个新的对话。
   - 如果不指定 unique 标志为，那么每次调用 `createConversation` 接口都会创建一个新的对话。
-  - 从通用的聊天场景来看，不管是 Tom 发出创建和 Jerry 单聊对话的请求，还是从 Jerry 发出创建和 Tom 单聊对话的请求，或者 Tom 以后再次发出创建和 Jerry 单聊对话的请求，都应该是同一个对话才是合理的，否则可能因为聊天记录的不同导致用户混乱。所以我们***建议开发者明确指定 unique 标志为 true***。
+  - 从通用的聊天场景来看，不管是 Tom 发出「创建和 Jerry 单聊对话」的请求，还是从 Jerry 发出「创建和 Tom 单聊对话」的请求，或者 Tom 以后再次发出创建和 Jerry 单聊对话的请求，都应该是同一个对话才是合理的，否则可能因为聊天记录的不同导致用户混乱。所以我们***建议开发者明确指定 unique 标志为 true***。
 4. 对话类型的其他标志，可选参数，例如 `transient/isTransient` 表示「聊天室」，`tempConv/tempConvTTL` 和 `AVIMConversationOptionTemporary` 用来创建「临时对话」等等。什么都不指定就表示创建普通对话，对于这些标志位的含义我们先不管，以后会有说明。
 
 创建对话之后，可以获取对话的内置属性，云端会为每一个对话生成一个全局唯一的 ID 属性： `Conversation.id`，它是其他用户查询对话时常用的匹配字段。
 
-### 4.发送消息
+### 发送消息
 
 对话已经创建成功了，接下来 Tom 可以在这个对话中发出第一条文本消息了：
 
@@ -323,7 +323,7 @@ await conversation.SendMessageAsync(textMessage);
 
 现在 Tom 发出了消息，那么接收者 Jerry 他要在界面上展示出来这一条新消息，该怎么来处理呢？
 
-### 5. 接收消息
+### 接收消息
 
 在另一个设备上，我们用 `Jerry` 作为 `clientId` 来创建一个 `AVIMClient` 并登录即时通讯服务（与前两节 Tom 的处理流程一样）:
 
@@ -362,7 +362,7 @@ Jerry 作为消息的被动接收方，他不需要主动创建与 Tom 的对话
 - 用户被邀请进入某个对话的通知事件。Tom 在创建和 Jerry 的单聊对话的时候，Jerry 这边就能立刻收到一条通知，获知到类似于「Tom 邀请你加入了一个对话」的信息。
 - 已加入对话中新消息到达的通知。在 Tom 发出「Jerry，起床了！」这条消息之后，Jerry 这边也能立刻收到一条新消息到达的通知，通知中带有消息具体数据以及对话、发送者等上下文信息。
 
-现在，我们看看具体应该如何响应服务端发过来的通知。Jerry 端会分别处理对话加入的事件通知和新消息到达的事件通知：
+现在，我们看看具体应该如何响应服务端发过来的通知。Jerry 端会分别处理「加入对话」的事件通知和「新消息到达」的事件通知：
 
 ```js
 // js SDK 通过在 IMClient 实例上监听事件回调来响应服务端通知
@@ -472,18 +472,18 @@ Cloud-->Jerry: 5.下发通知：接收到有新消息
 Jerry-->UI: 6.显示收到的消息内容
 ```
 
-在聊天过程中，接收方除了响应新消息到达通知之外，还需要响应多种对话成员变动通知，例如「新用户 XX 被 XX 邀请加入了对话」、「用户 XX 主动退出了对话」、「用户 XX 被管理员剔除出对话」，等等。LeanCloud 云端会实时下发这些事件通知给客户端，具体细节可以参考后续章节：[成员变更的事件通知总结](#6. 成员变更的事件通知总结)。
+在聊天过程中，接收方除了响应新消息到达通知之外，还需要响应多种对话成员变动通知，例如「新用户 XX 被 XX 邀请加入了对话」、「用户 XX 主动退出了对话」、「用户 XX 被管理员剔除出对话」，等等。LeanCloud 云端会实时下发这些事件通知给客户端，具体细节可以参考后续章节：[成员变更的事件通知总结](#成员变更的事件通知总结)。
 
 
 ## 多人群聊
 
-上面我们讨论了一对一单聊的实现流程，假设我们还需要实现一个「同学群」、「朋友群」、「同事群」的多人聊天，接下来我们就看看怎么完成这一功能。
+上面我们讨论了一对一单聊的实现流程，假设我们还需要实现一个「朋友群」的多人聊天，接下来我们就看看怎么完成这一功能。
 
-多人群聊与单聊的流程十分接近，主要差别在于对话内成员数量的多少。群聊对话支持在创建对话的时候一次性指定全部成员，也允许在创建之后通过邀请的方式来增加新的成员。
+从即时通讯云端来看，多人群聊与单聊的流程十分接近，主要差别在于对话内成员数量的多少。群聊对话支持在创建对话的时候一次性指定全部成员，也允许在创建之后通过邀请的方式来增加新的成员。
 
-### 1. 创建多人群聊对话
+### 创建多人群聊对话
 
-在 Tom 和 Jerry 的对话中（假设对话 id 为 `CONVERSATION_ID`），后来 Tom 又希望把 Mary 也拉进来，他可以使用如下的办法：
+在 Tom 和 Jerry 的对话中（假设对话 id 为 `CONVERSATION_ID`，这只是一个示例，并不代表实际数据），后来 Tom 又希望把 Mary 也拉进来，他可以使用如下的办法：
 
 ```js
 // 首先根据 id 获取 Conversation 实例
@@ -640,7 +640,7 @@ tom.createConversation(Arrays.asList("Jerry","Mary"), "Tom & Jerry & friends", n
 var conversation = await tom.CreateConversationAsync(new string[]{ "Jerry","Mary" },"Tom & Jerry & friends");
 ```
 
-### 2. 群发消息
+### 群发消息
 
 多人群聊中一个成员发送的消息，会实时同步到所有其他在线成员，其处理流程与单聊中 Jerry 接收消息的过程是一样的。
 
@@ -676,7 +676,7 @@ await conversation.SendMessageAsync(textMessage);
 
 而 Jerry 和 Mary 端都会有 `Event.MESSAGE` 事件触发，利用它来接收群聊消息，并更新产品 UI。
 
-### 3. 将他人踢出对话
+### 将他人踢出对话
 
 三个好友的群其乐融融不久，后来 Mary 出言不逊，惹恼了群主 Tom，Tom 直接把 Mary 踢出了对话群。Tom 端想要踢人，该怎么实现呢？
 
@@ -796,7 +796,7 @@ jerry.OnMembersLeft += OnMembersLeft;
 jerry.OnKicked += OnKicked;
 ```
 
-### 4. 用户主动加入对话
+### 用户主动加入对话
 
 把 Mary 踢走之后，Tom 嫌人少不好玩，所以他找到了 William，说他和 Jerry 有一个很好玩的聊天群，并且把群的 id（或名称）告知给了 William。William 也很想进入这个群看看他们究竟在聊什么，他自己主动加入了对话：
 
@@ -875,7 +875,7 @@ private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
 jerry.OnMembersJoined += OnMembersJoined;
 ```
 
-### 5. 用户主动退出对话
+### 用户主动退出对话
 
 随着 Tom 邀请进来的人越来越多，Jerry 觉得跟这些人都说不到一块去，他不想继续呆在这个对话里面了，所以选择自己主动退出对话，这时候可以调用 `Conversation#quit` 方法完成退群的操作:
 
@@ -945,7 +945,7 @@ private void OnMembersLeft(object sender, AVIMOnMembersLeftEventArgs e)
 }
 ```
 
-### 6. 成员变更的事件通知总结
+### 成员变更的事件通知总结
 
 前面的时序图和代码针对成员变更的操作做了逐步的分析和阐述，为了确保开发者能够准确的使用事件通知，如下表格做了一个统一的归类和划分:
 
@@ -965,11 +965,12 @@ Jerry 主动退出|`MEMBERS_LEFT`|`MEMBERS_LEFT`|/|`MEMBERS_LEFT`
 
 LeanCloud 即时通讯服务默认支持文本、文件、图像、音频、视频、位置、二进制等不同格式的消息，除了二进制消息之外，普通消息的收发接口都是字符串，但是文本消息和文件、图像、音视频消息有一点区别:
 
-<div class="callout callout-info">文本消息发送的就是本身的内容，而其他的多媒体消息，例如一张图片，实际上即时通讯 SDK 会首先调用 LeanCloud 存储服务的 AVFile 接口，将图像的二进制文件上传到存储服务云端，再把图像下载的 url 放入即时通讯消息结构体中，所以图像消息不过是包含了图像下载链接的固定格式文本消息。</div>
+- 文本消息发送的就是本身的内容
+- 而其他的多媒体消息，例如一张图片，实际上即时通讯 SDK 会首先调用 LeanCloud 存储服务的 AVFile 接口，将图像的二进制文件上传到存储服务云端，再把图像下载的 url 放入即时通讯消息结构体中，所以**图像消息不过是包含了图像下载链接的固定格式文本消息**。
 
-图像等二进制数据不随即时通讯消息直接下发的主要原因在于，LeanCloud 的文件存储服务默认都是开通了 CDN 加速选项的，通过文件下载对于终端用户来说可以有更快的展现速度，同时对于开发者来说也能获得更低的存储成本。
+> 图像等二进制数据不随即时通讯消息直接下发的主要原因在于，LeanCloud 的文件存储服务默认都是开通了 CDN 加速选项的，通过文件下载对于终端用户来说可以有更快的展现速度，同时对于开发者来说也能获得更低的存储成本。
 
-### 内建消息类型
+### 默认消息类型
 
 即时通讯服务内置了多种结构化消息用来满足常见的需求：
 
@@ -1058,15 +1059,15 @@ LeanCloud 即时通讯服务默认支持文本、文件、图像、音频、视�
 即时通讯 SDK 支持直接通过二进制数据，或者本地图像文件的路径，来构造一个图像消息并发送到云端。其流程如下：
 
 ```seq
-Tom-->source: 1. 获取图像实体内容
-Tom-->存储服务: 2. SDK 后台上传文件（AVFile）到云端
-存储服务-->Tom: 3. 返回图像的云端地址
+Tom-->Local: 1. 获取图像实体内容
+Tom-->Storage: 2. SDK 后台上传文件（AVFile）到云端
+Storage-->Tom: 3. 返回图像的云端地址
 Tom-->Cloud: 4. SDK 将图像消息发送给云端
-Cloud->Jerry: 5. 收到图像消息，根据接口获取图像的云端地址，在对话框里面做 UI 展现
+Cloud->Jerry: 5. 收到图像消息，在对话框里面做 UI 展现
 ```
 
 图解：
-1. source 可能是来自于 localStorage/camera， 表示图像的来源可以是本地存储例如 iPhone 手机的媒体库或者直接调用相机 API 实时地拍照获取的照片。
+1. Local 可能是来自于 localStorage/camera， 表示图像的来源可以是本地存储例如 iPhone 手机的媒体库或者直接调用相机 API 实时地拍照获取的照片。
 2. AVFile 是 LeanCloud 提供的文件存储服务对象，详细可以参阅[文件存储 AVFile](storage_overview.html#文件存储 AVFile)
 
 对应的代码并没有时序图那样复杂，因为调用 send 接口的时候，SDK 会自动上传图像，不需要开发者再去关心这一步:
@@ -1580,9 +1581,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 ## 扩展对话：支持自定义属性
 
-对话(`Conversation`)是即时通讯的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。
-
-默认提供的**内置**属性的对应关系如下：
+「对话(`Conversation`)」是即时通讯的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。默认提供的**内置**属性的对应关系如下：
 
 {{ docs.langSpecStart('js') }}
 
@@ -1671,9 +1670,12 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 {{ docs.langSpecEnd('cs') }}
 
+其实，我们可以通过「自定义属性」来在「对话」中保存更多业务层数据。
+
 ### 创建自定义属性
 
 在最开始介绍[创建单聊对话](#创建对话 Conversation)的时候，我们提到过 `IMClient#createConversation` 接口支持附加自定义属性，现在我们就来演示一下如何使用自定义属性。
+
 假如在创建对话的时候，我们需要添加两个额外的属性值对 `{"type": "private","pinned": true}`，那么在调用 `IMClient#createConversation` 方法时可以把附加属性传进去：
 
 ```js
@@ -1724,7 +1726,7 @@ var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry"
 
 ### 修改和使用属性
 
-在 Conversation 对象中，系统默认提供的属性，例如对话的「名字（name）」，如果业务层没有限制的话，所有成员都是可以修改的，示例代码如下：
+在 `Conversation` 对象中，系统默认提供的属性，例如对话的名字（name），如果业务层没有限制的话，所有成员都是可以修改的，示例代码如下：
 
 ```js
 conversation.name = '聪明的喵星人';
@@ -1756,7 +1758,7 @@ conversation.Name = "聪明的喵星人";
 await conversation.SaveAsync();
 ```
 
-而 Conversation 对象中自定义的属性，即时通讯服务本身也是允许对话内所有成员来读取、使用和修改的，示例代码如下：
+而 `Conversation` 对象中自定义的属性，即时通讯服务也是允许对话内其他成员来读取、使用和修改的，示例代码如下：
 
 ```js
 // 获取自定义属性
@@ -1806,7 +1808,7 @@ await conversation.SaveAsync();
 
 对话的名字以及应用层附加的其他属性，一般都是需要全员共享的，一旦有人对这些数据进行了修改，那么就需要及时通知到全部成员。在前一个例子中，有一个用户将对话名字改为了「聪明的喵星人」，那其他成员怎么能知道这件事情呢？
 
-LeanCloud 即时通讯云端提供了实时同步的通知机制，会把单个用户对「对话」的修改同步下发到所有在线成员（对于非在线的成员，他们下次登录上线之后，自然会拉取到最新的对话数据）。对话属性更新的通知事件声明如下：
+LeanCloud 即时通讯云端提供了实时同步的通知机制，会把单个用户对「对话」的修改同步下发到所有在线成员（对于非在线的成员，他们下次登录上线之后，自然会拉取到最新的完整的对话数据）。对话属性更新的通知事件声明如下：
 
 ```js
 /**
@@ -1849,18 +1851,22 @@ public void onInfoChanged(AVIMClient client, AVIMConversation conversation, JSON
 // not support yet.
 ```
 
-> 思考：对于删除自定义属性，sdk 内部是如何处理的呢？
+> 使用提示：
+>
+> 应用层在该事件的响应函数中，可以获知当前什么属性被修改了，也可以直接从 SDK 的 `Conversation` 实例中获取最新的合并之后的属性值，然后依据需要来更新产品 UI。
 
 ### 获取群内成员列表
 
 群内成员列表是作为对话的属性持久化保存在云端的，所以要获取一个 Conversation 对象的成员列表，我们可以在调用这个对象的更新方法之后，直接获取成员属性即可。
 
 ```js
+// fetch 方法会执行一次刷新操作，以获取云端最新对话数据。
 conversation.fetch().then(function(conversation) {
   console.log('members: ', conversation.members);
 ).catch(console.error.bind(console));
 ```
 ```objc
+// fetch 方法会执行一次刷新操作，以获取云端最新对话数据。
 [conversation fetchWithCallback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
         NSLog(@"", conversation.members);
@@ -1868,6 +1874,7 @@ conversation.fetch().then(function(conversation) {
 }];
 ```
 ```java
+// fetch 方法会执行一次刷新操作，以获取云端最新对话数据。
 conversation.fetchInfoInBackground(new AVIMConversationCallback() {
   @Override
   public void done(AVIMException e) {
@@ -1878,9 +1885,12 @@ conversation.fetchInfoInBackground(new AVIMConversationCallback() {
 });
 ```
 ```cs
+// fetch 方法会执行一次刷新操作，以获取云端最新对话数据。
 ```
 
-> 注意，成员列表是对***普通对话***而言的，对于像「聊天室」「系统对话」这样的特殊对话，并不存在「成员列表」属性。
+> 使用提示：
+>
+> 成员列表是对***普通对话***而言的，对于像「聊天室」「系统对话」这样的特殊对话，并不存在「成员列表」属性。
 
 ## 使用复杂条件来查询对话
 
@@ -2106,8 +2116,7 @@ query.whereContains("keywords", "教育");
 query.whereLessThan("age", 18);
 ```
 ```cs
-query.WhereContains("keywords", "教育");
-query.WhereLessThan("age", 18);
+query.WhereContains("keywords", "教育").WhereLessThan("age", 18);
 ```
 
 另外一种组合的方式是，两个查询采用 Or 或者 And 的方式构建一个新的查询。
