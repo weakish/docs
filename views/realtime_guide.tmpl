@@ -443,15 +443,15 @@ Tom 想建立一个群，把自己好朋友都拉进这个群，然后给他们�
 {% block message_read_ack %}{% endblock %}
 
 #### 自定义离线推送内容
-在使用 SDK 提供的 API 之前，请先阅读 [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
+在使用 SDK 提供的 API 之前，请先阅读 [离线推送通知](realtime-guide-intermediate.html#离线推送通知)。
 
-正如 [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知) 小节里面介绍的，发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
+正如 [离线推送通知](realtime-guide-intermediate.html#离线推送通知) 小节里面介绍的，发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
 
 {% block message_push_data %}{% endblock %}
 
 这种方式被称为「附件方式」，这里有一点非常重要：如果您在 [云引擎即时通讯离线消息推送 Hook](leanengine_cloudfunction_guide-node.html#_receiversOffline)里面定义了云函数来修改离线消息的内容，云端会优先使用 Hook 函数返回的结果作为最后推送的内容
 
-除此以外，还有其他方法来自定义离线推送内容，请参考 [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
+除此以外，还有其他方法来自定义离线推送内容，请参考 [离线推送通知](realtime-guide-intermediate.html#离线推送通知)。
 
 ### 未读消息
 
@@ -483,7 +483,7 @@ SDK 会在 Conversation 上维护 `unreadMessagesCount` 字段，这个字段在
 离线消息推送通知是 SDK 默认的未读消息处理方式。不管是单聊还是群聊，当用户 A 发出消息后，如果目标对话的部分用户当前不在线，LeanCloud 云端可以提供离线推送的方式将消息提醒发送至客户端。{% block offlineMessage %}{% endblock %}
 
 {%  if segment_code !== 'android' %}
-我们也提供多种自定义推送通知的方式，操作方法请参考 [即时通讯概览 · 离线推送通知](realtime_v2.html#离线推送通知)。
+我们也提供多种自定义推送通知的方式，操作方法请参考 [离线推送通知](realtime-guide-intermediate.html#离线推送通知)。
 {% endif %}
 
 ### 消息类详解
@@ -1188,7 +1188,7 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 
 ## 安全与签名
 
-在继续阅读下文之前，请确保你已经对 [即时通讯服务开发指南 &middot; 权限和认证](realtime_v2.html#权限和认证) 有了充分的了解。
+在继续阅读下文之前，请确保你已经对 [即时通讯服务开发指南 &middot; 安全与签名](realtime-guide-senior.html#安全与签名) 有了充分的了解。
 
 ### 实现签名工厂
 
@@ -1246,7 +1246,7 @@ Black 发现对话名字不够酷，他想修改成「聪明的喵星人」 ，�
 {% block client_auto_open %}{% endblock %}
 
 ## 即时通讯云引擎 Hook
-一些应用因其特殊的业务逻辑需要在消息发送时或者消息接收时插入一定的逻辑，因此我们也提供了[即时通讯云引擎 Hook](realtime_v2.html#云引擎_Hook)。
+一些应用因其特殊的业务逻辑需要在消息发送时或者消息接收时插入一定的逻辑，因此我们也提供了[即时通讯 Hook 机制](realtime-guide-systemconv.html#万能的 Hook 机制)。
 
 ## 即时通讯 REST API
 有些应用需要在用户登录之前就提前创建一些对话或者是针对对话进行操作，因此可以通过[即时通讯 REST API](realtime_rest_api.html)来实现。
@@ -1268,6 +1268,6 @@ LeanCloud 云引擎提供了托管 Python 和 Node.js 运行的方式，开发�
 
 **客户端连接被关闭**
 
-导致这一情况的原因很多，请参考 [云端错误码说明](realtime_v2.html#云端错误码说明)。
+导致这一情况的原因很多，请参考 [云端错误码说明](realtime_faq.html#云端错误码说明)。
 
 {% block platform_specific_faq %}{% endblock %}

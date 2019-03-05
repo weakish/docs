@@ -647,7 +647,7 @@ private void Liubei_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 }
 ```
 
-错误码可以参考：[云端错误码](realtime_v2.html#云端错误码说明)。
+错误码可以参考：[云端错误码](realtime_faq.html#云端错误码说明)。
 
 ## 消息
 

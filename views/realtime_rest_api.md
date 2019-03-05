@@ -16,7 +16,7 @@ Key|Value|含义|来源
 
 ## 对话数据操作
 
-你可以通过 REST API 对对话（相应的聊天室、群组或单聊等）进行操作，例如提前创建聊天室，关联聊天室到其他数据实体。LeanCloud 即时通讯系统采用透明的设计，对话数据在 LeanCloud 系统中是普通的数据表，表名为 `_Conversation`，你可以直接调用 [数据存储相关的 API 进行数据操作](./rest_api.html#对象-1)。`_Conversation` 表 包含一些内置的关键字段定义了对话的属性、成员等，你可以在 [即时通讯概览 - 对话](./realtime_v2.html#对话_Conversation_) 了解。
+你可以通过 REST API 对对话（相应的聊天室、群组或单聊等）进行操作，例如提前创建聊天室，关联聊天室到其他数据实体。LeanCloud 即时通讯系统采用透明的设计，对话数据在 LeanCloud 系统中是普通的数据表，表名为 `_Conversation`，你可以直接调用 [数据存储相关的 API 进行数据操作](./rest_api.html#对象-1)。`_Conversation` 表 包含一些内置的关键字段定义了对话的属性、成员等，你可以在 [即时通讯概览 - 对话](./realtime_v2.html#对话（Conversation）) 了解。
 
 ### 创建一个对话
 
@@ -103,7 +103,7 @@ curl -X GET \
 
 ### 签名
 
-为了保证获取聊天记录的安全性，可以开启签名认证 [控制台 > 消息 > 实时消息 > 设置 > 实时消息选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中的 **聊天记录查询启用签名认证**。了解更详细的签名规则请参考 [聊天签名方法](realtime_v2.html#开启对话签名)。签名参数仅在开启对应的选项后有效，如果没有开启选项，就不需要传签名参数。
+为了保证获取聊天记录的安全性，可以开启签名认证 [控制台 > 消息 > 实时消息 > 设置 > 实时消息选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中的 **聊天记录查询启用签名认证**。了解更详细的签名规则请参考 [聊天签名方法](realtime-guide-senior.html#安全与签名)。签名参数仅在开启对应的选项后有效，如果没有开启选项，就不需要传签名参数。
 
 签名采用 Hmac-sha1 算法，输出字节流的十六进制字符串 (hex dump)，签名的 key 必须是应用的 master key，签名的消息格式如下：
 
@@ -303,7 +303,7 @@ curl -X GET \
 我们目前提供 REST API 允许向一个已有对话发送消息。
 
 **注意**，由于这个接口的管理性质，当你通过这个接口发送消息时，我们不会检查 **from_peer** 是否有权限给这个对话发送消息，而是统统放行，请谨慎使用这个接口。
-如果你在应用中使用了我们内部定义的 [富媒体消息格式](./realtime_v2.html#消息_Message_)，在发送消息时 **message** 字段需要遵守一定的格式要求，下文 [富媒体消息格式说明](./realtime_rest_api.html#富媒体消息格式说明) 中将详细说明。
+如果你在应用中使用了我们内部定义的 [富媒体消息格式](./realtime_v2.html#消息（Message）)，在发送消息时 **message** 字段需要遵守一定的格式要求，下文 [富媒体消息格式说明](./realtime_rest_api.html#富媒体消息格式说明) 中将详细说明。
 
 ```sh
 curl -X POST \
@@ -321,7 +321,7 @@ conv_id | 必填 |发送到对话 id
 transient | 可选|是否为暂态消息（**由于向后兼容的考虑，默认为 true**，请注意设置这个值。）
 message | 必填 | 消息内容（这里的消息内容的本质是字符串，但是我们对字符串内部的格式没有做限定，<br/>理论上开发者可以随意发送任意格式，只要大小不超过 5 KB 限制即可。）
 no_sync | 可选|默认情况下消息会被同步给在线的 from_peer 用户的客户端，设置为 true 禁用此功能。
-push_data | 可选 | 以消息附件方式设置本条消息的离线推送通知内容。如果目标接收者使用的是 iOS 设备并且当前不在线，我们会按照该参数填写的内容来发离线推送。请参看 [离线推送通知](./realtime_v2.html#离线推送通知)
+push_data | 可选 | 以消息附件方式设置本条消息的离线推送通知内容。如果目标接收者使用的是 iOS 设备并且当前不在线，我们会按照该参数填写的内容来发离线推送。请参看 [离线推送通知](./realtime-guide-intermediate.html#离线推送通知)
 priority | 可选 | 定义消息优先级，可选值为 high、normal、low，分别对应高、中、低三种优先级。该参数大小写不敏感，默认为高优先级 high。本参数仅对暂态消息或聊天室的消息有效，高优先级下在服务端与用户设备的连接拥塞时依然排队。
 
 返回说明：
@@ -353,7 +353,7 @@ conv_id | 必填 |发送到对话 id
 transient | 可选|是否为暂态消息（**由于向后兼容的考虑，默认为 true**，请注意设置这个值。）
 message | 必填 | 消息内容（这里的消息内容的本质是字符串，但是我们对字符串内部的格式没有做限定，<br/>理论上开发者可以随意发送任意格式，只要大小不超过 5 KB 限制即可。）
 no_sync | 可选|默认情况下消息会被同步给在线的 from_peer 用户的客户端，设置为 true 禁用此功能。
-push_data | 可选 | 以消息附件方式设置本条消息的离线推送通知内容。如果目标接收者当前不在线，我们会按照该参数填写的内容来发离线推送。请参看 [离线推送通知](./realtime_v2.html#离线推送通知)
+push_data | 可选 | 以消息附件方式设置本条消息的离线推送通知内容。如果目标接收者当前不在线，我们会按照该参数填写的内容来发离线推送。请参看 [离线推送通知](./realtime-guide-intermediate.html#离线推送通知)
 
 ### 系统对话发送广播消息
 
@@ -952,7 +952,7 @@ session_token | AV.User 的 sessionToken
 {"nonce": "", "timestamp": "", "client_id": "", "signature": ""}
 ```
 
-返回的参数，可以参考「[用户登录签名](realtime_v2.html#用户登录的签名)」与「实现签名工厂（[JavaScript](realtime_guide-js.html#实现签名工厂)、[Android](realtime_guide-android.html#实现签名工厂)、[Objective-C](realtime_guide-objc.html#实现签名工厂)、[.Net](realtime_guide-dotnet.html#实现签名工厂)）」进行后续的登录。
+返回的参数，可以参考「[用户登录签名](realtime-guide-senior.html#用户登录签名)」与「[客户端如何支持操作签名](realtime-guide-senior.html#客户端如何支持操作签名)」进行后续的登录。
 
 为了方便用户进行细粒度控制，实现自定义功能（如黑名单），本接口提供了一个 hook `_rtmClientSign`，在验证 sessionToken 后去调用，传入的参数为 AV.User 构成的 JSON 对象：
 ```json
