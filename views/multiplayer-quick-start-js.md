@@ -142,30 +142,33 @@ const { Client, Region, Event, ReceiverGroup, setAdapters, LogLevel, setLogger }
 ```
 
 ```javascript
-const opts = {
-  // 设置 APP ID
-  appId: YOUR_APP_ID,
-  // 设置 APP Key
-  appKey: YOUR_APP_KEY,
-  // 设置节点地区
-  // Region.EastChina：华东节点
-  // Region.NorthChina：华北节点
-  // Region.NorthAmerica：美国节点
-  region: YOUR_APP_REGION,
-  // 用户 id
-  userId: USER_ID,
-  // 游戏版本号
-  gameVersion: GAME_VERSION,
-}
-
-const client = new Play(opts);
+const client = new Client({
+    // 设置 APP ID
+    appId: YOUR_APP_ID,
+    // 设置 APP Key
+    appKey: YOUR_APP_KEY,
+    // 设置节点地区
+    // EastChina：华东节点
+    // NorthChina：华北节点
+    // NorthAmerica：美国节点
+    region: Region.EastChina
+    // 设置用户 id
+    userId: 'leancloud'
+    // 设置游戏版本号（选填，默认 0.0.1）
+    gameVersion: '0.0.1'
+});
 ```
 {% endblock %}
 
 
 {% block connection %}
 ```javascript
-client.connect();
+client.connect().then(()=> {
+  // 连接成功
+}).catch((error) => {
+  // 连接失败
+    console.error(error.code, error.detail);
+});
 ```
 {% endblock %}
 
@@ -173,11 +176,12 @@ client.connect();
 
 {% block connectio_event %}
 ```javascript
-// 注册连接成功事件
-client.on(Event.CONNECTED, () => {
-  console.log('on joined lobby');
-  const roomName = 'cocos_creator_room';
-  client.joinOrCreateRoom(roomName);
+// 例如，有 4 个玩家同时加入一个房间名称为 「room1」 的房间，如果不存在，则创建并加入
+client.joinOrCreateRoom('room1').then(() => {
+    // 加入或创建房间成功
+}).catch((error) => {
+    // 加入房间失败，也没有成功创建房间
+    console.error(errod.code, error.detail);
 });
 ```
 
@@ -237,9 +241,7 @@ client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
 {% block win %}
 ```javascript
 if (client.player.isMaster()) {
-  client.sendEvent('win', 
-    { winnerId: client.room.masterId }, 
-    { receiverGroup: ReceiverGroup.All });
+  client.sendEvent('win', { winnerId: client.room.masterId }, { receiverGroup: ReceiverGroup.All });
 }
 ```
 {% endblock %}
@@ -262,7 +264,9 @@ client.on(Event.CUSTOM_EVENT, event => {
     } else {
       this.resultLabel.string = 'lose';
     }
-    client.disconnect();
+    client.close().then(() => {
+      // 断开连接成功
+    });
   }
 });
 ```

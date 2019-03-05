@@ -3,7 +3,7 @@
 {% set messageStatusAnchor = '<a id="message-status" name="message-status" escape-hash>status</a>'  %}
 #  即时通讯开发指南 &middot; {{platform_name}}
 
-即时通讯服务可以让你一行后端代码都不用写，就能做出一个功能完备的即时通讯应用，或是一个实时对战类的游戏。所有聊天记录都保存在云端，离线消息会通过消息推送来及时送达，推送消息文本可以灵活进行定制。
+即时通讯服务可以让你一行后端代码都不用写，就能做出一个功能完备的即时通讯应用。所有聊天记录都保存在云端，离线消息会通过消息推送来及时送达，推送消息文本可以灵活进行定制。
 
 在继续阅读本文档之前，请先阅读[《即时通讯开发指南》](./realtime_v2.html)，了解一下即时通讯的基本概念和模型。
 
@@ -570,7 +570,7 @@ SDK 会在 Conversation 上维护 `unreadMessagesCount` 字段，这个字段在
 
 {% block message_send_failed_remove_from_cache %}{% endblock %}
 
-你可以观察 [message.status 属性](#message-status) 的变化来更新 UI。例如，当 status 属性变为 `AVIMMessageStatusFailed` 时表示消息发送失败，这时可以在消息旁边显示一个重新发送的按钮。
+你可以观察 [message.status 属性](#消息类详解) 的变化来更新 UI。例如，当 status 属性变为 `AVIMMessageStatusFailed` 时表示消息发送失败，这时可以在消息旁边显示一个重新发送的按钮。
 
 {% endblock %}
 

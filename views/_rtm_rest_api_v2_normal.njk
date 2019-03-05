@@ -7,7 +7,7 @@ curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
-  -d '{"name":"My First Conversation","m": ["BillGates", "SteveJobs"]}' \
+  -d '{"name":"My First Conversation", "m": ["BillGates", "SteveJobs"], "unique": true}' \
   https://{{host}}/1.2/rtm/conversations
 ```
 

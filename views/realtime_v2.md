@@ -242,8 +242,7 @@ LeanCloud 即时通讯系统设计了四种类型的「对话」来满足不同�
 TextMessage  ImageMessage  AudioMessage  VideoMessage  LocationMessage   。。。
 ```
 
-关于这部分消息的格式请参考
-[《即时通讯 REST API - 富媒体消息格式说明》](realtime_rest_api.html#富媒体消息格式说明)了解。开发者也可以基于我们的框架，方便地扩展出自己的消息类型。
+关于这部分消息的格式请参考[《即时通讯 REST API - 富媒体消息格式说明》](realtime_rest_api.html#富媒体消息格式说明)了解。开发者也可以基于我们的框架，方便地扩展出自己的消息类型。
 
 #### 与消息相关的其他功能需求
 
@@ -261,7 +260,6 @@ TextMessage  ImageMessage  AudioMessage  VideoMessage  LocationMessage   。。�
 
 
 ## 系统限制
-
 * 对于客户端主动发起的操作会按照操作类型限制其频率。发消息操作限制为 **每分钟 60 次**，历史消息查询操作限制为 **每分钟 120 次**，其他类型操作包括加入对话、离开对话、登录服务、退出服务等均限制为 **每分钟 30 次**。当调用超过限制时，云端会拒绝响应这些超限的操作，这样如果操作本由 SDK 发起则表现为不会走回调。如果使用 REST API 发起各种操作，则不会受到上述频率的限制。
 * 应用全局服务器下发消息速度默认为每秒钟 160000 次，超过部分会被服务器丢弃。如果你的应用会超过此限制，请 [联系我们](/help.html)。
 * 通过 API 发送的消息有发送速率限制。最高每秒钟 50 次请求，超过该速率后服务器会对发送的消息做排队缓存，如果排队待发送的消息超过 10000 条则会拒绝新来的发消息请求。
@@ -275,7 +273,6 @@ TextMessage  ImageMessage  AudioMessage  VideoMessage  LocationMessage   。。�
 {{ im.conversationsLifespan("### 对话的有效期") }}
 
 {{ im.messagesLifespan("### 消息的有效期") }} 
-
 
 ## 即时通讯 Hook 机制
 
