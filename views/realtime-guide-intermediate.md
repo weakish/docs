@@ -1158,6 +1158,27 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 * 实现 `AVIMTypedMessageSubclassing` 协议；
 * 子类将自身类型进行注册，一般可在子类的 `+load` 方法或者 UIApplication 的 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerSubclass]`。
 
+```objc
+// 定义
+
+@interface CustomMessage : AVIMTypedMessage <AVIMTypedMessageSubclassing>
+
++ (AVIMMessageMediaType)classMediaType;
+
+@end
+
+@implementation CustomMessage
+
++ (AVIMMessageMediaType)classMediaType {
+    return 123;
+}
+
+@end
+
+// 注册
+[CustomMessage registerSubclass];
+```
+
 {{ docs.langSpecEnd('objc') }}
 
 {{ docs.langSpecStart('java') }}

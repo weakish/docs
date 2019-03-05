@@ -1275,14 +1275,16 @@ file.save().then(function() {
 }).catch(console.error.bind(console));
 ```
 ```objc
-NSString *path = [[NSBundle mainBundle] pathForResource:@"忐忑" ofType:@"mp3"];
-AVFile *file = [AVFile fileWithName:@"忐忑.mp3" contentsAtPath:path];
-AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"听听人类的神曲" file:file attributes:nil];
-[conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
-    if (succeeded) {
-        NSLog(@"发送成功！");
-    }
-}];
+NSError *error = nil;
+AVFile *file = [AVFile fileWithLocalPath:localPath error:&error];
+if (!error) {
+    AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"听听人类的神曲" file:file attributes:nil];
+    [conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
+        if (succeeded) {
+            NSLog(@"发送成功！");
+        }
+    }];
+}
 ```
 ```java
 AVFile file = AVFile.withAbsoluteLocalPath("忐忑.mp3",localFilePath);
@@ -1322,7 +1324,7 @@ file.save().then(function() {
 }).catch(console.error.bind(console));
 ```
 ```objc
-AVFile *file = [AVFile fileWithURL:[self @"https://some.website.com/apple.acc"]];
+AVFile *file = [AVFile fileWithRemoteURL:[NSURL URLWithString:@"https://some.website.com/apple.acc"]];
 AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"来自苹果发布会现场的录音" file:file attributes:nil];
 [conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
@@ -1733,9 +1735,8 @@ conversation.name = '聪明的喵星人';
 conversation.save();
 ```
 ```objc
-AVIMConversationUpdateBuilder *updateBuilder = [conversation newUpdateBuilder];
-updateBuilder.name = @"聪明的喵星人";
-[conversation update:[updateBuilder dictionary] callback:^(BOOL succeeded, NSError *error) {
+conversation[@"name"] = @"聪明的喵星人";
+[conversation updateWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
         NSLog(@"修改成功！");
     }
@@ -1762,17 +1763,17 @@ await conversation.SaveAsync();
 
 ```js
 // 获取自定义属性
-var type = conversation.get('type');
+var type = conversation.get('attr.type');
 // 为 pinned 属性设置新的值
-conversation.set('pinned',false);
+conversation.set('attr.pinned',false);
 // 保存
 conversation.save();
 ```
 ```objc
 // 获取自定义属性
-NSString *type = [conversation objectForKey:@"type"];
+NSString *type = [conversation objectForKey:@"attr.type"];
 // 为 pinned 属性设置新的值
-[conversation setObject:@(NO) forKey:@"pinned"];
+[conversation setObject:@(NO) forKey:@"attr.pinned"];
 // 保存
 [conversation updateWithCallback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
@@ -1782,9 +1783,9 @@ NSString *type = [conversation objectForKey:@"type"];
 ```
 ```java
 // 获取自定义属性
-String type = conversation.get("type");
+String type = conversation.get("attr.type");
 // 为 pinned 属性设置新的值
-conversation.set("pinned",false);
+conversation.set("attr.pinned",false);
 // 保存
 conversation.updateInfoInBackground(new AVIMConversationCallback(){
   @Override
@@ -1797,12 +1798,16 @@ conversation.updateInfoInBackground(new AVIMConversationCallback(){
 ```
 ```cs
 // 获取自定义属性
-var type = conversation["type"];
+var type = conversation["attr.type"];
 // 为 pinned 属性设置新的值
-conversation["pinned"] = false;
+conversation["attr.pinned"] = false;
 // 保存
 await conversation.SaveAsync();
 ```
+
+> 对自定义属性名的说明
+>
+> 在 `IMClient#createConversation` 接口中指定的自定义属性，会被存入 `_Conversation` 表的 `attr` 字段，所以在之后对这些属性进行读取或修改的时候，属性名需要指定完整的路径，例如上面的 `attr.type`，这一点需要特别注意。
 
 ### 对话属性同步
 
@@ -1823,16 +1828,15 @@ client.on(Event.CONVERSATION_INFO_UPDATED, function(payload) {
 });
 ```
 ```objc
-// 在 AVIMClientDelegate 中有如下定义
-/*!
- Notification for conversation property update.
- You can use this method to handle the properties that will be updated dynamicly during conversation's lifetime,
- for example, unread message count, last message and receipt timestamp, etc.
+/**
+ Notification for conversation's attribution updated.
  
- @param conversation The updated conversation.
- @param key          The property name of updated conversation.
+ @param conversation Updated conversation.
+ @param date Updated date.
+ @param clientId Client ID of doing updates.
+ @param data Updated data.
  */
-- (void)conversation:(AVIMConversation *)conversation didUpdateForKey:(AVIMConversationUpdatedKey)key;
+- (void)conversation:(AVIMConversation *)conversation didUpdateAt:(NSDate * _Nullable)date byClientId:(NSString * _Nullable)clientId updatedData:(NSDictionary * _Nullable)data;
 ```
 ```java
 // 在 AVIMConversationEventHandler 接口中有如下定义
@@ -1841,8 +1845,8 @@ client.on(Event.CONVERSATION_INFO_UPDATED, function(payload) {
  *
  * @param client
  * @param conversation
- * @param attr
- * @param operator
+ * @param attr      被更新的属性
+ * @param operator  该操作的发起者 id
  */
 public void onInfoChanged(AVIMClient client, AVIMConversation conversation, JSONObject attr,
                           String operator)
@@ -1940,14 +1944,14 @@ var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
 
 ```js
 var query = client.getQuery();
-query.equalTo('type','private');
+query.equalTo('attr.type','private');
 query.find().then(function(conversations) {
   // convs 就是想要的结果
 }).catch(console.error.bind(console));
 ```
 ```objc
 AVIMConversationQuery *query = [tom conversationQuery];
-[query whereKey:@"type" equalTo:@"private"];
+[query whereKey:@"attr.type" equalTo:@"private"];
 // 执行查询
 [query findConversationsWithCallback:^(NSArray *objects, NSError *error) {
     NSLog(@"找到 %ld 个对话！", [objects count]);
@@ -1955,7 +1959,7 @@ AVIMConversationQuery *query = [tom conversationQuery];
 ```
 ```java
 AVIMConversationsQuery query = tom.getConversationsQuery();
-query.whereEqualTo("type","private");
+query.whereEqualTo("attr.type","private");
 // 执行查询
 query.findInBackground(new AVIMConversationQueryCallback(){
   @Override
@@ -1969,13 +1973,13 @@ query.findInBackground(new AVIMConversationQueryCallback(){
 ```cs
 // 由于 WhereXXX 设置条件的接口每次都是返回一个新的 Query 实例，所以下面这样组合查询条件是无效的：
 //   var query = tom.GetQuery();
-//   query.WhereEqualTo("type","private");
+//   query.WhereEqualTo("attr.type","private");
 // 您可以这样写：
 //   var query = tom.GetQuery();
-//   query = query.WhereEqualTo("type","private");
+//   query = query.WhereEqualTo("attr.type","private");
 // 我们更建议采用这样的方式：
-//   var query = tom.GetQuery().WhereEqualTo("type","private");
-var query = tom.GetQuery().WhereEqualTo("type","private");
+//   var query = tom.GetQuery().WhereEqualTo("attr.type","private");
+var query = tom.GetQuery().WhereEqualTo("attr.type","private");
 await query.FindAsync();
 ```
 
@@ -2033,6 +2037,11 @@ await query.FindAsync();
 | 小于等于 | `WhereLessThanOrEqualsTo`    |     |
 {{ docs.langSpecEnd('cs') }}
 
+> 使用注意：默认查询条件
+> 
+> 为了防止用户无意间拉取到所有的对话数据，在客户端不指定任何 where 条件的时候，ConversationQuery 会默认查询包含当前用户的对话。如果客户端添加了任一 where 条件，那么 ConversationQuery 会忽略默认条件而严格按照指定的条件来查询。
+> 如果客户端要查询包含某一个 ClientId 的对话，那么使用下面的[数组查询](#数组查询)语法对 `m` 属性列和 `ClientId 值进行查询即可，不会和默认查询条件冲突。
+
 ### 正则匹配查询
 
 `ConversationsQuery` 也支持在查询条件中使用正则表达式来匹配数据。比如要查询所有 language 是中文的对话：
@@ -2050,22 +2059,82 @@ query.whereMatches("language","[\\u4e00-\\u9fa5]"); //language 是中文字符
 query.WhereMatches("language","[\\u4e00-\\u9fa5]"); //language 是中文字符 
 ```
 
-### 包含查询
+### 字符串查询
 
-例如查询关键字包含「教育」的对话：
+***前缀查询***类似于 SQL 的 `LIKE 'keyword%'` 条件。例如查询名字以「教育」开头的对话：
 
 ```js
-query.contains('keywords','教育');
+query.startsWith('name','教育');
 ```
 ```objc
-[query whereKey:@"keywords" containsString:@"教育"];
+[query whereKey:@"name" hasPrefix:@"教育"];
 ```
 ```java
-query.whereContains("keywords","教育"); 
+query.whereStartsWith("name","教育"); 
 ```
 ```cs
-query.WhereContains("keywords","教育"); 
+query.WhereStartsWith("name","教育"); 
 ```
+
+***包含查询***类似于 SQL 的 `LIKE '%keyword%'` 条件。例如查询名字中包含「教育」的对话：
+
+```js
+query.contains('name','教育');
+```
+```objc
+[query whereKey:@"name" containsString:@"教育"];
+```
+```java
+query.whereContains("name","教育"); 
+```
+```cs
+query.WhereContains("name","教育"); 
+```
+
+***不包含查询***则可以使用[正则匹配查询](#正则匹配查询)来实现。例如查询名字中不包含「教育」的对话：
+
+```js
+var regExp = new RegExp('^((?!教育).)*$', 'i');
+query.matches('name', regExp);
+```
+```objc
+[query whereKey:@"name" matchesRegex:@"^((?!教育).)*$"]; 
+```
+```java
+query.whereMatches("name","^((?!教育).)*$"); 
+```
+```cs
+query.WhereMatches("name","^((?!教育).)*$");
+```
+
+{{ docs.langSpecStart('objc') }}
+
+<pre><code class="lang-objc">
+  [query whereKey:@"name" matchesRegex:@"{{ data.regex() | safe }}];    
+</code></pre>
+
+{{ docs.langSpecEnd('objc') }}
+
+### 数组查询
+
+可以使用 `containsAll`、`containedIn`、`notContainedIn` 来对数组进行查询。
+例如查询成员中包含「Tom」的对话：
+
+```js
+query.containedIn('m', ['Tom']);
+```
+```objc
+[query whereKey:@"m" containedIn:@[@"Tom"]];
+```
+```java
+query.whereContainedIn("m", Arrays.asList("Tom")); 
+```
+```cs
+List<string> members = new List<string>();
+members.Add("Tom");
+query.WhereContainedIn("m", members); 
+```
+
 
 ### 空值查询
 
@@ -2387,19 +2456,19 @@ SDK 提供了多种方式来拉取历史记录，iOS 和 Android SDK 还提供�
 
 ```js
 conversation.queryMessages({
-  limit: 10, // limit 取值范围 1~1000，默认 20
+  limit: 10, // limit 取值范围 1~1000，默认 100
 }).then(function(messages) {
   // 最新的十条消息，按时间增序排列
 }).catch(console.error.bind(console));
 ```
 ```objc
-// 查询对话中最后 10 条消息， limit 取值范围 1~1000，默认 20
+// 查询对话中最后 10 条消息， limit 取值范围 1~1000，默认 100
 [conversation queryMessagesWithLimit:10 callback:^(NSArray *objects, NSError *error) {
     NSLog(@"查询成功！");
 }];
 ```
 ```java
-//  limit 取值范围 1~1000，默认 20
+//  limit 取值范围 1~1000，默认 100
 conv.queryMessages(10, new AVIMMessagesQueryCallback() {
   @Override
   public void done(List<AVIMMessage> messages, AVIMException e) {
@@ -2410,7 +2479,7 @@ conv.queryMessages(10, new AVIMMessagesQueryCallback() {
 });
 ```
 ```cs
-// limit 取值范围 1~1000，默认 20
+// limit 取值范围 1~1000，默认 100
 var messages = await conversation.QueryMessageAsync(limit: 10);
 foreach (var message in messages)
 {
@@ -2455,7 +2524,7 @@ messageIterator.next().then(function(result) {
 }];
 ```
 ```java
-//  limit 取值范围 1~1000，默认 20
+//  limit 取值范围 1~1000，默认 100
 conv.queryMessages(10, new AVIMMessagesQueryCallback() {
   @Override
   public void done(List<AVIMMessage> messages, AVIMException e) {
@@ -2479,7 +2548,7 @@ conv.queryMessages(10, new AVIMMessagesQueryCallback() {
 });
 ```
 ```cs
-// limit 取值范围 1~1000，默认 20
+// limit 取值范围 1~1000，默认 100
 var messages = await conversation.QueryMessageAsync(limit: 10);
 var oldestMessage = messages.ToList()[0];
 var messagesInPage = await conversation.QueryMessageAsync(beforeMessageId: oldestMessage.Id, beforeTimeStamp: oldestMessage.ServerTimestamp); 
