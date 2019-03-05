@@ -2107,14 +2107,6 @@ query.whereMatches("name","^((?!教育).)*$");
 query.WhereMatches("name","^((?!教育).)*$");
 ```
 
-{{ docs.langSpecStart('objc') }}
-
-<pre><code class="lang-objc">
-  [query whereKey:@"name" matchesRegex:@"{{ data.regex() | safe }}];    
-</code></pre>
-
-{{ docs.langSpecEnd('objc') }}
-
 ### 数组查询
 
 可以使用 `containsAll`、`containedIn`、`notContainedIn` 来对数组进行查询。
