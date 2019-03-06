@@ -482,4 +482,4 @@ Play.LeaveRoom();
 
 ## 价格及试用
 
-实时对战于 4 月 9 日起开始商用收费，详情请参考[博客](https://blog.leancloud.cn/6646/)。
+实时对战于 2019 年 4 月 9 日起开始商用收费，详情请参考[博客](https://blog.leancloud.cn/6646/)。
