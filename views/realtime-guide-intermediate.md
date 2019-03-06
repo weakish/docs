@@ -796,7 +796,7 @@ Will 消息有**如下限制**：
 conversation.addToLocalCache(message);
 ```
 ```cs
-// 不支持
+// 暂不支持
 ```
 
 将消息从缓存中删除:
@@ -811,7 +811,7 @@ conversation.addToLocalCache(message);
 conversation.removeFromLocalCache(message);
 ```
 ```cs
-// 不支持
+// 暂不支持
 ```
 
 从缓存中取出来的消息，在 UI 展示的时候可以根据 message.status 的属性值来做不同的处理，status 属性为 `AVIMMessageStatusFailed` 时即表示是发送失败了的本地消息，这时可以在消息旁边显示一个重新发送的按钮。通过将失败消息加入到 SDK 缓存中，还有一个好处就是，消息从缓存中取出来再次发送，不会造成服务端消息重复，因为 SDK 有做专门的去重处理。
@@ -1149,6 +1149,21 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 
 举个例子，实现一个在 [暂态消息](#暂态消息) 中提出的 OperationMessage：
 
+```js
+// TypedMessage, messageType, messageField 都是由 leancloud-realtime 这个包提供的
+// 在浏览器中则是 var { TypedMessage, messageType, messageField } = AV;
+var { TypedMessage, messageType, messageField } = require('leancloud-realtime');
+var inherit = require('inherit');
+// 定义 OperationMessage 类，用于发送和接收所有的用户操作消息
+export const OperationMessage = inherit(TypedMessage);
+// 指定 type 类型，可以根据实际换成其他正整数
+messageType(1)(OperationMessage);
+// 申明需要发送 op 字段
+messageField('op')(OperationMessage);
+// 注册消息类，否则收到消息时无法自动解析为 OperationMessage
+realtime.register(OperationMessage);
+```
+
 {{ docs.langSpecEnd('js') }}
 
 {{ docs.langSpecStart('objc') }}
@@ -1175,8 +1190,17 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 
 @end
 
-// 注册
-[CustomMessage registerSubclass];
+// 1. register subclass
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [CustomMessage registerSubclass];
+}
+// 2. received message
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
+    if (message.mediaType == 123) {
+        CustomMessage *imageMessage = (CustomMessage *)message;
+        // handle image message.
+    }
+}
 ```
 
 {{ docs.langSpecEnd('objc') }}
@@ -1193,6 +1217,39 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 * 调用 `AVIMMessageManager.registerMessageHandler()` 函数进行消息处理 handler 注册。
 
 AVIMTextMessage 的源码如下，可供参考：
+
+```java
+@AVIMMessageType(type = AVIMMessageType.TEXT_MESSAGE_TYPE)
+public class AVIMTextMessage extends AVIMTypedMessage {
+  // 空的构造方法，不可遗漏
+  public AVIMTextMessage() {
+
+  }
+
+  @AVIMMessageField(name = "_lctext")
+  String text;
+  @AVIMMessageField(name = "_lcattrs")
+  Map<String, Object> attrs;
+
+  public String getText() {
+    return this.text;
+  }
+
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public Map<String, Object> getAttrs() {
+    return this.attrs;
+  }
+
+  public void setAttrs(Map<String, Object> attr) {
+    this.attrs = attr;
+  }
+  // Creator 不可遗漏
+  public static final Creator<AVIMTextMessage> CREATOR = new AVIMMessageCreator<AVIMTextMessage>(AVIMTextMessage.class);
+}
+```
 
 {{ docs.langSpecEnd('java') }}
 
@@ -1257,56 +1314,7 @@ void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 {{ docs.langSpecEnd('cs') }}
 
-```js
-// TypedMessage, messageType, messageField 都是由 leancloud-realtime 这个包提供的
-// 在浏览器中则是 var { TypedMessage, messageType, messageField } = AV;
-var { TypedMessage, messageType, messageField } = require('leancloud-realtime');
-var inherit = require('inherit');
-// 定义 OperationMessage 类，用于发送和接收所有的用户操作消息
-export const OperationMessage = inherit(TypedMessage);
-// 指定 type 类型，可以根据实际换成其他正整数
-messageType(1)(OperationMessage);
-// 申明需要发送 op 字段
-messageField('op')(OperationMessage);
-// 注册消息类，否则收到消息时无法自动解析为 OperationMessage
-realtime.register(OperationMessage);
-```
-```objc
-```
-```java
-@AVIMMessageType(type = AVIMMessageType.TEXT_MESSAGE_TYPE)
-public class AVIMTextMessage extends AVIMTypedMessage {
-  // 空的构造方法，不可遗漏
-  public AVIMTextMessage() {
-
-  }
-
-  @AVIMMessageField(name = "_lctext")
-  String text;
-  @AVIMMessageField(name = "_lcattrs")
-  Map<String, Object> attrs;
-
-  public String getText() {
-    return this.text;
-  }
-
-  public void setText(String text) {
-    this.text = text;
-  }
-
-  public Map<String, Object> getAttrs() {
-    return this.attrs;
-  }
-
-  public void setAttrs(Map<String, Object> attr) {
-    this.attrs = attr;
-  }
-  // Creator 不可遗漏
-  public static final Creator<AVIMTextMessage> CREATOR = new AVIMMessageCreator<AVIMTextMessage>(AVIMTextMessage.class);
-}
-```
-```cs
-```
+自定义消息的接收，可以参看[前一章：再谈接收消息](realtime-guide-beginner.html#再谈接收消息)。
 
 ### 什么时候需要自定义消息
 

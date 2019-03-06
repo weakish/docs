@@ -200,8 +200,6 @@ Cloud::define("_messageReceived", function($params, $user) {
     return result;
   }
 ```
-```cs
-```
 
 而实际上启用上述代码之后，一条消息的时序图如下：
 
@@ -331,8 +329,6 @@ Cloud::define('_receiversOffline', function($params, $user) {
     return result;
 }
 ```
-```cs
-```
 
 #### `_messageSent`
 
@@ -436,8 +432,6 @@ Cloud::define('_messageSent', function($params, $user) {
     // ...
     return result;
 }
-```
-```cs
 ```
 
 #### `_messageUpdate`

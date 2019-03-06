@@ -108,6 +108,51 @@ var realtime = new AVRealtime('your-app-id','your-app-key');
 var tom = await realtime.CreateClientAsync('Tom');
 ```
 
+### 使用 `_User` 登录
+
+除了应用层指定 `ClientId` 登录之外，我们也支持直接使用 `_User` 对象来创建 `IMClient` 并登录。这种方式能直接利用云端内置的用户鉴权系统而省掉[登录签名](realtime-guide-senior.html#用户登录签名)操作，更方便地将存储和即时通讯这两个模块结合起来使用。示例代码如下：
+
+```js
+var AV = require('leancloud-storage');
+// 以 AVUser 的用户名和密码登录即时通讯服务
+AV.User.logIn('username', 'password').then(function(user) {
+  return realtime.createIMClient(user);
+}).catch(console.error.bind(console));
+```
+```objc
+// 以 AVUser 的用户名和密码登录到 LeanCloud 云端
+[AVUser logInWithUsernameInBackground:username password:password block:^(AVUser * _Nullable user, NSError * _Nullable error) {
+    // 以 AVUser 实例创建了一个 client
+    AVIMClient *client = [[AVIMClient alloc] initWithUser:user];
+    // 打开 client，与云端进行连接
+    [client openWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
+        // Do something you like.
+    }];
+}];
+```
+```java
+// 以 AVUser 的用户名和密码登录到 LeanCloud 存储服务
+AVUser.logInInBackground("username", "password", new LogInCallback<AVUser>() {
+    @Override
+    public void done(AVUser user, AVException e) {
+        if (null != e) {
+          return;
+        }
+        // 与服务器连接
+        AVIMClient client = AVIMClient.getInstance(user);
+        client.open(new AVIMClientCallback() {
+          @Override
+          public void done(final AVIMClient avimClient, AVIMException e) {
+            // do something as you need.
+          }
+       });
+    }
+});
+```
+```cs
+// not support yet
+```
+
 ### 创建对话 `Conversation`
 
 用户登录之后，要开始与其他人聊天，需要先创建一个「对话」。
@@ -1398,9 +1443,135 @@ locationMessage.Location = new AVGeoPoint(31.3753285, 120.9664658);
 await conversation.SendMessageAsync(locationMessage);
 ```
 
-### 接收消息
+### 再谈接收消息
 
-从前面的例子可以看到，不管消息类型如何，接收消息的流程都是一样的，我们可以在接收消息的事件回调中对于不同类型的消息使用不同处理方式，示例代码如下：
+{{ docs.langSpecStart('js') }}
+
+不管消息类型如何，JavaScript SDK 都是是通过 `IMClient` 上的 `Event.MESSAGE` 事件回调来通知新消息的，应用层只需要在在一个地方，统一对不同类型的消息使用不同方式来处理即可。
+
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('objc') }}
+
+Objective-C SDK 是通过实现 `AVIMClientDelegate` 代理来响应新消息到达通知的，并且，分别使用了两个方法来分别处理普通的 `AVIMMessage` 消息和内建的多媒体消息 `AVIMTypedMessage`（包括应用层由此派生的自定义消息）：
+
+```
+/*!
+ 接收到新的普通消息。
+ @param conversation － 所属对话
+ @param message - 具体的消息
+ */
+- (void)conversation:(AVIMConversation *)conversation didReceiveCommonMessage:(AVIMMessage *)message;
+
+/*!
+ 接收到新的富媒体消息。
+ @param conversation － 所属对话
+ @param message - 具体的消息
+ */
+- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message;
+```
+{{ docs.langSpecEnd('objc') }}
+
+{{ docs.langSpecStart('java') }}
+
+Java/Android SDK 中定义了 `AVIMMessageHandler` 接口来通知应用层新消息到达事件发生，开发者通过调用 `AVIMMessageManager#registerDefaultMessageHandler` 方法来注册自己的消息处理函数。`AVIMMessageManager` 提供了两个不同的方法来注册默认的消息处理函数，或特定类型的消息处理函数：
+
+```
+/**
+ * 注册默认的消息 handler
+ *
+ * @param handler
+ */
+public static void registerDefaultMessageHandler(AVIMMessageHandler handler);
+/**
+ * 注册特定消息格式的处理单元
+ *
+ * @param clazz 特定的消息类
+ * @param handler
+ */
+public static void registerMessageHandler(Class<? extends AVIMMessage> clazz, MessageHandler<?> handler);
+/**
+ * 取消特定消息格式的处理单元
+ *
+ * @param clazz
+ * @param handler
+ */
+public static void unregisterMessageHandler(Class<? extends AVIMMessage> clazz, MessageHandler<?> handler);
+```
+
+消息处理函数需要在应用初始化时完成设置，理论上我们支持为每一种消息（包括应用层自定义的消息）分别注册不同的消息处理函数，并且也支持取消注册。
+
+在 `AVIMMessageManager` 中多次注册 `defaultMessageHandler` 的话，只有最后一次调用的才是有效的；而通过 `registerMessageHandler` 注册的 `AVIMMessageHandler`，则是可以同存的。
+
+当客户端收到一条消息的时候，SDK 内部的处理流程为：
+
+- 首先解析消息的类型，然后找到开发者为这一类型所注册的处理响应 handler chain，再逐一调用这些 handler 的 `onMessage` 函数
+- 如果没有找到专门处理这一类型消息的 handler，就会转交给 defaultHandler 处理。
+
+这样一来，在开发者为 `AVIMTypedMessage`（及其子类） 指定了专门的 handler，也指定了全局的 defaultHandler 了的时候，如果发送端发送的是通用的 `AVIMMessage` 消息，那么接受端就是 `AVIMMessageManager#registerDefaultMessageHandler()` 中指定的 handler 被调用；如果发送的是 `AVIMTypedMessage`（及其子类）的消息，那么接受端就是 `AVIMMessageManager#registerMessageHandler()` 中指定的 handler 被调用。
+
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('cs') }}
+
+C# SDK 也是通过类似 `OnMessageReceived` 事件回调来通知新消息的，但是消息接收分为**两个层级**：
+
+* 第一层在 `AVIMClient` 上，它是为了帮助开发者实现被动接收消息，尤其是在本地并没有加载任何对话的时候，类似于刚登录，本地并没有任何 `AVIMConversation` 的时候，如果某个对话产生新的消息，当前{% block messagePolicy_send_method %}{% endblock %}负责接收这类消息，但是它并没有针对消息的类型做区分。
+
+* 第二层在 `AVIMConversation` 上，负责接收对话的全部信息，并且针对不同的消息类型有不同的事件类型做响应。
+
+以上两个层级的消息接收策略可以用下表进行描述，假如正在接收的是 `AVIMTextMessage`：
+
+AVIMClient 接收端 | 条件① |条件② |条件③ | 条件④ |条件⑤ 
+:---|:---|:---|:---|:---|:---
+`AVIMClient.OnMessageReceived` | × | √ | √ | √ | √
+`AVIMConversation.OnMessageReceived` | × | × | √ | × | × 
+`AVIMConversation.OnTypedMessageReceived`| × | × | × | √ | × 
+`AVIMConversation.OnTextMessageReceived` | × | × | × | × | √ 
+对应条件如下：
+
+条件①：
+```c#
+AVIMClient.Status != Online
+``` 
+条件②：
+```c#
+   AVIMClient.Status == Online 
+&& AVIMClient.OnMessageReceived != null
+```
+条件③：
+```c#
+   AVIMClient.Status == Online 
+&& AVIMClient.OnMessageReceived != null 
+&& AVIMConversation.OnMessageReceived != null
+```
+条件④：
+```c#
+   AVIMClient.Status == Online 
+&& AVIMClient.OnMessageReceived != null 
+&& AVIMConversation.OnMessageReceived != null
+&& AVIMConversation.OnTypedMessageReceived != null
+&& AVIMConversation.OnTextMessageReceived == null
+```
+
+条件⑤：
+```c#
+   AVIMClient.Status == Online 
+&& AVIMClient.OnMessageReceived != null 
+&& AVIMConversation.OnMessageReceived != null
+&& AVIMConversation.OnTypedMessageReceived != null
+&& AVIMConversation.OnTextMessageReceived != null
+```
+
+在 `AVIMConversation` 内，接收消息的顺序为： 
+
+`OnTextMessageReceived` > `OnTypedMessageReceived` > `OnMessageReceived`
+
+这是为了方便开发者在接收消息的时候有一个分层操作的空间，这一特性也适用于其他富媒体消息。
+
+{{ docs.langSpecEnd('cs') }}
+
+示例代码如下：
 
 ```js
 // 在初始化 Realtime 时，需加载 TypedMessagesPlugin
@@ -1536,6 +1707,7 @@ AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, new AVIMTypedM
     }
 });
 
+// handle customize typed message
 public class CustomMessage extends AVIMMessage {
   
 }
@@ -2098,13 +2270,13 @@ var regExp = new RegExp('^((?!教育).)*$', 'i');
 query.matches('name', regExp);
 ```
 ```objc
-[query whereKey:@"name" matchesRegex:@"^((?!教育).)*$"]; 
+[query whereKey:@"name" matchesRegex:@"^((?!教育).)* $ "]; 
 ```
 ```java
-query.whereMatches("name","^((?!教育).)*$"); 
+query.whereMatches("name","^((?!教育).)* $ "); 
 ```
 ```cs
-query.WhereMatches("name","^((?!教育).)*$");
+query.WhereMatches("name","^((?!教育).)* $ ");
 ```
 
 ### 数组查询

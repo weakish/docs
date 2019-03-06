@@ -401,21 +401,208 @@ LeanCloud 内置账户系统与即时通讯服务可以共享登录签名信息�
 
 角色的操作权限大小是按照 `Owner` -> `Manager` -> `Member` 的顺序逐级递减的，高级别的角色可以修改低级别角色的权限，但反过来的修改是不允许的。同时，对于加人和踢人的操作，在前面文档中我们可以看到，是所有成员都可以执行的操作，在成员角色管理功能开启之后，就变成 `Owner` 和 `Manager` 专属的功能的，普通成员发起这两种请求都会报错（错误码：）。
 
-一个对话的 `Owner` 是不可变更的，我们 SDK 可以把一个终端用户在 `Manager` 和 `Member` 之间切换角色，示例代码如下：
+一个对话的 `Owner` 是不可变更的，我们 SDK 提供了 `Conversation#updateMemberRole` 方法，支持把一个终端用户在 `Manager` 和 `Member` 之间切换角色：
 
 ```js
+/**
+ * 更新指定用户的角色
+ * @since 4.0.0
+ * @param {String} memberId 成员 Id
+ * @param {module:leancloud-realtime.ConversationMemberRole | String} role 角色
+ * @return {Promise.<this>} self
+ */
+async updateMemberRole(memberId, role);
 ```
 ```objc
+/**
+ Change a member's role.
+
+ @param memberId Equal to client id.
+ @param role Changing role.
+ @param callback Result callback.
+ */
+- (void)updateMemberRoleWithMemberId:(NSString *)memberId
+                                role:(AVIMConversationMemberRole)role
+                            callback:(void (^)(BOOL succeeded, NSError * _Nullable error))callback;
 ```
 ```java
+/**
+ * 更新成员的角色信息
+ * @param memberId  成员的 client id
+ * @param role      角色
+ * @param callback  结果回调函数
+ */
+public void updateMemberRole(final String memberId, final ConversationMemberRole role, final AVIMConversationCallback callback);
 ```
 ```cs
+// not support yet
 ```
+
+### 获取成员权限
+
+`Conversation` 对象提供了两种方法来获取成员权限信息：
+- `Conversation#getAllMemberInfo()` 可用来获取所有成员的权限信息
+```js
+/**
+ * 获取所有成员的对话属性
+ * @since 4.0.0
+ * @return {Promise.<ConversationMemberInfo[]>} 所有成员的对话属性列表
+ */
+async getAllMemberInfo({ noCache = false } = {})
+```
+```objc
+/**
+ Get all member info. using cache as a default.
+
+ @param callback Result callback.
+ */
+- (void)getAllMemberInfoWithCallback:(void (^)(NSArray<AVIMConversationMemberInfo *> * _Nullable memberInfos, NSError * _Nullable error))callback;
+
+/**
+ Get all member info.
+
+ @param ignoringCache Cache option.
+ @param callback Result callback.
+ */
+- (void)getAllMemberInfoWithIgnoringCache:(BOOL)ignoringCache
+                                 callback:(void (^)(NSArray<AVIMConversationMemberInfo *> * _Nullable memberInfos, NSError * _Nullable error))callback;
+```
+```java
+/**
+ * 获取当前对话的所有角色信息
+ * @param offset    查询结果的起始点
+ * @param limit     查询结果集上限
+ * @param callback  结果回调函数
+ */
+public void getAllMemberInfo(int offset, int limit, final AVIMConversationMemberQueryCallback callback);
+```
+```cs
+// not support yet
+```
+
+- `Conversation#getMemberInfo(memberId)` 可用来获取指定成员的权限信息
+
+```js
+/**
+ * 获取指定成员的对话属性
+ * @since 4.0.0
+ * @param {String} memberId 成员 Id
+ * @return {Promise.<ConversationMemberInfo>} 指定成员的对话属性
+ */
+async getMemberInfo(memberId);
+```
+```objc
+/**
+ Get a member info by member id. using cache as a default.
+
+ @param memberId Equal to client id.
+ @param callback Result callback.
+ */
+- (void)getMemberInfoWithMemberId:(NSString *)memberId
+                         callback:(void (^)(AVIMConversationMemberInfo * _Nullable memberInfo, NSError * _Nullable error))callback;
+```
+```java
+/**
+ * 获取对话内指定成员的角色信息
+ * @param memberId  成员的 clientid
+ * @param callback  结果回调函数
+ */
+public void getMemberInfo(final String memberId, final AVIMConversationMemberQueryCallback callback);
+```
+```cs
+// not support yet
+```
+
+这两类函数的返回值都是包含 `<ConversationId, MemberId, ConversationMemberRole>` 信息的三元组（数组）。
 
 ### 让部分用户禁言
 
 `Owner` 和 `Manager` 作为聊天群组管理员的权限之一，就是能够让部分用户禁言。
-被禁言的用户，只能接收群组里面的消息，而不能再往外发送消息，否则会报错（错误码：）。
+被禁言的用户，只能接收群组里面的消息，而不能再往外发送消息，否则会报错。
+
+`AVIMConversation` 类提供了对成员进行禁言操作的相关方法：
+
+```js
+/**
+ * 在该对话中禁言成员
+ * @param {String|String[]} clientIds 成员 client id
+ * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 id 列表、失败原因与对应的 id 列表
+ */
+async muteMembers(clientIds);
+
+/**
+ * 对话中解除禁言
+ * @param {String|String[]} clientIds 成员 client id
+ * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 id 列表、失败原因与对应的 id 列表
+ */
+async unmuteMembers(clientIds);
+
+/**
+ * 查询该对话禁言成员列表
+ * @param {Object} [options]
+ * @param {Number} [options.limit] 返回的成员数量，服务器默认值 10
+ * @param {String} [options.next] 从指定 next 开始查询，与 limit 一起使用可以完成翻页。
+ * @return {PagedResults.<string>} 查询结果。其中的 cureser 存在表示还有更多结果。
+ */
+async queryMutedMembers({ limit, next } = {});
+```
+```objc
+/**
+ Muting some members in the conversation.
+ 
+ @param memberIds Who will be muted.
+ @param callback Result callback.
+ */
+- (void)muteMembers:(NSArray<NSString *> *)memberIds
+           callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+/**
+ Unmuting some members in the conversation.
+ 
+ @param memberIds Who will be unmuted.
+ @param callback Result callback.
+ */
+- (void)unmuteMembers:(NSArray<NSString *> *)memberIds
+             callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+/**
+ Query muted members in the conversation.
+ 
+ @param limit Count of the muted members you want to query.
+ @param next Offset, if callback's next is nil or empty, that means there is no more muted members.
+ @param callback Result callback.
+ */
+- (void)queryMutedMembersWithLimit:(NSInteger)limit
+                              next:(NSString * _Nullable)next
+                          callback:(void (^)(NSArray<NSString *> * _Nullable mutedMemberIds, NSString * _Nullable next, NSError * _Nullable error))callback;
+```
+```java
+/**
+ * 将部分成员禁言
+ * @param memberIds  成员列表
+ * @param callback   结果回调函数
+ */
+public void muteMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * 将部分成员解除禁言
+ * @param memberIds  成员列表
+ * @param callback   结果回调函数
+ */
+public void unmuteMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * 查询被禁言的成员列表
+ * @param offset    查询结果的起始点
+ * @param limit     查询结果集上限
+ * @param callback  结果回调函数
+ */
+public void queryMutedMembers(int offset, int limit, final AVIMConversationSimpleResultCallback callback);
+```
+```cs
+// not support yet
+```
+
+注意这里对用户禁言/解除禁言的结果与以往的操作结果不一样，这里是***部分成功结果***，里面包含三部分数据：
+- ***error/exception***，表示整体是否成功。如果整体操作失败，这里会有异常信息返回，此时不必再看下面两部分结果；
+- ***successfulClientIds***，表示操作成功了的成员 id 列表。
+- ***failedIds***，表示所有操作失败了的成员信息，以 `List<reasonString, List<ClientId>>` 的形式列出了所有的失败原因以及对应的成员 id 列表。
 
 #### 禁言的通知事件
 管理员把部分用户禁言之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
@@ -429,20 +616,93 @@ LeanCloud 内置账户系统与即时通讯服务可以共享登录签名信息�
 
 使用这个功能需要在控制台 即时通讯-设置 中开启「黑名单功能」。
 
-SDK 操作黑名单的示例代码为：
+`AVIMConversation` 类提供了对对话黑名单进行操作的方法：
 
 ```js
+/**
+ * 将用户加入该对话黑名单
+ * @param {String|String[]} clientIds 成员 client id
+ * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 id 列表、失败原因与对应的 id 列表
+ */
+async blockMembers(clientIds);
+
+/**
+ * 将用户移出该对话黑名单
+ * @param {String|String[]} clientIds 成员 client id
+ * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 id 列表、失败原因与对应的 id 列表
+ */
+async unblockMembers(clientIds);
+
+/**
+ * 查询该对话黑名单
+ * @param {Object} [options]
+ * @param {Number} [options.limit] 返回的成员数量，服务器默认值 10
+ * @param {String} [options.next] 从指定 next 开始查询，与 limit 一起使用可以完成翻页
+ * @return {PagedResults.<string>} 查询结果。其中的 cureser 存在表示还有更多结果。
+ */
+async queryBlockedMembers({ limit, next } = {});
 ```
 ```objc
+/**
+ Blocking some members in the conversation.
+
+ @param memberIds Who will be blocked.
+ @param callback Result callback.
+ */
+- (void)blockMembers:(NSArray<NSString *> *)memberIds
+            callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+
+/**
+ Unblocking some members in the conversation.
+
+ @param memberIds Who will be unblocked.
+ @param callback Result callback.
+ */
+- (void)unblockMembers:(NSArray<NSString *> *)memberIds
+              callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+
+/**
+ Query blocked members in the conversation.
+
+ @param limit Count of the blocked members you want to query.
+ @param next Offset, if callback's next is nil or empty, that means there is no more blocked members.
+ @param callback Result callback.
+ */
+- (void)queryBlockedMembersWithLimit:(NSInteger)limit
+                                next:(NSString * _Nullable)next
+                            callback:(void (^)(NSArray<NSString *> * _Nullable blockedMemberIds, NSString * _Nullable next, NSError * _Nullable error))callback;
 ```
 ```java
+/**
+ * 将部分成员加入黑名单
+ * @param memberIds  成员列表
+ * @param callback   结果回调函数
+ */
+public void blockMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * 将部分成员从黑名单移出来
+ * @param memberIds  成员列表
+ * @param callback   结果回调函数
+ */
+public void unblockMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * 查询黑名单的成员列表
+ * @param offset    查询结果的起始点
+ * @param limit     查询结果集上限
+ * @param callback  结果回调函数
+ */
+public void queryBlockedMembers(int offset, int limit, final AVIMConversationSimpleResultCallback callback);
 ```
 ```cs
+// not support yet
 ```
+
+> 注意这里对黑名单操作的结果与禁言操作一样，是***部分成功结果***。
 
 用户被加入黑名单之后，就被从对话的成员中移除出去了，以后都无法再接受到对话里面的新消息，并且除非解除黑名单，其他人都无法再把 ta 加为对话成员了。
 
 #### 黑名单的通知事件
+
 管理员把部分用户加入黑名单之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
 
 
@@ -600,6 +860,15 @@ private void TomQueryWithLimit() {
 }
 ```
 ```cs
+// AVIMConversation.CountMembersAsync 这个方法返回的是实时数据
+public async void CountMembers_SampleCode()
+{
+    AVIMClient client = new AVIMClient("Tom");
+    await client.ConnectAsync();//Tom 登录客户端
+
+    AVIMConversation conversation = (await client.GetQuery().FindAsync()).FirstOrDefault();//获取对话列表，找到第一个对话
+    int membersCount = await conversation.CountMembersAsync();
+}
 ```
 
 ### 消息等级
@@ -682,7 +951,7 @@ AVIMClient tom = AVIMClient.getInstance("Tom");
     });
 ```
 ```cs
-// 我还能说什么
+// not support yet
 ```
 
 > 注意：
