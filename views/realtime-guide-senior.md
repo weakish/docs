@@ -1166,5 +1166,5 @@ var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 
 
 {{ docs.relatedLinks("进一步阅读",[
-  { title: "四，详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
+  { title: "四，详解消息 Hook 与系统对话的使用", href: "realtime-guide-systemconv.html"}])
 }}

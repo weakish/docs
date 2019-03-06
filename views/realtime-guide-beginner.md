@@ -3034,6 +3034,6 @@ realtime.on(Event.RECONNECT, function() {
 
 {{ docs.relatedLinks("进一步阅读",[
   { title: "二，消息收发的更多方式，离线推送与消息同步，多设备登录", href: "realtime-guide-intermediate.html"}, 
-  { title: "三，安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话", href: "/realtime-guide-senior.html"},
-  { title: "四，详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
+  { title: "三，安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话", href: "realtime-guide-senior.html"},
+  { title: "四，详解消息 Hook 与系统对话的使用", href: "realtime-guide-systemconv.html"}])
 }}
