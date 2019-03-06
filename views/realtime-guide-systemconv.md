@@ -657,7 +657,7 @@ timestamp | 消息创建的时间
 
 ## 打造自己的聊天机器人
 
-![comingsoon](http://lc-lhzo7z96.cn-n1.lcfile.com/f7b50d5a7f04819bd1a6.jpg)
+![comingsoon](images/comingsoon.jpg)
 
 > 这部分内容我们还在准备中，敬请期待。
 
