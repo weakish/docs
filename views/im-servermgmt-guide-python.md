@@ -6,7 +6,7 @@ SDK 的安装请参考[安装指南](sdk_setup-python.html)。
 
 ## 对话管理
 
-`leancloud.Conversation` 对应实时消息中的[对话概念](realtime_v2.html#对话_Conversation_)，同时也是 Python SDK 中 `leancloud.Object` 的子类，因此可以像正常的 `leancloud.Object` 来创建、查询对话。
+`leancloud.Conversation` 对应实时消息中的[对话概念](realtime_v2.html#对话（Conversation）)，同时也是 Python SDK 中 `leancloud.Object` 的子类，因此可以像正常的 `leancloud.Object` 来创建、查询对话。
 
 `leancloud.Conversation` 的查询与修改等操作，也受限于 LeanCloud 存储服务的 Class 权限设置与 ACL 权限设置。因此创建对话时，请确保当前权限设置正确，以免造成数据泄漏。
 
@@ -49,7 +49,7 @@ tr_conv.save()
 
 ### 添加用户到对话
 
-调用 `leancloud.Conversation` 上的 `add_member` 方法，可以将一个用户添加到此对话上来。需要注意的是，后面的参数应该是实时消息的 [clientId](realtime_v2.html#ClientID_用户和登录)，而不是 `leancloud.User` 实例。如果项目使用 `leancloud.User` 作为用户系统，而没有使用自己的用户系统，需要直接将 `leancloud.User` 的 `id` 当作参数进行调用。
+调用 `leancloud.Conversation` 上的 `add_member` 方法，可以将一个用户添加到此对话上来。需要注意的是，后面的参数应该是实时消息的 [clientId](realtime_v2.html#ClientID、用户和登录)，而不是 `leancloud.User` 实例。如果项目使用 `leancloud.User` 作为用户系统，而没有使用自己的用户系统，需要直接将 `leancloud.User` 的 `id` 当作参数进行调用。
 
 ```python
 import leancloud
@@ -98,7 +98,7 @@ message = 'System broadcast!'
 conversation.broadcast(from_client_id, message)
 ```
 
-另外以上三个发送消息的方法，都有一个可选的 `push_data` 参数，用来指定消息的[离线推送通知](realtime_v2.html#离线推送通知)。
+另外以上三个发送消息的方法，都有一个可选的 `push_data` 参数，用来指定消息的[离线推送通知](realtime-guide-intermediate.html#离线推送通知)。
 
 ### 历史消息查询
 

@@ -3,565 +3,1168 @@
 
 {{ docs.defaultLang('js') }}
 
-# 即时通讯开发指南 &middot; 高阶技巧
+# 三，安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话
 
-## 阅前准备
+## 本章导读
 
-建议先按照顺序阅读如下文档之后，再阅读本文效果最佳：
+在前一章[消息收发的更多方式，离线推送与消息同步，多设备登录](realtime-guide-intermediate.html)中，我们演示了与消息相关的更多特殊需求的实现方法，现在，我们会更进一步，从系统安全和成员权限管理的角度，给大家详细说明：
 
-- [即时通讯服务总览](realtime_v2.html)
-- [即时通讯开发指南 &middot; 基础入门](realtime-guide-beginner.html)
-- [即时通讯开发指南 &middot; 进阶功能](realtime-guide-intermediate.html)
+- 如何通过第三方鉴权来控制客户端登录与操作
+- 如何对成员权限进行限制，以保证聊天流程能被运营人员很好管理起来
+- 如何实现一个不限人数的直播聊天室
+- 如何对大型群聊中的消息进行实时内容过滤
+- 如何使用临时对话
 
-## 敏感词过滤和掉线通知
+## 安全与签名
 
-### 敏感词过滤
+LeanCloud 即时通讯服务有一大特色就是让应用账户系统和聊天服务解耦，终端用户只需要登录应用账户系统就可以直接使用即时通讯服务，同时从系统安全角度出发，我们还提供了第三方操作签名的机制来保证聊天通道的安全性。
 
-敏感词在[即时通讯服务总览#敏感词过滤](realtime_v2.html#敏感词过滤)有介绍，这是默认选项，而一些特殊场景中，可能会有一些自定义敏感词的需求，因此在控制台->消息->设置页面可以开关这个功能，并且还可以提交自定义敏感词的词库。
-
-### 掉线通知 - 遗愿消息
+该机制的工作架构是，在客户端和即时通讯云端之间，增加应用自己的鉴权服务器（也即即时通讯服务之外的「第三方」），在客户端开始一些有安全风险的操作命令（如登录聊天服务、建立对话、加入群组、邀请他人等）之前，先通过鉴权服务器获取签名，之后即时通讯云端会依据它和第三方鉴权服务之间的协议来验证该签名，只有附带有效签名的请求才会被执行，非法请求全部会被阻止下来。
 
-遗愿消息是在一个用户突然掉线之后，系统自动通知对话的其他成员关于该成员已掉线的消息。好似在掉线后要给对话中的其他成员一个妥善的交待，所以被戏称为「遗愿」消息，如下图中的「Tom 已掉线，无法收到消息」。
+使用操作签名可以保证聊天通道的安全，这一功能默认是关闭的，可以在 [控制台 > 消息 > 实时消息 > 设置 > 实时消息选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中进行开启：
 
-<img src="images/lastwill-message.png" width="400" class="responsive">
+- **登录启用签名认证**，用于控制所有的用户登录
+- **对话操作启用签名认证**，用于控制新建或加入对话、邀请/踢出对话成员等操作
+- **聊天记录查询启用签名认证**，用于控制聊天记录查询操作
+- **黑名单操作启用签名认证**，用于控制修改对话的黑名单用户列表操作（关于黑名单，请参考下一节）
 
-要发送遗愿消息，用户需要设定好消息内容（可能包含了一些业务逻辑相关的内容）发给云端，云端并不会将其马上发送给对话的成员，而是缓存下来，一旦检测到该用户掉线，云端立即将这条遗愿消息发送出去。开发者可以利用它来构建自己的断线通知的逻辑。
+开发者可根据实际需要进行选择。一般来说，**登录认证** 能够满足大部分安全需求，而且我们也强烈建议开发者开启登录认证。
+
+![image](images/leanmessage_signature2.png)
+
+1. 客户端进行登录或新建对话等操作，SDK 会调用 SignatureFactory 的实现，并携带用户信息和用户行为（登录、新建对话或群组操作）请求签名；
+2. 应用自有的权限系统，或应用在 LeanCloud 云引擎上的签名程序收到请求，进行权限验证，如果通过则利用下文所述的 [签名算法](#用户登录的签名) 生成时间戳、随机字符串和签名返回给客户端；
+3. 客户端获得签名后，编码到请求中，发给 LeanCloud 即时通讯服务器；
+4. 即时通讯服务器对请求的内容和签名做一遍验证，确认这个操作是被应用服务器允许的，进而执行后续的实际操作。
+
+签名采用 **Hmac-sha1** 算法，输出字节流的十六进制字符串（hex dump）。针对不同的请求，开发者需要拼装不同组合的字符串，加上 UTC timestamp 以及随机字符串作为签名的消息。
+对于使用 AVUser 的应用，可使用 REST API [获取 Client 登录签名](./realtime_rest_api_v2.html#获取登录签名) 进行登录认证。
+
+### 签名格式说明
+
+下面我们详细说明一下不同操作的签名格式。
+
+#### 用户登录签名
+
+签名的消息格式如下，注意 `clientid` 与 `timestamp` 之间是<u>两个冒号</u>：
+
+```
+appid:clientid::timestamp:nonce
+```
+
+参数|说明<a name="signature-param-table"></a><!--2015-09-04 -->
+---|---
+appid|应用的 id
+clientid|登录时使用的 clientId
+timestamp|当前的 UTC 时间距离 unix epoch 的**毫秒数**
+nonce|随机字符串
+
+>注意：签名的 key **必须** 是应用的 master key，你可以 [控制台 > 设置 > 应用 Key](/app.html?appid={{appid}}#/key) 里找到。**请保护好 master key，不要泄露给任何无关人员。**
+
+开发者可以实现自己的 SignatureFactory，调用远程服务器的签名接口获得签名。如果你没有自己的服务器，可以直接在 LeanCloud 云引擎上通过 **网站托管** 来实现自己的签名接口。在移动应用中直接做签名的作法 **非常危险**，它可能导致你的 **master key** 泄漏。
+
+#### 开启对话签名
+
+新建一个对话的时候，签名的消息格式为：
+
+```
+appid:clientid:sorted_member_ids:timestamp:nonce
+```
+
+* appid、clientid、timestamp 和 nonce 的含义 [同上](#signature-param-table)。
+* sorted_member_ids 是以半角冒号（:）分隔、**升序排序** 的 user id，即邀请参与该对话的成员列表。
+
+#### 群组功能的签名
+
+在群组功能中，我们对**加群**、**邀请**和**踢出群**这三个动作也允许加入签名，签名格式是：
+
+```
+appid:clientid:convid:sorted_member_ids:timestamp:nonce:action
+```
+
+* appid、clientid、sorted_member_ids、timestamp 和 nonce  的含义同上。对创建群的情况，这里 sorted_member_ids 是空字符串。
+* convid - 此次行为关联的对话 id。
+* action - 此次行为的动作，**invite** 表示加群和邀请，**kick** 表示踢出群。
+
+#### 查询聊天记录的签名
+
+```
+appid:client_id:convid:nonce:signature_ts
+```
+* client_id 查看者 id（签名参数）
+* nonce  签名随机字符串（签名参数）
+* signature_ts 签名时间戳（签名参数），单位是秒
+* signature  签名（签名参数）
+
+#### 黑名单的签名
+
+由于黑名单有两种情况，所以签名格式也有两种：
+
+1. client 对 conversation
+  ```
+  appid:clientid:convid::timestamp:nonce:action
+  ```
+  - action - 此次行为的动作，client-block-conversations 表示添加黑名单，client-unblock-conversations 表示取消黑名单
+  
+2. conversation 对 client
+  ```
+  appid:clientid:convid:sorted_member_ids:timestamp:nonce:action
+  ```
+  - action - 此次行为的动作，conversation-block-clients 表示添加黑名单，conversation-unblock-clients 表示取消黑名单
+  - sorted_member_ids 同上
+
+{{ im.signature("#### 测试签名") }}
+
+### 云引擎签名范例
+
+为了帮助开发者理解云端签名的算法，我们开源了一个用 Node.js + 云引擎实现签名的云端，供开发者学习和使用：[LeanCloud 即时通讯云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode)。
+
+### 客户端如何支持操作签名
+
+上面的签名算法，都是对第三方鉴权服务器如何进行签名的协议说明，在开启了操作签名的前提下，客户端这边的使用流程需要进行相应的改变，增加请求签名的环节，才能让整套机制顺利运行起来。
+
+LeanCloud 即时通讯 SDK 为每一个 AVIMClient 实例都预留了一个 Signature 工厂接口，这个接口默认不设置就表示不使用签名，启动签名的时候，只需要在客户端实现这一接口，调用远程服务器的签名接口获得签名，并把它绑定到 AVIMClient 实例上即可：
 
 ```js
-var message = new TextMessage('我掉线了');
-conversation.send(message, { will: true }).then(function() {
-  // 发送成功，当前 client 掉线的时候，这条消息会被下发给对话里面的其他成员
-}).catch(function(error) {
-  // 异常处理
-});
-```
-```objc
-AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
-option.will = YES;
-
-AVIMMessage *willMessage = [AVIMTextMessage messageWithText:@"I'm offline." attributes:nil];
-
-[conversaiton sendMessage:willMessage option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
-    if (succeeded) {
-        NSLog(@"Will message has been sent.");
-    }
-}];
-```
-```java
-AVIMTextMessage message = new AVIMTextMessage();
-message.setText("我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员");
-
-AVIMMessageOption option = new AVIMMessageOption();
-option.setWill(true);
-conversation.sendMessage(message, option, new AVIMConversationCallback() {
-  @Override
-  public void done(AVIMException e) {
-    if (e == null) {
-      // 发送成功
-    }
-  }
-});
-```
-```cs
-var message = new AVIMTextMessage()
-{
-    TextContent = "我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员"
+// 基于 LeanCloud 云引擎进行登录签名的 signature 工厂方法
+var signatureFactory = function(clientId) {
+  return AV.Cloud.rpc('sign', { clientId: clientId }); // AV.Cloud.rpc returns a Promise
 };
-var sendOptions = new AVIMSendOptions()
-{
-    Will = true
+// 基于 LeanCloud 云引擎进行对话创建/加入、邀请成员、踢出成员等操作签名的 signature 工厂方法
+var conversationSignatureFactory = function(conversationId, clientId, targetIds, action) {
+  return AV.Cloud.rpc('sign-conversation', {
+    conversationId: conversationId,
+    clientId: clientId,
+    targetIds: targetIds,
+    action: action,
+  });
 };
-await conversation.SendAsync(message, sendOptions);
-```
+// 基于 LeanCloud 云引擎进行对话黑名单操作签名的 signature 工厂方法
+var blacklistSignatureFactory = function(conversationId, clientId, targetIds, action) {
+  return AV.Cloud.rpc('sign-blacklist', {
+    conversationId: conversationId,
+    clientId: clientId,
+    targetIds: targetIds,
+    action: action,
+  });
+};
 
-## 在云端进行消息控制
-
-即时通讯服务通过云引擎服务可以实现 Hook 函数的功能：
-
-> 开发者在服务端定义一些 Hook 函数，在对话创建/消息发送等函数被调用的时候，即时通讯服务会调用这些 Hook 函数，让开发者更自由的控制业务逻辑。
-
-举个例子，做一个游戏聊天系统的时候，要合理地屏蔽一些竞争对手游戏的关键字，以下是使用云引擎支持的各种服务端编程语言实现这个函数的代码：
-
-```js
-AV.Cloud.onIMMessageReceived((request) => {
-    // request.params = {
-    //     fromPeer: 'Tom',
-    //     receipt: false,
-    //     groupId: null,
-    //     system: null,
-    //     content: '{"_lctext":"来我们去XX传奇玩吧","_lctype":-1}',
-    //     convId: '5789a33a1b8694ad267d8040',
-    //     toPeers: ['Jerry'],
-    //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
-    //     bin: false,
-    //     transient: false,
-    //     sourceIP: '121.239.62.103',
-    //     timestamp: 1472200796764
-    // };
-
-    let content = request.params.content;
-    console.log('content', content);
-    let processedContent = content.replace('XX传奇', '**');
-    // 必须含有以下语句给服务端一个正确的返回，否则会引起异常
-  return {
-    content: processedContent
-  };
-});
-```
-```python
-@engine.define
-def _messageReceived(**params):
-    # params = {
-    #     'fromPeer': 'Tom',
-    #     'receipt': false,
-    #     'groupId': null,
-    #     'system': null,
-    #     'content': '{"_lctext":"来我们去XX传奇玩吧","_lctype":-1}',
-    #     'convId': '5789a33a1b8694ad267d8040',
-    #     'toPeers': ['Jerry'],
-    #     '__sign': '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
-    #     'bin': false,
-    #     'transient': false,
-    #     'sourceIP': '121.239.62.103',
-    #     'timestamp': 1472200796764,
-    # }
-    print('_messageReceived start')
-    content = json.loads(params['content'])
-    text = content._lctext
-    print('text:', text)
-    processed_content = text.replace('XX传奇', '**')
-    print('_messageReceived end')
-    # 必须含有以下语句给服务端一个正确的返回，否则会引起异常
-    return {
-        'content': processed_content,
-    }
-```
-```php
-Cloud::define("_messageReceived", function($params, $user) {
-    // params = {
-    //     fromPeer: 'Tom',
-    //     receipt: false,
-    //     groupId: null,
-    //     system: null,
-    //     content: '{"_lctext":"来我们去XX传奇玩吧","_lctype":-1}',
-    //     convId: '5789a33a1b8694ad267d8040',
-    //     toPeers: ['Jerry'],
-    //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
-    //     bin: false,
-    //     transient: false,
-    //     sourceIP: '121.239.62.103',
-    //     timestamp: 1472200796764
-    // };
-
-    error_log('_messageReceived start');
-    $content = json_decode($params["content"], true);
-    $text = $content["_lctext"];
-    error_log($text);
-    $processedContent = preg_replace("XX传奇", "**", $text);
-    return array("content" => $processedContent);
-});
-```
-```java
-@IMHook(type = IMHookType.messageReceived)
-  public static Map<String, Object> onMessageReceived(Map<String, Object> params) {
-    // 打印整个 Hook 函数的参数
-    System.out.println(params);
-    Map<String, Object> result = new HashMap<String, Object>();
-    // 获取消息内容
-    String content = (String)params.get("content");
-    // 转化成 Map 格式
-    Map<String,Object> contentMap = (Map<String,Object>)JSON.parse(content);
-    // 读取文本内容
-    String text = (String)(contentMap.get("_lctext").toString());
-    // 过滤广告内容
-    String processedContent = text.replace("XX中介", "**");
-    // 将过滤之后的内容发还给服务端
-    result.put("content",processedContent);
-    return result;
-  }
-```
-```cs
-```
-
-而实际上启用上述代码之后，一条消息的时序图如下：
-
-```seq
-SDK->RTM: 1.发送消息
-RTM-->Engine: 2.触发 _messageReceived hook 调用
-Engine-->RTM: 3.返回 hook 函数处理结果
-RTM-->SDK: 4.将 hook 函数处理结果发送给接收方
-```
-
-- 上图假设的是对话所有成员都在线，而如果有成员不在线，流程有些不一样，下一节会做介绍。
-- RTM 表示即时通讯服务集群，Engine 表示云引擎服务集群，它们基于内网通讯。
-
-### 消息 Hook
-
-前一小节介绍的是最为常见的**服务端收到消息时的 Hook，并且所有成员都在线**，而完整的消息 Hook 的生命周期和执行顺序如下图所示：
-
-```mermaid
-graph LR
-A(SDK 客户端) --> |发送消息| B(RTM)
-B -.-> C(Engine/_messageReceived)
-C --> E{接收者是否在线?}
-E --> |否| F(_receiversOffline)
-E --> |是| G(_messageSent)
-F --> H[自定义离线消息推送]
-G --> I[直接在线送达消息]
-```
-
-而 `_receiversOffline` 触发条件是：
-
->在消息发送完成时触发、对话中某些用户却已经下线，此时可以根据发送的消息来生成离线消息推送的标题等等。例如截取所发送消息的前 6 个字符作为推送的标题：
-
-示例代码如下：
-
-```js
-AV.Cloud.onIMReceiversOffline((request) => {
-    let params = request.params;
-    let content = params.content;
-
-  // params.content 为消息的内容
-    let shortContent = content;
-
-    if (shortContent.length > 6) {
-        shortContent = content.slice(0, 6);
-    }
-
-    console.log('shortContent', shortContent);
-
-  return {
-    pushMessage: JSON.stringify({
-          // 自增未读消息的数目，不想自增就设为数字
-          badge: "Increment",
-          sound: "default",
-          // 使用开发证书
-          _profile: "dev",
-          alert: shortContent
-      })
-  }
-});
-```
-```python
-@engine.define
-def _receiversOffline(**params):
-    print('_receiversOffline start')
-    # params['content'] 为消息内容
-    content = params['content']
-    short_content = content[:6]
-    print('short_content:', short_content)
-    payloads = {
-        # 自增未读消息的数目，不想自增就设为数字
-        'badge': 'Increment',
-        'sound': 'default',
-        # 使用开发证书
-        '_profile': 'dev',
-        'alert': short_content,
-    }
-    print('_receiversOffline end')
-    return {
-        'pushMessage': json.dumps(payloads),
-    }
-```
-```php
-Cloud::define('_receiversOffline', function($params, $user) {
-    error_log('_receiversOffline start');
-    // content 为消息的内容
-    $shortContent = $params["content"];
-    if (strlen($shortContent) > 6) {
-        $shortContent = substr($shortContent, 0, 6);
-    }
-
-    $json = array(
-        // 自增未读消息的数目，不想自增就设为数字
-        "badge" => "Increment",
-        "sound" => "default",
-        // 使用开发证书
-        "_profile" => "dev",
-        "alert" => shortContent
-    );
-
-    $pushMessage = json_encode($json);
-    return array(
-        "pushMessage" => $pushMessage,
-    );
-});
-```
-```java
-@IMHook(type = IMHookType.receiversOffline)
-  public static Map<String, Object> onReceiversOffline(Map<String, Object> params) {
-    String alert = (String)params.get("content");
-    if(alert.length() > 6){
-      alert = alert.substring(0, 6);
-    }
-    System.out.println(alert);
-    Map<String, Object> result = new HashMap<String, Object>();
-    JSONObject object = new JSONObject();
-    object.put("badge", "Increment");
-    object.put("sound", "default");
-    object.put("_profile", "dev");
-    object.put("alert", alert);
-    result.put("pushMessage", object.toString());
-    return result;
-}
-```
-```cs
-```
-
-`_messageSent` 的触发时机在消息发送完成之后触发，此时可以做一些日志记录相关的操作，例如消息发送完后，在云引擎中打印一下日志：
-
-```js
-AV.Cloud.onIMMessageSent((request) => {
-    console.log('params', request.params);
-
-    // 在云引擎中打印的日志如下：
-    // params { fromPeer: 'Tom',
-    //   receipt: false,
-    //   onlinePeers: [],
-    //   content: '12345678',
-    //   convId: '5789a33a1b8694ad267d8040',
-    //   msgId: 'fptKnuYYQMGdiSt_Zs7zDA',
-    //   __sign: '1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711',
-    //   bin: false,
-    //   transient: false,
-    //   sourceIP: '114.219.127.186',
-    //   offlinePeers: [ 'Jerry' ],
-    //   timestamp: 1472703266522 }
-});
-```
-```python
-@engine.define
-def _messageSent(**params):
-    print('_messageSent start')
-    print('params:', params)
-    print('_messageSent end')
-    return {}
-
-# 在云引擎中打印的日志如下：
-# _messageSent start
-# params: {'__sign': '1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711',
-#  'bin': False,
-#  'content': '12345678',
-#  'convId': '5789a33a1b8694ad267d8040',
-#  'fromPeer': 'Tom',
-#  'msgId': 'fptKnuYYQMGdiSt_Zs7zDA',
-#  'offlinePeers': ['Jerry'],
-#  'onlinePeers': [],
-#  'receipt': False,
-#  'sourceIP': '114.219.127.186',
-#  'timestamp': 1472703266522,
-#  'transient': False}
-# _messageSent end
-```
-```php
-Cloud::define('_messageSent', function($params, $user) {
-    error_log('_messageSent start');
-    error_log('params' . json_encode($params));
-    return array();
-
-    // 在云引擎中打印的日志如下：
-    // _messageSent start
-    // params { fromPeer: 'Tom',
-    //   receipt: false,
-    //   onlinePeers: [],
-    //   content: '12345678',
-    //   convId: '5789a33a1b8694ad267d8040',
-    //   msgId: 'fptKnuYYQMGdiSt_Zs7zDA',
-    //   __sign: '1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711',
-    //   bin: false,
-    //   transient: false,
-    //   sourceIP: '114.219.127.186',
-    //   offlinePeers: [ 'Jerry' ],
-    //   timestamp: 1472703266522 }
-});
-```
-```java
-@IMHook(type = IMHookType.messageSent)
-  public static Map<String, Object> onMessageSent(Map<String, Object> params) {
-    System.out.println(params);
-    Map<String, Object> result = new HashMap<String, Object>();
-    // ...
-    return result;
-}
-```
-```cs
-```
-
-### 对话 Hook
-
-对话的创建/加入/退出/加人/删人都会有对应的 Hook。
-
-客户端发起创建对话的 Hook 流程图：
-
-```mermaid
-graph LR
-A(SDK 客户端) -->|创建对话|B(RTM)
-B -.-> C(Engine/_conversationStart)
-C --> E(_conversationStarted)
-E --> F[送达对话创建成功通知]
-```
-
-`_conversationStart` 的触发条件是：
-
-> 创建对话，在签名校验（如果开启）之后、实际创建之前触发
-
-成员加入时的 Hook 流程图如下：
-
-```mermaid
-graph LR
-A(SDK 客户端) -->|加入对话/邀请他人加入|B(RTM)
-B -.-> C(Engine/_conversationAdd)
-C --> E[送达对话加入成功通知]
-```
-
-对应的成员离开时的 Hook 流程图如下：
-
-```mermaid
-graph LR
-A(SDK 客户端) -->| 将他人从对话中踢出|B(RTM)
-B -.-> C(Engine/_conversationRemove)
-C --> E[送达踢出成功通知]
-```
-
-注意：此处有一个与 `_conversationAdd` 不同之处，自己退出对话，不会触发 `_conversationRemove`
-
-Hook 函数的示例代码请根据所需语言了解更多：
-
-- [PHP#即时通讯 Hook 函数](leanengine_cloudfunction_guide-php.html#即时通讯 Hook 函数)
-- [NodeJS#即时通讯 Hook 函数](leanengine_cloudfunction_guide-node.html#即时通讯 Hook 函数)
-- [Python#即时通讯 Hook 函数](leanengine_cloudfunction_guide-python.html#即时通讯 Hook 函数)
-- [Java#即时通讯 Hook 函数](leanengine_cloudfunction_guide-java.html#即时通讯 Hook 函数)
-
-## 安全与权限
-
-即时通讯采用基于签名的权限控制，关于签名的基本概念请阅读[即时通讯服务总览-权限和认证](realtime_v2.html#权限和认证)。
-
-### 签名鉴权与 Hook 的关系 
-
-对话的权限控制与 Hook 有一些关联，对话级别上的所有 Hook 触发都有另外一个前置条件：
-
-> 该操作的签名是确认合法的，LeanCloud 即时通讯服务器(RTM) 确认校验通过之后，才会去 Engine 服务器调用 Hook
-
-因此，加上签名的校验这一步，创建对话的完整的流程图如下：
-
-```mermaid
-graph LR
-A(SDK 客户端) -->|创建对话|B(RTM)
-B --> C{签名是否合法}
-C -->|否| D[拒绝操作]
-C -.->|是| E(Engine/_conversationStart)
-E --> G(_conversationStarted)
-G --> H[送达对话创建成功通知]
-```
-
-### 多端消息同步与单点登录
-
-一个用户可以使用相同的账号在不同的客户端上登录（例如网页版和手机客户端可以同时接收到消息和回复消息，实现多端消息同步），而有一些场景下，需要禁止一个用户同时在不同客户端登录（单点登录），而即时通讯服务也提供了这样的接口，来应对不同的需求：
-
-下面我们来详细说明：如何使用 LeanCloud SDK 去实现单点登录
-
-#### 设置登录标记 Tag
-
-假设开发者想实现 QQ 这样的功能，那么需要在登录到云端的时候，也就是打开与云端长连接的时候，标记一下这个链接是从什么类型的客户端登录到云端的：
-
-```js
-realtime.createIMClient('Tom', { tag: 'Mobile' }).then(function(tom) {
+realtime.createIMClient('Tom', {
+  signatureFactory: signatureFactory,
+  conversationSignatureFactory: conversationSignatureFactory,
+  blacklistSignatureFactory: blacklistSignatureFactory
+}).then(function(tom) {
   console.log('Tom 登录');
+}).catch(function(error) {
+  // 如果 signatureFactory 抛出了异常，或者签名没有验证通过，会在这里被捕获
 });
 ```
 ```objc
-AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile"];
-[currentClient openWithCallback:^(BOOL succeeded, NSError *error) {
-    if (succeeded) {
-        // 与云端建立连接成功
+// AVIMSignatureDataSource 接口的主要方法
+/*!
+ 对一个操作进行签名. 注意:本调用会在后台线程被执行
+ @param clientId - 操作发起人的 id
+ @param conversationId － 操作所属对话的 id
+ @param action － @see AVIMSignatureAction
+ @param clientIds － 操作目标的 id 列表
+ @return 一个 AVIMSignature 签名对象.
+ */
+- (AVIMSignature *)signatureWithClientId:(NSString *)clientId
+                          conversationId:(NSString * _Nullable)conversationId
+                                  action:(AVIMSignatureAction)action
+                       actionOnClientIds:(NSArray<NSString *> * _Nullable)clientIds;
+
+
+// 客户端只需要实现 AVIMSignatureDataSource 协议接口，并绑定到 AVIMClient 实例即可。
+AVIMClient *imClient = [[AVIMClient alloc] initWithClientId:@"Tom"];
+imClient.delegate = self;
+imClient.signatureDataSource = signatureDelegate;
+```
+```java
+// 这是一个依赖云引擎完成签名的示例
+public class KeepAliveSignatureFactory implements SignatureFactory {
+ @Override
+ public Signature createSignature(String peerId, List<String> watchIds) throws SignatureException {
+   Map<String,Object> params = new HashMap<String,Object>();
+   params.put("self_id",peerId);
+   params.put("watch_ids",watchIds);
+
+   try{
+     Object result =  AVCloud.callFunction("sign",params);
+     if(result instanceof Map){
+       Map<String,Object> serverSignature = (Map<String,Object>) result;
+       Signature signature = new Signature();
+       signature.setSignature((String)serverSignature.get("signature"));
+       signature.setTimestamp((Long)serverSignature.get("timestamp"));
+       signature.setNonce((String)serverSignature.get("nonce"));
+       return signature;
+     }
+   }catch(AVException e){
+     throw (SignatureFactory.SignatureException) e;
+   }
+   return null;
+ }
+
+  @Override
+  public Signature createConversationSignature(String convId, String peerId,
+                                               List<String> targetPeerIds,String action) throws SignatureException{
+   Map<String,Object> params = new HashMap<String,Object>();
+   params.put("client_id",peerId);
+   params.put("conv_id",convId);
+   params.put("members",targetPeerIds);
+   params.put("action",action);
+
+   try{
+     Object result = AVCloud.callFunction("sign2",params);
+     if(result instanceof Map){
+        Map<String,Object> serverSignature = (Map<String,Object>) result;
+        Signature signature = new Signature();
+        signature.setSignature((String)serverSignature.get("signature"));
+        signature.setTimestamp((Long)serverSignature.get("timestamp"));
+        signature.setNonce((String)serverSignature.get("nonce"));
+        return signature;
+     }
+   }catch(AVException e){
+     throw (SignatureFactory.SignatureException) e;
+   }
+   return null;
+  }
+
+  @Override
+  public Signature createBlacklistSignature(String clientId, String conversationId, List<String> memberIds,
+                                            String action) throws SignatureException {
+    Map<String,Object> params = new HashMap<String,Object>();
+    params.put("client_id",clientId);
+    params.put("conv_id",conversationId);
+    params.put("members",memberIds);
+    params.put("action",action);
+
+    try{
+      Object result = AVCloud.callFunction("sign3",params);
+      if(result instanceof Map){
+         Map<String,Object> serverSignature = (Map<String,Object>) result;
+         Signature signature = new Signature();
+         signature.setSignature((String)serverSignature.get("signature"));
+         signature.setTimestamp((Long)serverSignature.get("timestamp"));
+         signature.setNonce((String)serverSignature.get("nonce"));
+         return signature;
+      }
+    }catch(AVException e){
+      throw (SignatureFactory.SignatureException) e;
+    }
+    return null;
+  }
+}
+
+// 将签名工厂类的实例绑定到 AVIMClient 上
+AVIMClient.setSignatureFactory(new KeepAliveSignatureFactory());
+```
+```cs
+// 基于云引擎完成签名的 ISignatureFactory 接口实现
+public class LeanEngineSignatureFactory : ISignatureFactory
+{
+    public Task<AVIMSignature> CreateConnectSignature(string clientId)
+    {
+        var data = new Dictionary<string, object>();
+        data.Add("client_id", clientId);
+        return AVCloud.CallFunctionAsync<IDictionary<string,object>>("sign2", data).OnSuccess(_ => 
+        {
+            var jsonData = _.Result;
+            var s = jsonData["signature"].ToString();
+            var n = jsonData["nonce"].ToString();
+            var t = long.Parse(jsonData["timestamp"].ToString());
+            var signature = new AVIMSignature(s,t,n);
+            return signature;
+        });
+    }
+
+    public Task<AVIMSignature> CreateConversationSignature(string conversationId, string clientId, IEnumerable<string> targetIds, ConversationSignatureAction action)
+    {
+        var actionList = new string[] { "invite", "kick" };
+        var data = new Dictionary<string, object>();
+        data.Add("client_id", clientId);
+        data.Add("conv_id", conversationId);
+        data.Add("members", targetIds.ToList());
+        data.Add("action", actionList[(int)action]);
+        return AVCloud.CallFunctionAsync<IDictionary<string, object>>("sign2", data).OnSuccess(_ =>
+        {
+            var jsonData = _.Result;
+            var s = jsonData["signature"].ToString();
+            var n = jsonData["nonce"].ToString();
+            var t = long.Parse(jsonData["timestamp"].ToString());
+            var signature = new AVIMSignature(s, t, n);
+            return signature;
+        });
+    }
+
+    public Task<AVIMSignature> CreateQueryHistorySignature(string clientId, string conversationId)
+    {
+        return Task.FromResult<AVIMSignature>(null);
+    }
+
+    public Task<AVIMSignature> CreateStartConversationSignature(string clientId, IEnumerable<string> targetIds)
+    {
+        var data = new Dictionary<string, object>();
+        data.Add("client_id", clientId);
+        data.Add("members", targetIds.ToList());
+        return AVCloud.CallFunctionAsync<IDictionary<string, object>>("sign2", data).OnSuccess(_ =>
+        {
+            var jsonData = _.Result;
+            var s = jsonData["signature"].ToString();
+            var n = jsonData["nonce"].ToString();
+            var t = long.Parse(jsonData["timestamp"].ToString());
+            var signature = new AVIMSignature(s, t, n);
+            return signature;
+        });
+    }
+}
+
+// 即时通讯服务初始化的时候，设置这一签名工厂的实例。
+var config = new AVRealtime.Configuration()
+{
+    ApplicationId = "",
+    ApplicationKey = "",
+    SignatureFactory = new LeanEngineSignatureFactory()
+};
+var realtime = new AVRealtime(config);
+```
+
+{{ docs.alert("需要强调的是：开发者切勿在客户端直接使用 MasterKey 进行签名操作，因为 MaterKey 一旦泄露，会造成应用的数据处于高危状态，后果不容小视。因此，强烈建议开发者将签名的具体代码托管在安全性高稳定性好的云端服务器上（例如 LeanCloud 云引擎）。") }}
+
+### 内建账户系统（AVUser）的签名机制
+
+`AVUser` 是 LeanCloud 存储服务提供的默认账户系统，对于使用了它来完成用户注册、登录的产品来说，终端用户通过 AVUser 账户系统的登录认证之后，转到即时通讯服务上，是无需再进行登录签名操作的。
+使用 `AVUser` 账号系统登录即时通讯服务的示例如下：
+
+```js
+var AV = require('leancloud-storage');
+// 以用户名和密码登录内建账户系统
+AV.User.logIn('username', 'password').then(function(user) {
+  // 直接使用 AVUser 实例登录即时通讯服务
+  return realtime.createIMClient(user);
+}).catch(console.error.bind(console));
+```
+```objc
+// 以 AVUser 的用户名和密码登录到 LeanCloud 内建账户系统
+[AVUser logInWithUsernameInBackground:username password:password block:^(AVUser * _Nullable user, NSError * _Nullable error) {
+    // 以 AVUser 实例创建了一个 client
+    AVIMClient *client = [[AVIMClient alloc] initWithUser:user];
+    // 登录即时通讯云端
+    [client openWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
+        // Do something you like.
+    }];
+}];
+```
+```java
+// 以 AVUser 的用户名和密码登录到 LeanCloud 内建账户系统
+AVUser.logInInBackground("username", "password", new LogInCallback<AVUser>() {
+    @Override
+    public void done(AVUser user, AVException e) {
+        if (null != e) {
+          return;
+        }
+        // 以 AVUser 实例创建了一个 client
+        AVIMClient client = AVIMClient.getInstance(user);
+        // 登录即时通讯云端
+        client.open(new AVIMClientCallback() {
+          @Override
+          public void done(final AVIMClient avimClient, AVIMException e) {
+            // do something as you need.
+          }
+       });
+    }
+});
+```
+```cs
+// not support yet
+```
+
+LeanCloud 内置账户系统与即时通讯服务可以共享登录签名信息，这里我们直接用 login 成功之后的 AVUser 实例来创建 IMClient，在即时通讯服务的用户登录环节，LeanCloud 云端会自动关联账户系统来确认用户身份的合法性，这样可以省掉 SDK 向第三方申请登录签名的操作，进一步简化开发流程。
+
+`IMClient` 完成即时通讯系统登录之后，其他功能的使用就和之前的介绍没有任何区别了。
+
+## 权限管理与黑名单
+
+第三方鉴权是一种服务端对全局进行控制的机制，具体到单个对话的群组，例如开放聊天室，出于产品运营的需求，我们还需要对成员权限进行区分，以及允许管理员来限时/永久屏蔽部分用户。下面我们详细说明一下这样的需求该如何实现。
+
+### 设置成员权限
+
+「成员权限」是指将对话内成员划分成不同角色，实现类似 QQ 群管理员的效果。使用这个功能需要在控制台 即时通讯-设置 中开启「对话成员属性功能（成员角色管理功能）」。
+
+目前系统内的角色与管理功能的对应关系：
+
+| 角色 | 功能列表 |
+| ---------|--------- |
+| Owner | 永久性禁言、踢人、加人、拉黑、更新他人权限 |
+| Manager | 永久性禁言、踢人、加人、拉黑、更新他人权限 |
+| Member | 加人 |
+
+角色的操作权限大小是按照 `Owner` -> `Manager` -> `Member` 的顺序逐级递减的，高级别的角色可以修改低级别角色的权限，但反过来的修改是不允许的。同时，对于加人和踢人的操作，在前面文档中我们可以看到，是所有成员都可以执行的操作，在成员角色管理功能开启之后，就变成 `Owner` 和 `Manager` 专属的功能的，普通成员发起这两种请求都会报错（错误码：）。
+
+一个对话的 `Owner` 是不可变更的，我们 SDK 提供了 `Conversation#updateMemberRole` 方法，支持把一个终端用户在 `Manager` 和 `Member` 之间切换角色：
+
+```js
+/**
+ * 更新指定用户的角色
+ * @since 4.0.0
+ * @param {String} memberId 成员 Id
+ * @param {module:leancloud-realtime.ConversationMemberRole | String} role 角色
+ * @return {Promise.<this>} self
+ */
+async updateMemberRole(memberId, role);
+```
+```objc
+/**
+ Change a member's role.
+
+ @param memberId Equal to client id.
+ @param role Changing role.
+ @param callback Result callback.
+ */
+- (void)updateMemberRoleWithMemberId:(NSString *)memberId
+                                role:(AVIMConversationMemberRole)role
+                            callback:(void (^)(BOOL succeeded, NSError * _Nullable error))callback;
+```
+```java
+/**
+ * 更新成员的角色信息
+ * @param memberId  成员的 client id
+ * @param role      角色
+ * @param callback  结果回调函数
+ */
+public void updateMemberRole(final String memberId, final ConversationMemberRole role, final AVIMConversationCallback callback);
+```
+```cs
+// not support yet
+```
+
+### 获取成员权限
+
+`Conversation` 对象提供了两种方法来获取成员权限信息：
+- `Conversation#getAllMemberInfo()` 可用来获取所有成员的权限信息
+```js
+/**
+ * 获取所有成员的对话属性
+ * @since 4.0.0
+ * @return {Promise.<ConversationMemberInfo[]>} 所有成员的对话属性列表
+ */
+async getAllMemberInfo({ noCache = false } = {})
+```
+```objc
+/**
+ Get all member info. using cache as a default.
+
+ @param callback Result callback.
+ */
+- (void)getAllMemberInfoWithCallback:(void (^)(NSArray<AVIMConversationMemberInfo *> * _Nullable memberInfos, NSError * _Nullable error))callback;
+
+/**
+ Get all member info.
+
+ @param ignoringCache Cache option.
+ @param callback Result callback.
+ */
+- (void)getAllMemberInfoWithIgnoringCache:(BOOL)ignoringCache
+                                 callback:(void (^)(NSArray<AVIMConversationMemberInfo *> * _Nullable memberInfos, NSError * _Nullable error))callback;
+```
+```java
+/**
+ * 获取当前对话的所有角色信息
+ * @param offset    查询结果的起始点
+ * @param limit     查询结果集上限
+ * @param callback  结果回调函数
+ */
+public void getAllMemberInfo(int offset, int limit, final AVIMConversationMemberQueryCallback callback);
+```
+```cs
+// not support yet
+```
+
+- `Conversation#getMemberInfo(memberId)` 可用来获取指定成员的权限信息
+
+```js
+/**
+ * 获取指定成员的对话属性
+ * @since 4.0.0
+ * @param {String} memberId 成员 Id
+ * @return {Promise.<ConversationMemberInfo>} 指定成员的对话属性
+ */
+async getMemberInfo(memberId);
+```
+```objc
+/**
+ Get a member info by member id. using cache as a default.
+
+ @param memberId Equal to client id.
+ @param callback Result callback.
+ */
+- (void)getMemberInfoWithMemberId:(NSString *)memberId
+                         callback:(void (^)(AVIMConversationMemberInfo * _Nullable memberInfo, NSError * _Nullable error))callback;
+```
+```java
+/**
+ * 获取对话内指定成员的角色信息
+ * @param memberId  成员的 clientid
+ * @param callback  结果回调函数
+ */
+public void getMemberInfo(final String memberId, final AVIMConversationMemberQueryCallback callback);
+```
+```cs
+// not support yet
+```
+
+这两类函数的返回值都是包含 `<ConversationId, MemberId, ConversationMemberRole>` 信息的三元组（数组）。
+
+### 让部分用户禁言
+
+`Owner` 和 `Manager` 作为聊天群组管理员的权限之一，就是能够让部分用户禁言。
+被禁言的用户，只能接收群组里面的消息，而不能再往外发送消息，否则会报错。
+
+`AVIMConversation` 类提供了对成员进行禁言操作的相关方法：
+
+```js
+/**
+ * 在该对话中禁言成员
+ * @param {String|String[]} clientIds 成员 client id
+ * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 id 列表、失败原因与对应的 id 列表
+ */
+async muteMembers(clientIds);
+
+/**
+ * 对话中解除禁言
+ * @param {String|String[]} clientIds 成员 client id
+ * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 id 列表、失败原因与对应的 id 列表
+ */
+async unmuteMembers(clientIds);
+
+/**
+ * 查询该对话禁言成员列表
+ * @param {Object} [options]
+ * @param {Number} [options.limit] 返回的成员数量，服务器默认值 10
+ * @param {String} [options.next] 从指定 next 开始查询，与 limit 一起使用可以完成翻页。
+ * @return {PagedResults.<string>} 查询结果。其中的 cureser 存在表示还有更多结果。
+ */
+async queryMutedMembers({ limit, next } = {});
+```
+```objc
+/**
+ Muting some members in the conversation.
+ 
+ @param memberIds Who will be muted.
+ @param callback Result callback.
+ */
+- (void)muteMembers:(NSArray<NSString *> *)memberIds
+           callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+/**
+ Unmuting some members in the conversation.
+ 
+ @param memberIds Who will be unmuted.
+ @param callback Result callback.
+ */
+- (void)unmuteMembers:(NSArray<NSString *> *)memberIds
+             callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+/**
+ Query muted members in the conversation.
+ 
+ @param limit Count of the muted members you want to query.
+ @param next Offset, if callback's next is nil or empty, that means there is no more muted members.
+ @param callback Result callback.
+ */
+- (void)queryMutedMembersWithLimit:(NSInteger)limit
+                              next:(NSString * _Nullable)next
+                          callback:(void (^)(NSArray<NSString *> * _Nullable mutedMemberIds, NSString * _Nullable next, NSError * _Nullable error))callback;
+```
+```java
+/**
+ * 将部分成员禁言
+ * @param memberIds  成员列表
+ * @param callback   结果回调函数
+ */
+public void muteMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * 将部分成员解除禁言
+ * @param memberIds  成员列表
+ * @param callback   结果回调函数
+ */
+public void unmuteMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * 查询被禁言的成员列表
+ * @param offset    查询结果的起始点
+ * @param limit     查询结果集上限
+ * @param callback  结果回调函数
+ */
+public void queryMutedMembers(int offset, int limit, final AVIMConversationSimpleResultCallback callback);
+```
+```cs
+// not support yet
+```
+
+注意这里对用户禁言/解除禁言的结果与以往的操作结果不一样，这里是***部分成功结果***，里面包含三部分数据：
+- ***error/exception***，表示整体是否成功。如果整体操作失败，这里会有异常信息返回，此时不必再看下面两部分结果；
+- ***successfulClientIds***，表示操作成功了的成员 id 列表。
+- ***failedIds***，表示所有操作失败了的成员信息，以 `List<reasonString, List<ClientId>>` 的形式列出了所有的失败原因以及对应的成员 id 列表。
+
+#### 禁言的通知事件
+管理员把部分用户禁言之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
+
+### 黑名单
+
+「黑名单」功能可以实现类似微信「屏蔽」的效果，目前分为两大类
+
+- 对话 --> 成员，是指为某个对话设置的黑名单，禁止名单中的用户加入该对话。
+- 成员 --> 对话，是指某个用户自己设置的对话黑名单，表示禁止其他人把自己拉入这些对话，实现类似于「永久退群」的效果。
+
+使用这个功能需要在控制台 即时通讯-设置 中开启「黑名单功能」。
+
+`AVIMConversation` 类提供了对对话黑名单进行操作的方法：
+
+```js
+/**
+ * 将用户加入该对话黑名单
+ * @param {String|String[]} clientIds 成员 client id
+ * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 id 列表、失败原因与对应的 id 列表
+ */
+async blockMembers(clientIds);
+
+/**
+ * 将用户移出该对话黑名单
+ * @param {String|String[]} clientIds 成员 client id
+ * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 id 列表、失败原因与对应的 id 列表
+ */
+async unblockMembers(clientIds);
+
+/**
+ * 查询该对话黑名单
+ * @param {Object} [options]
+ * @param {Number} [options.limit] 返回的成员数量，服务器默认值 10
+ * @param {String} [options.next] 从指定 next 开始查询，与 limit 一起使用可以完成翻页
+ * @return {PagedResults.<string>} 查询结果。其中的 cureser 存在表示还有更多结果。
+ */
+async queryBlockedMembers({ limit, next } = {});
+```
+```objc
+/**
+ Blocking some members in the conversation.
+
+ @param memberIds Who will be blocked.
+ @param callback Result callback.
+ */
+- (void)blockMembers:(NSArray<NSString *> *)memberIds
+            callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+
+/**
+ Unblocking some members in the conversation.
+
+ @param memberIds Who will be unblocked.
+ @param callback Result callback.
+ */
+- (void)unblockMembers:(NSArray<NSString *> *)memberIds
+              callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+
+/**
+ Query blocked members in the conversation.
+
+ @param limit Count of the blocked members you want to query.
+ @param next Offset, if callback's next is nil or empty, that means there is no more blocked members.
+ @param callback Result callback.
+ */
+- (void)queryBlockedMembersWithLimit:(NSInteger)limit
+                                next:(NSString * _Nullable)next
+                            callback:(void (^)(NSArray<NSString *> * _Nullable blockedMemberIds, NSString * _Nullable next, NSError * _Nullable error))callback;
+```
+```java
+/**
+ * 将部分成员加入黑名单
+ * @param memberIds  成员列表
+ * @param callback   结果回调函数
+ */
+public void blockMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * 将部分成员从黑名单移出来
+ * @param memberIds  成员列表
+ * @param callback   结果回调函数
+ */
+public void unblockMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * 查询黑名单的成员列表
+ * @param offset    查询结果的起始点
+ * @param limit     查询结果集上限
+ * @param callback  结果回调函数
+ */
+public void queryBlockedMembers(int offset, int limit, final AVIMConversationSimpleResultCallback callback);
+```
+```cs
+// not support yet
+```
+
+> 注意这里对黑名单操作的结果与禁言操作一样，是***部分成功结果***。
+
+用户被加入黑名单之后，就被从对话的成员中移除出去了，以后都无法再接受到对话里面的新消息，并且除非解除黑名单，其他人都无法再把 ta 加为对话成员了。
+
+#### 黑名单的通知事件
+
+管理员把部分用户加入黑名单之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
+
+
+## 玩转直播聊天室
+
+在即时通讯服务总览中，我们比较了不同的[业务场景与对话类型](realtime_v2.html#业务场景的需求)，现在就来看看如何使用「聊天室」完成一个直播弹幕的需求。
+
+### 创建聊天室
+
+`AVIMClient` 提供了专门的 `createChatRoom` 方法来创建聊天室：
+
+```js
+tom.createChatRoom({ name:'聊天室' }).catch(console.error);
+```
+```objc
+[client createChatRoomWithName:@"聊天室" attributes:nil callback:^(AVIMChatRoom *chatRoom, NSError *error) {
+    if (chatRoom && !error) {        
+        AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这是一条消息" attributes:nil];
+        [chatRoom sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+            if (success && !error) {
+
+            }
+        }];
     }
 }];
 ```
 ```java
-// 第二个参数：登录标记 Tag
-AVIMClient currentClient = AVIMClient.getInstance(clientId,"Mobile");
-currentClient.open(new AVIMClientCallback() {
-  @Override
-  public void done(AVIMClient avimClient, AVIMException e) {
-    if(e == null){
-      // 与云端建立连接成功
-    }
-  }
+tom.createChatRoom(null, "聊天室", null,
+    new AVIMConversationCreatedCallback() {
+        @Override
+        public void done(AVIMConversation conv, AVIMException e) {
+            if (e == null) {
+                // 创建成功
+            }
+        }
 });
 ```
 ```cs
-AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile", deviceId: "your-device-id");
+// 最直接的方式，传入 name 即可
+tom.CreateChatRoomAsync("聊天室");
 ```
 
-上述代码可以理解为 LeanCloud 版 QQ 的登录，而另一个带有同样 Tag 的客户端打开连接，则较早前登录系统的客户端会被强制下线。
+在创建聊天室的时候，开发者可以指定聊天室的名字和附加属性（非必须），与[创建普通对话的接口](realtime-guide-beginner.html#创建对话 Conversation)相比，有如下差异：
+- 聊天室因为没有成员列表，所以创建的时候指定 `members` 是没有意义的
+- 同样的原因，创建聊天室的时候指定 `unique` 标志也是没有意义的（云端根据成员 id 来去重）
 
-#### 处理登录冲突
+> 尽管我们调用 `createConversation` 接口，通过传递合适的参数（`{transient: true}`），也可以创建一个聊天室，但是还是建议大家直接使用 `createChatRoom` 方法。
 
-我们可以看到上述代码中，登录的 Tag 是 `Mobile`。当存在与其相同的 Tag 登录的客户端，较早前登录的设备会被云端强行下线，而且他会收到被云端下线的通知：
+### 查找聊天室
+
+在前面一章中，我们已经了解了 [构造复杂条件来查询对话](realtime-guide-beginner.html#使用复杂条件来查询对话) 的方法，`ConversationsQuery` 依然适用于查询聊天室，只需要添加 `transient = true` 的限制条件即可。
 
 ```js
-var { Event } = require('leancloud-realtime');
-tom.on(Event.CONFLICT, function() {
-  // 弹出提示，告知当前用户的 Client Id 在其他设备上登陆了
-});
+var query = tom.getQuery().equalTo('tr',true);// 聊天室对象
+}).catch(console.error);
 ```
 ```objc
--(void)client:(AVIMClient *)client didOfflineWithError:(NSError *)error{
-    if ([error code]  == 4111) {
-        //适当的弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
-    }
-};
+AVIMConversationQuery *query = [tom conversationQuery];
+[query whereKey:@"tr" equalTo:@(YES)]; 
 ```
 ```java
-public class MyApplication extends Application{
-  public void onCreate(){
-   ...
-   AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
-   // 自定义实现的 AVIMClientEventHandler 需要注册到 SDK 后，SDK 才会通过回调 onClientOffline 来通知开发者
-   AVIMClient.setClientEventHandler(new AVImClientManager());
-   ...
-  }
-}
-
-public class AVImClientManager extends AVIMClientEventHandler {
-  ...
-  @Override
-  public void onClientOffline(AVIMClient avimClient, int i) {
-    if(i == 4111){
-      // 适当地弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
+AVIMConversationsQuery query = tom.getChatRoomQuery();
+query.findInBackground(new AVIMConversationQueryCallback() {
+    @Override
+    public void done(List<AVIMConversation> conversations, AVIMException e) {
+        if (null != e) {
+            // 获取成功
+        } else {
+          // 获取失败
+        }
     }
-  }
-  ...
+});
+```
+```cs
+var query = tom.GetChatRoomQuery();
+```
+
+> Java / Android / C# SDK 专门提供了 `AVIMClient#getChatRoomQuery` 方法来生成聊天室查询对象，屏蔽了 `transient` 属性的细节，建议开发者优先使用这些高层 API。
+
+### 加入和离开聊天室
+
+查询到聊天室之后，加入和离开聊天室与普通对话的对应接口没有区别，详细请参考[基础入门#多人群聊](realtime-guide-beginner.html#多人群聊)。
+
+在成员管理与变更通知方面，聊天室与普通对话的最大区别就是：
+- 在聊天室内无法邀请或者踢出成员，只能由用户主动加入和退出；
+- 除了用户主动退出之外，客户端断线也会被认为是退出了聊天室。为了防止网络抖动，如果客户端临时异常断线，只要在半小时内重新上线，都会自动加入原聊天室（主动退出的除外）；
+- 云端不会下发成员加入、退出的变更通知；
+- 不支持查询成员列表，但提供专门的 API 来查询实时在线人数；
+
+另外，也请注意***聊天室也不支持离线推送通知、离线消息同步、消息回执等功能***。
+
+### 查询成员数量
+
+`AVIMConversation#memberCount` 方法可以用来查询普通对话的成员总数，在聊天室中，它返回的就是实时在线的人数：
+
+```js
+chatRoom.count().then(function(count) {
+  console.log('在线人数: ' + count);
+}).catch(console.error.bind(console));
+```
+```objc
+- (void)tomCountsChatroomMembers{
+    // Tom 创建了一个 client，用自己的名字作为 clientId
+    self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+    NSString *conversationId=@"55dd9d7200b0c86eb4fdcbaa";
+    // Tom 打开 client
+    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+        // Tom 创建一个对话的查询
+        AVIMConversationQuery *query = [self.client conversationQuery];
+        // 根据已知 Id 获取对话实例，当前实例为聊天室。
+        [query getConversationById:conversationId callback:^(AVIMConversation *conversation, NSError *error) {
+            // 查询在线人数
+            [conversation countMembersWithCallback:^(NSInteger number, NSError *error) {
+                NSLog(@"%ld",number);
+            }];
+        }];
+    }];
+}
+```
+```java
+private void TomQueryWithLimit() {
+  AVIMClient tom = AVIMClient.getInstance("Tom");
+  tom.open(new AVIMClientCallback() {
+
+    @Override
+    public void done(AVIMClient client, AVIMException e) {
+      if (e == null) {
+        //登录成功
+        AVIMConversationsQuery query = tom.getConversationsQuery();
+        query.setLimit(1);
+        //获取第一个对话
+        query.findInBackground(new AVIMConversationQueryCallback() {
+          @Override
+          public void done(List<AVIMConversation> convs, AVIMException e) {
+            if (e == null) {
+              if (convs != null && !convs.isEmpty()) {
+                AVIMConversation conv = convs.get(0);
+                //获取第一个对话的
+                conv.getMemberCount(new AVIMConversationMemberCountCallback() {
+
+                  @Override
+                  public void done(Integer count, AVIMException e) {
+                    if (e == null) {
+                      Log.d("Tom & Jerry", "conversation got " + count + " members");
+                    }
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+    }
+  });
 }
 ```
 ```cs
-tom.OnSessionClosed += Tom_OnSessionClosed;
-private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
+// AVIMConversation.CountMembersAsync 这个方法返回的是实时数据
+public async void CountMembers_SampleCode()
 {
+    AVIMClient client = new AVIMClient("Tom");
+    await client.ConnectAsync();//Tom 登录客户端
+
+    AVIMConversation conversation = (await client.GetQuery().FindAsync()).FirstOrDefault();//获取对话列表，找到第一个对话
+    int membersCount = await conversation.CountMembersAsync();
 }
 ```
 
-如上述代码中，被动下线的时候，云端会告知原因，因此客户端在做展现的时候也可以做出类似于 QQ 一样友好的通知。
+### 消息等级
 
-> 如果不设置 Tag，则默认允许用户可以多端登录，并且消息会实时同步。
+为了保证消息的时效性，当聊天室消息过多导致客户端连接堵塞时，服务器端会选择性地丢弃部分低等级的消息。目前支持的消息等级有：
+
+| 消息等级                 | 描述                                                               |
+| ------------------------ | ------------------------------------------------------------------ |
+| `MessagePriority.HIGH`   | 高等级，针对时效性要求较高的消息，比如直播聊天室中的礼物，打赏等。 |
+| `MessagePriority.NORMAL` | 正常等级，比如普通非重复性的文本消息。                             |
+| `MessagePriority.LOW`    | 低等级，针对时效性要求较低的消息，比如直播聊天室中的弹幕。         |
+
+消息等级在发送接口的参数中设置。以下代码演示了如何发送一个高等级的消息：
+
+```js
+var { Realtime, TextMessage, MessagePriority } = require('leancloud-realtime');
+var realtime = new Realtime({ appId: 'GDBz24d615WLO5e3OM3QFOaV-gzGzoHsz', appKey: 'dlCDCOvzMnkXdh2czvlbu3Pk' });
+realtime.createIMClient('host').then(function (host) {
+    return host.createConversation({
+        members: ['broadcast'],
+        name: '2094 世界杯决赛梵蒂冈对阵中国比赛直播间',
+        transient: true
+    });
+}).then(function (conversation) {
+    console.log(conversation.id);
+    return conversation.send(new TextMessage('现在比分是 0:0，下半场中国队肯定要做出人员调整'), { priority: MessagePriority.HIGH });
+}).then(function (message) {
+    console.log(message);
+}).catch(console.error);
+```
+```objc
+// Tom 创建了一个 client，用自己的名字作为 clientId
+self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+// Tom 打开 client
+[self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+    // Tom 建立了与 Jerry 的会话
+    [self.client createConversationWithName:@"猫和老鼠" clientIds:@[@"Jerry"] callback:^(AVIMConversation *conversation, NSError *error) {
+        // Tom 发了一条消息给 Jerry
+
+        AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
+        option.priority = AVIMMessagePriorityHigh;
+        [conversation sendMessage:[AVIMTextMessage messageWithText:@"耗子，起床！" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+            // 在这里处理发送失败或者成功之后的逻辑
+        }];
+
+    }];
+}];
+```
+```java
+AVIMClient tom = AVIMClient.getInstance("Tom");
+    tom.open(new AVIMClientCallback() {
+      @Override
+      public void done(AVIMClient client, AVIMException e) {
+        if (e == null) {
+          // 创建名为“猫和老鼠”的对话
+          client.createConversation(Arrays.asList("Jerry"), "猫和老鼠", null,
+            new AVIMConversationCreatedCallback() {
+              @Override
+              public void done(AVIMConversation conv, AVIMException e) {
+                if (e == null) {
+                  AVIMTextMessage msg = new AVIMTextMessage();
+                  msg.setText("耗子，起床！");
+
+                  AVIMMessageOption messageOption = new AVIMMessageOption();
+                  messageOption.setPriority(AVIMMessageOption.MessagePriority.High);
+                  conv.sendMessage(msg, messageOption, new AVIMConversationCallback() {
+                    @Override
+                    public void done(AVIMException e) {
+                      if (e == null) {
+                        // 发送成功
+                      }
+                    }
+                  });
+                }
+              }
+            });
+        }
+      }
+    });
+```
+```cs
+// not support yet
+```
+
+> 注意：
+>
+> 此功能仅针对<u>聊天室消息</u>有效。普通对话的消息不需要设置等级，即使设置了也会被系统忽略，因为普通对话的消息不会被丢弃。
+
+### 消息免打扰
+
+假如某一用户不想再收到某对话的消息提醒，但又不想直接退出对话，可以使用静音操作，即开启「免打扰模式」。
+
+比如 Tom 工作繁忙，对某个对话设置了静音：
+
+```js
+black.getConversation(CONVERSATION_ID).then(function(conversation) {
+  return conversation.mute();
+}).then(function(conversation) {
+  console.log('静音成功');
+}).catch(console.error.bind(console));
+```
+```objc
+- (void)tomMuteConversation {
+    // Tom 创建了一个 client，用自己的名字作为 clientId
+    self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+    // Tom 打开 client
+    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+        // Tom 查询 id 为 551260efe4b01608686c3e0f 的会话
+        AVIMConversationQuery *query = [self.client conversationQuery];
+        [query getConversationById:@"551260efe4b01608686c3e0f" callback:^(AVIMConversation *conversation, NSError *error) {
+            // Tom 将会话设置为静音
+            [conversation muteWithCallback:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    NSLog(@"修改成功！");
+                }
+            }];
+        }];
+    }];
+}
+```
+```java
+AVIMClient tom = AVIMClient.getInstance("Tom");
+tom.open(new AVIMClientCallback(){
+
+    @Override
+    public void done(AVIMClient client,AVIMException e){
+      if(e==null){
+      //登录成功
+      AVIMConversation conv = client.getConversation("551260efe4b01608686c3e0f");
+      conv.mute(new AVIMConversationCallback(){
+
+        @Override
+        public void done(AVIMException e){
+          if(e==null){
+          //设置成功
+          }
+        }
+      });
+      }
+    }
+});
+```
+```cs
+// not support yet
+```
+
+设置静音之后，iOS、Windows Phone 及启用混合推送的 Android 用户就不会收到推送消息了。与之对应的就是取消静音的操作（`Conversation#unmute` 方法），即取消免打扰模式。
+
+> 使用建议：
+>
+> - 对话内消息的静音/取消静音操作不光对聊天室有效，普通的群聊对话也可以执行该操作。
+> - `mute` 和 `unmute` 操作会修改云端 `_Conversation` 里面的 `mu` 属性。**强烈建议开发者切勿在控制台中对 `mu` 随意进行修改**，否则可能会引起即时通讯云端的离线推送功能失效。
 
 
-## 实时音视频
+### 消息内容的实时过滤
 
-目前即时通讯服务还不支持，我们推荐如下几个产品结合即时通讯服务可以实现一个企业级的即时通讯应用：
+对于开放聊天室来说，内容的审核和实时过滤是产品运营上的一个基本要求。我们即时通讯服务默认提供了敏感词过滤的功能，多人的**普通对话、聊天室和系统对话里面的消息都会进行实时过滤**。
 
-1. [声网](https://www.agora.io/cn/)
-2. [ZEGO 即构科技](https://www.zego.im)
+过滤的词库由 LeanCloud 统一提供，命中的敏感词将会被替换为 `***`。同时我们也支持用户自定义敏感词过滤文件。
+在 [控制台 > 消息 > 实时消息 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中开启「消息敏感词实时过滤功能」，上传敏感词文件即可。
 
-相关的产品在市场上还有很多，都可以很方便地与 LeanCloud 即时通讯结合起来。
+如果开发者有较为复杂的过滤需求，我们推荐使用 [云引擎 hook _messageReceived](realtime-guide-systemconv.html#_messageReceived) 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
 
-{{ docs.relatedLinks("更多文档",[
-  { title: "服务总览", href: "realtime_v2.html" },
-  { title: "基础入门", href: "realtime-guide-beginner.html" }, 
-  { title: "进阶功能", href: "realtime-guide-intermediate.html"}])
+## 使用临时对话
+
+临时对话是一个全新的概念，它解决的是一种特殊的聊天场景：
+
+- 对话存续时间短
+- 聊天参与的人数较少（最多为 10 个 Client Id）
+- 聊天记录的存储不是强需求
+
+临时对话最大的特点是**较短的有效期**，这个特点可以解决对话的持久化存储在服务端占用的存储资源越来越大、开发者需要支付的成本越来越高的问题，也可以应对一些临时聊天的场景。诸如电商售前和售后在线聊天的客服系统，我们推荐使用临时对话。
+
+### 临时对话实例
+
+`AVIMConversation` 有专门的 `createTemporaryConversation` 方法用于创建临时对话：
+
+```js
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.createTemporaryConversation({
+    members: ['Jerry', 'William'],
+  });
+}).then(function(conversation) {
+  return conversation.send(new AV.TextMessage('这里是临时对话'));
+}).catch(console.error);
+```
+
+```objc
+[tom createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
+                                                timeToLive:3600
+                                                callback:
+            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
+
+                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这里是临时对话，一小时之后，这个对话就会消失"
+                                                                    attributes:nil];
+                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+
+                    if (success) {
+                        // send message success.
+                    }
+                }];
+            }];
+```
+
+```java
+tom.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
+    @Override
+    public void done(AVIMConversation conversation, AVIMException e) {
+        if (null == e) {
+        AVIMTextMessage msg = new AVIMTextMessage();
+        msg.setText("这里是临时对话，一小时之后，这个对话就会消失");
+        conversation.sendMessage(msg, new AVIMConversationCallback(){
+            @Override
+            public void done(AVIMException e) {
+            }
+        });
+        }
+    }
+});
+```
+
+```cs
+var temporaryConversation = await tom.CreateTemporaryConversationAsync();
+```
+
+与其他对话类型不同的是，临时对话有一个**重要**的属性：TTL，它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天，如果您的需求是一定要超过 30 天，请使用普通对话，传入 TTL 创建临时对话的代码如下：
+
+```js
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.createTemporaryConversation({
+    members: ['Jerry', 'William'],
+    ttl: 3600,
+  });
+}).then(function(conversation) {
+  return conversation.send(new AV.TextMessage('这里是临时对话，一小时之后，这个对话就会消失'));
+}).catch(console.error);
+```
+```objc
+AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+[client openWithCallback:^(BOOL success, NSError *error) {
+    
+    if (success) {
+        
+        [client createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
+                                                timeToLive:3600
+                                                callback:
+            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
+                
+                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"这里是临时对话，一小时之后，这个对话就会消失"
+                                                                    attributes:nil];
+                
+                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+                    
+                    if (success) {
+                        // send message success.
+                    }
+                }];
+            }];
+    }
+}];
+```
+```java
+AVIMClient client = AVIMClient.getInstance("Tom");
+client.open(new AVIMClientCallback() {
+    @Override
+    public void done(AVIMClient avimClient, AVIMException e) {
+    if (null == e) {
+        String[] members = {"Jerry", "William"};
+        avimClient.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
+        @Override
+        public void done(AVIMConversation conversation, AVIMException e) {
+            if (null == e) {
+            AVIMTextMessage msg = new AVIMTextMessage();
+            msg.setText("这里是临时对话，一小时之后，这个对话就会消失");
+            conversation.sendMessage(msg, new AVIMConversationCallback(){
+                @Override
+                public void done(AVIMException e) {
+                }
+            });
+            }
+        }
+        });
+    }
+    }
+});
+```
+```cs
+var temporaryConversation = await tom.CreateTemporaryConversationAsync();
+```
+
+临时对话的其他操作与普通对话无异。
+
+
+{{ docs.relatedLinks("进一步阅读",[
+  { title: "四，详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
 }}
-
-
-## REST API
-
-即时通讯 REST API 的目的是为了给开发者提供一个不依赖 SDK 的高级功能接口。首先请阅读[即时通讯 REST API 使用指南 v2](realtime_rest_api_v2.html)。

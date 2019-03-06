@@ -136,7 +136,7 @@ priority | 可选 | 定义消息优先级，可选值为 high、normal、low，�
 ### 查询历史消息
 
 该接口要求使用 master key。
-为了保证获取聊天记录的安全性，可以开启签名认证，具体可以参考总览里面的 [权限和认证](realtime_v2.html#权限和认证)。
+为了保证获取聊天记录的安全性，可以开启签名认证，具体可以参考总览里面的 [安全与签名](realtime-guide-senior.html#安全与签名)。
 ```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
@@ -312,7 +312,7 @@ curl -X DELETE \
 
 ### 对话权限
 
-该功能介绍可参考总览里面的 [对话权限](realtime_v2.html#对话权限)。
+该功能介绍可参考总览里面的 [权限管理与黑名单](realtime-guide-senior.html#权限管理与黑名单)。
 
 #### 增加权限
 
@@ -471,12 +471,12 @@ next | 可选 | 第一次查询时返回，后面的查询带着这个参数，�
 
 ### 黑名单
 
-该功能介绍可参考总览里面的 [黑名单](realtime_v2.html#黑名单)。
+该功能介绍可参考总览里面的 [黑名单](realtime-guide-senior.html#黑名单)。
 
 
 #### 增加聊天室黑名单
 
-该接口要求使用 master key。该功能介绍可参考总览里面的 [黑名单](realtime_v2.html#黑名单)。
+该接口要求使用 master key。该功能介绍可参考总览里面的 [黑名单](realtime-guide-senior.html#黑名单)。
 
 加入黑名单的 client 不允许再加入该聊天室，如果之前在该聊天室中将被移除。每个聊天室最多允许添加 10,000 个黑名单。
 ```sh

@@ -285,7 +285,7 @@ message 事件回调函数传入参数中的 cid 字段，即是该 Conversation
 
 为了满足开发者对权限和认证的需求，我们设计了签名的概念。
 
-详细请看《[即时通讯开发指南 - 权限和认证](realtime_v2.html#权限和认证)》。
+详细请看《[即时通讯开发指南 - 权限和认证](realtime-guide-senior.html#安全与签名)》。
 
 另外，在 [Demo1](https://github.com/leancloud/js-realtime-sdk/tree/master/demo) 中，我们也增加了一个实际的例子。
 
@@ -427,7 +427,7 @@ AV.realtime(options, callback)
 ---|---|---|---|---
 **options**|Object|必须||配置即时通讯服务所需的必要参数。其中包括：
 &nbsp;&nbsp;&nbsp;&nbsp; appId|String|必须||应用的 appId，在 **控制台** > **设置** > **基本信息** 中可以查看。
-&nbsp;&nbsp;&nbsp;&nbsp; authFun|Function|||可以传入权限认证的方法，每次当建立连接的时候就会去服务器请求认证，<br/>或者许可之后才能建立连接，详细阅读 [即时通讯概览 &middot; 权限和认证](realtime_v2.html#权限和认证)，<br/>也可以参考 [Demo](https://github.com/leancloud/js-realtime-sdk/blob/master/demo/demo1/test.js#L248) 中的示例。
+&nbsp;&nbsp;&nbsp;&nbsp; authFun|Function|||可以传入权限认证的方法，每次当建立连接的时候就会去服务器请求认证，<br/>或者许可之后才能建立连接，详细阅读 [即时通讯概览 &middot; 安全和签名](realtime-guide-senior.html#安全和签名)，<br/>也可以参考 [Demo](https://github.com/leancloud/js-realtime-sdk/blob/master/demo/demo1/test.js#L248) 中的示例。
 &nbsp;&nbsp;&nbsp;&nbsp; clientId|String|必须||当前客户端的唯一 id，用来标示当前客户端。
 &nbsp;&nbsp;&nbsp;&nbsp; secure|Boolean||true|是否关闭 WebSocket 的安全链接，即由 wss 协议转为 ws 协议，关闭 SSL 保护。<br/>默认开启 true，false 为关闭。
 &nbsp;&nbsp;&nbsp;&nbsp; region|String||cn|选择服务部署的节点，{% if node != 'qcloud' %}如果是美国节点，则设置为 `us`，如果是国内节点，则设置为 `cn`。{% else %}目前仅支持 `cn` 即中国节点。{% endif %}
@@ -751,7 +751,7 @@ RealtimeObject.conv(options, callback)
 &nbsp;&nbsp;&nbsp;&nbsp; attr|Object|可选|自定义的数据信息，如 title、image、xxx 等。
 &nbsp;&nbsp;&nbsp;&nbsp; members|Array|可选|创建 conversation 时可以直接加入成员的 clientId，<br/>如 `['LeanCloud1', 'LeanCloud2']`。
 &nbsp;&nbsp;&nbsp;&nbsp; name|String|可选|Conversation 的名字
-&nbsp;&nbsp;&nbsp;&nbsp; unique|Boolean|可选|是否原子创建对话，针对相同成员多次原子创建对话会返回同一个会话。请参考 [即时通讯服务概览](realtime_v2.html#普通对话_Normal_Conversation_) 中 `unique` 选项相关说明。
+&nbsp;&nbsp;&nbsp;&nbsp; unique|Boolean|可选|是否原子创建对话，针对相同成员多次原子创建对话会返回同一个会话。请参考 [即时通讯服务概览](realtime_v2.html#普通对话（Conversation）) 中 `unique` 选项相关说明。
 &nbsp;&nbsp;&nbsp;&nbsp; transient|Boolean|可选|是否为暂态的 conversation，暂态的 conversation 可以<br/>支持大量用户（超过 500 人）同时在此聊天，但是不支持消息回执。<br/>**普通聊天每个 conversation 最多只能支持 500 人，<br/>如果预计单个 conversation 会超过这个数字，那请开启这个选项。**<br/>具体可以查看文档「[即时通讯服务开发指南](realtime_v2.html)」。
 **callback**|Function|可选|创建成功后的回调函数，此时也会在 RealtimeObject <br/>内部派发一个 create 事件，可以通过 `RealtimeObject.on()` 方法来监听。
 

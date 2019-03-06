@@ -579,9 +579,9 @@ conversation.on(Event.LAST_READ_AT_UPDATE, function() {
 ```
 
 #### 自定义离线推送内容
-在使用 SDK 提供的 API 之前，请先阅读 [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
+在使用 SDK 提供的 API 之前，请先阅读 [即时通讯概览 &middot; 离线推送通知](realtime-guide-intermediate.html#离线推送通知)。
 
-正如 [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知) 小节里面介绍的，发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
+正如 [即时通讯概览 &middot; 离线推送通知](realtime-guide-intermediate.html#离线推送通知) 小节里面介绍的，发送消息时，可以指定该消息对应的离线推送内容。如果消息接收方不在线，我们会推送您指定的内容。以下代码演示了如何自定义离线推送内容：
 
 ```js
 var { Realtime, TextMessage } = require('leancloud-realtime');
@@ -610,7 +610,7 @@ realtime.createIMClient('Tom').then(function (host) {
 
 这种方式被称为「附件方式」，这里有一点非常重要：如果你已在 [云引擎即时通讯离线消息推送 Hook `_receiversOffline`](leanengine_cloudfunction_guide-node.html#_receiversOffline) 里面定义了云函数来修改离线消息的内容，云端会优先使用 Hook 函数返回的结果作为最后推送的内容。
 
-除此以外，还有其他方法来自定义离线推送内容，请参考 [即时通讯概览 &middot; 离线推送通知](realtime_v2.html#离线推送通知)。
+除此以外，还有其他方法来自定义离线推送内容，请参考 [即时通讯概览 &middot; 离线推送通知](realtime-guide-intermediate.html#离线推送通知)。
 
 ### 未读消息
 
@@ -1624,7 +1624,7 @@ tom.close().then(function() {
 
 ## 安全与签名
 
-在继续阅读下文之前，请确保你已经对 [即时通讯服务开发指南 &middot; 权限和认证](realtime_v2.html#权限和认证) 有了充分的了解。
+在继续阅读下文之前，请确保你已经对 [即时通讯服务开发指南 &middot; 安全与签名](realtime-guide-intermediate.html#安全与签名) 有了充分的了解。
 
 ### 实现签名工厂
 
@@ -1843,7 +1843,7 @@ var EnsureFileIdPlugin = {
 将 JavaScript SDK version 3 升级到 version 4，请参考《[JavaScript 即时通讯 SDK v4 升级检查清单](https://github.com/leancloud/js-realtime-sdk/wiki/v4.0-upgrade-checklist)》。
 
 ## 即时通讯云引擎 Hook
-一些应用因其特殊的业务逻辑需要在消息发送时或者消息接收时插入一定的逻辑，因此我们也提供了[即时通讯云引擎 Hook](realtime_v2.html#云引擎_Hook)。
+一些应用因其特殊的业务逻辑需要在消息发送时或者消息接收时插入一定的逻辑，因此我们也提供了[即时通讯云引擎 Hook](realtime-guide-systemconv.html#万能的 Hook 机制)。
 
 ## 即时通讯 REST API
 有些应用需要在用户登录之前就提前创建一些对话或者是针对对话进行操作，因此可以通过[即时通讯 REST API](realtime_rest_api.html)来实现。

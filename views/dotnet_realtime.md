@@ -1016,7 +1016,7 @@ con.QueryHistory(DateTime.Now.AddDays(-1), 0, "UserA").Wait();
 
 
 ## 签名与安全
-在继续阅读本文档之前，请确保您已经对 [即时通讯服务开发指南—权限和认证](./realtime_v2.html#权限和认证) 有了一定的了解。
+在继续阅读本文档之前，请确保您已经对 [即时通讯服务开发指南—安全与签名](./realtime-guide-senior.html#安全与签名) 有了一定的了解。
 ### 实现签名工厂
 `AVIMClient` 有一个属性：
 
