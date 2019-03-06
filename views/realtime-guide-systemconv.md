@@ -662,7 +662,7 @@ timestamp | 消息创建的时间
 > 这部分内容我们还在准备中，敬请期待。
 
 {{ docs.relatedLinks("即时通讯开发指南一览",[
-  { title: "服务总览", href: "realtime-v2.html"}, 
+  { title: "服务总览", href: "realtime_v2.html"}, 
   { title: "一，从简单的单聊、群聊、收发图文消息开始", href: "realtime-guide-beginner.html"},
   { title: "二，消息收发的更多方式，离线推送与消息同步，多设备登录", href: "realtime-guide-intermediate.html"}, 
   { title: "三，安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话", href: "realtime-guide-senior.html"}])
