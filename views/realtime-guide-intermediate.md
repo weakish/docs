@@ -1333,6 +1333,6 @@ void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 
 {{ docs.relatedLinks("进一步阅读",[
-  { title: "三，安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话", href: "/realtime-guide-senior.html"},
-  { title: "四，详解消息 Hook 与系统对话的使用", href: "/realtime-guide-systemconv.html"}])
+  { title: "三，安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话", href: "realtime-guide-senior.html"},
+  { title: "四，详解消息 Hook 与系统对话的使用", href: "realtime-guide-systemconv.html"}])
 }}
