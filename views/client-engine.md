@@ -24,9 +24,21 @@ Client Engine 是 LeanCloud Play 提供的实时对战游戏 Client 托管方案
 * [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 介绍了从初始项目开始，如何本地开发调试，以及部署到云端。
 * [Client Engine 开发指南 · Node.js](client-engine-guide-node.html) 对初始项目的逻辑、提供的通用属性方法等进行了详细的说明，最终您可以在初始项目的基础上完成自己的游戏。
 
-## 试用
+## 价格及试用
 
-Client Engine 正在公测中，公测期间免费试用。
+Client Engine 正在公测中，公测期间免费使用，开发版最大可使用 100% CPU，商用版最大可使用 200% CPU，如果您需要更高额度，请联系 support@leancloud.rocks。
 
 开启试用：打开 LeanCloud 应用[控制台](/app.html?appid={{appid}})，进入「Play」->「Client Engine」->「部署」页面，点击「试用 Client Engine」。
 
+未来收费方案如下：
+
+按照 CCU 或 CPU 用量来计费，这里的 CCU 指的是托管在 Client Engine 中的同时在线的 Client 数量。
+
+* 开发版：免费 20CCU / 天（自然天，0:00 ~ 24:00），不支持自动扩容及负载均衡。
+* 商用版：计费时根据每天的峰值 CCU 和峰值 CPU 用量分别统计，只会选择其中较大的一个费用进行扣除，具体费用为：
+  * 每 100 CCU 国内节点 ¥4，美国节点 $1。
+  * 每 50% CPU 国内节点 ¥4，美国节点 $1。
+
+举例：例如您的应用当天在 Client Engine 中最高使用了 80 CCU，消耗 CPU 80%，按 CCU 计费为 4 元钱，按 CPU 收费为 8 元钱，实际收费为 8 元钱。
+
+> 在正式收费之时，以上价格和标准可能会发生调整和变动，届时均以公布价格为准。
