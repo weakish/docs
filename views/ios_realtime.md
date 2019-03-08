@@ -377,5 +377,5 @@ conversationId的含义参考 [构建对话 ID](./rest_api.html#构建对话-id)
 
 ## 离线消息推送
 
-请参考 FAQ 中的 [为什么我的 iPhone 收不到离线消息推送？](realtime.html#为什么我的-iphone-收不到离线消息推送？) 
+请参考 FAQ 中的 [为什么我收不到离线消息推送？](realtime_faq.html#为什么我收不到离线消息推送？) 
  
