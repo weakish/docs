@@ -47,9 +47,9 @@ LeanCloud 即时通讯服务是完全独立的即时通讯业务抽象，专注�
 
 ![image](images/realtime_faq_console.png)
 
-接着请参考[离线推送通知](#离线推送通知)一节内容确认您应用是否有配置默认的推送内容，或是否有通过云引擎 Hook 、消息附件方式为期望产生离线推送的消息动态设置了离线消息推送内容。没有设置离线消息推送内容也无法触发离线消息推送。
+接着请参考[离线推送通知](realtime-guide-intermediate.html#离线推送通知)一节内容确认您应用是否有配置默认的推送内容，或是否有通过云引擎 Hook 、消息附件方式为期望产生离线推送的消息动态设置了离线消息推送内容。没有设置离线消息推送内容也无法触发离线消息推送。
 
-之后请在 {% if node=='qcloud' %} `控制台 > **消息** > **推送消息** > **在线发送** ` {% else %} [控制台 > **消息** > **推送消息** > **在线发送**](/messaging.html?appid={{appid}}#/message/push/create) {% endif %} 页面尝试给接收者用户 Client ID 在 `_Installation` 表关联的设备单独发推送，查看推送是否能收到。可以通过推送记录查看是否有错误产生。如看到 `Invalid Token` 计数非 0 表示目标 iOS 设备的 Device Token 过期或 Device Token 和推送使用的证书不匹配或目标 Device Token 和推送使用的环境不匹配。请尝试切换推送证书，确认目标 Device Token 是 Production 环境还是 Development 环境后再重新推送，不匹配的证书或不匹配的推送环境均会导致推送失败。
+之后请在 {% if node=='qcloud' %} `控制台 > **消息** > **推送消息** > **在线发送** ` {% else %} [控制台 > **消息** > **推送消息** > **在线发送**](/messaging.html?appid={{appid}}#/message/push/create) {% endif %} 页面尝试给接收者用户 Client ID 在 `_Installation` 表关联的设备单独发推送，查看推送是否能收到。可以通过推送记录查看是否有错误产生。如看到 `Invalid Token` 计数非 0 表示目标 iOS 设备的 Device Token 过期或 Device Token 和推送使用的证书不匹配或目标 Device Token 和推送使用的环境不匹配。请尝试切换推送证书，确认目标 Device Token 是 Production 环境还是 Development 环境后再重新推送，不匹配的证书或不匹配的推送环境均会导致推送失败。如何切换离线推送通知的证书请参考 [离线推送通知](realtime-guide-intermediate.html#离线推送通知)
 
 检查方法总结如下：
 
