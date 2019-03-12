@@ -61,8 +61,7 @@
     "time-grunt": "^1.2.2",
     "underscore": "^1.8.3"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "contributors": [
     "dennis zhuang <killme2008@gmail.com>",
     "Tunghsiao Liu <t@sparanoid.com>",
