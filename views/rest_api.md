@@ -156,6 +156,16 @@ REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 
       <td>使用"验证码"验证用户手机号码</td>
     </tr>
     <tr>
+      <td>/1.1/requestChangePhoneNumber</td>
+      <td>POST</td>
+      <td>请求发送手机短信验证码以绑定或更新手机号。</td>
+    </tr>
+    <tr>
+      <td>/1.1/changePhoneNumber</td>
+      <td>POST</td>
+      <td>验证手机短信验证码并绑定或更新手机号。</td>
+    </tr>
+    <tr>
       <td>/1.1/requestLoginSmsCode</td>
       <td>POST</td>
       <td>请求发送手机号码登录短信。</td>
