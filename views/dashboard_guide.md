@@ -22,28 +22,25 @@
 
 ![app overview](images/dash_appoverview.png)
 
-这里主要分为四块区域：
+- 左上角显示应用名，通过下拉箭头可以快速切换应用或创建新应用。
+- 左栏按照服务类型，将应用数据做了一级分类，包括存储（结构化数据存储、文件存储、离线数据分析），云引擎（网站托管、云函数、定时任务、LeanCache），消息（即时通讯、推送、短信），游戏（ClientEngine、实时对战、排行榜），组件（用户反馈、应用内搜索、社交），应用设置（基本信息、Key、服务开关、安全域名、邮件模板、协作管理、风险检测、操作日志、数据导出与恢复）。
+- 一级分类下还有二级菜单，详情见以下章节。
 
-- `区域 1` 显示应用名，并允许我们快速切换应用（点击应用名）。
-- `区域 2` 按照服务类型，将应用数据做了一级分类。这里分成了存储（包括结构化数据存储、文件存储、云引擎、离线数据分析等功能）、消息（包括即时通讯、消息推送和短信服务三种）、分析（应用/用户分析结果展示）、组件（其它扩展组件，如用户反馈、应用内搜索、社交组件等）四个大类，也增加了应用设置菜单。
-- `区域 3` 则是一级服务下，具体数据、信息组织的二级菜单。
-- `区域 4` 这里展示具体的数据或者结果信息。
-
-我们重点看看四个一级菜单下的内容。
+我们重点看看一级菜单下的内容。
 
 ### 存储服务数据管理
 
 **控制台 > {应用} > 存储** 服务下，包含了四大菜单：
 
 - 「数据」：展示了结构化数据（`AVObject` 及扩展子类）和非结构化数据（`AVFile`）的内容，支持在页面上直接进行增删改查，对于少量的数据维护操作，可以在这里直接进行。
-- 「云引擎」：展示了云引擎和云缓存的所有信息，如果需要查看云引擎／云缓存运行状态，部署、增减云引擎／云缓存实例数量，可以在这里直接操作。
-- 「API 统计」：这里展示了应用使用数据存储服务的一些统计信息，包括一段时间内存储 API 总的请求量、每天的请求量、按操作类型／Class 分类统计的请求量，文件的存储空间和流量变化趋势等等，由于这些数据可以直接反应我们应用的流量和云端性能，能够指导我们进行数据模型和代码优化，同时也与每月账单息息相关，所以请开发者一定仔细查看这里展示的统计数据。
+- 「统计」：这里展示了应用使用数据存储服务的一些统计信息，包括一段时间内存储 API 总的请求量、每天的请求量、按操作类型／Class 分类统计的请求量，文件的存储空间和流量变化趋势等等，由于这些数据可以直接反应我们应用的流量和云端性能，能够指导我们进行数据模型和代码优化，同时也与每月账单息息相关，所以请开发者一定仔细查看这里展示的统计数据。
 - 「离线数据分析」：标准的增删改查 API 无法一次处理大量数据，所以我们额外提供了这一功能，允许大家通过 SQL 来进行大规模、实时的数据分析和挖掘。
+- 「设置」：用户账号、文件域名与协议、安全、高级功能等配置。
 
 特别地，对于下列数据管理需求，我们都可以在控制台完成：
 
 #### 创建新的 Class
-进入 **存储 > 数据** 页面，点击「数据」菜单右边的齿轮按钮，可以为应用增加新的 Class，如下图所示：
+进入 **存储 > 数据** 页面，点击加号，可以为应用增加新的 Class，如下图所示：
 
 ![storage - create class](images/dash_storage_data1.png)
 
@@ -55,7 +52,7 @@
 
 #### 本地数据导入 LeanCloud
 
-在上面的页面，大家可以看到「数据导入」菜单，它就是为方便批量导入本地数据准备的。详细的数据导入页面如下图所示：
+点击加号「创建 Class」右方的菜单按钮（三个小点），会弹出「数据导入」菜单，可供批量导入本地数据。详细的数据导入页面如下图所示：
 
 ![storage - import data](images/dash_storage_data3.png)
 
@@ -64,12 +61,7 @@
 - 必须是 JSON 或者 CSV 文件
 - UTF-8 文件编码
 - 单个文件大小不能超过 30 MB。超大文件要拆分为小于 30 MB 的多个文件进行导入，只要使用同一个「Class 名称」，数据就会导入到一个表中。
-
-
-我们支持两种数据导入：
-
-- 导入数据到某个 Class，把本地文件内所有的数据都导入到同一个 Class 中去。所以如果我们本地有多个 Class 的数据，需要按照 Class 类别分成多个文件依次导入。
-- 导入数据到某个 Class 的 Relation。Relation 是 LeanCloud 数据模型中实现多对多映射的一种方式，细节可以参看[这里的说明](./storage_overview.html#数据关联)。在导入 Relation 的时候，我们需要原 Class 名字、关联 Class 名字、关联属性名等信息。
+- 一次只能向一个 Class 导入数据。所以如果我们本地有多个 Class 的数据，需要按照 Class 类别分成多个文件依次导入。
 
 <div class="callout callout-info">
 <ul><li>数据文件的扩展名必须是 `.csv` 或者 `.json` 结尾，我们以此来判断导入数据的类型。</li><li>数据导入不会触发任何 [云引擎 hook 函数](leanengine_cloudfunction_guide-node.html#Hook_函数)。</li></div>
@@ -104,7 +96,9 @@ JSON 格式要求是一个符合我们 REST 格式的 JSON 对象数组，或者
 
 【密码】导入用户密码需要使用一个特殊的字段 `bcryptPassword`，并且完全遵循 [Stackoverflow &middot; What column type/length should I use for storing a Bcrypt hashed password in a Database?](http://stackoverflow.com/a/5882472/1351961)  所描述的加密算法加密后，才可以作为合法的密码进行导入。
 
-【关系】导入 Relation 关联数据时，需要填写要导入的 Class 名称、导入后的字段名称、关联的 Class 名称等信息，才能完整导入，例如：
+顺便提下，数据导入页还有一个「导入 relation」标签。 relation 已经启用，推荐使用中间表。下面的内容仅供还在使用 relation 的开发者参考。
+
+导入 relation 时，需要填写要导入的 Class 名称、导入后的字段名称、关联的 Class 名称等信息，才能完整导入，例如：
 
 ```json
 { "results": [
@@ -124,30 +118,6 @@ JSON 格式要求是一个符合我们 REST 格式的 JSON 对象数组，或者
 
 例如，Post 有一个字段 comments 是 Relation 类型，对应的 Class 是 Comment，那么 owningId 就是已存在的 Post 的 objectId，而 relatedId 就是关联的 Comment 的 objectId。
 
-##### 批量导入多个 Class 的 JSON 文件格式
-
-我们现在还支持一个 JSON 文件导入多个 class，要求格式如下：
-
-```json
-{
-  "classes": ["Post", "Author"],
-  "Post": [
-    {"title": "LeanCloud 数据导入说明",
-     "desc": "批量导入格式说明"},
-    {"title": "LeanCloud 数据安全指南",
-     "desc": "ACL 和 class 权限说明"}
-  ],
-  "Author": [
-    {"name": "LeanCloud 文档工程师",
-     "email": "support@leancloud.rocks"}
-  ]
-}
-```
-
-其中 `classes` 数组指定文件中的要导入的 class 列表，然后每个 class 名称对应一个要导入的对象数组即可，对象格式参见上文 [JSON 文件格式](#JSON_文件格式)
-
-<div class="callout callout-info">当文件格式为批量导入的时候，控制台数据导入界面上的 **Class 名称** 可以填写为其中任意一个 Class 的名称，服务端会忽略该设置，以导入文件中的 `classes:` 的值为准。</div>
-
 ##### CSV 格式文件
 
 导入 Class 的 CSV 文件格式必须符合我们的扩展要求：
@@ -164,7 +134,7 @@ name,age,address,account,createdAt
 王五,21,上海,1000.5,2012-04-22T09:21:35.701Z
 ```
 
-导入的 `geopoint` 格式是一个用空格隔开字符串：
+导入的 `geopoint` 格式是一个用空格隔开纬度、经度的字符串：
 
 ```csv
 geopoint,string,int,string,double,date
@@ -174,13 +144,6 @@ location,name,age,address,account,createdAt
 40 40,王五,21,上海,1000.5,2012-04-22T09:21:35.701Z
 ```
 
-导入的 Relation 数据，比 JSON 简单一些，第一列对应 JSON 的 `owningId`，也就是要导入的 Class 的存在对象的 objectId，第二列对应 `relatedId`，对应关联 Class 的 objectId。例如：
-
-```csv
-dMEbKFJiQo,19rUj9I0cy
-mQtjuMF5xk,xPVrHL0W4n
-```
-
 CSV 导入也支持 Pointer 类型，要求类型声明为 `pointer:类名`，其中类名就是该 Pointer 列所指定的 className，列的值只要提供 objectId 即可，例如：
 
 ```csv
@@ -188,6 +151,15 @@ string,pointer:Player
 playerName,player
 张三,mQtjuMF5xk
 李四,xPVrHL0W4n
+```
+
+注意：relation 已弃用，推荐使用中间表。以下仅供尚在使用 relation 的开发者参考：
+
+导入 Relation 数据，比 JSON 简单一些，第一列对应 JSON 的 `owningId`，也就是要导入的 Class 的存在对象的 objectId，第二列对应 `relatedId`，对应关联 Class 的 objectId。例如：
+
+```csv
+dMEbKFJiQo,19rUj9I0cy
+mQtjuMF5xk,xPVrHL0W4n
 ```
 
 #### 云端数据导出到本地
@@ -201,12 +173,12 @@ LeanCloud 不会把大家强制绑定到自己平台上，所以我们也提供�
 
 对于每一个 Class，我们允许对如下几种操作分别授予用户操作权限：
 
+- 为 Class 增加新的属性（add fields）
 - 增加新的记录（create）
 - 删除记录（delete）
-- 修改记录（update）
 - 指定条件查找记录（find）
 - 指定 id 获取单条记录（get）
-- 为 Class 增加新的属性（add fields）
+- 修改记录（update）
 
 可以授权访问的用户类型有如下三种：
 
@@ -230,8 +202,8 @@ LeanCloud 不会把大家强制绑定到自己平台上，所以我们也提供�
 
 - 这里只能创建唯一索引，对单列索引和组合索引则没有限制。
 - LeanCloud 后端智能索引系统会分析你的请求逻辑，自动创建一些索引，来提升数据查询性能。同时，为了支持地理位置信息的查询，我们也会自动对 GeoPoint 属性列创建索引。如果不是你创建的索引请不要进行任何变更操作。
-- {{ data.limitationsOnCreatingClassIndex() }}
 - 索引可以有效改善查询性能，但是对于数据插入和修改则是有负作用的，所以是否创建索引、如何创建索引，还需要全面考虑慎重选择。
+- {{ data.limitationsOnCreatingClassIndex() }}
 
 #### 应用之间共享部分数据
 同一个帐户下的其他应用（称为「目标应用」）下的 Class（称为「目标 Class」）绑定到当前 Class，访问当前 Class 数据，将会访问到目标应用下的目标 Class 数据，这就是我们所谓的「Class 绑定」功能，用来解决应用之间数据共享的需求。最简单的应用就是 _User 表共享，不同应用之间打通帐户，可以相互注册和登录。
@@ -269,6 +241,10 @@ LeanCloud 不会把大家强制绑定到自己平台上，所以我们也提供�
 - 按照操作类型分类展示 API 调用量，这里可以看到 `Create 请求`、`Find 请求`、`Get 请求`、`Update 请求`、`Delete 请求` 等不同操作类型下每天的请求量变化趋势，方便我们对特殊的操作来做 profiling 和优化。
 - 文件存储空间和流量方面的统计。
 - 其它更多的统计项目。
+
+### 云引擎
+
+- 「云引擎」：展示了云引擎和云缓存的所有信息，如果需要查看云引擎／云缓存运行状态，部署、增减云引擎／云缓存实例数量，可以在这里直接操作。
 
 ### 消息服务数据管理
 
