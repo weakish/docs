@@ -296,7 +296,7 @@ const realtime = new Realtime({
 <details>
 <summary>查看示例</summary>
 <p>
-![image](https://cloud.githubusercontent.com/assets/175227/22236906/7c651c80-e243-11e6-819b-007d5862bdbf.png)
+<img src="../images/dash-leanengine-setting.png" alt="控制台截屏" />
 </p>
 </details>
 

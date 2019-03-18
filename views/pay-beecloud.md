@@ -32,7 +32,7 @@ $ cd python-getting-started
 
 创建新页面 `templates/jsbutton.html` 和 `views/jsbutton.py`，如下图：
 
-![](https://lc-lhzo7z96.cn-n1.lcfile.com/ffa3a36dbf7d647e7382.jpg)  
+![创建 jsbutton 页面](../images/beecloud/jsbutton.jpg)  
 
 在 `jsbutton.html` 页面的 `<head></head>` 中插入上一节中我们获得的 script 标签：
 
