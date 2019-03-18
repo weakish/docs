@@ -196,13 +196,13 @@ client.joinOrCreateRoom('room1').then(() => {
 client.on(Event.PLAYER_ROOM_JOINED, (data) => {
   const { newPlayer } = data;
   console.log(`new player: ${newPlayer.userId}`);
-  if (client.player.isMaster()) {
+  if (client.player.isMaster) {
     // 获取房间内玩家列表
     const playerList = client.room.playerList;
     for (let i = 0; i < playerList.length; i++) {
       const player = playerList[i];
       // 判断如果是房主，则设置 10 分，否则设置 5 分
-      if (player.isMaster()) {
+      if (player.isMaster) {
         player.setCustomProperties({
           point: 10,
         });
@@ -226,9 +226,9 @@ client.on(Event.PLAYER_ROOM_JOINED, (data) => {
 client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
   const { player } = data;
   // 解构得到玩家的分数
-  const { point } = player.getCustomProperties();
+  const { point } = player.customProperties;
   console.log(`${player.userId}: ${point}`);
-  if (player.isLocal()) {
+  if (player.isLocal) {
     // 判断如果玩家是自己，则做 UI 显示
     this.scoreLabel.string = `score:${point}`;
   }
@@ -240,7 +240,7 @@ client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
 
 {% block win %}
 ```javascript
-if (client.player.isMaster()) {
+if (client.player.isMaster) {
   client.sendEvent('win', { winnerId: client.room.masterId }, { receiverGroup: ReceiverGroup.All });
 }
 ```

@@ -331,7 +331,7 @@ Play.Player.CustomProperties = prop;
 ```js
 play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
   // MasterClient 才会执行这个运算
-  if (play.player.isMaster()) {
+  if (play.player.isMaster) {
     // 在自己写的方法中检查已经准备的玩家数量，可以通过 play.room.playerList 获取玩家列表。
     const readyPlayerCount = getReadyPlayerCount();
     // 如果都准备好了就开始游戏

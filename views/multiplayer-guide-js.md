@@ -156,7 +156,7 @@ client.createRoom({
 - `playerTtl`：当玩家掉线时，保留玩家在房间内的数据的时间（单位：秒）。默认为 0，即 玩家掉线后，立即销毁玩家数据。最大值为 300，即 5 分钟。
 - `maxPlayerCount`：房间允许的最大玩家数量。
 - `customRoomProperties`：房间的自定义属性。
-- `customRoomPropertyKeysForLobby`：房间的自定义属性 `customRoomProperties` 中「键」的数组，包含在 `customRoomPropertyKeysForLobby` 中的属性将会出现在大厅的房间属性中（`client.lobbyRoomList`），而全部属性要在加入房间后的 `room.getCustomProperties()` 中查看。这些属性将会在匹配房间时用到。
+- `customRoomPropertyKeysForLobby`：房间的自定义属性 `customRoomProperties` 中「键」的数组，包含在 `customRoomPropertyKeysForLobby` 中的属性将会出现在大厅的房间属性中（`client.lobbyRoomList`），而全部属性要在加入房间后的 `room.customProperties` 中查看。这些属性将会在匹配房间时用到。
 - `flag`：创建房间标志位，详情请看下文中 [MasterClient 掉线不转移](#MasterClient 掉线不转移), [指定其他成员为 MasterClient](#指定其他成员为 MasterClient)，[只允许 MasterClient 修改房间属性](#只允许 MasterClient 修改房间属性)。
 {% endblock %}
 
@@ -379,7 +379,7 @@ client.on(Event.PLAYER_ROOM_LEFT, (data) => {
 // 通过玩家的 Id 指定 MasterClient
 client.setMaster(otherActorId).then(() => {
 	// 此时这里的值为 false
-	console.log(client.player.isMaster());
+	console.log(client.player.isMaster);
 }).catch(console.error);
 ```
 {% endblock %}
@@ -392,7 +392,7 @@ client.on(Event.MASTER_SWITCHED, (data) => {
 	// TODO 可以做主机切换的展示
 
 	// 可以根据判断当前客户端是否是 Master，来确定是否执行逻辑处理。
-	if (client.player.isMaster()) {
+	if (client.player.isMaster) {
 
 	}
 });
@@ -434,7 +434,7 @@ const props = {
 };
 // 设置 gold 属性为 1000
 client.room.setCustomProperties(props).then(() => {
-	var newProperties = client.room.getCustomProperties();
+	var newProperties = client.room.customProperties;
 }).catch(console.error);
 ```
 {% endblock %}
@@ -449,7 +449,7 @@ client.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (data) => {
 	const changedProperties = data.changedProps;
 
 	// 可以从这个方法中获得房间的全部属性
-	const properties = client.room.getCustomProperties();
+	const properties = client.room.customProperties;
 	const gold = properties.gold;
 	
 	// TODO 可以做属性变化的界面展示
@@ -457,7 +457,7 @@ client.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, (data) => {
 });
 ```
 
-注意：`changedProps` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `client.room.getCustomProperties()` 获得。
+注意：`changedProps` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `client.room.customProperties` 获得。
 
 {% endblock %}
 
@@ -507,7 +507,7 @@ client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
 	// 从 data 中可以拿到是哪个 player 的属性被修改了
 	const { player } = data;
 	// 得到玩家所有自定义属性
-	const props = player.getCustomProperties();
+	const props = player.customProperties;
 	const { title, gold } = props;
 	// TODO 可以做属性变化的界面展示
 
