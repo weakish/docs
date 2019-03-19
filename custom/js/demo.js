@@ -52,6 +52,13 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         type: 'ios',
         qcloudShow: true
       },{
+        name: 'SNS 第三方登录',
+        desc: 'iOS 第三方登录示例 Demo',
+        downPath: '',
+        mdPath: 'https://github.com/leancloud/LeanCloudSNSDemo-iOS',
+        type: 'ios',
+        qcloudShow: true
+      },{
         name: '用户反馈 Feedback',
         desc: '演示了 LeanCloud 反馈模块的用法。',
         downPath: '',
