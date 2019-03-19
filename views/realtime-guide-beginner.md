@@ -1308,7 +1308,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 如果文件是 **外部链接的 URL**，则：
 
-1. 直接将 URL 封装在消息体内，不获取元信息，不包含 `objectId`
+1. 直接将 URL 封装在消息体内，不获取元信息（例如，音频消息的时长），不包含 `objectId`
 1. 调用接口发送消息
 
 以发送音频消息为例，基本流程是：读取音频文件（或者录制音频）> 构建音频消息 > 消息发送。
