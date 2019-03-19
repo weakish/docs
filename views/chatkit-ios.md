@@ -393,7 +393,9 @@ ChatListViewController.h 需导入头文件 `#import <ChatKit/LCChatKit.h>`,示�
 - (void)createConversationBtnClick{
 // clientId 是聊天对象 AUser 对象的 objectId。例如下面这个是用户「李四」的 objectId：
     NSString *clientId = @"5a5b995cac502e006e2e1391";
-    [[LCChatKit sharedInstance].client createConversationWithName:@"创建第一个会话" clientIds:@[clientId]callback:^(AVIMConversation *conversation, NSError *error)
+    [[LCChatKit sharedInstance].client createConversationWithName:@"创建第一个会话"
+      clientIds:@[clientId] options:AVIMConversationOptionUnique
+      callback:^(AVIMConversation *conversation, NSError *error)
         {
            [conversation sendMessage:[AVIMTextMessage messageWithText:@"你好，小王" attributes:nil]
                               callback:^(BOOL succeeded, NSError *error) {

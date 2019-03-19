@@ -906,7 +906,9 @@ self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
 // Tom 打开 client
 [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
     // Tom 建立了与 Jerry 的会话
-    [self.client createConversationWithName:@"猫和老鼠" clientIds:@[@"Jerry"] callback:^(AVIMConversation *conversation, NSError *error) {
+    [self.client createConversationWithName:@"猫和老鼠" clientIds:@[@"Jerry"]
+      options:AVIMConversationOptionUnique
+      callback:^(AVIMConversation *conversation, NSError *error) {
         // Tom 发了一条消息给 Jerry
 
         AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
