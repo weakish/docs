@@ -25,7 +25,7 @@
 {% set saveOptions_query= "where" %}
 {% set saveOptions_fetchWhenSave= "fetch_when_save" %}
 {% set acl_guide_url = "（PHP 文档待补充）" %}
-{% set sms_guide_url = "（PHP 文档待补充）" %}
+{% set sms_guide_url = "[短信服务使用指南](sms-guide.html)" %}
 {% set relation_guide_url = "（PHP 文档待补充）" %}
 {% set inapp_search_guide_url = "（PHP SDK 暂不支持）" %}
 {% set status_system_guide_url = "（PHP SDK 暂不支持）" %}
