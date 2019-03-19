@@ -50,11 +50,10 @@ brew upgrade
 
 ## 使用
 
-安装成功之后，直接在 terminal 终端运行 `lean -h`，输出帮助信息：
+安装成功之后，直接在 terminal 终端运行 `lean help`，输出帮助信息：
 
 ```sh
 $ lean help
-
  _                        ______ _                 _
 | |                      / _____) |               | |
 | |      ____ ____ ____ | /     | | ___  _   _  _ | |
@@ -68,7 +67,7 @@ USAGE:
    lean [global options] command [command options] [arguments...]
 
 VERSION:
-   0.20.0
+   0.20.1
 
 COMMANDS:
      login    Log in to LeanCloud
@@ -86,11 +85,32 @@ COMMANDS:
      cache    LeanCache shell
      cql      Start CQL interactive mode
      search   Search development docs
-     help, h  Show all commands or help info for one command
+     help, h  Show all commands
 
 GLOBAL OPTIONS:
    --version, -v  print the version
+
 ```
+
+简单介绍下主要的子命令：
+
+命令 | 用途
+- | -
+`login` | 登录 LeanCloud 账号
+`metric` | 当前项目的 LeanStorage 统计信息
+`info` | 当前用户、应用
+`up` | 启动本地开发调试实例
+`init` | 初始化云引擎项目
+`switch` | 切换关联的云引擎项目
+`deploy` | 部署项目至云引擎
+`publish` | 部署至生产环境
+`upload` | 上传文件至当前应用（可以在 `_File` 类中查看）
+`logs` | 显示云引擎日志
+`debug` | 单独运行云函数调试功能，而不在本地运行项目本身
+`env` | 显示当前项目的环境变量
+`cache` | LeanCache 命令行
+`cql` | 交互式 CQL
+
 
 可以通过 `--version` 选项查看版本：
 
