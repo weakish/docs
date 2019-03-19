@@ -501,8 +501,8 @@ sid: "cXVlcnlUaGVuRmV0Y2g7Mzs0NDpWX0NFUmFjY1JtMnpaRDFrNUlBcTNnOzQzOlZfQ0VSYWNjUm
 
 返回结果 results 列表里是一个一个的对象，字段是你在应用内搜索设置里启用的字段列表，并且有两个特殊字段：
 
-- `_app_url`: 应用内搜索结果在网站上的链接。
-- `_deeplink`: 应用内搜索的程序调用 URL，也就是 deeplink。
+- `_app_url`：应用内搜索结果在网站上的链接。
+- `_deeplink`：应用内搜索的程序调用 URL，也就是 deeplink。
 
 最外层的 `sid` 用来标记本次查询结果，下次查询继续传入这个 sid 将翻页查找后 200 条数据：
 

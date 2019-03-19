@@ -776,7 +776,7 @@ realtime.register(OperationMessage);
 
 遗愿消息是在一个用户突然掉线之后，系统自动通知对话的其他成员关于该成员已掉线的消息。好似在掉线后要给对话中的其他成员一个妥善的交待，所以被戏称为「遗愿」消息，如下图中的「Tom 已掉线，无法收到消息」。
 
-<img src="images/lastwill-message.png" width="400" class="responsive">
+<img src="images/lastwill-message.png" width="400" class="img-responsive">
 
 要发送遗愿消息，用户需要设定好消息内容（可能包含了一些业务逻辑相关的内容）发给云端，云端并不会将其马上发送给对话的成员，而是缓存下来，一旦检测到该用户掉线，云端立即将这条遗愿消息发送出去。开发者可以利用它来构建自己的断线通知的逻辑。
 
@@ -1811,8 +1811,8 @@ var ConfirmOnQuitPlugin = {
 
 目前可扩展的点有:
 
-- `beforeMessageParse`: 在解析消息前对原始消息进行处理，参数是 json 格式的原始消息
-- `afterMessageParse`: 在解析消息后对消息进行处理，参数是对应的富媒体消息类的实例
+- `beforeMessageParse`：在解析消息前对原始消息进行处理，参数是 json 格式的原始消息
+- `afterMessageParse`：在解析消息后对消息进行处理，参数是对应的富媒体消息类的实例
 
 举个例子，有一些对话中存在一些 FileMessage 类型的历史消息，由于某种原因缺少了必须的 file.id 字段，会导致解析到这些消息时 SDK 抛出异常。这时可以通过 `beforeMessageParse` 扩展点来在 SDK 解析消息前「修补」这个问题。
 
