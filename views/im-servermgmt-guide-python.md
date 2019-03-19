@@ -1,12 +1,12 @@
 # 即时通讯服务端管理开发指南
 
-Python 的数据存储 SDK，基于 REST API 封装了一组对话及消息管理的接口。这部分接口主要用来在服务器或者云引擎中对[实时消息](realtime_v2.html)的对话或者消息进行管理。
+Python 的数据存储 SDK，基于 REST API 封装了一组对话及消息管理的接口。这部分接口主要用来在服务器或者云引擎中对[即时通讯](realtime_v2.html)的对话或者消息进行管理。
 
 SDK 的安装请参考[安装指南](sdk_setup-python.html)。
 
 ## 对话管理
 
-`leancloud.Conversation` 对应实时消息中的[对话概念](realtime_v2.html#对话（Conversation）)，同时也是 Python SDK 中 `leancloud.Object` 的子类，因此可以像正常的 `leancloud.Object` 来创建、查询对话。
+`leancloud.Conversation` 对应即时通讯中的[对话概念](realtime_v2.html#对话（Conversation）)，同时也是 Python SDK 中 `leancloud.Object` 的子类，因此可以像正常的 `leancloud.Object` 来创建、查询对话。
 
 `leancloud.Conversation` 的查询与修改等操作，也受限于 LeanCloud 存储服务的 Class 权限设置与 ACL 权限设置。因此创建对话时，请确保当前权限设置正确，以免造成数据泄漏。
 
@@ -49,7 +49,7 @@ tr_conv.save()
 
 ### 添加用户到对话
 
-调用 `leancloud.Conversation` 上的 `add_member` 方法，可以将一个用户添加到此对话上来。需要注意的是，后面的参数应该是实时消息的 [clientId](realtime_v2.html#ClientID、用户和登录)，而不是 `leancloud.User` 实例。如果项目使用 `leancloud.User` 作为用户系统，而没有使用自己的用户系统，需要直接将 `leancloud.User` 的 `id` 当作参数进行调用。
+调用 `leancloud.Conversation` 上的 `add_member` 方法，可以将一个用户添加到此对话上来。需要注意的是，后面的参数应该是即时通讯的 [clientId](realtime_v2.html#ClientID、用户和登录)，而不是 `leancloud.User` 实例。如果项目使用 `leancloud.User` 作为用户系统，而没有使用自己的用户系统，需要直接将 `leancloud.User` 的 `id` 当作参数进行调用。
 
 ```python
 import leancloud

@@ -115,7 +115,7 @@ boolean watched = session.isWatching("friend1");
 
 ###发送消息
 
-在用户成功登录实时消息系统以后，用户就可以进行消息的发送接收等。
+在用户成功登录即时通讯系统以后，用户就可以进行消息的发送接收等。
 
 ```java
 Session session = SessionManager.getInstance(selfId);

@@ -3,7 +3,7 @@
 
 ## 权限和认证
 
-使用签名可以保证聊天通道的安全，这一功能默认是关闭的，可以在 [控制台 > 消息 > 实时消息 > 设置 > 实时消息选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中进行开启：
+使用签名可以保证聊天通道的安全，这一功能默认是关闭的，可以在 [控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中进行开启：
 
 - **登录启用签名认证**，用于控制所有的用户登录
 - **对话操作启用签名认证**，用于控制新建或加入对话、邀请/踢出对话成员等操作

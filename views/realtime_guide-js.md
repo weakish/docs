@@ -1630,7 +1630,7 @@ tom.close().then(function() {
 
 为了满足开发者对权限和认证的要求，我们设计了操作签名的机制。签名启用后，所有的用户登录、对话创建/加入、邀请成员、踢出成员等登录都需要验证签名，这样开发者就对消息具有了完全的掌控。
 
-我们强烈推荐启用登录签名，具体步骤是进入 [控制台 > 消息 > 实时消息 > 设置 > 实时消息选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf)，勾选 **登录启用签名认证**。
+我们强烈推荐启用登录签名，具体步骤是进入 [控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf)，勾选 **登录启用签名认证**。
 
 客户端这边究竟该如何使用呢？我们只需要实现 signature 工厂方法，然后作为参数实例化 IMClient 即可
 

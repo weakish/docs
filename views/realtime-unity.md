@@ -22,7 +22,7 @@ LeanCloud Unity SDK 在很多重要的功能点上都采用了微软提供的[�
 在继续阅读本文档之前，请先阅读[《即时通讯概览》](realtime_v2.html)，了解一下即时通讯的基本概念和模型。
 
 ### WebSocket 协议
-LeanCloud 实时消息是基于 WebSocket 和私有通讯协议实现的一套聊天系统，因此开发者最好提前了解一下 WebSocket 协议的相关内容。推荐没有接触过的开发者可以阅读《[WebSocket 是什么原理？为什么可以实现持久连接？- Ovear 的回答](http://zhihu.com/question/20215561/answer/40316953)》。
+LeanCloud 即时通讯是基于 WebSocket 和私有通讯协议实现的一套聊天系统，因此开发者最好提前了解一下 WebSocket 协议的相关内容。推荐没有接触过的开发者可以阅读《[WebSocket 是什么原理？为什么可以实现持久连接？- Ovear 的回答](http://zhihu.com/question/20215561/answer/40316953)》。
 
 ## 安装 SDK
 

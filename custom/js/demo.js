@@ -147,7 +147,7 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         qcloudShow: true
       },{
         name: 'LeanMessage',
-        desc: '使用 JavaScript 实时通讯 SDK 与 Angular 实现的完整功能的聊天 WebApp',
+        desc: '使用 JavaScript 即时通讯 SDK 与 Angular 实现的完整功能的聊天 WebApp',
         downPath: '',
         mdPath: 'https://github.com/leancloud/LeanMessage-Demo',
         type: 'web',

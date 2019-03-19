@@ -103,7 +103,7 @@ curl -X GET \
 
 ### 签名
 
-为了保证获取聊天记录的安全性，可以开启签名认证 [控制台 > 消息 > 实时消息 > 设置 > 实时消息选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中的 **聊天记录查询启用签名认证**。了解更详细的签名规则请参考 [聊天签名方法](realtime-guide-senior.html#安全与签名)。签名参数仅在开启对应的选项后有效，如果没有开启选项，就不需要传签名参数。
+为了保证获取聊天记录的安全性，可以开启签名认证 [控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中的 **聊天记录查询启用签名认证**。了解更详细的签名规则请参考 [聊天签名方法](realtime-guide-senior.html#安全与签名)。签名参数仅在开启对应的选项后有效，如果没有开启选项，就不需要传签名参数。
 
 签名采用 Hmac-sha1 算法，输出字节流的十六进制字符串 (hex dump)，签名的 key 必须是应用的 master key，签名的消息格式如下：
 
@@ -933,7 +933,7 @@ reason | 下线的原因，字符串，不超过 20 个字符
 
 ## 获取 Client 登录签名
 
-本接口可以让使用了 [AV.User](rest_api.html#用户-1) 的应用方便快捷地实现登录认证。登录认证默认关闭，可以进入 [控制台 > 消息 > 实时消息 > 设置 > 实时消息选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf)，选中 **登录启用签名认证**。
+本接口可以让使用了 [AV.User](rest_api.html#用户-1) 的应用方便快捷地实现登录认证。登录认证默认关闭，可以进入 [控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf)，选中 **登录启用签名认证**。
 
 ```sh
 curl -X POST \

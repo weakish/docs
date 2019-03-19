@@ -36,7 +36,7 @@
 {% macro signature(heading="") -%}
   {% if heading != "" %}{{ heading }}{% endif %}
 
-开发者可以在控制台中方便地测试签名。进入 {% if node == 'qcloud' %}**消息** > **实时消息** > **用户**{% else %}[消息 > 实时消息 > 用户](/dashboard/messaging.html?appid={{appid}}#/message/realtime/client){% endif %}，输入一个 `clientId` 进行查找，找到后界面会显示 **测试签名** 按键及更多内容。
+开发者可以在控制台中方便地测试签名。进入 {% if node == 'qcloud' %}**消息** > **即时通讯** > **用户**{% else %}[消息 > 即时通讯 > 用户](/dashboard/messaging.html?appid={{appid}}#/message/realtime/client){% endif %}，输入一个 `clientId` 进行查找，找到后界面会显示 **测试签名** 按键及更多内容。
 
 <img src="images/console-im-signature-test.png" width="600" class="img-responsive" alt="一个标题为「测试签名」的表单，包含「签名类型」、「用户 ID」、「被操作者 ID」、「时间戳」和「随机字符串」输入框以及一个「生成签名」按钮。">
 {%- endmacro %}

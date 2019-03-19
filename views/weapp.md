@@ -230,7 +230,7 @@ SDK 所有的云引擎相关的 API 都能正常使用，详细的用法请参�
 
 ## 即时通讯
 
-要使用 LeanCloud 的聊天、实时消息功能，需要使用 LeanCloud 即时通讯 SDK。
+要使用 LeanCloud 的聊天、即时通讯功能，需要使用 LeanCloud 即时通讯 SDK。
 
 ### 安装与初始化
 请参阅《[JavaScript SDK 安装指南](sdk_setup-js.html)》中对应平台的说明。

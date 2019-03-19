@@ -23,7 +23,7 @@
 ```bash
 # 存储服务（包括推送）
 $ npm install leancloud-storage --save
-# 实时消息服务
+# 即时通讯服务
 $ npm install leancloud-realtime --save
 ```
 
@@ -32,7 +32,7 @@ $ npm install leancloud-realtime --save
 ```bash
 # 存储服务（包括推送）
 $ npm install leancloud-storage --save --registry=https://registry.npm.taobao.org
-# 实时消息服务
+# 即时通讯服务
 $ npm install leancloud-realtime --save --registry=https://registry.npm.taobao.org
 ```
 
@@ -42,7 +42,7 @@ $ npm install leancloud-realtime --save --registry=https://registry.npm.taobao.o
 // 存储服务
 var AV = require('leancloud-storage');
 var { Query, User } = AV;
-// 实时消息服务
+// 即时通讯服务
 var { Realtime, TextMessage } = require('leancloud-realtime');
 ```
 
@@ -60,7 +60,7 @@ var AV = require('leancloud-storage/live-query');
 ```html
 <!-- 存储服务 -->
 <script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js"></script>
-<!-- 实时消息服务 -->
+<!-- 即时通讯服务 -->
 <script src="//cdn.jsdelivr.net/npm/leancloud-realtime@{{jsimsdkversion}}/dist/realtime.browser.min.js"></script>
 ```
 
@@ -77,7 +77,7 @@ var AV = require('leancloud-storage/live-query');
 // 存储服务
 var { Query, User } = AV;
 AV.init('appId', 'appKey');
-// 实时消息服务
+// 即时通讯服务
 var { Realtime, TextMessage } = AV;
 ```
 
@@ -125,9 +125,9 @@ set DEBUG=leancloud*,LC* lean up
 
 在 `app.js` 中使用 `const AV = require('./libs/av-weapp-min.js');` 获得 `AV` 的引用。在其他文件中使用时请将路径替换成对应的相对路径。 
 
-#### 实时消息服务
+#### 即时通讯服务
 
-前往 [实时消息 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `realtime.weapp.min.js`，移动到 `libs` 目录。
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `realtime.weapp.min.js`，移动到 `libs` 目录。
 
 在 `app.js` 中使用 `const { Realtime, TextMessage } = require('./libs/realtime.weapp.min.js');` 获得 `Realtime` 等 SDK 暴露成员的引用。在其他文件中使用时请将路径替换成对应的相对路径。
 
@@ -163,7 +163,7 @@ set DEBUG=leancloud*,LC* lean up
 - var AV = require('leancloud-storage/live-query');
 + var AV = require('leancloud-storage/dist/av-live-query-weapp-min.js');
 
-  // 实时消息服务 SDK 路径变更为
+  // 即时通讯服务 SDK 路径变更为
 - var { Realtime } = require('leancloud-realtime');
 + var { Realtime } = require('leancloud-realtime/dist/realtime.weapp.js');
 ```
@@ -180,7 +180,7 @@ set DEBUG=leancloud*,LC* lean up
 |--|:--:|:--:|
 |存储服务|[leancloud-storage-weapp.min.js][]|[leancloud-storage.min.js][]|
 |存储服务（LiveQuery）|[leancloud-storage-live-query-weapp.min.js][]|[leancloud-storage-live-query.min.js][]|
-|实时消息服务|[leancloud-realtime-weapp.min.js][]|[leancloud-realtime.min.js][]|
+|即时通讯服务|[leancloud-realtime-weapp.min.js][]|[leancloud-realtime.min.js][]|
 
 [leancloud-storage-weapp.min.js]: https://cdn.jsdelivr.net/combine/gh/leancloud/laya-weapp-module-wrapper@0.1.1/start.js,npm/leancloud-storage@{{jssdkversion}}/dist/av-weapp-min.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/end.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/_/leancloud-storage-weapp.min.js
 [leancloud-storage.min.js]: https://cdn.jsdelivr.net/combine/gh/leancloud/laya-weapp-module-wrapper@0.1.1/start.js,npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/end.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/_/leancloud-storage.min.js
@@ -213,7 +213,7 @@ set DEBUG=leancloud*,LC* lean up
 // 存储服务
 var { Query, User } = AV;
 AV.init('appId', 'appKey');
-// 实时消息服务
+// 即时通讯服务
 var { Realtime, TextMessage } = AV;
 ```
 
@@ -298,7 +298,7 @@ AV.init('appId', 'appKey');
 ```bash
 # 存储服务（包括推送）
 $ npm install leancloud-storage --save
-# 实时消息服务
+# 即时通讯服务
 $ npm install leancloud-realtime --save
 ```
 
@@ -309,7 +309,7 @@ $ npm install leancloud-realtime --save
 ```html
 <!-- 存储服务 -->
 <script src="./node_modules/leancloud-storage/dist/av-min.js"></script>
-<!-- 实时消息服务 -->
+<!-- 即时通讯服务 -->
 <script src="./node_modules/leancloud-realtime/dist/realtime.browser.min.js"></script>
 ```
 
