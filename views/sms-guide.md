@@ -879,6 +879,9 @@ AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
 ```java
 // Java SDK 暂不支持图形验证码
 ```
+```php
+// PHP SDK 暂不支持图形验证码
+```
 
 #### 校验图形验证码
 
@@ -917,6 +920,9 @@ AVCloud.VerifyCaptchaAsync("这里填写用户输入的图形验证码，例如 
 ```
 ```java
 // Java SDK 暂不支持图形验证码
+```
+```php
+// PHP SDK 暂不支持图形验证码
 ```
 
 #### 使用 validate_token 发送短信
@@ -998,6 +1004,9 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","New_Series",null,"sign_BuyBuyBuy","�
 ```
 ```java
 // Java SDK 暂不支持图形验证码
+```
+```php
+// PHP SDK 暂不支持图形验证码
 ```
 
 ## 国际短信
