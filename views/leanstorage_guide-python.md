@@ -23,7 +23,7 @@
 {% set dateType= "datetime.datetime" %}
 {% set byteType= "byte[]" %}
 {% set acl_guide_url = "[Python SDK 权限管理使用指南](acl_guide-python.html)" %}
-{% set sms_guide_url = "（Python SDK 文档待补充）" %}
+{% set sms_guide_url = "[短信服务使用指南](sms-guide.html)" %}
 {% set inapp_search_guide_url = "（Python SDK 暂不支持）" %}
 {% set status_system_guide_url = "（Python SDK 暂不支持）" %}
 {% set feedback_guide_url = "（Python SDK 暂不支持）" %}
