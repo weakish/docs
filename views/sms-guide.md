@@ -882,6 +882,10 @@ AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
 ```php
 // PHP SDK 暂不支持图形验证码
 ```
+```python
+from leancloud import cloud
+captcha = cloud.request_captcha(width=100, height=50)
+```
 
 #### 校验图形验证码
 
@@ -923,6 +927,10 @@ AVCloud.VerifyCaptchaAsync("这里填写用户输入的图形验证码，例如 
 ```
 ```php
 // PHP SDK 暂不支持图形验证码
+```
+```python
+# captcha 是上一步得到的验证码实例对象
+validate_token = captcha.verify("这里填写用户输入的图形验证码，例如 AM8N")
 ```
 
 #### 使用 validate_token 发送短信
@@ -1007,6 +1015,12 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","New_Series",null,"sign_BuyBuyBuy","�
 ```
 ```php
 // PHP SDK 暂不支持图形验证码
+```
+```python
+from leancloud import cloud
+options = { "validate_token": validate_token }
+cloud.request_sms_code("186xxxxxxxx",
+  template="New_Series", sign="sign_BuyBuyBuy", params=options)
 ```
 
 ## 国际短信
