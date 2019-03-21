@@ -1047,6 +1047,8 @@ curl -X GET \
   https://{{host}}/1.1/classes/Post
 ```
 
+注意，由于 createdAt 和 updatedAt 属于保留字段，因此通过 REST API 请求这两个字段时，将直接返回 UTC 时间戳字符串。
+
 **Byte** 类型包含了一个 base64 字段，这个字段是一些二进制数据编码过的 base64 字符串。base64 是 MIME 使用的标准，不包含空白符：
 
 ```json
