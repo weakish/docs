@@ -613,7 +613,7 @@ public void queryMutedMembers(int offset, int limit, final AVIMConversationSimpl
 
 - `error`/`exception`，表示整体是否成功。如果整体操作失败，这里会有异常信息返回，此时不必再看下面两部分结果。
 - `successfulClientIds`，表示操作成功了的成员 ID 列表。
-- `failedIds`，表示所有操作失败了的成员信息，以 `List<reasonString, List<ClientId>>` 的形式列出了所有的失败原因以及对应的成员 ID 列表。
+- `failedIds`，表示所有操作失败了的成员信息，以 `List<ReasonString, List<ClientId>>` 的形式列出了所有的失败原因以及对应的成员 ID 列表。
 
 #### 禁言的通知事件
 
