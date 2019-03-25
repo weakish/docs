@@ -105,6 +105,19 @@ AVCloud.RequestSMSCodeAsync("18612345678","Register_Notice",null,"LeanCloud").Co
 // 往 18612345678 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
 AVOSCloud.requestSMSCode("18612345678", "Register_Notice", null);
 ```
+```php
+// 往 18612345678 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
+$options = [
+  "template" => "Register_Notice",
+  "name" => "LeanCloud",
+];
+SMS::requestSMSCode("18612345678", $options);
+```
+```python
+from leancloud import cloud
+cloud.request_sms_code("18612345678", template="Register_Notice", sign="LeanCloud")
+```
+
 
 用户收到的短信内容如下：
 
@@ -223,6 +236,22 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","应用名称","某种操作",10).Cont
 // 下面参数中的 10 表示验证码有效时间为 10 分钟
 AVOSCloud.requestSMSCode("186xxxxxxxx", "应用名称", "某种操作", 10);
 ```
+```php
+$options = [
+  "name" => "应用名称",
+  "op" => "某种操作",
+  "ttl" => 10, // 验证码有效时间为 10 分钟
+];
+SMS::requestSMSCode("186xxxxxxxx", $options);
+```
+```python
+from leancloud import cloud
+options = {
+  "op": "某种操作",
+  "ttl": 10  # 验证码有效时间为 10 分钟
+}
+cloud.request_sms_code("186xxxxxxxx", sign="应用名称", params=options) 
+```
 
 3. **用户收到短信，并且输入了验证码。**  
   在进行下一步之前，我们建议先进行客户端验证（对有效性进行基本验证，例如长度、特殊字符等），这样就避免了错误的验证码被服务端驳回而产生的流量，以及与服务端沟通的时间，有助于提升用户体验。
@@ -277,6 +306,15 @@ try {
 } catch (AVException ex) {
   /* 验证失败 */
 }
+```
+```php
+// 注意，PHP SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
+SMS::verifySmsCode('186xxxxxxxx', '123456');
+```
+```python
+from leancloud import cloud
+# 注意，Python SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
+cloud.verify_sms_code('186xxxxxxxx', '123456')
 ```
 
 针对上述的需求，可以把场景换成异地登录验证、修改个人敏感信息验证等一些常见的场景，步骤是类似的，调用的接口也是一样的，仅仅是在做 UI 展现的时候需要开发者自己去优化验证过程。
@@ -339,6 +377,16 @@ AVCloud.RequestVoiceCodeAsync ("18688888888").ContinueWith(t =>{
 ```java
 AVOSCloud.requestVoiceCode("18688888888");
 ```
+```php
+$options = [
+  "smsType": "voice",
+];
+SMS::requestSMSCode("186xxxxxxxx", $options);
+```
+```python
+from leancloud import cloud
+cloud.request_sms_code("186xxxxxxxx", sms_type="voice")
+```
 
 发送成功之后，用户的手机就会收到一段语音通话，它会播报 6 位数的验证码，然后开发者需要再次调用：
 
@@ -392,6 +440,13 @@ try {
   /* 验证失败 */
 }
 ```
+```php
+SMS::verifySmsCode('186xxxxxxxx', '123456');
+```
+```python
+from leancloud import cloud
+cloud.verify_sms_code('186xxxxxxxx', '123456')
+```
 
 再次验证用户输入的验证码是否正确。
 
@@ -437,7 +492,7 @@ try {
 
 ### 使用模板
 
-假设提交的短信模板的类型为「通知类」内容如下：
+假设提交的短信模板的类型为「通知类」，内容如下：
 
 {% call docs.bubbleWrap() -%}
 尊敬的的用户，您的订单号：{{ docs.mustache("order_id") }} 正在派送，请保持手机畅通，我们的快递员随时可能与您联系，感谢您的订阅。 
@@ -522,6 +577,22 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","Order_Notice",env,"sign_BuyBuyBuy").C
 Map<String, Object> parameters = new HashMap<String, Object>();
 parameters.put("order_id", "7623432424540");      // 使用实际的值来替换模板中的变量
 AVOSCloud.requestSMSCode("186xxxxxxxx", "Order_Notice", parameters);
+```
+```php
+$options = [
+  "template" => "Order_Notice",
+  "name" => "sign_BuyBuyBuy",
+  "order_id" => "7623432424540", // 使用实际的值来替换模板中的变量
+];
+SMS::requestSmsCode("186xxxxxxxx", $options);
+```
+```python
+from leancloud import cloud
+options = {
+  "order_id": "7623432424540" # 使用实际的值来替换模板中的变量
+}
+cloud.request_sms_code("186xxxxxxxx",
+  template="Order_Notice", sign="sign_BuyBuyBuy", params=options)
 ```
 
 用户收到的内容如下：
@@ -808,6 +879,13 @@ AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
 ```java
 // Java SDK 暂不支持图形验证码
 ```
+```php
+// PHP SDK 暂不支持图形验证码
+```
+```python
+from leancloud import cloud
+captcha = cloud.request_captcha(width=100, height=50)
+```
 
 #### 校验图形验证码
 
@@ -846,6 +924,13 @@ AVCloud.VerifyCaptchaAsync("这里填写用户输入的图形验证码，例如 
 ```
 ```java
 // Java SDK 暂不支持图形验证码
+```
+```php
+// PHP SDK 暂不支持图形验证码
+```
+```python
+# captcha 是上一步得到的验证码实例对象
+validate_token = captcha.verify("这里填写用户输入的图形验证码，例如 AM8N")
 ```
 
 #### 使用 validate_token 发送短信
@@ -927,6 +1012,15 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","New_Series",null,"sign_BuyBuyBuy","�
 ```
 ```java
 // Java SDK 暂不支持图形验证码
+```
+```php
+// PHP SDK 暂不支持图形验证码
+```
+```python
+from leancloud import cloud
+options = { "validate_token": validate_token }
+cloud.request_sms_code("186xxxxxxxx",
+  template="New_Series", sign="sign_BuyBuyBuy", params=options)
 ```
 
 ## 国际短信
@@ -1153,6 +1247,22 @@ user.SignUpAsync().ContinueWith(t =>
 ```java
 // Java SDK 与 Android 代码相同
 ```
+```php
+$user = new User();
+$user->setUsername("hjiang");
+$user->setPassword("f32@ds*@&dsa");
+$user->setMobilePhoneNumber("186xxxxxxxx");
+$user->signUp();
+```
+```python
+import leancloud
+
+user = leancloud.User()
+user.set_username("hjiang")
+user.set_password("f32@ds*@&dsa")
+user.set_mobile_phone_number("186xxxxxxxx")
+user.sign_up()
+```
 
 3. **云端发送手机验证码，并且返回注册成功**。但是此时用户的 `mobilePhoneVerified` 依然是 `false`，客户端需要引导用户去输入验证码。   
   
@@ -1200,6 +1310,13 @@ AVUser.VerifyMobilePhoneAsync("6位数字验证码", "186xxxxxxxx").ContinueWith
 ```
 ```java
 // Java SDK 与 Android 代码相同
+```
+```php
+User::verifyMobilePhone("6位数字验证码");
+```
+```python
+from leancloud import user
+user.verify_mobile_phone_number("6位数字验证码")
 ```
 
 以上是一个通用的带有手机号验证的注册过程。开发者可以根据需求增加或减少步骤，但是推荐开发者在使用该功能时，首先明确是否需要勾选「验证注册用户手机号码」。因为一旦勾选，只要调用了 AVUser 相关的注册账号，并传入手机号，云端就会自动发送短信验证码。
@@ -1254,6 +1371,13 @@ AVUser.RequestMobilePhoneVerifyAsync("186xxxxxxxx").ContinueWith(t =>
 ```java
 // Java SDK 与 Android 代码相同
 ```
+```php
+User::requestMobilePhoneVerify("186xxxxxxxx");
+```
+```python
+from leancloud import cloud
+cloud.request_mobile_phone_verify("186xxxxxxxx")
+```
 
 2. **调用验证接口，验证用户输入的纯数字的验证码。** 
 ```objc
@@ -1300,6 +1424,13 @@ AVUser.VerifyMobilePhoneAsync("6位数字验证码").ContinueWith(t =>
 ```
 ```java
 // Java SDK 与 Android 代码相同
+```
+```php
+User::verifyMobilePhone("6位数字验证码");
+```
+```python
+from leancloud import cloud
+cloud.verify_mobile_phone_number("6位数字验证码")
 ```
 
 #### 未收到注册验证短信
