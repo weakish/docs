@@ -146,7 +146,7 @@ AVObject 保存到 LeanCloud 云端之后，如何再次获取到它们呢？这
 
 ## 数据存储 Hook 机制
 
-详见 [云函数开发指南 > Hook 函数](https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html#hash1095356413)
+详见 [云函数开发指南 > Hook 函数](leanengine_cloudfunction_guide-node.html#Hook-函数)。
 
 ## 主要性能指标
 
