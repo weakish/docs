@@ -158,7 +158,7 @@ AVUser.logInInBackground("username", "password", new LogInCallback<AVUser>() {
 
 用户登录之后，要开始与其他人聊天，需要先创建一个「对话」。
 
-> [对话（`Conversation`）](/realtime_v2.html#对话（Conversation）)是消息的载体，所有消息都是发送给对话，即时通讯服务端会把消息下发给所有在对话中的成员。
+> [对话（`Conversation`）](realtime_v2.html#对话（Conversation）)是消息的载体，所有消息都是发送给对话，即时通讯服务端会把消息下发给所有在对话中的成员。
 
 Tom 完成了登录之后，就可以选择用户聊天了。现在他要给 Jerry 发送消息，所以需要先创建一个只有他们两个成员的 `Conversation`：
 

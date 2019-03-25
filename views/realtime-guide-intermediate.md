@@ -1007,11 +1007,11 @@ AVIMClient.setUnreadNotificationEnabled(true);
 
 客户端 SDK 会在 `AVIMConversation` 上维护一个 `unreadMessagesCount` 字段，来统计当前对话中存在有多少未读消息。
 
-客户端用户登录之后，云端会以「未读消息数更新」事件的形式，将当前用户所在的多对 `<Conversation, unReadMessageCount, lastMessage>` 数据通知到客户端，这就是客户端维护的 `<Conversation, unReadMessageCount>` 初始值。之后 SDK 在收到新的在线消息的时候，会自动增加对应的 `unReadMessageCount` 计数。直到用户把某一个对话的未读消息清空，这时候云端和 SDK 的 `<Conversation, unReadMessageCount>` 计数都会清零。
+客户端用户登录之后，云端会以「未读消息数更新」事件的形式，将当前用户所在的多对 `<Conversation, UnreadMessageCount, LastMessage>` 数据通知到客户端，这就是客户端维护的 `<Conversation, UnreadMessageCount>` 初始值。之后 SDK 在收到新的在线消息的时候，会自动增加对应的 `unreadMessageCount` 计数。直到用户把某一个对话的未读消息清空，这时候云端和 SDK 的 `<Conversation, UnreadMessageCount>` 计数都会清零。
 
 > 注意：开启未读消息数后，即使客户端在线收到了消息，未读消息数量也会增加，因此开发者需要在合适时机重置未读消息数。
 
-客户端 SDK 在 `<Conversation, unReadMessageCount>` 数字变化的时候，会通过 `IMClient` 派发 `未读消息数量更新（UNREAD_MESSAGES_COUNT_UPDATE）` 事件到应用层。开发者可以监听 `UNREAD_MESSAGES_COUNT_UPDATE` 事件，在对话列表界面上更新这些对话的未读消息数量，不过考虑到这个通知回调会非常频繁，并且未读消息数量变化的通知一般也都是伴随其他事件产生的，所以建议开发者 ***对于此通知不做特殊处理*** 即可。
+客户端 SDK 在 `<Conversation, UnreadMessageCount>` 数字变化的时候，会通过 `IMClient` 派发 `未读消息数量更新（UNREAD_MESSAGES_COUNT_UPDATE）` 事件到应用层。开发者可以监听 `UNREAD_MESSAGES_COUNT_UPDATE` 事件，在对话列表界面上更新这些对话的未读消息数量，不过考虑到这个通知回调会非常频繁，并且未读消息数量变化的通知一般也都是伴随其他事件产生的，所以建议开发者 ***对于此通知不做特殊处理*** 即可。
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -1051,15 +1051,15 @@ onUnreadMessagesCountUpdated(AVIMClient client, AVIMConversation conversation) {
 
 一个用户可以使用相同的账号在不同的客户端上登录（例如 QQ 网页版和手机客户端可以同时接收到消息和回复消息，实现多端消息同步），而有一些场景下，需要禁止一个用户同时在不同客户端登录，例如我们不能用同一个微信账号在两个手机上同时登录。LeanCloud 即时通讯服务提供了灵活的机制，来满足 ***多端登录*** 和 ***单设备登录*** 这两种完全相反的需求。
 
-即时通讯 SDK 在生成 `IMClient` 实例的时候，允许开发者在 `clientId` 之外，增加一个额外的 `Tag` 标记。云端在用户登录的时候，会检查 `<ClientId, Tag>` 组合的唯一性。如果当前用户已经在其他设备上使用同样的 Tag 登录了，那么云端会强制让之前登录的设备下线。如果多个 `Tag` 不发生冲突，那么云端会把他们当初独立的设备进行处理，应该下发给该用户的消息会分别下发给所有设备，不同设备上的未读消息计数则是合并在一起的（各端之间消息状态是同步的）；该用户在单个设备上发出来的上行消息，云端也会默认同步到其他设备。
+即时通讯 SDK 在生成 `IMClient` 实例的时候，允许开发者在 `clientId` 之外，增加一个额外的 `tag` 标记。云端在用户登录的时候，会检查 `<ClientId, Tag>` 组合的唯一性。如果当前用户已经在其他设备上使用同样的 `tag` 登录了，那么云端会强制让之前登录的设备下线。如果多个 `tag` 不发生冲突，那么云端会把他们当成独立的设备进行处理，应该下发给该用户的消息会分别下发给所有设备，不同设备上的未读消息计数则是合并在一起的（各端之间消息状态是同步的）；该用户在单个设备上发出来的上行消息，云端也会默认同步到其他设备。
 
-以 QQ 那样的多端登录需求为例，我们可以设计三种 Tag：Mobile、Pad、Web，分别对应三种类型的设备：手机、平板和电脑，那么用户分别在三种设备上登录就都是允许的，但是却不能同时在两台电脑上登录。
+以 QQ 那样的多端登录需求为例，我们可以设计三种 `tag`：`Mobile`、`Pad`、`Web`，分别对应三种类型的设备：手机、平板和电脑，那么用户分别在三种设备上登录就都是允许的，但是却不能同时在两台电脑上登录。
 
-> 如果不设置 Tag，则默认对用户的多端登录不作限制。如果所有客户端都只使用一个 Tag，那么就可以实现「单设备登录」的效果了。
+> 如果不设置 `tag`，则默认对用户的多端登录不作限制。如果所有客户端都只使用一个 `tag`，那么就可以实现「单设备登录」的效果了。
 
 ### 设置登录标记
 
-按照上面的方案，以手机端登录为例，在创建 `IMClient` 实例的时候，我们增加 `Tag: Mobile` 这样的标记：
+按照上面的方案，以手机端登录为例，在创建 `IMClient` 实例的时候，我们增加 `tag: Mobile` 这样的标记：
 
 ```js
 realtime.createIMClient('Tom', { tag: 'Mobile' }).then(function(tom) {
