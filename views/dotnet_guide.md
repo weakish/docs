@@ -984,17 +984,6 @@ await callTask;
 ```
 只需要传入云引擎中函数的名字和这个函数需要参数即可，如果是无参的函数，直接传入`null`即可。
 
-## 自定义参数
-
-{% if node=='qcloud' %}
-在控制台的`自定义参数设置`页面可以设置一些静态的全局共享的参数，他们都是键值对的格式，在 SDK 中提供了获取这些在线参数的方法：
-{% else %}
-在控制台的[自定义参数设置](/devcomponent.html?appid={{appid}}#/component/custom_param)页面可以设置一些静态的全局共享的参数，他们都是键值对的格式，在 SDK 中提供了获取这些在线参数的方法：
-{% endif %}
-
-```cs
-IDictionary<string, object> cp=await AVCloud.GetCustomParameters();
-```
 ## 消息推送
 ### 推送给所有的设备
 
