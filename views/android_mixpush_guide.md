@@ -365,22 +365,22 @@ dependencies {
 
 当魅族通知栏消息被点击后，如果已经设置了 [自定义 Receiver](#自定义_Receiver)，则 SDK 会发送一个 action 为 `com.avos.avoscloud.flyme_notification_action` 的 broadcast。如有需要，开发者可以通过订阅此消息获取点击事件，否则 SDK 会默认打开 [启动推送服务](#启动推送服务) 对应设置的 Activity。
 
-## VIVO 推送（Beta）
+## vivo 推送（beta）
 
-我们新推出了支持 VIVO 手机的混合推送，当前该功能还处于 Beta 阶段，可能存有缺陷，所以我们没有发布正式版 SDK，而是采用了源码配 Demo 的形式来公开这一功能。欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
+我们新推出了支持 vivo 手机的混合推送，当前该功能还处于 beta 阶段，可能存有缺陷，所以我们没有发布正式版 SDK，而是采用了源码配 demo 的形式来公开这一功能。欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
 
-- VIVO 混合推送 SDK 源代码：可参照 [这里](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush)。
-- VIVO 混合推送 Demo：可参照 [这里](https://github.com/leancloud/mixpush-demos/tree/master/vivo)。在 Demo 工程的 [app/libs](https://github.com/leancloud/mixpush-demos/tree/master/vivo/app/libs) 目录下，即可发现我们编译好的 `4.7.11-beta` 版本 SDK，大家可以拷贝到自己的工程中来直接使用。
+- vivo 混合推送 SDK 源代码：可参照 [这里](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush)。
+- vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush-demos/tree/master/vivo)。在 demo 工程的 [app/libs](https://github.com/leancloud/mixpush-demos/tree/master/vivo/app/libs) 目录下，即可发现我们编译好的 `4.7.11-beta` 版本 SDK，大家可以拷贝到自己的工程中来直接使用。
 
 ### 环境配置
-要使用 VIVO 官方推送服务，需要在 [VIVO 开发者平台](https://dev.vivo.com.cn/home)注册一个账号，并创建好应用。
+要使用 vivo 官方推送服务，需要在 [vivo 开发者平台](https://dev.vivo.com.cn/home)注册一个账号，并创建好应用。
 这里假设大家已经完成上述操作，
 创建好了应用，并获取了 `appId` 和 `appKey`（请保存好这两个值，下一步接入的时候会用到。）
 
 ### 接入 SDK
-当前版本的 SDK 是基于 VIVO 官方文档 [Push SDK接入文档](https://dev.vivo.com.cn/documentCenter/doc/158) 封装而来，使用的 VIVO Push SDK 基线版本是 `2.3.4`。我们会结合 Demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
+当前版本的 SDK 是基于 vivo 官方文档 [push SDK 接入文档](https://dev.vivo.com.cn/documentCenter/doc/158) 封装而来，使用的 vivo push SDK 基线版本是 `2.3.4`。我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
 
-首先将 Demo 工程 app/libs 目录下的所有 jar 包拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+首先将 demo 工程 app/libs 目录下的所有 jar 包拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
 ```
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -435,7 +435,7 @@ dependencies {
 
 #### 初始化
 
-与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行 VIVO 推送的初始化：
+与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行 vivo 推送的初始化：
 
 ```java
 public class MyApp extends Application {
@@ -453,16 +453,16 @@ public class MyApp extends Application {
     // AVOSCloud SDK 初始化
     AVOSCloud.initialize(this,LC_APP_ID,LC_APP_KEY);
 
-    // VIVO 推送初始化
+    // vivo 推送初始化
     AVMixPushManager.registerVIVOPush(this);
     AVMixPushManager.turnOnVIVOPush(new AVCallback<Boolean>() {
       @Override
       protected void internalDone0(Boolean aBoolean, AVException e) {
         if (null != e) {
-          System.out.println("failed to turn on VIVO push. cause:");
+          System.out.println("failed to turn on vivo push. cause:");
           e.printStackTrace();
         } else {
-          System.out.println("succeed to turn on VIVO push.");
+          System.out.println("succeed to turn on vivo push.");
         }
       }
     });
@@ -470,14 +470,14 @@ public class MyApp extends Application {
 }
 ```
 
-开发者也可以在 `onCreate` 方法中调用 AVMixPushManager 的其他方法，已使用 VIVO 推送的全部功能：
+开发者也可以在 `onCreate` 方法中调用 AVMixPushManager 的其他方法，已使用 vivo 推送的全部功能：
 
 ```java
 public class AVMixPushManager {
-  // 判断当前设备是否支持 VIVO 推送
+  // 判断当前设备是否支持 vivo 推送
   public static boolean isSupportVIVOPush(Context context);
 
-  // 关闭 VIVO 推送
+  // 关闭 vivo 推送
   public static void turnOffVIVOPush(final AVCallback<Boolean> callback);
 
   public static void bindVIVOAlias(Context context, String alias, final AVCallback<Boolean> callback)；
@@ -496,13 +496,13 @@ public class AVMixPushManager {
 
 #### 响应通知栏消息的点击事件
 
-与其他厂商的混合推送机制一样，VIVO 混合推送也是通过系统通道来下发消息，开发者调用 Push API 发送消息时，其流程为：
+与其他厂商的混合推送机制一样，vivo 混合推送也是通过系统通道来下发消息，开发者调用 push API 发送消息时，其流程为：
 
 - 用户服务器向 LeanCloud 推送服务器发送推送请求；
-- LeanCloud 推送服务器 向 VIVO 服务器 转发请求；
-- VIVO 服务器 通过系统长链接下发推送通知到 手机端；
+- LeanCloud 推送服务器 向 vivo 服务器 转发请求；
+- vivo 服务器 通过系统长链接下发推送通知到 手机端；
 - 手机端操作系统将消息展示在通知栏；
-- 用户点击通知栏消息。此时 VIVO 系统会调用应用 AndroidManifest 里定义的响应 `com.vivo.pushclient.action.RECEIVE` action 的接收器（如前面 Manifest 里定义的 `MyPushMessageReceiver` 类）。
+- 用户点击通知栏消息。此时 vivo 系统会调用应用 AndroidManifest 里定义的响应 `com.vivo.pushclient.action.RECEIVE` action 的接收器（如前面 AndroidManifest 里定义的 `MyPushMessageReceiver` 类）。
 
 应用需要从混合推送 SDK 中的 `AVVIVOPushMessageReceiver` 类派生出自己的实现类，在 `void onNotificationMessageClicked(Context var1, UPSNotificationMessage var2)` 方法中响应点击事件，以动态改变展示内容。
 下面的例子展示了 `MyPushMessageReceiver` 类的简单示例：
@@ -525,7 +525,7 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 }
 ```
 
-这样就完成了 VIVO 推送的完整流程。
+这样就完成了 vivo 推送的完整流程。
 
 ## 华为推送-老版本（仅中国节点）
 
