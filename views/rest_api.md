@@ -145,7 +145,6 @@ REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 
       <td>POST</td>
       <td>请求验证用户邮箱</td>
     </tr>
-    {% if node != 'qcloud' and node != 'us' %}
     <tr>
       <td>/1.1/requestMobilePhoneVerify</td>
       <td>POST</td>
@@ -155,6 +154,16 @@ REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 
       <td>/1.1/verifyMobilePhone/&lt;code&gt;</td>
       <td>POST</td>
       <td>使用"验证码"验证用户手机号码</td>
+    </tr>
+    <tr>
+      <td>/1.1/requestChangePhoneNumber</td>
+      <td>POST</td>
+      <td>请求发送手机短信验证码以绑定或更新手机号。</td>
+    </tr>
+    <tr>
+      <td>/1.1/changePhoneNumber</td>
+      <td>POST</td>
+      <td>验证手机短信验证码并绑定或更新手机号。</td>
     </tr>
     <tr>
       <td>/1.1/requestLoginSmsCode</td>
@@ -171,7 +180,6 @@ REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 
       <td>PUT</td>
       <td>验证手机短信验证码并重置密码。</td>
     </tr>
-    {% endif %}
   </tbody>
 </table>
 

@@ -35,6 +35,8 @@
 | /1.1/usersByMobilePhone              | POST | 使用手机号码注册或登录       |
 | /1.1/requestMobilePhoneVerify        | POST | 请求发送用户手机号码验证短信    |
 | /1.1/verifyMobilePhone/`<code>`      | POST | 使用「验证码」验证用户手机号码   |
+| /1.1/requestChangePhoneNumber        | POST | 请求发送手机短信验证码以绑定或更新手机号 |
+| /1.1/changePhoneNumber               | POST | 验证手机短信验证码并绑定或更新手机号 |
 | /1.1/requestLoginSmsCode             | POST | 请求发送手机号码短信登录验证码   |
 | /1.1/requestPasswordResetBySmsCode   | POST | 请求发送手机短信验证码重置用户密码 |
 | /1.1/resetPasswordBySmsCode/`<code>` | PUT  | 验证手机短信验证码并重置密码    |
@@ -293,6 +295,51 @@ curl -X POST \
   "objectId":"587a0f0661ff4b0065f1dff8"
 }
 ```
+
+如果希望用户绑定或修改手机号时先通过短信验证，可以使用 `requestChangePhoneNumber` 和 `changePhoneNumber` 这两个接口。
+
+`requestChangePhoneNumber` 接受以下请求参数：
+
+参数 | 说明
+- | -
+`mobilePhoneNumber` | **必填** 接受手机验证码短信的手机号，同时也是绑定或更新的新手机号
+`ttl` | **可选** 验证码有效时间
+
+`changePhoneNumber` 接受以下请求参数：
+
+参数 | 说明
+- | -
+`mobilePhoneNumber` | **必填** 绑定或更新的新手机号
+`code` | **必填** 用户手机接收到的短信验证码 
+
+绑定手机号或修改手机号时请求发送验证码：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"186xxxxxxxx","ttl":10}' \
+  https://{{host}}/1.1/requestChangePhoneNumber
+```
+
+{{ sms.successfulResponse() }}
+
+验证后绑定或更新手机号：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"186xxxxxxxx","code":"123456"}' \
+  https://{{host}}/1.1/changePhoneNumber
+```
+
+未绑定手机号的用户（比如通过邮箱、密码注册的用户），通过以上流程绑定手机号后，其`mobilePhoneNumberVerified` 将变为 `true`，并会触发调用云引擎的 `AV.Cloud.onVerified(type, function)` 方法，`type` 被设置为 `sms`。
+
+`requestChangePhoneNumber` 和 `changePhoneNumber` 的请求参数 `mobilePhoneNumber` 需保持一致，否则 `changePhoneNumber` 会报错。
 
 ### 请求手机号码验证
 
