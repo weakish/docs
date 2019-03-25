@@ -144,6 +144,10 @@ AVObject 保存到 LeanCloud 云端之后，如何再次获取到它们呢？这
 
 还支持邮箱密码重置、手机密码重置等辅助功能，详细使用方法请参考各 SDK 开发指南。
 
+## 数据存储 Hook 机制
+
+详见 [云函数开发指南 > Hook 函数](https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html#hash1095356413)
+
 ## 主要性能指标
 
 LeanCloud 平台保证 99.9% 的高可用性，并且数据访问方面保证了极高的读写性能和极大的数据支持规模：

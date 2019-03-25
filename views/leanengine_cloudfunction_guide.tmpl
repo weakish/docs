@@ -231,6 +231,34 @@ Hook 函数本质上是云函数，但它有固定的名称，定义之后会**�
 
 对于 before 类的 Hook（也包括 `{{hook_on_login}}`），如果返回了一个错误的话，这个操作就会被中断，你可以在这些 Hook 中主动抛出一个错误来拒绝掉某些操作；对于 after 类的 Hook（也包括 `{{hook_on_verified}}`），返回错误并不会影响操作的执行（因为其实操作已经执行完了）。
 
+```mermaid
+graph LR
+A((save)) -->D{object}
+D-->E(new)
+E-->|beforeSave|H{error?}
+H-->N(No)
+N-->B[create new object on the cloud]
+B -->|afterSave|C((done))
+H-->Y(Yes)
+Y-->Z((interrupted))
+D-->F(existing)
+F-->|beforeUpdate|I{error?}
+I-->Y
+I-->V(No)
+V-->G[update existing object on the cloud]
+G-->|afterUpdate|C
+```
+
+```mermaid
+graph LR
+A((delete))-->|beforeDelete|H{error?}
+H-->Y(Yes)
+Y-->Z((interrupted))
+H-->N(No)
+N-->B[delete object on the cloud]
+B -->|afterDelete|C((done))
+```
+
 为了认证 Hook 调用者的身份，我们的 SDK 内部会确认请求确实是从云引擎内网的云存储组件发出的，如果认证失败，可能会出现 `Hook key check failed` 的提示，如果在本地调试时出现这样的错误，请确保是通过命令行工具启动调试的。
 
 ### {{hook_before_save}}
