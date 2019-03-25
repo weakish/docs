@@ -365,6 +365,168 @@ dependencies {
 
 当魅族通知栏消息被点击后，如果已经设置了 [自定义 Receiver](#自定义_Receiver)，则 SDK 会发送一个 action 为 `com.avos.avoscloud.flyme_notification_action` 的 broadcast。如有需要，开发者可以通过订阅此消息获取点击事件，否则 SDK 会默认打开 [启动推送服务](#启动推送服务) 对应设置的 Activity。
 
+## VIVO 推送（Beta）
+
+我们新推出了支持 VIVO 手机的混合推送，当前该功能还处于 Beta 阶段，可能存有缺陷，所以我们没有发布正式版 SDK，而是采用了源码配 Demo 的形式来公开这一功能。欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
+
+- VIVO 混合推送 SDK 源代码：可参照 [这里](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush)。
+- VIVO 混合推送 Demo：可参照 [这里](https://github.com/leancloud/mixpush-demos/tree/master/vivo)。在 Demo 工程的 [app/libs](https://github.com/leancloud/mixpush-demos/tree/master/vivo/app/libs) 目录下，即可发现我们编译好的 `4.7.11-beta` 版本 SDK，大家可以拷贝到自己的工程中来直接使用。
+
+### 环境配置
+要使用 VIVO 官方推送服务，需要在 [VIVO 开发者平台](https://dev.vivo.com.cn/home)注册一个账号，并创建好应用。
+这里假设大家已经完成上述操作，
+创建好了应用，并获取了 `appId` 和 `appKey`（请保存好这两个值，下一步接入的时候会用到。）
+
+### 接入 SDK
+当前版本的 SDK 是基于 VIVO 官方文档 [Push SDK接入文档](https://dev.vivo.com.cn/documentCenter/doc/158) 封装而来，使用的 VIVO Push SDK 基线版本是 `2.3.4`。我们会结合 Demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
+
+首先将 Demo 工程 app/libs 目录下的所有 jar 包拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+
+```
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.squareup.okhttp3:okhttp:3.8.1'
+    implementation 'com.alibaba:fastjson:1.2.37'
+    implementation 'org.java-websocket:Java-WebSocket:1.3.9'
+    implementation 'com.google.protobuf:protobuf-java:3.4.0'
+
+    implementation 'com.meizu.flyme.internet:push-internal:3.6.2@aar'
+```
+
+接下来配置 AndroidManifest，添加权限声明：
+
+```xml
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+```
+
+最后在 AndroidManifest 中添加 service 与 receiver（开发者要将其中的 `com.vivo.push.app_id` 和 `com.vivo.push.app_key` 替换为自己的应用的信息）：
+
+```xml
+        <service
+            android:name="com.vivo.push.sdk.service.CommandClientService"
+            android:exported="true" />
+        <activity
+            android:name="com.vivo.push.sdk.LinkProxyClientActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!-- push应用定义消息receiver声明，大家要换成自己的实现类 -->
+        <receiver android:name=".MyPushMessageReceiver">
+            <intent-filter>
+                <!-- 接收push消息 -->
+                <action android:name="com.vivo.pushclient.action.RECEIVE" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="com.vivo.push.api_key"
+            android:value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+        <meta-data
+            android:name="com.vivo.push.app_id"
+            android:value="xxxxx" />
+```
+
+接下来我们看看代码上要怎么做。
+
+#### 初始化
+
+与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行 VIVO 推送的初始化：
+
+```java
+public class MyApp extends Application {
+  // 请替换成您自己的 appId 和 appKey
+  private static final String LC_APP_ID = "xxx";
+  private static final String LC_APP_KEY = "xxx";
+
+  @Override
+  public void onCreate() {
+    super.onCreate();
+
+    //开启调试日志
+    AVOSCloud.setDebugLogEnabled(true);
+
+    // AVOSCloud SDK 初始化
+    AVOSCloud.initialize(this,LC_APP_ID,LC_APP_KEY);
+
+    // VIVO 推送初始化
+    AVMixPushManager.registerVIVOPush(this);
+    AVMixPushManager.turnOnVIVOPush(new AVCallback<Boolean>() {
+      @Override
+      protected void internalDone0(Boolean aBoolean, AVException e) {
+        if (null != e) {
+          System.out.println("failed to turn on VIVO push. cause:");
+          e.printStackTrace();
+        } else {
+          System.out.println("succeed to turn on VIVO push.");
+        }
+      }
+    });
+  }
+}
+```
+
+开发者也可以在 `onCreate` 方法中调用 AVMixPushManager 的其他方法，已使用 VIVO 推送的全部功能：
+
+```java
+public class AVMixPushManager {
+  // 判断当前设备是否支持 VIVO 推送
+  public static boolean isSupportVIVOPush(Context context);
+
+  // 关闭 VIVO 推送
+  public static void turnOffVIVOPush(final AVCallback<Boolean> callback);
+
+  public static void bindVIVOAlias(Context context, String alias, final AVCallback<Boolean> callback)；
+
+  public static void unbindVIVOAlias(Context context, String alias, final AVCallback<Boolean> callback);
+
+  public static String getVIVOAlias(Context context);
+
+  public static void setVIVOTopic(Context context, String topic, final AVCallback<Boolean> callback);
+
+  public static void delVIVOTopic(Context context, String topic, final AVCallback<Boolean> callback);
+
+  public static List<String> getVIVOTopics(Context context);  
+}
+```
+
+#### 响应通知栏消息的点击事件
+
+与其他厂商的混合推送机制一样，VIVO 混合推送也是通过系统通道来下发消息，开发者调用 Push API 发送消息时，其流程为：
+
+- 用户服务器向 LeanCloud 推送服务器发送推送请求；
+- LeanCloud 推送服务器 向 VIVO 服务器 转发请求；
+- VIVO 服务器 通过系统长链接下发推送通知到 手机端；
+- 手机端操作系统将消息展示在通知栏；
+- 用户点击通知栏消息。此时 VIVO 系统会调用应用 AndroidManifest 里定义的响应 `com.vivo.pushclient.action.RECEIVE` action 的接收器（如前面 Manifest 里定义的 `MyPushMessageReceiver` 类）。
+
+应用需要从混合推送 SDK 中的 `AVVIVOPushMessageReceiver` 类派生出自己的实现类，在 `void onNotificationMessageClicked(Context var1, UPSNotificationMessage var2)` 方法中响应点击事件，以动态改变展示内容。
+下面的例子展示了 `MyPushMessageReceiver` 类的简单示例：
+
+```java
+import android.content.Context;
+
+import com.avos.avoscloud.AVVIVOPushMessageReceiver;
+import com.vivo.push.model.UPSNotificationMessage;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
+  private static final Logger logger = Logger.getLogger(MyPushMessageReceiver.class.getSimpleName());
+
+  public void onNotificationMessageClicked(Context var1, UPSNotificationMessage var2) {
+    logger.log(Level.FINER, "received MessageClick Event. " + var2.toString());
+  }
+}
+```
+
+这样就完成了 VIVO 推送的完整流程。
+
 ## 华为推送-老版本（仅中国节点）
 
 ### 环境配置
