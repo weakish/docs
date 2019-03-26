@@ -33,7 +33,7 @@ vendor | 厂商
 
 下面我们逐一看看如何对接华为、小米、魅族等厂商的推送服务，文档的最后也提及了在海外市场如何对接 Firebase Cloud Messaging 的方法。
 
-## 华为推送-HMS 版本（仅中国节点）
+## 华为推送-HMS 版本
 
 ### 环境配置
 
@@ -185,7 +185,7 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 ### 参考 demo
 我们提供了一个 [最新的华为推送 demo](https://github.com/leancloud/mixpush-demos/tree/master/huawei)，可供你在接入过程中参考。
 
-## 小米推送（仅中国节点）
+## 小米推送
 
 ### 环境配置
 
@@ -296,7 +296,7 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用小
 
 当小米通知栏消息被点击后，如果已经设置了 [自定义 Receiver](#自定义_Receiver)，则 SDK 会发送一个 action 为 `com.avos.avoscloud.mi_notification_action` 的 broadcast。如有需要，开发者可以通过订阅此消息获取点击事件，否则 SDK 会默认打开 [启动推送服务](#启动推送服务) 对应设置的 Activity。
 
-## 魅族推送（仅中国节点）
+## 魅族推送
 
 ### 环境配置
 
@@ -470,7 +470,7 @@ public class MyApp extends Application {
 }
 ```
 
-开发者也可以在 `onCreate` 方法中调用 AVMixPushManager 的其他方法，已使用 vivo 推送的全部功能：
+开发者也可以在 `onCreate` 方法中调用 AVMixPushManager 的其他方法，以使用 vivo 推送的全部客户端功能：
 
 ```java
 public class AVMixPushManager {
@@ -527,7 +527,99 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 
 这样就完成了 vivo 推送的完整流程。
 
-## 华为推送-老版本（仅中国节点）
+
+## FCM 推送（仅美国节点可用）
+
+{{ docs.alert("FCM 推送仅支持部署在 LeanCloud 美国节点上的应用使用。") }}
+
+[FCM](https://firebase.google.com/docs/cloud-messaging)（Firebase Cloud Messaging）是 Google/Firebase 提供的一项将推送通知消息发送到手机的服务。接入时后台需要配置连接 FCM 服务器需要的推送 key 和证书，FCM 相关的 token 由 LeanCloud SDK 来申请。
+
+### 环境要求
+
+FCM 客户端需要在运行 Android 4.0 或更高版本且安装了 Google Play 商店应用的设备上运行，或者在运行 Android 4.0 且支持 Google API 的模拟器中运行。具体要求参见 [在 Android 上设置 Firebase 云消息传递客户端应用](https://firebase.google.com/docs/cloud-messaging/android/client)。
+
+### 接入 SDK
+#### 首先导入 avoscloud-fcm 包
+修改 build.gradle 文件，在 dependencies 中添加依赖：
+
+```xml
+dependencies {
+    compile ('cn.leancloud.android:avoscloud-fcm:{{ version.leancloud }}@aar')
+}
+```
+
+#### 下载最新的配置文件并加入项目
+从 Firebase 控制台下载最新的配置文件（google-services.json），加入 app 项目的根目录下。
+
+#### 修改应用清单
+将以下内容添加至您应用的 `AndroidManifest`文件中：
+- LeanCloud PushService 服务。
+```
+<service android:name="com.avos.avoscloud.PushService"/>
+```
+- `AVFirebaseMessagingService` 的服务。如果您希望在后台进行除接收应用通知之外的消息处理，则必须添加此服务。要接收前台应用中的通知、接收数据有效负载以及发送上行消息等，您必须继承此服务。
+```
+<service
+  android:name="com.avos.avoscloud.AVFirebaseMessagingService">
+ <intent-filter>
+  <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+ </intent-filter>
+</service>
+```
+- `AVFirebaseInstanceIdService` 的服务，用于处理注册令牌的创建、轮替和更新。如果要发送至特定设备或者创建设备组，则必须添加此服务。
+```
+<service
+  android:name="com.avos.avoscloud.AVFirebaseInstanceIDService">
+ <intent-filter>
+  <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+ </intent-filter>
+</service>
+```
+- （可选）应用组件中用于设置默认通知图标和颜色的元数据元素。如果传入的消息未明确设置图标和颜色，Android 就会使用这些值。
+```
+<meta-data
+  android:name="com.google.firebase.messaging.default_notification_icon"
+  android:resource="@drawable/ic_launcher_background" />
+<meta-data
+  android:name="com.google.firebase.messaging.default_notification_color"
+  android:resource="@color/colorAccent" />
+```
+- （可选）从 Android 8.0（API 级别 26）和更高版本开始，Android 系统支持并推荐使用[通知渠道](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels)。FCM 提供具有基本设置的默认通知渠道。如果您希望[创建](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#CreateChannel)和使用您自己的默认渠道，请将 `default_notification_channel_id` 设为您的通知渠道对象的 ID（如下所示）；如果传入的消息未明确设置通知渠道，FCM 就会使用此值。
+```
+<meta-data
+  android:name="com.google.firebase.messaging.default_notification_channel_id"
+  android:value="@string/default_notification_channel_id"/>
+```
+- 如果 FCM 对于 Android 应用的功能至关重要，请务必在应用的 `build.gradle` 中设置 `minSdkVersion 8` 或更高版本。这可确保 Android 应用无法安装在不能让其正常运行的环境中。
+
+### 程序初始化
+
+使用 FCM 推送，客户端程序无需做特别的初始化。如果注册成功，`_Installation` 表中应该出现 **vendor** 这个字段为 `fcm` 的新记录。
+
+### 配置控制台（设置 FCM 的 ProjectId 及 私钥文件）
+
+在 [Firebase 控制台](https://console.firebase.google.com/) > **应用** > **云消息传递** > **网络推送证书** 可以获得服务端发送推送请求的私钥文件。将此 文件 及 ProjectId 通过 [LeanCloud 控制台][leancloud-console] > **消息** > **推送** > **设置** > **混合推送**，与 LeanCloud 应用关联。
+
+
+## 取消混合推送注册
+
+对于已经注册了混合推送的用户，如果想取消混合推送的注册而改走 LeanCloud 自有的 WebSocket 的话，可以调用如下函数：
+
+```java
+AVMixPushManager.unRegisterMixPush();
+```
+
+此函数为异步函数，如果取消成功会有「Registration canceled successfully」的日志输出，万一取消注册失败的话会有类似「unRegisterMixPush error」的日志输出。
+
+## 错误排查建议
+
+- 只要注册时有条件不符合，SDK 会在日志中输出导致注册失败的原因，例如「register error, mainifest is incomplete」代表 manifest 未正确填写。如果注册成功，`_Installation` 表中的相关记录应该具有 **vendor** 这个字段并且不为空值。
+- 查看魅族机型的设置，并打开「信任此应用」、「开机自启动」、「自启动管理」和「权限管理」等相关选项。
+- 如果注册一直失败的话，请去论坛发帖，提供相关日志、具体机型以及系统版本号，我们会跟进协助来排查。
+
+## 华为推送-老版本（deprecated）
+
+{{ docs.alert("华为已经不再支持老版本的推送服务，请大家尽快切换到 HMS 推送。") }}
 
 ### 环境配置
 
@@ -622,95 +714,7 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 
 当使用华为推送发透传消息时，如果目标设备上 App 进程被杀，会出现推送消息无法接收的情况。这个是华为 ROM 对透传消息广播的限制导致的，需要引导用户在华为 「权限设置」中对 App 开启自启动权限来避免。
 
-
-## 取消混合推送注册
-
-对于已经注册了混合推送的用户，如果想取消混合推送的注册而改走 LeanCloud 自有的 WebSocket 的话，可以调用如下函数：
-
-```java
-AVMixPushManager.unRegisterMixPush();
-```
-
-此函数为异步函数，如果取消成功会有「Registration canceled successfully」的日志输出，万一取消注册失败的话会有类似「unRegisterMixPush error」的日志输出。
-
-## 错误排查建议
-
-- 只要注册时有条件不符合，SDK 会在日志中输出导致注册失败的原因，例如「register error, mainifest is incomplete」代表 manifest 未正确填写。如果注册成功，`_Installation` 表中的相关记录应该具有 **vendor** 这个字段并且不为空值。
-- 查看魅族机型的设置，并打开「信任此应用」、「开机自启动」、「自启动管理」和「权限管理」等相关选项。
-- 如果注册一直失败的话，请去论坛发帖，提供相关日志、具体机型以及系统版本号，我们会跟进协助来排查。
-
-## FCM 推送（仅美国节点可用）
-{{ docs.alert("FCM 推送仅支持部署在 LeanCloud 美国节点上的应用使用。") }}
-
-[FCM](https://firebase.google.com/docs/cloud-messaging)（Firebase Cloud Messaging）是 Google/Firebase 提供的一项将推送通知消息发送到手机的服务。接入时后台需要配置连接 FCM 服务器需要的推送 key 和证书，FCM 相关的 token 由 LeanCloud SDK 来申请。
-
-### 环境要求
-
-FCM 客户端需要在运行 Android 4.0 或更高版本且安装了 Google Play 商店应用的设备上运行，或者在运行 Android 4.0 且支持 Google API 的模拟器中运行。具体要求参见 [在 Android 上设置 Firebase 云消息传递客户端应用](https://firebase.google.com/docs/cloud-messaging/android/client)。
-
-### 接入 SDK
-#### 首先导入 avoscloud-fcm 包
-修改 build.gradle 文件，在 dependencies 中添加依赖：
-
-```xml
-dependencies {
-    compile ('cn.leancloud.android:avoscloud-fcm:{{ version.leancloud }}@aar')
-}
-```
-
-#### 下载最新的配置文件并加入项目
-从 Firebase 控制台下载最新的配置文件（google-services.json），加入 app 项目的根目录下。
-
-#### 修改应用清单
-将以下内容添加至您应用的 `AndroidManifest`文件中：
-- LeanCloud PushService 服务。
-```
-<service android:name="com.avos.avoscloud.PushService"/>
-```
-- `AVFirebaseMessagingService` 的服务。如果您希望在后台进行除接收应用通知之外的消息处理，则必须添加此服务。要接收前台应用中的通知、接收数据有效负载以及发送上行消息等，您必须继承此服务。
-```
-<service
-  android:name="com.avos.avoscloud.AVFirebaseMessagingService">
- <intent-filter>
-  <action android:name="com.google.firebase.MESSAGING_EVENT"/>
- </intent-filter>
-</service>
-```
-- `AVFirebaseInstanceIdService` 的服务，用于处理注册令牌的创建、轮替和更新。如果要发送至特定设备或者创建设备组，则必须添加此服务。
-```
-<service
-  android:name="com.avos.avoscloud.AVFirebaseInstanceIDService">
- <intent-filter>
-  <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
- </intent-filter>
-</service>
-```
-- （可选）应用组件中用于设置默认通知图标和颜色的元数据元素。如果传入的消息未明确设置图标和颜色，Android 就会使用这些值。
-```
-<meta-data
-  android:name="com.google.firebase.messaging.default_notification_icon"
-  android:resource="@drawable/ic_launcher_background" />
-<meta-data
-  android:name="com.google.firebase.messaging.default_notification_color"
-  android:resource="@color/colorAccent" />
-```
-- （可选）从 Android 8.0（API 级别 26）和更高版本开始，Android 系统支持并推荐使用[通知渠道](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels)。FCM 提供具有基本设置的默认通知渠道。如果您希望[创建](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#CreateChannel)和使用您自己的默认渠道，请将 `default_notification_channel_id` 设为您的通知渠道对象的 ID（如下所示）；如果传入的消息未明确设置通知渠道，FCM 就会使用此值。
-```
-<meta-data
-  android:name="com.google.firebase.messaging.default_notification_channel_id"
-  android:value="@string/default_notification_channel_id"/>
-```
-- 如果 FCM 对于 Android 应用的功能至关重要，请务必在应用的 `build.gradle` 中设置 `minSdkVersion 8` 或更高版本。这可确保 Android 应用无法安装在不能让其正常运行的环境中。
-
-### 程序初始化
-
-使用 FCM 推送，客户端程序无需做特别的初始化。如果注册成功，`_Installation` 表中应该出现 **vendor** 这个字段为 `fcm` 的新记录。
-
-### 配置控制台（设置 FCM 的 ProjectId 及 私钥文件）
-
-在 [Firebase 控制台](https://console.firebase.google.com/) > **应用** > **云消息传递** > **网络推送证书** 可以获得服务端发送推送请求的私钥文件。将此 文件 及 ProjectId 通过 [LeanCloud 控制台][leancloud-console] > **消息** > **推送** > **设置** > **混合推送**，与 LeanCloud 应用关联。
-
-## GCM 推送（已停用）
+## GCM 推送（deprecated）
 
 {{ docs.alert("Google 已停止支持，请升级使用上面的 FCM 推送。") }}
 
