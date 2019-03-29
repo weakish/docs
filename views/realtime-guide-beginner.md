@@ -324,8 +324,8 @@ public Task<AVIMConversation> CreateConversationAsync(string member = null,
 3. `attributes`：对话的自定义属性，可选。上面示例代码没有指定额外属性，开发者如果指定了额外属性的话，以后其他成员可以通过 `AVIMConversation` 的接口获取到这些属性值。附加属性在 `_Conversation` 表中被保存在 `attr` 列中。
 4. `unique`/`isUnique` 或者是 `AVIMConversationOptionUnique`：唯一对话标志位，可选。
    - 如果设置为唯一对话，云端会根据完整的成员列表先进行一次查询，如果已经有正好包含这些成员的对话存在，那么就返回已经存在的对话，否则才创建一个新的对话。
-   - 如果指定 unique 标志为假，那么每次调用 `createConversation` 接口都会创建一个新的对话。
-   - 未指定 unique 时，Java SDK 默认值为真，其他 SDK 默认值为假（未来会改为默认值为真）。  
+   - 如果指定 `unique` 标志为假，那么每次调用 `createConversation` 接口都会创建一个新的对话。
+   - 未指定 `unique` 时，Java SDK 默认值为真，其他 SDK 默认值为假（未来会改为默认值为真）。  
    - 从通用的聊天场景来看，不管是 Tom 发出「创建和 Jerry 单聊对话」的请求，还是 Jerry 发出「创建和 Tom 单聊对话」的请求，或者 Tom 以后再次发出创建和 Jerry 单聊对话的请求，都应该是同一个对话才是合理的，否则可能因为聊天记录的不同导致用户混乱。所以我们 ***建议开发者明确指定 `unique` 标志为 `true`***。
 5. 对话类型的其他标志，可选参数，例如 `transient`/`isTransient` 表示「聊天室」，`tempConv`/`tempConvTTL` 和 `AVIMConversationOptionTemporary` 用来创建「临时对话」等等。什么都不指定就表示创建普通对话，对于这些标志位的含义我们先不管，以后会有说明。
 
