@@ -71,7 +71,7 @@ var tom = await realtime.CreateClientAsync('Tom');
 
 ### 登录即时通讯服务器
 
-创建好了「Tom」这个用户对应的 `IMClient` 实例之后，我们接下来需要让该实例「登录」 LeanCloud 即时通讯服务器。只有登录成功之后客户端才能开始与其他用户聊天，也才能接收到 LeanCloud 云端下发的各种事件通知。
+创建好了「Tom」这个用户对应的 `IMClient` 实例之后，我们接下来需要让该实例「登录」LeanCloud 即时通讯服务器。只有登录成功之后客户端才能开始与其他用户聊天，也才能接收到 LeanCloud 云端下发的各种事件通知。
 
 这里需要说明一点，JavaScript 和 C#（Unity3D）SDK 在创建 `IMClient` 实例的同时会自动进行登录，而 iOS（包括 Objective-C 和 Swift）和 Android（包括通用的 Java）SDK 则需要调用开发者手动执行 `open` 方法进行登录：
 
