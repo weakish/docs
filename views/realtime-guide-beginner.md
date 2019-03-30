@@ -912,7 +912,7 @@ public class CustomConversationEventHandler extends AVIMConversationEventHandler
   @Override
   public void onMemberJoined(AVIMClient client, AVIMConversation conversation,
       List<String> members, String invitedBy) {
-      // 手机屏幕上会显示一小段文字：Tom 加入到 551260efe4b01608686c3e0f ；操作者为：Tom
+      // 手机屏幕上会显示一小段文字：William 加入到 551260efe4b01608686c3e0f ；操作者为：William
       Toast.makeText(AVOSCloud.applicationContext,
         members + " 加入到" + conversation.getConversationId() + "；操作者为： "
             + invitedBy, Toast.LENGTH_SHORT).show();
