@@ -546,7 +546,7 @@ tom.getConversation(‘CONVERSATION_ID’).then(function(conversation) {
 // 首先根据 id 获取 Conversation 实例
 AVIMConversationQuery *query = [self.client conversationQuery];
 [query getConversationById:@"CONVERSATION_ID" callback:^(AVIMConversation *conversation, NSError *error) {
-    // Jerry 邀请 Mary 到对话中
+    // 邀请 Mary 加入对话
     [conversation addMembersWithClientIds:@[@"Mary"] callback:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
             NSLog(@"邀请成功！");
