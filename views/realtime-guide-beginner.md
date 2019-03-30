@@ -668,7 +668,7 @@ tom.createConversation({
 }).catch(console.error);
 ```
 ```objc
-// Jerry 建立了与朋友们的会话
+// Tom 建立了与朋友们的会话
 NSArray *friends = @[@"Jerry", @"Mary"];
 [tom createConversationWithName:@"Tom & Jerry & friends" clientIds:friends
   options:AVIMConversationOptionUnique
