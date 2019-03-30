@@ -630,8 +630,8 @@ jerry.OnMembersJoined += OnMembersJoined;
 
 其中 `payload` 参数包含如下内容：
 
-1. `members`：字符串数组, 被添加的用户 `clientId` 列表
-2. `invitedBy`：字符串, 邀请者 `clientId`
+1. `members`：字符串数组，被添加的用户 `clientId` 列表
+2. `invitedBy`：字符串，邀请者 `clientId`
 
 {{ docs.langSpecEnd('js') }}
 
@@ -639,7 +639,7 @@ jerry.OnMembersJoined += OnMembersJoined;
 
 其中 `AVIMOnInvitedEventArgs` 参数包含如下内容：
 
-1. `InvitedBy`：改操作的发起者
+1. `InvitedBy`：该操作的发起者
 2. `JoinedMembers`：此次加入对话的包含的成员列表
 3. `ConversationId`：被操作的对话
 
@@ -660,7 +660,7 @@ Cloud-->Jerry: 2. 下发通知：Mary 被 Tom 邀请加入了对话
 
 ```js
 tom.createConversation({
-  // 创建的时候直接指定 Jerry 和 Mary 一起加入多人群聊，当然根据需求可以添加更多成员
+  // 创建的时候直接指定 Jerry 和 Mary 一起加入多人群聊，当然根据需求可以添加更多成员
   members: ['Jerry','Mary'],
   // 对话名称
   name: 'Tom & Jerry & friends',
@@ -723,7 +723,7 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
 });
 ```
 ```cs
-var textMessage = new AVIMTextMessage("大家好，欢迎来到我们的群聊对话！");
+var textMessage = new AVIMTextMessage("大家好，欢迎来到我们的群聊对话！");
 await conversation.SendMessageAsync(textMessage);
 ```
 
