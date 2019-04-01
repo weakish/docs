@@ -284,6 +284,13 @@ client.on(Event.PLAYER_ROOM_JOINED, (data) => {
 可以通过 `client.room.playerList` 获取房间内的所有玩家。
 {% endblock %}
 
+{% block player_is_local %}
+```javascript
+const players = client.room.playerList;
+const player = palyers[0];
+const isLocal = player.isLocal;
+```
+{% endblock %}
 
 {% block leave_room %}
 ```javascript

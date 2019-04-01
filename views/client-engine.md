@@ -17,12 +17,18 @@ Client Engine 是 LeanCloud Play 提供的实时对战游戏 Client 托管方案
 * 运维支持更成熟。Client Engine 提供了完善的日志收集、状态监控、负载均衡以及自动容错恢复机制，可以提供更高的稳定性保障。
 * 自由伸缩更有弹性。Client Engine 提供了庞大的资源池，可以快速响应单个游戏产品临时的、突发的扩容需求，无需手动调整实例，自动完成扩容。
 
-## 使用文档
+## 文档及 Demo
 
 详细的使用方式请参考文档：
 
 * [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 介绍了从初始项目开始，如何本地开发调试，以及部署到云端。
-* [Client Engine 开发指南 · Node.js](client-engine-guide-node.html) 对初始项目的逻辑、提供的通用属性方法等进行了详细的说明，最终您可以在初始项目的基础上完成自己的游戏。
+* [你的第一个 Client Engine 小游戏 · Node.js](client-engine-first-game-node.html) 该文档帮助您快速上手，通过 Client Engine 实现一个剪刀石头布的猜拳小游戏。完成本文档教程后，您会对 Client Engine 的基础使用流程有初步的理解。
+* [Client Engine 开发指南 · Node.js](client-engine-guide-node.html) 在初始项目的基础上深入讲解 Client Engine SDK。
+
+
+示例 Demo：
+
+* [回合制 Demo](game-demos.html#回合制 Demo)。
 
 ## 价格及试用
 

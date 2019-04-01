@@ -323,6 +323,13 @@ play.On(Event.PLAYER_ROOM_JOINED, (evtData) => {
 可以通过 `play.Room.PlayerList` 获取房间内的所有玩家。
 {% endblock %}
 
+{% block player_is_local %}
+```cs
+var players = client.room.playerList;
+var player = palyers[0];
+var isLocal = player.isLocal;
+```
+{% endblock %}
 
 
 {% block leave_room %}

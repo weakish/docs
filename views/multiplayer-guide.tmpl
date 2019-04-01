@@ -170,6 +170,13 @@
 {% block player_room_joined %}
 {% endblock %}
 
+### 判断本地玩家
+
+拿到房间内的所有玩家后，可以判断某一个 `Player` 是否是当前本地玩家
+
+{% block player_is_local %}
+{% endblock %}
+
 ### 离开房间
 
 当玩家想要「主动」离开房间时，可以调用下面的接口。

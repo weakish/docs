@@ -136,7 +136,7 @@ var games = gameManager.getAvailableGames();
 
 1. 客户端向实时对战服务请求[有条件的匹配](multiplayer-guide-js.html#随机加入房间)，如果有空余的房间，则会触发加入成功事件。
 2. 如果实时对战服务此时没有空余的房间，客户端会收到「加入房间失败」事件，在这个事件中，发现错误码是 [4301](multiplayer-error-code.html#4301)，则向 Client Engine 请求创建房间。
-3. Client Engine 收到请求后创建房间并返回 roomName 给客户端。这一部分的逻辑可以使用[示例项目]((client-engine-first-game-node.html)中的 `/game` 入口。
+3. Client Engine 收到请求后创建房间并返回 roomName 给客户端。这一部分的逻辑可以使用[示例项目](client-engine-first-game-node.html)中的 `/game` 入口。
 4. 客户端拿到 Client Engine 返回的 roomName 后加入房间，等待其他人匹配加入。
 
 这个流程在客户端中的示例代码如下（**非 Client Engine**）：

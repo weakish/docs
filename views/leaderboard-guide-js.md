@@ -254,6 +254,15 @@ leaderboard.reset({ useMasterKey: true })
 
 {{ docs.note("重置排行榜接口需要使用 masterKey。") }}
 
+### 获取排行榜属性
+通过这个接口可以获得当前排行榜的属性，例如：重置周期、版本号、更新策略等。
+
+```js
+AV.Leaderboard.getLeaderboard('world').then((data) => {
+  console.log(data);
+}).catch(console.error)
+```
+
 ### 修改排行榜属性
 
 排行榜创建后，名字与成绩排序方式不可修改。

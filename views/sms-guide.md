@@ -615,7 +615,7 @@ cloud.request_sms_code("186xxxxxxxx",
 
 - `name`：应用名称
 - `code`：验证码（通知类和营销类不会包含）
-- `ttl`：过期时间（默认为 10 分钟）
+- `ttl`：过期时间（默认为 10 分钟，最长可设置 30 分钟）
 - `sign`：短信签名
 - `template`：模板名称
 
