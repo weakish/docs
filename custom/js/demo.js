@@ -212,6 +212,13 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         mdPath: 'https://github.com/leancloud/lean-cache-demos',
         type: 'node',
         qcloudShow: true
+      },{
+        name: '球球大作战',
+        desc: '使用 LeanCloud 实时对战服务 + Cocos Creator 开发的模拟《球球大作战》demo',
+        downPath: '',
+        mdPath: 'https://github.com/onerain88/BallBattle',
+        type: 'node',
+        qcloudShow: true
       }]
     }
     $scope.$watch('currentSDKType',function(){
