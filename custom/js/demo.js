@@ -27,7 +27,8 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
       'node': 'Node.js',
       'php': 'PHP',
       'weapp': '微信小程序',
-      'reactnative': 'React Native'
+      'reactnative': 'React Native',
+      'typescript': 'TypeScript'
     }
     $scope.demos = {
       'ios': [{
@@ -218,6 +219,14 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         downPath: '',
         mdPath: 'https://github.com/onerain88/BallBattle',
         type: 'node',
+        qcloudShow: true
+      }],
+      'typescript': [{
+        name: '回合制在线对战',
+        desc: '用 LeanCloud 实时对战和 Client Engine 实现的一款回合制对战游戏',
+        downPath: '',
+        mdPath: 'https://github.com/leancloud/multiplayer-turn-based-game-demo',
+        type: 'typescript',
         qcloudShow: true
       }]
     }
