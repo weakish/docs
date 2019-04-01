@@ -126,7 +126,7 @@ reversed | 可选 | 以默认排序（默认按时间降序）相反的方向返
 limit | 可选 | 返回条数限制，可选，默认 100 条，最大 1000 条
 peerid | 可选 | 查看者 id（签名参数）
 nonce | 可选 | 签名随机字符串（签名参数）
-signature_ts | 可选 | 签名时间戳（签名参数），单位是秒
+signature_ts | 可选 | 签名时间戳（签名参数），单位是毫秒
 signature | 可选 | 签名（签名参数）
 max_ts | 可选 | {{ docs.alertInline("废弃") }}，使用 timestamp 表示查询起始时间戳
 
