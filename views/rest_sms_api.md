@@ -434,7 +434,7 @@ curl -X PUT \
 |/1.1/requestCaptcha|GET|获取图形验证码|
 |/1.1/verifyCaptcha|POST|校验图形验证码并返回二次凭证|
 
-要使用图形验证码来防止用户短信接口遭到轰炸，首先在 [控制台 > 设置 > 应用选项 > 短信](/app.html?appid={{appid}}#/permission) 中打开 **启用短信图形验证码**，然后通过上述接口获取图形验证码：
+要使用图形验证码来防止用户短信接口遭到轰炸，首先在 [控制台 > 消息 > 短信 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf) 中打开 **启用短信图形验证码**，然后通过上述接口获取图形验证码：
 
 ```sh
 curl -X GET \

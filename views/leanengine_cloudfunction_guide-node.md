@@ -292,7 +292,7 @@ AV.Cloud.beforeSave('Review', function(request) {
 * 在定义的函数会覆盖你之前用 Git 或命令行部署的项目。
 * 目前只能在线编写云函数和 Hook，不支持托管静态网页、编写动态路由。
 
-在 {% if node=='qcloud' %}**控制台** > **云引擎** > **部署** > **在线编辑**{% else %}[控制台 > 云引擎 > 部署 > 在线编辑](/cloud.html?appid={{appid}}#/deploy/online){% endif %} 标签页，可以：
+在 **[控制台 > 云引擎 > 部署 > 在线编辑](/dashboard/cloud.html?appid={{appid}}#/deploy)** 标签页，可以：
 
 * **创建函数**：指定函数类型，函数名称，函数体的具体代码，注释等信息，然后「保存」即可创建一个云函数。
 * **部署**：选择要部署的环境，点击「部署」即可看到部署过程和结果。

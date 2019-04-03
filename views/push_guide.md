@@ -207,7 +207,7 @@ apns_team_id | 可选 | Apple 不支持在一次推送中向从属于不同 Team
 
 #### master key 校验
 
-当在 {% if node=='qcloud' %}**控制台** > **设置** > **应用选项**{% else %}[控制台 > 设置 > 应用选项](/app.html?appid={{appid}}#/permission){% endif %} 中点选了 **聊天、推送** > **禁止从客户端进行消息推送** 后，推送消息接口必须增加 **master key** 校验才能成功发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。我们建议用户都将此限制启用。
+当在 [控制台 > 消息 > 推送 > 设置 > 推送选项](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 中点选了 **禁止从客户端进行消息推送** 后，推送消息接口必须增加 **master key** 校验才能成功发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。我们建议用户都将此限制启用。
 
 ```sh
 curl -X POST \
