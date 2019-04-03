@@ -10,30 +10,11 @@
 - [java-war-getting-started](https://github.com/leancloud/java-war-getting-started)
 - [dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started)
 
-## Node.js 小 Demo 合集
+## Node.js 云引擎 Demo 仓库
 
-[leanengine-nodejs-demos](https://github.com/leancloud/leanengine-nodejs-demos) 中包含了大量小的功能点：
+[leanengine-nodejs-demos](https://github.com/leancloud/leanengine-nodejs-demos) 是 LeanEngine Node.js 项目的常用功能和示例仓库。包括了推荐的最佳实践和常用的代码片段，每个文件中都有较为详细的注释，适合云引擎的开发者阅读、参考，也可以将代码片段复制到你的项目中使用。
 
-- 一个完整的 Todo List 项目，基于云存储实现数据的增、删、改、查，并使用 ACL 来保护数据。
-- 一个用户系统，基于云存储实现用户的注册、登录、登出。
-- 批量更新或删除对象。
-- 从客户端或运行环境获取元信息。
-- 图片处理（imagemagick）、WebSocket。
-- 更多……
-
-该项目包括了推荐的最佳实践和常用的代码片段，每个文件中都有较为详细的注释，适合云引擎的开发者来阅读和参考，所涉及的代码片段也可以直接复制到项目中使用。
-
-## LeanCache 常见场景示例
-
-<div class="callout callout-danger">抢红包、游戏排名、秒杀购物等场景，强烈建议使用 LeanCache。</div>
-
-LeanCache 的示例位于 [leanengine-nodejs-demos](https://github.com/leancloud/leanengine-nodejs-demos/tree/master/lean-cache) 的 `lean-cache` 文件夹中，包括
-
-* **关联数据缓存**：缓存一些数据量少、查询频繁、不常修改、关联结构复杂的关联数据。
-* **图形验证码**：利用图形验证码保护短信发送接口。
-* **排行榜缓存**：维护一个用户游戏分数的排行榜，并在次日将榜单归档到云存储中。
-* **热点只读数据缓存**：将几乎只读的配置（例如购物网站的商品分类信息）通过 Class Hook 缓存在 Redis。
-* **节点选举和锁**：多个任务共同竞争一个资源（锁），确保同一时间只有一个任务能够在执行（持有这个锁）。
+在这个仓库的 README 中有详细的功能列表和介绍。
 
 ## OAuth 授权验证回调服务器
 
@@ -55,9 +36,3 @@ LeanCache 的示例位于 [leanengine-nodejs-demos](https://github.com/leancloud
 3. 你会收到机器人回复的消息。
 
 <a href="webhosting_weixin.html" class="btn btn-default">阅读</a>
-
-## 即时通讯云引擎签名 Demo
-
-LeanCloud 即时通讯服务采用 [签名方式](realtime-guide-senior.html#安全与签名) 与用户系统对接。当客户端进行与权限、认证相关的操作时，客户端需要首先向用户系统发起请求获得一个签名，再把签名发送到 LeanCloud 即时通讯服务，从而帮助 LeanCloud 确认请求是否有效，其机制与 OAuth 1.0 类似。本 Demo 仅仅演示签名，并不包含实际业务逻辑，在实际应用中你需要根据业务做相应的检查。
-
-<a href="https://github.com/leancloud/realtime-messaging-signature-cloudcode" class="btn btn-default">阅读</a>

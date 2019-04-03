@@ -126,7 +126,7 @@ appid:client_id:convid:nonce:signature_ts
 
 ### 云引擎签名范例
 
-为了帮助开发者理解云端签名的算法，我们开源了一个用「Node.js + 云引擎」实现签名的云端，供开发者学习和使用：[LeanCloud 即时通讯云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode)。
+为了帮助开发者理解云端签名的算法，我们开源了一个用「Node.js + 云引擎」实现签名的云端，供开发者学习和使用：[LeanCloud 即时通讯云引擎签名 Demo](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js)。
 
 ### 客户端如何支持操作签名
 

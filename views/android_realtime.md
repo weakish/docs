@@ -421,7 +421,7 @@ public class DemoGroupMessageReceiver extends AVGroupMessageReceiver{
 
 完成一个简单的权限管理认证系统，你需要以下几个步骤（下面以LeanCloud的云引擎服务作为权限认证服务器为例）：
 
-1. 部署云引擎[签名范例](https://github.com/leancloud/realtime-messaging-signature-cloudcode)代码到LeanCloud的云引擎服务器
+1. 从 [node-js-getting-started](https://github.com/leancloud/node-js-getting-started) 创建一个新的云引擎项目，然后将 [即时通讯签名 Demo](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js) 复制到新项目的 `functions` 目录，然后部署到你的云引擎上。
 2. 在LeanCloud中你的项目对应的网页控制台的`设置`->`应用选项`->`聊天推送`中打开`聊天服务签名认证`
 3. 在 SDK 中间继承 SignatureFactory 抽象类
 

@@ -341,7 +341,7 @@ private void AVIMClient_OnMessageReceived(object sender, AVIMMessageEventArgs e)
 即时通讯系统中往往会存在一定的管理需求，例如游戏中 GM 会禁言某一些不良行为的玩家，或者说不允许某一个玩家加入到某个频道。LeanCloud 即时通讯采用签名鉴权的方式，请开发者务必详细了解 [安全与签名](realtime-guide-senior.html#安全与签名)。而在 SDK 中，开发者需要通过实现 `ISignatureFactory` 接口，并且在初始化的时候指定给 `AVRealtime`：
 
 ### 云引擎签名实例
-为了配合如下代码的运行，首先开发者需要部署 [LeanCloud 即时通讯云引擎签名 Demo](https://github.com/leancloud/realtime-messaging-signature-cloudcode) 到你应用的云引擎中。
+为了配合如下代码的运行，首先开发者需要从 [node-js-getting-started](https://github.com/leancloud/node-js-getting-started) 创建一个新的云引擎项目，然后将 [即时通讯签名 Demo](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js) 复制到新项目的 `functions` 目录，然后部署到你的云引擎上。
 
 ```cs
 public class LeanEngineSignatureFactory : ISignatureFactory
