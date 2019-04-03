@@ -9,7 +9,7 @@
 另外，离线分析仅支持 `SELECT` 语句，不支持 `UPDATE`、`INSERT`、`DELETE` 等语句，所以它不会更新或修改数据源，开发者可以放心使用。
 
 {% call docs.noteWrap() -%}
-离线数据分析功能（ {% if node=='qcloud' %}**控制台** > **存储** > **离线数据分析**{% else %}[控制台 > 存储 > 离线数据分析](/dataquery.html?appid={{appid}}#/){% endif %}）**仅向商用版和企业版应用开放**，开发版应用无法使用；如果商用版和企业版应用无法正常使用该功能，请通过 [工单系统](https://leanticket.cn/t/leancloud) 或 [用户论坛](https://forum.leancloud.cn) 联系我们。
+离线数据分析功能（ {% if node=='qcloud' %}**控制台** > **存储** > **离线数据分析**{% else %}[控制台 > 存储 > 离线数据分析](/dashboard/dataquery.html?appid={{appid}}#/){% endif %}）**仅向商用版和企业版应用开放**，开发版应用无法使用；如果商用版和企业版应用无法正常使用该功能，请通过 [工单系统](https://leanticket.cn/t/leancloud) 或 [用户论坛](https://forum.leancloud.cn) 联系我们。
 {%- endcall %}
 
 ## 限制
@@ -17,7 +17,7 @@
 - `_Conversation` 表的 **m** 和 **mu** 字段往往包含大量数组元素，容易引起计算节点故障，因此我们限制了对这些字段的查询。
 - `_User` 表的 **sessionToken**、**password**、**salt** 字段，以及所有表的 **ACL** 字段，因为安全原因被限制查询。
 - 不支持对 **Relation 类型**字段的查询。<br/>由于内部机制，离线分析无法访问 AVRelation 所使用的内部关联表，所以就无法从该字段所在的表中获取相关联的数据。开发者可考虑使用自定义的 [关联表](storage_overview.html#数据关联) 并配合 [join](#多表_Join) 语句来解决这个问题。
-- 由于资源管理上的限制，每次导出的数据条数不能超过 **100,000**（十万条）。<br/>要导出更多的结果，可以分多次查询并多次导出。如果导出全表的数据，请在该应用的 {% if node=='qcloud' %}**设置** > **数据导出**{% else %}[设置 > 数据导出](/app.html?appid={{appid}}#/export){% endif %} 中操作。
+- 由于资源管理上的限制，每次导出的数据条数不能超过 **100,000**（十万条）。<br/>要导出更多的结果，可以分多次查询并多次导出。如果导出全表的数据，请在该应用的 [设置 > 数据导出](/dashboard/app.html?appid={{appid}}#/export) 中操作。
 - 离线分析结果导入到另一张表的条目不能超过 200 条。
 - 离线分析在同一时间最多支持 3 个不同的 job。
 

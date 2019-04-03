@@ -20,7 +20,7 @@
 
 ## 准备工作
 ### 创建应用
-- 如果你还没有创建过 LeanCloud 应用，请登录 LeanCloud 控制台 [创建一个新应用](/applist.html#/newapp)。
+- 如果你还没有创建过 LeanCloud 应用，请登录 LeanCloud 控制台 [创建一个新应用](/dashboard/applist.html#/newapp)。
 - 如果你还没有小程序帐号，请访问 [微信公众平台](https://mp.weixin.qq.com) 注册一个小程序帐号。如果你不需要进行真机调试可以跳过这一步。
 - 下载 [小程序开发工具](https://mp.weixin.qq.com/debug/wxadoc/dev/devtools/download.html)，按照 [小程序开发教程](https://mp.weixin.qq.com/debug/wxadoc/dev/) 创建一个项目。
 

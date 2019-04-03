@@ -89,7 +89,7 @@ AVObject 中的 **键**，必须是由字母、数字或下划线组成的字符
 
 ### 数据管理
 
-{% if node == 'qcloud' %}**LeanCloud 控制台** > **存储** > **数据**{% else %}[LeanCloud 控制台 > 存储 > 数据](/data.html?appid={{appid}}){% endif %} 是一个允许在任何应用里更新或者创建对象的 Web UI 管理平台。在这里你可以看到保存在 Class 里的每个对象的原生 JSON 值。
+[LeanCloud 控制台 > 存储 > 数据](/dashboard/data.html?appid={{appid}}) 是一个允许在任何应用里更新或者创建对象的 Web UI 管理平台。在这里你可以看到保存在 Class 里的每个对象的原生 JSON 值。
 
 当使用这个平台的时候，请牢记：
 

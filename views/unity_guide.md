@@ -101,11 +101,7 @@ await equipBag.SaveAsync();
 Debug.Log(equipBag.ObjectId);
 ```
 
-{% if node=='qcloud' %}
-运行以上代码后，要想确认保存动作是否已经生效，可以到 LeanCloud 应用管理平台的 `数据管理`  页面来查看数据的存储情况。
-{% else %}
-运行以上代码后，要想确认保存动作是否已经生效，可以到 LeanCloud 应用管理平台的 [数据管理](/data.html?appid={{appid}})  页面来查看数据的存储情况。
-{% endif %}
+运行以上代码后，要想确认保存动作是否已经生效，可以到 LeanCloud 应用管理平台的 [数据管理](/dashboard/data.html?appid={{appid}})  页面来查看数据的存储情况。
 
 除了 scale、name 之外，其他字段都是数据表的内置属性。
 
@@ -519,7 +515,7 @@ equipments.ForEach((equip) =>
 
 **删除文件就意味着，执行之后在数据库中立刻删除记录，并且原始文件也会从存储仓库中删除（所有涉及到物理级别删除的操作请谨慎使用）**
 
-<div class="callout callout-danger">默认情况下，文件的删除权限是关闭的，需要进入 {% if node == 'qcloud' %}**控制台** > **存储** > `_File`{% else %}[控制台 > 存储 > **`_File`**](/data.html?appid={{appid}}#/_File){% endif %}，选择菜单 **其他** > **权限设置** > **delete** 来开启。</div>
+<div class="callout callout-danger">默认情况下，文件的删除权限是关闭的，需要进入 {% if node == 'qcloud' %}**控制台** > **存储** > `_File`{% else %}[控制台 > 存储 > **`_File`**](/dashboard/data.html?appid={{appid}}#/_File){% endif %}，选择菜单 **其他** > **权限设置** > **delete** 来开启。</div>
 
 ```cs
 AVFile file = await AVFile.GetFileWithObjectIdAsync("538ed669e4b0e335f6102809");

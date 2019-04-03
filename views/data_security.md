@@ -42,7 +42,7 @@ LeanCloud 允许你对两种目标设置 ACL：
 {% if node=='qcloud' %}
 另外，针对已经存在的 Class 你可以更新整个 Class 权限。进入 `控制台 > 存储 > 数据`，选择一个 Class，再点击右侧菜单中的 **其他** > **权限设置**。
 {% else %}
-另外，针对已经存在的 Class 你可以更新整个 Class 权限。进入 [控制台 > 存储 > 数据](/data.html?appid={{appid}}#/)，选择一个 Class，再点击右侧菜单中的 **其他** > **权限设置**。
+另外，针对已经存在的 Class 你可以更新整个 Class 权限。进入 [控制台 > 存储 > 数据](/dashboard/data.html?appid={{appid}}#/)，选择一个 Class，再点击右侧菜单中的 **其他** > **权限设置**。
 {% endif %}
 
 ![image](images/cla_permission.png)
@@ -126,7 +126,7 @@ https:
 {% if node=='qcloud' %}
 如果在前端使用 JavaScript SDK，当你打算正式发布出去的时候，请务必配置 **Web 安全域名**，方法是进入 `控制台 > 设置 > 安全中心 > **Web 安全域名**`。
 {% else %}
-如果在前端使用 JavaScript SDK，当你打算正式发布出去的时候，请务必配置 **Web 安全域名**，方法是进入 [控制台 > 设置 > 安全中心 > **Web 安全域名**](/app.html?appid={{appid}}#/security)。
+如果在前端使用 JavaScript SDK，当你打算正式发布出去的时候，请务必配置 **Web 安全域名**，方法是进入 [控制台 > 设置 > 安全中心 > **Web 安全域名**](/dashboard/app.html?appid={{appid}}#/security)。
 {% endif %}
 
 
@@ -137,7 +137,7 @@ https:
 {% if node=='qcloud' %}
 安全中心，是我们为每个应用提供的设置基本安全的入口，位置在 `控制台 / 设置 / 安全中心`。除了之前讲过的**Web 安全域名**外，这里还可以设置或查看：
 {% else %}
-安全中心，是我们为每个应用提供的设置基本安全的入口，位置在 [控制台 / 设置 / 安全中心](/app.html?appid={{appid}}#/security)。除了之前讲过的**Web 安全域名**外，这里还可以设置或查看：
+安全中心，是我们为每个应用提供的设置基本安全的入口，位置在 [控制台 / 设置 / 安全中心](/dashboard/app.html?appid={{appid}}#/security)。除了之前讲过的**Web 安全域名**外，这里还可以设置或查看：
 {% endif %}
 
 ### 服务开关
@@ -168,7 +168,7 @@ https:
 - **禁止从客户端进行消息推送**<br/>
   是否禁止从客户端推送消息。禁止后只能通过 [控制台 > 消息 > 推送 > 在线发送](/dashboard/messaging.html?appid={{appid}}#/message/push/create) 或带着 **master key** 调用 [推送消息 API ](push_guide.html#推送消息) 来推送消息。
 
-如果想彻底关闭一个应用的数据存储、短信发送、消息推送和聊天（即时通讯）功能，请进入 [控制台 > 设置 > 安全中心](/app.html?appid={{appid}}#/security) 来进行相应设置。
+如果想彻底关闭一个应用的数据存储、短信发送、消息推送和聊天（即时通讯）功能，请进入 [控制台 > 设置 > 安全中心](/dashboard/app.html?appid={{appid}}#/security) 来进行相应设置。
 
 ### 自动备份
 

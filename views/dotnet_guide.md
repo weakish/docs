@@ -81,7 +81,7 @@ await saveTask;
 {% if node=='qcloud' %}
 在运行此代码后，您应当了解保存动作是否已经生效 。为了确保数据被保存，您可以在 LeanCloud 上的`数据管理`中查看您应用的数据。
 {% else %}
-在运行此代码后，您应当了解保存动作是否已经生效 。为了确保数据被保存，您可以在 LeanCloud 上的[数据管理](/data.html?appid={{appid}})中查看您应用的数据。
+在运行此代码后，您应当了解保存动作是否已经生效 。为了确保数据被保存，您可以在 LeanCloud 上的[数据管理](/dashboard/data.html?appid={{appid}})中查看您应用的数据。
 {% endif %}
 
 此处有两件事情需要特别注明。
@@ -494,17 +494,10 @@ catch(AVException avException)
 
 ### 邮箱认证
 
-在移动互联时代，任何一个用户信息都是必须在双方统一认证之后才会被视为一种安全机制，比如邮箱的认证，同样，在`AVUser`这个特殊的 `AVObject` 拥有一个特殊字段 `email`，可以在 {% if node=='qcloud' %}**数据管理**{% else %}[数据管理](/data.html?appid={{appid}}){% endif %} 的 `_User` 表看到这个默认的字段，这就是在注册是提供的邮箱，当在 {% if node=='qcloud' %}**应用设置**{% else %}[应用设置](/app.html?appid={{appid}}#/permission){% endif %} 中勾选了 **启用注册用户邮箱验证**。
-
-{% if node=='qcloud' %}
-这样在注册用户的时候，LeanCloud默认就会发送一封邮件，进行验证，邮件的模板也可以在`邮件模板`中进行设置。
-{% else %}
-这样在注册用户的时候，LeanCloud默认就会发送一封邮件，进行验证，邮件的模板也可以在[邮件模板](/app.html?appid={{appid}}#/email)中进行设置。
-{% endif %}
+在移动互联时代，任何一个用户信息都是必须在双方统一认证之后才会被视为一种安全机制，比如邮箱的认证，同样，在`AVUser`这个特殊的 `AVObject` 拥有一个特殊字段 `email`，可以在 **[数据管理](/dashboard/data.html?appid={{appid}})** 的 `_User` 表看到这个默认的字段，这就是在注册时提供的邮箱。在 **[控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)** 中勾选 **用户注册邮箱或者更新邮箱时，发送验证邮件**，这样在注册用户的时候，LeanCloud 默认就会发送一封邮件，进行验证，邮件的模板也可以在[邮件模板](/dashboard/app.html?appid={{appid}}#/email)中进行设置。
 
 注意，验证过的用户，TA 的 `emailVerified` 将会置成 `true`，反之 `false`，但是如果<u>未启用</u>注册用户邮箱验证，这个字段会为空。
 
-{% if node != 'qcloud' and node != 'us' %}
 ### 手机号认证
 相对于邮箱认证，手机号认证的过程稍微需要多一点代码，如果当您的应用在注册的时候没有开启短信验证，伴随业务发展，发现需要验证用户的手机，LeanCloud 正好提供了这一接口。
 
@@ -588,9 +581,6 @@ await AVCloud.RequestVoiceCode ("18688888888");
 AVCloud.VerifySmsCode ("18688888888","012345")
 ```
 再次验证用户输入的验证码是否正确。
-
-目前语音短信验证码仅支持大陆的手机号（移动、电信、联通全面覆盖）。
-{% endif %}
 
 ### 当前用户
 诚如所有移动应用一样当前用户一直是被在客户端视作持久化存储处理，比如手机QQ等流行的App，LeanCloud必然也会如此为开发者解决持久化存储当前用户，只要调用了`登录`相关的接口，当前用户就会被持久化存储在客户端。
@@ -691,7 +681,7 @@ await AVUser.LogInAsync("demoUser", "asvscloud").ContinueWith(t =>
 {% if node=='qcloud' %}
 基于以上这一点，LeanCloud在开发者创建一个应用的时候，默认地在服务端为该应用添加了一张`_Role`的表，开发者可以在`数据管理`中看到这张表。
 {% else %}
-基于以上这一点，LeanCloud在开发者创建一个应用的时候，默认地在服务端为该应用添加了一张`_Role`的表，开发者可以在[数据管理](/data.html?appid={{appid}})中看到这张表。
+基于以上这一点，LeanCloud在开发者创建一个应用的时候，默认地在服务端为该应用添加了一张`_Role`的表，开发者可以在[数据管理](/dashboard/data.html?appid={{appid}})中看到这张表。
 {% endif %}
 
 ### 默认访问权限

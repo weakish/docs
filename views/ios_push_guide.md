@@ -91,7 +91,7 @@
 }
 ```
 
-在 iOS 设备中，Installation 的类是 AVInstallation，并且是 AVObject 的子类，使用同样的 API 存储和查询。如果要访问当前应用的 Installation 对象，可以通过 `[AVInstallation currentInstallation]` 方法。当你第一次保存 AVInstallation 的时候，它会插入 `_Installation` 表，你可以在 {% if node=='qcloud' %}**控制台 > 存储 > 数据 > `_Installation`**{% else %}[控制台 > 存储 > 数据 > `_Installation`](/data.html?appid={{appid}}#/_Installation){% endif %} 查看和查询。当 deviceToken 一被保存，你就可以向这台设备推送消息了。
+在 iOS 设备中，Installation 的类是 AVInstallation，并且是 AVObject 的子类，使用同样的 API 存储和查询。如果要访问当前应用的 Installation 对象，可以通过 `[AVInstallation currentInstallation]` 方法。当你第一次保存 AVInstallation 的时候，它会插入 `_Installation` 表，你可以在 {% if node=='qcloud' %}**控制台 > 存储 > 数据 > `_Installation`**{% else %}[控制台 > 存储 > 数据 > `_Installation`](/dashboard/data.html?appid={{appid}}#/_Installation){% endif %} 查看和查询。当 deviceToken 一被保存，你就可以向这台设备推送消息了。
 
 
 ```objc
@@ -149,7 +149,7 @@ AVInstallation *currentInstallation = [AVInstallation currentInstallation];
 [currentInstallation saveInBackground];
 ```
 
-订阅后要记得保存，即可在 {% if node=='qcloud' %}**控制台 > 存储 > 数据 > `_Installation`**{% else %}[控制台 > 存储 > 数据 > `_Installation`](/data.html?appid={{appid}}#/_Installation){% endif %} 中看到该 installation 的 channels 字段多了一个「Giants」。
+订阅后要记得保存，即可在 **[控制台 > 存储 > 数据 > `_Installation`](/dashboard/data.html?appid={{appid}}#/_Installation)** 中看到该 installation 的 channels 字段多了一个「Giants」。
 
 退订：
 
@@ -199,7 +199,7 @@ AVPush *push = [[AVPush alloc] init];
 
 ```
 
-<div class="callout callout-info">为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，并在 {% if node=='qcloud' %}**控制台 > 消息 > 推送记录**{% else %}[控制台 > 消息 > 推送记录](/messaging.html?appid={{appid}}#/message/push/list){% endif %} 页面中体现。因此，在使用开发证书推送时，请合理设置推送条件。</div>
+<div class="callout callout-info">为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，并在 **[控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list)** 页面中体现。因此，在使用开发证书推送时，请合理设置推送条件。</div>
 
 
 ## 高级定向发送
@@ -511,104 +511,6 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
  ```
 
 你可以阅读 [Apple 本地化和推送的文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40008194-CH1-SW1) 来更多地了解推送通知。
-
-## 跟踪推送和应用的打开情况
-
-通过 `AVAnalytics` 你可以跟踪通知和应用的打开情况。添加下列代码到上面例子中的 `application:didFinishLaunchingWithOptions:` 方法来收集打开信息：
-
-```objc
-if (application.applicationState != UIApplicationStateBackground) {
-  // Track an app open here if we launch with a push, unless
-  // "content_available" was used to trigger a background push (introduced
-  // in iOS 7). In that case, we skip tracking here to avoid double
-  // counting the app-open.
-  BOOL preBackgroundPush = ![application respondsToSelector:@selector(backgroundRefreshStatus)];
-  BOOL oldPushHandlerOnly = ![self respondsToSelector:@selector(application:didReceiveRemoteNotification:fetchCompletionHandler:)];
-  BOOL noPushPayload = ![launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
-  if (preBackgroundPush || oldPushHandlerOnly || noPushPayload) {
-    [AVAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
-  }
-}
-```
-
-
-传递 `nil` 或者空白的参数给 `trackAppOpenedWithLaunchOptions:` 方法只是统计一次标准的应用打开事件（比如不是通过通知打开的应用）。
-
-你可以在 {% if node=='qcloud' %}**控制台 > 分析 > 行为分析 > 应用使用**{% else %}[控制台 > 分析 > 行为分析 > 应用使用](/stat.html?appid={{appid}}#/stat/appuse){% endif %} 里看到通知和应用打开的情况。
-
-请注意，如果你的应用正在运行或者在后台，`application:didReceiveRemoteNotification:`方法将会处理收到的推送通知。
-
-<div class="callout callout-info">如果你的应用处于运行状态，iOS 系统将不会在系统的通知中心显示推送消息，你可以使用 `UILocalNotification` 展示一个通知给用户。</div>
-
-如果应用在后台，并且用户点击了通知，那么应用将被带到前台可视，为了跟踪这种通过通知打开应用的情况，你需要在跟踪代码里多作一个检查：
-
-```objc
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-  if (application.applicationState == UIApplicationStateActive) {
-    // 此处可以写上应用激活状态下接收到通知的处理代码，如无需处理可忽略
-  } else {
-    // The application was just brought from the background to the foreground,
-    // so we consider the app as having been "opened by a push notification."
-    [AVAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];
-  }
-}
-```
-
-如果使用 iOS 7 推送的新特性（包括新的 content-available 功能），你需要实现 iOS 7 新加的方法：
-
-```objc
-- (void)application:(UIApplication *)application
-        didReceiveRemoteNotification:(NSDictionary *)userInfo
-        fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  if (application.applicationState == UIApplicationStateActive) {
-    // 此处可以写上应用激活状态下接收到通知的处理代码，如无需处理可忽略
-  } else {
-    [AVAnalytics trackAppOpenedWithRemoteNotificationPayload:userInfo];
-  }
-}
-```
-
-### 跟踪本地通知
-
-为了统计跟踪本地通知消息，需要注意 iOS10 以前以下两种方法都会调用到：
-
-- `application:didFinishLaunchingWithOptions:`
-- `application:didReceiveLocalNotification:`
-
-如果你实现了 `application:didReceiveLocalNotification:` 这个方法，要注意避免重复统计。
-
-iOS10 以上会调用下面的两个方法：
-
-```objc
- //在前台收到本地通知, 执行的方法
--[UNUserNotificationCenterDelegate willPresentNotification:withCompletionHandler:] 
- //在后台和启动之前收到本地推送, 执行的方法
--[UNUserNotificationCenterDelegate didReceiveNotificationResponse:withCompletionHandler:]") 
-```
-
-### 清除 Badge
-
-清除 Badge 数字的最好时机是打开应用的时候。设置当前 installation 的 badge 属性并保存到服务器：
-
-```objc
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    int num=application.applicationIconBadgeNumber;
-    if(num!=0){
-        AVInstallation *currentInstallation = [AVInstallation currentInstallation];
-        [currentInstallation setBadge:0];
-        [currentInstallation saveEventually];
-        application.applicationIconBadgeNumber=0;
-    }
-}
-```
-
-清除 Badge 数字最相关的三个方法是：
-
-- `applicationDidBecomeActive:`
-- `application:didFinishLaunchingWithOptions:`
-- `application:didReceiveRemoteNotification:`
-
-请阅读 [UIApplicationDelegate 文档](http://developer.apple.com/library/ios/#DOCUMENTATION/UIKit/Reference/UIApplicationDelegate_Protocol/Reference/Reference.html)。
 
 ## 离线消息重复推送
 

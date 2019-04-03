@@ -6,11 +6,11 @@
 
 你可以基于 Push SDK 做很多有趣的 Web 应用。比如，年会上面做个简单的弹幕应用，一些客户端发，弹幕墙接收。
 
-当然，你可以做一个比较简单的消息通知功能。推送消息的方式也是很灵活的，可以在客户端通过对应 SDK 的接口发送，也可以在 [控制台 >（选择应用）> 消息 > 推送 > 在线发送](/messaging.html?appid={{appid}}#/message/push/create) 中手动发送推送消息到各个客户端。
+当然，你可以做一个比较简单的消息通知功能。推送消息的方式也是很灵活的，可以在客户端通过对应 SDK 的接口发送，也可以在 [控制台 >（选择应用）> 消息 > 推送 > 在线发送](/dashboard/messaging.html?appid={{appid}}#/message/push/create) 中手动发送推送消息到各个客户端。
 
 <div class="callout callout-info">如果前端使用的是 JavaScript SDK，请务必配置 <strong>Web 安全域名</strong>，来防止其他人盗用你的服务器资源。
 
-配置方式：进入 [控制台 >（选择应用）> 设置 > 安全中心](/app.html?appid={{appid}}#/security)，找到 **Web 安全域名**。</div>
+配置方式：进入 [控制台 >（选择应用）> 设置 > 安全中心](/dashboard/app.html?appid={{appid}}#/security)，找到 **Web 安全域名**。</div>
 
 详细内容请查看 [数据和安全 &middot; Web 安全域名](data_security.html#Web_应用安全设置)。
 

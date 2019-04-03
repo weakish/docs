@@ -30,7 +30,7 @@
 
 然后检查 Hook 函数是否被执行过：
 
-可以先在 Hook 函数的入口打印一行日志，然后进行操作，再到 [云引擎日志](/cloud.html?appid={{appid}}#/log) 中检查该行日志是否被打印出来，如果没有看到日志原因可能包括：
+可以先在 Hook 函数的入口打印一行日志，然后进行操作，再到 [云引擎日志](/dashboard/cloud.html?appid={{appid}}#/log) 中检查该行日志是否被打印出来，如果没有看到日志原因可能包括：
 
 * 代码没有被部署到正确的应用
 * 代码没有被部署到生产环境（或没有部署成功）
@@ -156,7 +156,7 @@ lean -p 3002
 
 ## 如何进行域名备案和域名绑定？
 
-只有网站类的才需要备案，并且在主域名已备案的情况下，二级子域名不需要备案。如果主站需要托管在我们这边，且还没有备案过，请进入 **应用控制台 > 账号设置 >** [域名备案](/settings.html#/setting/domainrecord) 和 [域名绑定](/settings.html#/setting/domainbind)，按照步骤提示操作即可。
+只有网站类的才需要备案，并且在主域名已备案的情况下，二级子域名不需要备案。如果主站需要托管在我们这边，且还没有备案过，请进入 **应用控制台 > 账号设置 >** [域名备案](/dashboard/settings.html#/setting/domainrecord) 和 [域名绑定](/dashboard/settings.html#/setting/domainbind)，按照步骤提示操作即可。
 
 ## 调用云引擎方法如何收费？
 
@@ -274,9 +274,9 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 ## 如何下载云引擎的应用日志和访问日志
 
-云引擎的应用日志（程序的标准输出和标准错误输出）可以在 [应用控制台 > 云引擎 > 应用日志](/cloud.html?appid={{appid}}#/log) 查看；并且可以使用 [命令行工具](leanengine_cli.html#查看日志) 导出最长 7 天的日志。
+云引擎的应用日志（程序的标准输出和标准错误输出）可以在 [应用控制台 > 云引擎 > 应用日志](/dashboard/cloud.html?appid={{appid}}#/log) 查看；并且可以使用 [命令行工具](leanengine_cli.html#查看日志) 导出最长 7 天的日志。
 
-云引擎的访问日志（Access Log）可在 [应用控制台 > 云引擎 > 访问日志](/cloud.html?appid={{appid}}#/accesslog) 中导出，通过控制台下载经过打包的日志。
+云引擎的访问日志（Access Log）可在 [应用控制台 > 云引擎 > 访问日志](/dashboard/cloud.html?appid={{appid}}#/accesslog) 中导出，通过控制台下载经过打包的日志。
 
 ## 如何定制 Java 的堆内存大小？
 
