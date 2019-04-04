@@ -36,6 +36,12 @@ const {
 } = Play;
 ```
 
+注意：Cocos Creator 在构建「微信小游戏」项目时，无法将 `Play` 正常加载到全局变量中，因此需要先导入 `Play` 模块
+
+```javascript
+const Play = require('./play');
+```
+
 接着我们需要实例化一个实时对战 SDK 的客户端对象。
 
 ```javascript
