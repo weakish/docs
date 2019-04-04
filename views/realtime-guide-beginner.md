@@ -1455,7 +1455,7 @@ await conversation.SendMessageAsync(locationMessage);
 
 {{ docs.langSpecStart('js') }}
 
-不管消息类型如何，JavaScript SDK 都是是通过 `IMClient` 上的 `Event.MESSAGE` 事件回调来通知新消息的，应用层只需要在在一个地方，统一对不同类型的消息使用不同方式来处理即可。
+不管消息类型如何，JavaScript SDK 都是是通过 `IMClient` 上的 `Event.MESSAGE` 事件回调来通知新消息的，应用层只需要在一个地方，统一对不同类型的消息使用不同方式来处理即可。
 
 {{ docs.langSpecEnd('js') }}
 
