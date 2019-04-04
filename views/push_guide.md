@@ -750,7 +750,7 @@ curl -X DELETE \
 ## 限制
 
 * 为避免给大量早已不再活跃的用户发消息，我们限制只能给 `_Installation` 表内 `updatedAt` 时间在最近三个月以内的设备推送消息。我们会在根据推送查询条件查出目标设备后自动将不符合条件的设备从目标设备中剔除，并且被剔除的设备不会计入 [控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 内的目标设备数中。
-* 为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，在 [控制台 > 消息 > 推送记录](/dashboard/dashboard/messaging.html?appid={{appid}}#/message/push/list) 中的 **状态** 一栏显示「错误」，提示信息为「dev profile disabled for massive push」。因此，在使用开发证书推送时，请合理设置推送条件。
+* 为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，在 [控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 中的 **状态** 一栏显示「错误」，提示信息为「dev profile disabled for massive push」。因此，在使用开发证书推送时，请合理设置推送条件。
 * Apple 对推送消息大小有限制，对 iOS 推送请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html)。
 * 如果使用了 Android 的混合推送，请注意华为推送对消息大小有限制。为保证推送消息能被正常发送，我们要求 data + channels 参数须小于 4096 字节，超过限制会导致推送无法正常发送，请尽量减小发送数据大小。
 * 每个开发版应用处在待发队列中的定时推送数量最多 10 条，每个商用版应用处在待发队列中的定时推送数量最多 1000 条。

@@ -125,7 +125,6 @@ AVObject *testObject = [AVObject objectWithClassName:@"TestObject"];
 ```
 
 运行 App，一个类名为 `TestObject` 的新对象会被发送到 LeanCloud 并保存下来。当做完这一切，访问 [控制台 > 存储 > 数据](/dashboard/data.html?appid={{appid}}#/TestObject) 可以看到上面创建的 TestObject 的相关数据。
-{% endif %}
 
 {{ include.debuglog('objc') }}
 
