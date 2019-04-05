@@ -1850,7 +1850,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 | `MuteMemberIds`         | `mu`               | 静音该对话的成员                                 |
 | `Creator`               | `c`                | 对话创建者                                       |
 | `IsTransient`           | `tr`               | 是否为聊天室（暂态对话）                         |
-| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话（暂态对话）             |
+| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话                         |
 | `IsSystem`              | `sys`              | 是否为系统对话                                   |
 | `LastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
 | `LastMessage`           | N/A                | 最后一条消息，可能会空                           |
