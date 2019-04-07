@@ -2135,7 +2135,7 @@ var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
 var query = client.getQuery();
 query.equalTo('attr.type','private');
 query.find().then(function(conversations) {
-  // convs 就是想要的结果
+  // conversations 就是想要的结果
 }).catch(console.error.bind(console));
 ```
 ```objc
