@@ -2179,7 +2179,7 @@ await query.FindAsync();
 - 支持通过 `first` 获取第一个结果
 - 支持通过 `skip` 和 `limit` 对结果进行分页
 
-与 `equalTo` 类似，针对 `number` 和 `date` 类型的属性还可以使用大于、大于等于、小于、小于等于等，详见下表：
+与 `equalTo` 类似，针对 `Number` 和 `Date` 类型的属性还可以使用大于、大于等于、小于、小于等于等，详见下表：
 
 {{ docs.langSpecStart('js') }}
 
