@@ -27,7 +27,7 @@ JOIN     | Embedded，Reference  | Embedded Object, Pointer{#, Relation #}
 
 **PERSON 表**
 
-Pers_ID | Surname | First_Name | City 
+Person_ID | Surname | First_Name | City 
 ------- | ------- | ---------- | ---- 
 0       |   柳      | 红           |  伦敦    
 1       |   杨      | 真           | 北京     
@@ -35,7 +35,7 @@ Pers_ID | Surname | First_Name | City
 
 **CAR 表**
 
-Car_ID | Model | Year | Value | Pers_ID 
+Car_ID | Model | Year | Value | Person_ID 
 ------ | ----- | ---- | ----- | ------- 
 101    |  大众迈腾     | 2015     | 180000      | 0        
 102    |  丰田汉兰达     | 2016     | 240000      |      0   
@@ -43,7 +43,7 @@ Car_ID | Model | Year | Value | Pers_ID
 104    |  现代索纳塔     | 2013     | 150000      |      2   
   
 
-RDBMS 中通过 Pers_ID 域来连接 PERSON 表和 CAR 表，以此支持应用中显示每辆车的拥有者信息。使用文档模型，通过内嵌子对象和数组可以将相关数据提前合并到一个单一的数据结构中，传统的跨表的行和列现在都被存储到了一个文档内，完全省略掉了 join 操作。
+RDBMS 中通过 Person_ID 域来连接 PERSON 表和 CAR 表，以此支持应用中显示每辆车的拥有者信息。使用文档模型，通过内嵌子对象和数组可以将相关数据提前合并到一个单一的数据结构中，传统的跨表的行和列现在都被存储到了一个文档内，完全省略掉了 join 操作。
 
 换成 LeanCloud 来对同样的数据建模，则允许我们创建这样的 schema：一个单一的 Person 对象，里面通过一个子对象数组来保存该用户所拥有的每一部 Car，例如：
 
