@@ -54,6 +54,11 @@ libs/ | 包含 HMS 所有功能的 jar 包。通用包不再按照业务功能�
 res/ | HMS SDK 需要使用的资源目录，包含多国语言。应用如果不需要集成多种语言的，可以适当裁剪。但是必须保留默认语言和简体中文。 | 请直接将 res 目录拷贝到应用工程根目录
 assets/ | HMS SDK 请求华为服务器需要使用的证书文件 | 请直接将 assets 目录拷贝到应用工程根目录
 
+HMS Agent SDK 包含帐号、支付、消息、推送、游戏等功能，如果只打算使用其中部分功能，可以使用 HMS Agent SDK 压缩包中自带的 `GetHMSAgent` 脚本删除不需要的文件。
+这样可以既可以减少应用大小，也可以避免要求不必要的权限。
+详见 [华为开发者文档 > 集成 Agent](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweisns_agent.html?page=hmssdk_huaweisns_devprepare_agent#4%20%E9%9B%86%E6%88%90Agent)。
+注意，华为的文档里只提到了 `GetHMSAgent_cn.bat`，但实际上HMS Agent SDK 压缩包中还提供了 `GetHMSAgent_cn.sh`，如果您的开发环境是 macOS 或 Linux，可以用这个脚本。
+
 
 > 注意：华为 HMS 推送不能与老的 HwPush 共存，如果切换到 HMS 推送，则需要将原来的 HwPush SDK 全部删除干净才行。
 
