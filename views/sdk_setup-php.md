@@ -32,24 +32,6 @@ Client::setServerUrl("https://{{host}}"); // 0.7.0 及以上版本支持
 ```
 {% endblock %}
 
-{% block sdk_switching_node %}
-```php
-use \LeanCloud\Client;
-use \LeanCloud\Region;
-// 参数依次为 AppId, AppKey, MasterKey
-Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
-{% if node != 'qcloud' %}
-// 启用美国节点
-// Client::useRegion(Region::US);
-// 启用中国节点（默认启用）
-Client::useRegion(Region::CN);
-{% else %}
-// 启用中国节点（默认启用）目前仅支持 E1。
-Client::useRegion(Region::CN_E1);
-{% endif %}
-```
-{% endblock %}
-
 {% block save_a_hello_world %}
 
 ```php

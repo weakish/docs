@@ -219,24 +219,6 @@ public class MyLeanCloudApp extends Application {
 
 {% endblock %}
 
-{% block sdk_switching_node %}
-```java
-public class MyLeanCloudApp extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        // 启用北美节点, 需要在 initialize 之前调用
-        AVOSCloud.useAVCloudUS();
-
-        // 初始化参数依次为 this, AppId, AppKey
-        AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
-    }
-}
-```
-{% endblock %}
-
 {% block save_a_hello_world %}
 在 `MainActivity.java` 中的 `onCreate` 方法添加如下代码：
 

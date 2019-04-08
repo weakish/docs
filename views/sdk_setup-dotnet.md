@@ -71,6 +71,10 @@ using LeanCloud.Realtime;
 
 ### Unity
 
+#### 设置运行时环境
+
+在 Unity 的 Player Settings 中设置运行时环境为 .Net 4.x。
+
 #### 数据存储初始化
 
 初始化**必须**在 Unity Editor 上将 `AVInitializeBehaviour` 挂载在某一个 GameObject 下，如下图：

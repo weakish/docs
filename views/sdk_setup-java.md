@@ -16,20 +16,6 @@ public static void main(String[] args){
 ```
 {% endblock %}
 
-{% block sdk_switching_node %}
-
-
-``` java
-
-public static void main(String[] args){
-        // 启用北美节点
-        AVOSCloud.useAVCloudUS();
-        // 初始化参数依次为 AppId, AppKey, MasterKey
-        AVOSCloud.initialize("{{appid}}","{{appkey}}","{{masterkey}}");
-}
-```
-{% endblock %}
-
 {% block save_a_hello_world %}
 
 
