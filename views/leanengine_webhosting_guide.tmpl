@@ -263,6 +263,7 @@ systemDependencies:
 - `phantomjs` 一个无 UI 的 WebKit 浏览器（该项目已停止维护）
 - `chrome-headless` 一个无 UI 的 Chrome 浏览器（体积很大，会显著增加部署耗时，运行时也会消耗大量 CPU 和内存；如果使用 puppeter 的话，需要给 puppeteer.launch 传递这些参数：`{executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-setuid-sandbox']}`；暂不支持 Java）
 - `node-canvas` 安装 node-canvas 所需要的系统级依赖（你仍需要安装 node-canvas）
+- `python-talib` 金融市场数据分析库
 
 注意添加系统依赖将会拖慢部署速度，因此请不要添加未用到的依赖。
 
