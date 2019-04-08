@@ -71,7 +71,7 @@ var tom = await realtime.CreateClientAsync('Tom');
 
 ### 登录即时通讯服务器
 
-创建好了「Tom」这个用户对应的 `IMClient` 实例之后，我们接下来需要让该实例「登录」 LeanCloud 即时通讯服务器。只有登录成功之后客户端才能开始与其他用户聊天，也才能接收到 LeanCloud 云端下发的各种事件通知。
+创建好了「Tom」这个用户对应的 `IMClient` 实例之后，我们接下来需要让该实例「登录」LeanCloud 即时通讯服务器。只有登录成功之后客户端才能开始与其他用户聊天，也才能接收到 LeanCloud 云端下发的各种事件通知。
 
 这里需要说明一点，JavaScript 和 C#（Unity3D）SDK 在创建 `IMClient` 实例的同时会自动进行登录，而 iOS（包括 Objective-C 和 Swift）和 Android（包括通用的 Java）SDK 则需要调用开发者手动执行 `open` 方法进行登录：
 
@@ -324,8 +324,8 @@ public Task<AVIMConversation> CreateConversationAsync(string member = null,
 3. `attributes`：对话的自定义属性，可选。上面示例代码没有指定额外属性，开发者如果指定了额外属性的话，以后其他成员可以通过 `AVIMConversation` 的接口获取到这些属性值。附加属性在 `_Conversation` 表中被保存在 `attr` 列中。
 4. `unique`/`isUnique` 或者是 `AVIMConversationOptionUnique`：唯一对话标志位，可选。
    - 如果设置为唯一对话，云端会根据完整的成员列表先进行一次查询，如果已经有正好包含这些成员的对话存在，那么就返回已经存在的对话，否则才创建一个新的对话。
-   - 如果指定 unique 标志为假，那么每次调用 `createConversation` 接口都会创建一个新的对话。
-   - 未指定 unique 时，Java SDK 默认值为真，其他 SDK 默认值为假（未来会改为默认值为真）。  
+   - 如果指定 `unique` 标志为假，那么每次调用 `createConversation` 接口都会创建一个新的对话。
+   - 未指定 `unique` 时，Java SDK 默认值为真，其他 SDK 默认值为假（未来会改为默认值为真）。  
    - 从通用的聊天场景来看，不管是 Tom 发出「创建和 Jerry 单聊对话」的请求，还是 Jerry 发出「创建和 Tom 单聊对话」的请求，或者 Tom 以后再次发出创建和 Jerry 单聊对话的请求，都应该是同一个对话才是合理的，否则可能因为聊天记录的不同导致用户混乱。所以我们 ***建议开发者明确指定 `unique` 标志为 `true`***。
 5. 对话类型的其他标志，可选参数，例如 `transient`/`isTransient` 表示「聊天室」，`tempConv`/`tempConvTTL` 和 `AVIMConversationOptionTemporary` 用来创建「临时对话」等等。什么都不指定就表示创建普通对话，对于这些标志位的含义我们先不管，以后会有说明。
 
@@ -546,7 +546,7 @@ tom.getConversation(‘CONVERSATION_ID’).then(function(conversation) {
 // 首先根据 id 获取 Conversation 实例
 AVIMConversationQuery *query = [self.client conversationQuery];
 [query getConversationById:@"CONVERSATION_ID" callback:^(AVIMConversation *conversation, NSError *error) {
-    // Jerry 邀请 Mary 到对话中
+    // 邀请 Mary 加入对话
     [conversation addMembersWithClientIds:@[@"Mary"] callback:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
             NSLog(@"邀请成功！");
@@ -630,8 +630,8 @@ jerry.OnMembersJoined += OnMembersJoined;
 
 其中 `payload` 参数包含如下内容：
 
-1. `members`：字符串数组, 被添加的用户 `clientId` 列表
-2. `invitedBy`：字符串, 邀请者 `clientId`
+1. `members`：字符串数组，被添加的用户 `clientId` 列表
+2. `invitedBy`：字符串，邀请者 `clientId`
 
 {{ docs.langSpecEnd('js') }}
 
@@ -639,7 +639,7 @@ jerry.OnMembersJoined += OnMembersJoined;
 
 其中 `AVIMOnInvitedEventArgs` 参数包含如下内容：
 
-1. `InvitedBy`：改操作的发起者
+1. `InvitedBy`：该操作的发起者
 2. `JoinedMembers`：此次加入对话的包含的成员列表
 3. `ConversationId`：被操作的对话
 
@@ -660,7 +660,7 @@ Cloud-->Jerry: 2. 下发通知：Mary 被 Tom 邀请加入了对话
 
 ```js
 tom.createConversation({
-  // 创建的时候直接指定 Jerry 和 Mary 一起加入多人群聊，当然根据需求可以添加更多成员
+  // 创建的时候直接指定 Jerry 和 Mary 一起加入多人群聊，当然根据需求可以添加更多成员
   members: ['Jerry','Mary'],
   // 对话名称
   name: 'Tom & Jerry & friends',
@@ -668,7 +668,7 @@ tom.createConversation({
 }).catch(console.error);
 ```
 ```objc
-// Jerry 建立了与朋友们的会话
+// Tom 建立了与朋友们的会话
 NSArray *friends = @[@"Jerry", @"Mary"];
 [tom createConversationWithName:@"Tom & Jerry & friends" clientIds:friends
   options:AVIMConversationOptionUnique
@@ -723,7 +723,7 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
 });
 ```
 ```cs
-var textMessage = new AVIMTextMessage("大家好，欢迎来到我们的群聊对话！");
+var textMessage = new AVIMTextMessage("大家好，欢迎来到我们的群聊对话！");
 await conversation.SendMessageAsync(textMessage);
 ```
 
@@ -912,7 +912,7 @@ public class CustomConversationEventHandler extends AVIMConversationEventHandler
   @Override
   public void onMemberJoined(AVIMClient client, AVIMConversation conversation,
       List<String> members, String invitedBy) {
-      // 手机屏幕上会显示一小段文字：Tom 加入到 551260efe4b01608686c3e0f ；操作者为：Tom
+      // 手机屏幕上会显示一小段文字：William 加入到 551260efe4b01608686c3e0f ；操作者为：William
       Toast.makeText(AVOSCloud.applicationContext,
         members + " 加入到" + conversation.getConversationId() + "；操作者为： "
             + invitedBy, Toast.LENGTH_SHORT).show();
@@ -1455,7 +1455,7 @@ await conversation.SendMessageAsync(locationMessage);
 
 {{ docs.langSpecStart('js') }}
 
-不管消息类型如何，JavaScript SDK 都是是通过 `IMClient` 上的 `Event.MESSAGE` 事件回调来通知新消息的，应用层只需要在在一个地方，统一对不同类型的消息使用不同方式来处理即可。
+不管消息类型如何，JavaScript SDK 都是是通过 `IMClient` 上的 `Event.MESSAGE` 事件回调来通知新消息的，应用层只需要在一个地方，统一对不同类型的消息使用不同方式来处理即可。
 
 {{ docs.langSpecEnd('js') }}
 
@@ -1514,7 +1514,7 @@ public static void unregisterMessageHandler(Class<? extends AVIMMessage> clazz, 
 
 当客户端收到一条消息的时候，SDK 内部的处理流程为：
 
-- 首先解析消息的类型，然后找到开发者为这一类型所注册的处理响应 handler chain，再逐一调用这些 handler 的 `onMessage` 函数
+- 首先解析消息的类型，然后找到开发者为这一类型所注册的处理响应 handler chain，再逐一调用这些 handler 的 `onMessage` 函数。
 - 如果没有找到专门处理这一类型消息的 handler，就会转交给 `defaultHandler` 处理。
 
 这样一来，在开发者为 `AVIMTypedMessage`（及其子类）指定了专门的 handler，也指定了全局的 `defaultHandler` 了的时候，如果发送端发送的是通用的 `AVIMMessage` 消息，那么接受端就是 `AVIMMessageManager#registerDefaultMessageHandler()` 中指定的 handler 被调用；如果发送的是 `AVIMTypedMessage`（及其子类）的消息，那么接受端就是 `AVIMMessageManager#registerMessageHandler()` 中指定的 handler 被调用。
@@ -1525,8 +1525,7 @@ public static void unregisterMessageHandler(Class<? extends AVIMMessage> clazz, 
 
 C# SDK 也是通过类似 `OnMessageReceived` 事件回调来通知新消息的，但是消息接收分为 **两个层级**：
 
-* 第一层在 `AVIMClient` 上，它是为了帮助开发者实现被动接收消息，尤其是在本地并没有加载任何对话的时候，类似于刚登录，本地并没有任何 `AVIMConversation` 的时候，如果某个对话产生新的消息，当前{% block messagePolicy_send_method %}{% endblock %}负责接收这类消息，但是它并没有针对消息的类型做区分。
-
+* 第一层在 `AVIMClient` 上，它是为了帮助开发者实现被动接收消息，尤其是在本地并没有加载任何对话的时候，类似于刚登录，本地并没有任何 `AVIMConversation` 的时候，如果某个对话产生新的消息，当前 `AVIMClient.OnMessageReceived` 负责接收这类消息，但是它并没有针对消息的类型做区分。
 * 第二层在 `AVIMConversation` 上，负责接收对话的全部信息，并且针对不同的消息类型有不同的事件类型做响应。
 
 以上两个层级的消息接收策略可以用下表进行描述，假如正在接收的是 `AVIMTextMessage`：
@@ -1537,6 +1536,7 @@ C# SDK 也是通过类似 `OnMessageReceived` 事件回调来通知新消息的�
 `AVIMConversation.OnMessageReceived` | × | × | √ | × | ×
 `AVIMConversation.OnTypedMessageReceived` | × | × | × | √ | ×
 `AVIMConversation.OnTextMessageReceived` | × | × | × | × | √
+
 对应条件如下：
 
 条件 1：
@@ -1850,7 +1850,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 | `MuteMemberIds`         | `mu`               | 静音该对话的成员                                 |
 | `Creator`               | `c`                | 对话创建者                                       |
 | `IsTransient`           | `tr`               | 是否为聊天室（暂态对话）                         |
-| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话（暂态对话）             |
+| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话                         |
 | `IsSystem`              | `sys`              | 是否为系统对话                                   |
 | `LastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
 | `LastMessage`           | N/A                | 最后一条消息，可能会空                           |
@@ -1913,7 +1913,7 @@ options.Add("pinned",true);
 var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry", isUnique:true, options:options);
 ```
 
-**自定义属性在 SDK 级别是对所有成员可见的。**我们也支持通过自定义属性来查询对话，请参见 [对话的查询](#对话的查询)。
+**自定义属性在 SDK 级别是对所有成员可见的。**我们也支持通过自定义属性来查询对话，请参见 [使用复杂条件来查询对话](#使用复杂条件来查询对话)。
 
 ### 修改和使用属性
 
@@ -2135,7 +2135,7 @@ var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
 var query = client.getQuery();
 query.equalTo('attr.type','private');
 query.find().then(function(conversations) {
-  // convs 就是想要的结果
+  // conversations 就是想要的结果
 }).catch(console.error.bind(console));
 ```
 ```objc
@@ -2179,7 +2179,7 @@ await query.FindAsync();
 - 支持通过 `first` 获取第一个结果
 - 支持通过 `skip` 和 `limit` 对结果进行分页
 
-与 `equalTo` 类似，针对 `number` 和 `date` 类型的属性还可以使用大于、大于等于、小于、小于等于等，详见下表：
+与 `equalTo` 类似，针对 `Number` 和 `Date` 类型的属性还可以使用大于、大于等于、小于、小于等于等，详见下表：
 
 {{ docs.langSpecStart('js') }}
 
@@ -3052,9 +3052,9 @@ realtime.on(Event.RECONNECT, function() {
 
 即时通讯服务提供的功能就是让一个客户端与其他客户端进行在线的消息互发，对应不同的使用场景，除了前两章节介绍的 [一对一单聊](#一对一单聊) 和 [多人群聊](#多人群聊) 之外，我们也支持其他形式的「对话」模型：
 
-- 开放聊天室，例如直播中的弹幕聊天室，它与普通的「多人群聊」的主要差别是允许的成员人数以及消息到达的保证程度不一样。有兴趣的开发者可以参考文档：[第三篇：玩转直播聊天室](realtime-guide-senior.html#直播场景下的开放聊天室)。
+- 开放聊天室，例如直播中的弹幕聊天室，它与普通的「多人群聊」的主要差别是允许的成员人数以及消息到达的保证程度不一样。有兴趣的开发者可以参考文档：[第三篇：玩转直播聊天室](realtime-guide-senior.html#玩转直播聊天室)。
 - 临时对话，例如客服系统中用户和客服人员之间建立的临时通道，它与普通的「一对一单聊」的主要差别在于对话总是临时创建并且不会长期存在，在提升实现便利性的同时，还能降低服务使用成本（能有效减少存储空间方面的花费）。有兴趣的开发者可以参考下篇文档：[第三篇：使用临时对话](realtime-guide-senior.html#使用临时对话)。
-- 系统对话，例如在微信里面常见的公众号/服务号，系统全局的广播账号，与普通「多人群聊」的主要差别，在于「服务号」是以订阅的形式加入的，也没有成员限制，并且订阅用户和服务号的消息交互是一对一的，一个用户的上行消息不会群发给其他订阅用户。有兴趣的开发者可以参考下篇文档：[第四篇：系统对话](realtime-guide-systemconv.html#系统对话)。
+- 系统对话，例如在微信里面常见的公众号/服务号，系统全局的广播账号，与普通「多人群聊」的主要差别，在于「服务号」是以订阅的形式加入的，也没有成员限制，并且订阅用户和服务号的消息交互是一对一的，一个用户的上行消息不会群发给其他订阅用户。有兴趣的开发者可以参考下篇文档：[第四篇：「系统对话」的使用](realtime-guide-systemconv.html#「系统对话」的使用)。
 
 ## 进一步阅读
 
