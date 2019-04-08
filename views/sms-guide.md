@@ -1463,4 +1463,3 @@ cloud.verify_mobile_phone_number("6位数字验证码")
 短信发送采取实时扣费。如果当前账户没有足够的余额，短信将无法发送。充值请进入 [开发者账户 > 财务 > 财务概况](/dashboard/bill.html#/bill/general)，点击 **余额充值**。
 
 同时我们建议设定好 [余额告警](/dashboard/settings.html#/setting/alert)，以便在第一时间收到短信或邮件获知余额不足。
-{% endif %}
