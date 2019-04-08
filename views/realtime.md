@@ -133,9 +133,8 @@ SignatureFactory 的实现，并携带用户信息和用户行为（登录、关
 ### 云引擎签名范例
 
 我们提供了一个运行在 LeanCloud [云引擎](leanengine_webhosting_guide-node.html)上的
-[签名范例程序](https://github.com/leancloud/realtime-messaging-signature-cloudcode)
-，他提供了基于 Web Hosting 和 Cloud Function 两种方式的签名实现，你可以根据实际情况选
-择自己的实现。
+[签名范例程序](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js)
+，他提供了基于云函数的签名实现，你可以在此基础上进行修改。
 
 ### 签名方法
 

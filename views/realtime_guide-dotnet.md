@@ -1240,11 +1240,11 @@ public ISignatureFactoryV2 SignatureFactory { get; set; }
 是预留给开发者实现签名需求的接口，开发者只需要在登录之前实现这个接口即可。
 
 ###  签名的云引擎实例
-为了方便开发者理解签名，我们特地开源了签名的[云引擎实例](https://github.com/leancloud/realtime-messaging-signature-cloudcode)，只要按照要求正确配置，就可以在客户端通过调用云引擎的具体的函数实现签名。
+为了方便开发者理解签名，我们特地开源了签名的[云引擎示例](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js)，只要按照要求正确配置，就可以在客户端通过调用云引擎的具体的函数实现签名。
 
 演示实例的步骤：
 
-* 首先您需要下载最新版本的[云引擎实例](https://github.com/leancloud/realtime-messaging-signature-cloudcode)到本地，然后部署到您的应用中，详细请参考[命令行工具使用指南](leanengine_cli.html#)
+* 首先你需要从 [node-js-getting-started](https://github.com/leancloud/node-js-getting-started) 创建一个新的云引擎项目，然后将 [即时通讯签名 Demo](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js) 复制到新项目的 `functions` 目录，然后部署到你的云引擎上。
 
 * 其次，在 Visual Studio 中，新建一个类叫做 `SampleSignatureFactory` ，把下面这段代码拷贝到其中：
 

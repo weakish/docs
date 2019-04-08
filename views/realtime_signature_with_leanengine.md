@@ -23,8 +23,8 @@
 
 ### 云引擎签名范例
 
-我们提供了一个运行在 LeanCloud [云引擎](leanengine_overview.html) 上的 [签名范例程序](https://github.com/leancloud/realtime-messaging-signature-cloudcode)
-，它提供了基于 Web Hosting 和云函数两种方式的签名实现，你可以根据实际情况选择自己的实现。
+我们提供了一个运行在 LeanCloud [云引擎](leanengine_overview.html) 上的 [签名范例程序](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js)
+，它提供了基于云函数的签名实现，你可以在此基础上进行修改。
 
 ### 用户登录的签名
 
