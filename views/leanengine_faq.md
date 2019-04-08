@@ -24,7 +24,7 @@
 * `beforeDelete`：对象删除之前
 * `afterDelete`：对象删除之后
 * `onVerified`：用户通过邮箱或手机验证后
-* `onLogin`：用户在进行登录操作时
+* `onLogin`：用户在进行登录操作时（`become(sessionToken)` 不是登录操作，因此不会调用 `onLogin`）
 
 还需注意在本地进行云引擎调试时，运行的会是线上预备环境的 Hook，如果没有预备环境则不会运行。
 
