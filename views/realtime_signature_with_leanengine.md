@@ -42,7 +42,7 @@ timestamp|当前的 UTC 时间距离 unix epoch 的**毫秒数**
 nonce|随机字符串
 
 
->注意：签名的 key **必须** 是应用的 master key，你可以 {% if node=='qcloud' %}控制台 > 设置 > 应用 Key{% else %}[控制台 > 设置 > 应用 Key](/app.html?appid={{appid}}#/key){% endif %} 里找到。**请保护好 master key，不要泄露给任何无关人员。**
+>注意：签名的 key **必须** 是应用的 master key，你可以 [控制台 > 设置 > 应用 Key](/dashboard/app.html?appid={{appid}}#/key) 里找到。**请保护好 master key，不要泄露给任何无关人员。**
 
 开发者可以实现自己的 SignatureFactory，调用远程服务器的签名接口获得签名。如果你没有自己的服务器，可以直接在 LeanCloud 云引擎上通过 **网站托管** 来实现自己的签名接口。在移动应用中直接做签名的作法 **非常危险**，它可能导致你的 **master key** 泄漏。
 

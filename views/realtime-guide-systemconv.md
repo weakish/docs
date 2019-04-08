@@ -621,7 +621,7 @@ Cloud::define('_messageSent', function($params, $user) {
 
 #### Web Hook
 
-需要开发者自行在 [控制台> 消息 > 即时通讯 > 设置 > 系统对话消息回调设置](/messaging.html?appid={{appid}}#/message/realtime/conf) 定义，来实时接收用户发给系统对话的消息，消息的数据结构与上文所述的 `_SysMessage` 一致。
+需要开发者自行在 [控制台> 消息 > 即时通讯 > 设置 > 系统对话消息回调设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 定义，来实时接收用户发给系统对话的消息，消息的数据结构与上文所述的 `_SysMessage` 一致。
 
 当有用户向系统对话发送消息时，我们会通过 HTTP POST 请求将 JSON 格式的数据发送到用户设置的 Web Hook 上。请注意，我们调用 Web Hook 时并不是一次调用只发送一条消息，而是会以批量的形式将消息发送过去。从下面的发送消息格式中能看到，JSON 的最外层是个 `Array`。
 

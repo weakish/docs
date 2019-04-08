@@ -289,7 +289,7 @@ $ lean deploy
 [INFO] Deleting temporary files
 ```
 
-默认部署备注为「从命令行工具构建」，显示在 [应用控制台 > 云引擎 > 日志](/cloud.html?appid={{appid}}#/log) 中。你可以通过 `-m` 选项来自定义部署的备注信息：
+默认部署备注为「从命令行工具构建」，显示在 [应用控制台 > 云引擎 > 日志](/dashboard/cloud.html?appid={{appid}}#/log) 中。你可以通过 `-m` 选项来自定义部署的备注信息：
 
 ```sh
 $ lean deploy -m 'Be more awesome! 这是定制的部署备注'

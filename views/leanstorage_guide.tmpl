@@ -78,7 +78,7 @@
 
 {% block code_save_todo_folder %}{% endblock %}
 
-创建完成后，打开 {% if node=='qcloud' %}**控制台** > **存储**{% else %}[控制台 > 存储](/data.html?appid={{appid}}#/){% endif %}，点开 **TodoFolder** 类，就可以看到刚才添加的数据。除了 name、priority（优先级）之外，其他字段都是数据表的内置属性。
+创建完成后，打开 [控制台 > 存储](/dashboard/data.html?appid={{appid}}#/)，点开 **TodoFolder** 类，就可以看到刚才添加的数据。除了 name、priority（优先级）之外，其他字段都是数据表的内置属性。
 
 内置属性|类型|描述
 ---|---|---
@@ -455,7 +455,7 @@ Pointer 只是个描述并没有具象的类与之对应，它与 `{{relationObj
 
 当文件较多时，要把一些不需要的文件从云端删除：
 
-<div class="callout callout-danger">默认情况下，文件的删除权限是关闭的，需要进入 {% if node == 'qcloud' %}**控制台** > **存储** > `_File`{% else %}[控制台 > 存储 > **`_File`**](/data.html?appid={{appid}}#/_File){% endif %}，选择菜单 **其他** > **权限设置** > **delete** 来开启。</div>
+<div class="callout callout-danger">默认情况下，文件的删除权限是关闭的，需要进入 [控制台 > 存储 > **`_File`**](/dashboard/data.html?appid={{appid}}#/_File)，选择菜单 **其他** > **权限设置** > **delete** 来开启。</div>
 
 {% block code_file_delete %}{% endblock %}
 

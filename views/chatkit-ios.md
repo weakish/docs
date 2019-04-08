@@ -182,7 +182,7 @@ gem install cocoapods
  [self.window makeKeyAndVisible];
 ```
 
-AppId 和 appKey 可以在 [控制台 > 应用设置](/app.html?appid={{appid}}#/key) 中找到。
+AppId 和 appKey 可以在 [控制台 > 应用设置](/dashboard/app.html?appid={{appid}}#/key) 中找到。
 
 以 Source Code 方式打开 info.plist 文件，粘贴配置下列权限:
 

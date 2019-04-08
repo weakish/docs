@@ -293,7 +293,7 @@ LeanCache 采取按天扣费，使用时间不足一天按一天收费，次日�
 已停止服务的实例状态显示为 <span class="label label-warning">未运行</span>。要恢复服务，需要向账户充值。在账户余额补足后的 5 分钟内，已停止服务的所有实例将会自动恢复运行。
 
 {% if node!='qcloud' %}
-<div class="callout callout-info">账户充值请到 [财务概况](/bill.html#/bill/general) 中进行。建议使用「支付宝」来实时充值，避免对公账户付款（银行转账）产生的到款延迟而影响服务开通的时间。</div>
+<div class="callout callout-info">账户充值请到 [财务概况](/dashboard/bill.html#/bill/general) 中进行。建议使用「支付宝」来实时充值，避免对公账户付款（银行转账）产生的到款延迟而影响服务开通的时间。</div>
 {% endif %}
 
 ### 删除无用实例

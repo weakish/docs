@@ -131,7 +131,7 @@ cloud.request_sms_code("18612345678", template="Register_Notice", sign="LeanClou
 ## 开通短信服务
 
 ### 在安全中心开启短信服务
-要使用短信服务，首先需要在控制台创建一个应用，然后进入 [控制台 > 设置 > 安全中心](/app.html?appid={{appid}}#/security)，确保 **短信服务** 开关是打开的：
+要使用短信服务，首先需要在控制台创建一个应用，然后进入 [控制台 > 设置 > 安全中心](/dashboard/app.html?appid={{appid}}#/security)，确保 **短信服务** 开关是打开的：
 
 ![sms_switch](images/sms_switch_setting.png)
 
@@ -143,7 +143,7 @@ cloud.request_sms_code("18612345678", template="Register_Notice", sign="LeanClou
 - 关闭：请求验证发送短信以及验证短信验证码都会被服务端拒绝，但是请注意，跟用户相关的验证与该选项无关。
 
 ### 设置默认签名
-短信发送的时候需要有签名运营商才会放行，如前面示例中的「购物网」、「当当」即为短信签名。在开始发送短信之前，你需要进入[控制台 > 消息 > 短信 > 设置](/messaging.html?appid={{appid}}#/message/sms/conf)，设置默认的短信签名（第一个签名即为「默认签名」）：
+短信发送的时候需要有签名运营商才会放行，如前面示例中的「购物网」、「当当」即为短信签名。在开始发送短信之前，你需要进入[控制台 > 消息 > 短信 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf)，设置默认的短信签名（第一个签名即为「默认签名」）：
 
 ![sms_switch](images/sms_create_signature.png)
 
@@ -1460,7 +1460,6 @@ cloud.verify_mobile_phone_number("6位数字验证码")
 
 ### 短信购买
 
-短信发送采取实时扣费。如果当前账户没有足够的余额，短信将无法发送。{% if node != 'qcloud' %}充值请进入 [开发者账户 > 财务 > 财务概况](/bill.html#/bill/general)，点击 **余额充值**。
+短信发送采取实时扣费。如果当前账户没有足够的余额，短信将无法发送。充值请进入 [开发者账户 > 财务 > 财务概况](/dashboard/bill.html#/bill/general)，点击 **余额充值**。
 
-同时我们建议设定好 [余额告警](/settings.html#/setting/alert)，以便在第一时间收到短信或邮件获知余额不足。
-{% endif %}
+同时我们建议设定好 [余额告警](/dashboard/settings.html#/setting/alert)，以便在第一时间收到短信或邮件获知余额不足。

@@ -96,7 +96,7 @@ git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 [AVOSCloud setApplicationId:@"{{appid}}" clientKey:@"{{appkey}}"];
 ```
 
-创建应用后，可以在 {% if node=='qcloud' %}**控制台 > 应用设置 > 应用 Key**{% else %}[控制台 > 应用设置 > 应用 Key](/app.html?appid={{appid}}#/key){% endif %} 中找到应用对应的 id 和 key。
+创建应用后，可以在 [控制台 > 应用设置 > 应用 Key](/dashboard/app.html?appid={{appid}}#/key) 中找到应用对应的 id 和 key。
 
 在 **v11.4.0 版本以前** 使用 **美国节点** 需要增加以下代码：
 
@@ -124,8 +124,7 @@ AVObject *testObject = [AVObject objectWithClassName:@"TestObject"];
 [testObject save];
 ```
 
-运行 App，一个类名为 `TestObject` 的新对象会被发送到 LeanCloud 并保存下来。当做完这一切，访问 {% if node=='qcloud' %}**控制台 > 存储 > 数据**{% else %}[控制台 > 存储 > 数据](/data.html?appid={{appid}}#/TestObject) 可以看到上面创建的 TestObject 的相关数据。
-{% endif %}
+运行 App，一个类名为 `TestObject` 的新对象会被发送到 LeanCloud 并保存下来。当做完这一切，访问 [控制台 > 存储 > 数据](/dashboard/data.html?appid={{appid}}#/TestObject) 可以看到上面创建的 TestObject 的相关数据。
 
 {{ include.debuglog('objc') }}
 

@@ -13,8 +13,8 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 ### 获取客服支持有哪些途径
 
 * 到免费的[用户社区](https://forum.leancloud.cn/) 进行提问。
-* 购买 [技术支持](/bill.html#/bill/general)，进入 [工单系统](https://leanticket.cn/t/leancloud) 来提交问题。
-* 发送邮件到 {{ include.supportEmail() }} 获取帮助。
+* 购买 [技术支持](/dashboard/bill.html#/bill/general)，进入 [工单系统](https://leanticket.cn/t/leancloud) 来提交问题。
+* 账号相关事项，可发送邮件到 {{ include.supportEmail() }} 获取帮助。
 * 紧急故障拨打客服电话：+8618625038918。
 * 售前咨询请致电 +8613011098244。
 
@@ -38,7 +38,7 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 
 * 支付宝充值
 
-  进入 [控制台 > 财务 > 账务概况](/bill.html#/bill/general)，点击「充值」或「购买」按钮时将会出现「支付宝充值」窗口。 我们将每天自动从您的账户余额里扣除前一日的费用。每次扣费优先使用充值金额，其次是赠送金额。
+  进入 [控制台 > 财务 > 账务概况](/dashboard/bill.html#/bill/general)，点击「充值」或「购买」按钮时将会出现「支付宝充值」窗口。 我们将每天自动从您的账户余额里扣除前一日的费用。每次扣费优先使用充值金额，其次是赠送金额。
 
 * 对公账户汇款
 
@@ -79,7 +79,7 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 * [官方微博](http://weibo.com/avoscloud)
 * 官方微信公众号：LeanCloud通讯
 * 每月初，我们会将每月的更新摘要发送到您的注册邮箱。
-* 在控制台页面的右上方有 [消息中心](/info-center.html#/index)，请注意查看新通知。
+* 在控制台页面的右上方有 [消息中心](/dashboard/info-center.html#/index)，请注意查看新通知。
 {% endif %}
 
 ### API 开放吗
@@ -202,7 +202,7 @@ REST API 文档使用 curl 作为示范，其中 `--data-urlencode` 表示要对
 
 原则：数据量少时，不建索引。多的时候请记住，因为索引也占空间，以此来换取更少的查询时间。针对每张表的情况，写少读多就多建索引，写多读少就少建索引。
 
-操作：进入 {% if node=='qcloud' %}**控制台 > 存储**{% else %}[控制台 > 存储](/data.html?appid={{appid}}#/_File){% endif %}，选定一张表之后，点击右侧的 **其他**下拉菜单，然后选择 **索引**，然后根据你的查询需要建立好索引。
+操作：进入 {% if node=='qcloud' %}**控制台 > 存储**{% else %}[控制台 > 存储](/dashboard/data.html?appid={{appid}}#/_File){% endif %}，选定一张表之后，点击右侧的 **其他**下拉菜单，然后选择 **索引**，然后根据你的查询需要建立好索引。
 
 提示：数据表的默认四个字段 `objectId`、`ACL`、`createdAt`、`updatedAt` 是自带索引的，但是在勾选时，可以作为联合索引来使用。
 

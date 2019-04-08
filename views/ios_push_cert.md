@@ -2,7 +2,7 @@
 {% if node=='qcloud' %}
   {% set pushSettingLink = "**控制台** > **消息** > **推送** > **设置**" %}
 {% else %}
-  {% set pushSettingLink = "[控制台 > 消息 > 推送 > 设置](/messaging.html?appid={{appid}}#/message/push/conf)" %}
+  {% set pushSettingLink = "[控制台 > 消息 > 推送 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/push/conf)" %}
 {% endif %}
 # iOS 推送证书设置指南
 

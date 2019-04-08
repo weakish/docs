@@ -830,7 +830,7 @@ LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在�
 
 1. 静态配置提醒消息
 
-  用户可以在控制台中为应用设置一个全局的静态 JSON 字符串，指定固定内容来发送通知。例如，我们进入 [控制台 > 消息 > 即时消息 > 设置 > 离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
+  用户可以在控制台中为应用设置一个全局的静态 JSON 字符串，指定固定内容来发送通知。例如，我们进入 [控制台 > 消息 > 即时消息 > 设置 > 离线推送设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
 
   ```
   { "alert": "您有新的消息", "badge": "Increment" }
@@ -957,7 +957,7 @@ Apple 不允许在一次推送请求中向多个从属于不同 Team ID 的设�
 
 `_profile` 和 `_apns_team_id` 属性均不会实际推送。
 
-目前，[控制台 > 消息 > 即时消息 > 设置 > 离线推送设置](/messaging.html?appid={{appid}}#/message/realtime/conf) 这里的推送内容也支持一些内置变量，你可以将上下文信息直接设置到推送内容中：
+目前，[控制台 > 消息 > 即时消息 > 设置 > 离线推送设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 这里的推送内容也支持一些内置变量，你可以将上下文信息直接设置到推送内容中：
 
 * `${convId}` 推送相关的对话 ID
 * `${timestamp}` 触发推送的时间戳（Unix 时间戳）
