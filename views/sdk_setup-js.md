@@ -76,7 +76,7 @@ var AV = require('leancloud-storage/live-query');
 ```js
 // 存储服务
 var { Query, User } = AV;
-AV.init('appId', 'appKey');
+AV.init({{appid}}, {{appkey}});
 // 即时通讯服务
 var { Realtime, TextMessage } = AV;
 ```
@@ -212,7 +212,7 @@ set DEBUG=leancloud*,LC* lean up
 ```js
 // 存储服务
 var { Query, User } = AV;
-AV.init('appId', 'appKey');
+AV.init({{appid}}, {{appkey}});
 // 即时通讯服务
 var { Realtime, TextMessage } = AV;
 ```
@@ -280,7 +280,7 @@ var { Realtime, TextMessage } = AV;
 
 ```js
 var { Query, User } = AV;
-AV.init('appId', 'appKey');
+AV.init({{appid}}, {{appkey}});
 ```
 
 {{ docs.note("目前在 Egret 平台上，我们只提供存储服务的 SDK（不含 LiveQuery 功能）。") }} 
