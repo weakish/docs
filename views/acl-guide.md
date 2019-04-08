@@ -978,20 +978,15 @@ else:
     }];
 ```
 ```swift
-    guard let user = AVUser.current() else {
+    guard let user = LCUser.current() else {
         return
     }
 
-    user.getRolesInBackground { (roles, error) in
-        // avRoles 就是一个 AVRole 的数组，这些 AVRole 就是当前用户所在拥有的角色
-    }
-
-    // 第二种是通过构建 AVQuery
-    let roleQuery = AVRole.query()
+    let roleQuery = LCRole.query()
 
     roleQuery.whereKey("users", equalTo: user)
     roleQuery.findObjectsInBackground { (roles, error) in
-        // avRoles 就是一个 AVRole 的数组，这些 AVRole 就是当前用户所在拥有的角色
+        // roles 是一个 Relation，其中的 LCRole 就是当前用户所在拥有的角色
     }
 ```
 ```java
@@ -1015,7 +1010,7 @@ else:
 ```js
    //第一种是通过 AV.User 的内置接口：
    user.getRoles().then(function(roles){
-    // roles 是一个 AV.Role 数组，这些 AV.Role 表示 user 拥有的角色
+    // roles 是一个 Relation，其中的 AV.Role 表示 user 拥有的角色
    });
    
   // 第二种是通过查询：
@@ -1024,7 +1019,7 @@ else:
   // 查询当前用户拥有的角色
   roleQuery.equalTo('users', AV.User.current());
   roleQuery.find().then(function(roles) {
-    // roles 是一个 AV.Role 数组，这些 AV.Role 表示当前用户所拥有的角色
+    // roles 是一个 Relation，其中的 AV.Role 表示当前用户所拥有的角色
   }, function (error) {
   });
 ```
