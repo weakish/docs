@@ -76,7 +76,7 @@ appid:client_id:convid:nonce:signature_ts
 ```
 * client_id 查看者 id（签名参数）
 * nonce  签名随机字符串（签名参数）
-* signature_ts 签名时间戳（签名参数），单位是秒
+* signature_ts 签名时间戳（签名参数），单位是毫秒
 * signature  签名（签名参数）
 
 ### 黑名单的签名
