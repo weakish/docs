@@ -2797,8 +2797,8 @@ conversation.queryMessages({
 }];
 ```
 ```java
-AVIMMessageInterval internal = new AVIMMessageInterval(null, null);
-conversation.queryMessages(internal, AVIMMessageQueryDirectionFromOldToNew, limit,
+AVIMMessageInterval interval = new AVIMMessageInterval(null, null);
+conversation.queryMessages(interval, AVIMMessageQueryDirectionFromOldToNew, limit,
   new AVIMMessagesQueryCallback(){
     public void done(List<AVIMMessage> messages, AVIMException exception) {
       // handle result
@@ -2890,9 +2890,9 @@ AVIMMessageInterval *interval = [[AVIMMessageInterval alloc] initWithStartInterv
 ```java
 AVIMMessageIntervalBound start = AVIMMessageInterval.createBound(messageId, timestamp, false);
 AVIMMessageIntervalBound end = AVIMMessageInterval.createBound(endMessageId, endTimestamp, false);
-AVIMMessageInterval internal = new AVIMMessageInterval(start, end);
+AVIMMessageInterval interval = new AVIMMessageInterval(start, end);
 AVIMMessageQueryDirection direction;
-conversation.queryMessages(internal, direction, limit,
+conversation.queryMessages(interval, direction, limit,
   new AVIMMessagesQueryCallback(){
     public void done(List<AVIMMessage> messages, AVIMException exception) {
       // handle result
