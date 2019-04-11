@@ -164,13 +164,13 @@ Tom 完成了登录之后，就可以选择用户聊天了。现在他要给 Jer
 
 ```js
 // 创建与 Jerry 之间的对话
-return tom.CreateConversationAsync({
+tom.CreateConversationAsync({ // tom 是一个 IMClient 实例
   // 指定对话的成员除了当前用户 Tom(SDK 会默认把当前用户当做对话成员)之外，还有 Jerry
   members: ['Jerry'],
   // 对话名称
   name: 'Tom & Jerry',
   unique: true
-});.catch(console.error);
+}).then(/* 略 */)
 ```
 ```objc
 // 创建与 Jerry 之间的对话
@@ -534,7 +534,7 @@ Jerry-->UI: 6. 显示收到的消息内容
 
 ```js
 // 首先根据 id 获取 Conversation 实例
-tom.getConversation(‘CONVERSATION_ID’).then(function(conversation) {
+tom.getConversation('CONVERSATION_ID').then(function(conversation) {
   // 邀请 Mary 加入对话
   return conversation.add(['Mary']);
 }).then(function(conversation) {
@@ -971,7 +971,7 @@ Cloud-->Tom: 2. 下发通知：Jerry 已离开对话
 
 ```js
 mary.on(Event.MEMBERS_LEFT, function membersLeftEventHandler(payload, conversation) {
-    console.log(payload.members, payload.invitedBy, conversation.id);
+    console.log(payload.members, payload.kickedBy, conversation.id);
 });
 ```
 ```objc
@@ -993,8 +993,8 @@ public class CustomConversationEventHandler extends AVIMConversationEventHandler
 mary.OnMembersLeft += OnMembersLeft;
 private void OnMembersLeft(object sender, AVIMOnMembersLeftEventArgs e)
 {
-    // e.InvitedBy 是该项操作的发起人, e.ConversationId 是该项操作针对的对话 Id
-    Debug.Log(string.Format("{0} 离开了 {1} 对话，操作者是 {2}",e.JoinedMembers, e.ConversationId, e.InvitedBy));
+    // e.KickedBy 是该项操作的发起人, e.ConversationId 是该项操作针对的对话 Id
+    Debug.Log(string.Format("{0} 离开了 {1} 对话，操作者是 {2}",e.JoinedMembers, e.ConversationId, e.KickedBy));
 }
 ```
 
@@ -1317,7 +1317,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 var AV = require('leancloud-storage');
 var { AudioMessage } = require('leancloud-realtime-plugin-typed-messages');
 
-var fileUploadControl = $('#photoFileUpload')[0];
+var fileUploadControl = $('#musicFileUpload')[0];
 var file = new AV.File('忐忑.mp3', fileUploadControl.files[0]);
 file.save().then(function() {
   var message = new AudioMessage(file);
@@ -1510,7 +1510,7 @@ public static void unregisterMessageHandler(Class<? extends AVIMMessage> clazz, 
 
 消息处理函数需要在应用初始化时完成设置，理论上我们支持为每一种消息（包括应用层自定义的消息）分别注册不同的消息处理函数，并且也支持取消注册。
 
-在 `AVIMMessageManager` 中多次注册 `defaultMessageHandler` 的话，只有最后一次调用的才是有效的；而通过 `registerMessageHandler` 注册的 `AVIMMessageHandler`，则是可以同存的。
+多次调用 `AVIMMessageManager` 的 `registerDefaultMessageHandler`，只有最后一次调用有效；而通过 `registerMessageHandler` 注册的 `AVIMMessageHandler`，则是可以同存的。
 
 当客户端收到一条消息的时候，SDK 内部的处理流程为：
 
@@ -2761,7 +2761,7 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
 }];
 ```
 ```java
-int msgType = .AVIMMessageType.TEXT_MESSAGE_TYPE;
+int msgType = .AVIMMessageType.IMAGE_MESSAGE_TYPE;
 conversation.queryMessagesByType(msgType, limit, new AVIMMessagesQueryCallback() {
     @Override
     public void done(List<AVIMMessage> messages, AVIMException e){
@@ -2797,8 +2797,8 @@ conversation.queryMessages({
 }];
 ```
 ```java
-AVIMMessageInterval internal = new AVIMMessageInterval(null, null);
-conversation.queryMessages(internal, AVIMMessageQueryDirectionFromOldToNew, limit,
+AVIMMessageInterval interval = new AVIMMessageInterval(null, null);
+conversation.queryMessages(interval, AVIMMessageQueryDirectionFromOldToNew, limit,
   new AVIMMessagesQueryCallback(){
     public void done(List<AVIMMessage> messages, AVIMException exception) {
       // handle result
@@ -2844,9 +2844,9 @@ AVIMMessageInterval *interval = [[AVIMMessageInterval alloc] initWithStartInterv
 ```
 ```java
 AVIMMessageIntervalBound start = AVIMMessageInterval.createBound(messageId, timestamp, false);
-AVIMMessageInterval internal = new AVIMMessageInterval(start, null);
+AVIMMessageInterval interval = new AVIMMessageInterval(start, null);
 AVIMMessageQueryDirection direction;
-conversation.queryMessages(internal, direction, limit,
+conversation.queryMessages(interval, direction, limit,
   new AVIMMessagesQueryCallback(){
     public void done(List<AVIMMessage> messages, AVIMException exception) {
       // handle result
@@ -2890,9 +2890,9 @@ AVIMMessageInterval *interval = [[AVIMMessageInterval alloc] initWithStartInterv
 ```java
 AVIMMessageIntervalBound start = AVIMMessageInterval.createBound(messageId, timestamp, false);
 AVIMMessageIntervalBound end = AVIMMessageInterval.createBound(endMessageId, endTimestamp, false);
-AVIMMessageInterval internal = new AVIMMessageInterval(start, end);
+AVIMMessageInterval interval = new AVIMMessageInterval(start, end);
 AVIMMessageQueryDirection direction;
-conversation.queryMessages(internal, direction, limit,
+conversation.queryMessages(interval, direction, limit,
   new AVIMMessagesQueryCallback(){
     public void done(List<AVIMMessage> messages, AVIMException exception) {
       // handle result
@@ -2902,7 +2902,7 @@ conversation.queryMessages(internal, direction, limit,
 ```cs
 var earliestMessage = await conversation.QueryMessageAsync(direction: 0, limit: 1);
 var latestMessage = await conversation.QueryMessageAsync(limit: 1);
-// mex count for messagesInInterval is 100
+// max count for messagesInInterval is 100
 var messagesInInterval = await conversation.QueryMessageInIntervalAsync(earliestMessage.FirstOrDefault(), latestMessage.FirstOrDefault());
 ```
 
