@@ -1,10 +1,10 @@
-# 实时对战开发指南 · {{platformName}}
+# 多人在线对战开发指南 · {{platformName}}
 
 
 
 ## 前言
 
-实时对战是一款基于 {{platformName}} 编写的游戏 SDK，它为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。实时对战提供的主要功能如下：
+多人在线对战是一款基于 {{platformName}} 编写的游戏 SDK，它为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。多人在线对战提供的主要功能如下：
 
 - 获取房间列表
 - 创建房间
@@ -41,7 +41,7 @@
 
 ### 建立连接
 
-通过下面的代码将当前玩家连接到实时对战对战服务：
+通过下面的代码将当前玩家连接到多人对战服务：
 
 {% block connection %}
 {% endblock %}
@@ -195,7 +195,7 @@
 
 ## MasterClient
 
-实时对战服务默认房间的创建者房主为 MasterClient。在游戏中他可以关闭房间、设置房间不可见、踢人等，同时他所在的设备还承担了「逻辑运算功能」，例如它在游戏中可以负责以下场景：
+多人对战服务默认房间的创建者房主为 MasterClient。在游戏中他可以关闭房间、设置房间不可见、踢人等，同时他所在的设备还承担了「逻辑运算功能」，例如它在游戏中可以负责以下场景：
 
 * 在卡牌游戏中为用户发牌；
 * 控制刷怪的时机及逻辑；
@@ -203,10 +203,10 @@
 * ...等等。
 
 ### MasterClient 位于玩家客户端
-您可以将 MasterClient 的逻辑写在客户端中，作为房间创建者的玩家终端会承担游戏运算。在这种情况下，实时对战为 MasterClient 提供了以下方便的功能：
+您可以将 MasterClient 的逻辑写在客户端中，作为房间创建者的玩家终端会承担游戏运算。在这种情况下，多人对战为 MasterClient 提供了以下方便的功能：
 
 #### MasterClient 掉线转移
-当 MasterClient 掉线后，实时对战服务会指任一名新的玩家客户端为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。当 MasterClient 变化时，SDK 会派发 `MASTER_SWITCHED`（主机切换）事件通知客户端。
+当 MasterClient 掉线后，多人对战服务会指任一名新的玩家客户端为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。当 MasterClient 变化时，SDK 会派发 `MASTER_SWITCHED`（主机切换）事件通知客户端。
 
 {% block master_switched_event %}
 {% endblock %}

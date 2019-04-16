@@ -19,13 +19,13 @@
 
 
 {% block initialization %}
-首先实时对战 SDK 在内部实会例化了一个 `Play` 类型的实例对象，我们只需要通过 `Play.Instance` 使用即可。后文中的 `play` 都是指这个对象。
+首先多人在线对战 SDK 在内部实会例化了一个 `Play` 类型的实例对象，我们只需要通过 `Play.Instance` 使用即可。后文中的 `play` 都是指这个对象。
 
 ```cs
 private Play play = Play.Instance;
 ```
 
-接着我们需要实例化一个对象作为初始化实时对战的参数。
+接着我们需要实例化一个对象作为初始化多人对战的参数。
 
 ```cs
 // 初始化
@@ -429,7 +429,7 @@ play.CreateRoom(roomOptions: options);
 {% endblock %}
 
 {% block custom_props %}
-为了满足开发者不同的游戏需求，实时对战 SDK 允许开发者设置「自定义属性」。
+为了满足开发者不同的游戏需求，多人对战 SDK 允许开发者设置「自定义属性」。
 {% endblock %}
 
 

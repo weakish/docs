@@ -2,7 +2,7 @@
 
 请先阅读 [Client Engine 快速入门 · Node.js](client-engine-quick-start-node.html) 及[你的第一个 Client Engine 小游戏](client-engine-first-game-node.html)来初步了解如何使用初始项目来开发游戏。本文档将在初始项目的基础上深入讲解 Client Engine SDK。
 
-Client Engine 初始项目依赖了专门的 Client Engine SDK， Client Engine SDK 在实时对战 Play SDK 的基础上进行了封装，帮助您更好的撰写服务端游戏逻辑。您可以通过[快速入门](client-engine-quick-start-node.html)安装依赖。
+Client Engine 初始项目依赖了专门的 Client Engine SDK， Client Engine SDK 在多人在线对战 SDK 的基础上进行了封装，帮助您更好的撰写服务端游戏逻辑。您可以通过[快速入门](client-engine-quick-start-node.html)安装依赖。
 
 ## 组件
 SDK 提供以下组件：
@@ -92,7 +92,7 @@ const loadBalancer = loadBalancerFactory.bind(gameManager, ["createGameAndGetNam
 
 `createGame()` 接受以下参数：
 
-* playerId：发起请求的客户端在实时对战服务中的 [userId](multiplayer-guide-js.html#设置 userId)。
+* playerId：发起请求的客户端在多人对战服务中的 [userId](multiplayer-guide-js.html#设置 userId)。
 * createGameOptions（可选）：创建指定条件的房间。
   * roomName（可选）：创建指定 roomName 的房间。例如您需要和好友一起玩时，可以用这个接口创建房间后，把 roomName 分享给好友。如果您不关心 roomName，可以不指定这个参数。
   * roomOptions（可选）：通过这个参数，客户端在请求 Client Engine 创建房间时，可以设置 `customRoomProperties`，`customRoomPropertyKeysForLobby`，`visible`，对这三个参数的说明请参考[创建房间](multiplayer-guide-js.html#创建房间)。
@@ -127,28 +127,28 @@ GameManager 提供了 `getAvailableGames()` 方法来获取当前 GameManager �
 var games = gameManager.getAvailableGames();
 ```
 
-需要注意的是，这个方法获取的不是实时对战服务中所有的可用房间，**仅限于当前所在 Client Engine 实例中的可用房间**，Client Engine 多实例负载均衡请参考[负载均衡](#负载均衡)。
+需要注意的是，这个方法获取的不是多人对战服务中所有的可用房间，**仅限于当前所在 Client Engine 实例中的可用房间**，Client Engine 多实例负载均衡请参考[负载均衡](#负载均衡)。
 
 #### 匹配
 `GameManager` 暂时没有提供匹配机制，如果客户端只需要随机加入某个房间，可以参考[示例项目](client-engine-first-game-node.html)中「快速开始」的实现方案。这个实现方案会在负载最低的实例中寻找可用房间或创建房间，最终返回给客户端一个可加入的房间名称。
 
 如果您希望实现有条件的匹配，可以这样实现：
 
-1. 客户端向实时对战服务请求[有条件的匹配](multiplayer-guide-js.html#随机加入房间)，如果有空余的房间，则会触发加入成功事件。
-2. 如果实时对战服务此时没有空余的房间，客户端会收到「加入房间失败」事件，在这个事件中，发现错误码是 [4301](multiplayer-error-code.html#4301)，则向 Client Engine 请求创建房间。
+1. 客户端向多人对战服务请求[有条件的匹配](multiplayer-guide-js.html#随机加入房间)，如果有空余的房间，则会触发加入成功事件。
+2. 如果的多人对战服务此时没有空余的房间，客户端会收到「加入房间失败」事件，在这个事件中，发现错误码是 [4301](multiplayer-error-code.html#4301)，则向 Client Engine 请求创建房间。
 3. Client Engine 收到请求后创建房间并返回 roomName 给客户端。这一部分的逻辑可以使用[示例项目](client-engine-first-game-node.html)中的 `/game` 入口。
 4. 客户端拿到 Client Engine 返回的 roomName 后加入房间，等待其他人匹配加入。
 
 这个流程在客户端中的示例代码如下（**非 Client Engine**）：
 
-客户端首先向实时对战服务发起有条件的加入房间请求：
+客户端首先向多人对战服务发起有条件的加入房间请求：
 
 ```js
 const matchProps = {level: 2};
 play.joinRandomRoom({matchProperties: matchProps});
 ```
 
-如果实时对战服务此时有可以加入的新房间，您会自动加入到新房间中，并触发加入房间成功事件：
+如果多人对战服务此时有可以加入的新房间，您会自动加入到新房间中，并触发加入房间成功事件：
 
 ```js
 play.on(Event.ROOM_JOINED, () => {
@@ -202,7 +202,7 @@ play.on(Event.ROOM_JOIN_FAILED, (error) => {
 * `players` 属性：不包含 masterClient 的玩家列表。注意，如果您通过 Play SDK Room 实例的 `playerList` 属性获取的房间成员列表是包括 masterClient 的。
 
 #### Game 通用方法
-Game 类在实时对战 SDK 的基础上封装了以下方法，使得 MasterClient 可以更便利的发送自定义事件：
+Game 类在多人对战 SDK 的基础上封装了以下方法，使得 MasterClient 可以更便利的发送自定义事件：
 
 * `broadcast()` 方法：向所有玩家广播自定义事件。示例代码请参考[广播自定义事件](#广播自定义事件)。
 * `forwardToTheRests()` 方法：将一个玩家发送的自定义事件转发给其他玩家。示例代码请参考[转发自定义事件](#转发自定义事件)。
@@ -220,9 +220,9 @@ export default class SampleGame extends Game {
 ```
 
 #### 设置房间内玩家数量
-这里的玩家数量指的是不包括 MasterClient 的玩家数量，根据实时对战服务的限制，最多不能超过 9 个人。
+这里的玩家数量指的是不包括 MasterClient 的玩家数量，根据多人对战服务的限制，最多不能超过 9 个人。
 
-在 `Game` 中需要指定 `defaultSeatCount` 静态属性作为默认的玩家数量，Client Engine 会根据这个值向实时对战服务请求创建房间。例如斗地主需要 3 个人才能玩，可以这样设置：
+在 `Game` 中需要指定 `defaultSeatCount` 静态属性作为默认的玩家数量，Client Engine 会根据这个值向多人对战服务请求创建房间。例如斗地主需要 3 个人才能玩，可以这样设置：
 
 ```js
 export default class SampleGame extends Game {
@@ -316,14 +316,14 @@ this.forwardToTheRests(event, (eventData) => {
 在这个代码中，`event` 参数是某个客户端发来的原始事件，`eventData` 是原始事件的数据，您可以在转发事件给其他客户端时处理该数据，例如抹去或增加一些信息。MasterClient 发送该事件后，客户端的[接收自定义事件](multiplayer-guide-js.html#接收自定义事件)会被触发。
 
 #### MasterClient 与客户端通信
-除了上方初始项目提供的[广播自定义事件](#广播自定义事件)及[转发自定义事件](#转发自定义事件)外，您依然可以使用实时对战服务中的[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)进行通信。
+除了上方初始项目提供的[广播自定义事件](#广播自定义事件)及[转发自定义事件](#转发自定义事件)外，您依然可以使用多人对战服务中的[自定义属性](multiplayer-guide-js.html#自定义属性及同步)、[自定义事件](multiplayer-guide-js.html#自定义事件)进行通信。
 
 除此之外，`Game` 还提供了以下 [RxJS](http://reactivex.io/rxjs) 方法方便您对事件进行流处理，进而精简自己的代码及逻辑：
 
 * `getStream()` 方法：获取玩家发送的自定义事件的流，这是一个 RxJS 中的 Observable 对象。接口说明请参考 [API 文档](https://leancloud.github.io/client-engine-nodejs-sdk/classes/game.html#getstream)。
 * `takeFirst()` 方法：获取玩家发送的指定条件的从现在开始算的第一条自定义事件的流，返回一个 RxJS 中的 Observable 对象。接口说明请参考 [API 文档](https://leancloud.github.io/client-engine-nodejs-sdk/classes/game.html#takefirst)。
 
-注意，以上两个方法需要您了解 [RxJS](http://reactivex.io/rxjs) 才能使用，如果您不了解 [RxJS](http://reactivex.io/rxjs)，依然可以使用实时对战服务中的[事件方法](multiplayer-guide-js.html#自定义事件)进行通信。
+注意，以上两个方法需要您了解 [RxJS](http://reactivex.io/rxjs) 才能使用，如果您不了解 [RxJS](http://reactivex.io/rxjs)，依然可以使用多人对战服务中的[事件方法](multiplayer-guide-js.html#自定义事件)进行通信。
 
 #### 游戏结束
 

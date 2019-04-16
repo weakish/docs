@@ -1,8 +1,8 @@
 # Client Engine 总览
 
-**在阅读本文档之前，请先阅读[实时对战服务总览](multiplayer.html)及 [MasterClient](multiplayer-guide-js.html#MasterClient) ，了解实时对战开发的基础结构。**
+**在阅读本文档之前，请先阅读[多人在线对战服务总览](multiplayer.html)及 [MasterClient](multiplayer-guide-js.html#MasterClient) ，了解多人在线对战开发的基础结构。**
 
-Client Engine 是 LeanCloud Play 提供的实时对战游戏 Client 托管方案。实时对战服务提供了 MasterClient 机制来控制游戏逻辑：MasterClient 是一个特殊的 Client，它接收和处理游戏内的所有事件与消息，进行实时处理之后将结果下发给其他游戏客户端，用以控制游戏向下执行。开发者可以基于实时对战 SDK 开发出一套完整的 MasterClient 逻辑，继而将这样的「客户端」托管到 Client Engine，省去程序部署、运维的负担。如图所示：
+Client Engine 是 LeanCloud Play 提供的多人在线游戏 Client 托管方案。[多人在线对战服务](multiplayer.html)提供了 MasterClient 机制来控制游戏逻辑：MasterClient 是一个特殊的 Client，它接收和处理游戏内的所有事件与消息，进行实时处理之后将结果下发给其他游戏客户端，用以控制游戏向下执行。开发者可以基于多人在线对战的 SDK 开发出一套完整的 MasterClient 逻辑，继而将这样的「客户端」托管到 Client Engine，省去程序部署、运维的负担。如图所示：
 
 ![image](images/client-engine-structure.png)
 
@@ -13,7 +13,7 @@ Client Engine 是 LeanCloud Play 提供的实时对战游戏 Client 托管方案
 
 将游戏逻辑托管在 Client Engine 有以下优势：
 
-* 网络延迟更低。游戏运行过程中涉及到「游戏玩家」-「实时对战云端」- MasterClient 三方非常频繁的消息交互， Client Engine 与实时对战云端处于同一物理网络，可以大幅减少公网的传输延迟。
+* 网络延迟更低。游戏运行过程中涉及到「游戏玩家」-「多人对战云端」- MasterClient 三方非常频繁的消息交互， Client Engine 与多人对战云端处于同一物理网络，可以大幅减少公网的传输延迟。
 * 运维支持更成熟。Client Engine 提供了完善的日志收集、状态监控、负载均衡以及自动容错恢复机制，可以提供更高的稳定性保障。
 * 自由伸缩更有弹性。Client Engine 提供了庞大的资源池，可以快速响应单个游戏产品临时的、突发的扩容需求，无需手动调整实例，自动完成扩容。
 

@@ -42,7 +42,7 @@ const {
 const Play = require('./play');
 ```
 
-接着我们需要实例化一个实时对战 SDK 的客户端对象。
+接着我们需要实例化一个在线对战 SDK 的客户端对象。
 
 ```javascript
 const client = new Client({
@@ -426,7 +426,7 @@ client.createRoom({
 
 
 {% block custom_props %}
-为了满足开发者不同的游戏需求，实时对战 SDK 允许开发者设置「自定义属性」。自定义属性接口参数定义为 JavaScript 的 `Object` 类型，支持的数据类型包括：
+为了满足开发者不同的游戏需求，在线对战 SDK 允许开发者设置「自定义属性」。自定义属性接口参数定义为 JavaScript 的 `Object` 类型，支持的数据类型包括：
 
 - Boolean
 - Number

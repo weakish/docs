@@ -28,11 +28,11 @@
 [点击下载客户端项目](https://github.com/leancloud/client-engine-demo-webapp)。**打开 `./src` 中的 `config.ts`，将 appId 和 appKey 修改为自己应用的信息**，按照 README 启动项目后观察界面的变化。游戏相关的逻辑位于 `./src/components` 下的文件中，在有需要的时候您可以打开这里的文件查看代码。
 
 ## 核心流程
-在实时对战服务中，房间的创建者为 MasterClient，因此在这个小游戏中，每一个房间都是由 Client Engine 管理的 MasterClient 调用实时对战服务相关的接口来创建的。Client Engine 中会有多个 MasterClient，每一个 MasterClient 管理着自己房间内的游戏逻辑。
+在多人对战服务中，房间的创建者为 MasterClient，因此在这个小游戏中，每一个房间都是由 Client Engine 管理的 MasterClient 调用在线对战服务相关的接口来创建的。Client Engine 中会有多个 MasterClient，每一个 MasterClient 管理着自己房间内的游戏逻辑。
 
 这个小游戏的核心逻辑为：**Client Engine 中的 MasterClient 及客户端玩家 Client 加入到同一个房间，在通信过程中由 MasterClient 控制游戏内的逻辑。**具体拆解步骤如下：
 
-1. 玩家客户端连接[实时对战服务](multiplayer.html)，向 Client Engine 提供的 `/reservation` 接口请求快速开始游戏。
+1. 玩家客户端连接[多人在线对战服务](multiplayer.html)，向 Client Engine 提供的 `/reservation` 接口请求快速开始游戏。
 2. Client Engine 每次收到请求后会检查是否有可用的房间，如果有则返回已有的 roomName 给客户端；如果没有则创建新的 MasterClient 并创建一个新的房间，返回 roomName 给客户端。
 3. 客户端通过 Client Engine 返回的 roomName 加入房间。
 4. MasterClient 和客户端在同一房间内，每次客户端出拳时会将消息发送给 MasterClient，MasterClient 将消息转发给其他客户端，并最终判定游戏结果。
@@ -173,7 +173,7 @@ export default class RPSGame extends Game {
   public static defaultSeatCount = 2;
 }
 ```
-在这里配置完成后，Client Engine 初始项目每次请求实时对战服务创建房间时，都会根据这里的值限定房间内的玩家数量。
+在这里配置完成后，Client Engine 初始项目每次请求多人对战服务创建房间时，都会根据这里的值限定房间内的玩家数量。
 
 对设置房间内玩家数量的详细讲解请参考 [Client Engine 开发指南](client-engine-guide-node.html#设置房间内玩家数量)。
 
@@ -312,7 +312,7 @@ protected start = async () => {
 }
 ```
 
-在这段代码中，Game 中的 MasterClient 对象注册了实时对战服务的自定义事件，当玩家 A 发送 `play` 事件给 MasterClient 时，这个事件会被触发。我们在这个事件中使用了 `Game` 的转发事件方法 `forwardToTheRests()`，这个方法第一个参数是原始的事件，第二个参数是原始事件的 eventData 数据处理，我们将原始的 eventData 数据，也就是玩家 A 发来的 `{index}`，修改为空数据 `{}`，这样当玩家 B 收到事件后无法获知玩家 A 的详细动作。
+在这段代码中，Game 中的 MasterClient 对象注册了多人对战的自定义事件，当玩家 A 发送 `play` 事件给 MasterClient 时，这个事件会被触发。我们在这个事件中使用了 `Game` 的转发事件方法 `forwardToTheRests()`，这个方法第一个参数是原始的事件，第二个参数是原始事件的 eventData 数据处理，我们将原始的 eventData 数据，也就是玩家 A 发来的 `{index}`，修改为空数据 `{}`，这样当玩家 B 收到事件后无法获知玩家 A 的详细动作。
 
 #### 玩家 B 收到 MasterClient 转发来的事件，界面展示：对方已选择
 

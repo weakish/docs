@@ -5,7 +5,7 @@
 
 
 {% block installation %}
-实时对战客户端 SDK 是开源的，您可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。源码请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。
+多人在线对战客户端 SDK 是开源的，您可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。源码请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。
 
 ## 支持开发平台
 

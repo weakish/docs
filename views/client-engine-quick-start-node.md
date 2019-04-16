@@ -1,6 +1,6 @@
 # Client Engine 快速入门 · Node.js
 
-该文档帮助你快速了解如何创建一个 Client Engine 项目，该项目是一个简单的双人剪刀石头布游戏，游戏逻辑的开发依赖于实时对战 JavaScript SDK。
+该文档帮助你快速了解如何创建一个 Client Engine 项目，该项目是一个简单的双人剪刀石头布游戏，游戏逻辑的开发依赖于多人在线对战 JavaScript SDK。
 
 我们在这篇文档中先了解如何本地启动项目，简单试玩一下，然后部署项目到云端。之后在[开发指南](client-engine-guide-node.html)中会介绍详细的游戏逻辑以及如何开发自己的游戏。
 
