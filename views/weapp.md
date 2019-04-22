@@ -7,12 +7,11 @@
 ## Demo
 我们在小程序上实现了 LeanTodo 应用。在这个 Demo 中你可以看到：
 
+- 如何集成 LeanCloud 用户系统，包括自动登录、unionid 绑定以及如何在登录后设置账号与密码以供用户在其他平台的 LeanTodo 应用上登录
 - 如何对云端数据进行查询、增加、修改与删除
 - 如何将查询结果数组绑定到视图层进行展示，以及如何在点击事件中得到对应的数组项
 - 如何使用 [LiveQuery](livequery-guide.html) 实现对查询结果的实时更新和多端同步
-- 如何自动登录 LeanCloud 用户系统，以及如何在登录后设置账号与密码以供用户在其他平台的 LeanTodo 应用上登录
 - 如何集成微信支付
-- 如何实现下拉刷新
 
 你可以通过微信扫描以下二维码进入 Demo。 Demo 的源码与运行说明请参考 [https://github.com/leancloud/leantodo-weapp](https://github.com/leancloud/leantodo-weapp)。
 
@@ -27,66 +26,128 @@
 ### 配置域名白名单
 请按照 [小程序域名白名单配置](weapp-domains.html) 的步骤配置。如果你不需要进行真机调试可以跳过这一步（可在开发者工具的 **详情** > **项目设置** 中勾选**不校验安全域名、TLS 版本以及 HTTPS 证书**）。
 
-## 存储
+### 安装与初始化 SDK
 
-要使用 LeanCloud 的数据存储、用户系统、调用云引擎等功能，需要使用 LeanCloud 存储 SDK。
+要使用 LeanCloud 的结构化对象存储、文件存储、用户系统等功能，需要使用 LeanCloud 存储 SDK。存储 SDK 的安装与初始化请请参阅《[JavaScript SDK 安装指南](sdk_setup-js.html)》中对应平台的说明。
 
-### 安装与初始化
-请参阅《[JavaScript SDK 安装指南](sdk_setup-js.html)》中对应平台的说明。
-
-### 对象存储
-所有的对象存储 API 都能正常使用，详细的用法请参考 [JavaScript 数据存储开发指南](leanstorage_guide-js.html)。
-
-#### 数据绑定
-直接使用 `this.setData()` 将 `AV.Object` 对象设置为当前页面的 data，即可在 WXML 中使用 Mustache 语法访问绑定的数据了。下面这个例子展示了如何将一个 Query 的查询结果显示在页面上：
+安装存储 SDK 后即可在 `app.js` 中初始化应用：
 
 ```javascript
-// pages/todos/todos.js
+// 获取 AV 命名空间的方式根据不同的安装方式而异，这里假设是通过手动导入文件的方式安装的 SDK
+const AV = require('./libs/av-weapp-min.js');
+AV.init({
+  appId: '{{appid}}',
+  appKey: '{{appkey}}',
+});
+```
+
+要使用 LeanCloud 的即时通讯服务实现聊天等功能，需要使用 LeanCloud 即时通讯 SDK。即时通讯 SDK 是与存储 SDK 独立的 SDK，我们在单独的 [即时通讯](#即时通讯) 章节介绍其安装与初始化的步骤。
+
+
+## 结构化对象存储
+所有的结构化对象存储 API 都能正常使用，详细的用法请参考 [JavaScript 数据存储开发指南](leanstorage_guide-js.html)。
+
+### 数据绑定
+
+<a name="data-binding"></a>`AV.Object` 实例是一些携带很多信息与方法的对象，而小程序的存放渲染用数据的 `data` 字段需要的是 JSON 类型的数据，因此我们需要将 `AV.Object` 实例处理为 JSON 数据后再设置给 `data`。
+
+以 LeanTodo Demo 中的 Todo 列表为例，要实现「将 `AV.Query` 查询结果 `Todo` 列表中的 `content` 与 `done` 字段展示为列表」的功能，我们可以定义一个 `getDataForRender` 来做上面说的「处理」：
+
+```js
+const getDataForRender = todo => ({
+  content: todo.get('content'),
+  done: todo.get('done')
+});
+
 Page({
   data: {
-    todos: [],
+    todos: []
   },
-  onReady: function() {
+  onReady() {
     new AV.Query('Todo')
-      .descending('createdAt')
       .find()
-      .then(todos => this.setData({ todos }))
+      .then(todos => this.setData({
+        todos: todos.map(getDataForRender)
+      }))
       .catch(console.error);
-  },
+  }
 });
 ```
-```html
-<!-- pages/todos/todos.wxml -->
-<block wx:for="{{ docs.mustache('todos','',{},true) }}" wx:for-item="todo" wx:key="objectId">
-  <text data-id="{{ docs.mustache('todo.objectId','',{},true) }}">
-    {{ docs.mustache('todo.content','',{},true) }}
-  </text>
-</block>
+
+`AV.Object` 提供了一个 `#toJSON()` 方法以 JSON 的形式返回其携带的有效信息。因此如果不考虑渲染性能，`getDataForRender` 可以简化为：
+
+```js
+const getDataForRender = todo => todo.toJSON();
 ```
 
-使用 `include` 得到的嵌套对象也可以直接在视图层通过 `.` 访问到：
+{{ docs.note("使用 `#toJSON()` 会比手动 pick 需要的数据带来更多的性能消耗。这是因为小程序的 `data` 在逻辑层与渲染层之间是通过序列化后的字符串格式通讯的，过大的 `data` 结构会造成渲染耗时过久。因此对于结构复杂的 `AV.Object`，特别是如果是一个列表，手动 pick 需要的数据设置为 `data` 是一种常见的优化方法。") }}
 
-```javascript
-// pages/student/student.js
+当然，每次 `setData` 时遇到不同结构中的 `AV.Object` 都要进行这样的处理会让代码充斥噪音，你可以使用各种技巧对此进行优化。这里分享一个 Demo 中使用的一个统一对 `setData` 的对象进行「处理」的 utility 方法 `jsonify`：
+
+```js
+const isPlainObject = target =>
+  target &&
+  target.toString() == '[object Object]' &&
+  Object.getPrototypeOf(target) == Object.prototype;
+const _jsonify = target => {
+  if (target && typeof target.toJSON === 'function') return target.toJSON();
+  if (Array.isArray(target)) return target.map(_jsonify);
+  return target;
+};
+
+const jsonify = target =>
+  isPlainObject(target)
+    ? Object.keys(target).reduce(
+      (result, key) => ({
+        ...result,
+        [key]: _jsonify(target[key])
+      }),
+      {}
+    )
+    : _jsonify(target);
+```
+
+`jsonify` 能正确的处理 `AV.Object`、`AV.Object` 数组以及其他类型的数据。使用时可以简单的在所有的 `setData` 之前对数据调用一次 `jsonify` 方法：
+
+```js
+this.setData(jsonify({
+  todos, // AV.Object list
+  user, // AV.Object
+}));
+```
+
+值得注意的是从 `AV.Object` 到 JSON 数据的处理是不可逆的，如果在之后还需要用到查询结果的 `AV.Object`，我们可以将其保存到 Page 实例上：
+
+```js
 Page({
+  // todos 存放的是 AV.Object 列表，后续可以这些对象进行操作（比如调用其 save 方法），不参与渲染
+  todos: [],
   data: {
-    student: null,
+    // data.todo 存放的是 JSON 数据，供 WXML 页面渲染用
+    todos: []
   },
-  onReady: function() {
-    new AV.Query('Student')
-      .include('avatar') // avatar is an AV.File
-      .get('56a9803e1532bc005303650c')
-      .then(student => this.setData({ student }))
+  onReady() {
+    new AV.Query('Todo')
+      .find()
+      .then(todos => {
+        this.todos = todos;
+        this.setData(jsonify({
+          todos
+        });
+      })
       .catch(console.error);
   },
+  saveAll() {
+    // 可以在这里获取到 this.todos 进行操作
+    return AV.Object.saveAll(this.todos)
+  }
 });
 ```
-```html
-<!-- pages/student/student.wxml -->
-<image src="{{ docs.mustache('student.avatar.url','','',true) }}"></image>
-```
 
-### 文件存储
+{{ docs.note("你可能会在某些过时的文档或者 Demo 中看到直接使用 `this.setData()` 将 `AV.Object` 对象设置为当前页面的 data 的用法。我们 **不再推荐这种用法**。这是 SDK 针对小程序做的特殊「优化」，利用了小程序渲染机制中的一个未定义行为，目前已知在使用了自定义组件（`usingComponents`）时这种用法会失效。") }}
+
+
+## 文件存储
 
 在小程序中，可以将用户相册或拍照得到的图片上传到 LeanCloud 服务器进行保存。首先通过 `wx.chooseImage` 方法选择或拍摄照片，得到本地临时文件的路径，然后按照下面的方法构造一个 `AV.File` 将其上传到 LeanCloud：
 
@@ -97,39 +158,32 @@ wx.chooseImage({
   sourceType: ['album', 'camera'],
   success: function(res) {
     var tempFilePath = res.tempFilePaths[0];
+    // 使用本地临时文件的路径构造 AV.File
     new AV.File('file-name', {
       blob: {
         uri: tempFilePath,
       },
-    }).save().then(
-      file => console.log(file.url())
-    ).catch(console.error);
+    })
+      // 上传
+      .save()
+      // 上传成功
+      .then(file => console.log(file.url()))
+      // 上传发生异常
+      .catch(console.error);
   }
 });
 ```
 
 上传成功后可以通过 `file.url()` 方法得到服务端的图片 url。
 
-#### 文件批量上传
-目前在小程序 Android 上不支持文件并发上传，需要串行上传：
+关于文件存储更详细的用法请参考 [JavaScript 数据存储开发指南 · 文件](leanstorage_guide-js.html#文件)。
 
-```javascript
-res.tempFilePaths.map(tempFilePath => () => new AV.File('filename', {
-  blob: {
-    uri: tempFilePath,
-  },
-}).save()).reduce(
-  (m, p) => m.then(v => AV.Promise.all([...v, p()])),
-  AV.Promise.resolve([])
-).then(files => console.log(files.map(file => file.url()))).catch(console.error);
-```
+## 用户系统
 
-### 用户系统
+小程序中提供了登录 API 来获取微信的用户登录状态，应用可以访问到用户的昵称、性别等基本信息。但是如果想要保存额外的用户信息，如用户的手机号码、收货地址等，或者需要在其他平台使用该用户登录，则需要使用 LeanCloud 的用户系统。
 
-小程序中提供了登录 API 来获取微信的用户登录状态，应用可以访问到用户的昵称、性别等基本信息，但是如果想要保存额外的用户信息，如用户的手机号码、收货地址等，则需要使用 LeanCloud 的用户系统。
-
-#### 一键登录
-LeanCloud 的用户系统现已支持一键使用微信用户身份登录。要使用一键登录功能，需要先设置小程序的 AppID 与 AppSecret：
+### 一键登录
+LeanCloud 的用户系统支持一键使用微信用户身份登录。要使用一键登录功能，需要先设置小程序的 AppID 与 AppSecret：
 
 1. 登录 [微信公众平台](https://mp.weixin.qq.com)，在 **设置** > **开发设置** 中获得 AppID 与 AppSecret。
 2. 前往 LeanCloud 控制台 > **组件** > **社交**，保存「微信小程序」的 AppID 与 AppSecret。
@@ -138,13 +192,27 @@ LeanCloud 的用户系统现已支持一键使用微信用户身份登录。要�
 
 ```javascript
 AV.User.loginWithWeapp().then(user => {
-  this.globalData.user = user.toJSON();
+  this.globalData.user = user;
 }).catch(console.error);
 ```
 
-如果该用户是第一次使用此应用，调用登录 API 会创建一个新的用户，你可以在 控制台 > **存储** 中的 `_User` 表中看到该用户的信息，如果该用户曾经使用该方式登录过此应用，再次调用登录 API 会返回同一个用户。
+使用一键登录方式登录时，LeanCloud 会将该用户的小程序 `openid` 与 `session_key` 等信息保存在对应的 `user.authData.lc_weapp` 属性中，你可以在控制台的 `_User` 表中看到：
 
-用户的登录状态会保存在客户端中，可以使用 `AV.User.current()` 方法来获取当前登录的用户，下面的例子展示了如何同步登录用户的信息：
+```json
+{
+  "authData": {
+    "lc_weapp": {
+      "session_key": "2zIDoEEUhkb0B5pUTzsLVg==",
+      "expires_in": 7200,
+      "openid": "obznq0GuHPxdRYaaDkPOHk785DuA"
+    }
+  }
+}
+```
+
+如果用户是第一次使用此应用，调用登录 API 会创建一个新的用户，你可以在 控制台 > **存储** 中的 `_User` 表中看到该用户的信息，如果用户曾经使用该方式登录过此应用（存在对应 `openid` 的用户），再次调用登录 API 会返回同一个用户。
+
+用户的登录状态会保存在客户端中，可以使用 `AV.User.current()` 方法来获取当前登录的用户，下面的例子展示了如何为登录用户保存额外的信息：
 
 ```javascript
 // 假设已经通过 AV.User.loginWithWeapp() 登录
@@ -156,41 +224,128 @@ wx.getUserInfo({
     // 更新当前用户的信息
     user.set(userInfo).save().then(user => {
       // 成功，此时可在控制台中看到更新后的用户信息
-      this.globalData.user = user.toJSON();
+      this.globalData.user = user;
     }).catch(console.error);
   }
 });
 ```
 
-使用一键登录方式登录时，LeanCloud 会将该用户的小程序 openid 保存在对应的 `user.authData.lc_weapp` 属性中，你可以在控制台的 `_User` 表中看到。可以使用 masterKey 在云引擎中获取该用户的 openid 进行支付、推送等操作。详情请参考 [支付](#支付)。
+`authData` 默认只有对应用户可见，开发者可以使用 masterKey 在云引擎中获取该用户的 `openid` 与 `session_key` 进行支付、推送等操作。详情的示例请参考 [支付](#支付)。
 
-#### 使用 unionid 登录
+{{ docs.note("小程序的登录态（`session_key`）存在有效期，可以通过 [`wx.checkSession()`](https://developers.weixin.qq.com/miniprogram/dev/api/wx.checkSession.html) 方法检测当前用户登录态是否有效，失效后可以通过调用 `AV.User.loginWithWeapp()` 重新登录。") }}
 
-微信开放平台使用 [unionid](https://mp.weixin.qq.com/debug/wxadoc/dev/api/uinionID.html) 来区分用户的唯一性，也就是说同一个微信开放平台帐号下的移动应用、网站应用和公众帐号（包括小程序），用户的 unionid 都是同一个，而 openid 会是多个。
+### 使用 unionid
 
-开发者需要自行获得用户的 unionid，然后调用 `AV.User.loginWithAuthDataAndUnionId()` 投入 unionid 完成登录授权（而不应该再使用 `AV.User.loginWithWeapp()`）：
+微信开放平台使用 [unionid](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/union-id.html) 来区分用户的唯一性，也就是说同一个微信开放平台帐号下的移动应用、网站应用和公众帐号（包括小程序），用户的 unionid 都是同一个，而 openid 会是多个。如果你想要实现多个小程序之间，或者小程序与使用微信开放平台登录的应用之间共享用户系统的话，则需要使用 unionid 登录。
 
-  ```javascript
-AV.User.loginWithAuthDataAndUnionId({
-  uid: openid,
-  access_token: session_key,
-  ...其他可选属性
-}, 'weapp_union', unionid, {
-  unionIdPlatform: 'weixin', // 指定为 weixin 即可通过 unionid 与其他 weixin 平台的帐号打通
-  asMainAccount: true,
-}).then(console.log, console.error);
+{{ docs.note("要在小程序中使用 unionid 登录，请先确认已经在 **微信开放平台** 绑定了该小程序") }}
+
+在小程序中有很多途径可以 [获取到 unionid](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/union-id.html)。不同的 unionid 获取方式，接入 LeanCloud 用户系统的方式也有所不同。
+
+#### 一键登录时静默获取 unionid
+
+当满足以下条件时，一键登录 API `AV.User.loginWithWeapp()` 能静默地获取到用户的 unionid 并用 unionid + openid 进行匹配登录。
+
+- 微信开放平台帐号下存在同主体的公众号，并且该用户已经关注了该公众号。
+- 微信开放平台帐号下存在同主体的公众号或移动应用，并且该用户已经授权登录过该公众号或移动应用。
+
+要启用这种方式，需要在一键登录时指定参数 `preferUnionId` 为 true：
+
+```js
+AV.User.loginWithWeapp({
+  preferUnionId: true,
+});
+```
+
+使用 unionid 登录后，用户的 authData 中会增加 `_weixin_unionid` 一项（与 `lc_weapp` 平级）：
+
+```json
+{
+  "authData": {
+    "lc_weapp": {
+      "session_key": "2zIDoEEUhkb0B5pUTzsLVg==",
+      "expires_in": 7200,
+      "openid": "obznq0GuHPxdRYaaDkPOHk785DuA",
+      "unionid": "ox7NLs5BlEqPS4glxqhn5kkO0UUo"
+    },
+    "_weixin_unionid": {
+      "uid": "ox7NLs5BlEqPS4glxqhn5kkO0UUo"
+    }
+  }
+}
+```
+
+用 unionid + openid 登录时，会按照下面的步骤进行用户匹配：
+
+1. 如果已经存在对应 unionid（`authData._weixin_unionid.uid`）的用户，则会直接作为这个用户登录，并将所有信息（`openid`、`session_key`、`unionid` 等）更新到该用户的 `authData.lc_ewapp` 中。
+2. 如果不存在匹配 unionid 的用户，但存在匹配 openid（`authData.lc_weapp.openid`）的用户，则会直接作为这个用户登录，并将所有信息（`session_key`、`unionid` 等）更新到该用户的 `authData.lc_ewapp` 中，同时将 `unionid` 保存到 `authData._weixin_unionid.uid` 中。
+3. 如果不存在匹配 unionid 的用户，也不存在匹配 openid 的用户，则创建一个新用户，将所有信息（`session_key`、`unionid` 等）更新到该用户的 `authData.lc_ewapp` 中，同时将 `unionid` 保存到 `authData._weixin_unionid.uid` 中。
+
+不管匹配的过程是如何的，最终登录用户的 `authData` 都会是上面这种结构。
+
+[LeanTodo Demo](#Demo) 便是使用这种方式登录的，如果你已经关注了其关联的公众号（搜索 AVOSCloud，或通过小程序关于页面的相关公众号链接访问），那么你在登录后会在 LeanTodo Demo 的 **设置 - 用户** 页面看到当前用户的 `authData` 中已经绑定了 unionid。
+
+需要注意的是：
+
+- 如果用户不符合上述静默获取 unionid 的条件，那么就算指定了 `preferUnionId` 也不会使用 unionid 登录。
+- 如果用户符合上述静默获取 unionid 的条件，但没有指定 `preferUnionId`，那么该次登录不会使用 unionid 登录，但仍然会将获取到的 unionid 作为一般字段写入该用户的 `authData.lc_weapp` 中。此时用户的 `authData` 会是这样的：
+
+  ```json
+  {
+    "authData": {
+      "lc_weapp": {
+        "session_key": "2zIDoEEUhkb0B5pUTzsLVg==",
+        "expires_in": 7200,
+        "openid": "obznq0GuHPxdRYaaDkPOHk785DuA",
+        "unionid": "ox7NLs5BlEqPS4glxqhn5kkO0UUo"
+      }
+    }
+  }
   ```
 
-为确保同一个 uid 只存在一条记录，你还需要为 `authData.weapp_union.uid` 加上唯一索引。进入 **控制台** > **存储** > 选择 `_User` 表 > **其他** > **索引**，勾选 **authData** 然后在出现的输入框中键入 `authData.weapp_union.uid`，点击 **创建**。
+#### 通过其他方式获取 unionid 后登录
 
-{{
-  docs.note(
-    data.limitationsOnCreatingClassIndex()
-  )
-}}
+如果开发者自行获得了用户的 unionid（例如通过解密 wx.getUserInfo 获取到的用户信息），可以在小程序中调用 `AV.User.loginWithWeappWithUnionId()` 投入 unionid 完成登录授权：
 
-#### 启用其他登录方式
-由于 `AV.User.loginWithWeapp()` 只能在小程序中使用，所以使用该 API 创建的用户无法直接在小程序之外的平台上登录。如果需要使用 LeanCloud 用户系统提供的其他登录方式，如用手机号验证码登录、邮箱密码登录等，在小程序一键登录后设置对应的用户属性即可：
+```javascript
+AV.User.loginWithWeappWithUnionId(unionid, {
+  asMainAccount: true
+}).then(console.log, console.error);
+```
+
+#### 通过其他方式获取 unionid 与 openid 后登录
+
+如果开发者希望更灵活的控制小程序的登录流程，也可以自行在服务端实现 unionid 与 openid 的获取，然后调用通用的第三方 unionid 登录接口指定平台为 `lc_weapp` 来登录：
+
+```js
+const unionid = ''
+const authData = {
+  openid: '',
+  session_key: ''
+};
+const platform = 'lc_weapp';
+AV.User.loginWithAuthDataAndUnionId(authData, platform, unionid, {
+  asMainAccount: true
+}).then(console.log, console.error);
+```
+
+相对上面提到的一些 Weapp 相关的登录 API，loginWithAuthDataAndUnionId 是更加底层的第三方登录接口，不依赖小程序运行环境，因此这种方式也提供了更高的灵活度：
+- 可以在服务端获取到 unionid 与 openid 等信息后返回给小程序客户端，在客户端调用 `AV.User.loginWithAuthDataAndUnionId` 来登录。
+- 也可以在服务端获取到 unionid 与 openid 等信息后直接调用 `AV.User.loginWithAuthDataAndUnionId` 登录，成功后得到登录用户的 `sessionToken` 后返回给客户端，客户端再使用该 `sessionToken` 直接登录。
+
+#### 获取 unionid 后与现有用户关联
+
+如果一个用户已经登录，现在通过某种方式获取到了其 unionid（一个常见的使用场景是用户完成了支付操作后在服务端通过 getPaidUnionId 得到了 unionid）希望与之关联，可以在小程序中使用 `AV.User#associateWithWeappWithUnionId()`：
+
+```javascript
+const user = AV.User.current(); // 获取当前登录用户
+user.associateWithWeappWithUnionId(unionid, {
+  asMainAccount: true
+}).then(console.log, console.error);
+```
+
+### 启用其他登录方式
+上述的登录 API 对接的是小程序的用户系统，所以使用这些 API 创建的用户无法直接在小程序之外的平台上登录。如果需要使用 LeanCloud 用户系统提供的其他登录方式，如用手机号验证码登录、邮箱密码登录等，在小程序登录后设置对应的用户属性即可：
 
 ```javascript
 // 小程序登录
@@ -210,34 +365,28 @@ AV.User.loginWithWeapp().then(user => {
 
 {{ docs.note("验证手机号码功能要求在 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf) 启用「用户注册时，向注册手机号码发送验证短信」。") }}
 
-#### 绑定现有用户
-如果你的应用已经在使用 LeanCloud 的用户系统，或者用户已经通过其他方式注册了你的应用（比如在 Web 端通过用户名密码注册），可以通过在小程序中调用 `AV.User#linkWithWeapp()` 来关联已有的账户：
+### 绑定现有用户
+如果你的应用已经在使用 LeanCloud 的用户系统，或者用户已经通过其他方式注册了你的应用（比如在 Web 端通过用户名密码注册），可以通过在小程序中调用 `AV.User#associateWithWeapp()` 来关联已有的账户：
 
 ```javascript
 // 首先，使用用户名与密码登录一个已经存在的用户
 AV.User.logIn('username', 'password').then(user => {
   // 将当前的微信用户与当前登录用户关联
-  return user.linkWithWeapp();
+  return user.associateWithWeapp();
 }).catch(console.error);
 ```
 
-### 云引擎
-使用云引擎可以方便地实现一些在服务器执行的逻辑，比如处理敏感信息、数据聚合、采集数据等，并且不需要准备额外的服务器。
-
-SDK 所有的云引擎相关的 API 都能正常使用，详细的用法请参考 [云函数开发指南](leanengine_cloudfunction_guide-node.html)。
-
-使用云引擎实现小程序支付的方案参见 [支付](#支付)。
-
 ## 即时通讯
 
-要使用 LeanCloud 的聊天、即时通讯功能，需要使用 LeanCloud 即时通讯 SDK。
+要使用 LeanCloud 的即时通讯服务实现聊天等功能，需要使用 LeanCloud 即时通讯 SDK。
 
 ### 安装与初始化
 请参阅《[JavaScript SDK 安装指南](sdk_setup-js.html)》中对应平台的说明。
 
-在 `app.js` 中初始化应用：
+安装 SDK 后即可在 `app.js` 中初始化应用：
 
 ```javascript
+// Realtime 类获取的方式根据不同的安装方式而异，这里假设是通过手动导入文件的方式安装的 SDK
 const { Realtime } = require('./libs/realtime.weapp.min.js');
 const realtime = new Realtime({
   appId: '{{appid}}',
@@ -245,7 +394,23 @@ const realtime = new Realtime({
 });
 ```
 
-需要特别注意的是，由于小程序限制了同时只能有一个 WebSocket 连接，因此推荐的用法是初始化 Realtime 一次，挂载到全局的 App 实例上，然后在所有需要的时候都使用这个 realtime 实例。
+需要特别注意的是，小程序对 WebSocket 连接的数量是有限制的，因此推荐的用法是初始化 `Realtime` 一次，挂载到全局的 App 实例上，然后在所有需要的时候都使用这个 `Realtime` 实例。
+
+```js
+// app.js
+const { Realtime } = require('./libs/realtime.weapp.min.js');
+const realtime = new Realtime({
+  appId: '{{appid}}',
+  appKey: '{{appkey}}',
+});
+App({
+  realtime: realtime,
+  // ...
+});
+
+// some-page.js
+const realtime = getApp().realtime;
+```
 
 即时通讯 SDK 的详细用法请参考 [即时通讯开发指南](realtime_guide-js.html)。
 
@@ -278,6 +443,10 @@ const realtime = new Realtime({
   ```
 
 富媒体消息的用法请参考 [即时通讯开发指南 - 富媒体消息](realtime_guide-js.html#富媒体消息)。
+
+### 数据绑定
+
+使用即时通讯 SDK，一个常见的需求是将 `Conversation` 与 `Message` 类型的数据绑定到视图层进行渲染。这里会遇到一些与结构化数据存储 SDK 一样的问题，其解决方案与最佳实践请参考结构化数据存储的 [数据绑定](#数据绑定) 章节（`Conversation` 与 `Message` 都实现了 `#toJSON` 方法，上文中介绍的 `jsonify` 方法同样适用于`Conversation` 与 `Message` 实例）。
 
 ## 支付
 
