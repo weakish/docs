@@ -146,7 +146,15 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         mdPath: 'https://github.com/leancloud/leantodo-vue/',
         type: 'web',
         qcloudShow: true
-      },{
+      }, {
+        name: 'LeanTodo (React Hooks)',
+        desc: '使用 JavaScript 存储 SDK 与 React Hooks 实现的 LeanTodo 应用。',
+        downPath: '',
+        mdPath: 'https://github.com/hjiang/react-hook-demo',
+        type: 'web',
+        qcloudShow: true
+        
+      }, {
         name: 'LeanMessage',
         desc: '使用 JavaScript 即时通讯 SDK 与 Angular 实现的完整功能的聊天 WebApp',
         downPath: '',
