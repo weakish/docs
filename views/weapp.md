@@ -318,7 +318,7 @@ AV.User.loginWithWeappWithUnionId(unionid, {
 如果开发者希望更灵活的控制小程序的登录流程，也可以自行在服务端实现 unionid 与 openid 的获取，然后调用通用的第三方 unionid 登录接口指定平台为 `lc_weapp` 来登录：
 
 ```js
-const unionid = ''
+const unionid = '';
 const authData = {
   openid: '',
   session_key: ''
@@ -332,6 +332,32 @@ AV.User.loginWithAuthDataAndUnionId(authData, platform, unionid, {
 相对上面提到的一些 Weapp 相关的登录 API，loginWithAuthDataAndUnionId 是更加底层的第三方登录接口，不依赖小程序运行环境，因此这种方式也提供了更高的灵活度：
 - 可以在服务端获取到 unionid 与 openid 等信息后返回给小程序客户端，在客户端调用 `AV.User.loginWithAuthDataAndUnionId` 来登录。
 - 也可以在服务端获取到 unionid 与 openid 等信息后直接调用 `AV.User.loginWithAuthDataAndUnionId` 登录，成功后得到登录用户的 `sessionToken` 后返回给客户端，客户端再使用该 `sessionToken` 直接登录。
+
+##### 关联第二个小程序
+
+这种用法的另一种常见场景是关联同一个开发者帐号下的第二个小程序。
+
+因为一个 LeanCloud 应用默认关联一个微信小程序（对应的平台名称是 `lc_weapp`），使用小程序系列 API 的时候也都是默认关联到 `authData.lc_weapp` 字段上。如果想要接入第二个小程序，则需要自行获取到 unionid 与 openid，然后将其作为一个新的第三方平台登录。这里同样需要用到 `AV.User.loginWithAuthDataAndUnionId` 方法，但与关联内置的小程序平台（`lc_weapp`）有一些不同：
+
+- 需要指定一个新的 `platform`
+- 需要将 `openid` 保存为 `uid`（内置的微信平台做了特殊处理可以直接用 `openid` 而这里是作为通用第三方 OAuth 平台保存因此需要使用标准的 `uid` 字段）。
+
+这里我们以新的平台 `weapp2` 为例：
+
+
+```js
+const unionid = '';
+const openid = '';
+const authData = {
+  uid: openid,
+  session_key: ''
+};
+const platform = 'weapp2';
+AV.User.loginWithAuthDataAndUnionId(authData, platform, unionid, {
+  asMainAccount: true
+}).then(console.log, console.error);
+```
+
 
 #### 获取 unionid 后与现有用户关联
 
