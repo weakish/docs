@@ -299,10 +299,8 @@ imConversation.updateMessage(oldMessage, textMessage, new AVIMMessageUpdatedCall
 });
 ```
 ```cs
-// dotNot SDK 接口不太一样，允许直接修改对应的内容
-textMessage.TextContent = "修改之后的文本消息内容";
-// 将修改后的消息传入 ModifyAsync
-await conversation.ModifyAsync(textMessage);
+var newMessage = new AVIMTextMessage("修改后的消息内容");
+await conversation.UpdateAsync(oldMessage, newMessage);
 ```
 
 Tom 将消息修改成功之后，对话内的其他成员会立刻接收到 `MESSAGE_UPDATE` 事件：
@@ -335,11 +333,10 @@ void onMessageUpdated(AVIMClient client, AVIMConversation conversation, AVIMMess
 }
 ```
 ```cs
-tom.OnMessageModified += Tom_OnMessageModified;
-private void Tom_OnMessageModified(object sender, AVIMMessagePatchEventArgs e)
-{
-    // e.Messages  是一个集合，SDK 可能会合并多次消息修改统一分发
-}
+tom.OnMessageUpdated += (sender, e) => {
+  var message = (AVIMTextMessage) e.Message; // e.Messages  是一个集合，SDK 可能会合并多次消息修改统一分发
+  Debug.Log(string.Format("内容 {0}, 消息 Id {1}", message.TextContent, message.Id));
+};
 ```
 
 对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（这时候消息列表会出现内容变化）。
