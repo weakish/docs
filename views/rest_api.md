@@ -239,6 +239,31 @@ REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 
       <td>POST</td>
       <td>推送通知</td>
     </tr>
+    <tr>
+      <td>/1.1/notifications</td>
+      <td>GET</td>
+      <td>查询推送记录</td>
+    </tr>
+    <tr>
+      <td>/1.1/notifications/:notification_id</td>
+      <td>GET</td>
+      <td>根据 ID 查推送记录</td>
+    </tr>
+    <tr>
+      <td>/1.1/notifications/:notification_id</td>
+      <td>DELETE</td>
+      <td>根据 ID 删推送记录</td>
+    </tr>
+    <tr>
+      <td>/1.1/scheduledPushMessages</td>
+      <td>GET</td>
+      <td>查询应用下所有的定时推送</td>
+    </tr>
+    <tr>
+      <td>/1.1/scheduledPushMessages/:id</td>
+      <td>DELETE</td>
+      <td>根据 ID 删定时推送</td>
+    </tr>
   </tbody>
 </table>
 
