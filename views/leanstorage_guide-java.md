@@ -879,7 +879,7 @@
 
 ```java
     String cql = " select * from Todo where status = ? and priority = ?";
-    AVCloudQueryResult avCloudQueryResult = AVQuery.doCloudQuery(cql, Arrays.asList(0, 1));
+    AVCloudQueryResult avCloudQueryResult = AVQuery.doCloudQuery(cql, 0, 1);
 ```
 {% endblock %}
 
