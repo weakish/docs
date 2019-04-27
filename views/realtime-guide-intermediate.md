@@ -819,8 +819,6 @@ conversation.removeFromLocalCache(message);
 
 对于移动设备来说，在聊天的过程中部分客户端难免会临时下线，如何保证离线用户也能及时收到消息，是我们需要考虑的重要问题。LeanCloud 即时通讯云端会在用户下线的时候，主动通过「Push Notification」这种外部方式来通知客户端新消息到达事件，以促使用户尽快打开应用查看新消息。
 
-![iPhone 的屏幕顶端弹出了一条消息通知，包含应用名「LeanChat」以及通知内容「您有新的消息」。](images/realtime_ios_push.png)
-
 LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在将推送与即时通讯服务无缝结合起来，LeanCloud 云端会将用户的即时通讯 `clientId` 与推送服务的设备数据 `_Installation` 自动进行关联。当用户 A 发出消息后，如果对话中部分成员当前不在线，而且这些成员使用的是 iOS、Windows Phone 设备，或者是成功开通 [混合推送功能](android_mixpush_guide.html) 的 Android 设备的话，LeanCloud 云端会自动将即时通讯消息转成特定的推送通知发送至客户端，同时我们也提供扩展机制，允许开发者对接第三方的消息推送服务。
 
 要有效使用本功能，关键在于 **自定义推送的内容**。我们提供三种方式允许开发者来指定推送内容：
