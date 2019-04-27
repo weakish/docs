@@ -1,3 +1,4 @@
+{% import "views/_helper.njk" as docs %}
 {# 指定继承模板 #}
 {% extends "./leanstorage_guide.tmpl" %}
 
@@ -559,8 +560,32 @@ todo.set('whereCreated', point);
 ```
 {% endblock %}
 
-{% block text_deserialize_and_serialize %}
-<!-- js 以及 ts 没有序列化和反序列化的需求 -->
+{% block code_serialize_baseObject_to_string %}
+`AV.Object` 提供了 `#toFullJSON()` 方法将该对象序列化成 JSON 格式
+
+```js
+var todoFolder = new AV.Object('TodoFolder');// 构建对象
+todoFolder.put('name', '工作'); // 设置名称
+todoFolder.put('priority', 1); // 设置优先级
+todoFolder.put('owner', AV.User.current()); // Pointer 类型属性
+
+// 将 AV.Object 对象反序列化成 JSON 对象
+var json = todoFolder.toFullJSON();
+// 将 JSON 对象序列化为字符串
+var serializedString = JSON.stringify(json);
+```
+
+{{ docs.note("`AV.Object` 还提供了另一个方法 `#toJSON()`。它们的区别是 `#toJSON()` 得到的对象仅包含对象的 payload，一般用于展示，而 `#toFullJSON()` 得到的对象包含了元数据，一般用于传输。在使用时请注意区分。") }}
+
+{% endblock %}
+
+{% block code_deserialize_string_to_baseObject %}
+```js
+// 将字符串反序列化为 JSON 对象
+var json = JSON.parse(serializedString);
+// 将 JSON 对象反序列化成 AV.Object 对象
+var todoFolder = AV.parse(json);
+```
 {% endblock %}
 
 {% block code_data_protocol_save_date %}
