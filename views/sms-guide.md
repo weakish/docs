@@ -38,8 +38,8 @@
 AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
 options.templateName = @"Register_Notice";// 控制台预设的模板名称
 options.signatureName = @"LeanCloud";     // 控制台预设的短信签名
-// 往 18612345678 这个手机号码发送短信，使用预设的模板和签名
-[AVSMS requestShortMessageForPhoneNumber:@"18612345678"
+// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板和签名
+[AVSMS requestShortMessageForPhoneNumber:@"186xxxxxxxx"
                                 options:options
                                 callback:^(BOOL succeeded, NSError * _Nullable error) {
                                     if (succeeded) {
@@ -50,18 +50,16 @@ options.signatureName = @"LeanCloud";     // 控制台预设的短信签名
                                 }];
 ```
 ```swift
-let options = AVShortMessageRequestOptions()
-
-options.templateName = "Register_Notice"
-options.signatureName = "LeanCloud"
-
-// 控制台预设的短信签名
-// 往 18612345678 这个手机号码发送短信，使用预设的模板和签名
-AVSMS.requestShortMessage(forPhoneNumber: "18612345678", options: options) { (succeeded, error) in
-    if succeeded {
-        /* 请求成功 */
-    } else {
-        /* 请求失败 */
+let dic: LCDictionary = [
+    "sign": LCString("LeanCloud") // 控制台预设的短信签名
+]
+// Register_Notice 控制台预设的模板名称
+LCSMSClient.requestShortMessage(mobilePhoneNumber: "186xxxxxxxx", templateName: "Register_Notice", variables: dic) { (result) in
+    switch result {
+    case .success:
+        print("success")
+    case .failure(error: let error):
+        print(error)
     }
 }
 ```
@@ -69,8 +67,8 @@ AVSMS.requestShortMessage(forPhoneNumber: "18612345678", options: options) { (su
 AVSMSOption option = new AVSMSOption();
 option.setTemplateName("Register_Notice");  // 控制台预设的模板名称
 option.setSignatureName("LeanCloud");       // 控制台预设的短信签名
-// 往 18612345678 这个手机号码发送短信，使用预设的模板和签名
-AVSMS.requestSMSCodeInBackground("18612345678", option, new RequestMobileCodeCallback() {
+// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板和签名
+AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option, new RequestMobileCodeCallback() {
   @Override
   public void done(AVException e) {
     if (null == e) {
@@ -82,9 +80,9 @@ AVSMS.requestSMSCodeInBackground("18612345678", option, new RequestMobileCodeCal
 });
 ```
 ```javascript
-// 往 18612345678 这个手机号码发送短信，使用预设的模板和签名
+// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板和签名
 AV.Cloud.requestSmsCode({
-  mobilePhoneNumber: '18612345678',  // 目标手机号
+  mobilePhoneNumber: '186xxxxxxxx',  // 目标手机号
   template: 'Register_Notice',       // 控制台预设的模板名称
   sign:'LeanCloud'.                  // 控制台预设的短信签名
 }).then(function(){
@@ -94,28 +92,28 @@ AV.Cloud.requestSmsCode({
 });
 ```
 ```cs
-// 往 18612345678 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）和签名（「LeanCloud」参数）
-AVCloud.RequestSMSCodeAsync("18612345678","Register_Notice",null,"LeanCloud").ContinueWith(t =>
+// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）和签名（「LeanCloud」参数）
+AVCloud.RequestSMSCodeAsync("186xxxxxxxx","Register_Notice",null,"LeanCloud").ContinueWith(t =>
 {
     var result = t.Result;
     // result 为 True 则表示调用成功
 });
 ```
 ```java
-// 往 18612345678 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
-AVOSCloud.requestSMSCode("18612345678", "Register_Notice", null);
+// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
+AVOSCloud.requestSMSCode("186xxxxxxxx", "Register_Notice", null);
 ```
 ```php
-// 往 18612345678 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
+// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
 $options = [
   "template" => "Register_Notice",
   "name" => "LeanCloud",
 ];
-SMS::requestSMSCode("18612345678", $options);
+SMS::requestSMSCode("186xxxxxxxx", $options);
 ```
 ```python
 from leancloud import cloud
-cloud.request_sms_code("18612345678", template="Register_Notice", sign="LeanCloud")
+cloud.request_sms_code("186xxxxxxxx", template="Register_Notice", sign="LeanCloud")
 ```
 
 
@@ -180,17 +178,19 @@ options.operation = @"某种操作";        // 操作名称
                                 }];
 ```
 ```swift
-let options = AVShortMessageRequestOptions()
+let dic: LCDictionary = [
+    "ttl": LCNumber(10), // 验证码有效时间为 10 分钟
+    "name": LCString("应用名称"), // 应用名称
+    "op": LCString("某种操作")  // 操作名称
+]
 
-options.ttl = 10 /* 验证码有效时间 */
-options.applicationName = "应用名称" /* 应用名称 */
-options.operation = "某种操作" /* 操作名称 */
-
-AVSMS.requestShortMessage(forPhoneNumber: "186xxxxxxxx", options: options) { (succeeded, error) in
-    if succeeded {
-        /* 请求成功 */
-    } else {
-        /* 请求失败 */
+// templateName: 短信模板，不传此参数会使用默认短信模板
+LCSMSClient.requestShortMessage(mobilePhoneNumber: "186xxxxxxxx", templateName: "", variables: dic) { (result) in
+    switch result {
+    case .success:
+        print("success")
+    case .failure(error: let error):
+        print(error)
     }
 }
 ```
@@ -258,6 +258,7 @@ cloud.request_sms_code("186xxxxxxxx", sign="应用名称", params=options)
   
 4. **调用接口验证用户输入的验证码是否有效。**  
   注意，调用时需要确保验证码和手机号的参数顺序，我们假设验证码数字是「123456」。
+  
 ```objc
 [AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"186xxxxxxxx" callback:^(BOOL succeeded, NSError *error) {
     if(succeeded){
@@ -266,9 +267,12 @@ cloud.request_sms_code("186xxxxxxxx", sign="应用名称", params=options)
 }];
 ```
 ```swift
-AVOSCloud.verifySmsCode("123456", mobilePhoneNumber: "186xxxxxxxx") { (succeeded, error) in
-    if succeeded {
-        /* 验证成功 */
+LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
+    switch result {
+    case .success:
+        print("success")
+    case .failure(error: let error):
+        print(error)
     }
 }
 ```
@@ -335,13 +339,12 @@ options.type = AVShortMessageTypeVoice;
 }];
 ```
 ```swift
-let options = AVShortMessageRequestOptions()
-
-options.type = .voice
-
-AVSMS.requestShortMessage(forPhoneNumber: "188xxxxxxxx", options: options) { (succeeded, error) in
-    if succeeded {
+LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "188xxxxxxxx") { (result) in
+    switch result {
+    case .success:
         print("A voice short message has been sent.")
+    case .failure(error: let error):
+        print(error)
     }
 }
 ```
@@ -399,9 +402,12 @@ cloud.request_sms_code("186xxxxxxxx", sms_type="voice")
 }];
 ```
 ```swift
-AVOSCloud.verifySmsCode("123456", mobilePhoneNumber: "186xxxxxxxx") { (succeeded, error) in
-    if succeeded {
-        /* 验证成功 */
+LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
+    switch result {
+    case .success:
+        print("success")
+    case .failure(error: let error):
+        print(error)
     }
 }
 ```
@@ -518,18 +524,16 @@ options.templateVariables = @{ @"order_id": @"7623432424540" }; // 使用实际�
                                 }];
 ```
 ```swift
-let options = AVShortMessageRequestOptions()
-
-options.templateName = "Order_Notice"
-options.signatureName = "sign_BuyBuyBuy"
-options.templateVariables = ["order_id": "7623432424540"]
-
-/* 使用实际的值来替换模板中的变量 */
-AVSMS.requestShortMessage(forPhoneNumber: "186xxxxxxxx", options: options) { (succeeded, error) in
-    if succeeded {
-        /* 请求成功 */
-    } else {
-        /* 请求失败 */
+let dic: LCDictionary = [
+    "sign": LCString("sign_BuyBuyBuy"),
+    "order_id": LCString("7623432424540")
+]
+LCSMSClient.requestShortMessage(mobilePhoneNumber: "186xxxxxxxx", templateName: "Order_Notice", variables: dic) { (result) in
+    switch result {
+    case .success:
+        print("success")
+    case .failure(error: let error):
+        print(error)
     }
 }
 ```
@@ -837,17 +841,6 @@ options.height = 50;
                                 NSString *url = captchaDigest.URLString;
                             }];
 ```
-```swift
-let options = AVCaptchaRequestOptions()
-
-options.width = 100
-options.height = 50
-
-AVCaptcha.request(with: options) { (captchaDigest, error) in
-    /* URL string of captcha image. */
-    var url = captchaDigest?.urlString
-}
-```
 ```android
 AVCaptchaOption option = new AVCaptchaOption();
 option.setWidth(85);
@@ -898,11 +891,6 @@ captcha = cloud.request_captcha(width=100, height=50)
                         /* validationToken 可用短信认证 */
                     }];
 ```
-```swift
-AVCaptcha.verifyCaptchaCode(code, for: captchaDigest) { (validationToken, error) in
-    /* validationToken 可用短信认证 */
-}
-```
 ```android
 AVCaptcha.verifyCaptchaCodeInBackground(code, captchaDigest, new AVCallback<String>() {
   @Override
@@ -952,21 +940,6 @@ options.validationToken = <#validationToken#>;
                                         /* 请求失败 */
                                     }
                                 }];
-```
-```swift
-let options = AVShortMessageRequestOptions()
-
-options.templateName = "New_Series"
-options.signatureName = "sign_BuyBuyBuy"
-options.validationToken = <#A validation Token#>
-
-AVSMS.requestShortMessage(forPhoneNumber: "186xxxxxxxx", options: options) { (succeeded, error) in
-    if succeeded {
-        /* 请求成功 */
-    } else {
-        /* 请求失败 */
-    }
-}
 ```
 ```android
 AVSMSOption option = new AVSMSOption();
@@ -1196,19 +1169,22 @@ AVUser *user = [AVUser user];
 user.username = @"hjiang";
 user.password =  @"f32@ds*@&dsa";
 user.email = @"hang@leancloud.rocks";
-user.mobilePhoneNumber = @"18612340000";
-NSError *error = nil;
-[user signUp:&error];
+user.mobilePhoneNumber = @"186xxxxxxxx";
+[user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // 注册成功
+    } else {
+        // 注册失败
+    }
+}];
 ```
 ```swift
-user.username = "hjiang"
-user.password = "f32@ds*@&dsa"
-user.email = "hang@leancloud.rocks"
-user.mobilePhoneNumber = "18612340000"
-
-var error: NSError? = nil
-
-user.signUp(&error)
+let user = LCUser()
+user.username = LCString("hjiang")
+user.password = LCString("f32@ds*@&dsa")
+user.email = LCString("hang@leancloud.rocks")
+user.mobilePhoneNumber = LCString("186xxxxxxxx")
+user.signUp()
 ```
 ```android
 AVUser user = new AVUser();
@@ -1270,14 +1246,15 @@ user.sign_up()
   最好本地先验证一下有效性（例如长度、特殊字符等）。
   
 5. **调用验证接口，检查用户输入的纯数字验证码是否合法。**
+
 ```objc
 [AVUser verifyMobilePhone:@"123456" withBlock:^(BOOL succeeded, NSError *error) {
     //验证结果
 }];
 ```
 ```swift
-AVUser.verifyMobilePhone("123456") { (succeeded, error) in
-    /* 验证结果 */
+LCUser.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
+   //验证结果
 }
 ```
 ```android
@@ -1326,22 +1303,26 @@ user.verify_mobile_phone_number("6位数字验证码")
 另外，假如注册的时候并没有强制用户验证手机号，而是在用户使用某一个功能的时候，要求用户验证手机号，也可以调用接口进行「延迟验证」，验证之后 `mobilePhoneVerified` 就会被置为 `true`。
 
 1. **请求发送验证码**    
+
 ```objc
-[AVUser requestMobilePhoneVerify:@"18612345678" withBlock:^(BOOL succeeded, NSError *error) {
+[AVUser requestMobilePhoneVerify:@"186xxxxxxxx" withBlock:^(BOOL succeeded, NSError *error) {
 if(succeeded){
     //调用成功
 }
 }];
 ```
 ```swift
-AVUser.requestMobilePhoneVerify("18612345678") { (succeeded, error) in
-    if succeeded {
-        /* 调用成功 */
+LCUser.requestVerificationCode(mobilePhoneNumber: "186xxxxxxxx") { (result) in
+	switch result {
+    case .success:
+        print("调用成功")
+    case .failure(error: let error):
+        print(error)
     }
 }
 ```
 ```android
-AVUser.requestMobilePhoneVerifyInBackground("13800000000", new RequestMobileCodeCallback() {
+AVUser.requestMobilePhoneVerifyInBackground("186xxxxxxxx", new RequestMobileCodeCallback() {
     @Override
     public void done(AVException e) {
         if(e == null){
@@ -1380,6 +1361,7 @@ cloud.request_mobile_phone_verify("186xxxxxxxx")
 ```
 
 2. **调用验证接口，验证用户输入的纯数字的验证码。** 
+
 ```objc
 [AVUser verifyMobilePhone:@"123456" withBlock:^(BOOL succeeded, NSError *error) {
     if(succeeded){
@@ -1388,9 +1370,12 @@ cloud.request_mobile_phone_verify("186xxxxxxxx")
 }];
 ```
 ```swift
-AVUser.verifyMobilePhone("123456") { (succeeded, error) in
-    if succeeded {
-        /* 验证成功 */
+LCUser.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
+    switch result {
+    case .success:
+        print("验证成功")
+    case .failure(error: let error):
+        print(error)
     }
 }
 ```
