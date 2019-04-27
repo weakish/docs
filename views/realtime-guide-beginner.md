@@ -1203,7 +1203,7 @@ AVIMImageMessage *message = [AVIMImageMessage messageWithText:@"萌妹子一枚"
 }];
 ```
 ```java
-AVFile file =new AVFile("萌妹子","http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", null);
+AVFile file = new AVFile("萌妹子","http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif", null);
 AVIMImageMessage m = new AVIMImageMessage(file);
 m.setText("萌妹子一枚");
 // 创建一条图片消息
@@ -1386,7 +1386,7 @@ AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"来自苹果发�
 }];
 ```
 ```java
-AVFile file =new AVFile("apple.acc", "https://some.website.com/apple.acc", null);
+AVFile file = new AVFile("apple.acc", "https://some.website.com/apple.acc", null);
 AVIMAudioMessage m = new AVIMAudioMessage(file);
 m.setText("来自苹果发布会现场的录音");
 conv.sendMessage(m, new AVIMConversationCallback() {
@@ -1430,7 +1430,7 @@ AVIMLocationMessage *message = [AVIMLocationMessage messageWithText:@"蛋糕店�
 }];
 ```
 ```java
-final AVIMLocationMessage locationMessage=new AVIMLocationMessage();
+final AVIMLocationMessage locationMessage = new AVIMLocationMessage();
 // 开发者更可以通过具体的设备的 API 去获取设备的地理位置，此处仅设置了 2 个经纬度常量仅做演示
 locationMessage.setLocation(new AVGeoPoint(31.3753285,120.9664658));
 locationMessage.setText("蛋糕店的位置");

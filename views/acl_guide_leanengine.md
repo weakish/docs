@@ -68,7 +68,7 @@ AV.Cloud.beforeSave('Post', function(request, response) {
 
 ```java
  // 新建一个帖子对象
- AVObject post=new AVObject('Post');
+ AVObject post = new AVObject('Post');
  post.put('title', '大家好，我是新人');
 
  post.saveInBackground();// 保存

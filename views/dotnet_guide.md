@@ -176,7 +176,7 @@ AVObject character = await query.GetAsync("549818e0e4b096e3561a6abd");
 首先需要明确最核心的一点，在.NET SDK中，`AVQuery` 对象的所有带有 `Where` 开头方法，以及查询范围限定类的方法(`Skip||Limit||ThenBy||Include`等)都会返回一个全新的对象，它并不是在原始的 `AVQuery` 对象上修改内部属性。比如:
 
 ```cs
-AVQuery<AVObject> query=new AVQuery<AVObject>("Character")
+AVQuery<AVObject> query = new AVQuery<AVObject>("Character")
 query.WhereEqualTo ("age", 37);//注意：这是错误的！！！
 await query.FindAsync ();
 ```
@@ -186,7 +186,7 @@ await query.FindAsync ();
 正确地写法应该是：
 
 ```cs
-AVQuery<AVObject> query=new AVQuery<AVObject>("Character").WhereEqualTo ("age", "37");
+AVQuery<AVObject> query = new AVQuery<AVObject>("Character").WhereEqualTo ("age", "37");
 ```
 以此类推，所有复合条件查询的构造都应该遵循用`.`这个符号进行链式创建出来的 `AVQuery<T>`，比如，查找所有 `age` 等于37，并且 `name` 包含 `peter` 的`Character`：
 
@@ -202,7 +202,7 @@ SELECT * FROM Persons WHERE FirstName='Bush'
 的`=`操作，如下：
 
 ```cs
-AVQuery<AVObject> query=new AVQuery<AVObject>("Persons").WhereEqualTo ("FirstName", "Bush");
+AVQuery<AVObject> query = new AVQuery<AVObject>("Persons").WhereEqualTo ("FirstName", "Bush");
 await query.FindAsync ().ContinueWith (t => {
 	IEnumerable<AVObject> persons=t.Result;
 	int sum=persons.Count();
@@ -322,7 +322,7 @@ beckham ["focusType"] = girlType;
 //保存beckham的时候会自动将girlType也保存到服务器。
 Task saveTask = beckham.SaveAsync ().ContinueWith (t =>
 	{
-		AVQuery<AVObject> boyQuery=new AVQuery<AVObject>("Boy");
+		AVQuery<AVObject> boyQuery = new AVQuery<AVObject>("Boy");
 		boyQuery = boyQuery.WhereEqualTo("focusType", girlType);
 		boyQuery.FindAsync().ContinueWith(s=>
 		{
@@ -730,8 +730,8 @@ await book.SaveAsync();
 AVObject salary = new AVObject("salary");
 salary["value"] = 2000000;
 
-AVUser boss=new AVUser();//假设此处为老板
-AVUser hrWang=new AVUser();  //人事小王
+AVUser boss = new AVUser();//假设此处为老板
+AVUser hrWang = new AVUser();  //人事小王
 AVUser me = new AVUser(); //我们就在文档里爽一爽吧
 AVUser cashierZhou = new AVUser(); //出纳老周
 

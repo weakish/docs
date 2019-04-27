@@ -77,7 +77,7 @@ LeanCloud 云端对客户端发过来的每一个请求都要进行了用户身�
     post.save()
 ```
 ```java
-  AVObject post=new AVObject("Post");
+  AVObject post = new AVObject("Post");
   post.put("title","大家好，我是新人");
   
   //新建一个 ACL 实例
@@ -405,7 +405,7 @@ let roleACL = AVACL()
 ```
 ```java
   // 新建一个针对角色本身的 ACL
-  AVACL roleACL=new AVACL();
+  AVACL roleACL = new AVACL();
   roleACL.setPublicReadAccess(true);
   roleACL.setWriteAccess(AVUser.getCurrentUser(),true);
 
@@ -515,7 +515,7 @@ administrator_role.save()  # 保存
   post.put("title", "夏天吃什么夜宵比较爽？");
   post.put("content", "求推荐啊！");
 
-  AVQuery<AVRole> roleQuery=new AVQuery<AVRole>("_Role");
+  AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
   // 假设上一步创建的 Administrator 角色的 objectId 为 55fc0eb700b039e44440016c
   roleQuery.getInBackground("55fc0eb700b039e44440016c", new GetCallback<AVRole>() {
     @Override
@@ -660,7 +660,7 @@ post.save()
     }
 ```
 ```java
-  final AVQuery<AVRole> roleQuery =new AVQuery<AVRole>("_Role");
+  final AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
   roleQuery.whereEqualTo("name","Administrator");
   roleQuery.findInBackground(new FindCallback<AVRole>() {
     @Override
@@ -680,7 +680,7 @@ post.save()
         });
       }else {
         // 角色不存在，就新建角色
-        AVRole administratorRole=new AVRole("Administrator");
+        AVRole administratorRole = new AVRole("Administrator");
         administratorRole.getUsers().add(AVUser.getCurrentUser());// 赋予角色
         administratorRole.saveInBackground();
       }
@@ -790,7 +790,7 @@ else:
     }
 ```
 ```java
-  final AVQuery<AVRole> roleQuery=new AVQuery<AVRole>("_Role");
+  final AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
   roleQuery.whereEqualTo("name","Moderator");
   roleQuery.findInBackground(new FindCallback<AVRole>() {
     @Override
@@ -905,7 +905,7 @@ else:
     }
 ```
 ```java
-  AVQuery<AVRole> roleQuery=new AVQuery<AVRole>("_Role");
+  AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
   roleQuery.whereEqualTo("name", "Administrator");
   roleQuery.findInBackground(new FindCallback<AVRole>() {
     @Override
@@ -1298,10 +1298,10 @@ moderator_role.save()
   var photographicRole = new AV.Role('Photographic');
 
   //新建手机平板版主角色
-  var mobileRole=new AV.Role('Mobile');
+  var mobileRole = new AV.Role('Mobile');
 
   //新建电子数码版主角色
-  var digitalRole=new AV.Role('Digital');
+  var digitalRole = new AV.Role('Digital');
 
    AV.Promise.all([
     // 先行保存 photographicRole 和 mobileRole

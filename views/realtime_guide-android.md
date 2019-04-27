@@ -266,7 +266,7 @@ tom.open(new AVIMClientCallback() {
                 @Override
                 public void done(AVIMConversation conv, AVIMException e) {
                   if (e == null) {
-                    AVFile file =new AVFile("萌妹子","http://pic2.zhimg.com/6c10e6053c739ed0ce676a0aff15cf1c.gif", null);
+                    AVFile file = new AVFile("萌妹子","http://pic2.zhimg.com/6c10e6053c739ed0ce676a0aff15cf1c.gif", null);
                     AVIMImageMessage m = new AVIMImageMessage(file);
                     m.setText("萌妹子一枚");
                     // 创建一条图片消息
@@ -556,7 +556,7 @@ AVIMMessageManager.registerMessageHandler(AVIMAudioMessage.class,
 
 {% block locationMessage_sent %}
 ```java
-final AVIMLocationMessage locationMessage=new AVIMLocationMessage();
+final AVIMLocationMessage locationMessage = new AVIMLocationMessage();
 // 开发者更可以通过具体的设备的 API 去获取设备的地理位置，此处仅设置了 2 个经纬度常量仅做演示
 locationMessage.setLocation(new AVGeoPoint(138.12454,52.56461));
 locationMessage.setText("新开的蛋糕店！耗子咱们有福了…");
