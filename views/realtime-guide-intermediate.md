@@ -44,7 +44,7 @@
 带有提醒信息的消息，有可能既有提醒全部成员的标志，也还单独设置了 `mentionList`，这由应用层去控制。发送方在发送「@ 成员」提醒消息的时候，如何输入、选择成员名称，这是业务方 UI 层面需要解决的问题，即时通讯 SDK 不关心其实现逻辑，SDK 只要求开发者在发送一条「@ 成员」消息的时候，调用 `mentionList` 和 `mentionAll` 的 setter 方法，设置正确的成员列表即可。示例代码如下：
 
 ```js
-const message = new TextMessage(`@Tom 早点回家`).setMentionList('Tom');
+const message = new TextMessage(`@Tom 早点回家`).setMentionList(['Tom']);
 conversation.send(message).then(function(message) {
   console.log('发送成功！');
 }).catch(console.error);

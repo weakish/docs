@@ -502,7 +502,7 @@ realtime.createIMClient('bob').then(function(bob) {
 发送消息的时候可以显式地指定这条消息提醒某一个或者一些人:
 
 ```js
-const message = new TextMessage(`@Tom`).setMentionList('Tom').mentionAll();
+const message = new TextMessage(`@Tom`).setMentionList(['Tom']);
 ```
 
 或者也可以提醒所有人：
