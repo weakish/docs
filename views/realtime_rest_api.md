@@ -245,7 +245,7 @@ curl -X PUT \
 
 本接口需要 Master Key 授权。
 
-[控制台 > 消息 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中的「聊天服务，对消息启用撤回功能」和「聊天服务，对消息启用编辑功能」仅影响 SDK，对本接口无影响。
+[控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中的「允许通过 SDK 编辑消息」和「允许通过 SDK 撤回消息」仅影响 SDK，对本接口无影响。
 
 ```sh
 curl -X POST \

@@ -49,7 +49,7 @@ AV.init({
 
 ### 数据绑定
 
-<a name="data-binding"></a>`AV.Object` 实例是一些携带很多信息与方法的对象，而小程序的存放渲染用数据的 `data` 字段需要的是 JSON 类型的数据，因此我们需要将 `AV.Object` 实例处理为 JSON 数据后再设置给 `data`。
+`AV.Object` 实例是一些携带很多信息与方法的对象，而小程序的存放渲染用数据的 `data` 字段需要的是 JSON 类型的数据，因此我们需要将 `AV.Object` 实例处理为 JSON 数据后再设置给 `data`。
 
 以 LeanTodo Demo 中的 Todo 列表为例，要实现「将 `AV.Query` 查询结果 `Todo` 列表中的 `content` 与 `done` 字段展示为列表」的功能，我们可以定义一个 `getDataForRender` 来做上面说的「处理」：
 

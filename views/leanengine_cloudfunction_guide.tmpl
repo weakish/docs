@@ -392,7 +392,7 @@ Hook 函数的超时时间为 3 秒。如果 Hook 函数被其他的云函数调
 定时任务是普通的云函数，也会遇到 [超时问题](#云函数超时)，具体请参考 [超时处理方案](#超时的处理方案)。
 
 {% call docs.noteWrap() %}
-一个定时器如果在 24 小时内收到了超过 30 次的 400 (Bad Request) 或 502 (Bad Gateway) 的应答，它将会被云引擎禁用，同时系统会向开发者发出相关的禁用通知邮件。在控制台的日志中，对应的错误信息为 [`{{ errorMessage_shortCircuited }}`](#short-circuited)。
+一个定时器如果在 24 小时内收到了超过 30 次的 400 (Bad Request) 或 502 (Bad Gateway) 的应答，它将会被云引擎禁用，同时系统会向开发者发出相关的禁用通知邮件。在控制台的日志中，对应的错误信息为 [`{{ errorMessage_shortCircuited }}`](#错误信息)。
 {% endcall %}
 
 部署云引擎之后，进入 [控制台 > 云引擎 > 定时任务](/dashboard/cloud.html?appid={{appid}}#/task)，点击 **创建定时器**，然后设定执行的函数名称、执行环境等等。例如定义一个打印循环打印日志的任务 `log_timer`：
@@ -457,7 +457,7 @@ Cron 表达式的基本语法为：
 
 - **timerAction timed-out and no fallback available**<br/>
   某个定时器触发的云函数，因 15 秒内没有响应而超时（可参考 [对云函数调用超时的处理](#超时的处理方案)）。
-- <a name="short-circuited"></a>**{{ errorMessage_shortCircuited }}**<br/>
+- **{{ errorMessage_shortCircuited }}**<br/>
   某个定时器触发的云函数，因为太多次超时而停止触发。
 
 ## Master Key 和超级权限

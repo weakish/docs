@@ -302,7 +302,7 @@ LeanCache 采取按天扣费，使用时间不足一天按一天收费，次日�
 
 ## 常见问题
 
-### <a name="advantages-over-hashtable" id="advantages-over-hashtable">与自建的 HashTable 相比较，LeanCache 有什么优势？</a>
+### 与自建的 HashTable 相比较，LeanCache 有什么优势？
 
 与自己在程序的全局作用域中维护一个 HashTable 相比，使用 LeanCache 的优势在于：
 

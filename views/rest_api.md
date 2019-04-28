@@ -1168,7 +1168,7 @@ curl -X GET \
 | `$lte`        | 小于等于                     |
 | `$gt`         | 大于                       |
 | `$gte`        | 大于等于                     |
-| `$regex`      | 正则表达式。`$options` 指定 [全局修饰符](#regex-options) |
+| `$regex`      | 正则表达式。`$options` 指定 [全局修饰符](#正则查询) |
 | `$in`         | 包含任意一个数组值                |
 | `$nin`        | 不包含任意一个数组值               |
 | `$all`        | 包括所有的数组值                 |
@@ -1347,7 +1347,7 @@ curl -X GET \
   https://{{host}}/1.1/classes/Post
 ```
 
-<a name="regex-options"></a>我们使用以下数据来演示如何使用 `$options` 匹配 **title** 字段值：
+我们使用以下数据来演示如何使用 `$options` 匹配 **title** 字段值：
 
 ```
 { "_id" : 100, "title" : "Single line description." },

@@ -53,14 +53,14 @@ conversation.send(message).then(function(message) {
 AVIMMessage *message = [AVIMTextMessage messageWithText:@"@Tom 早点回家" attributes:nil];
 message.mentionList = @[@"Tom"];
 [conversation sendMessage:message callback:^(BOOL succeeded, NSError * _Nullable error) {
-    /* A message which will mention Tom has been sent. */
+    /* 一条提及 Tom 的消息已发出 */
 }];
 ```
 ```java
 String content = "@Tom 早点回家";
 AVIMTextMessage  message = new AVIMTextMessage();
 message.setText(content);
-List<String> list = new ArrayList<>(); // 部分用户的 mention list，你可以向下面代码这样来填充
+List<String> list = new ArrayList<>(); // 部分用户的 mention list，你可以像下面代码这样来填充
 list.add("Tom");
 message.setMentionList(list);
 imConversation.sendMessage(message, new AVIMConversationCallback() {
@@ -86,18 +86,18 @@ conversation.send(message).then(function(message) {
 }).catch(console.error);
 ```
 ```objc
-AVIMMessage *message = [AVIMTextMessage messageWithText:@"@all!" attributes:nil];
+AVIMMessage *message = [AVIMTextMessage messageWithText:@"@all" attributes:nil];
 message.mentionAll = YES;
 [conversation sendMessage:message callback:^(BOOL succeeded, NSError * _Nullable error) {
-    /* A message which will mention all members has been sent. */
+    /* 一条提及所有用户的消息已发出 */
 }];
 ```
 ```java
-String content = "something as you will";
+String content = "@all";
 AVIMTextMessage  message = new AVIMTextMessage();
 message.setText(content);
 
-boolean mentionAll = true;// 指示是否 mention 了所有人
+boolean mentionAll = true; // 指示是否提及了所有人
 message.mentionAll(mentionAll);
 
 imConversation.sendMessage(message, new AVIMConversationCallback() {
@@ -122,16 +122,16 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
 });
 ```
 ```objc
-// 示例代码演示 AVIMTypedMessage 接收时，获取该条消息提醒的 client id 列表，同理可以用类似的代码操作 AVIMMessage 的其他子类
+// 示例代码演示 AVIMTypedMessage 接收时，获取该条消息提醒的 clientId 列表，同理可以用类似的代码操作 AVIMMessage 的其他子类
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
-    // get mention list of client id.
-     NSArray *mentionList = message.mentionList;
+    // 读取消息 @ 的 clientId 列表
+    NSArray *mentionList = message.mentionList;
 }
 ```
 ```java
 @Override
 public void onMessage(AVIMAudioMessage msg, AVIMConversation conv, AVIMClient client) {
-  // 读取消息 @ 的 client id 列表
+  // 读取消息 @ 的 clientId 列表
   List<String> currentMsgMentionUserList = message.getMentionList();
 }
 ```
@@ -159,10 +159,11 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
 });
 ```
 ```objc
-  // 示例代码演示 AVIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员，同理可以用类似的代码操作 AVIMMessage 的其他子类
+// 示例代码演示 AVIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员或当前用户，同理可以用类似的代码操作 AVIMMessage 的其他子类
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
-    // get this message mentioned all members of this conversion.
+    // 读取消息是否 @ 了对话的所有成员
     BOOL mentionAll = message.mentionAll;
+    // 读取消息是否 @ 了当前用户
     BOOL mentionedMe = message.mentioned;
 }
 ```
@@ -171,6 +172,7 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
 public void onMessage(AVIMAudioMessage msg, AVIMConversation conv, AVIMClient client) {
   // 读取消息是否 @ 了对话的所有成员
   boolean currentMsgMentionAllUsers = message.isMentionAll();
+  // 读取消息是否 @ 了当前用户
   boolean currentMsgMentionedMe = message.mentioned();
 }
 ```
@@ -180,7 +182,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
     if (e.Message is AVIMImageMessage imageMessage)
     {
          var mentionedAll = e.Message.MentionAll;
-         // 判断当前用户是否被 @，dotNet SDK 还需要自己计算
+         // 判断当前用户是否被 @，.NET SDK 还需要自己计算
          var mentioned = e.Message.MentionAll || e.Message.MentionList.Contains("Tom");
     }
 }
@@ -188,16 +190,16 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 ### 消息的撤回和修改
 
-> 需要在 **控制台** > **消息** > **设置** 中启用「聊天服务，对消息启用撤回功能」。
+> 需要在 [控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中启用「允许通过 SDK 编辑消息」和「允许通过 SDK 撤回消息」。
 
-终端用户在消息发送之后，还可以对自己已经发送的消息进行修改（`Conversation#updateMessage` 方法）或撤回（`Conversation#recallMessage` 方法），目前即时通讯服务端并没有在时效性上进行限制，不过只允许用户修改或撤回自己发出去的消息，对别人的消息进行修改或撤回是被禁止的（错误码：）。
+终端用户在消息发送之后，还可以对自己已经发送的消息进行修改（`Conversation#updateMessage` 方法）或撤回（`Conversation#recallMessage` 方法），目前即时通讯服务端并没有在时效性上进行限制，不过只允许用户修改或撤回自己发出去的消息，对别人的消息进行修改或撤回是被禁止的。
 
 如果 Tom 要 ***撤回一条自己之前发送过的消息***，示例代码如下：
 
 ```js
 conversation.recall(oldMessage).then(function(recalledMessage) {
-  // 修改成功
-  // recalledMessage is an RecalledMessage
+  // 撤回成功
+  // recalledMessage 是一个 RecalledMessage
 }).catch(function(error) {
   // 异常处理
 });
@@ -207,7 +209,7 @@ AVIMMessage *oldMessage = <#MessageYouWantToRecall#>;
 
 [conversation recallMessage:oldMessage callback:^(BOOL succeeded, NSError * _Nullable error, AVIMRecalledMessage * _Nullable recalledMessage) {
     if (succeeded) {
-        NSLog(@"Message has been recalled.");
+        NSLog(@"消息已被撤回。");
     }
 }];
 ```
@@ -231,13 +233,13 @@ Tom 成功调用 `recallMessage` 方法之后，对话内的其他成员会接�
 var { Event } = require('leancloud-realtime');
 conversation.on(Event.MESSAGE_RECALL, function(recalledMessage) {
   // recalledMessage 为已撤回的消息
-  // 在视图层可以通过消息的 id 找到原来的消息并用 recalledMessage 替换
+  // 在视图层可以通过消息的 ID 找到原来的消息并用 recalledMessage 替换
 });
 ```
 ```objc
 /* 实现 delegate 方法，以处理消息修改和撤回的事件 */
 - (void)conversation:(AVIMConversation *)conversation messageHasBeenUpdated:(AVIMMessage *)message {
-    /* A message has been updated or recalled. */
+    /* 有消息被修改或撤回 */
 
     switch (message.mediaType) {
     case kAVIMMessageMediaTypeRecalled:
@@ -282,7 +284,7 @@ AVIMMessage *newMessage = [AVIMTextMessage messageWithText:@"Just a new message"
               toNewMessage:newMessage
                   callback:^(BOOL succeeded, NSError * _Nullable error) {
                       if (succeeded) {
-                          NSLog(@"Message has been updated.");
+                          NSLog(@"消息已被修改。");
                       }
 }];
 ```
@@ -309,13 +311,13 @@ Tom 将消息修改成功之后，对话内的其他成员会立刻接收到 `ME
 var { Event } = require('leancloud-realtime');
 conversation.on(Event.MESSAGE_UPDATE, function(newMessage) {
   // newMessage 为修改后的的消息
-  // 在视图层可以通过消息的 id 找到原来的消息并用 newMessage 替换
+  // 在视图层可以通过消息的 ID 找到原来的消息并用 newMessage 替换
 });
 ```
 ```objc
 /* 实现 delegate 方法，以处理消息修改和撤回的事件 */
 - (void)conversation:(AVIMConversation *)conversation messageHasBeenUpdated:(AVIMMessage *)message {
-    /* A message has been updated or recalled. */
+    /* 有消息被修改或撤回 */
 
     switch (message.mediaType) {
     case kAVIMMessageMediaTypeRecalled:
@@ -334,8 +336,8 @@ void onMessageUpdated(AVIMClient client, AVIMConversation conversation, AVIMMess
 ```
 ```cs
 tom.OnMessageUpdated += (sender, e) => {
-  var message = (AVIMTextMessage) e.Message; // e.Messages  是一个集合，SDK 可能会合并多次消息修改统一分发
-  Debug.Log(string.Format("内容 {0}, 消息 Id {1}", message.TextContent, message.Id));
+  var message = (AVIMTextMessage) e.Message; // e.Messages 是一个集合，SDK 可能会合并多次消息修改统一分发
+  Debug.Log(string.Format("内容 {0}, 消息 ID {1}", message.TextContent, message.Id));
 };
 ```
 
@@ -390,9 +392,9 @@ public static Task<T> SendAsync<T>(this AVIMConversation conversation, T message
  * @param {Object} [options] since v3.3.0，发送选项
  * @param {Boolean} [options.transient] since v3.3.1，是否作为暂态消息发送
  * @param {Boolean} [options.receipt] 是否需要回执，仅在普通对话中有效
- * @param {Boolean} [options.will] since v3.4.0，是否指定该消息作为「掉线消息」发送，
- * 「掉线消息」会延迟到当前用户掉线后发送，常用来实现「下线通知」功能
- * @param {MessagePriority} [options.priority] 消息优先级，仅在暂态对话中有效，
+ * @param {Boolean} [options.will] since v3.4.0，是否指定该消息作为「遗愿消息」发送，
+ * 「遗愿消息」会延迟到当前用户掉线后发送，常用来实现「下线通知」功能
+ * @param {MessagePriority} [options.priority] 消息优先级，仅在聊天室中有效，
  * see: {@link module:leancloud-realtime.MessagePriority MessagePriority}
  * @param {Object} [options.pushData] 消息对应的离线推送内容，如果消息接收方不在线，会推送指定的内容。其结构说明参见: {@link https://url.leanapp.cn/pushData 推送消息内容}
  * @return {Promise.<Message>} 发送的消息
@@ -437,22 +439,22 @@ public Task<IAVIMMessage> SendMessageAsync(IAVIMMessage avMessage, AVIMSendOptio
 - 是否为「遗愿消息」（设置 `will` 属性，后续章节会说明）；
 - 消息对应的离线推送内容（设置 `pushData` 属性，后续章节会说明），如果消息接收方不在线，会推送指定的内容。
 
-如果我们需要让 Tom 在聊天页面的输入框获得焦点的时候，给群内成员同步一条「Tom is typing…」的状态信息，可以使用如下代码：
+如果我们需要让 Tom 在聊天页面的输入框获得焦点的时候，给群内成员同步一条「Tom 正在输入…」的状态信息，可以使用如下代码：
 
 ```js
-const message = new TextMessage('Tom is typing…');
+const message = new TextMessage('Tom 正在输入…');
 conversation.send(message, {transient: true});
 ```
 ```objc
-AVIMMessage *message = [AVIMTextMessage messageWithText:@"Tom is typing…" attributes:nil];
+AVIMMessage *message = [AVIMTextMessage messageWithText:@"Tom 正在输入…" attributes:nil];
 AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
 option.transient = true;
 [conversation sendMessage:message option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
-    /* A message which will mention all members has been sent. */
+    /* 一条暂态消息已发出 */
 }];
 ```
 ```java
-String content = "Tom is typing…";
+String content = "Tom 正在输入…";
 AVIMTextMessage  message = new AVIMTextMessage();
 message.setText(content);
 
@@ -466,7 +468,7 @@ imConversation.sendMessage(message, option, new AVIMConversationCallback() {
 });
 ```
 ```cs
-var textMessage = new AVIMTextMessage("Tom is typing…")
+var textMessage = new AVIMTextMessage("Tom 正在输入…")
 {
     MentionAll = true
 };
@@ -485,7 +487,7 @@ LeanCloud 即时通讯服务端在进行消息投递的时候，会按照消息�
 与上一节「暂态消息」的发送类似，要使用消息回执功能，需要在发送消息时在 `AVIMMessageOption` 参数中标记「需要回执」选项：
 
 ```js
-var message = new TextMessage('very important message');
+var message = new TextMessage('一条非常重要的消息。');
 conversation.send(message, {
   receipt: true,
 });
@@ -493,7 +495,7 @@ conversation.send(message, {
 ```objc
 [conversation sendMessage:message options:AVIMMessageSendOptionRequestReceipt callback:^(BOOL succeeded, NSError *error) {
   if (succeeded) {
-    NSLog(@"发送成功！需要回执");
+    NSLog(@"发送成功！需要回执。");
   }
 }];
 ```
@@ -507,7 +509,7 @@ imConversation.sendMessage(message, messageOption, new AVIMConversationCallback(
 });
 ```
 ```cs
-var textMessage = new AVIMTextMessage("very important message");
+var textMessage = new AVIMTextMessage("一条非常重要的消息。");
 var option = new AVIMSendOptions(){Receipt = true};
 await conv.SendAsync(textMessage, option);
 ```
@@ -549,18 +551,18 @@ public class CustomConversationEventHandler extends AVIMConversationEventHandler
 AVIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
 ```
 ```cs
-//Tom 用自己的名字作为 ClientId 建立了一个 AVIMClient
+// Tom 用自己的名字作为 clientId 建立了一个 AVIMClient
 AVIMClient client = new AVIMClient("Tom");
 
-//Tom 登录到系统
+// Tom 登录到系统
 await client.ConnectAsync();
 
-//设置送达回执
+// 设置送达回执
 conversaion.OnMessageDeliverd += (s, e) =>
 {
-//在这里可以书写消息送达之后的业务逻辑代码
+// 在这里可以书写消息送达之后的业务逻辑代码
 };
-//发送消息
+// 发送消息
 await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
 ```
 
@@ -599,7 +601,7 @@ async read();
 public void read();
 ```
 ```cs
-// not support yet.
+// 暂不支持
 ```
 
 对方「阅读」了消息之后，云端会向发送方发出一个回执通知，表明消息已被阅读。
@@ -609,7 +611,7 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
 1. Tom 向 Jerry 发送一条消息，且标记为「需要回执」：
   
     ```js
-    var message = new TextMessage('very important message');
+    var message = new TextMessage('一条非常重要的消息。');
     conversation.send(message, {
       receipt: true,
     });
@@ -646,7 +648,7 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
     });
     ```
     ```cs
-    // not support yet.
+    // 暂不支持
     ```
 
 2. Jerry 阅读 Tom 发的消息后，调用对话上的 `read` 方法把「对话中最近的消息」标记为已读：
@@ -663,16 +665,16 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
     conversation.read();
     ```
     ```cs
-    // not support yet.
+    // 暂不支持
     ```
 
-3. Tom 将收到一个已读回执，对话的 `lastReadAt` 属性会更新。此时可以更新 UI，把时间戳小于 `lastReadAt` 的消息都标记为已读。
+3. Tom 将收到一个已读回执，对话的 `lastReadAt` 属性会更新。此时可以更新 UI，把时间戳小于 `lastReadAt` 的消息都标记为已读：
   
     ```js
     var { Event } = require('leancloud-realtime');
     conversation.on(Event.LAST_READ_AT_UPDATE, function() {
-      console.log(conversation.lastDeliveredAt);
-      // 在 UI 中将早于 lastDeliveredAt 的消息都标记为「已送达」
+      console.log(conversation.lastReadAt);
+      // 在 UI 中将早于 lastReadAt 的消息都标记为「已读」
     });
     ```
     ```objc
@@ -698,7 +700,7 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
     AVIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
     ```
     ```cs
-    // not support yet.
+    // 暂不支持
     ```
 
 > 注意：
@@ -713,12 +715,12 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
 
 LeanCloud 即时通讯服务还支持一类比较特殊的消息：Will（遗愿）消息。「Will 消息」是在一个用户突然掉线之后，系统自动通知对话的其他成员关于该成员已掉线的消息，好似在掉线后要给对话中的其他成员一个妥善的交待，所以被戏称为「遗愿」消息，如下图中的「Tom 已断线，无法收到消息」：
 
-<img src="images/lastwill-message.png" width="400" class="img-responsive" alt="Jerry 在一个名为「Tom & Jerry」的对话中收到内容为「Tom 已断线，无法收到消息」的 Will 消息。">
+<img src="images/lastwill-message.png" width="400" class="img-responsive" alt="在一个名为「Tom & Jerry」的对话中，Jerry 收到内容为「Tom 已断线，无法收到消息」的 Will 消息。这条消息看起来像一条系统通知，与普通消息的样式不同。">
 
 要发送 Will 消息，用户需要设定好消息内容发给云端，云端并不会将其马上发送给对话的成员，而是缓存下来，一旦检测到该用户掉线，云端立即将这条遗愿消息发送出去。开发者可以利用它来构建自己的断线通知的逻辑。
 
 ```js
-var message = new TextMessage('我掉线了');
+var message = new TextMessage('我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。');
 conversation.send(message, { will: true }).then(function() {
   // 发送成功，当前 client 掉线的时候，这条消息会被下发给对话里面的其他成员
 }).catch(function(error) {
@@ -729,17 +731,17 @@ conversation.send(message, { will: true }).then(function() {
 AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
 option.will = YES;
 
-AVIMMessage *willMessage = [AVIMTextMessage messageWithText:@"I'm offline." attributes:nil];
+AVIMMessage *willMessage = [AVIMTextMessage messageWithText:@"我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。" attributes:nil];
 
 [conversaiton sendMessage:willMessage option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
-        NSLog(@"Will message has been sent.");
+        NSLog(@"遗愿消息已发出。");
     }
 }];
 ```
 ```java
 AVIMTextMessage message = new AVIMTextMessage();
-message.setText("我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员");
+message.setText("我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。");
 
 AVIMMessageOption option = new AVIMMessageOption();
 option.setWill(true);
@@ -756,7 +758,7 @@ conversation.sendMessage(message, option, new AVIMConversationCallback() {
 ```cs
 var message = new AVIMTextMessage()
 {
-    TextContent = "我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员"
+    TextContent = "我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。"
 };
 var sendOptions = new AVIMSendOptions()
 {
@@ -786,7 +788,7 @@ Will 消息有 **如下限制**：
 将消息加入缓存的代码如下：
 
 ```js
-// 不支持
+// 暂不支持
 ```
 ```objc
 [conversation addMessageToCache:message];
@@ -801,7 +803,7 @@ conversation.addToLocalCache(message);
 将消息从缓存中删除：
 
 ```js
-// 不支持
+// 暂不支持
 ```
 ```objc
 [conversation removeMessageFromCache:message];
@@ -825,15 +827,15 @@ LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在�
 
 1. 静态配置提醒消息
 
-  用户可以在控制台中为应用设置一个全局的静态 JSON 字符串，指定固定内容来发送通知。例如，我们进入 [控制台 > 消息 > 即时消息 > 设置 > 离线推送设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
+  用户可以在控制台中为应用设置一个全局的静态 JSON 字符串，指定固定内容来发送通知。例如，我们进入 [控制台 > 消息 > 即时通讯 > 设置 > 离线推送设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
 
-  ```
+  ```json
   { "alert": "您有新的消息", "badge": "Increment" }
   ```
 
-  那么在有新消息到达的时候，符合条件的离线用户会收到一条「您有新消息」的通知栏消息。
+  那么在有新消息到达的时候，符合条件的离线用户会收到一条「您有新的消息」的通知栏消息。
 
-  注意，这里 `badge` 参数为 iOS 设备专用，且 `Increment` 大小写敏感，表示自动增加应用 badge 上的数字计数。清除 badge 的操作请参考 [iOS 推送指南 · 清除 badge](ios_push_guide.html#清除_Badge)。此外，对于 iOS 设备您还可以设置声音等推送属性，具体的字段可以参考 [推送 · 消息内容 Data](./push_guide.html#消息内容_Data)。
+  注意，这里 `badge` 参数为 iOS 设备专用，且 `Increment` 大小写敏感，表示自动增加应用 badge 上的数字计数。清除 badge 的操作请参考 [iOS 推送指南 · 定制通知](ios_push_guide.html#定制通知)。此外，对于 iOS 设备您还可以设置声音等推送属性，具体的字段可以参考 [推送 · 消息内容 Data](push_guide.html#消息内容_Data)。
 
 2. 客户端发送消息的时候额外指定推送信息
 
@@ -842,28 +844,16 @@ LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在�
   还记得我们发送「暂态消息」时的 `AVIMMessageOption` 参数吗？即时通讯 SDK 允许客户端在发送消息的时候，指定附加的推送信息（在 `AVIMMessageOption` 中设置 `pushData` 属性），这样在需要离线推送的时候我们就会使用这里设置的内容来发出推送通知。示例代码如下：
 
   ```js
-  var { Realtime, TextMessage } = require('leancloud-realtime');
-  var realtime = new Realtime({ appId: '', region: 'cn' });
-  realtime.createIMClient('Tom').then(function (host) {
-      return host.createConversation({
-          members: ['Jerry'],
-          name: 'Tom & Jerry',
-          unique: true
-      });
-  }).then(function (conversation) {
-      console.log(conversation.id);
-      return conversation.send(new TextMessage('Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！'), {
-          pushData: {
-              "alert": "您有一条未读的消息",
-              "category": "消息",
-              "badge": 1,
-              "sound": "声音文件名，前提在应用里存在",
-              "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
-          }
-      });
-  }).then(function (message) {
-      console.log(message);
-  }).catch(console.error);
+  const message = new TextMessage('Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！');
+  conversation.send(message), {
+      pushData: {
+          "alert": "您有一条未读的消息",
+          "category": "消息",
+          "badge": 1,
+          "sound": "message.mp3", // 声音文件名，前提在应用里存在
+          "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
+      }
+  });
   ```
   ```objc
   AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
@@ -882,7 +872,7 @@ LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在�
       @Override
       public void done(AVIMException e) {
           if (e == null) {
-          // 发送成功
+              // 发送成功
           }
       }
   });
@@ -900,7 +890,7 @@ LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在�
           { "alert", "您有一条未读的消息"},
           { "category", "消息"},
           { "badge", 1},
-          { "sound", "message.mp3//声音文件名，前提在应用里存在"},
+          { "sound", "message.mp3"}, // 声音文件名，前提在应用里存在
           { "custom-key", "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"}
       }
   };
@@ -913,10 +903,10 @@ LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在�
   我们还提供了第三种方式，让开发者在推送动态内容的时候，也不失实现上的灵活性。这种方式需要使用 [即时通讯 Hook 机制](realtime-guide-systemconv.html#万能的 Hook 机制) 在服务端来统一指定离线推送消息内容，感兴趣的开发者可以参阅下述文档：
 
   - [详解消息 hook 与系统对话](realtime-guide-systemconv.html#_receiversOffline)
-  - [即时通讯 Hook（云引擎 PHP 开发）](leanengine_cloudfunction_guide-php.html#_receiversOffline)
-  - [即时通讯 Hook（云引擎 NodeJS 开发）](leanengine_cloudfunction_guide-node.html#_receiversOffline)
+  - [即时通讯 Hook（云引擎 Node.js 开发）](leanengine_cloudfunction_guide-node.html#onIMReceiversOffline)
   - [即时通讯 Hook（云引擎 Python 开发）](leanengine_cloudfunction_guide-python.html#_receiversOffline)
-
+  - [即时通讯 Hook（云引擎 PHP 开发）](leanengine_cloudfunction_guide-php.html#_receiversOffline)
+  - [即时通讯 Hook（云引擎 Java 开发）](leanengine_cloudfunction_guide-java.html#_receiversOffline)
 
 三种方式之间的优先级如下：**服务端动态生成通知 > 客户端发送消息的时候额外指定推送信息 > 静态配置提醒消息**。
 
@@ -926,7 +916,7 @@ LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在�
 
 同时使用了 LeanCloud 推送服务和即时通讯服务的应用，客户端在成功登录即时通讯服务时，SDK 会自动关联当前的 `clientId` 和设备数据（推送服务中的 `Installation` 表）。关联的方式是通过让目标设备 **订阅** 名为 `clientId` 的 Channel 实现的。开发者可以在数据存储的 `_Installation` 表中的 `channels` 字段查到这组关联关系。在实际离线推送时，云端系统会根据用户 `clientId` 找到对应的关联设备进行推送。
 
-由于即时通讯触发的推送量比较大，内容单一， 所以推送服务云端不会保留这部分记录，开发者在 **控制台 > 消息 > 推送记录** 中也无法找到这些记录。
+由于即时通讯触发的推送量比较大，内容单一，所以推送服务云端不会保留这部分记录，开发者在 **控制台** > **消息** > **推送** > **推送记录** 中也无法找到这些记录。
 
 LeanCloud 推送服务的通知过期时间是 7 天，也就是说，如果一个设备 7 天内没有连接到 APNs、MPNs 或设备对应的混合推送平台，系统将不会再给这个设备推送通知。
 
@@ -952,7 +942,7 @@ Apple 不允许在一次推送请求中向多个从属于不同 Team ID 的设�
 
 `_profile` 和 `_apns_team_id` 属性均不会实际推送。
 
-目前，[控制台 > 消息 > 即时消息 > 设置 > 离线推送设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 这里的推送内容也支持一些内置变量，你可以将上下文信息直接设置到推送内容中：
+目前，[控制台 > 消息 > 即时通讯 > 设置 > 离线推送设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 这里的推送内容也支持一些内置变量，你可以将上下文信息直接设置到推送内容中：
 
 * `${convId}` 推送相关的对话 ID
 * `${timestamp}` 触发推送的时间戳（Unix 时间戳）
@@ -977,7 +967,7 @@ LeanCloud 提供两种方式进来同步离线消息：
 由于历史原因，不同平台的 SDK 对两种方式的支持度是不一样的：
 1. Android、iOS SDK 同时支持这两种方式，且默认是「推」的方式
 2. JavaScript SDK 默认支持「拉」的方式
-3. dotNet SDK 目前还不支持第二种方式。
+3. .NET SDK 目前还不支持第二种方式。
 
 > 注意，请不要混合使用上面两种方式，比如在 iOS 平台使用第一种方式获取离线消息，而 Android 平台使用第二种方式获取离线消息，可能导致所有离线消息无法正常获取。
 
@@ -997,7 +987,7 @@ LeanCloud 提供两种方式进来同步离线消息：
 AVIMClient.setUnreadNotificationEnabled(true);
 ```
 ```cs
-// 尚不支持
+// 暂不支持
 ```
 
 客户端 SDK 会在 `AVIMConversation` 上维护一个 `unreadMessagesCount` 字段，来统计当前对话中存在有多少未读消息。
@@ -1006,7 +996,7 @@ AVIMClient.setUnreadNotificationEnabled(true);
 
 > 注意：开启未读消息数后，即使客户端在线收到了消息，未读消息数量也会增加，因此开发者需要在合适时机重置未读消息数。
 
-客户端 SDK 在 `<Conversation, UnreadMessageCount>` 数字变化的时候，会通过 `IMClient` 派发 `未读消息数量更新（UNREAD_MESSAGES_COUNT_UPDATE）` 事件到应用层。开发者可以监听 `UNREAD_MESSAGES_COUNT_UPDATE` 事件，在对话列表界面上更新这些对话的未读消息数量，不过考虑到这个通知回调会非常频繁，并且未读消息数量变化的通知一般也都是伴随其他事件产生的，所以建议开发者 ***对于此通知不做特殊处理*** 即可。
+客户端 SDK 在 `<Conversation, UnreadMessageCount>` 数字变化的时候，会通过 `IMClient` 派发「未读消息数量更新（`UNREAD_MESSAGES_COUNT_UPDATE`）」事件到应用层。开发者可以监听 `UNREAD_MESSAGES_COUNT_UPDATE` 事件，在对话列表界面上更新这些对话的未读消息数量，不过考虑到这个通知回调会非常频繁，并且未读消息数量变化的通知一般也都是伴随其他事件产生的，所以建议开发者 ***对于此通知不做特殊处理*** 即可。
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -1032,7 +1022,7 @@ onUnreadMessagesCountUpdated(AVIMClient client, AVIMConversation conversation) {
 }
 ```
 ```cs
-// 尚不支持
+// 暂不支持
 ```
 
 对开发者来说，在 `UNREAD_MESSAGES_COUNT_UPDATE` 事件响应的时候，SDK 传给应用层的 `Conversation` 对象，其 `lastMessage` 应该是当前时点当前用户在当前对话里面接收到的最后一条消息，开发者如果要展示更多的未读消息，就需要通过 [消息拉取](realtime-guide-beginner.html#聊天记录查询) 的接口来主动获取了。
@@ -1070,7 +1060,7 @@ AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mo
 }];
 ```
 ```java
-// 第二个参数：登录标记 Tag
+// 第二个参数：登录标记 tag
 AVIMClient currentClient = AVIMClient.getInstance(clientId, "Mobile");
 currentClient.open(new AVIMClientCallback() {
   @Override
@@ -1094,13 +1084,13 @@ AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile", deviceId
 ```js
 var { Event } = require('leancloud-realtime');
 tom.on(Event.CONFLICT, function() {
-  // 弹出提示，告知当前用户的 Client Id 在其他设备上登陆了
+  // 弹出提示，告知当前用户的 clientId 在其他设备上登陆了
 });
 ```
 ```objc
 -(void)client:(AVIMClient *)client didOfflineWithError:(NSError *)error{
     if ([error code]  == 4111) {
-        //适当的弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
+        // 适当的弹出友好提示，告知当前用户的 clientId 在其他设备上登陆了
     }
 };
 ```
@@ -1116,7 +1106,7 @@ public class AVImClientManager extends AVIMClientEventHandler {
   @Override
   public void onClientOffline(AVIMClient avimClient, int i) {
     if(i == 4111){
-      // 适当地弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
+      // 适当地弹出友好提示，告知当前用户的 clientId 在其他设备上登陆了
     }
   }
 }
@@ -1141,10 +1131,10 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 
 {{ docs.langSpecStart('js') }}
 
-通过继承 TypedMessage，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
+通过继承 `TypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
 
-* 申明新的消息类型，继承自 TypedMessage 或其子类，然后：
-  * 对 class 使用 `messageType(123)` 装饰器，具体消息类型的值（这里是 `123`）由开发者自己决定（LeanCloud 内建的 [消息类型使用负数](realtime-guide-beginner.html#内建消息类型)，所有正数都预留给开发者扩展使用）。
+* 申明新的消息类型，继承自 `TypedMessage` 或其子类，然后：
+  * 对 class 使用 `messageType(123)` 装饰器，具体消息类型的值（这里是 `123`）由开发者自己决定（LeanCloud 内建的 [消息类型使用负数](realtime-guide-beginner.html#默认消息类型)，所有正数都预留给开发者扩展使用）。
   * 对 class 使用 `messageField(['fieldName'])` 装饰器来声明需要发送的字段。
 * 调用 `Realtime#register()` 函数注册这个消息类型。
 
@@ -1172,7 +1162,7 @@ realtime.register(OperationMessage);
 继承于 `AVIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
 
 * 实现 `AVIMTypedMessageSubclassing` 协议；
-* 子类将自身类型进行注册，一般可在子类的 `+load` 方法或者 UIApplication 的 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerSubclass]`。
+* 子类将自身类型进行注册，一般可在子类的 `+load` 方法或者 `UIApplication` 的 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerSubclass]`。
 
 ```objc
 // 定义
@@ -1191,15 +1181,15 @@ realtime.register(OperationMessage);
 
 @end
 
-// 1. register subclass
+// 1. 注册子类
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [CustomMessage registerSubclass];
 }
-// 2. received message
+// 2. 接收消息
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
     if (message.mediaType == 123) {
         CustomMessage *imageMessage = (CustomMessage *)message;
-        // handle image message.
+        // 处理自定义消息
     }
 }
 ```
@@ -1257,6 +1247,7 @@ public class AVIMTextMessage extends AVIMTypedMessage {
 {{ docs.langSpecStart('cs') }}
 
 首先定义一个自定义的子类继承自 `AVIMTypedMessage`：
+
 ```cs
 // 定义自定义消息类名
 [AVIMMessageClassName("InputtingMessage")]
@@ -1328,7 +1319,7 @@ void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
 - `FileMessage` 普通文件消息(.txt/.doc/.md 等各种)
 - `LocationMessage` 地理位置消息
 
-这些消息类型还支持应用层设置若干 key-value 自定义属性来实现扩展。譬如有一条图像消息，除了文本之外，还需要附带地理位置信息，这时候开发者使用消息类中预留的 {{attributes}} 属性就可以保存额外信息了，并不需要去实现一个复杂的自定义消息。
+这些消息类型还支持应用层设置若干 key-value 自定义属性来实现扩展。譬如有一条图像消息，除了文本之外，还需要附带地理位置信息，这时候开发者使用消息类中预留的 `attributes` 属性就可以保存额外信息了，并不需要去实现一个复杂的自定义消息。
 
 因此，我们建议只有在默认的消息类型完全无法满足需求的时候，才去使用自定义的消息类型。
 

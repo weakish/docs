@@ -106,10 +106,10 @@ LeanCloud 即时通讯服务提供的主要功能有：
 `attributes`|`attr`|`Object`|可选|自定义属性，供开发者扩展使用。
 `conversationId`|`objectId`|`String`||对话 ID（只读），由云端为该对话生成的一个全局唯一的 ID。
 `creator`|`c`|`String`||对话创建者的 `clientId`（只读）。
-`members`|`m`|`Array`||普通对话的所有参与者（仅针对普通对话，暂态对话和系统对话并不支持持久化的成员列表，具体的开发指南中会有详细解释）。
+`members`|`m`|`Array`||普通对话的所有参与者（仅针对普通对话，聊天室和系统对话并不支持持久化的成员列表，具体的开发指南中会有详细解释）。
 `mute`|`mu`|`Array`||将对话设为静音的参与者，这部分参与者不会收到推送（仅针对 iOS、 Windows Phone 以及开启了混合推送的 Android 用户有效，具体的开发指南中会有详细解释）。
 `lastMessageAt`|`lm`|`Date`||对话中最后一条消息的发送或接收时间。
-`transient`|`tr`|`Boolean`|可选|对话类型标志，是否为暂态对话，后面会说明。
+`transient`|`tr`|`Boolean`|可选|对话类型标志，是否为聊天室，后面会说明。
 `system`|`sys`|`Boolean`|可选|对话类型标志，是否是系统对话，后面会说明。
 `unique`|`unique`|`Boolean`|可选|内部字段，对话类型标志，标记根据成员原子创建的对话，后面会说明。
 
