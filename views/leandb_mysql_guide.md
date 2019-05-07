@@ -118,6 +118,43 @@ try {
     ```
 
 - 更多的用法请参考 [MySQL Connector/J 文档](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-usagenotes-connect-drivermanager.html)
+### Python
+
+在 Python 中你可以这样连接到 MySQL:
+
+```python
+import os
+import mysql.connector
+
+result = ''
+
+host = os.environ['MYSQL_HOST_MYRDB']
+port = os.environ['MYSQL_PORT_MYRDB']
+user = os.environ['MYSQL_ADMIN_USER_MYRDB']
+password = os.environ['MYSQL_ADMIN_PASSWORD_MYRDB']
+try:
+  cnx = mysql.connector.connect(
+    user=user, password=password, database='test', host=host, port=port)
+except mysql.connector.Error as err:
+  if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+    print("username or password error")
+  elif err.errno == errorcode.ER_BAD_DB_ERROR:
+    print("Database does not exist")
+  else:
+    print(err)
+  else:
+    cursor = cnx.cursor()
+    cursor.execute('SELECT 1 + 1 AS solution')
+    for row in cursor:
+      result = "The solution is {}".format(row[0])
+
+    cursor.close()
+    cnx.close()
+```
+
+- 上面用的是 MySQL 官方的 python driver，你需要在 `requirements.txt` 中列出这一依赖，例如：`mysql-connector-python>=8.0.16,<9.0.0`
+- 更多的用法请参考 [MySQL Connector/Python 文档](https://dev.mysql.com/doc/connector-python/en/)
+
 
 ## 常见问题
 
