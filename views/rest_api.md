@@ -701,6 +701,43 @@ curl -X GET \
   https://{{host}}/1.1/classes/Post/<objectId>
 ```
 
+类不存在时，返回 404 Not Found 错误：
+
+```json
+{
+  "code": 101,
+  "error": "Class or object doesn't exists."
+}
+```
+
+objectId 不存在时，返回一个空对象（HTTP 状态码为 200 OK）：
+
+```json
+{}
+```
+
+某些特殊的系统内置类（类名以下划线开头），objectId 不存在时不一定返回空对象。
+例如，查询 `_User` 时，objectId 不存在会返回 400 Bad Request 错误：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://{{host}}/1.1/classes/_User/<NonexistObjectId>
+```
+
+返回：
+
+```json
+{
+  "code": 211,
+  "error": "Could not find user."
+}
+```
+
+顺带提一下，获取用户推荐使用 `GET /users/<objectId>`，而不是直接查询 `_User` 类。参见[获取用户](#获取用户)。
+
+
 ### 更新对象
 
 为了更改一个对象已经有的数据，你可以发送一个 PUT 请求到对象相应的 URL 上，任何你未指定的 key 都不会更改，所以你可以只更新对象数据的一个子集。例如，我们来更改我们对象的一个 content 字段：
@@ -1778,6 +1815,15 @@ curl -X GET \
   "createdAt":"2015-07-14T02:31:50.100Z",
   "emailVerified":false,
   "mobilePhoneVerified":false
+}
+```
+
+用户不存在时返回 400 Bad Request 错误：
+
+```json
+{
+  "code": 211,
+  "error": "Could not find user."
 }
 ```
 
