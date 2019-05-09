@@ -27,7 +27,7 @@ lean switch
 
 ![image](images/client-engine-lean-switch.png)
 
-注意，本分组只会在[控制台](/dashboard/app.html?appid={{appid}})开启试用 Client Engine 后出现。
+**注意，本分组只会在[控制台](/dashboard/app.html?appid={{appid}})开启试用 Client Engine 后出现。**
 
 
 ### 本地运行

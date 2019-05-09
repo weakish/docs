@@ -71,3 +71,7 @@ versionChangeInterval 代表数据重置周期，共有以下选项：
 * [快速入门](leaderboard-quick-start.html)：展示了如何快速接入排行榜功能。
 * [Demo](https://leancloud.github.io/javascript-sdk/demo/leaderboard/) ：通过一个 Demo 来展示排行榜功能。
 * [JavaScript 排行榜开发指南](leaderboard-guide-js.html)：对如何开发排行榜进行了详细介绍。
+
+### 在线交流
+
+为了能及时解答大家的疑问，进一步了解游戏开发者的需求和使用场景，我们建立了游戏开发群，欢迎各位游戏开发者加入。[详情 >>>](https://forum.leancloud.cn/t/leancloud-qq/19389)

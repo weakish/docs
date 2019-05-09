@@ -2,7 +2,6 @@
 
 多人在线对战是 LeanCloud 专门针对多人在线类型的游戏推出的后端服务。开发者不需要自己搭建后端系统，利用云服务就可以轻松实现游戏内玩家匹配、在线对战消息同步等功能。
 
-
 ## 核心功能
 - **玩家匹配**：随机或按指定条件将玩家匹配到一起玩游戏。在线对战的匹配功能会将即将一起游戏的玩家匹配到同一个房间（Room）中。例如《第五人格》、《王者荣耀》、《吃鸡》等对战类手游，玩家只需点击「自由匹配」就可以迅速匹配到其他玩家，大家进入到同一个房间中准备开始游戏；玩家也可以自己新开房间邀请好友一起玩。
 - **对战消息快速同步**：客户端与服务端使用 WebSocket 通道进行实时双向通信，确保游戏内所有消息能够快速同步。
@@ -83,7 +82,7 @@ public override void OnJoinedRoom()
 * 设置 [玩家掉线后的保留时间](multiplayer-guide-csharp.html#玩家掉线之后被保留的时间)，在有效时间内如果该玩家加回房间，房间内依然保留该玩家的自定义属性。
 
 ```js
-client.joinRandomRoom().then().catch((error) =>
+client.joinRandomRoom().then().catch((error) => {
   if (error.code === 4301) {
     const options = {
       // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
@@ -98,7 +97,7 @@ client.joinRandomRoom().then().catch((error) =>
       // 创建房间成功
     });
   }
-);
+});
 
 ```
 
@@ -484,6 +483,10 @@ Play.LeaveRoom();
 * [实时对战 Demo](game-demos.html#实时对战 Demo)
 * [回合制对战 Demo](game-demos.html#回合制 Demo)
 
-## 价格及试用
+## 价格
 
 多人在线对战的核心计费单位为 CCU，即同时在线人数。价格请参考[官网](https://leancloud.cn/pricing/)。
+
+### 在线交流
+
+为了能及时解答大家的疑问，进一步了解游戏开发者的需求和使用场景，我们建立了游戏开发群，欢迎各位游戏开发者加入。[详情 >>>](https://forum.leancloud.cn/t/leancloud-qq/19389)
