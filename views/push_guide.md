@@ -205,6 +205,15 @@ req_id | 可选 | 自定义请求 id，最长 16 个字符且只能由英文字�
 topic | 可选 | installation 的 apnsTopic，iOS Token Authentication 鉴权需要该字段。iOS SDK 会自动读取 iOS app 的 bundle ID，但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK; 2. 不使用 iOS SDK （如 React Native）；3. 推送目标设备使用的 topic 与 iOS Bundle ID 不同。
 apns_team_id | 可选 | Apple 不支持在一次推送中向从属于不同 Team Id 的设备发推送。在使用 iOS Token Authentication 的鉴权方式后，如果应用配置了多个不同 Team Id 的 Private Key，请填写该参数，并通过 where 查询条件保证单次推送请求的目标设备均属于本参数指定的 Team Id，以保证推送正常进行。
 
+此接口受频率限制，限制如下：
+
+|  商用版   |      开发版    |
+|----------|---------------|
+| 每应用 600 次/分钟 | 每应用 60 次/分钟  |
+
+超过频率限制后 1 分钟内 LeanCloud 会拒绝请求持续返回 429 错误码，一分钟后会重新处理请求。
+
+
 #### master key 校验
 
 当在 [控制台 > 消息 > 推送 > 设置 > 推送选项](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 中点选了 **禁止从客户端进行消息推送** 后，推送消息接口必须增加 **master key** 校验才能成功发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。我们建议用户都将此限制启用。

@@ -388,6 +388,10 @@ Push 的格式与[推送 REST API 消息内容](push_guide.html#消息内容_Dat
 }
 ```
 
+频率限制：
+
+此接口受频率限制，[点击查看详情](realtime_rest_api_v2.html#接口请求频率限制)。
+
 ### 删除系统对话广播消息
 
 调用此 API 将删除已发布的广播消息。
