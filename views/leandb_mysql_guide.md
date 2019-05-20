@@ -73,6 +73,50 @@ try {
 
 - 更多的用法请参考 [PDO 的文档](https://www.php.net/manual/zh/class.pdo.php)
 
+### Java
+
+在 Java 中你可以这样连接到 MySQL:
+
+```java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+String host = System.getenv("MYSQL_HOST_MYRDB");
+String port = System.getenv("MYSQL_PORT_MYRDB");
+String user = System.getenv("MYSQL_ADMIN_USER_MYRDB");
+String password = System.getenv("MYSQL_ADMIN_PASSWORD_MYRDB");
+try {
+  Class.forName("com.mysql.jdbc.Driver").newInstance();
+} catch (Exception ex) {
+  // 处理异常
+}
+try {
+  Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/test?" +
+  "user=" + user + "&password=" + password);
+  Statement statement = connection.createStatement();
+  ResultSet resultSet = statement.executeQuery("SELECT 1 + 1 AS solution");
+  resultSet.first();
+  System.out.format("The solution is %d", resultSet.getInt("solution"));
+} catch (SQLException ex) {
+  // 处理异常
+}
+```
+
+- 需要在 `pom.xml` 中加入 mysql connector 依赖：
+
+    ```xml
+    <dependency>
+      <groupId>mysql</groupId>
+ 	    <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.16</version>
+    </dependency>
+    ```
+
+- 更多的用法请参考 [MySQL Connector/J 文档](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-usagenotes-connect-drivermanager.html)
+
 ## 常见问题
 
 - 目前 LeanDB 只支持从云引擎（和控制台的 Web 界面）中访问，在本地调试时无法访问。
