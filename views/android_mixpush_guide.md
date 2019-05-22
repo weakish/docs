@@ -37,16 +37,17 @@ vendor | 厂商
 
 ### 环境配置
 
-1. **注册华为账号**：在 [华为开发者联盟](http://developer.huawei.com/cn/consumer/) 注册华为开发者账号（[详细流程](http://developer.huawei.com/cn/consumer/wiki/index.php?title=%E6%B3%A8%E5%86%8C%E7%99%BB%E5%BD%95)）。
-2. **创建华为应用**：实名认证通过后，需要创建华为移动应用并配置 Push 权益（[详细流程](http://developer.huawei.com/cn/consumer/wiki/index.php?title=%E6%8E%A5%E5%85%A5%E8%AF%B4%E6%98%8E#2.1_.E6.B3.A8.E5.86.8C)）。
-3. **设置华为的 AppId 及 AppKey**：在 [华为开发者联盟控制中心](http://developer.huawei.com/cn/consumer/devunion/openPlatform/html/memberCenter.html#appManage#) > **应用管理** > **移动应用详情**  可以查到具体的华为推送服务应用的 AppId 及 AppSecret，将此 AppId 及 AppSecret 通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
+1. **注册华为账号**：在 [华为开发者联盟](http://developer.huawei.com/cn/consumer/) 注册华为开发者账号（[详细流程](https://developer.huawei.com/consumer/cn/devservice/doc/20300)）。
+2. **开发前准备**：接入华为 PUSH 之前，需要 [配置应用签名](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#2%20配置应用签名)。
+3. 登录 [华为开发者联盟](http://developer.huawei.com/cn/consumer/)，点击右上角「管理中心」，在管理中心 > 应用服务 > 开发服务 > 配置中 [开通推送服务](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#3%20开通推送服务)。
+3. **设置华为的 AppId 及 AppKey**：在华为开发者联盟 > 管理中心 > 开发服务 > Push 产品列表中选择目标产品。点进目标产品获取应用的服务信息 AppId 及 AppSecret，将此 AppId 及 AppSecret 通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
 
 ### 接入 SDK
 
 #### 获取 HMS SDK 和 HMS Agent SDK
-华为 HMS 推送 SDK 分为两部分，一个是 HMS SDK，一个是 HMS Agent SDK，两者需要主版本号一致才能正常使用（当前 LeanCloud 混合推送基于 v2.6.1 这一主版本），具体可以参见 [华为 SDK 获取](http://developer.huawei.com/consumer/cn/service/hms/catalog/HuaweiJointOperation.html?page=hmssdk_jointOper_sdkdownload)。
+华为 HMS 推送 SDK 分为两部分，一个是 HMS SDK，一个是 HMS Agent SDK，两个 SDK 都要正确接入，且两者需要主版本号一致才能正常使用（当前 LeanCloud 混合推送基于 v2.6.1 这一主版本）。
 
-HMS SDK 可以直接通过 jar 包加入，HMS Agent SDK 则需要下载解压之后把源码完全拷贝进入工程。解压 HMS SDK 目录如下表所示，华为要求将 HMS 资源文件和证书文件打包到 apk 中，详情请见 [HMS SDK 接入流程](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweiid.html?page=hmssdk_huaweiid_devprepare)。
+HMS SDK 可以直接通过 jar 包加入，解压 HMS SDK 目录如下表所示，需要将下面三个目录的文件拷贝到应用工程根目录，华为要求将 HMS 资源文件和证书文件打包到 apk 中。（[SDK 下载地址](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#4%20%E4%B8%8B%E8%BD%BDSDK)）
 
 目录 | 说明 | 使用方式
 ----|----|----
@@ -54,9 +55,13 @@ libs/ | 包含 HMS 所有功能的 jar 包。通用包不再按照业务功能�
 res/ | HMS SDK 需要使用的资源目录，包含多国语言。应用如果不需要集成多种语言的，可以适当裁剪。但是必须保留默认语言和简体中文。 | 请直接将 res 目录拷贝到应用工程根目录
 assets/ | HMS SDK 请求华为服务器需要使用的证书文件 | 请直接将 assets 目录拷贝到应用工程根目录
 
-HMS Agent SDK 包含帐号、支付、消息、推送、游戏等功能，如果只打算使用其中部分功能，可以使用 HMS Agent SDK 压缩包中自带的 `GetHMSAgent` 脚本删除不需要的文件。
-这样可以既可以减少应用大小，也可以避免要求不必要的权限。
-详见 [华为开发者文档 > 集成 Agent](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweisns_agent.html?page=hmssdk_huaweisns_devprepare_agent#4%20%E9%9B%86%E6%88%90Agent)。
+HMS Agent SDK 需要下载解压之后把源码完全拷贝进入工程。HMS Agent SDK 包含帐号、支付、消息、推送、游戏等功能，如果只打算使用其中的推送功能，可以使用 HMS Agent SDK 压缩包中自带的 GetHMSAgent 脚本删除不需要的文件，具体步骤如下：
+
+1. 执行 `GetHMSAgent_cn.bat` 生成 copysrc 的文件夹，copysrc 里面是根据您选择需要集成 HMS 服务，抽取后的 HMSAgent 代码（java 文件夹）和manifest文件（AndroidManifest.xml）。注意此步骤中会用到当前应用签名对应的 SHA256 指纹与应用的 App ID 与 App Secret 等信息。
+2. 拷贝 copysrc/java 里面的代码到您现有的工程。请保持 HMSAgent 代码的包的路径和结构不变。AndroidManifest.xml仅供配置参考。
+
+这样既可以减少应用大小，也可以避免要求不必要的权限。
+详见 [华为开发者文档 > 集成 HMS SDK Agent](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#5.1%20%E9%9B%86%E6%88%90SDK)。
 注意，华为的文档里只提到了 `GetHMSAgent_cn.bat`，但实际上HMS Agent SDK 压缩包中还提供了 `GetHMSAgent_cn.sh`，如果您的开发环境是 macOS 或 Linux，可以用这个脚本。
 
 
@@ -73,8 +78,6 @@ dependencies {
     }
 }
 ```
-
-注：如果是通过 jar 包导入，则需要手动下载 jar 包：[华为 Push SDK](http://developer.huawei.com/cn/consumer/wiki/index.php?title=PushSDK%E4%B8%8B%E8%BD%BD)。
 
 然后配置相关 AndroidManifest，添加 Permission：
 
@@ -161,12 +164,15 @@ dependencies {
 
 1. 在 `AVOSCloud.initialize` 时调用 `AVMixPushManager.registerHMSPush(context, profile)` 即可。参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
 
+2. 在应用启动的第一个页面的 `onCreate` 中调用 `AVMixPushManager.connectHMS(activity)` 即可。
+
 LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华为推送：
 
   - EMUI 系统
+  - 在华为后台正确配置应用签名
   - manifest 正确填写
-
-2. 在应用启动的第一个页面的 `onCreate` 中调用 `AVMixPushManager.connectHMS(activity)` 即可。
+  
+> 检测华为推送是否集成成功，可以检查 Installation 表中该设备对应的记录是否增加一个 vendor 字段，vendor 字段值为 HMS 表示设备成功注册为华为 HMS 推送。 
 
 ### 提升透传消息到达率
 
