@@ -144,7 +144,6 @@ def after_user_save(user):
 @engine.before_update('Review')
 def before_hook_object_update(obj):
     # 如果 comment 字段被修改了，检查该字段的长度
-    assert obj.updated_keys == ['clientValue']
     if 'comment' not in obj.updated_keys:
         # comment 字段没有修改，跳过检查
         return
