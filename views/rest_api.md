@@ -1578,7 +1578,7 @@ curl -X GET \
 
 不仅在移动应用上，还在其他系统中，很多应用都有一个统一的登录流程。通过 REST API 访问用户的账户让你可以在 LeanCloud 上简单实现这一功能。
 
-通常来说，**用户**（类名 `_User`）这个类的功能与其他的对象是相同的，比如都没有限制模式（Schema free）。User 对象和其他对象不同的是一个用户必须有用户名（username）和密码（password），密码会被自动地加密和存储。LeanCloud 强制要求 username 和 email 这两个字段必须是没有重复的。
+通常来说，**用户**（类名 `_User`）这个类的功能与其他的对象是相同的，比如都没有限制模式（Schema free）。User 对象和其他对象不同的是一个用户必须有用户名（username）和密码（password），密码会被自动地加密和存储。LeanCloud 强制要求 username 和 email 这两个字段必须是没有重复的（大小写敏感）。
 
 ### 注册
 
