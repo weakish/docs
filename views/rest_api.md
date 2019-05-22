@@ -1588,6 +1588,8 @@ curl -X GET \
 
 这项设置启用了的话，所有填写了 email 的用户在注册时都会产生一个 email 验证地址，并发回到用户邮箱，用户打开邮箱点击了验证链接之后，用户表里 `emailVerified` 属性值会被设为 true。你可以在 `emailVerified` 字段上查看用户的 email 是否已经通过验证。
 
+你还可以在 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)，勾选**未验证邮箱的用户，禁止登录**。
+
 为了注册一个新的用户，需要向 user 路径发送一个 POST 请求，你可以加入一个新的字段，例如，创建一个新的用户有一个电话号码:
 
 ```sh
