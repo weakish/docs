@@ -29,7 +29,7 @@ git clone https://github.com/leancloud/java-war-getting-started.git
 我们建议使用示例项目做为起步，因为一些细节的开发环境的配置会让开发调试方便很多：
 
 * [java-war-getting-started](https://github.com/leancloud/java-war-getting-started): 使用 Servlet，集成 LeanEngine Java SDK 的一个简单项目，打包成 WAR 文件。
-* [spring-boot-getting-started](https://github.com/leancloud/spring-boot-getting-started): 使用 [Spring boot](https://projects.spring.io/spring-boot/) 做为项目框架，集成 LeanEngine Java SDK 的一个简单的项目，打包成 JAR 文件。
+* [spring-boot-getting-started](https://github.com/leancloud/spring-boot-getting-started): 使用 [Spring Boot](https://projects.spring.io/spring-boot/) 做为项目框架，集成 LeanEngine Java SDK 的一个简单的项目，打包成 JAR 文件。
 
 Java 运行环境对内存的使用较多，所以建议：
 
