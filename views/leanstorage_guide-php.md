@@ -169,6 +169,7 @@ $todo->getCreatedAt();
 $query = new Query("Todo");
 $todo  = $query->get("558e20cbe4b060308e3eb36c");
 // $todo 就是 ID 为 558e20cbe4b060308e3eb36c 的对象实例
+// 如果 objectId 不存在，会抛出异常 LeanCloud\CloudException: [101]: Object not found.
 ```
 {% endmacro %}
 
