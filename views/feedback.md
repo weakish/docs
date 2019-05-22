@@ -94,15 +94,15 @@ type | 反馈类型，分别为 "user" 和 "dev"。
 
 ## Android 反馈组件
 
-### 导入 SDK
+### 安装 SDK
 
-你可以从我们的 [SDK 下载](sdk_down.html) 页面获取 **用户反馈模块**。解压缩后，将 libs 下得的 avosfeedback-v{**version**}.jar 包（需要包括下载的其他基础 jar 包）加入你工程的 libs 下面。
+推荐使用包依赖管理工具 Gradle 安装。打开 app 目录下的 build.gradle 进行如下配置：
 
-之后，你需要将 res 下的资源文件夹拷贝并且合并到你工程的 res 目录下。更改资源文件的内容并不影响 SDK，但是请不要改变资源的文件名和文件内资源ID。
-
-注：LeanCloud Feedback Android SDK 的资源文件都是以 avoscloud_feedback 打头。
-
-
+```java
+// LeanCloud 用户反馈包
+compile ('cn.leancloud.android:avoscloud-feedback:4.7.10@aar')
+```
+其他模块的 SDK 安装细节可以在 [Android SDK 安装指南](sdk_setup-android.html) 中查看。
 ### 添加代码，使用基础功能
 
 #### 配置 AndroidManifest.xml
