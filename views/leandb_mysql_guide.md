@@ -61,7 +61,9 @@ mysqlPool.queryAsync('SELECT 1 + 1 AS solution').then( rows => {
 
 ```php
 try {
-  $pdo = new PDO("mysql:host={${getenv('MYSQL_HOST_MYRDB')}}:{${getenv('MYSQL_HOST_MYRDB')}};dbname=test", getenv('MYSQL_ADMIN_USER_MYRDB'), getenv('MYSQL_ADMIN_PASSWORD_MYRDB'));
+  $mysqlHost = getenv('MYSQL_HOST_MYRDB');
+  $mysqlPort = getenv('MYSQL_PORT_MYRDB');
+  $pdo = new PDO("mysql:host=$mysqlHost:$mysqlPort;dbname=test", getenv('MYSQL_ADMIN_USER_MYRDB'), getenv('MYSQL_ADMIN_PASSWORD_MYRDB'));
 
   foreach($pdo->query('SELECT 1 + 1 AS solution') as $row) {
     print "The solution is {$row['solution']}";
