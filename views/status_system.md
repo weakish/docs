@@ -922,28 +922,28 @@ curl -X GET \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -G \
-  --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"dennis id"}' \
+  --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"51c3ba67e4b0f0e851c16221"}' \
   https://{{host}}/1.1/subscribe/statuses
 ```
 
 【示例二】查询我的最新私信列表：
 
 ```sh
-    --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"dennis"}' \
+    --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"51c3ba67e4b0f0e851c16221"}' \
     --data-urlencode 'inboxType=private'
 ```
 
 【示例三】假设上次返回的最大 messageId 是 99，查询从 mesageId = 99 开始最新的 status：
 
 ```sh
-    --data-urlencode 'owner={"__type":"Pointer", "className":"_User","objectId":"dennis"}' \
+    --data-urlencode 'owner={"__type":"Pointer", "className":"_User","objectId":"51c3ba67e4b0f0e851c16221"}' \
     --data-urlencode 'sinceId=99'
 ```
 
 【示例四】查询 messageId 在 99 到 199 之间的 status：
 
 ```sh
-    --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"dennis"}' \
+    --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"51c3ba67e4b0f0e851c16221"}' \
     --data-urlencode 'sinceId=99' \
     --data-urlencode 'maxId=199'
 ```
@@ -951,7 +951,7 @@ curl -X GET \
 【示例五】查询最新的 status，并且 status 的 image 属性存在，也就是查询包含图片的最新 status：
 
 ```sh
-    --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"dennis"}' \
+    --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"51c3ba67e4b0f0e851c16221"}' \
     --data-urlencode 'where={"image":{"$exists":true }}'
 ```
 
@@ -965,7 +965,7 @@ curl -X DELETE \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -G \
-  --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"dennis id"}' \
+  --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"51c3ba67e4b0f0e851c16221"}' \
   --data-urlencode 'inboxType=default' \
   --data-urlencode 'messageId=99' \
   https://{{host}}/1.1/subscribe/statuses/inbox
@@ -999,7 +999,7 @@ curl -X GET \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -G \
-  --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"dennis"}' \
+  --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"51c3ba67e4b0f0e851c16221"}' \
   https://{{host}}/1.1/subscribe/statuses/count
 ```
 
@@ -1017,7 +1017,7 @@ curl -X GET \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -G \
-   --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"dennis"}' \
+   --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"51c3ba67e4b0f0e851c16221"}' \
    --data-urlencode 'inboxType=private' \
    https://{{host}}/1.1/subscribe/statuses/count
 ```
@@ -1032,7 +1032,7 @@ curl -X POST \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -G \
-   --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"dennis"}' \
+   --data-urlencode 'owner={"__type":"Pointer","className":"_User","objectId":"51c3ba67e4b0f0e851c16221"}' \
    --data-urlencode 'inboxType=private' \
    https://{{host}}/1.1/subscribe/statuses/resetUnreadCount
 ```
