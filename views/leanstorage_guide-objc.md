@@ -134,6 +134,7 @@
     AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
     [query getObjectInBackgroundWithId:@"558e20cbe4b060308e3eb36c" block:^(AVObject *object, NSError *error) {
         // object 就是 id 为 558e20cbe4b060308e3eb36c 的 Todo 对象实例
+        // 如果 objectId 不存在，会报错 kAVErrorObjectNotFound
     }];
 ```
 {% endmacro %}
@@ -1045,7 +1046,7 @@ AVQuery *endDateQuery = [AVQuery queryWithClassName:@"Todo"];
 
 AVQuery *query = [AVQuery andQueryWithSubqueries:[NSArray arrayWithObjects:startDateQuery,endDateQuery,nil]];
 [query findObjectsInBackgroundWithBlock:^(NSArray *results, NSError *error) {
-    
+
 }];
 ```
 {% endblock %}
@@ -1654,7 +1655,7 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo"];
 [todo setObject:file forKey:@"girl"];
 [todo setObject:@"明星" forKey:@"topic"];
 [todo saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        
+
 }];
 ```
 {% endblock %}
@@ -1678,10 +1679,10 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 ```objc
 AVObject *todo = [AVObject objectWithClassName:@"Todo" objectId:@"5735aae7c4c9710060fbe8b0"];
 [todo fetchInBackgroundWithKeys:@[@"todoFolder"] block:^(AVObject * _Nullable todoObject, NSError * _Nullable error) {
-    
+
     AVObject *todoFolder = [todoObject objectForKey:@"todoFolder"];
     NSLog(@"%@", todoFolder);
-    
+
 }];
 ```
 {% endblock %}
