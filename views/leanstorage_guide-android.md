@@ -140,6 +140,8 @@
             @Override
             public void done(AVObject avObject, AVException e) {
                 // object 就是 id 为 558e20cbe4b060308e3eb36c 的 Todo 对象实例
+                // objectId 为空时不会报错，
+                // 可以通过检验 avObject.getObjectId 方法是否返回空字符串判断其存在性
             }
         });
 ```
@@ -1428,6 +1430,8 @@ fetchAllInBackground()
 ```java
         AVQuery<AVUser> userQuery = new AVQuery<>("_User");
 ```
+
+通过 objectId 查询用户时，若 objectId 不存在，会抛出异常 `AVException: Could not find user.` 
 {% endblock %}
 
 {% block text_subclass %}
