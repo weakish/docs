@@ -233,7 +233,7 @@ query.find().then(function(statuses){
 
 ## iOS SDK
 
-请先 [下载应用内社交模块](sdk_down.html)。
+SDK 的安装参考 [Objective-C 安装指南](sdk_setup-objc.html)。
 
 ### 好友关系
 
@@ -400,7 +400,7 @@ query.inboxType=kAVStatusTypeTimeline;
 
 ## Android SDK
 
-请先 [下载应用内社交模块](sdk_down.html)。
+SDK 的安装参考 [Android 安装指南](sdk_setup-android.html)。
 
 ### 好友关系
 
