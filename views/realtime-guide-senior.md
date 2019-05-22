@@ -42,7 +42,7 @@ LeanMessage Cluster-->终端: 4. 对请求的内容和签名进行验证，执�
 3. 客户端获得签名后，编码到请求中，发给 LeanCloud 即时通讯服务器；
 4. 即时通讯服务器对请求的内容和签名做一遍验证，确认这个操作是被应用服务器允许的，进而执行后续的实际操作。
 
-签名采用 **Hmac-sha1** 算法，输出字节流的十六进制字符串（hex dump）。针对不同的请求，开发者需要拼装不同组合的字符串，加上 UTC timestamp 以及随机字符串作为签名的消息。对于使用 `AVUser` 的应用，可使用 REST API [获取 Client 登录签名](./realtime_rest_api_v2.html#获取登录签名) 进行登录认证。
+签名采用 **HMAC-SHA1** 算法，输出字节流的十六进制字符串（hex dump）。针对不同的请求，开发者需要拼装不同组合的字符串，加上 UTC timestamp 以及随机字符串作为签名的消息。对于使用 `AVUser` 的应用，可使用 REST API [获取 Client 登录签名](./realtime_rest_api_v2.html#获取登录签名) 进行登录认证。
 
 ### 签名格式说明
 
@@ -60,12 +60,12 @@ appid:clientid::timestamp:nonce
 --- | ---
 `appid` | 应用的 ID。
 `clientid` | 登录时使用的 `clientId`。
-`timestamp` | 当前的 UTC 时间距离 unix epoch 的 **毫秒数**。
+`timestamp` | 当前的 UTC 时间距离 Unix epoch 的 **毫秒数**。
 `nonce` | 随机字符串。
 
 > 注意：签名的 key **必须** 是应用的 Master Key，你可以在 [控制台 > 设置 > 应用 Key](/dashboard/app.html?appid={{appid}}#/key) 里找到。**请保护好 Master Key，不要泄露给任何无关人员。**
 
-开发者可以实现自己的 `SignatureFactory`，调用远程服务器的签名接口获得签名。如果你没有自己的服务器，可以直接在 LeanCloud 云引擎上通过 **网站托管** 来实现自己的签名接口。在移动应用中直接做签名的作法 **非常危险**，它可能导致你的 **Master Key** 泄漏。
+开发者可以实现自己的 `SignatureFactory`，调用远程服务器的签名接口获得签名。如果你没有自己的服务器，可以直接在 LeanCloud 云引擎上通过 **网站托管** 来实现自己的签名接口。在移动应用中直接进行签名的做法 **非常危险**，它可能导致你的 **Master Key** 泄漏。
 
 #### 开启对话签名
 
@@ -76,7 +76,7 @@ appid:clientid:sorted_member_ids:timestamp:nonce
 ```
 
 * `appid`、`clientid`、`timestamp` 和 `nonce` 的含义 [同上](#用户登录签名)。
-* `sorted_member_ids` 是以半角冒号（`:`）分隔、**升序排序** 的 user ID，即邀请参与该对话的成员列表。
+* `sorted_member_ids` 是以半角冒号（`:`）分隔、**升序排序** 的 `clientId`，即邀请参与该对话的成员列表。
 
 #### 群组功能的签名
 
@@ -357,7 +357,7 @@ AV.User.logIn('username', 'password').then(function(user) {
     AVIMClient *client = [[AVIMClient alloc] initWithUser:user];
     // 登录即时通讯云端
     [client openWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
-        // Do something you like.
+        // 执行其他逻辑
     }];
 }];
 ```
@@ -708,7 +708,7 @@ public void queryBlockedMembers(int offset, int limit, final AVIMConversationSim
 
 > 注意这里对黑名单操作的结果与禁言操作一样，是 ***部分成功结果***。
 
-用户被加入黑名单之后，就被从对话的成员中移除出去了，以后都无法再接受到对话里面的新消息，并且除非解除黑名单，其他人都无法再把 ta 加为对话成员了。
+用户被加入黑名单之后，就被从对话的成员中移除出去了，以后都无法再接收到对话里面的新消息，并且除非解除黑名单，其他人都无法再把 ta 加为对话成员了。
 
 #### 黑名单的通知事件
 
@@ -756,7 +756,7 @@ tom.CreateChatRoomAsync("聊天室");
 在创建聊天室的时候，开发者可以指定聊天室的名字和附加属性（非必须），与 [创建普通对话的接口](realtime-guide-beginner.html#创建对话 Conversation) 相比，有如下差异：
 
 - 聊天室因为没有成员列表，所以创建的时候指定 `members` 是没有意义的
-- 同样的原因，创建聊天室的时候指定 `unique` 标志也是没有意义的（云端根据成员 ID 来去重）
+- 同样的原因，创建聊天室的时候指定 `unique` 标志也是没有意义的（云端无需根据成员 ID 来去重）
 
 > 尽管我们调用 `createConversation` 接口，通过传递合适的参数（`{ transient: true }`），也可以创建一个聊天室，但是还是建议大家直接使用 `createChatRoom` 方法。
 
@@ -766,6 +766,8 @@ tom.CreateChatRoomAsync("聊天室");
 
 ```js
 var query = tom.getQuery().equalTo('tr',true); // 聊天室对象
+query.find().then(function(conversations) {
+  // conversations 就是想要的结果
 }).catch(console.error);
 ```
 ```objc
@@ -887,7 +889,7 @@ public async void CountMembers_SampleCode()
 
 | 消息等级                 | 描述                                                               |
 | ------------------------ | ------------------------------------------------------------------ |
-| `MessagePriority.HIGH`   | 高等级，针对时效性要求较高的消息，比如直播聊天室中的礼物，打赏等。 |
+| `MessagePriority.HIGH`   | 高等级，针对时效性要求较高的消息，比如直播聊天室中的礼物、打赏等。 |
 | `MessagePriority.NORMAL` | 正常等级，比如普通非重复性的文本消息。                             |
 | `MessagePriority.LOW`    | 低等级，针对时效性要求较低的消息，比如直播聊天室中的弹幕。         |
 
@@ -977,7 +979,7 @@ AVIMClient tom = AVIMClient.getInstance("Tom");
 比如 Tom 工作繁忙，对某个对话设置了静音：
 
 ```js
-black.getConversation(CONVERSATION_ID).then(function(conversation) {
+tom.getConversation('CONVERSATION_ID').then(function(conversation) {
   return conversation.mute();
 }).then(function(conversation) {
   console.log('静音成功');
@@ -1036,13 +1038,11 @@ tom.open(new AVIMClientCallback(){
 > - 对话内消息的静音/取消静音操作不光对聊天室有效，普通的群聊对话也可以执行该操作。
 > - `mute` 和 `unmute` 操作会修改云端 `_Conversation` 里面的 `mu` 属性。**开发者切勿在控制台中对 `mu` 随意进行修改**，否则可能会引起即时通讯云端的离线推送功能失效。
 
-
 ### 消息内容的实时过滤
 
 对于开放聊天室来说，内容的审核和实时过滤是产品运营上的一个基本要求。我们即时通讯服务默认提供了敏感词过滤的功能，多人的 **普通对话、聊天室和系统对话里面的消息都会进行实时过滤**。
 
-过滤的词库由 LeanCloud 统一提供，命中的敏感词将会被替换为 `***`。同时我们也支持用户自定义敏感词过滤文件。
-在 [控制台 > 消息 > 即时通讯 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中开启「消息敏感词实时过滤功能」，上传敏感词文件即可。
+过滤的词库由 LeanCloud 统一提供，在 [控制台 > 消息 > 即时通讯 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中开启「消息敏感词实时过滤功能」即可使用。命中的敏感词将会被替换为 `***`。同时我们也支持开发者自定义敏感词词库，只需上传敏感词文件即可。
 
 如果开发者有较为复杂的过滤需求，我们推荐使用 [云引擎 hook `_messageReceived`](realtime-guide-systemconv.html#_messageReceived) 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
 
@@ -1105,7 +1105,7 @@ tom.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversati
 var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 ```
 
-与其他对话类型不同的是，临时对话有一个 **重要** 的属性：TTL，它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天，如果您的需求是一定要超过 30 天，请使用普通对话，传入 TTL 创建临时对话的代码如下：
+与其他对话类型不同的是，临时对话有一个 **重要** 的属性：TTL。它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天。如果您的需求是一定要超过 30 天，请使用普通对话。传入 TTL 创建临时对话的代码如下：
 
 ```js
 realtime.createIMClient('Tom').then(function(tom) {
