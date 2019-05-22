@@ -93,13 +93,10 @@ appid:clientid:convid:sorted_member_ids:timestamp:nonce:action
 #### 查询聊天记录的签名
 
 ```
-appid:client_id:convid:nonce:signature_ts
+appid:client_id:convid:nonce:timestamp
 ```
 
-* `client_id` 是查看者的 ID（签名参数）。
-* `nonce` 是签名随机字符串（签名参数）。
-* `signature_ts` 是签名时间戳（签名参数），单位是毫秒。
-* `signature` 是签名（签名参数）。
+各参数的含义同上。
 
 #### 黑名单的签名
 
