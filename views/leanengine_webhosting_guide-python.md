@@ -141,7 +141,7 @@ if env == 'development':
 elif env == 'production':
   # 当前环境为「生产环境」，是线上正式运行的环境
   do_some_thing()
-elif env == 'staging':
+elif env == 'stage':
   # 当前环境为「预备环境」
   do_some_thing()
 ```
