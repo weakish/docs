@@ -1631,6 +1631,12 @@ curl -X POST \
 https://{{host}}/1.1/login
 ```
 
+用户也可以通过邮箱地址和密码登录，只需将 body 中的 username 换成 email：
+
+```json
+{"email":"hjiang@example.com","password":"f32@ds*@&dsa"}
+```
+
 返回的主体是一个 JSON 对象包括所有除了 password 以外的自定义字段。它同样包含了 createdAt、updateAt、objectId 和 sessionToken 字段。
 
 ```json

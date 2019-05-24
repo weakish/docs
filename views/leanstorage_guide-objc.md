@@ -1249,6 +1249,20 @@ AVQuery *query = [AVQuery andQueryWithSubqueries:[NSArray arrayWithObjects:start
 ```
 {% endblock %}
 
+{% block code_user_logIn_with_email_and_password %}
+
+```objc
+  [AVUser loginWithEmail:@"tom@example.com" password:@"cat!@#123" block:^(AVUser *user, NSError *error) {
+      if (user != nil) {
+
+      } else {
+
+      }
+  }];
+```
+
+{% endblock %}
+
 {% block code_user_logIn_with_mobilephonenumber_and_password %}
 
 ```objc

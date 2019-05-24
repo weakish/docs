@@ -1456,6 +1456,20 @@ LCUser.logIn(username: "Tom", password: "leancloud") { result in
 ```
 {% endblock %}
 
+{% block code_user_logIn_with_email_and_password %}
+
+```swift
+LCUser.logIn(email: "tom@example.com", password: "leancloud") { result in
+    switch result {
+    case .success(let user):
+        break
+    case .failure(let error):
+        print(error)
+    }
+}
+```
+{% endblock %}
+
 {% block code_user_logIn_with_mobilephonenumber_and_password %}
 
 ```swift

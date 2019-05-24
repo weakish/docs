@@ -1290,6 +1290,12 @@ file.save({
 ```
 {% endblock %}
 
+{% block code_user_logIn_with_email_and_password %}
+  AV.User.loginWithEmail('tom@example.com', 'cat!@#123').then(function (loggedInUser) {
+    console.log(loggedInUser);
+  }, function (error) {
+  });
+{% endblock %}
 
 {% block code_user_logIn_with_mobilephonenumber_and_password %}
 

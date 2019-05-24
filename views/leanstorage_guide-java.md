@@ -951,6 +951,13 @@ Java SDK 不支持缓存策略。
 ```
 {% endblock %}
 
+{% block code_user_logIn_with_email_and_password %}
+
+```java
+// 暂不支持
+```
+{% endblock %}
+
 {% block code_user_logIn_with_mobilephonenumber_and_password %}
 
 ```java

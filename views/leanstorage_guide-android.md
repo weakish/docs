@@ -1272,6 +1272,19 @@ fetchAllInBackground()
 ```
 {% endblock %}
 
+{% block code_user_logIn_with_email_and_password %}
+
+```java
+        AVUser.loginByEmailInBackground("tom@example.com", "cat!@#123", new LogInCallback<AVUser>() {
+            @Override
+            public void done(AVUser avUser, AVException e) {
+
+            }
+        });
+
+```
+{% endblock %}
+
 {% block code_user_logIn_with_mobilephonenumber_and_password %}
 
 ```java

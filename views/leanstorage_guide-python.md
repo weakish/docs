@@ -1157,7 +1157,16 @@ user.sign_up()
 import leancloud
 
 user = leancloud.User()
-user.login('Tom', 'cat!@#123')
+user.login(username='Tom', password='cat!@#123')
+```
+{% endblock %}
+
+{% block code_user_logIn_with_email_and_password %}
+```python
+import leancloud
+
+user = leancloud.User()
+user.login(email='tom@example.com', password='cat!@#123')
 ```
 {% endblock %}
 
