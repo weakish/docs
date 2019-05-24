@@ -13,10 +13,12 @@ LeanCloud 云端提供的统一的访问云函数的接口，所有的客户端 
 
 ## 预备环境和生产环境
 
-在客户端 SDK 调用云函数时，可以通过 REST API 的特殊的 HTTP 头 `X-LC-Prod` 来区分调用的环境。
+在客户端通过 REST API 调用云函数时，可以设置 HTTP 头 `X-LC-Prod` 来区分调用的环境。
 
 * `X-LC-Prod: 0` 表示调用预备环境
 * `X-LC-Prod: 1` 表示调用生产环境
+
+通过 SDK 调用云函数时，SDK 会根据当前环境设置 `X-LC-Prod` HTTP 头，详见 [云函数开发指南中关于预备环境和生产环境的说明](leanengine_cloudfunction_guide-node.html#切换云引擎环境)。
 
 ## 云函数
 
