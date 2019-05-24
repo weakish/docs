@@ -149,7 +149,8 @@ if (play.Player.IsMaster) {
     data.Add("winnerId", play.Room.Master.ActorId);
     var opts = new SendEventOptions();
     opts.ReceiverGroup = ReceiverGroup.All;
-    play.SendEvent("win", data, opts);
+    byte winEventId = 2;
+    play.SendEvent(winEventId, data, opts);
 }
 ```
 {% endblock %}

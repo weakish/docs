@@ -290,7 +290,8 @@ export default class RPSGame extends Game {
 choices = ["✊", "✌️", "✋"];
 
 // 当用户选择时，我们把对应选项的 index 发送给服务端
-play.sendEvent( "play", {index}, {receiverGroup: ReceiverGroup.MasterClient});
+const PLAY_EVENT_ID = 1;
+play.sendEvent(PLAY_EVENT_ID, {index}, {receiverGroup: ReceiverGroup.MasterClient});
 ```
 
 #### MasterClient 收到事件，转发事件给玩家 B

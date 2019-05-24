@@ -538,8 +538,11 @@ var options = new SendEventOptions() {
 // 设置技能 Id
 var eventData = new Dictionary<string, object>();
 eventData.Add("skillId", 123);
-// 发送 eventId 为 skill 的事件
-play.SendEvent("skill", eventData, options);
+
+// 设置 skill 事件 id
+byte skillEventId = 1;
+// 发送自定义事件
+play.SendEvent(skillEventId, eventData, options);
 ```
 
 其中 `options` 是指事件发送参数，包括「接收组」和「接收者 ID 数组」。

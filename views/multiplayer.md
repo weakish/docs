@@ -67,13 +67,11 @@ Play.JoinRandomRoom();
 ```
 
 ```cs
-[PlayEvent]
-public override void OnJoinedRoom()
-{
-  Play.Log("OnJoinedRoom");
-}
-```
+play.On(Event.ROOM_JOINED, (evtData) => {
+  // 成功加入房间
 
+});
+```
 
 3、如果没有空房间，就会加入失败。此时在失败触发的回调中建立一个房间等待其他人加入，建立房间时：
 
@@ -103,17 +101,17 @@ client.joinRandomRoom().then().catch((error) => {
 
 ```cs
 // 加入失败时，这个回调会被触发
-[PlayEvent]
-public override void OnJoinRoomFailed(int errorCode, string reason)
+play.On(Event.ROOM_JOIN_FAILED, (evtData) => 
 {
-  var roomConfig = PlayRoom.RoomConfig.Default;
-  // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
-  roomConfig.MaxPlayerCount = 4;
-  // 设置玩家掉线后的保留时间为 120 秒
-  roomConfig.PlayerTimeToKeep = 120;
-  // 创建房间
-  Play.CreateRoom(roomConfig);
-}
+  var options = new RoomOptions()
+  {   
+    // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+    MaxPlayerCount = 4,
+    // 设置玩家掉线后的保留时间为 120 秒
+    PlayerTtl = 120,
+  };
+  play.CreateRoom(roomOptions: options);
+});
 ```
 
 #### 自定义房间匹配规则
@@ -185,20 +183,25 @@ client.joinRandomRoom({matchProperties: matchProps}).then().catch((error) => {
 });
 ```
 ```cs
-[PlayEvent]
-public void OnRandomJoinRoomFailed() {
-  // 设置匹配属性
-  PlayRoom.RoomConfig config = new PlayRoom.RoomConfig() {
-    CustomRoomProperties = matchProp
-    LobbyMatchKeys = new string[] { "matchLevel" }
-  };
-
-  // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
-  roomConfig.MaxPlayerCount = 4;
-  // 设置玩家掉线后的保留时间为 120 秒
-  roomConfig.PlayerTimeToKeep = 120; 
-  Play.CreateRoom(config);
-}
+play.On(Event.ROOM_JOIN_FAILED, (error) => {
+  if (error["code"] == 4301) 
+  {
+    var props = new Dictionary<string, object>();
+    props.Add("level", 2);
+    var options = new RoomOptions()
+    {   
+      // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+      MaxPlayerCount = 3,
+      // 设置玩家掉线后的保留时间为 120 秒
+      PlayerTtl = 120,
+      // 房间的自定义属性
+      CustomRoomProperties = props,
+      // 从房间的自定义属性中选择匹配用的 key
+      CustoRoomPropertyKeysForLobby = new List<string>() { "level" },
+    };
+    play.CreateRoom(roomOptions: options);
+  }
+});
 ```
 
 #### 和好友一起玩
@@ -222,10 +225,11 @@ client.createRoom({
 ```
 
 ```cs
-PlayRoom.RoomConfig config = new PlayRoom.RoomConfig() {
-  IsVisible = false,
+var options = new RoomOptions()
+{
+  Visible = false,
 };
-Play.CreateRoom(config, roomName);
+play.CreateRoom(roomOptions: options);
 ```
 
 2、PlayerA 通过某种通信方式（例如 [LeanCloud 即时通讯](realtime_v2.html)）将房间名称告诉 PlayerB。
@@ -244,7 +248,7 @@ Play.JoinRoom(roomName);
 ##### 好友和陌生人一起玩
 PlayerA 通过某种通信方式（例如 [LeanCloud 即时通讯](realtime_v2.html)）邀请 PlayerB，PlayerB 接受邀请。
 
-1、PlayerA 和 PlayerB 一起组队进入某个房间
+1、PlayerA 设置和 PlayerB 一起匹配进入某个房间
 
 ```js
 client.joinRandomRoom({expectedUserIds: ["playerB"]}).then(() => {
@@ -253,21 +257,30 @@ client.joinRandomRoom({expectedUserIds: ["playerB"]}).then(() => {
 ```
 
 ```cs
-Play.JoinRandomRoom(expectedUsers: new string[] {"playerB"});
+Play.JoinRandomRoom(expectedUserIds: new string[] {"playerB"});
 ```
 
-2、如果有足够空位的房间，加入成功。
+2、如果有足够空位的房间，PlayerA 加入成功。
 
 ```js
 // JavaScript SDK 通过 joinRandomRoom 的 Promise 判断是否加入房间成功
 ```
 
 ```cs
-[PlayEvent]
-public override void OnJoinedRoom()
-{
-  Play.Log("OnJoinedRoom");
-}
+play.On(Event.ROOM_JOINED, (evtData) => {
+  // TODO 可以做跳转场景之类的操作
+
+});
+```
+
+PlayerA 通过某种通信方式（例如 [LeanCloud 即时通讯](realtime_v2.html)）告诉 PlayerB 已经加入房间的 roomName，PlayerB 根据 roomName 加入房间。
+
+```js
+client.joinRoom('LiLeiRoom').then().catch(console.error);
+```
+
+```cs
+Play.JoinRoom(roomName);
 ```
 
 3、如果没有合适的房间则创建并加入房间： 
@@ -285,10 +298,20 @@ client.joinRandomRoom({expectedUserIds}).then().catch((error) => {
 ```
 
 ```cs
-[PlayEvent]
-public void OnRandomJoinRoomFailed() {
-  Play.CreateRoom(expectedUsers: new string[] { "playerB" });
-}
+play.On(Event.ROOM_JOIN_FAILED, (error) => {
+  var expectedUserIds = new List<string>() { "cr3_2" };
+  Play.CreateRoom(expectedUserIds: expectedUserIds);
+});
+```
+
+PlayerA 创建房间后，通过某种通信方式（例如 [LeanCloud 即时通讯](realtime_v2.html)）告诉 PlayerB 已经加入房间的 roomName，PlayerB 根据 roomName 加入房间。
+
+```js
+client.joinRoom('LiLeiRoom').then().catch(console.error);
+```
+
+```cs
+Play.JoinRoom(roomName);
 ```
 
 更多匹配接口请参考房间匹配文档：[JavaScript](multiplayer-guide-js.html#房间匹配)、[c#](multiplayer-guide-csharp.html#房间匹配)。
@@ -322,7 +345,7 @@ play.player.setCustomProperties(props).then(() => {
 // 玩家设置准备状态
 Hashtable prop = new Hashtable();
 prop.Add("ready", true);
-Play.Player.CustomProperties = prop;
+play.Player.SetCustomProperties(props);
 ```
 
 所有玩家（包括 PlayerA）都会收到事件回调通知：
@@ -346,24 +369,23 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
 ```
 
 ```cs
-[PlayEvent]
-public override void OnPlayerCustomPropertiesChanged(Player player, Hashtable updatedProperties)
-{
+
+play.On(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
   // MasterClient 才会执行这个运算
-  if (Play.Player.IsMasterClient)
+  if (play.Player.IsMaster) 
   {
-    // 在自己写的方法中检查已经准备的玩家数量，可以通过 play.room.playerList 获取玩家列表。
+    // 在自己写的方法中检查已经准备的玩家数量，可以通过 play.Room.playerList 获取玩家列表。
     var readyPlayerCount = getReadyPlayerCount();
     // 如果都准备好了就开始游戏
     if (readyPlayersCount > 1 && readyPlayersCount == Play.Players.Count()) 
     {
       // 设置房间不可见，避免其他玩家被匹配进来
-      Play.Room.SetVisible(false);
+      play.SetRoomVisible(false);
       // 开始游戏
       start();
-    } 
+    }
   }
-}
+});
 ```
 
 #### 游戏中发送消息
@@ -383,11 +405,28 @@ const options = {
 const eventData = {
 	actorId: play.player.actorId,
 };
-play.sendEvent('follow', eventData, options);
+
+// 设置事件 Id
+const FOLLOW_EVENT_ID = 1;
+
+// 发送事件
+play.sendEvent(FOLLOW_EVENT_ID, eventData, options);
 ```
 
 ```cs
-Play.RPC("follow", PlayRPCTargets.MasterClient, Play.Player.ActorID);
+// 设置事件的接收组为 Master
+var options = new SendEventOptions() {
+    ReceiverGroup = ReceiverGroup.MasterClient
+};
+// 设置要发送的信息
+var eventData = new Dictionary<string, object>();
+eventData.Add("actorId", play.player.actorId);
+
+// 设置事件 Id
+byte followEventId = 1;
+
+// 发送事件
+play.SendEvent(followEventId, eventData, options);
 ```
 
 2、 MasterClient 中的相关方法会被触发。MasterClient 计算出下一位操作的玩家是 PlayerB，然后调用 `next` 方法，通知所有玩家当前需要 PlayerB 操作。
@@ -396,7 +435,8 @@ Play.RPC("follow", PlayRPCTargets.MasterClient, Play.Player.ActorID);
 // Event.CUSTOM_EVENT 方法会被触发
 play.on(Event.CUSTOM_EVENT, event => {
   const { eventId } = event;
-  if (eventId === 'follow') {
+
+  if (eventId === FOLLOW_EVENT_ID) {
     // follow 自定义事件
     // 判断下一步需要 PlayerB 操作
     int PlayerBId = getNextPlayerId();
@@ -406,23 +446,35 @@ play.on(Event.CUSTOM_EVENT, event => {
       receiverGroup: ReceiverGroup.All,
     };
     const eventData = {
-	  actorId: PlayerBId,
+	    actorId: PlayerBId,
     };
-    play.sendEvent('next', eventData, options);
+    const NEXT_EVENT_ID = 2;
+    play.sendEvent(NEXT_EVENT_ID, eventData, options);
   }
 });
 
 ```
 ```cs
-// 提前定义的名为 follow 方法，此时这个方法被自动触发。
-[PlayRPC]
-public void follow(int playerId) 
-{
-  // 判断下一步轮到 PlayerB 操作。
-  int PlayerBId = getNextPlayerId();
-  // 通知所有玩家下一步需要 PlayerB 操作。
-  Play.RPC("next", PlayRPCTargets.All, PlayerBId);
-}
+// Event.CUSTOM_EVENT 方法会被触发
+play.On(Event.CUSTOM_EVENT, (evtData) => {
+  // 获取事件参数
+  var eventId = evtData["eventId"];
+  if (eventId == followEventId) {
+    byte nextEventId = 2;
+    
+    // 事件内容
+    var eventData = new Dictionary<string, object>();
+    eventData.Add("actorId", PlayerBId);
+    
+    // 发送给所有人
+    var options = new SendEventOptions() 
+    {
+      ReceiverGroup = ReceiverGroup.All
+    };
+
+    play.SendEvent(nextEventId, eventData, options);
+  }
+});
 ```
 
 3、所有玩家的相关方法被触发。
@@ -431,9 +483,10 @@ public void follow(int playerId)
 // Event.CUSTOM_EVENT 方法会被触发
 play.on(Event.CUSTOM_EVENT, event => {
   const { eventId, eventData } = event;
-  if (eventId === 'follow') {
+  if (eventId === FOLLOW_EVENT_ID) {
     ......
-  } else if (eventId === 'next') {
+  };
+  if (eventId === NEXT_EVENT_ID) {
     // next 事件逻辑
     console.log('Next Player:'  + eventData.actorId);
   }
@@ -441,13 +494,18 @@ play.on(Event.CUSTOM_EVENT, event => {
 
 ```
 ```cs
-// 提前定义的名为 rpcNext 方法，此时这个方法被自动触发。
-[PlayRPC]
-public void rpcNext(int playerId) 
-{
-  // 告诉所有玩家当前需要 playerId 操作。
-  Debug.Log("Next Player: " + playerId);
-}
+play.On(Event.CUSTOM_EVENT, (evtData) => {
+  if (eventId == followEventId) 
+  {
+    ......
+  } 
+  
+  if (eventId == nextEventId) 
+  {
+    // next 事件逻辑
+    var actorId = evtData["actorId"];
+  }
+});
 ```
 
 更详细的用法及介绍，请参考 ：
