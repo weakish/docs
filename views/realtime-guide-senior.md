@@ -714,6 +714,10 @@ public void queryBlockedMembers(int offset, int limit, final AVIMConversationSim
 
 管理员把部分用户加入黑名单之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
 
+#### 屏蔽某用户发送的消息
+
+还有一种场景是某个用户不希望收到特定用户发来的消息。这可以通过即时通讯 hook 函数实现，详见 [即时通讯 Hook 函数文档](leanengine_cloudfunction_guide-node.html)。 
+
 ## 玩转直播聊天室
 
 在即时通讯服务总览中，我们比较了不同的 [业务场景与对话类型](realtime_v2.html#业务场景的需求)，现在就来看看如何使用「聊天室」完成一个直播弹幕的需求。
