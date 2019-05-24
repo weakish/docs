@@ -46,11 +46,12 @@ let todo = LCObject(className: "Todo")
 
 ```swift
 // 执行 CQL 语句实现新增一个 TodoFolder 对象
-LCCQLClient.execute("insert into TodoFolder(name, priority) values('工作', 1)") { result in
+_ = LCCQLClient.execute("insert into TodoFolder(name, priority) values('工作', 1)") { result in
     switch result {
     case .success(let value):
-        let todoFolder = value.objects.first
-        print(todoFolder)
+        if let object = value.objects.first {
+            print(object)
+        }
     case .failure(let error):
         print(error)
     }
@@ -58,21 +59,28 @@ LCCQLClient.execute("insert into TodoFolder(name, priority) values('工作', 1)"
 ```
 {% endblock %}
 
+{% block section_saveOptions %}
+{% endblock %}
+
 {% block code_quick_save_a_todo %}
 
 ```swift
-let todo = LCObject(className: "Todo")
-
-todo.set("title", value: "工程师周会")
-todo.set("content", value: "每周工程师会议，周一下午 2 点")
-
-todo.save { result in
-    switch result {
-    case .success:
-        break
-    case .failure(let error):
-        print(error)
+do {
+    let todo = LCObject(className: "Todo")
+    
+    try todo.set("title", value: "工程师周会")
+    try todo.set("content", value: "每周工程师会议，周一下午 2 点")
+    
+    _ = todo.save { result in
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            print(error)
+        }
     }
+} catch {
+    print(error)
 }
 ```
 {% endblock %}
@@ -80,21 +88,25 @@ todo.save { result in
 {% block code_quick_save_a_todo_with_location %}
 
 ```swift
-let todo = LCObject(className: "Todo")
-
-todo.set("title", value: "工程师周会")
-todo.set("content", value: "每周工程师会议，周一下午 2 点")
-
-// 设置 location 的值为「会议室」
-todo.set("location", value: "会议室")
-
-todo.save { result in
-    switch result {
-    case .success:
-        break
-    case .failure(let error):
-        print(error)
+do {
+    let todo = LCObject(className: "Todo")
+    
+    try todo.set("title", value: "工程师周会")
+    try todo.set("content", value: "每周工程师会议，周一下午 2 点")
+    
+    // 设置 location 的值为「会议室」
+    try todo.set("location", value: "会议室")
+    
+    _ = todo.save { result in
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            print(error)
+        }
     }
+} catch {
+    print(error)
 }
 ```
 {% endblock %}
@@ -102,18 +114,22 @@ todo.save { result in
 {% block code_save_todo_folder %}
 
 ```swift
-let todoFolder = LCObject(className: "TodoFolder")
-
-todoFolder.set("name", value: "工作")
-todoFolder.set("priority", value: 1)
-
-todoFolder.save { result in
-    switch result {
-    case .success:
-        break
-    case .failure(let error):
-        print(error)
+do {
+    let todoFolder = LCObject(className: "TodoFolder")
+    
+    try todoFolder.set("name", value: "工作")
+    try todoFolder.set("priority", value: 1)
+    
+    _ = todoFolder.save { result in
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            print(error)
+        }
     }
+} catch {
+    print(error)
 }
 ```
 {% endblock %}
@@ -144,14 +160,12 @@ let _ = query.get("558e20cbe4b060308e3eb36c") { (result) in
 {% block code_fetch_todo_by_objectId %}
 ```swift
 let object = LCObject(className: "Todo", objectId: "558e20cbe4b060308e3eb36c")
-let _ = object.fetch { (result) in
+_ = object.fetch { (result) in
     switch result {
     case .success:
-        // handle object
         break
     case .failure(error: let error):
-        // handle error
-        break
+        print(error)
     }
 }
 ```
@@ -162,22 +176,23 @@ let _ = object.fetch { (result) in
 ```swift
 do {
     let todo = LCObject(className: "Todo")
+    
     try todo.set("title", value: "meeting")
     try todo.set("content", value: "monday,14:00")
     try todo.set("location", value: "room")
-    let _ = todo.save { (result) in
+    
+    _ = todo.save { (result) in
         switch result {
         case .success:
-            // handle object
-            print(String(describing: todo.objectId?.stringValue))
-            break
+            if let objectId = todo.objectId?.stringValue {
+                print(objectId)
+            }
         case .failure(error: let error):
-            // handle error
-            break
+            print(error)
         }
     }
 } catch {
-    // handle error
+    print(error)
 }
 ```
 {% endblock %}
@@ -186,18 +201,23 @@ do {
 
 ```swift
 let query = LCQuery(className: "Todo")
-let _ = query.get("5c25b986808ca4565ceb5de8") { (result) in
+_ = query.get("OBJECT_ID") { (result) in
     switch result {
     case .success(object: let object):
-        // get value by string key
-        let title = object.get("title")
-        // get property
-        let objectId = object.objectId
-        let updatedAt = object.updatedAt
-        let createdAt = object.createdAt
+        if let title = object.get("title")?.stringValue {
+            print(title)
+        }
+        if let objectId = object.objectId?.value {
+            print(objectId)
+        }
+        if let updatedAt = object.updatedAt?.value {
+            print(updatedAt)
+        }
+        if let createdAt = object.createdAt?.value {
+            print(createdAt)
+        }
     case .failure(error: let error):
-        // handle error
-        break
+        print(error)
     }
 }
 ```
@@ -534,18 +554,21 @@ comment.save()
 {% block code_data_type %}
 
 ```swift
-let number     : LCNumber     = 42
-let bool       : LCBool       = true
-let string     : LCString     = "foo"
-let object     : LCObject     = LCObject()
-let dictionary : LCDictionary = LCDictionary(["name": string, "count": number])
-let array      : LCArray      = LCArray([number, bool, string])
-let relation   : LCRelation   = object.relationForKey("elements")
-let acl        : LCACL        = LCACL()
-let point      : LCGeoPoint   = LCGeoPoint(latitude: 45, longitude: -45)
-let date       : LCDate       = LCDate()
-let data       : LCData       = LCData()
-let null       : LCNull       = LCNull()
+let number       : LCNumber       = 42
+let bool         : LCBool         = true
+let string       : LCString       = "foo"
+let dictionary   : LCDictionary   = LCDictionary(["name": string, "count": number])
+let array        : LCArray        = LCArray([number, bool, string])
+let data         : LCData         = LCData()
+let date         : LCDate         = LCDate()
+let null         : LCNull         = LCNull()
+let geoPoint     : LCGeoPoint     = LCGeoPoint(latitude: 45, longitude: -45)
+let acl          : LCACL          = LCACL()
+let object       : LCObject       = LCObject()
+let relation     : LCRelation     = object.relationForKey("elements")
+let user         : LCUser         = LCUser()
+let file         : LCFile         = LCFile()
+let installation : LCInstallation = LCInstallation()
 ```
 {% endblock %}
 
