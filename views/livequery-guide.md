@@ -136,6 +136,8 @@ var doingQuery = new AVQuery<AVObject>("Todo").WhereEqualTo("state", "doing");
 var doneQuery = new AVQuery<AVObject>("Todo").WhereEqualTo("state", "done");
 ```
 
+LiveQuery 不支持内嵌查询，也不支持返回指定属性（字段）。
+
 ## 主动拉取
 
 一般来说用户打开页面之后，客户端第一次需要主动执行一次查询，用来做列表展示：
