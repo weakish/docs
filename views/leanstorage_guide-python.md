@@ -147,6 +147,8 @@ query = leancloud.Query('Todo')
 # 这里填入需要查询的 objectId
 query_result = query.get('57301af42e958a006982efad')
 title = query_result.get('title')
+# 如果 objectId 有误（云端不存在该对象），则 title 为 None，
+# 且 query_result.is_existed() 返回 False.
 ```
 {% endmacro %}
 
