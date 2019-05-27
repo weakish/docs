@@ -141,6 +141,16 @@ set DEBUG=leancloud*,LC* lean up
 
 如果使用 [mpvue](http://mpvue.com/) 来开发小程序，可以直接通过 npm 安装和引用 SDK，具体操作步骤请参考 [npm](#npm)。
 
+#### Taro
+
+如果使用 [Taro](https://taro.jd.com/) 来开发小程序，通过 npm 安装 SDK 后，需要从指定路径引入小程序 SDK：
+
+```js
+import AV from 'leancloud-storage/dist/av-weapp.js'
+```
+
+如果使用 TypeScript 开发，可以手动把 `leancloud-storage/storage.d.ts` 复制到 `leancloud-storage/dist/av-live-query-weapp.d.ts`。
+
 ### 微信小游戏
 
 <a id="weapp-game" name="weapp-game"></a>微信小游戏手动导入 SDK 的步骤与微信小程序一致，请参考 [微信小程序 · 手动导入文件](#手动导入文件)。
