@@ -408,13 +408,7 @@ invalidTokens 的数量由以下两部分组成：
 如果要自定义 receiver，必须在消息的 data 里带上自定义的 action。LeanCloud 在接收到消息后，将广播 action 为您定义的值的 intent 事件，您的 receiver 里也必须带上 `intent-filter` 来捕获该 action 值的 intent 事件。
 
 ### Android 应用进程被杀掉后无法收到推送消息
-iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系统之间还会存在连接，这条连接跟应用无关，所以无论应用是否被杀掉，消息都能发送到 APNs 再通过这条连接发送到设备。 但对 Android 来说，如果是国内用户，因为众所周知的原因，Google 和设备之间的这条连接是无法使用的，所以应用只能自己去保持连接并在后台持续运行，一旦后台进程被杀掉，就无法收到推送消息了。
-
-{% if node != 'qcloud' %}
-LeanCloud 美国节点提供 [GCM 支持](android_push_guide.html#GCM_推送)，如果应用的服务对象主要是国外用户，可以通过 [GCM (Google Cloud Messaging)](https://developers.google.com/cloud-messaging/) 来克服上述问题。
-{% endif %}
-
-国内节点的应用依然很难避免这个问题，因为无法建立系统级别的长连接去收消息。不过 LeanCloud SDK 已经采取了各种办法保持应用在后台运行，能保证在大部分情况下都能收到消息。
+iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系统之间还会存在连接，这条连接跟应用无关，所以无论应用是否被杀掉，消息都能发送到 APNs 再通过这条连接发送到设备。但对 Android 来说，如果是国内用户，因为众所周知的原因，Google 和设备之间的这条连接是无法使用的，所以应用只能自己去保持连接并在后台持续运行，一旦后台进程被杀掉，就无法收到推送消息了。虽然 LeanCloud SDK 已经采取了各种办法保持应用在后台运行，但随着 Android 系统版本的升级，权限控制越来越严，第三方推送通道的生命周期受到较大限制。因此 LeanCloud SDK 推出了混合推送的方案，对接国内主流厂商，保障了主流 Android 系统上的推送到达率。详见 [Android 混合推送开发指南](android_mixpush_guide.html)。
 
 ## 文件
 
