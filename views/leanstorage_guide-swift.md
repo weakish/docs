@@ -226,14 +226,12 @@ _ = query.get("OBJECT_ID") { (result) in
 {% block code_object_fetch %}
 ```swift
 let object = LCObject(className: "Todo", objectId: "558e20cbe4b060308e3eb36c")
-let _ = object.fetch { (result) in
+_ = object.fetch { (result) in
     switch result {
     case .success:
-        // handle object
         break
     case .failure(error: let error):
-        // handle error
-        break
+        print(error)
     }
 }
 ```
@@ -283,18 +281,16 @@ do {
 do {
     let todo = LCObject(className: "Todo", objectId: "5c25b986808ca4565ceb5de8")
     try todo.set("content", value: "wednesday,15:30")
-    let _ = todo.save { (result) in
+    _ = todo.save { (result) in
         switch result {
         case .success:
-            // handle success
             break
         case .failure(error: let error):
-            // handle error
-            break
+            print(error)
         }
     }
 } catch {
-    // handle error
+    print(error)
 }
 ```
 
@@ -303,10 +299,10 @@ do {
 {% block code_update_object_by_cql %}
 
 ```swift
-LCCQLClient.execute("update TodoFolder set name='家庭' where objectId='575d2c692e958a0059ca3558'") { result in
+_ = LCCQLClient.execute("update TodoFolder set name='家庭' where objectId='575d2c692e958a0059ca3558'") { result in
     switch result {
     case .success:
-        break // 更新成功
+        break
     case .failure(let error):
         print(error)
     }
@@ -317,18 +313,19 @@ LCCQLClient.execute("update TodoFolder set name='家庭' where objectId='575d2c6
 {% block code_atomic_operation_increment %}
 
 ```swift
-let todo = LCObject(className: "Todo", objectId: "575cf743a3413100614d7d75")
-
-// 递增 views 属性，保存时，服务端会保证原子性
-todo.increase("views", by: 1)
-
-todo.save { result in
-    switch result {
-    case .success:
-        break // 更新成功
-    case .failure(let error):
-        print(error)
+do {
+    let todo = LCObject(className: "Todo", objectId: "575cf743a3413100614d7d75")
+    try todo.increase("views", by: 1)
+    _ = todo.save { result in
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            print(error)
+        }
     }
+} catch {
+    print(error)
 }
 ```
 {% endblock %}
@@ -353,42 +350,44 @@ todo.save { result in
 {% block code_set_array_value %}
 
 ```swift
-func dateWithString(string: String) -> LCDate {
-    let dateFormatter = NSDateFormatter()
-
+func dateWithString(_ string: String) -> LCDate {
+    let dateFormatter = DateFormatter()
+    
     dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-    dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
-
-    let date = LCDate(dateFormatter.dateFromString(string)!)
-
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+    
+    let date = LCDate(dateFormatter.date(from: string)!)
+    
     return date
 }
 
 func testSetArray() {
-    let todo = LCObject(className: "Todo")
-
-    let reminder1 = dateWithString("2015-11-11 07:10:00")
-    let reminder2 = dateWithString("2015-11-11 07:20:00")
-    let reminder3 = dateWithString("2015-11-11 07:30:00")
-
-    todo.set("reminders", value: [reminder1, reminder2, reminder3])
-
-    // 同步地保存，为了示例的简洁，故意忽略了错误检查
-    todo.save()
-
-    // 新增一个闹钟时间
-    let reminder4 = dateWithString("2015-11-11 07:40:00")
-
-    // 使用 append 方法添加
-    todo.append("reminders", element: reminder4, unique: true)
-
-    todo.save { result in
-        switch result {
-        case .success:
-            break // 更新成功
-        case .failure(let error):
-            print(error)
+    do {
+        let todo = LCObject(className: "Todo")
+        
+        let reminder1 = dateWithString("2015-11-11 07:10:00")
+        let reminder2 = dateWithString("2015-11-11 07:20:00")
+        let reminder3 = dateWithString("2015-11-11 07:30:00")
+        
+        try todo.set("reminders", value: [reminder1, reminder2, reminder3])
+        
+        let result = todo.save()
+        assert(result.isSuccess)
+        
+        let reminder4 = dateWithString("2015-11-11 07:40:00")
+        
+        try todo.append("reminders", element: reminder4, unique: true)
+        
+        _ = todo.save { result in
+            switch result {
+            case .success:
+                break
+            case .failure(let error):
+                print(error)
+            }
         }
+    } catch {
+        print(error)
     }
 }
 ```
@@ -397,39 +396,59 @@ func testSetArray() {
 {% block code_batch_operation %}
 ```swift
 let objects: [LCObject] = []
-// save
-let _ = LCObject.save(objects)
-let _ = LCObject.save(objects, completion: { (result) in
-    // handle result
+
+_ = LCObject.save(objects, completion: { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
 })
-// delete
-let _ = LCObject.delete(objects)
-let _ = LCObject.delete(objects) { (result) in
-    // handle result
-}
-// fetch
-let _ = LCObject.fetch(objects)
-let _ = LCObject.fetch(objects) { (result) in
-    // handle result
-}
+
+_ = LCObject.fetch(objects, completion: { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+})
+
+_ = LCObject.delete(objects, completion: { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+})
 ```
 {% endblock %}
 
 {% block code_batch_set_todo_completed %}
 ```swift
 let query = LCQuery(className: "Todo")
-let _ = query.find { (result) in
+_ = query.find { (result) in
     switch result {
     case .success(objects: let objects):
-        for _ in objects {
-            // handle item
+        for object in objects {
+            do {
+                try object.set("title", value: "work")
+            } catch {
+                print(error)
+            }
         }
         let _ = LCObject.save(objects, completion: { (result) in
-            // handle result
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
         })
     case .failure(error: let error):
-        // handle error
-        break
+        print(error)
     }
 }
 ```
@@ -442,10 +461,10 @@ let _ = query.find { (result) in
 ```swift
 let todo = LCObject(className: "Todo")
 
-todo.save { result in
+_ = todo.save { result in
     switch result {
     case .success:
-        break // 保存成功
+        break
     case .failure(let error):
         print(error)
     }
@@ -454,16 +473,16 @@ todo.save { result in
 上述用法都是提供给开发者在主线程调用用来实现后台运行的方法，因此开发者可以放心地在主线程调用这种命名方式的函数。另外，需要强调的是：**回调函数的代码是在主线程执行。**
 {% endblock %}
 
+{% block save_eventually %}{% endblock %}
+
 {% block code_delete_todo_by_objectId %}
 
 ```swift
 let todo = LCObject(className: "Todo", objectId: "575cf743a3413100614d7d75")
-
-// 调用实例方法删除对象
-todo.delete { result in
+_ = todo.delete { result in
     switch result {
     case .success:
-        break // 删除成功
+        break
     case .failure(let error):
         print(error)
     }
@@ -474,11 +493,10 @@ todo.delete { result in
 {% block code_delete_todo_by_cql %}
 
 ```swift
-// 执行 CQL 语句实现删除一个 Todo 对象
-LCCQLClient.execute("delete from Todo where objectId='558e20cbe4b060308e3eb36c'") { result in
+_ = LCCQLClient.execute("delete from Todo where objectId='558e20cbe4b060308e3eb36c'") { result in
     switch result {
     case .success:
-        break // 删除成功
+        break
     case .failure(let error):
         print(error)
     }
@@ -489,65 +507,63 @@ LCCQLClient.execute("delete from Todo where objectId='558e20cbe4b060308e3eb36c'"
 {% block code_relation_todoFolder_one_to_many_todo %}
 
 ```swift
-// 以下代码需要同步执行
-// 新建一个 TodoFolder 对象
-let todoFolder = LCObject(className: "TodoFolder")
-
-todoFolder.set("name", value: "工作")
-todoFolder.set("priority", value: 1)
-
-todoFolder.save()
-
-// 新建 3 个 Todo 对象
-let todo1 = LCObject(className: "Todo")
-todo1.set("title", value: "工程师周会")
-todo1.set("content", value: "每周工程师会议，周一下午 2 点")
-todo1.set("location", value: "会议室")
-todo1.save()
-
-let todo2 = LCObject(className: "Todo")
-todo2.set("title", value: "维护文档")
-todo2.set("content", value: "每天 16：00 到 18：00 定期维护文档")
-todo2.set("location", value: "当前工位")
-todo2.save()
-
-let todo3 = LCObject(className: "Todo")
-todo3.set("title", value: "发布 SDK")
-todo3.set("content", value: "每周一下午 15：00")
-todo3.set("location", value: "SA 工位")
-todo3.save()
-
-// 使用接口 insertRelation 建立 todoFolder 与 todo1,todo2,todo3 的一对多的关系
-todoFolder.insertRelation("containedTodos", object: todo1)
-todoFolder.insertRelation("containedTodos", object: todo2)
-todoFolder.insertRelation("containedTodos", object: todo3)
-
-todoFolder.save()
-
-// 保存完毕之后，读取 LCRelation 对象
-let relation = todoFolder.get("containedTodos") as? LCRelation
+do {
+    let todoFolder = LCObject(className: "TodoFolder")
+    
+    try todoFolder.set("name", value: "工作")
+    try todoFolder.set("priority", value: 1)
+    
+    assert(todoFolder.save().isSuccess)
+    
+    let todo1 = LCObject(className: "Todo")
+    try todo1.set("title", value: "工程师周会")
+    try todo1.set("content", value: "每周工程师会议，周一下午 2 点")
+    try todo1.set("location", value: "会议室")
+    assert(todo1.save().isSuccess)
+    
+    let todo2 = LCObject(className: "Todo")
+    try todo2.set("title", value: "维护文档")
+    try todo2.set("content", value: "每天 16：00 到 18：00 定期维护文档")
+    try todo2.set("location", value: "当前工位")
+    assert(todo2.save().isSuccess)
+    
+    let todo3 = LCObject(className: "Todo")
+    try todo3.set("title", value: "发布 SDK")
+    try todo3.set("content", value: "每周一下午 15：00")
+    try todo3.set("location", value: "SA 工位")
+    assert(todo3.save().isSuccess)
+    
+    try todoFolder.insertRelation("containedTodos", object: todo1)
+    try todoFolder.insertRelation("containedTodos", object: todo2)
+    try todoFolder.insertRelation("containedTodos", object: todo3)
+    
+    assert(todoFolder.save().isSuccess)
+    
+    let relation = todoFolder.get("containedTodos") as? LCRelation
+    assert(relation != nil)
+} catch {
+    print(error)
+}
 ```
 {% endblock %}
 
 {% block code_pointer_comment_one_to_many_todoFolder %}
 
 ```swift
-// 新建一条留言
-let comment = LCObject(className: "Comment")
-
-// 如果点了赞就是 1，而点了不喜欢则为 -1，没有做任何操作就是默认的 0
-comment.set("likes", value: 1)
-
-// 留言的内容
-comment.set("content", value: "这个太赞了！楼主，我也要这些游戏，咱们团购么？")
-
-// 假设已知了被分享的该 TodoFolder 的 objectId 是 5590cdfde4b00f7adb5860c8
-let todoFolder = LCObject(className: "TodoFolder", objectId: "5590cdfde4b00f7adb5860c8")
-
-// 在 comment 对象上创建一个名为 targetTodoFolder 属性，它是一个 Pointer 类型，指向 objectId 为 5590cdfde4b00f7adb5860c8 的 TodoFolder 对象
-comment.set("targetTodoFolder", value: todoFolder)
-
-comment.save()
+do {
+    let comment = LCObject(className: "Comment")
+    
+    try comment.set("likes", value: 1)
+    try comment.set("content", value: "这个太赞了！楼主，我也要这些游戏，咱们团购么？")
+    
+    let todoFolder = LCObject(className: "TodoFolder", objectId: "5590cdfde4b00f7adb5860c8")
+    
+    try comment.set("targetTodoFolder", value: todoFolder)
+    
+    assert(comment.save().isSuccess)
+} catch {
+    print(error)
+}
 ```
 {% endblock %}
 
@@ -582,9 +598,13 @@ let leancloudOffice = LCGeoPoint(latitude: 39.9, longitude: 116.4)
 {% block code_use_geoPoint %}
 
 ```swift
-let todo = LCObject(className: "Todo", objectId: "575cf743a3413100614d7d75")
-
-todo.set("whereCreated", value: leancloudOffice)
+do {
+    let todo = LCObject(className: "Todo", objectId: "575cf743a3413100614d7d75")
+    let leancloudOffice = LCGeoPoint(latitude: 39.9, longitude: 116.4)
+    try todo.set("whereCreated", value: leancloudOffice)
+} catch {
+    print(error)
+}
 ```
 {% endblock %}
 
@@ -1704,12 +1724,9 @@ let query = LCQuery(className: "Todo")
 query.whereKey("objectId", .equalTo("5735aae7c4c9710060fbe8b0"))
 query.whereKey("todoFolder", .included)
 
-if
-    let todo = query.getFirst().object,
-    let todoFolder = todo["todoFolder"] as? LCObject
-{
-    // Todo folder did fetch.
-}
+let todo = query.getFirst().object
+let todoFolder = todo?["todoFolder"] as? LCObject
+assert(todoFolder != nil)
 ```
 {% endblock %}
 
