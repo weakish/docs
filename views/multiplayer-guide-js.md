@@ -555,8 +555,11 @@ const options = {
 const eventData = {
 	skillId: 123,
 };
-// 发送 eventId 为 skill 的事件
-client.sendEvent('skill', eventData, options).then(() => {
+
+// 设置事件 Id
+const SKILL_EVENT_ID = 1;
+// 发送自定义事件
+client.sendEvent(SKILL_EVENT_ID, eventData, options).then(() => {
 
 }).catch(console.error);
 ```
@@ -565,8 +568,6 @@ client.sendEvent('skill', eventData, options).then(() => {
 - 接收组（ReceiverGroup）是接收事件的目标的枚举值，包括 Others（房间内除自己之外的所有人）、All（房间内的所有人）、MasterClient（房主）。
 - 接收者 ID 数组是指接收事件的目标的具体值，即玩家的 `actorId` 数组。`actorId` 可以通过 `player.actorId` 获得。
 {% endblock %}
-
-
 
 {% block send_event_event %}
 ```javascript

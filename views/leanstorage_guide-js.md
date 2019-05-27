@@ -195,7 +195,7 @@ AV.Object.register(Todo);
     // 成功获得实例
     // todo 就是 id 为 57328ca079bc44005c2472d0 的 Todo 对象实例
   }, function (error) {
-    // 异常处理
+    // 如果 todo 不存在，error 为 AVError.OBJECT_NOT_FOUND
   });
 ```
 {% endmacro %}
@@ -1290,6 +1290,12 @@ file.save({
 ```
 {% endblock %}
 
+{% block code_user_logIn_with_email_and_password %}
+  AV.User.loginWithEmail('tom@example.com', 'cat!@#123').then(function (loggedInUser) {
+    console.log(loggedInUser);
+  }, function (error) {
+  });
+{% endblock %}
 
 {% block code_user_logIn_with_mobilephonenumber_and_password %}
 

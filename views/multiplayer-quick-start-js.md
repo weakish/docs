@@ -241,7 +241,8 @@ client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, data => {
 {% block win %}
 ```javascript
 if (client.player.isMaster) {
-  client.sendEvent('win', { winnerId: client.room.masterId }, { receiverGroup: ReceiverGroup.All });
+  const WIN_EVENT_ID = 2;
+  client.sendEvent(WIN_EVENT_ID, { winnerId: client.room.masterId }, { receiverGroup: ReceiverGroup.All });
 }
 ```
 {% endblock %}

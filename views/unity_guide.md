@@ -1001,7 +1001,11 @@ await AVUser.RequestEmailVerifyAsync("tom@leancloud.cn");
 #### 用户名和密码登录
 ```cs
 var user = await AVUser.LogInAsync("tom", "password");
-Debug.Log(user.Username);
+```
+
+#### 邮箱和密码登录
+```cs
+var user = await AVUser.LogInByEmailAsync("tom@example.com", "password");
 ```
 
 #### 手机号和密码登录

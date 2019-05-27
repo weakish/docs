@@ -34,7 +34,22 @@
 {% endblock %}
 ## 切换云引擎环境
 
-云引擎应用有「生产环境」和「预备环境」之分，在客户端的切换方法为：
+云引擎应用有「生产环境」和「预备环境」之分。
+在云引擎通过 SDK 调用云函数时，包括显式调用以及隐式调用（由于触发 hook 条件导致 hook 函数被调用），
+SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云函数。
+例如，假定定义了 beforeDelete 云函数，在预备环境通过 SDK 删除一个对象，会触发预备环境的 beforeDelete hook 函数。
+
+在云引擎以外的环境通过 SDK 显式或隐式调用云函数时，`X-LC-Prod` 的默认值一般为 `1`，也就是调用生产环境。
+但由于历史原因，各 SDK 的具体行为有一些差异：
+
+- 在 Node.js、PHP、Java 这三个 SDK 下，默认总是调用生产环境的云函数。
+- 在 Python SDK 下，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数。
+- 云引擎 Java 环境的模板项目 [java-war-getting-started] 和 [spring-boot-getting-started] 做了处理，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数（与 Python SDK 的行为一致）。
+
+[java-war-getting-started]: https://github.com/leancloud/java-war-getting-started/
+[spring-boot-getting-started]: https://github.com/leancloud/spring-boot-getting-started/
+
+你还可以在 SDK 中指定客户端将请求所发往的环境：
 
 ```objc
 [AVCloud setProductionMode:NO]; // 调用预备环境
@@ -50,6 +65,7 @@ AV.setProduction(false); // 调用预备环境
 ```
 ```python
 leancloud.use_production(False) # 调用预备环境
+# 注意：需要在 SDK 初始化语句（`leancloud.init`）之前调用。
 ```
 
 [免费版云引擎](leanengine_plan.html#体验实例) 应用只有「生产环境」，因此请不要切换到预备环境。

@@ -78,7 +78,7 @@ var AV = require('leancloud-storage/live-query');
 ```js
 // 存储服务
 var { Query, User } = AV;
-AV.init({{appid}}, {{appkey}});
+AV.init("{{appid}}", "{{appkey}}");
 // 即时通讯服务
 var { Realtime, TextMessage } = AV;
 ```
@@ -140,6 +140,16 @@ set DEBUG=leancloud*,LC* lean up
 #### mpvue
 
 如果使用 [mpvue](http://mpvue.com/) 来开发小程序，可以直接通过 npm 安装和引用 SDK，具体操作步骤请参考 [npm](#npm)。
+
+#### Taro
+
+如果使用 [Taro](https://taro.jd.com/) 来开发小程序，通过 npm 安装 SDK 后，需要从指定路径引入小程序 SDK：
+
+```js
+import AV from 'leancloud-storage/dist/av-weapp.js'
+```
+
+如果使用 TypeScript 开发，可以手动把 `leancloud-storage/storage.d.ts` 复制到 `leancloud-storage/dist/av-live-query-weapp.d.ts`。
 
 ### 微信小游戏
 
@@ -214,7 +224,7 @@ set DEBUG=leancloud*,LC* lean up
 ```js
 // 存储服务
 var { Query, User } = AV;
-AV.init({{appid}}, {{appkey}});
+AV.init("{{appid}}", "{{appkey}}");
 // 即时通讯服务
 var { Realtime, TextMessage } = AV;
 ```
@@ -282,7 +292,7 @@ var { Realtime, TextMessage } = AV;
 
 ```js
 var { Query, User } = AV;
-AV.init({{appid}}, {{appkey}});
+AV.init("{{appid}}", "{{appkey}}");
 ```
 
 {{ docs.note("目前在 Egret 平台上，我们只提供存储服务的 SDK（不含 LiveQuery 功能）。") }} 

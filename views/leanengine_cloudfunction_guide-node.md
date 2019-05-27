@@ -74,7 +74,7 @@ AV.Cloud.run('averageStars', {
 });
 ```
 
-云引擎中默认会直接进行一次本地的函数调用，而不会像客户端一样发起一个 HTTP 请求。如果你希望发起 HTTP 请求来调用云函数，可以传入一个 `remote: true` 的选项。当你在云引擎之外运行 Node SDK 时这个选项非常有用：
+云引擎中默认会直接进行一次本地的函数调用，而不会像客户端一样发起一个 HTTP 请求。如果你希望发起 HTTP 请求来调用云函数，可以传入一个 `remote: true` 的选项。当你在云引擎之外运行 Node SDK 时（包括在拓展分组的云引擎上调用主分组上的云函数时）这个选项非常有用：
 
 ```nodejs
 AV.Cloud.run('averageStars', {movie: '夏洛特烦恼'}, {remote: true}).then(function(data) {
