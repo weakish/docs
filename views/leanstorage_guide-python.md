@@ -532,7 +532,7 @@ file3.save()
 ```python
 import leancloud
 
-with open('~/avatar.png') as f:
+with open('~/avatar.png', 'rb') as f:
     avatar = leancloud.File('fileFromLocalFile', f)
     avatar.save()
 ```
@@ -587,7 +587,7 @@ thumbnail_url = avatar.get_thumbnail_url(width=100, height=100)
 ```python
 import leancloud
 
-with open('~/avatar.png') as f:
+with open('~/avatar.png', 'rb') as f:
     avatar = leancloud.File('fileFromLocallFile', f)
     avatar.metadata['width'] = 100  # avatar.metadata 是一个字典，可以添加内容并保存。
     avatar.metadata['heigth'] = 100
