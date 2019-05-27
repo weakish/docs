@@ -260,6 +260,10 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 对于 Node.js 建议检查是否在 `package-lock.json` 或 `yarn.lock` 中指定了较慢的源（见 [网站托管开发指南 · Node.js](leanengine_webhosting_guide-node.html#package_json)）。
 
+## 部署到多个实例时，部分实例失败需要重新部署吗？
+
+同一环境（预备/生产）下有多个实例时，云引擎会同时在所有实例上部署项目。如因偶然因素部分实例部署不成功，会在几分钟后自动尝试再次部署，无需手动重新部署。
+
 ## 云引擎的健康检查是什么？
 
 云引擎的管理系统会每隔几分钟检查所有实例的工作状态（通过 HTTP 检查，详见 [网站托管开发指南：健康监测](leanengine_webhosting_guide-node.html#健康监测)），如果实例无法正确响应的话，管理系统会触发一次重新部署，并在控制台上打印类似下面的日志：
