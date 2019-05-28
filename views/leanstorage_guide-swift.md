@@ -611,25 +611,46 @@ do {
 {% block code_serialize_baseObject_to_string %}
 
 ```swift
-let todoFolder = LCObject(className: "TodoFolder")
-
-todoFolder.set("name", value: "工作")
-todoFolder.set("owner", value: LCUser.current)
-todoFolder.set("priority", value: 1)
-
-// 将 todoFolder 序列化成 NSData 对象
-let data = NSKeyedArchiver.archivedDataWithRootObject(todoFolder)
+do {
+    let todoFolder = LCObject(className: "TodoFolder")
+    
+    try todoFolder.set("name", value: "工作")
+    try todoFolder.set("owner", value: LCApplication.default.currentUser)
+    try todoFolder.set("priority", value: 1)
+    
+    let data: Data
+    if #available(iOS 11.0, *) {
+        data = try NSKeyedArchiver.archivedData(withRootObject: todoFolder, requiringSecureCoding: false)
+    } else {
+        data = NSKeyedArchiver.archivedData(withRootObject: todoFolder)
+    }
+} catch {
+    print(error)
+}
 ```
 {% endblock %}
 
 {% block code_deserialize_string_to_baseObject %}
 
 ```swift
-// 将 todoFolder 序列化成 NSData 对象
-let data = NSKeyedArchiver.archivedDataWithRootObject(todoFolder)
-
-// 将 data 反序列化成 LCObject 对象
-let newTodoFolder = NSKeyedUnarchiver.unarchiveObjectWithData(data) as! LCObject
+do {
+    let todoFolder = LCObject(className: "TodoFolder")
+    
+    try todoFolder.set("name", value: "工作")
+    try todoFolder.set("owner", value: LCApplication.default.currentUser)
+    try todoFolder.set("priority", value: 1)
+    
+    let data: Data
+    if #available(iOS 11.0, *) {
+        data = try NSKeyedArchiver.archivedData(withRootObject: todoFolder, requiringSecureCoding: false)
+    } else {
+        data = NSKeyedArchiver.archivedData(withRootObject: todoFolder)
+    }
+    
+    let newTodoFolder: LCObject? = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? LCObject
+} catch {
+    print(error)
+}
 ```
 {% endblock %}
 
@@ -678,10 +699,14 @@ let lcNumber: LCNumber = 123
 `LCArray` 是 `Array` 类型的封装，它与 `Array` 相互转化的代码如下：
 
 ```swift
-let lcArray = LCArray(unsafeObject: [1, "abc", ["foo": true]])
+do {
+    let lcArray = try LCArray(unsafeObject: [1, "abc", ["foo": true]])
+} catch {
+    print(error)
+}
 ```
 
-`LCArray` 实现了 `ArrayLiteralConvertible` 协议。在需要 `LCArray` 的地方，可以直接使用数组字面量：
+`LCArray` 实现了 `ExpressibleByArrayLiteral` 协议。在需要 `LCArray` 的地方，可以直接使用数组字面量：
 
 ```swift
 let lcArray: LCArray = [LCNumber(1), LCString("abc")]
@@ -689,16 +714,31 @@ let lcArray: LCArray = [LCNumber(1), LCString("abc")]
 
 注意：当使用数组字面量构造 `LCArray` 对象时，数组字面量的类型必须是 `[LCType]`。
 
+#### LCDictionary
+`LCDictionary` 是 `Dictionary` 类型的封装，它与 `Dictionary` 相互转化的代码如下：
+
+```swift
+do {
+    let lcDictionary = try LCDictionary(unsafeObject: ["number": 1, "string": "abd", "array": ["foo"]])
+} catch {
+    print(error)
+}
+```
+
+`LCDictionary` 实现了 `ExpressibleByDictionaryLiteral` 协议。在需要 `LCDictionary` 的地方，可以直接使用字典字面量：
+
+```swift
+let lcDictionary: LCDictionary = ["number": LCNumber(1), "string": LCString("abd")]
+```
+
+注意：当使用数组字面量构造 `LCDictionary` 对象时，字典字面量的 value 类型必须是 `LCType`。
+
 #### LCDate
 `LCDate` 是 `NSDate` 类型的封装，它与 `NSDate` 相互转化的代码如下：
 
 ```swift
-let date = NSDate()
-
-// 将 NSDate 转化成 LCDate
+let date = Date()
 let lcDate = LCDate(date)
-
-// 从 LCDate 获取 NSDate
 let value = lcDate.value
 ```
 
@@ -747,12 +787,12 @@ let file = LCFile(url: "https://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20b
 {% block code_upload_file %}
 
 ```swift
-file.save { result in
+_ = file.save { result in
     switch result {
     case .success:
         break
     case .failure(let error):
-        break
+        print(error)
     }
 }
 ```
@@ -761,18 +801,16 @@ file.save { result in
 {% block code_upload_file_with_progress %}
 
 ```swift
-file.save(
-    progress: { progress in
-        print(progress)
-    },
-    completion: { result in
-        switch result {
-        case .success:
-            break
-        case .failure(let error):
-            break
-        }
-    })
+_ = file.save(progress: { (progress) in
+    print(progress)
+}) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(let error):
+        print(error)
+    }
+}
 ```
 {% endblock %}
 
