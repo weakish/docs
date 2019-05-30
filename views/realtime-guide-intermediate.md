@@ -231,9 +231,10 @@ Tom 成功调用 `recallMessage` 方法之后，对话内的其他成员会接�
 
 ```js
 var { Event } = require('leancloud-realtime');
-conversation.on(Event.MESSAGE_RECALL, function(recalledMessage) {
+conversation.on(Event.MESSAGE_RECALL, function(recalledMessage, reason) {
   // recalledMessage 为已撤回的消息
   // 在视图层可以通过消息的 ID 找到原来的消息并用 recalledMessage 替换
+  // reason (可选) 为撤回消息的原因，详见下文修改消息部分的说明。
 });
 ```
 ```objc
@@ -266,7 +267,7 @@ private void Tom_OnMessageRecalled(object sender, AVIMMessagePatchEventArgs e)
 
 对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部需要保证数据的一致性，所以会先从缓存中删除这条消息记录，然后再通知应用层。对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（此时消息列表中的消息会直接变少，或者显示撤回提示）。
 
-Tom 除了删除出错消息之外，还可以 ***直接修改原来的消息***。这时候不是直接在老的消息对象上修改，而是像发新消息一样创建一个消息实例，然后调用 `Conversation#updateMessage(oldMessage, newMessage)` 方法来向云端提交请求（C# SDK 接口例外），示例代码如下：
+Tom 除了撤回消息之外，还可以 ***直接修改原来的消息***。这时候不是直接在老的消息对象上修改，而是像发新消息一样创建一个消息实例，然后调用 `Conversation#updateMessage(oldMessage, newMessage)` 方法来向云端提交请求，示例代码如下：
 
 ```js
 var newMessage = new TextMessage('new message');
@@ -309,9 +310,16 @@ Tom 将消息修改成功之后，对话内的其他成员会立刻接收到 `ME
 
 ```js
 var { Event } = require('leancloud-realtime');
-conversation.on(Event.MESSAGE_UPDATE, function(newMessage) {
+conversation.on(Event.MESSAGE_UPDATE, function(newMessage, reason) {
   // newMessage 为修改后的的消息
   // 在视图层可以通过消息的 ID 找到原来的消息并用 newMessage 替换
+  // reason （可选）对象表示消息修改的原因，
+  // reason 不存在表示发送者主动修改。
+  // reason 的 code 属性为正数时，表示因触发云引擎 hook 而导致消息修改
+  // （具体数值由开发者在 hook 函数定义中自行指定），
+  // reason 的 code 属性为负数时，表示因触发系统内置机制而导致消息修改，
+  // 例如 -4408 表示因敏感词过滤被修改。
+  // reason 的 detail 属性是一个字符串，指明具体的修改原因。
 });
 ```
 ```objc
@@ -342,6 +350,8 @@ tom.OnMessageUpdated += (sender, e) => {
 ```
 
 对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（这时候消息列表会出现内容变化）。
+
+如果系统修改了消息（例如触发了内置的敏感词过滤功能，或者云引擎的 hook 函数），对话成员（包括发送者）同样会收到 `MESSAGE_UPDATE` 事件。
 
 ### 暂态消息
 
