@@ -716,7 +716,7 @@ public void queryBlockedMembers(int offset, int limit, final AVIMConversationSim
 
 #### 屏蔽某用户发送的消息
 
-还有一种场景是某个用户不希望收到特定用户发来的消息。这可以通过即时通讯 hook 函数实现，详见 [即时通讯 Hook 函数文档](leanengine_cloudfunction_guide-node.html)。 
+还有一种场景是某个用户不希望收到特定用户发来的消息。这可以通过即时通讯 hook 函数实现，详见 [即时通讯 Hook 函数文档](leanengine_cloudfunction_guide-node.html#即时通讯 Hook 函数)。
 
 ## 玩转直播聊天室
 
