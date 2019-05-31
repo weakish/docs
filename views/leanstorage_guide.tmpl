@@ -671,6 +671,9 @@ LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地�
 ```
 可以用 include 方法获取数组中的 pointer 数据，例如：
 
+```swift
+query.whereKey("todoArray", .included);
+```
 ```objc
 [query includeKey:@"todoArray"];
 ```
@@ -685,6 +688,9 @@ query.include('todoArray');
 
 `select` 也具备使用 dot 符号 `.` 来进行级联操作：
 
+```swift
+query.whereKey("targetTodoFolder.targetAVUser.username", .selected);
+```
 ```objc
 [query selectKeys:@"targetTodoFolder.targetAVUser.username"];
 ```
@@ -716,7 +722,7 @@ Todo 的 `whereCreated`（创建 Todo 时的位置）是一个 `{{geoPointObject
 {% block code_query_geoPoint_near %}{% endblock %}
 
 #### 查询指定范围内的对象
-要查找指定距离范围内的数据，可使用 `whereWithinKilometers` 、 `whereWithinMiles` 或 `whereWithinRadians` 方法。
+
 例如，我要查询距离指定位置，2 千米范围内的 Todo：
 
 {% block code_query_geoPoint_within %}{% endblock %}
@@ -923,7 +929,7 @@ CQL 是 {{productName}} 独创的使用类似 SQL 语法来实现云端查询功
 
 {% block code_send_verify_email %}{% endblock %}
 
-当用户 `AVUser` 通过 `setEmail()` 更新成一个新邮箱并成功 save 后，云端会自动向新邮箱发一封验证邮件，因此开发者**不需要**再单独调用 `requestEmailVerify` 接口来发送验证邮件。
+当用户更新邮箱并成功保存后，云端会自动向新邮箱发一封验证邮件，因此开发者**不需要**再单独调用接口来发送验证邮件。
 
 ### 登录
 
@@ -955,9 +961,9 @@ CQL 是 {{productName}} 独创的使用类似 SQL 语法来实现云端查询功
 
 {% block code_user_logIn_with_smsCode %}{% endblock %}
 
-{% block text_current_user %}
-
 {{ sms.fixedVerificationCode("####") }}
+
+{% block text_current_user %}
 
 #### 单设备登录
 
