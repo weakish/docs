@@ -56,12 +56,24 @@ AV.Cloud.beforeSave('Post', function(request, response) {
 
 **iOS**
 
+```swift
+do {
+    let post = LCObject(className: "Post")
+    
+    try post.set("title", value: "大家好，我是新人")
+    try post.set("content", value: "我喜欢看新闻和阅读报纸，请多多关照")
+    
+    assert(post.save().isSuccess)
+} catch {
+    print(error)
+}
+```
 ```objc
- AVObject *post = [AVObject objectWithClassName:@"Post"];
- [post setObject:@"大家好，我是新人" forKey:@"title"];
- [post setObject:@"我喜欢看新闻和阅读报纸，请多多关照" forKey:@"content"]
+AVObject *post = [AVObject objectWithClassName:@"Post"];
+[post setObject:@"大家好，我是新人" forKey:@"title"];
+[post setObject:@"我喜欢看新闻和阅读报纸，请多多关照" forKey:@"content"];
 
- [post saveInBackground];
+[post save];
 ```
 
 **Android**
