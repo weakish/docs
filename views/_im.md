@@ -9,7 +9,6 @@
 - [iOS - Objective-C](realtime_guide-objc.html)
 - [Android - Java](realtime_guide-android.html)
 - [JavaScript](realtime_guide-js.html)
-- [Windows Classic Desktop - C#](realtime-guide-dotnet.html)
 - [Unity - C#](realtime-unity.html)
 
 {% endmacro %}
@@ -166,7 +165,7 @@ websocket=>{"msg":"{\"ECode\":\"#e001\",\"_letype\":2}","cid":"58d4c2472e9af6631
 
 因此 `AVIMTypedMessage` 的子类都会对 msg 字段进行 JSON 序列化和反序列化。
 
-#### 1.2 继承 AVIMMessage 
+#### 1.2 继承 AVIMMessage
 
 为了更加开放地允许开发者自定义自己的消息类，SDK 提供了一个接口，只要开发者实现自定义的消息类实现了这个接口，这个消息就可以在 SDK 中发送，并且在接收时返回的也是这个消息的实例。继续以上面的表情消息做例子，这次我们定义为一个 V2 版本的表情消息：
 
@@ -262,14 +261,14 @@ public class BinaryMessage : IAVIMMessage
         get; set;
     }
 
-	public	bool MentionAll 
-    { 
-        get; set; 
+	public	bool MentionAll
+    {
+        get; set;
     }
 
-    public IEnumerable<string> MentionList 
-    { 
-        get; set; 
+    public IEnumerable<string> MentionList
+    {
+        get; set;
     }
 
 
@@ -330,7 +329,7 @@ private void AVIMClient_OnMessageReceived(object sender, AVIMMessageEventArgs e)
         var binaryData = binaryMessage.BinaryData;
         // 下面的字符串内容就是 I love Unity
         var text = System.Text.Encoding.UTF8.GetString(binaryData);
-    } 
+    }
 }
 ```
 {% endmacro %}
@@ -350,7 +349,7 @@ public class LeanEngineSignatureFactory : ISignatureFactory
     {
         var data = new Dictionary<string, object>();
         data.Add("client_id", clientId);
-        return AVCloud.CallFunctionAsync<IDictionary<string,object>>("sign2", data).OnSuccess(_ => 
+        return AVCloud.CallFunctionAsync<IDictionary<string,object>>("sign2", data).OnSuccess(_ =>
         {
             var jsonData = _.Result;
             var s = jsonData["signature"].ToString();
@@ -517,7 +516,6 @@ Will 消息可以针对场景的不同可以有如下用法：
 - [iOS - Objective-C 自定义消息](realtime_guide-objc.html#自定义消息)
 - [Android - Java 自定义消息](realtime_guide-android.html#自定义消息)
 - [JavaScript 自定义消息](realtime_guide-js.html#自定义消息属性)
-- [Windows Classic Desktop - C# 自定义消息](realtime-guide-dotnet.html#自定义消息)
 - [Unity - C# 自定义消息](realtime-unity.html#自定义消息)
 {% endmacro %}
 
@@ -899,7 +897,7 @@ clang: error: linker command failed with exit code 1 (use -v to see invocation)
 
 ![link-libs](https://dn-lhzo7z96.qbox.me/1493266411053)
 
-#### Android 
+#### Android
 经过测试在 Android ，该插件所打包的 jar 包内部的 websocket lib 不支持 wss 加密链接，因此我们经过与该插件作者的沟通，我们重新打包了一个支持 wss 加密链接的 jar 包，下载地址是：
 [websocketunity.jar](https://dn-lhzo7z96.qbox.me/1494239779983)，下载之后替换目标目录 `~/Assets/WebSocketUnity/Plugins/Android/websocketunity.jar` 即可。
 
