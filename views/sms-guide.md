@@ -50,14 +50,14 @@ options.signatureName = @"LeanCloud";     // 控制台预设的短信签名
                                 }];
 ```
 ```swift
-let dic: LCDictionary = [
-    "sign": LCString("LeanCloud") // 控制台预设的短信签名
-]
-// Register_Notice 控制台预设的模板名称
-LCSMSClient.requestShortMessage(mobilePhoneNumber: "186xxxxxxxx", templateName: "Register_Notice", variables: dic) { (result) in
+_ = LCSMSClient.requestShortMessage(
+    mobilePhoneNumber: "186xxxxxxxx", 
+    templateName: "Register_Notice", // 控制台预设的模板名称
+    signatureName: "LeanCloud") // 控制台预设的短信签名
+{ (result) in
     switch result {
     case .success:
-        print("success")
+        break
     case .failure(error: let error):
         print(error)
     }
@@ -178,17 +178,16 @@ options.operation = @"某种操作";        // 操作名称
                                 }];
 ```
 ```swift
-let dic: LCDictionary = [
+let variables: LCDictionary = [
     "ttl": LCNumber(10), // 验证码有效时间为 10 分钟
     "name": LCString("应用名称"), // 应用名称
     "op": LCString("某种操作")  // 操作名称
 ]
 
-// templateName: 短信模板，不传此参数会使用默认短信模板
-LCSMSClient.requestShortMessage(mobilePhoneNumber: "186xxxxxxxx", templateName: "", variables: dic) { (result) in
+_ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "186xxxxxxxx", variables: variables) { (result) in
     switch result {
     case .success:
-        print("success")
+        break
     case .failure(error: let error):
         print(error)
     }
@@ -267,10 +266,10 @@ cloud.request_sms_code("186xxxxxxxx", sign="应用名称", params=options)
 }];
 ```
 ```swift
-LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
+_ = LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
     switch result {
     case .success:
-        print("success")
+        break
     case .failure(error: let error):
         print(error)
     }
@@ -339,10 +338,10 @@ options.type = AVShortMessageTypeVoice;
 }];
 ```
 ```swift
-LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "188xxxxxxxx") { (result) in
+_ = LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "188xxxxxxxx") { (result) in
     switch result {
     case .success:
-        print("A voice short message has been sent.")
+        break
     case .failure(error: let error):
         print(error)
     }
@@ -402,10 +401,10 @@ cloud.request_sms_code("186xxxxxxxx", sms_type="voice")
 }];
 ```
 ```swift
-LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
+_ = LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
     switch result {
     case .success:
-        print("success")
+        break
     case .failure(error: let error):
         print(error)
     }
@@ -524,14 +523,19 @@ options.templateVariables = @{ @"order_id": @"7623432424540" }; // 使用实际�
                                 }];
 ```
 ```swift
-let dic: LCDictionary = [
-    "sign": LCString("sign_BuyBuyBuy"),
+let variables: LCDictionary = [
     "order_id": LCString("7623432424540")
 ]
-LCSMSClient.requestShortMessage(mobilePhoneNumber: "186xxxxxxxx", templateName: "Order_Notice", variables: dic) { (result) in
+
+_ = LCSMSClient.requestShortMessage(
+    mobilePhoneNumber: "186xxxxxxxx",
+    templateName: "Order_Notice",
+    signatureName: "sign_BuyBuyBuy",
+    variables: variables)
+{ (result) in
     switch result {
     case .success:
-        print("success")
+        break
     case .failure(error: let error):
         print(error)
     }
@@ -841,6 +845,21 @@ options.height = 50;
                                 NSString *url = captchaDigest.URLString;
                             }];
 ```
+```swift
+LCCaptchaClient.requestCaptcha(width: 100, height: 50) { (result) in
+    switch result {
+    case .success(value: let captcha):
+        if let url = captcha.url {
+            print(url)
+        }
+        if let token = captcha.token {
+            print(token)
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
 ```android
 AVCaptchaOption option = new AVCaptchaOption();
 option.setWidth(85);
@@ -891,6 +910,18 @@ captcha = cloud.request_captcha(width=100, height=50)
                         /* validationToken 可用短信认证 */
                     }];
 ```
+```swift
+LCCaptchaClient.verifyCaptcha(code: "code", captchaToken: "captcha.token") { (result) in
+    switch result {
+    case .success(value: let verification):
+        if let token = verification.token {
+            print(token)
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
 ```android
 AVCaptcha.verifyCaptchaCodeInBackground(code, captchaDigest, new AVCallback<String>() {
   @Override
@@ -940,6 +971,21 @@ options.validationToken = <#validationToken#>;
                                         /* 请求失败 */
                                     }
                                 }];
+```
+```swift
+_ = LCSMSClient.requestShortMessage(
+    mobilePhoneNumber: "186xxxxxxxx",
+    templateName: "New_Series",
+    signatureName: "sign_BuyBuyBuy",
+    captchaVerificationToken: "captcha_verification_token")
+{ (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```android
 AVSMSOption option = new AVSMSOption();
