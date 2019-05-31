@@ -1150,6 +1150,41 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 
 举个例子，实现一个在 [暂态消息](#暂态消息) 中提出的 `OperationMessage`：
 
+{{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('objc') }}
+
+继承于 `AVIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
+
+* 实现 `AVIMTypedMessageSubclassing` 协议；
+* 子类将自身类型进行注册，一般可在子类的 `+load` 方法或者 `UIApplication` 的 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerSubclass]`。
+
+{{ docs.langSpecEnd('objc') }}
+
+{{ docs.langSpecStart('java') }}
+
+继承于 `AVIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
+
+* 实现新的消息类型，继承自 `AVIMTypedMessage`。这里需要注意：
+  * 在 class 上增加一个 `@AVIMMessageType(type=123)` 的 Annotation<br/>具体消息类型的值（这里是 `123`）由开发者自己决定。LeanCloud 内建的消息类型使用负数，所有正数都预留给开发者扩展使用。
+  * 在消息内部声明字段属性时，要增加 `@AVIMMessageField(name="")` 的 Annotation<br/>`name` 为可选字段，同时自定义的字段要有对应的 getter/setter 方法。
+  * **请不要遗漏空的构造方法和 Creator 的代码**（参考下面的示例代码），否则会造成类型转换失败。
+* 调用 `AVIMMessageManager.registerAVIMMessageType()` 函数进行类型注册。
+* 调用 `AVIMMessageManager.registerMessageHandler()` 函数进行消息处理 handler 注册。
+
+`AVIMTextMessage` 的源码如下，可供参考：
+
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('cs') }}
+
+继承于 `AVIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
+
+* 首先定义一个自定义的子类继承自 `AVIMTypedMessage`。
+* 然后在初始化的时候注册这个子类。
+
+{{ docs.langSpecEnd('cs') }}
+
 ```js
 // TypedMessage, messageType, messageField 都是由 leancloud-realtime 这个包提供的
 // 在浏览器中则是 var { TypedMessage, messageType, messageField } = AV;
@@ -1164,16 +1199,6 @@ messageField('op')(OperationMessage);
 // 注册消息类，否则收到消息时无法自动解析为 OperationMessage
 realtime.register(OperationMessage);
 ```
-
-{{ docs.langSpecEnd('js') }}
-
-{{ docs.langSpecStart('objc') }}
-
-继承于 `AVIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
-
-* 实现 `AVIMTypedMessageSubclassing` 协议；
-* 子类将自身类型进行注册，一般可在子类的 `+load` 方法或者 `UIApplication` 的 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerSubclass]`。
-
 ```objc
 // 定义
 
@@ -1203,22 +1228,6 @@ realtime.register(OperationMessage);
     }
 }
 ```
-
-{{ docs.langSpecEnd('objc') }}
-
-{{ docs.langSpecStart('java') }}
-
-继承于 `AVIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
-
-* 实现新的消息类型，继承自 `AVIMTypedMessage`。这里需要注意：
-  * 在 class 上增加一个 `@AVIMMessageType(type=123)` 的 Annotation<br/>具体消息类型的值（这里是 `123`）由开发者自己决定。LeanCloud 内建的消息类型使用负数，所有正数都预留给开发者扩展使用。
-  * 在消息内部声明字段属性时，要增加 `@AVIMMessageField(name="")` 的 Annotation<br/>`name` 为可选字段，同时自定义的字段要有对应的 getter/setter 方法。
-  * **请不要遗漏空的构造方法和 Creator 的代码**（参考下面的示例代码），否则会造成类型转换失败。
-* 调用 `AVIMMessageManager.registerAVIMMessageType()` 函数进行类型注册。
-* 调用 `AVIMMessageManager.registerMessageHandler()` 函数进行消息处理 handler 注册。
-
-`AVIMTextMessage` 的源码如下，可供参考：
-
 ```java
 @AVIMMessageType(type = AVIMMessageType.TEXT_MESSAGE_TYPE)
 public class AVIMTextMessage extends AVIMTypedMessage {
@@ -1251,13 +1260,6 @@ public class AVIMTextMessage extends AVIMTypedMessage {
   public static final Creator<AVIMTextMessage> CREATOR = new AVIMMessageCreator<AVIMTextMessage>(AVIMTextMessage.class);
 }
 ```
-
-{{ docs.langSpecEnd('java') }}
-
-{{ docs.langSpecStart('cs') }}
-
-首先定义一个自定义的子类继承自 `AVIMTypedMessage`：
-
 ```cs
 // 定义自定义消息类名
 [AVIMMessageClassName("InputtingMessage")]
@@ -1270,19 +1272,11 @@ public class InputtingMessage : AVIMTypedMessage
     [AVIMMessageFieldName("Ecode")]
     public string Ecode { get; set; }
 }
-```
 
-然后在初始化的时候注册这个子类：
-
-```cs
+// 注册子类
 realtime.RegisterMessageType<InputtingMessage>();
-```
 
-到这里，自定义消息的工作就完成了。
-
-现在我们发送一个自己定义的消息：
-
-```cs
+// 现在我们发送一个自己定义的消息：
 var inputtingMessage = new InputtingMessage();
 // 这里的 TextContent 继承自 AVIMTypedMessage
 inputtingMessage.TextContent = "对方正在输入…";
@@ -1291,11 +1285,8 @@ inputtingMessage.Ecode = "#e001";
         
 // 执行此行代码前，用户已经登录并拿到了当前的 conversation 对象
 await conversation.SendMessageAsync(inputtingMessage);
-```
 
-在同一个 `conversation` 中的其他用户，接收该条自定义消息的方法为：
-
-```cs
+// 在同一个 `conversation` 中的其他用户，接收该条自定义消息的方法为：
 async void Start() 
 {   
     var jerry = await realtime.CreateClientAsync("jerry");
@@ -1310,11 +1301,9 @@ void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
         Debug.Log(string.Format("收到自定义消息 {0} {1}", inputtingMessage.TextContent, inputtingMessage.Ecode));
     }
 }
+
+// 在这个案例中，通过「对方正在输入…」这种场景，我们介绍了如何自定义消息，但要真正实现「对方正在输入…」这个完整的功能，我们还需要指定该条消息为「[暂态消息](#暂态消息)」。
 ```
-
-在这个案例中，通过「对方正在输入…」这种场景，我们介绍了如何自定义消息，但要真正实现「对方正在输入…」这个完整的功能，我们还需要指定该条消息为「[暂态消息](#暂态消息)」。
-
-{{ docs.langSpecEnd('cs') }}
 
 自定义消息的接收，可以参看 [前一章：再谈接收消息](realtime-guide-beginner.html#再谈接收消息)。
 
