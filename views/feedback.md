@@ -4,13 +4,6 @@ LeanCloud Feedback 是一个非常轻量的模块，可以用最少两行的代�
 
 **你可以在应用的组件菜单里看到所有的用户反馈并回复。**
 
-## LeanCloud 移动 App
-
-用户如果有新的反馈会主动推送通知到我们提供的移动App，建议你安装，并使用LeanCloud帐户登录：
-
-* [Android App](http://download.leancloud.cn/apk/AVOSCloudMobileApp.apk)
-* [iOS App](https://itunes.apple.com/cn/app/avos-cloud-ying-yong-tong/id854896336?mt=8&uo=4)
-
 ## iOS 反馈组件
 		
 ![image](images/avoscloud-ios-feedback.png)
@@ -20,7 +13,7 @@ LeanCloud Feedback 是一个非常轻量的模块，可以用最少两行的代�
 目前反馈组件从 SDK 中独立出来，开放了源码和 Demo 。项目地址是：[leancloud-feedback-ios](https://github.com/leancloud/leancloud-feedback-ios)。从 v3.1.3 开始，SDK 中的 feedback 组件不再维护。欢迎大家使用开源组件，相信在大家的共同维护下，开源组件会变得越来越好。
 
 ### 安装
-推荐使用 Cocoapods 安装，在项目的 Podfile 中加入以下声明，随后执行 `pod install` 即可，如果太慢了，请参考[这篇博客](http://www.cnblogs.com/yiqiedejuanlian/p/3698788.html)加快速度。	
+推荐使用 Cocoapods 安装，在项目的 Podfile 中加入以下声明，随后执行 `pod install` 即可，如果太慢了，请参考 [这篇博客](http://www.cnblogs.com/yiqiedejuanlian/p/3698788.html) 加快速度。	
 ```
 	pod 'LeanCloudFeedback'
 ```
@@ -28,9 +21,16 @@ LeanCloud Feedback 是一个非常轻量的模块，可以用最少两行的代�
 该开源组件和 SDK 中的 feedback 组件接口稍有不同，类名的前缀由`AV`改成了`LC`，其它无变化。
 
 ### 基本使用
-导入头文件，
+导入头文件：
+
 ```objc
 	#import <LeanCloudFeedback/LeanCloudFeedback.h>
+```
+
+然后粘贴下列代码到 application:didFinishLaunchingWithOptions: 方法中：
+
+```objc
+[AVOSCloud setApplicationId:@"{{appid}}" clientKey:@"{{appkey}}"];
 ```
 
 开发者可以使用当前的 UIViewController 打开默认的反馈界面，代码如下：
@@ -43,7 +43,8 @@ LeanCloud Feedback 是一个非常轻量的模块，可以用最少两行的代�
 
 ### 界面定制
 
-默认的反馈界面的导航栏样式和你应用的样式不一样，这时你希望能统一样式，或者想更改反馈界面的字体等，可以通过下面的接口进行界面定制，
+默认的反馈界面的导航栏样式和你应用的样式不一样，这时你希望能统一样式，或者想更改反馈界面的字体等，可以通过下面的接口进行界面定制：
+
 ```objc
 typedef enum : NSUInteger {
     LCUserFeedbackNavigationBarStyleBlue = 0,
@@ -69,7 +70,8 @@ typedef enum : NSUInteger {
 ```
 
 ### 新回复通知
-往往用户反馈放在设置页面，于是可以在用户反馈一栏增加红点提醒，代码如下，
+往往用户反馈放在设置页面，于是可以在用户反馈一栏增加红点提醒，代码如下：
+
 ```objc
     [[LCUserFeedbackAgent sharedInstance] countUnreadFeedbackThreadsWithBlock:^(NSInteger number, NSError *error) {
         if (error) {
@@ -80,15 +82,65 @@ typedef enum : NSUInteger {
     }];
 ```
 
-### 增加额外的数据
+### 高级定制指南
 
-可能你需要在反馈的时候增加额外的数据，比如应用的版本号，则可以给 `AVUserFeedbackThread` 增加 `app_version` 属性，还可增加其它属性，只要不和现有的属性冲突即可。现有的属性有：
+如果我们的反馈组件 UI 无法满足你的需求，你可以通过 Feedback SDK 提供的数据模型结合自定义 UI 来满足你的需求。
 
-属性|说明
----|---
-content | 代表反馈内容
-createdAt | 反馈内容创建时间
-type | 反馈类型，分别为 "user" 和 "dev"。
+#### Feedback 数据模型
+
+* **LCUserFeedbackReply**    
+  代表了反馈系统中，用户或者开发者的每一次回复。不同的类型可以通过 LCReplyType 属性来指定，`LCReplyTypeUser` 表示客户端用户的回复，`LCReplyTypeDev` 表示开发人员在控制台的回复。
+
+```objc
+LCUserFeedbackReply *feedbackReply = [LCUserFeedbackReply feedbackReplyWithContent:@"一条新的回复" type:LCReplyTypeUser];
+```
+
+* **LCUserFeedbackThread**  
+  代表了用户与开发者的整个交流过程。LCUserFeedbackThread 在控制台 > 组件 >用户反馈中显示为一条反馈数据。也可以将新建 LCUserFeedbackThread 想象为新建一个会话窗口。
+
+#### 第一次提交反馈
+
+第一次提交反馈的时候需要新建一个会话，即创建一个 LCUserFeedbackThread：
+
+```objc
+[LCUserFeedbackThread feedbackWithContent:@"我是控制台显示的内容标题" contact:@"test@leancloud.cn" withBlock:^(id  _Nullable object, NSError * _Nullable error) {
+    if (object) {
+        NSLog(@"成功");
+    }
+
+}];
+
+```
+
+#### 发送一条文字反馈
+
+LCUserFeedbackThread 创建完成以后，可以向 LCUserFeedbackThread 发送消息。发送一条文字反馈代码如下：
+
+```objc
+[LCUserFeedbackThread fetchFeedbackWithBlock:^(LCUserFeedbackThread *feedback, NSError *error) {
+    LCUserFeedbackReply *feedbackReply = [LCUserFeedbackReply feedbackReplyWithContent:@"新建一条消息2" type:LCReplyTypeUser];
+    [feedback saveFeedbackReplyInBackground:feedbackReply withBlock:^(id object, NSError *error) {
+        if (object) {
+           NSLog(@"成功");
+        }
+    }];
+}];
+```
+
+#### 发送一条图片反馈
+发送图片消息，只需传入图片的 URL 地址即可。如果需要从移动端本地相册获取图片，可以先把图片存储到 LeanCloud 云端（使用 AVFile），然后传入 AVFile 的 url 即可。
+
+```objc
+[LCUserFeedbackThread fetchFeedbackWithBlock:^(LCUserFeedbackThread *feedback, NSError *error) {
+    LCUserFeedbackReply *feedbackReply = [LCUserFeedbackReply feedbackReplyWithAttachment:@"https://www.baidu.com/img/bd_logo1.png" type:LCReplyTypeUser];
+    [feedback saveFeedbackReplyInBackground:feedbackReply withBlock:^(id object, NSError *error) {
+        if (object) {
+            NSLog(@"成功");
+        }
+    }];
+}];
+```
+
 
 更加自由的界面定制和业务逻辑修改，可能需要你阅读代码了，请前往 [feedback](https://github.com/leancloud/leancloud-feedback-ios) 项目。
 

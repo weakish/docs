@@ -166,14 +166,14 @@ dotnet add LeanCloud.Engine.Middleware.AspNetCore
 
 直接使用 [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) 里面构建的方式。
 
-假设在控制台创建了一个名字叫做 `dev` 云缓存实例，如下代码将演示如何连接这个实例，并且存储、读取数据： 
+假设在控制台创建了一个名字叫做 `dev` 云缓存实例，如下代码将演示如何连接这个实例，并且存储、读取数据：
 
 ```cs
 // 获取 dev 实例
 var leancache = new LeanCache("dev");
 // 获取 dev 的配置
 var redisConfiguration = leancache.CurrentConfigurations;
-// 构建 StackExchange.Redis.ConfigurationOptions 
+// 构建 StackExchange.Redis.ConfigurationOptions
 ConfigurationOptions config = new ConfigurationOptions
 {
     ServiceName = this.InstanceName,
@@ -265,7 +265,7 @@ MSET (10 keys): 60096.15 requests per second
 
 ## 在线扩容
 
-你可以在线扩大（或者缩小） LeanCache 实例的最大内存容量。整个过程可能会持续一段时间，在此期间 LeanCache 会中断几秒钟进行切换，其他时间都正常提供服务。
+你可以在线扩大（或者缩小） LeanCache 实例的最大内存容量。整个过程可能会持续一段时间，在此期间 LeanCache 会中断几秒钟进行切换，其他时间都正常提供服务。如果你的应用访问量较大的话，LeanCache 中断的这几秒可能会对你的云引擎实例产生较为明显的影响（例如内存增加），可以考虑将扩容安排在低峰时刻。
 
 <div class="callout callout-danger">缩小容量之前，请务必确认现有数据体积小于目标容量，否则可能造成数据丢失。</div>
 
