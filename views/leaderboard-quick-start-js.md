@@ -1,18 +1,11 @@
-# 排行榜快速入门
-本文档展示了如何快速接入排行榜功能。
+{% extends "./leaderboard-quick-start.tmpl" %}
+{% set platformName = "JavaScript" %}
+{% set signUpCode = "`AV.User.signUp`" %}
 
-## 创建排行榜
-首先通过控制台创建一个世界排行榜：
-* 排行榜名称 statisticName 设置为 `world`。
-* 玩家成绩降序排列。
-* 更新策略选择 better，即保留用户最好的成绩。
-* 每月自动重置。
-
-![image](images/create-leaderboard.png)
-
-点击完成后，我们在控制台看到一个已经创建好的排行榜。
 
 ## SDK 安装
+{% block installSDK %}
+
 接下来我们在客户端调用相关接口来更新用户的分数。在客户端接入排行榜需要安装存储 SDK 模块，在这篇文档中，为了简单，我们使用 CDN 的方式引入存储 SDK。在同一目录下，创建两个文件 `index.html` 和 `leaderboard-quick-start.js`。
 
 `index.html` 中的代码如下：
@@ -38,8 +31,10 @@ AV.init({
 
 注：其他 SDK 安装方式，请参考 [JavaScript SDK 安装指南](sdk_setup-js.html)
 
-## 更新成绩
-这里在客户端模拟注册两个玩家 A 和 B 并更新自己的成绩。首先运行以下代码注册玩家 A 并更新排行榜中的成绩：
+{% endblock %}
+
+
+{% block updateStatistics %}
 
 ```javascript
 // 注册时输入玩家 A 的用户名及密码
@@ -56,13 +51,10 @@ AV.User.signUp('playerA', 'passwordA')
 })
 .catch(console.error);
 ```
+{% endblock %}
 
-接下来换玩家 B 登录并更新成绩，将以上代码中 `AV.User.signUp` 的参数换成玩家 B 的用户名 `playerB` 和密码 `passwordB` 后再次运行代码，运行成功后排行榜中也就有了玩家 B 的成绩。
 
-
-## 获取名次
-接下来我们获取排行榜中前 10 的名次，由于当前排行榜中只有 2 个玩家，所以结果是这两个玩家的数据。
-
+{% block getStatisticsResults %}
 ```js
 const leaderboard = AV.Leaderboard.createWithoutData('world');
 leaderboard.getResults({
@@ -74,6 +66,8 @@ leaderboard.getResults({
 })
 .catch(console.error)
 ```
+{% endblock %}
 
-## 使用指南
-更详细的使用方式，请参考[ JavaScript 排行榜开发指南](leaderboard-guide-js.html)
+{% block leaderboardGuideDocs %}
+更详细的使用方式，请参考[ JavaScript 排行榜开发指南](leaderboard-guide-js.html)。
+{% endblock %}

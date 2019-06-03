@@ -1,15 +1,21 @@
 {% import "views/_helper.njk" as docs %}
+{% extends "./leaderboard-guide.tmpl" %}
+{% set platformName = "JavaScript" %}
+{% set avUser = "AV.User" %}
 
-# 排行榜开发指南 · JavaScript
+{% block Demo %}
 
 ## Demo
 您可以通过查看 [Demo](https://leancloud.github.io/javascript-sdk/demo/leaderboard/) 感受排行榜功能。
 
-## 安装 SDK
-排行榜是存储 SDK 中的一个模块，要在 JavaScript 运行环境中使用排行榜功能，需要安装存储 SDK，请参考《[ JavaScript SDK 安装指南](sdk_setup-js.html)》。
+{% endblock %}
 
-## SDK 中的类
-SDK 提供了对排行榜、成绩与用户的抽象。在开始之前，请确认您已阅读《[排行榜总览](leaderboard.html)》，本文中将不再具体解释相关的概念。
+
+{% block installSDK %}
+排行榜是存储 SDK 中的一个模块，要在 JavaScript 运行环境中使用排行榜功能，需要安装存储 SDK，请参考《[ JavaScript SDK 安装指南](sdk_setup-js.html)》。
+{% endblock %}
+
+{% block leaderboardClass %}
 
 ### AV.Leaderboard
 
@@ -25,18 +31,18 @@ SDK 提供了对排行榜、成绩与用户的抽象。在开始之前，请确�
 |`nextResetAt`|`Date`|计划下次重置时间|
 |`createdAt`|`Date`|创建时间|
 
-### Statistic
+{% endblock %}
 
-排行榜是对用户的成绩进行排名的结果。SDK 提供了一个 `Statistic` 类来表示成绩。`Statistic` 实例有以下属性：
+{% block statisticClass %}
 
 |属性|类型|说明|
 |:--:|:--:|--|
 |`name`|`string`|成绩名字，对应排行榜的 `statisticName`|
 |`value`|`number`|成绩值|
 
-### Ranking
+{% endblock %}
 
-排行榜排序的结果是一个数组，数组的成员是一个叫 `Ranking` 的结构：
+{% block rankingClass %}
 
 |属性|类型|说明|
 |:--:|:--:|--|
@@ -45,15 +51,10 @@ SDK 提供了对排行榜、成绩与用户的抽象。在开始之前，请确�
 |`value`|`number`|该用户的成绩|
 |`includedStatistics`|`Statistic[]`|该用户的其他成绩|
 
-### AV.User
+{% endblock %}
 
-排行榜中的用户指的是 LeanCloud 数据存储服务用户系统中的用户。在客户端，只有登录后才能更新当前登录用户的成绩。您可以通过《[数据存储开发指南 - 用户](leanstorage_guide-js.html#hash954895)》了解更多用户系统的功能与用法。
 
-## 用户成绩管理
-
-### 更新成绩
-
-当用户完成了一局游戏后，你可以使用 SDK 的 `updateStatistic` 方法更新该用户的成绩。
+{% block updateStatistic %}
 
 ```js
 AV.Leaderboard.updateStatistics(AV.User.current(), {
@@ -64,13 +65,9 @@ AV.Leaderboard.updateStatistics(AV.User.current(), {
 }).catch(console.error);
 ```
 
-`updateStatistic` 方法的第二个参数是一个 key-value 的对象，key 为要更新的 `statisticName`，value 为要更新的成绩。你可以一次更新多个不同的成绩。
+{% endblock %}
 
-{{ docs.note("更新成绩 API 需要用户登录，且用户只能更新自己的成绩。也可使用 masterKey 更新任意用户的成绩。") }}
-
-#### 强制更新成绩
-
-有些情况下，你会想要绕过排行榜的 [更新策略](leaderboard.html#更新策略) 强制更新用户的成绩（比如修改一个作弊用户的成绩），你可以使用 `overwrite` 参数实现这一需求：
+{% block overWriteStatistic %}
 
 ```js
 AV.Leaderboard.updateStatistics(AV.User.current(), { score: 0 }, {
@@ -79,43 +76,45 @@ AV.Leaderboard.updateStatistics(AV.User.current(), { score: 0 }, {
   // score 会被强制更新为 0
 }).catch(console.error);
 ```
+{% endblock %}
 
 ### 查询成绩
 
 你可以通过 `getStatistics` 方法查询某用户的某些成绩：
 
+{% block getStatistics %}
+
 ```js
-var user = AV.User.createWithoutData('userid');
-AV.Leaderboard.getStatistics(user, {
-  statisticNames: ['score', 'kills']
+// 当前玩家需要先登录
+AV.User.logIn('playerA', 'passwordA').then((loggedInUser) => {
+  // 查询另一个玩家在排行榜中的成绩
+  var otherUser = AV.Object.createWithoutData(AV.User, '5cee072ac8959c0069f62ca8');
+  return AV.Leaderboard.getStatistics(otherUser)
 }).then(function(statistics) {
   // statistics 是查询的成绩结果
-}).catch(console.error);
+}).catch(function (error) {
+    // 异常处理
+});
 ```
+{% endblock %}
 
-你也可以省略 `statisticNames` 选项用来查询某用户的所有成绩：
 
+{% block getStatisticsWithoutStatisticNames %}
 ```js
-var user = AV.User.createWithoutData('userid');
-AV.Leaderboard.getStatistics(user)
-  .then(function(statistics) {
-     // statistics 是查询的成绩结果
-  }).catch(console.error);
+// 当前玩家需要先登录
+AV.User.logIn('playerA', 'passwordA').then((loggedInUser) => {
+  // 查询另一个玩家在排行榜中的成绩
+  var otherUser = AV.Object.createWithoutData(AV.User, '5cee072ac8959c0069f62ca8');
+  return AV.Leaderboard.getStatistics(otherUser,  {statisticNames: ['score', 'kills']});
+}).then(function(statistics) {
+  // statistics 是查询的成绩结果
+}).catch(function (error) {
+    // 异常处理
+});
 ```
+{% endblock %}
 
-## 获取排行榜结果
-
-SDK 提供了两种获取排行榜结果的 API：
-
-|方法|作用|
-|--|--|
-|`Leaderboard#getResults`|获取指定区间的排名|
-|`Leaderboard#getResultsAroundUser`|获取指定用户附近的排名|
-
-
-### 获取指定区间的排名
-
-获取排行榜结果最常见的使用场景是获取排名前 N 的用户成绩。
+{% block getResults %}
 
 ```js
 var leaderboard = AV.Leaderboard.createWithoutData('score');
@@ -126,24 +125,9 @@ leaderboard.getResults({
   // rankings 为前 10 的排名结果
 }).catch(console.error);
 ```
+{% endblock %}
 
-`Leaderboard#getResults` 方法的第一个参数包含以下选项：
-
-|选项名|类型|说明
-|:--:|:--:|--|
-|`limit`|`number`|限制返回的结果数量|
-|`skip`|`number`| 指定从某个位置开始获取，与 `limit` 一起可以实现翻页|
-|`selectUserKeys`|`string[]`|指定返回的 `Ranking` 中的 `user` 需要包含的属性|
-|`includeStatistics`|`string[]`|指定返回的 `Ranking` 中需要包含的其他成绩|
-|`version`|`number`|指定返回某个历史版本的成绩|
-
-默认情况下返回的排行榜结果中的 `user` 是一个只有 `id` 属性的 `AV.User` Pointer。如果想要想下面这个例子一样，在排行榜结果中显示用户名或者其他的用户属性（对应 `_User` 表中的属性），那么需要使用 `selectUserKeys` 选项。
-
-|排名|Username|Age|Score↓|
-|:--:|--|:--:|:--:|
-|0|Genji|35|3458|
-|1|Lúcio|26|3252|
-|2|D.Va|19|3140|
+{% block getResultsWithSelectUserKeys %}
 
 ```js
 var leaderboard = AV.Leaderboard.createWithoutData('score');
@@ -155,13 +139,9 @@ leaderboard.getResults({
 }).catch(console.error);
 ```
 
-类似的，如果想要在排行榜结果中包含用户的其他成绩，可以使用 `includeStatistics` 选项。
+{% endblock %}
 
-|排名|Username|Score↓|Kills
-|:--:|--|:--:|:--:|
-|0|Genji|3458|28|
-|1|Lúcio|3252|2|
-|2|D.Va|3140|31|
+{% block getResultsWithIncludeStatistics %}
 
 ```js
 var leaderboard = AV.Leaderboard.createWithoutData('score');
@@ -173,18 +153,9 @@ leaderboard.getResults({
 }).catch(console.error);
 ```
 
-### 获取当前用户附近的排名
+{% endblock %}
 
-另一种常见的需求是获取当前登录用户附近的排名：
-
-|排名|Username|Score↓|
-|:--:|--|:--:|
-|…|||
-|24|Bastion|716|
-|25 (You)|Widowmaker|698|
-|26|Hanzo|23|
-|…||||
-
+{% block getResultsAroundUser %}
 ```js
 var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.getResultsAroundUser({
@@ -193,29 +164,10 @@ leaderboard.getResultsAroundUser({
   // rankings 为当前用户附近的 3 条排名结果
 }).catch(console.error);
 ```
+{% endblock %}
 
-`Leaderboard#getResultsAroundUser` 方法的第一个参数包含以下选项：
 
-|选项名|类型|说明
-|:--:|:--:|--|
-|`limit`|`number`|限制返回的结果数量，当前用户会在结果的中间位置|
-|`selectUserKeys`|`string[]`|指定返回的 `Ranking` 中的 `user` 需要包含的属性|
-|`includeStatistics`|`string[]`|指定返回的 `Ranking` 中需要包含的其他成绩|
-|`version`|`number`|指定返回某个历史版本的成绩|
-
-各参数的适用场景与用法与上文 `Leaderboard#getResults` 的参数类似，不再详述。
-
-#### 获取当前用户的排名
-
-如果仅需要获取当前用户的排名，使用 [获取当前用户附近的排名](#获取指定用户附近的排名) 中的 `Leaderboard#getResultsAroundUser` 方法并指定 `limit` 为 1 时即可。
-
-## 管理排行榜
-
-您可以在控制台的「游戏 - 排行榜 - 数据」页面完成排行榜的创建、重置、修改以及删除等操作。除此之外您也可以通过调用 SDK 的 API 来管理排行榜。
-
-请注意，管理排行榜 API 需要 masterKey，因此只能在服务端等可信任的环境中调用。
-
-### 创建排行榜
+{% block createLeaderboard %}
 
 ```js
 AV.Leaderboard.createLeaderboard({
@@ -235,14 +187,11 @@ AV.Leaderboard.createLeaderboard({
 |`updateStrategy`|[`AV.LeaderboardUpdateStrategy`](https://leancloud.github.io/javascript-sdk/docs/AV.html#.LeaderboardUpdateStrategy)|可选|`AV.LeaderboardUpdateStrategy.BETTER`|成绩更新策略|
 |`versionChangeInterval`|[`AV.LeaderboardVersionChangeInterval`](https://leancloud.github.io/javascript-sdk/docs/AV.html#.LeaderboardVersionChangeInterval)|可选|`AV.LeaderboardVersionChangeInterval.WEEK`|自动重置周期|
 
-
 详见《[创建排行榜 API 文档](https://leancloud.github.io/javascript-sdk/docs/AV.Leaderboard.html#.createLeaderboard)》。
 
-{{ docs.note("创建排行榜接口需要使用 masterKey。") }}
+{% endblock %}
 
-### 手动重置排行榜
-
-排行榜在创建之后会按照自动重置周期的设置自动定期重置，重置后该排行榜中所有用户的成绩都会被清空，你可以在控制台的历史版本中找到历史版本的归档。你也可以随时调用重置排行榜的接口手动进行重置。
+{% block resetLeaderboard %}
 
 ```js
 var leaderboard = AV.Leaderboard.createWithoutData('score');
@@ -251,24 +200,17 @@ leaderboard.reset({ useMasterKey: true })
     // 重置成功
   }).catch(console.error);
 ```
+{% endblock %}
 
-{{ docs.note("重置排行榜接口需要使用 masterKey。") }}
-
-### 获取排行榜属性
-通过这个接口可以获得当前排行榜的属性，例如：重置周期、版本号、更新策略等。
-
+{% block getLeaderboard %}
 ```js
 AV.Leaderboard.getLeaderboard('world').then((data) => {
   console.log(data);
 }).catch(console.error)
 ```
+{% endblock %}
 
-### 修改排行榜属性
-
-排行榜创建后，名字与成绩排序方式不可修改。
-
-自动重置周期可以通过调用以下 API 修改：
-
+{% block updateVersionChangeInterval %}
 ```js
 var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.updateVersionChangeInterval(
@@ -278,9 +220,9 @@ leaderboard.updateVersionChangeInterval(
   // 修改成功
 }).catch(console.error);
 ```
+{% endblock %}
 
-成绩更新策略可以通过调用以下 API 修改：
-
+{% block updateUpdateStrategy %}
 ```js
 var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.updateUpdateStrategy(
@@ -290,11 +232,9 @@ leaderboard.updateUpdateStrategy(
   // 修改成功
 }).catch(console.error);
 ```
+{% endblock %}
 
-{{ docs.note("修改排行榜属性接口需要使用 masterKey。") }}
-
-### 删除排行榜
-
+{% block destroy %}
 ```js
 var leaderboard = AV.Leaderboard.createWithoutData('score');
 leaderboard.destroy({ useMasterKey: true })
@@ -302,6 +242,4 @@ leaderboard.destroy({ useMasterKey: true })
     // 删除成功
   }).catch(console.error);
 ```
-
-{{ docs.alert("删除排行榜会删除该排行榜的所有数据，包括当前数据及所有历史版本归档。")}}
-{{ docs.note("删除排行榜接口需要使用 masterKey。") }}
+{% endblock %}
