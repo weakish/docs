@@ -52,6 +52,13 @@ realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
 }).catch(console.error);
 ```
+```swift
+do {
+    let tom = try IMClient(ID: "Tom")
+} catch {
+    print(error)
+}
+```
 ```objc
 @property (nonatomic, strong) AVIMClient *tom;
 // clientId 为 Tom
@@ -79,6 +86,21 @@ var tom = await realtime.CreateClientAsync('Tom');
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
 }).catch(console.error);
+```
+```swift
+do {
+    let tom = try IMClient(ID: "Tom")
+    tom.open { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 ```objc
 // Tom 创建了一个 client，用自己的名字作为 clientId
@@ -118,6 +140,9 @@ var AV = require('leancloud-storage');
 AV.User.logIn('username', 'password').then(function(user) {
   return realtime.createIMClient(user);
 }).catch(console.error.bind(console));
+```
+```swift
+// 暂不支持
 ```
 ```objc
 // 以 AVUser 的用户名和密码登录到 LeanCloud 云端
@@ -171,6 +196,20 @@ tom.CreateConversationAsync({ // tom 是一个 IMClient 实例
   unique: true
 }).then(/* 略 */);
 ```
+```swift
+do {
+    try tom.createConversation(clientIDs: ["Jerry"], name: "Tom & Jerry", isUnique: true, completion: { (result) in
+        switch result {
+        case .success(value: let conversation):
+            print(conversation)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 // 创建与 Jerry 之间的对话
 [tom createConversationWithName:@"Tom & Jerry" clientIds:@[@"Jerry"] attributes:nil options:AVIMConversationOptionUnique
@@ -217,6 +256,17 @@ async createConversation({
   tempConvTTL,
   // 可添加更多属性
 });
+```
+```swift
+/// Create a Normal Conversation. Default is a Unique Conversation.
+///
+/// - Parameters:
+///   - clientIDs: The set of client ID. it's the members of the conversation which will be created. the initialized members always contains current client's ID. if the created conversation is unique, and server has one unique conversation with the same members, that unique conversation will be returned.
+///   - name: The name of the conversation.
+///   - attributes: The attributes of the conversation.
+///   - isUnique: True means create or get a unique conversation, default is true.
+///   - completion: callback.
+public func createConversation(clientIDs: Set<String>, name: String? = nil, attributes: [String : Any]? = nil, isUnique: Bool = true, completion: @escaping (LCGenericResult<IMConversation>) -> Void) throws
 ```
 ```objc
 /*!
@@ -340,6 +390,21 @@ conversation.send(new TextMessage('Jerry，起床了！')).then(function(message
   console.log('Tom & Jerry', '发送成功！');
 }).catch(console.error);
 ```
+```swift
+do {
+    let textMessage = IMTextMessage(text: "Jerry，起床了！")
+    try conversation.send(message: textMessage) { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMTextMessage *message = [AVIMTextMessage messageWithText:@"耗子，起床！" attributes:nil];
 [conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
@@ -379,6 +444,21 @@ var { Event } = require('leancloud-realtime');
 // Jerry 登录
 realtime.createIMClient('Jerry').then(function(jerry) {
 }).catch(console.error);
+```
+```swift
+do {
+    let jerry = try IMClient(ID: "jerry")
+    jerry.open { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 ```objc
 jerry = [[AVIMClient alloc] initWithClientId:@"Jerry"];
@@ -424,9 +504,26 @@ jerry.on(Event.MESSAGE, function(message, conversation) {
     console.log('收到新消息：' + message.text);
 });
 ```
+```swift
+jerry.delegate = delegator
+
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case .received(message: let message):
+            print(message)
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
+```
 ```objc
 // Objective-C SDK 通过实现 AVIMClientDelegate 代理来处理服务端通知
-jerry.delegate = self;
+jerry.delegate = delegator;
 
 /*!
  当前用户被邀请加入对话的通知。
@@ -541,6 +638,40 @@ tom.getConversation('CONVERSATION_ID').then(function(conversation) {
   // 此时对话成员为：['Mary', 'Tom', 'Jerry']
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    let conversationQuery = client.conversationQuery
+    try conversationQuery.getConversation(by: "CONVERSATION_ID") { (result) in
+        switch result {
+        case .success(value: let conversation):
+            do {
+                try conversation.add(members: ["Mary"], completion: { (result) in
+                    switch result {
+                    case .allSucceeded:
+                        break
+                    case .failure(error: let error):
+                        print(error)
+                    case let .slicing(success: succeededIDs, failure: failures):
+                        if let succeededIDs = succeededIDs {
+                            print(succeededIDs)
+                        }
+                        for (failedIDs, error) in failures {
+                            print(failedIDs)
+                            print(error)
+                        }
+                    }
+                })
+            } catch {
+                print(error)
+            }
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 // 首先根据 ID 获取 Conversation 实例
 AVIMConversationQuery *query = [self.client conversationQuery];
@@ -579,8 +710,25 @@ jerry.on(Event.MEMBERS_JOINED, function membersjoinedEventHandler(payload, conve
     console.log(payload.members, payload.invitedBy, conversation.id);
 });
 ```
+```swift
+jerry.delegate = delegator
+
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case let .joined(byClientID: byClientID, at: atDate):
+        print(byClientID)
+        print(atDate)
+    case let .membersJoined(members: members, byClientID: byClientID, at: atDate):
+        print(members)
+        print(byClientID)
+        print(atDate)
+    default:
+        break
+    }
+}
+```
 ```objc
-jerry.delegate = self;
+jerry.delegate = delegator;
 
 #pragma mark - AVIMClientDelegate
 /*!
@@ -666,6 +814,20 @@ tom.createConversation({
   unique: true,
 }).catch(console.error);
 ```
+```swift
+do {
+    try tom.createConversation(clientIDs: ["Jerry", "Mary"], name: "Tom & Jerry & friends", isUnique: true, completion: { (result) in
+        switch result {
+        case .success(value: let conversation):
+            print(conversation)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 // Tom 建立了与朋友们的会话
 NSArray *friends = @[@"Jerry", @"Mary"];
@@ -700,6 +862,21 @@ var conversation = await tom.CreateConversationAsync(new string[]{ "Jerry","Mary
 
 ```js
 conversation.send(new TextMessage('大家好，欢迎来到我们的群聊对话'));
+```
+```swift
+do {
+    let textMessage = IMTextMessage(text: "大家好，欢迎来到我们的群聊对话！")
+    try conversation.send(message: textMessage, completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
 ```
 ```objc
 [conversation sendMessage:[AVIMTextMessage messageWithText:@"大家好，欢迎来到我们的群聊对话！" attributes:nil] callback:^(BOOL succeeded, NSError *error) {
@@ -736,6 +913,28 @@ await conversation.SendMessageAsync(textMessage);
 conversation.remove(['Mary']).then(function(conversation) {
   console.log('移除成功', conversation.members);
 }).catch(console.error.bind(console));
+```
+```swift
+do {
+    try conversation.remove(members: ["Mary"], completion: { (result) in
+        switch result {
+        case .allSucceeded:
+            break
+        case .failure(error: let error):
+            print(error)
+        case let .slicing(success: succeededIDs, failure: failures):
+            if let succeededIDs = succeededIDs {
+                print(succeededIDs)
+            }
+            for (failedIDs, error) in failures {
+                print(failedIDs)
+                print(error)
+            }
+        }
+    })
+} catch {
+    print(error)
+}
 ```
 ```objc
 [conversation removeMembersWithClientIds:@[@"Mary"] callback:^(BOOL succeeded, NSError *error) {
@@ -776,8 +975,25 @@ jerry.on(Event.KICKED, function membersjoinedEventHandler(payload, conversation)
     console.log(payload.kickedBy, conversation.id);
 });
 ```
+```swift
+jerry.delegate = delegator
+
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case let .left(byClientID: byClientID, at: atDate):
+        print(byClientID)
+        print(atDate)
+    case let .membersLeft(members: members, byClientID: byClientID, at: atDate):
+        print(members)
+        print(byClientID)
+        print(atDate)
+    default:
+        break
+    }
+}
+```
 ```objc
-jerry.delegate = self;
+jerry.delegate = delegator;
 
 #pragma mark - AVIMClientDelegate
 /*!
@@ -860,6 +1076,32 @@ william.getConversation('CONVERSATION_ID').then(function(conversation) {
   // 此时对话成员为：['William', 'Tom', 'Jerry']
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    let conversationQuery = client.conversationQuery
+    try conversationQuery.getConversation(by: "CONVERSATION_ID") { (result) in
+        switch result {
+        case .success(value: let conversation):
+            do {
+                try conversation.join(completion: { (result) in
+                    switch result {
+                    case .success:
+                        break
+                    case .failure(error: let error):
+                        print(error)
+                    }
+                })
+            } catch {
+                print(error)
+            }
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMConversationQuery *query = [william conversationQuery];
 [query getConversationById:@"CONVERSATION_ID" callback:^(AVIMConversation *conversation, NSError *error) {
@@ -901,6 +1143,18 @@ jerry.on(Event.MEMBERS_JOINED, function membersJoinedEventHandler(payload, conve
     console.log(payload.members, payload.invitedBy, conversation.id);
 });
 ```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case let .membersJoined(members: members, byClientID: byClientID, at: atDate):
+        print(members)
+        print(byClientID)
+        print(atDate)
+    default:
+        break
+    }
+}
+```
 ```objc
 - (void)conversation:(AVIMConversation *)conversation membersAdded:(NSArray *)clientIds byClientId:(NSString *)clientId {
     NSLog(@"%@", [NSString stringWithFormat:@"%@ 加入到对话，操作者为：%@",[clientIds objectAtIndex:0],clientId]);
@@ -935,6 +1189,20 @@ jerry.OnMembersJoined += OnMembersJoined;
 conversation.quit().then(function(conversation) {
   console.log('退出成功', conversation.members);
 }).catch(console.error.bind(console));
+```
+```swift
+do {
+    try conversation.leave(completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
 ```
 ```objc
 [conversation quitWithCallback:^(BOOL succeeded, NSError *error) {
@@ -972,6 +1240,18 @@ Cloud-->Tom: 2. 下发通知：Jerry 已离开对话
 mary.on(Event.MEMBERS_LEFT, function membersLeftEventHandler(payload, conversation) {
     console.log(payload.members, payload.kickedBy, conversation.id);
 });
+```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case let .membersLeft(members: members, byClientID: byClientID, at: atDate):
+        print(members)
+        print(byClientID)
+        print(atDate)
+    default:
+        break
+    }
+}
 ```
 ```objc
 // Mary 登录之后，Jerry 退出了对话，在 Mary 所在的客户端就会激发以下回调
@@ -1138,6 +1418,23 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    if let imageFilePath = Bundle.main.url(forResource: "image", withExtension: "jpg")?.path {
+        let imageMessage = IMImageMessage(filePath: imageFilePath, format: "jpg")
+        try conversation.send(message: imageMessage, completion: { (result) in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        })
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -1190,6 +1487,23 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    if let url = URL(string: "http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif") {
+        let imageMessage = IMImageMessage(url: url, format: "gif")
+        try conversation.send(message: imageMessage, completion: { (result) in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        })
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 // Tom 发了一张图片给 Jerry
 AVFile *file = [AVFile fileWithURL:[self @"http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif"]];
@@ -1238,6 +1552,26 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
         console.log('收到图像消息，URL：' + file.url());
         break;
    }
+}
+```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case .received(message: let message):
+            switch message {
+            case let imageMessage as IMImageMessage:
+                print(imageMessage)
+            default:
+                break
+            }
+        default:
+            break
+        }
+    default:
+        break
+    }
 }
 ```
 ```objc
@@ -1325,6 +1659,24 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    if let filePath = Bundle.main.url(forResource: "audio", withExtension: "mp3")?.path {
+        let audioMessage = IMAudioMessage(filePath: filePath, format: "mp3")
+        audioMessage.text = "听听人类的神曲"
+        try conversation.send(message: audioMessage, completion: { (result) in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        })
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 NSError *error = nil;
 AVFile *file = [AVFile fileWithLocalPath:localPath error:&error];
@@ -1374,6 +1726,24 @@ file.save().then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    if let url = URL(string: "https://some.website.com/apple.acc") {
+        let audioMessage = IMAudioMessage(url: url, format: "acc")
+        audioMessage.text = "来自苹果发布会现场的录音"
+        try conversation.send(message: audioMessage, completion: { (result) in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        })
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 AVFile *file = [AVFile fileWithRemoteURL:[NSURL URLWithString:@"https://some.website.com/apple.acc"]];
 AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"来自苹果发布会现场的录音" file:file attributes:nil];
@@ -1419,6 +1789,21 @@ conversation.send(message).then(function() {
   console.log('发送成功');
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    let locationMessage = IMLocationMessage(latitude: 31.3753285, longitude: 120.9664658)
+    try conversation.send(message: locationMessage, completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMLocationMessage *message = [AVIMLocationMessage messageWithText:@"蛋糕店的位置" latitude:31.3753285 longitude:120.9664658 attributes:nil];
 [conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
@@ -1458,6 +1843,45 @@ await conversation.SendMessageAsync(locationMessage);
 {{ docs.langSpecEnd('js') }}
 
 {{ docs.langSpecStart('objc') }}
+
+Swift SDK 是通过实现 `IMClientDelegate` 代理来响应新消息到达通知的：
+
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case .received(message: let message):
+            if let categorizedMessage = message as? IMCategorizedMessage {
+                switch categorizedMessage {
+                case let textMessage as IMTextMessage:
+                    print(textMessage)
+                case let imageMessage as IMImageMessage:
+                    print(imageMessage)
+                case let audioMessage as IMAudioMessage:
+                    print(audioMessage)
+                case let videoMessage as IMVideoMessage:
+                    print(videoMessage)
+                case let fileMessage as IMFileMessage:
+                    print(fileMessage)
+                case let locationMessage as IMLocationMessage:
+                    print(locationMessage)
+                case let recalledMessage as IMRecalledMessage:
+                    print(recalledMessage)
+                default:
+                    break
+                }
+            } else {
+                print(message)
+            }
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
+```
 
 Objective-C SDK 是通过实现 `AVIMClientDelegate` 代理来响应新消息到达通知的，并且，分别使用了两个方法来分别处理普通的 `AVIMMessage` 消息和内建的多媒体消息 `AVIMTypedMessage`（包括应用层由此派生的自定义消息）：
 
