@@ -267,6 +267,22 @@ async createConversation({
 ///   - isUnique: True means create or get a unique conversation, default is true.
 ///   - completion: callback.
 public func createConversation(clientIDs: Set<String>, name: String? = nil, attributes: [String : Any]? = nil, isUnique: Bool = true, completion: @escaping (LCGenericResult<IMConversation>) -> Void) throws
+
+/// Create a Chat Room.
+///
+/// - Parameters:
+///   - name: The name of the chat room.
+///   - attributes: The attributes of the chat room.
+///   - completion: callback.
+public func createChatRoom(name: String? = nil, attributes: [String : Any]? = nil, completion: @escaping (LCGenericResult<IMChatRoom>) -> Void) throws
+
+/// Create a Temporary Conversation. Temporary Conversation is unique in it's Life Cycle.
+///
+/// - Parameters:
+///   - clientIDs: The set of client ID. it's the members of the conversation which will be created. the initialized members always contains this client's ID.
+///   - timeToLive: The time interval for the life of the temporary conversation.
+///   - completion: callback.
+public func createTemporaryConversation(clientIDs: Set<String>, timeToLive: Int32, completion: @escaping (LCGenericResult<IMTemporaryConversation>) -> Void) throws
 ```
 ```objc
 /*!
@@ -1327,6 +1343,27 @@ LeanCloud 即时通讯服务默认支持文本、文件、图像、音频、视�
 
 {{ docs.langSpecEnd('js') }}
 
+{{ docs.langSpecStart('swift') }}
+
+| 属性 | 类型 | 描述 |
+| --- | --- | --- |
+| `content`                  | `IMMessage.Content`    | 消息内容，支持 `String` 和 `Data` 两种格式。 |
+| `fromClientID`             | `String`               | 消息发送者的 `client ID`。 |
+| `currentClientID`          | `String`               | 消息接受者的 `client ID`。 |
+| `conversationID`           | `String`               | 消息所属对话的 `conversation ID`。 |
+| `ID`                       | `String`               | 消息发送成功之后，由 LeanCloud 云端给每条消息赋予的唯一 `message ID`。 |
+| `sentTimestamp`            | `int64_t`              | 消息发送的时间。消息发送成功之后，由 LeanCloud 云端赋予的全局的时间戳。 |
+| `deliveredTimestamp`       | `int64_t`              | 消息被对方接收到的时间戳。 |
+| `readTimestamp`            | `int64_t`              | 消息被对方阅读的时间戳。 |
+| `patchedTimestamp`         | `int64_t`              | 消息被修改的时间戳。 |
+| `isAllMembersMentioned`    | `Bool`                 | @ 所有会话成员。 |
+| `mentionedMembers`         | `[String]`             | @ 会话成员。 |
+| `isCurrentClientMentioned` | `Bool`                 | 当前 `Client` 是否被 @。 |
+| `status`                   | `IMMessage.Status`     | 消息状态，有 6 种取值：<br/><br/>`none`（无状态）<br/>`sending`（发送中）<br/>`sent`（发送成功）<br/>`delivered`（已被接收）<br/>`read`（已被读）<br/>`failed`（发送失败） |
+| `ioType`                   | `IMMessage.IOType`     | 消息传输方向，有两种取值：<br/><br/>`in`（当前用户接受到的）<br/>`out`（由当前用户发出的） |
+
+{{ docs.langSpecEnd('swift') }}
+
 {{ docs.langSpecStart('objc') }}
 
 | 属性 | 类型 | 描述 |
@@ -1842,7 +1879,7 @@ await conversation.SendMessageAsync(locationMessage);
 
 {{ docs.langSpecEnd('js') }}
 
-{{ docs.langSpecStart('objc') }}
+{{ docs.langSpecStart('swift') }}
 
 Swift SDK 是通过实现 `IMClientDelegate` 代理来响应新消息到达通知的：
 
@@ -1852,28 +1889,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
     case .message(event: let messageEvent):
         switch messageEvent {
         case .received(message: let message):
-            if let categorizedMessage = message as? IMCategorizedMessage {
-                switch categorizedMessage {
-                case let textMessage as IMTextMessage:
-                    print(textMessage)
-                case let imageMessage as IMImageMessage:
-                    print(imageMessage)
-                case let audioMessage as IMAudioMessage:
-                    print(audioMessage)
-                case let videoMessage as IMVideoMessage:
-                    print(videoMessage)
-                case let fileMessage as IMFileMessage:
-                    print(fileMessage)
-                case let locationMessage as IMLocationMessage:
-                    print(locationMessage)
-                case let recalledMessage as IMRecalledMessage:
-                    print(recalledMessage)
-                default:
-                    break
-                }
-            } else {
-                print(message)
-            }
+            print(message)
         default:
             break
         }
@@ -1882,6 +1898,10 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
     }
 }
 ```
+
+{{ docs.langSpecEnd('swift') }}
+
+{{ docs.langSpecStart('objc') }}
 
 Objective-C SDK 是通过实现 `AVIMClientDelegate` 代理来响应新消息到达通知的，并且，分别使用了两个方法来分别处理普通的 `AVIMMessage` 消息和内建的多媒体消息 `AVIMTypedMessage`（包括应用层由此派生的自定义消息）：
 
@@ -2058,6 +2078,79 @@ conversation.on(Event.MESSAGE, function messageEventHandler(message) {
   // 这里补充业务逻辑
 });
 ```
+```swift
+// 处理默认类型消息
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case .received(message: let message):
+            if let categorizedMessage = message as? IMCategorizedMessage {
+                switch categorizedMessage {
+                case let textMessage as IMTextMessage:
+                    print(textMessage)
+                case let imageMessage as IMImageMessage:
+                    print(imageMessage)
+                case let audioMessage as IMAudioMessage:
+                    print(audioMessage)
+                case let videoMessage as IMVideoMessage:
+                    print(videoMessage)
+                case let fileMessage as IMFileMessage:
+                    print(fileMessage)
+                case let locationMessage as IMLocationMessage:
+                    print(locationMessage)
+                case let recalledMessage as IMRecalledMessage:
+                    print(recalledMessage)
+                default:
+                    break
+                }
+            } else {
+                print(message)
+            }
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
+
+// 处理自定义类型消息
+class CustomMessage: IMCategorizedMessage {
+    
+    class override var messageType: MessageType {
+        return 1
+    }    
+}
+
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    
+    do {
+        try CustomMessage.register()
+    } catch {
+        print(error)
+        return false
+    }
+    
+    return true
+}
+
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case .received(message: let message):
+            if let customMessage = message as? CustomMessage {
+                print(customMessage)
+            }
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
+```
 ```objc
 // 处理默认类型消息
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
@@ -2216,6 +2309,29 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 {{ docs.langSpecEnd('js') }}
 
+{{ docs.langSpecStart('swift') }}
+
+| `IMConversation` 属性名 | `_Conversation` 字段 | 含义 |
+| --- | --- | --- |
+| `ID`                            | `objectId`         | 会话的全局唯一 `ID` |
+| `uniqueID`                      | `uniqueId`         | `Unique Conversation` 全局唯一的 `ID` |
+| `isUnique`                      | `unique`           | 是否是 `Unique Conversation` |
+| `name`                          | `name`             | 会话的名称 |
+| `members`                       | `m`                | 会话的成员列表 |
+| `creator`                       | `c`                | 会话的创建者 |
+| `attributes`                    | `attr`             | 会话的自定义属性 |
+| `createdAt`                     | `createdAt`        | 会话的创建时间 |
+| `updatedAt`                     | `updatedAt`        | 会话的最后更新时间 |
+| `lastMessage`                   | N/A                | 最新一条消息，可能会空 |
+| `isMuted`                       | N/A                | 当前用户是否静音该对话 |
+| `unreadMessageCount`            | N/A                | 未读消息数 |
+| `isUnreadMessageContainMention` | N/A                | 未读消是否 @ 了当前的 `Client` |
+| `client`                        | N/A                | 会话所属的 `Client` |
+| `clientID`                      | N/A                | 会话所属的 `Client` 的 `ID` |
+| `isOutdated`                    | N/A                | 会话的属性是否过期，可以根据该属性来决定是否更新会话的数据 |
+
+{{ docs.langSpecEnd('swift') }}
+
 {{ docs.langSpecStart('objc') }}
 
 | `AVIMConversation` 属性名 | `_Conversation` 字段 | 含义 |
@@ -2300,6 +2416,20 @@ tom.createConversation({
   console.log('创建成功。ID：' + conversation.id);
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    try tom.createConversation(clientIDs: ["Jerry"], name: "猫和老鼠", attributes: ["type": "private", "pinned": true], isUnique: true, completion: { (result) in
+        switch result {
+        case .success(value: let conversation):
+            print(conversation)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 // Tom 创建名称为「猫和老鼠」的会话，并附加会话属性
 NSDictionary *attributes = @{ 
@@ -2343,6 +2473,20 @@ var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry"
 conversation.name = '聪明的喵星人';
 conversation.save();
 ```
+```swift
+do {
+    try conversation.update(attribution: ["name": "聪明的喵星人"], completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 conversation[@"name"] = @"聪明的喵星人";
 [conversation updateWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
@@ -2378,9 +2522,24 @@ conversation.set('attr.pinned',false);
 // 保存
 conversation.save();
 ```
+```swift
+do {
+    let type = conversation.attributes?["type"] as? String
+    try conversation.update(attribution: ["attr.pinned": false]) { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 // 获取自定义属性
-NSString *type = [conversation objectForKey:@"attr.type"];
+NSString *type = conversation.attributes[@"type"];
 // 为 pinned 属性设置新的值
 [conversation setObject:@(NO) forKey:@"attr.pinned"];
 // 保存
@@ -2436,6 +2595,19 @@ var { Event } = require('leancloud-realtime');
 client.on(Event.CONVERSATION_INFO_UPDATED, function(payload) {
 });
 ```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case let .dataUpdated(updatingData: updatingData, updatedData: updatedData, byClientID: byClientID, at: atDate):
+        print(updatingData)
+        print(updatedData)
+        print(byClientID)
+        print(atDate)
+    default:
+        break
+    }
+}
+```
 ```objc
 /**
  对话信息被更新
@@ -2478,6 +2650,22 @@ conversation.fetch().then(function(conversation) {
   console.log('members: ', conversation.members);
 ).catch(console.error.bind(console));
 ```
+```swift
+do {
+    try conversation.refresh { (result) in
+        switch result {
+        case .success:
+            if let members = conversation.members {
+                print(members)
+            }
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 // fetchWithCallback 方法会执行一次刷新操作，以获取云端最新对话数据。
 [conversation fetchWithCallback:^(BOOL succeeded, NSError *error) {
@@ -2518,6 +2706,21 @@ tom.getConversation('551260efe4b01608686c3e0f').then(function(conversation) {
   console.log(conversation.id);
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    let conversationQuery = tom.conversationQuery
+    try conversationQuery.getConversation(by: "551260efe4b01608686c3e0f") { (result) in
+        switch result {
+        case .success(value: let conversation):
+            print(conversation)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMConversationQuery *query = [tom conversationQuery];
 [query getConversationById:@"551260efe4b01608686c3e0f" callback:^(AVIMConversation *conversation, NSError *error) {
@@ -2557,6 +2760,22 @@ query.equalTo('attr.type','private');
 query.find().then(function(conversations) {
   // conversations 就是想要的结果
 }).catch(console.error.bind(console));
+```
+```swift
+do {
+    let conversationQuery = tom.conversationQuery
+    try conversationQuery.where("attr.type", .equalTo("private"))
+    try conversationQuery.findConversations { (result) in
+        switch result {
+        case .success(value: let conversations):
+            print(conversations)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 ```objc
 AVIMConversationQuery *query = [tom conversationQuery];
@@ -2614,6 +2833,19 @@ await query.FindAsync();
 
 {{ docs.langSpecEnd('js') }}
 
+{{ docs.langSpecStart('swift') }}
+
+| 逻辑比较 | `IMConversationQuery` 的 `Constraint` |
+| --- | --- |
+| 等于     | `equalTo`                  |
+| 不等于   | `notEqualTo`               |
+| 大于     | `greaterThan`              |
+| 大于等于 | `greaterThanOrEqualTo`     |
+| 小于     | `lessThan`                 |
+| 小于等于 | `lessThanOrEqualTo`        |
+
+{{ docs.langSpecEnd('swift') }}
+
 {{ docs.langSpecStart('objc') }}
 
 | 逻辑比较 | `AVIMConversationQuery` 方法 |
@@ -2664,8 +2896,11 @@ await query.FindAsync();
 ```js
 query.matches('language',/[\\u4e00-\\u9fa5]/); // language 是中文字符
 ```
+```swift
+try conversationQuery.where("language", .matchedRegularExpression("[\\u4e00-\\u9fa5]", option: nil))
+```
 ```objc
-[query whereKey:@"language" matchesRegex:@"[\u4e00-\u9fa5]"]; // language 是中文字符
+[query whereKey:@"language" matchesRegex:@"[\\u4e00-\\u9fa5]"]; // language 是中文字符
 ```
 ```java
 query.whereMatches("language","[\\u4e00-\\u9fa5]"); // language 是中文字符
@@ -2681,6 +2916,9 @@ query.WhereMatches("language","[\\u4e00-\\u9fa5]"); // language 是中文字符
 ```js
 query.startsWith('name','教育');
 ```
+```swift
+try conversationQuery.where("name", .prefixedBy("教育"))
+```
 ```objc
 [query whereKey:@"name" hasPrefix:@"教育"];
 ```
@@ -2695,6 +2933,9 @@ query.WhereStartsWith("name","教育");
 
 ```js
 query.contains('name','教育');
+```
+```swift
+try conversationQuery.where("name", .matchedSubstring("教育"))
 ```
 ```objc
 [query whereKey:@"name" containsString:@"教育"];
@@ -2712,6 +2953,9 @@ query.WhereContains("name","教育");
 var regExp = new RegExp('^((?!教育).)*$', 'i');
 query.matches('name', regExp);
 ```
+```swift
+try conversationQuery.where("name", .matchedRegularExpression("^((?!教育).)* $ ", option: nil))
+```
 ```objc
 [query whereKey:@"name" matchesRegex:@"^((?!教育).)* $ "];
 ```
@@ -2728,6 +2972,9 @@ query.WhereMatches("name","^((?!教育).)* $ ");
 
 ```js
 query.containedIn('m', ['Tom']);
+```
+```swift
+try conversationQuery.where("m", .containedIn(["Tom"]))
 ```
 ```objc
 [query whereKey:@"m" containedIn:@[@"Tom"]];
@@ -2748,6 +2995,9 @@ query.WhereContainedIn("m", members);
 ```js
 query.doesNotExist('lm')
 ```
+```swift
+try conversationQuery.where("lm", .notExisted)
+```
 ```objc
 [query whereKeyDoesNotExist:@"lm"];
 ```
@@ -2762,6 +3012,9 @@ query.WhereDoesNotExist("lm");
 
 ```js
 query.exists('lm')
+```
+```swift
+try conversationQuery.where("lm", .existed)
 ```
 ```objc
 [query whereKeyExists:@"lm"];
@@ -2781,6 +3034,10 @@ query.WhereExists("lm");
 // 查询 keywords 包含「教育」且 age 小于 18 的对话
 query.contains('keywords', '教育').lessThan('age', 18);
 ```
+```swift
+try conversationQuery.where("keywords", .matchedSubstring("教育"))
+try conversationQuery.where("age", .lessThan(18))
+```
 ```objc
 [query whereKey:@"keywords" containsString:@"教育"];
 [query whereKey:@"age" lessThan:@(18)];
@@ -2799,6 +3056,19 @@ query.WhereContains("keywords", "教育").WhereLessThan("age", 18);
 
 ```js
 // JavaScript SDK 暂不支持
+```
+```swift
+do {
+    let ageQuery = tom.conversationQuery
+    try ageQuery.where("age", .greaterThan(18))
+    
+    let keywordsQuery = tom.conversationQuery
+    try keywordsQuery.where("keywords", .matchedSubstring("教育"))
+    
+    let conversationQuery = try ageQuery.or(keywordsQuery)
+} catch {
+    print(error)
+}
 ```
 ```objc
 AVIMConversationQuery *ageQuery = [tom conversationQuery];
@@ -2834,17 +3104,11 @@ var query = AVIMConversationQuery.or(new AVIMConversationQuery[] { ageQuery, key
 // 对查询结果按照 name 升序，然后按照创建时间降序排序
 query.addAscending('name').addDescending('createdAt');
 ```
+```swift
+try conversationQuery.where("createdAt", .descending)
+```
 ```objc
-AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
-
-[client openWithCallback:^(BOOL succeeded, NSError *error) {
-    AVIMConversationQuery *query = [client conversationQuery];
-    /* 按创建时间降序排列 */
-    [query orderByDescending:@"createdAt"];
-    [query findConversationsWithCallback:^(NSArray *conversations, NSError *error) {
-        NSLog(@"找到 %ld 个对话！", [conversations count]);
-    }];
-}];
+[query orderByDescending:@"createdAt"];
 ```
 ```java
 AVIMClient tom = AVIMClient.getInstance("Tom");
@@ -2884,17 +3148,11 @@ tom.open(new AVIMClientCallback() {
 ```js
 query.compact(true);
 ```
+```swift
+conversationQuery.options = [.notContainMembers]
+```
 ```objc
-AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
-
-[client openWithCallback:^(BOOL succeeded, NSError *error) {
-    AVIMConversationQuery *query = [client conversationQuery];
-    /* 指定不返回对话的成员列表 */
-    query.option = AVIMConversationQueryOptionCompact;
-    [query findConversationsWithCallback:^(NSArray *conversations, NSError *error) {
-        NSLog(@"找到 %ld 个对话！", [conversations count]);
-    }];
-}];
+query.option = AVIMConversationQueryOptionCompact;
 ```
 ```java
 public void queryConversationCompact() {
@@ -2931,17 +3189,11 @@ public void queryConversationCompact() {
 // withLastMessagesRefreshed 方法可以指定让查询结果带上最后一条消息
 query.withLastMessagesRefreshed(true);
 ```
+```swift
+conversationQuery.options = [.containLastMessage]
+```
 ```objc
-AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
-
-[client openWithCallback:^(BOOL succeeded, NSError *error) {
-    AVIMConversationQuery *query = [client conversationQuery];
-    /* 设置查询选项，指定返回对话的最后一条消息 */
-    query.option = AVIMConversationQueryOptionWithMessage;
-    [query findConversationsWithCallback:^(NSArray *conversations, NSError *error) {
-        NSLog(@"找到 %ld 个对话！", [conversations count]);
-    }];
-}];
+query.option = AVIMConversationQueryOptionWithMessage;
 ```
 ```java
 public void queryConversationWithLastMessage() {
@@ -2980,6 +3232,93 @@ public void queryConversationWithLastMessage() {
 JavaScript SDK 会对按照对话 ID 对对话进行内存字典缓存，但不会进行持久化的缓存。
 
 {{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('swift') }}
+
+Swift SDK 提供了会话的缓存功能，包括内存缓存和持久化缓存。
+
+会话的内存缓存：
+
+```swift
+client.getCachedConversation(ID: "CONVERSATION_ID") { (result) in
+    switch result {
+    case .success(value: let conversation):
+        print(conversation)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+
+client.removeCachedConversation(IDs: ["CONVERSATION_ID"]) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+会话的持久化缓存。**注意，使用「查询持久存储会话」以及「删除持久存储会话」的功能前，需调用 `prepareLocalStorage` 方法且回调结果为成功；`prepareLocalStorage` 方法只需要调用一次（返回成功），一般在 `IMClient.init()` 和 `IMClient.open()` 之间调用**：
+
+```swift
+// Switch for Local Storage of IM Client
+do {
+    // Client init with Local Storage feature
+    let clientWithLocalStorage = try IMClient(ID: "CLIENT_ID")
+    
+    // Client init without Local Storage feature
+    var options = IMClient.Options.default
+    options.remove(.usingLocalStorage)
+    let clientWithoutLocalStorage = try IMClient(ID: "CLIENT_ID", options: options)
+} catch {
+    print(error)
+}
+
+// Preparetion for Local Storage of IM Client
+do {
+    try client.prepareLocalStorage { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+
+// Get and Load Stored Conversations to Memory
+do {
+    try client.getAndLoadStoredConversations(completion: { (result) in
+        switch result {
+        case .success(value: let conversations):
+            print(conversations)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+
+// Delete Stored Conversations and Messages belong to them
+do {
+    try client.deleteStoredConversationAndMessages(IDs: ["CONVERSATION_ID"], completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
+
+{{ docs.langSpecEnd('swift') }}
 
 {{ docs.langSpecStart('objc') }}
 
@@ -3069,6 +3408,20 @@ conversation.queryMessages({
   // 最新的十条消息，按时间增序排列
 }).catch(console.error.bind(console));
 ```
+```swift
+do {
+    try conversation.queryMessage(type: 10) { (result) in
+        switch result {
+        case .success(value: let messages):
+            print(messages)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 // 查询对话中最后 10 条消息，limit 取值范围 1~1000，默认 100
 [conversation queryMessagesWithLimit:10 callback:^(NSArray *objects, NSError *error) {
@@ -3119,6 +3472,25 @@ messageIterator.next().then(function(result) {
   //   done: false,
   // }
 }).catch(console.error.bind(console));
+```
+```swift
+do {
+    let start = IMConversation.MessageQueryEndpoint(
+        messageID: "MESSAGE_ID",
+        sentTimestamp: 31415926,
+        isClosed: false
+    )
+    try conversation.queryMessage(start: start, limit: 10, completion: { (result) in
+        switch result {
+        case .success(value: let messages):
+            print(messages)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
 ```
 ```objc
 // 查询对话中最后 10 条消息
@@ -3173,6 +3545,20 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
   console.log(messages);
 }).catch(console.error);
 ```
+```swift
+do {
+    try conversation.queryMessage(limit: 10, type: IMTextMessage.messageType, completion: { (result) in
+        switch result {
+        case .success(value: let messages):
+            print(messages)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 [conversation queryMediaMessagesFromServerWithType:kAVIMMessageMediaTypeImage limit:10 fromMessageId:nil fromTimestamp:0 callback:^(NSArray *messages, NSError *error) {
     if (!error) {
@@ -3208,6 +3594,20 @@ conversation.queryMessages({
 }.catch(function(error) {
   // 处理异常
 });
+```
+```swift
+do {
+    try conversation.queryMessage(direction: .oldToNew, limit: 10, completion: { (result) in
+        switch result {
+        case .success(value: let messages):
+            print(messages)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
 ```
 ```objc
 [conversation queryMessagesInInterval:nil direction:AVIMMessageQueryDirectionFromOldToNew limit:20 callback:^(NSArray<AVIMMessage *> * _Nullable messages, NSError * _Nullable error) {
@@ -3253,6 +3653,25 @@ startClosed: false,
   // 处理异常
 });
 ```
+```swift
+do {
+    let start = IMConversation.MessageQueryEndpoint(
+        messageID: "MESSAGE_ID",
+        sentTimestamp: 31415926,
+        isClosed: true
+    )
+    try conversation.queryMessage(start: start, direction: .oldToNew, limit: 10, completion: { (result) in
+        switch result {
+        case .success(value: let messages):
+            print(messages)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMMessageIntervalBound *start = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:timestamp closed:false];
 AVIMMessageInterval *interval = [[AVIMMessageInterval alloc] initWithStartIntervalBound:start endIntervalBound:nil];
@@ -3297,6 +3716,30 @@ conversation.queryMessages({
   // 处理异常
 });
 ```
+```swift
+do {
+    let start = IMConversation.MessageQueryEndpoint(
+        messageID: "MESSAGE_ID_1",
+        sentTimestamp: 31415926,
+        isClosed: true
+    )
+    let end = IMConversation.MessageQueryEndpoint(
+        messageID: "MESSAGE_ID_2",
+        sentTimestamp: 31415900,
+        isClosed: true
+    )
+    try conversation.queryMessage(start: start, end: end, completion: { (result) in
+        switch result {
+        case .success(value: let messages):
+            print(messages)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMMessageIntervalBound *start = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:startTimestamp closed:false];
     AVIMMessageIntervalBound *end = [[AVIMMessageIntervalBound alloc] initWithMessageId:nil timestamp:endTimestamp closed:false];
@@ -3339,6 +3782,41 @@ iOS 和 Android SDK 针对移动设备的特殊性，实现了客户端消息的
 ```js
 // 暂不支持
 ```
+```swift
+// Switch for Local Storage of IM Client
+do {
+    // Client init with Local Storage feature
+    let clientWithLocalStorage = try IMClient(ID: "CLIENT_ID")
+    
+    // Client init without Local Storage feature
+    var options = IMClient.Options.default
+    options.remove(.usingLocalStorage)
+    let clientWithoutLocalStorage = try IMClient(ID: "CLIENT_ID", options: options)
+} catch {
+    print(error)
+}
+
+// Message Query Policy
+enum MessageQueryPolicy {
+    case `default`
+    case onlyNetwork
+    case onlyCache
+    case cacheThenNetwork
+}
+    
+do {
+    try conversation.queryMessage(policy: .default, completion: { (result) in
+        switch result {
+        case .success(value: let messages):
+            print(messages)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 // 需要在调用 [avimClient openWithCallback:callback] 函数之前设置，关闭历史消息缓存开关。
 avimClient.messageQueryCacheEnabled = false;
@@ -3361,6 +3839,16 @@ AVIMClient.setMessageQueryCacheEnable(false);
 tom.close().then(function() {
   console.log('Tom 退出登录');
 }).catch(console.error.bind(console));
+```
+```swift
+tom.close { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 [tom closeWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
@@ -3424,6 +3912,25 @@ realtime.on(Event.RECONNECT, function() {
 ```
 
 {{ docs.langSpecEnd('js') }}
+
+{{ docs.langSpecStart('swift') }}
+
+```swift
+func client(_ client: IMClient, event: IMClientEvent) {
+    switch event {
+    case .sessionDidOpen:
+        break
+    case .sessionDidPause(error: let error):
+        print(error)
+    case .sessionDidResume:
+        break
+    case .sessionDidClose(error: let error):
+        print(error)
+    }
+}
+```
+
+{{ docs.langSpecEnd('swift') }}
 
 {{ docs.langSpecStart('objc') }}
 
