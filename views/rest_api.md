@@ -554,6 +554,17 @@ curl -X PUT \
 
 <div class="callout callout-danger">使用 master key 将绕过所有权限校验，应该确保只在可控环境中使用，比如自行开发的管理平台，并且要完全避免泄露。因此，以上两种计算 sign 的方法可以根据实际情况来选择一种使用。</div>
 
+#### 指定 hook 函数调用环境
+
+POST 和 PUT 请求可能触发[云引擎的 hook 函数][hooks]，可以通过设置 HTTP 头 `X-LC-Prod` 来区分调用的环境。
+
+* `X-LC-Prod: 0` 表示调用预备环境
+* `X-LC-Prod: 1` 表示调用生产环境
+
+默认（未指定 `X-LC-Prod` 头）调用生产环境的 hook 函数。 
+
+[hooks]: https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html#hash1095356413
+
 ### 响应格式
 
 对于所有的请求，响应格式都是一个 JSON 对象。
@@ -1047,7 +1058,7 @@ curl -X POST \
 ]
 ```
 
-需要注意，即使一个 batch 请求返回的响应码为 200，这仅代表服务端已收到并处理了这个请求，但并不说明该 
+需要注意，即使一个 batch 请求返回的响应码为 200，这仅代表服务端已收到并处理了这个请求，但并不说明该
 batch 中的所有操作都成功完成，只有当返回 body 的列表中**不存在 error 元素**，开发者才可以认为所有操作都已成功完成。
 
 在 batch 操作中 update 和 delete 同样是有效的：
@@ -1178,7 +1189,7 @@ curl -X GET \
 }
 ```
 
-{{ data.localizedDates() }} 
+{{ data.localizedDates() }}
 
 ### 查询约束
 
@@ -1284,17 +1295,17 @@ curl -X GET \
   --data-urlencode 'where={
     "author": {
       "$select": {
-        "query": { 
+        "query": {
           "className":"_Followee",
            "where": {
              "user":{
                "__type": "Pointer",
                "className": "_User",
-               "objectId": "55a39634e4b0ed48f0c1845c" 
+               "objectId": "55a39634e4b0ed48f0c1845c"
              }
            }
-        }, 
-        "key":"followee" 
+        },
+        "key":"followee"
       }
     }
   }' \
@@ -1577,7 +1588,7 @@ curl -X GET \
 `$and` 操作符用于查询**符合全部条件**的对象，它的值为一个 JSON 数组。例如查找存在 price 字段且 price != 199 的对象：
 
 ```
---data-urlencode 'where={"$and":[{"price": {"$ne":199}},{"price":{"$exists":true}}]}' \ 
+--data-urlencode 'where={"$and":[{"price": {"$ne":199}},{"price":{"$exists":true}}]}' \
 ```
 
 {{ docs.alert("在组合查询的子查询中不支持使用 limit、skip、order、include 等非过滤型的约束。") }}
@@ -1998,10 +2009,10 @@ LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾�
 ```
 同时，请在控制台的 `_User` 表里为 `authData.第三方平台名称.uid` 建立唯一索引，并且勾选上 **允许缺失值** 选项，这样才能保证一个第三方账号只绑定到一个 LeanCloud 应用内用户上。
 
-{{ 
+{{
   docs.note(
     data.limitationsOnCreatingClassIndex()
-  ) 
+  )
 }}
 
 {{ include.retrieveAuthData(node, "#### 获取 authData") }}
@@ -2106,7 +2117,7 @@ Location: https://{{host}}/1.1/users/55a4800fe4b05001a7745c41
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \ 
+  -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -d '{
      "authData": {
@@ -2123,33 +2134,33 @@ curl -X POST \
     }
     }' \
    https://{{host}}/1.1/users
-  
+
 ```
 应答内容包括 objectId、createdAt、sessionToken、authData 以及一个自动生成的随机 username，应答的 body 类似：
 
 ```json
 {
-    "sessionToken": "v53f0q4oecbrjojn530w89s5f", 
-    "updatedAt": "2018-08-16T08:03:44.203Z", 
-    "objectId": "5b752fe0a22b9d003137e16d", 
-    "username": "vp7szn9ytuaylgtnw14qnjx2u", 
-    "createdAt": "2018-08-16T08:03:44.203Z", 
-    "emailVerified": false, 
+    "sessionToken": "v53f0q4oecbrjojn530w89s5f",
+    "updatedAt": "2018-08-16T08:03:44.203Z",
+    "objectId": "5b752fe0a22b9d003137e16d",
+    "username": "vp7szn9ytuaylgtnw14qnjx2u",
+    "createdAt": "2018-08-16T08:03:44.203Z",
+    "emailVerified": false,
     "authData": {
         "weixin1": {
-            "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc", 
-            "access_token": "12_b6mz7ujXbTY4vpbqCRaKVa_y0Ij3N9grCeVtM8VJT8KFd4qnQ9lXtBsZVxG6x9c9Nay_oNgvbKK7KYKbn8R2P7uEgA0EhsXMHmxkx-xU-Tk", 
-            "expires_in": 7200, 
-            "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838", 
-            "scope": "snsapi_userinfo", 
-            "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U", 
-            "platform": "weixin", 
+            "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc",
+            "access_token": "12_b6mz7ujXbTY4vpbqCRaKVa_y0Ij3N9grCeVtM8VJT8KFd4qnQ9lXtBsZVxG6x9c9Nay_oNgvbKK7KYKbn8R2P7uEgA0EhsXMHmxkx-xU-Tk",
+            "expires_in": 7200,
+            "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838",
+            "scope": "snsapi_userinfo",
+            "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
+            "platform": "weixin",
             "main_account": "true"
-        }, 
+        },
         "_weixin_unionid": {
             "uid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
         }
-    }, 
+    },
     "mobilePhoneVerified": false
 }
 ```
@@ -2886,7 +2897,7 @@ curl -X GET \
 https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
 
-将 `<:feedback_objectId>` 替换为 feedback 的 objectId（可以从上述的「获取所有的反馈」这个查询中得到 objectId）。 
+将 `<:feedback_objectId>` 替换为 feedback 的 objectId（可以从上述的「获取所有的反馈」这个查询中得到 objectId）。
 
 客服为一条已经存在的反馈增加一条回复：
 
@@ -2895,7 +2906,7 @@ curl -X POST \
 -H "X-LC-Id:{{appid}}" \
 -H "X-LC-Key:{{appkey}}"\
  -H "Content-Type: application/json" \
--d '{"type":"dev","content":"感谢您的反馈！我们正在修复您所述的问题，修复后再通知您。", "attachment":"{{url}}"}' \ 
+-d '{"type":"dev","content":"感谢您的反馈！我们正在修复您所述的问题，修复后再通知您。", "attachment":"{{url}}"}' \
 https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
 
@@ -2906,7 +2917,7 @@ curl -X POST \
 -H "X-LC-Id:{{appid}}" \
 -H "X-LC-Key:{{appkey}}"\
  -H "Content-Type: application/json" \
--d '{"type":"user","content":"我刚才又试了下，现在没问题了！耶~", "attachment":"{{url}}"}' \ 
+-d '{"type":"user","content":"我刚才又试了下，现在没问题了！耶~", "attachment":"{{url}}"}' \
 https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
 
