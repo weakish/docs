@@ -165,6 +165,9 @@ realtime.createIMClient('Tom', {
   // 如果 signatureFactory 抛出了异常，或者签名没有验证通过，会在这里被捕获
 });
 ```
+```swift
+// 暂不支持
+```
 ```objc
 // AVIMSignatureDataSource 接口的主要方法
 /*!
@@ -350,6 +353,9 @@ AV.User.logIn('username', 'password').then(function(user) {
   return realtime.createIMClient(user);
 }).catch(console.error.bind(console));
 ```
+```swift
+// 暂不支持
+```
 ```objc
 // 以 AVUser 的用户名和密码登录到 LeanCloud 内建账户系统
 [AVUser logInWithUsernameInBackground:username password:password block:^(AVUser * _Nullable user, NSError * _Nullable error) {
@@ -419,6 +425,9 @@ LeanCloud 内置账户系统与即时通讯服务可以共享登录签名信息�
  */
 async updateMemberRole(memberId, role);
 ```
+```swift
+// 暂不支持
+```
 ```objc
 /**
  更新成员的角色信息
@@ -457,6 +466,9 @@ public void updateMemberRole(final String memberId, final ConversationMemberRole
    * @return {Promise.<ConversationMemberInfo[]>} 所有成员的对话属性列表
    */
   async getAllMemberInfo({ noCache = false } = {})
+  ```
+  ```swift
+  // 暂不支持
   ```
   ```objc
   /**
@@ -552,6 +564,9 @@ async unmuteMembers(clientIds);
  * @return {PagedResults.<string>} 查询结果。其中的 cureser 存在表示还有更多结果。
  */
 async queryMutedMembers({ limit, next } = {});
+```
+```swift
+// 暂不支持
 ```
 ```objc
 /**
@@ -651,6 +666,9 @@ async unblockMembers(clientIds);
  */
 async queryBlockedMembers({ limit, next } = {});
 ```
+```swift
+// 暂不支持
+```
 ```objc
 /**
  将部分成员加入黑名单
@@ -729,6 +747,20 @@ public void queryBlockedMembers(int offset, int limit, final AVIMConversationSim
 ```js
 tom.createChatRoom({ name:'聊天室' }).catch(console.error);
 ```
+```swift
+do {
+    try client.createChatRoom(name: "聊天室", attributes: nil) { (result) in
+        switch result {
+        case .success(value: let chatRoom):
+            print(chatRoom)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 [client createChatRoomWithName:@"聊天室" attributes:nil callback:^(AVIMChatRoom *chatRoom, NSError *error) {
     if (chatRoom && !error) {        
@@ -773,6 +805,24 @@ var query = tom.getQuery().equalTo('tr',true); // 聊天室对象
 query.find().then(function(conversations) {
   // conversations 就是想要的结果
 }).catch(console.error);
+```
+```swift
+do {
+    let query = client.conversationQuery
+    try query.where("tr", .equalTo(true))
+    try query.findConversations { (result) in
+        switch result {
+        case .success(value: let conversations):
+            guard conversations is [IMChatRoom] else {
+                return
+            }
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 ```objc
 AVIMConversationQuery *query = [tom conversationQuery];
@@ -819,24 +869,25 @@ chatRoom.count().then(function(count) {
   console.log('在线人数：' + count);
 }).catch(console.error.bind(console));
 ```
-```objc
-- (void)tomCountsChatroomMembers{
-    // Tom 创建了一个 client，用自己的名字作为 clientId
-    self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
-    NSString *conversationId=@"55dd9d7200b0c86eb4fdcbaa";
-    // Tom 打开 client
-    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
-        // Tom 创建一个对话的查询
-        AVIMConversationQuery *query = [self.client conversationQuery];
-        // 根据已知 ID 获取对话实例，当前实例为聊天室。
-        [query getConversationById:conversationId callback:^(AVIMConversation *conversation, NSError *error) {
-            // 查询在线人数
-            [conversation countMembersWithCallback:^(NSInteger number, NSError *error) {
-                NSLog(@"%ld",number);
-            }];
-        }];
-    }];
+```swift
+do {
+    chatRoom.getOnlineMembersCount { (result) in
+        switch result {
+        case .success(count: let count):
+            print(count)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
 }
+```
+```objc
+// 查询在线人数
+[conversation countMembersWithCallback:^(NSInteger number, NSError *error) {
+    NSLog(@"%ld",number);
+}];
 ```
 ```java
 private void TomQueryWithLimit() {
@@ -915,6 +966,21 @@ realtime.createIMClient('host').then(function (host) {
     console.log(message);
 }).catch(console.error);
 ```
+```swift
+do {
+    let message = IMTextMessage(text: "现在比分是 0:0，下半场中国队肯定要做出人员调整")
+    try chatRoom.send(message: message, priority: .high) { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 // Tom 创建了一个 client，用自己的名字作为 clientId
 self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
@@ -988,6 +1054,16 @@ tom.getConversation('CONVERSATION_ID').then(function(conversation) {
 }).then(function(conversation) {
   console.log('静音成功');
 }).catch(console.error.bind(console));
+```
+```swift
+conversation.mute { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 - (void)tomMuteConversation {
@@ -1073,6 +1149,20 @@ realtime.createIMClient('Tom').then(function(tom) {
   return conversation.send(new AV.TextMessage('这里是临时对话'));
 }).catch(console.error);
 ```
+```swift
+do {
+    try client.createTemporaryConversation(clientIDs: ["Jerry", "William"], timeToLive: 3600) { (result) in
+        switch result {
+        case .success(value: let tempConversation):
+            print(tempConversation)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 [tom createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
                                                 timeToLive:3600
@@ -1120,6 +1210,20 @@ realtime.createIMClient('Tom').then(function(tom) {
 }).then(function(conversation) {
   return conversation.send(new AV.TextMessage('这里是临时对话，一小时之后，这个对话就会消失'));
 }).catch(console.error);
+```
+```swift
+do {
+    try client.createTemporaryConversation(clientIDs: ["Jerry", "William"], timeToLive: 3600) { (result) in
+        switch result {
+        case .success(value: let tempConversation):
+            print(tempConversation)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 ```objc
 AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
