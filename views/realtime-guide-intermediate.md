@@ -49,6 +49,22 @@ conversation.send(message).then(function(message) {
   console.log('发送成功！');
 }).catch(console.error);
 ```
+```swift
+do {
+    let message = IMTextMessage(text: "@Tom 早点回家")
+    message.mentionedMembers = ["Tom"]
+    try conversation.send(message: message, completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMMessage *message = [AVIMTextMessage messageWithText:@"@Tom 早点回家" attributes:nil];
 message.mentionList = @[@"Tom"];
@@ -84,6 +100,22 @@ const message = new TextMessage(`@all`).mentionAll();
 conversation.send(message).then(function(message) {
   console.log('发送成功！');
 }).catch(console.error);
+```
+```swift
+do {
+    let message = IMTextMessage(text: "@all")
+    message.isAllMembersMentioned = true
+    try conversation.send(message: message, completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
 ```
 ```objc
 AVIMMessage *message = [AVIMTextMessage messageWithText:@"@all" attributes:nil];
@@ -121,6 +153,26 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   var mentionList = receivedMessage.getMentionList();
 });
 ```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case .received(message: let message):
+            if let mentionedMembers = message.mentionedMembers {
+                print(mentionedMembers)
+            }
+            if let isAllMembersMentioned = message.isAllMembersMentioned {
+                print(isAllMembersMentioned)
+            }
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
+```
 ```objc
 // 示例代码演示 AVIMTypedMessage 接收时，获取该条消息提醒的 clientId 列表，同理可以用类似的代码操作 AVIMMessage 的其他子类
 - (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
@@ -157,6 +209,21 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   var mentionedAll = receivedMessage.mentionedAll;
   var mentionedMe = receivedMessage.mentioned;
 });
+```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case .received(message: let message):
+            print(message.isCurrentClientMentioned)
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
 ```
 ```objc
 // 示例代码演示 AVIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员或当前用户，同理可以用类似的代码操作 AVIMMessage 的其他子类
@@ -204,6 +271,20 @@ conversation.recall(oldMessage).then(function(recalledMessage) {
   // 异常处理
 });
 ```
+```swift
+do {
+    try conversation.recall(message: oldMessage, completion: { (result) in
+        switch result {
+        case .success(value: let recalledMessage):
+            print(recalledMessage)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMMessage *oldMessage = <#MessageYouWantToRecall#>;
 
@@ -236,6 +317,23 @@ conversation.on(Event.MESSAGE_RECALL, function(recalledMessage, reason) {
   // 在视图层可以通过消息的 ID 找到原来的消息并用 recalledMessage 替换
   // reason (可选) 为撤回消息的原因，详见下文修改消息部分的说明。
 });
+```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case let .updated(updatedMessage: updatedMessage, reason: _):
+            if let recalledMessage = updatedMessage as? IMRecalledMessage {
+                print(recalledMessage)
+            }
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
 ```
 ```objc
 /* 实现 delegate 方法，以处理消息修改和撤回的事件 */
@@ -276,6 +374,21 @@ conversation.update(oldMessage, newMessage).then(function() {
 }).catch(function(error) {
   // 异常处理
 });
+```
+```swift
+do {
+    let newMessage = IMTextMessage(text: "Just a new message")
+    try conversation.update(oldMessage: oldMessage, to: newMessage, completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
 ```
 ```objc
 AVIMMessage *oldMessage = <#MessageYouWantToUpdate#>;
@@ -321,6 +434,21 @@ conversation.on(Event.MESSAGE_UPDATE, function(newMessage, reason) {
   // 例如 -4408 表示因敏感词过滤被修改。
   // reason 的 detail 属性是一个字符串，指明具体的修改原因。
 });
+```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case let .updated(updatedMessage: updatedMessage, reason: _):
+            print(updatedMessage)
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
 ```
 ```objc
 /* 实现 delegate 方法，以处理消息修改和撤回的事件 */
@@ -375,6 +503,18 @@ tom.OnMessageUpdated += (sender, e) => {
  */
 async send(message)
 ```
+```swift
+/// Send Message.
+///
+/// - Parameters:
+///   - message: The message to be sent.
+///   - options: @see `MessageSendOptions`.
+///   - priority: @see `IMChatRoom.MessagePriority`.
+///   - pushData: The push data of APNs.
+///   - progress: The file uploading progress.
+///   - completion: callback.
+public func send(message: IMMessage, options: MessageSendOptions = .default, priority: IMChatRoom.MessagePriority? = nil, pushData: [String : Any]? = nil, progress: ((Double) -> Void)? = nil, completion: @escaping (LCBooleanResult) -> Void) throws
+```
 ```objc
 /*!
  往对话中发送消息。
@@ -410,6 +550,30 @@ public static Task<T> SendAsync<T>(this AVIMConversation conversation, T message
  * @return {Promise.<Message>} 发送的消息
  */
 async send(message, options)
+```
+```swift
+/// Message Sending Option
+public struct MessageSendOptions: OptionSet {
+    /// Get Receipt when other client received message or read message.
+    public static let needReceipt = MessageSendOptions(rawValue: 1 << 0)
+    
+    /// Indicates whether this message is transient.
+    public static let isTransient = MessageSendOptions(rawValue: 1 << 1)
+    
+    /// Indicates whether this message will be auto delivering to other client when this client disconnected.
+    public static let isAutoDeliveringWhenOffline = MessageSendOptions(rawValue: 1 << 2)
+}
+
+/// Send Message.
+///
+/// - Parameters:
+///   - message: The message to be sent.
+///   - options: @see `MessageSendOptions`.
+///   - priority: @see `IMChatRoom.MessagePriority`.
+///   - pushData: The push data of APNs.
+///   - progress: The file uploading progress.
+///   - completion: callback.
+public func send(message: IMMessage, options: MessageSendOptions = .default, priority: IMChatRoom.MessagePriority? = nil, pushData: [String : Any]? = nil, progress: ((Double) -> Void)? = nil, completion: @escaping (LCBooleanResult) -> Void) throws
 ```
 ```objc
 /*!
@@ -454,6 +618,21 @@ public Task<IAVIMMessage> SendMessageAsync(IAVIMMessage avMessage, AVIMSendOptio
 ```js
 const message = new TextMessage('Tom 正在输入…');
 conversation.send(message, {transient: true});
+```
+```swift
+do {
+    let message = IMTextMessage(text: "Tom 正在输入…")
+    try conversation.send(message: message, options: [.isTransient], completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
 ```
 ```objc
 AVIMMessage *message = [AVIMTextMessage messageWithText:@"Tom 正在输入…" attributes:nil];
@@ -502,6 +681,21 @@ conversation.send(message, {
   receipt: true,
 });
 ```
+```swift
+do {
+    let message = IMTextMessage(text: "一条非常重要的消息。")
+    try conversation.send(message: message, options: [.needReceipt], completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 [conversation sendMessage:message options:AVIMMessageSendOptionRequestReceipt callback:^(BOOL succeeded, NSError *error) {
   if (succeeded) {
@@ -540,6 +734,23 @@ conversation.on(Event.LAST_DELIVERED_AT_UPDATE, function() {
   console.log(conversation.lastDeliveredAt);
   // 在 UI 中将早于 lastDeliveredAt 的消息都标记为「已送达」
 });
+```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case let .delivered(toClientID: toClientID, messageID: messageID, deliveredTimestamp: deliveredTimestamp):
+            if messageID == message.ID {
+                message.deliveredTimestamp = deliveredTimestamp
+            }
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
 ```
 ```objc
 // 监听消息是否已送达实现 `conversation:messageDelivered` 即可。
@@ -597,6 +808,12 @@ LeanCloud 即时通讯服务还支持「已读」消息的回执，不过这首�
  */
 async read();
 ```
+```swift
+/// Clear unread messages that its sent timestamp less than the sent timestamp of the parameter message.
+///
+/// - Parameter message: The default is the last message.
+public func read(message: IMMessage? = nil)
+```
 ```objc
 /*!
  将对话标记为已读。
@@ -625,6 +842,21 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
     conversation.send(message, {
       receipt: true,
     });
+    ```
+    ```swift
+    do {
+        let message = IMTextMessage(text: "Hello, Jerry!")
+        try conversation.send(message: message, options: [.needReceipt], completion: { (result) in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        })
+    } catch {
+        print(error)
+    }
     ```
     ```objc
     AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
@@ -668,6 +900,9 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
       ;
     }).catch(console.error.bind(console));
     ```
+    ```swift
+    conversation.read()
+    ```
     ```objc
     [conversation readInBackground];
     ```
@@ -686,6 +921,23 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
       console.log(conversation.lastReadAt);
       // 在 UI 中将早于 lastReadAt 的消息都标记为「已读」
     });
+    ```
+    ```swift
+    func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+        switch event {
+        case .message(event: let messageEvent):
+            switch messageEvent {
+            case let .read(byClientID: byClientID, messageID: messageID, readTimestamp: readTimestamp):
+                if messageID == message.ID {
+                    message.readTimestamp = readTimestamp
+                }
+            default:
+                break
+            }
+        default:
+            break
+        }
+    }
     ```
     ```objc
     // Tom 可以在 client 的 delegate 方法中捕捉到 lastReadAt 的更新
@@ -736,6 +988,21 @@ conversation.send(message, { will: true }).then(function() {
 }).catch(function(error) {
   // 异常处理
 });
+```
+```swift
+do {
+    let message = IMTextMessage(text: "我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。")
+    try conversation.send(message: message, options: [.isAutoDeliveringWhenOffline], completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
 ```
 ```objc
 AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
@@ -800,6 +1067,9 @@ Will 消息有 **如下限制**：
 ```js
 // 暂不支持
 ```
+```swift
+// 暂不支持
+```
 ```objc
 [conversation addMessageToCache:message];
 ```
@@ -813,6 +1083,9 @@ conversation.addToLocalCache(message);
 将消息从缓存中删除：
 
 ```js
+// 暂不支持
+```
+```swift
 // 暂不支持
 ```
 ```objc
@@ -864,6 +1137,28 @@ LeanCloud 本就提供完善的 [消息推送服务](push_guide.html)，现在�
           "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
       }
   });
+  ```
+  ```swift
+  do {
+      let message = IMTextMessage(text: "Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！")
+      let pushData: [String: Any] = [
+          "alert": "您有一条未读的消息",
+          "category": "消息",
+          "badge": 1,
+          "sound": "message.mp3",
+          "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
+      ]
+      try conversation.send(message: message, pushData: pushData, completion: { (result) in
+          switch result {
+          case .success:
+              break
+          case .failure(error: let error):
+              print(error)
+          }
+      })
+  } catch {
+      print(error)
+  }
   ```
   ```objc
   AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
@@ -990,6 +1285,18 @@ LeanCloud 提供两种方式进来同步离线消息：
 ```js
 // 默认支持，无需额外设置
 ```
+```swift
+// 默认支持，无需额外设置
+
+// 关闭未读消息数更新通知
+do {
+    var options = IMClient.Options.default
+    options.remove(.receiveUnreadMessageCountAfterSessionDidOpen)
+    let client = try IMClient(ID: "CLIENT_ID", options: options)
+} catch {
+    print(error)
+}
+```
 ```objc
 [AVIMClient setUnreadNotificationEnabled:YES];
 ```
@@ -1015,6 +1322,16 @@ client.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, function(conversations) {
     console.log(conv.id, conv.name, conv.unreadMessagesCount);
   }
 });
+```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .unreadMessageCountUpdated:
+        print(conversation.unreadMessageCount)
+    default:
+        break
+    }
+}
 ```
 ```objc
 // 使用代理方法 conversation:didUpdateForKey: 来观察对话的 unreadMessagesCount 属性
@@ -1061,6 +1378,21 @@ realtime.createIMClient('Tom', { tag: 'Mobile' }).then(function(tom) {
   console.log('Tom 登录');
 });
 ```
+```swift
+do {
+    let client = try IMClient(ID: "CLIENT_ID", tag: "Mobile")
+    client.open { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile"];
 [currentClient openWithCallback:^(BOOL succeeded, NSError *error) {
@@ -1096,6 +1428,18 @@ var { Event } = require('leancloud-realtime');
 tom.on(Event.CONFLICT, function() {
   // 弹出提示，告知当前用户的 clientId 在其他设备上登陆了
 });
+```
+```swift
+func client(_ client: IMClient, event: IMClientEvent) {
+    switch event {
+    case .sessionDidClose(error: let error):
+        if error.code == 4111 {
+            // 弹出提示，告知当前用户的 clientId 在其他设备上登陆了
+        }
+    default:
+        break
+    }
+}
 ```
 ```objc
 -(void)client:(AVIMClient *)client didOfflineWithError:(NSError *)error{
@@ -1152,6 +1496,15 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 
 {{ docs.langSpecEnd('js') }}
 
+{{ docs.langSpecStart('swift') }}
+
+继承于 `IMCategorizedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
+
+* 实现 `IMMessageCategorizing` 协议；
+* 子类将自身类型进行注册，一般可在 `AppDelegate` 的 `application(_:didFinishLaunchingWithOptions:)` 方法里面调用 `try CustomMessage.register()`。
+
+{{ docs.langSpecEnd('swift') }}
+
 {{ docs.langSpecStart('objc') }}
 
 继承于 `AVIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
@@ -1198,6 +1551,42 @@ messageType(1)(OperationMessage);
 messageField('op')(OperationMessage);
 // 注册消息类，否则收到消息时无法自动解析为 OperationMessage
 realtime.register(OperationMessage);
+```
+```swift
+class CustomMessage: IMCategorizedMessage {
+    
+    class override var messageType: MessageType {
+        return 1
+    }
+}
+
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    
+    do {
+        try CustomMessage.register()
+    } catch {
+        print(error)
+        return false
+    }
+    
+    return true
+}
+
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case .received(message: let message):
+            if let customMessage = message as? CustomMessage {
+                print(customMessage)
+            }
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
 ```
 ```objc
 // 定义
