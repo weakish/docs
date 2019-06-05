@@ -48,33 +48,35 @@ LeanCloud 云端对客户端发过来的每一个请求都要进行了用户身�
 实例代码如下：
 
 ```objc
-    // 新建一个帖子对象
-    AVObject *post = [AVObject objectWithClassName:@"Post"];
-    [post setObject:@"大家好，我是新人" forKey:@"title"];
-    
-    //新建一个 ACL 实例
-    AVACL *acl = [AVACL ACL];
-    [acl setPublicReadAccess:YES];// 设置公开的「读」权限，任何人都可阅读
-    [acl setWriteAccess:YES forUser:[AVUser currentUser]];// 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
-    post.ACL = acl;// 将 ACL 实例赋予 Post对象
-    
-    [post saveInBackground];
+// 新建一个帖子对象
+AVObject *post = [AVObject objectWithClassName:@"Post"];
+[post setObject:@"大家好，我是新人" forKey:@"title"];
+
+//新建一个 ACL 实例
+AVACL *acl = [AVACL ACL];
+[acl setPublicReadAccess:YES];// 设置公开的「读」权限，任何人都可阅读
+[acl setWriteAccess:YES forUser:[AVUser currentUser]];// 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+post.ACL = acl;// 将 ACL 实例赋予 Post对象
+
+[post save];
 ```
 ```swift
-    let post = AVObject(className: "Post")
-    post["title"] = "大家好，我是新人"
-
-    let acl = AVACL()
-
-    acl.setPublicReadAccess(true)
-
-    if let currentUser = AVUser.current() {
-        acl.setWriteAccess(true, for: currentUser)
+do {
+    let post = LCObject(className: "Post")
+    try post.set("title", value: "大家好，我是新人")
+    
+    let acl = LCACL()
+    acl.setAccess([.read], allowed: true)
+    if let currentUserID = LCApplication.default.currentUser?.objectId?.value {
+        acl.setAccess([.write], allowed: true, forUserID: currentUserID)
     }
-
-    post.acl = acl
-
-    post.save()
+    
+    post.ACL = acl
+    
+    assert(post.save().isSuccess)
+} catch {
+    print(error)
+}
 ```
 ```java
   AVObject post = new AVObject("Post");
@@ -150,65 +152,65 @@ post.save()
 {{ docs.note("注意：**开启 `_User` 表的查询权限**才可以执行以下代码。") }}
 
 ```objc
-    AVQuery *query = [AVUser query];
-    [query whereKey:@"objectId" equalTo:@"55f1572460b2ce30e8b7afde"];
-    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        if (error == nil) {
-            // 新建一个帖子对象
-            AVObject *post = [AVObject objectWithClassName:@"Post"];
-            [post setObject:@"这是我的第二条发言，谢谢大家！" forKey:@"title"];
-            [post setObject:@"我最近喜欢看足球和篮球了。" forKey:@"content"];
-            
-            //新建一个 ACL 实例
-            AVACL *acl = [AVACL ACL];
-            [acl setPublicReadAccess:YES];// 设置公开的「读」权限，任何人都可阅读
-            [acl setWriteAccess:YES forUser:[AVUser currentUser]];// 为当前用户赋予「写」权限
-            
-            AVUser *otherUser = [objects objectAtIndex:0];// 读取 admin
-            [acl setWriteAccess:YES forUser:otherUser];
-            
-            post.ACL = acl;// 将 ACL 实例赋予 Post 对象
-            
-            [post saveInBackground];
-            
-        } else {
-            NSLog(@"error");
-        }
-    }];
+AVQuery *query = [AVUser query];
+[query whereKey:@"objectId" equalTo:@"55f1572460b2ce30e8b7afde"];
+[query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    if (error == nil) {
+        // 新建一个帖子对象
+        AVObject *post = [AVObject objectWithClassName:@"Post"];
+        [post setObject:@"这是我的第二条发言，谢谢大家！" forKey:@"title"];
+        [post setObject:@"我最近喜欢看足球和篮球了。" forKey:@"content"];
+        
+        //新建一个 ACL 实例
+        AVACL *acl = [AVACL ACL];
+        [acl setPublicReadAccess:YES];// 设置公开的「读」权限，任何人都可阅读
+        [acl setWriteAccess:YES forUser:[AVUser currentUser]];// 为当前用户赋予「写」权限
+        
+        AVUser *otherUser = [objects objectAtIndex:0];// 读取 admin
+        [acl setWriteAccess:YES forUser:otherUser];
+        
+        post.ACL = acl;// 将 ACL 实例赋予 Post 对象
+        
+        [post save];
+    } else {
+        NSLog(@"error");
+    }
+}];
 ```
 ```swift
-    let query = AVUser.query()
+let query = LCQuery(className: LCUser.objectClassName())
 
-    query.whereKey("objectId", equalTo: "55f1572460b2ce30e8b7afde")
+query.whereKey("objectId", .equalTo("55f1572460b2ce30e8b7afde"))
 
-    query.findObjectsInBackground { objects, error in
-        if let error = error {
+_ = query.find { result in
+    switch result {
+    case .success(objects: let objects):
+        do {
+            let post = LCObject(className: "Post")
+            
+            try post.set("title", value: "这是我的第二条发言，谢谢大家！")
+            try post.set("content", value: "我最近喜欢看足球和篮球了。")
+            
+            let acl = LCACL()
+            
+            acl.setAccess([.read], allowed: true)
+            if let currentUserID = LCApplication.default.currentUser?.objectId?.value {
+                acl.setAccess([.write], allowed: true, forUserID: currentUserID)
+            }
+            if let anotherUserID = (objects.first as? LCUser)?.objectId?.value {
+                acl.setAccess([.write], allowed: true, forUserID: anotherUserID)
+            }
+            
+            post.ACL = acl
+            
+            assert(post.save().isSuccess)
+        } catch {
             print(error)
-        } else {
-            let post = AVObject(className: "Post")
-
-            post["title"] = "这是我的第二条发言，谢谢大家！"
-            post["content"] = "我最近喜欢看足球和篮球了。"
-
-            let acl = AVACL()
-
-            // Anyone can read this post.
-            acl.setPublicReadAccess(true)
-
-            // Current user and another user can manage this post.
-            if let currentUser = AVUser.current() {
-                acl.setWriteAccess(true, for: currentUser)
-            }
-
-            if let anotherUser = objects?.first as? AVUser {
-                acl.setWriteAccess(true, for: anotherUser)
-            }
-
-            post.acl = acl
-
-            post.save()
         }
+    case .failure(error: let error):
+        print(error)
     }
+}
 ```
 ```java
   AVQuery<AVUser> query = AVUser.getQuery();
@@ -376,32 +378,42 @@ post.save()
 这里有一个需要特别注意的地方，因为 `AVRole` 本身也是一个 `AVObject`，它自身也有 ACL 控制，并且它的权限控制应该更严谨，如同「论坛的管理员有权力任命版主，而版主无权任命管理员」一样的道理，所以创建角色的时候需要显式地设定该角色的 ACL，而角色是一种较为稳定的对象：
 
 ```objc
-    // 设定角色本身的 ACL 
-    AVACL *roleACL = [AVACL ACL];
-    [roleACL setPublicReadAccess:YES];
-    [roleACL setWriteAccess:YES forUser:[AVUser currentUser]];
-    
-    // 创建角色，并且保存
-    AVRole *administratorRole = [AVRole roleWithName:@"Administrator" acl:roleACL];
-    [[administratorRole users] addObject: [AVUser currentUser]];
-    [administratorRole saveInBackground];
+// 设定角色本身的 ACL
+AVACL *roleACL = [AVACL ACL];
+[roleACL setPublicReadAccess:YES];
+[roleACL setWriteAccess:YES forUser:[AVUser currentUser]];
+
+// 创建角色，并且保存
+AVRole *administratorRole = [AVRole roleWithName:@"Administrator" acl:roleACL];
+[[administratorRole users] addObject: [AVUser currentUser]];
+[administratorRole save];
 ```
 ```swift
-let roleACL = AVACL()
-
-    roleACL.setPublicReadAccess(true)
-
-    if let currentUser = AVUser.current() {
-        roleACL.setWriteAccess(true, for: currentUser)
+do {
+    let roleACL = LCACL()
+    
+    roleACL.setAccess([.read], allowed: true)
+    if let currentUserID = LCApplication.default.currentUser?.objectId?.value {
+        roleACL.setAccess([.write], allowed: true, forUserID: currentUserID)
     }
-
-    let administratorRole = AVRole(name: "Administrator", acl: roleACL)
-
-    if let currentUser = AVUser.current() {
-        administratorRole.users().add(currentUser)
+    
+    let administratorRole = LCRole(name: "Administrator")
+    administratorRole.ACL = roleACL
+    
+    if let currentUser = LCApplication.default.currentUser {
+        if let usersRelation = administratorRole.users {
+            try usersRelation.insert(currentUser)
+        } else {
+            let usersRelation = administratorRole.relationForKey("users")
+            try usersRelation.insert(currentUser)
+            administratorRole.users = usersRelation
+        }
     }
-
-    administratorRole.save()
+    
+    assert(administratorRole.save().isSuccess)
+} catch {
+    print(error)
+}
 ```
 ```java
   // 新建一个针对角色本身的 ACL
@@ -460,54 +472,65 @@ administrator_role.save()  # 保存
 我们现在已经创建了一个有效的角色，接下来为 `Post` 对象设置 `Administrator` 的访问「可读可写」的权限，设置成功以后，任何具备 `Administrator` 角色的用户都可以对 `Post` 对象进行「可读可写」的操作了：
 
 ```objc
-    // 新建一个帖子对象
-    AVObject *post = [AVObject objectWithClassName:@"Post"];
-    [post setObject:@"夏天吃什么夜宵比较爽？" forKey:@"title"];
-    [post setObject:@"求推荐啊！" forKey:@"content"];
-    
-    
-     // 假设之前创建的 Administrator 角色 objectId 为 55fc0eb700b039e44440016c
-    AVQuery *roleQuery= [AVRole query];
-    [roleQuery getObjectInBackgroundWithId:@"55fc0eb700b039e44440016c" block:^(AVObject *object, NSError *error) {
-        AVRole *administratorRole = (AVRole*) object;
-        [administratorRole saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-            //新建一个 ACL 实例
-            AVACL *acl = [AVACL ACL];
-            [acl setPublicReadAccess:YES];// 设置公开的「读」权限，任何人都可阅读
-            [acl setWriteAccess:YES  forRole:administratorRole];// 为 Administrator 「写」权限
-            [acl setWriteAccess:YES  forUser:[AVUser currentUser]];// 为当前用户赋予「写」权限
-            post.ACL = acl;// 将 ACL 实例赋予 Post对象
-            
-            // 以上代码的效果就是：只有 Post 作者（当前用户）和拥有 Administrator 角色的用户可以修改这条 Post，而所有人都可以读取这条 Post
-            [post saveInBackground];
-        }];
+// 新建一个帖子对象
+AVObject *post = [AVObject objectWithClassName:@"Post"];
+[post setObject:@"夏天吃什么夜宵比较爽？" forKey:@"title"];
+[post setObject:@"求推荐啊！" forKey:@"content"];
+
+
+// 假设之前创建的 Administrator 角色 objectId 为 55fc0eb700b039e44440016c
+AVQuery *roleQuery= [AVRole query];
+[roleQuery getObjectInBackgroundWithId:@"55fc0eb700b039e44440016c" block:^(AVObject *object, NSError *error) {
+    AVRole *administratorRole = (AVRole*) object;
+    [administratorRole saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+        //新建一个 ACL 实例
+        AVACL *acl = [AVACL ACL];
+        [acl setPublicReadAccess:YES];// 设置公开的「读」权限，任何人都可阅读
+        [acl setWriteAccess:YES  forRole:administratorRole];// 为 Administrator 「写」权限
+        [acl setWriteAccess:YES  forUser:[AVUser currentUser]];// 为当前用户赋予「写」权限
+        post.ACL = acl;// 将 ACL 实例赋予 Post对象
+        
+        // 以上代码的效果就是：只有 Post 作者（当前用户）和拥有 Administrator 角色的用户可以修改这条 Post，而所有人都可以读取这条 Post
+        [post save];
     }];
+}];
 ```
 ```swift
-    let roleQuery = AVRole.query()
-    let post = AVObject(className: "Post")
-
-    post["title"] = "夏天吃什么夜宵比较爽？"
-    post["content"] = "求推荐啊！"
-
-    roleQuery.getObjectInBackground(withId: "55fc0eb700b039e44440016c") { object, error in
-        guard let administratorRole = object as? AVRole else {
-            return
+do {
+    let roleQuery = LCQuery(className: LCRole.objectClassName())
+    let post = LCObject(className: "Post")
+    
+    try post.set("title", value: "夏天吃什么夜宵比较爽？")
+    try post.set("content", value: "求推荐啊！")
+    
+    _ = roleQuery.get("55fc0eb700b039e44440016c") { (result) in
+        switch result {
+        case .success(object: let object):
+            guard
+                let administratorRole = object as? LCRole,
+                let administratorRoleName = administratorRole.name?.value
+                else
+            {
+                return
+            }
+            
+            let acl = LCACL()
+            acl.setAccess([.read], allowed: true)
+            acl.setAccess([.write], allowed: true, forRoleName: administratorRoleName)
+            if let currentUserID = LCApplication.default.currentUser?.objectId?.value {
+                acl.setAccess([.write], allowed: true, forUserID: currentUserID)
+            }
+            
+            post.ACL = acl
+            
+            assert(post.save().isSuccess)
+        case .failure(error: let error):
+            print(error)
         }
-        let acl = AVACL()
-
-        acl.setPublicReadAccess(true)
-
-        acl.setWriteAccess(true, for: administratorRole)
-
-        if let currentUser = AVUser.current() {
-            acl.setWriteAccess(true, for: currentUser)
-        }
-
-        post.acl = acl
-
-        post.save()
     }
+} catch {
+    print(error)
+}
 ```
 ```java
   // 新建一个帖子对象
@@ -606,58 +629,76 @@ post.save()
 以下代码演示为当前用户添加 `Administrator`角色：
 
 ```objc
-    AVQuery *roleQuery= [AVRole query];
-    [roleQuery whereKey:@"name" equalTo:@"Administrator"];
-    [roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        // 如果角色存在
-        if ([objects count] > 0) {
-            AVRole *administratorRole= [objects objectAtIndex:0];
-            [roleQuery whereKey:@"users" equalTo:[AVUser currentUser]];
-            [roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error){
-                if ([objects count] == 0) {
-                    //为用户赋予角色
-                    [[administrator users ] addObject:[AVUser currentUser]];
-                    [administrator saveInBackground];
-                } else {
-                    NSLog(@"已经拥有 Moderator 角色了。");
-                }
-            }];
-            
-        } else {
-            // 角色不存在，就新建角色
-            AVRole *administrator =[AVRole roleWithName:@"Administrator"];
-            [[administrator users ] addObject:[AVUser currentUser]];// 赋予角色
-            [administrator saveInBackground];
-        }
-    }];
+AVQuery *roleQuery= [AVRole query];
+[roleQuery whereKey:@"name" equalTo:@"Administrator"];
+[roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    // 如果角色存在
+    if ([objects count] > 0) {
+        AVRole *administrator = [objects objectAtIndex:0];
+        [roleQuery whereKey:@"users" equalTo:[AVUser currentUser]];
+        [roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+            if ([objects count] == 0) {
+                //为用户赋予角色
+                [[administrator users] addObject:[AVUser currentUser]];
+                [administrator save];
+            } else {
+                NSLog(@"已经拥有 Moderator 角色了。");
+            }
+        }];
+    } else {
+        // 角色不存在，就新建角色
+        AVRole *administrator =[AVRole roleWithName:@"Administrator"];
+        [[administrator users ] addObject:[AVUser currentUser]];// 赋予角色
+        [administrator saveInBackground];
+    }
+}];
 ```
 ```swift
-    let roleQuery = AVRole.query()
+let roleQuery = LCQuery(className: LCRole.objectClassName())
 
-    roleQuery.whereKey("name", equalTo: "Administrator")
+roleQuery.whereKey("name", .equalTo("Administrator"))
 
-    roleQuery.findObjectsInBackground { (objects, error) in
-        guard let currentUser = AVUser.current() else {
+_ = roleQuery.find { result in
+    switch result {
+    case .success(objects: let objects):
+        guard let currentUser = LCApplication.default.currentUser else {
             return
         }
-
-        if let administrator = objects?.first as? AVRole {
-            roleQuery.whereKey("users", equalTo: currentUser)
-
-            roleQuery.findObjectsInBackground { objects, error in
-                if let _ = objects?.first as? AVRole {
-                    print("Current user is already an administrator.")
-                } else {
-                    administrator.users().add(currentUser)
-                    administrator.save()
+        
+        if let administrator = objects.first as? LCRole {
+            
+            roleQuery.whereKey("users", .equalTo(currentUser))
+            
+            _ = roleQuery.find { result in
+                switch result {
+                case .success(objects: let objects):
+                    if let _ = objects.first as? LCRole {
+                        print("Current user is already an administrator.")
+                    } else {
+                        do {
+                            try administrator.users?.insert(currentUser)
+                            assert(administrator.save().isSuccess)
+                        } catch {
+                            print(error)
+                        }
+                    }
+                case .failure(error: let error):
+                    print(error)
                 }
             }
         } else {
-            let administrator = AVRole(name: "Administrator")
-            administrator.users().add(currentUser)
-            administrator.save()
+            do {
+                let administrator = LCRole(name: "Administrator")
+                try administrator.users?.insert(currentUser)
+                assert(administrator.save().isSuccess)
+            } catch {
+                print(error)
+            }
         }
+    case .failure(error: let error):
+        print(error)
     }
+}
 ```
 ```java
   final AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
@@ -748,46 +789,61 @@ else:
 * 剥夺角色： 首先判断该用户是否已经被赋予该角色，如果未曾赋予则不做修改，如果已被赋予，则从对应的用户（AVUser）的 `roles` 属性当中把该角色删除。 
 
 ```objc
-    AVQuery *roleQuery= [AVRole query];
-    [roleQuery whereKey:@"name" equalTo:@"Moderator"];
-    [roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        // 如果角色存在
-        if ([objects count] > 0) {
-            AVRole *moderatorRole= [objects objectAtIndex:0];
-            [roleQuery whereKey:@"users" equalTo:[AVUser currentUser]];
-            [roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error){
-                // 如果用户确实拥有该角色，那么就剥夺
-                if ([objects count] > 0) {
-                    [[moderatorRole users ]  removeObject:[AVUser currentUser]];
-                    [moderatorRole saveInBackground];
-                }
-            }];
-        }
-    }];
+AVQuery *roleQuery= [AVRole query];
+[roleQuery whereKey:@"name" equalTo:@"Moderator"];
+[roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    // 如果角色存在
+    if ([objects count] > 0) {
+        AVRole *moderatorRole= [objects objectAtIndex:0];
+        [roleQuery whereKey:@"users" equalTo:[AVUser currentUser]];
+        [roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+            // 如果用户确实拥有该角色，那么就剥夺
+            if ([objects count] > 0) {
+                [[moderatorRole users] removeObject:[AVUser currentUser]];
+                [moderatorRole save];
+            }
+        }];
+    }
+}];
 ```
 ```swift
-    let roleQuery = AVRole.query()
+let roleQuery = LCQuery(className: LCUser.objectClassName())
 
-    roleQuery.whereKey("name", equalTo: "Moderator")
+roleQuery.whereKey("name", .equalTo("Moderator"))
 
-    roleQuery.findObjectsInBackground { (objects, error) in
+_ = roleQuery.find { result in
+    switch result {
+    case .success(objects: let objects):
         guard
-            let currentUser = AVUser.current(),
-            let moderatorRole = objects?.first as? AVRole
-        else {
+            let currentUser = LCApplication.default.currentUser,
+            let moderatorRole = objects.first as? LCRole
+            else
+        {
             return
         }
-
-        roleQuery.whereKey("users", equalTo: currentUser)
-
-        roleQuery.findObjectsInBackground { (objects, error) in
-            guard let _ = objects?.first else {
-                return
+        
+        roleQuery.whereKey("users", .equalTo(currentUser))
+        
+        _ = roleQuery.find { result in
+            switch result {
+            case .success(objects: let objects):
+                guard let _ = objects.first else {
+                    return
+                }
+                do {
+                    try moderatorRole.users?.remove(currentUser)
+                    assert(moderatorRole.save().isSuccess)
+                } catch {
+                    print(error)
+                }
+            case .failure(error: let error):
+                print(error)
             }
-            moderatorRole.users().remove(currentUser)
-            moderatorRole.save()
         }
+    case .failure(error: let error):
+        print(error)
     }
+}
 ```
 ```java
   final AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
@@ -875,34 +931,44 @@ else:
 注：`AVRole` 也继承自 `AVObject`，因此熟悉了解 `AVQuery` 的开发者可以熟练的掌握关于角色查询的各种方法。
 
 ```objc
-    // 构建角色的查询，并且查看该角色所对应的用户
-    AVQuery *roleQuery = [AVRole query];
-    [roleQuery whereKey:@"name" equalTo:@"Administrator"];
-    [roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        AVRole *administrator =[objects objectAtIndex:0];
-        AVRelation *userRelation =[administrator users];
-        AVQuery *userQuery = [userRelation query];
-        [userQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-            // objects 就是拥有该角色权限的所有用户了。
-        }];
+// 构建角色的查询，并且查看该角色所对应的用户
+AVQuery *roleQuery = [AVRole query];
+[roleQuery whereKey:@"name" equalTo:@"Administrator"];
+[roleQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    AVRole *administrator =[objects objectAtIndex:0];
+    AVRelation *userRelation =[administrator users];
+    AVQuery *userQuery = [userRelation query];
+    [userQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        // objects 就是拥有该角色权限的所有用户了。
     }];
+}];
 ```
 ```swift
-    let roleQuery = AVRole.query()
+let roleQuery = LCQuery(className: LCRole.objectClassName())
 
-    roleQuery.whereKey("name", equalTo: "Administrator")
+roleQuery.whereKey("name", .equalTo("Administrator"))
 
-    roleQuery.findObjectsInBackground { (roles, error) in
-        guard let administrator = roles?.first as? AVRole else {
+_ = roleQuery.find { result in
+    switch result {
+    case .success(objects: let roles):
+        guard let administrator = roles.first as? LCRole else {
             return
         }
-
-        let userQuery = administrator.users().query()
-
-        userQuery.findObjectsInBackground { (users, error) in
-            // users 就是拥有该角色权限的所有用户了。
+        
+        let userQuery = administrator.users?.query
+        
+        _ = userQuery?.find { result in
+            switch result {
+            case .success(objects: let users):
+                print(users)
+            case .failure(error: let error):
+                print(error)
+            }
         }
+    case .failure(error: let error):
+        print(error)
     }
+}
 ```
 ```java
   AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
@@ -965,29 +1031,35 @@ else:
 查询某一个用户拥有哪些角色：
 
 ```objc
-    // 第一种方式是通过内置的接口
-    [user getRolesInBackgroundWithBlock:^(NSArray<AVRole *> * _Nullable avRoles, NSError * _Nullable error) {
-        // avRoles 就是一个 AVRole 的数组，这些 AVRole 就是当前用户所在拥有的角色
-    }];
-    
-    // 第二种是通过构建 AVQuery
-    AVQuery *roleQuery= [AVRole query];
-    [roleQuery whereKey:@"users" equalTo: user];
-    [roleQuery findObjectsInBackgroundWithBlock:^(NSArray *avRoles, NSError *error) {
-        // avRoles 就是一个 AVRole 的数组，这些 AVRole 就是当前用户所在拥有的角色
-    }];
+AVUser *user = [AVUser currentUser];
+// 第一种方式是通过内置的接口
+[user getRolesInBackgroundWithBlock:^(NSArray<AVRole *> * _Nullable avRoles, NSError * _Nullable error) {
+    // avRoles 就是一个 AVRole 的数组，这些 AVRole 就是当前用户所在拥有的角色
+}];
+
+// 第二种是通过构建 AVQuery
+AVQuery *roleQuery= [AVRole query];
+[roleQuery whereKey:@"users" equalTo:user];
+[roleQuery findObjectsInBackgroundWithBlock:^(NSArray *avRoles, NSError *error) {
+    // avRoles 就是一个 AVRole 的数组，这些 AVRole 就是当前用户所在拥有的角色
+}];
 ```
 ```swift
-    guard let user = LCUser.current() else {
-        return
+if let user = LCApplication.default.currentUser {
+    
+    let roleQuery = LCQuery(className: LCRole.objectClassName())
+    
+    roleQuery.whereKey("users", .equalTo(user))
+    
+    _ = roleQuery.find { result in
+        switch result {
+        case .success(objects: let roles):
+            print(roles)
+        case .failure(error: let error):
+            print(error)
+        }
     }
-
-    let roleQuery = LCRole.query()
-
-    roleQuery.whereKey("users", equalTo: user)
-    roleQuery.findObjectsInBackground { (roles, error) in
-        // roles 是一个 Relation，其中的 LCRole 就是当前用户所在拥有的角色
-    }
+}
 ```
 ```java
   // 第一种方式是通过 AVUser 内置的接口：
@@ -1041,21 +1113,26 @@ role_query_list = role_query.find()  # 返回当前用户的角色列表
 查询哪些用户都被赋予 `Moderator` 角色：
 
 ```objc
-    AVRole *moderatorRole =//根据 id 查询或者根据 name 查询出一个实例
-    AVRelation *userRelation = [moderatorRole users];
-    AVQuery *userQuery = [userRelation query];
-    [userQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        // objects 就是拥有 moderatorRole 角色的所有用户了。
-    }];
+AVRole *moderatorRole; //根据 id 查询或者根据 name 查询出一个实例
+AVRelation *userRelation = [moderatorRole users];
+AVQuery *userQuery = [userRelation query];
+[userQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    // objects 就是拥有 moderatorRole 角色的所有用户了。
+}];
 ```
 ```swift
-    let moderatorRole = <#An AVRole#>   //根据 id 查询或者根据 name 查询出一个实例
-    let userRelation = moderatorRole.users()
-    let userQuery = userRelation.query()
+var moderatorRole: LCRole? //根据 id 查询或者根据 name 查询出一个实例
+let userRelation = moderatorRole?.users
+let userQuery = userRelation?.query
 
-    userQuery.findObjectsInBackground { (objects, error) in
-        // objects 就是拥有 moderatorRole 角色的所有用户了。
+_ = userQuery?.find { result in
+    switch result {
+    case .success(objects: let objects):
+        print(objects)
+    case .failure(error: let error):
+        print(error)
     }
+}
 ```
 ```java
   AVRole moderatorRole= new AVRole("Moderator"); //根据 id 查询或者根据 name 查询出一个实例
@@ -1100,23 +1177,27 @@ user_list = user_relation.query.find()  # 根据 relation 查找所包含的用�
 权限共享很好理解，比如管理员拥有论坛所有板块的管理权限，而版主只拥有单一板块的管理权限，如果开发一个版主使用的新功能，都要同样的为管理员设置该项功能权限，代码就会冗余，因此，我们通俗的理解是：管理员也是版主，只是他是所有板块的版主。因此，管理员在角色从属的关系上是属于版主的，只不过 TA 是特殊的版主。
 
 ```objc
-    AVRole *administratorRole = //从服务端查询出 Administrator 角色实例
-    AVRole *moderatorRole = //从服务端查询出 Moderator 角色实例
-    
-    // 向 moderatorRole 的 roles（AVRelation）中添加 administratorRole
-    [[moderatorRole roles] addObject:administratorRole];
-    
-    [moderatorRole saveInBackground];
-    /**
-     * 以上用同步方法是为了保证在调用 [[moderator roles] addObject:administratorRole] 之前 administratorRole 和 moderator 都已保存在服务端
-     **/
+AVRole *administratorRole; //从服务端查询出 Administrator 角色实例
+AVRole *moderatorRole; //从服务端查询出 Moderator 角色实例
+
+// 向 moderatorRole 的 roles（AVRelation）中添加 administratorRole
+[[moderatorRole roles] addObject:administratorRole];
+
+[moderatorRole saveInBackground];
+/**
+ * 以上用同步方法是为了保证在调用 [[moderator roles] addObject:administratorRole] 之前 administratorRole 和 moderator 都已保存在服务端
+ **/
 ```
 ```swift
-    let administratorRole: AVRole = <#An AVRole#>    // 从服务端查询出 Administrator 角色实例
-    let moderatorRole: AVRole = <#An AVRole#>    //从服务端查询出 Moderator 角色实例
+var administratorRole: LCRole? // 从服务端查询出 Administrator 角色实例
+var moderatorRole: LCRole? //从服务端查询出 Moderator 角色实例
 
-    moderatorRole.roles().add(administratorRole)
-    moderatorRole.save()
+do {
+    try moderatorRole!.roles?.insert(administratorRole!)
+    assert(moderatorRole!.save().isSuccess)
+} catch {
+    print(error)
+}
 ```
 ```java
   AVRole administratorRole = // 从服务端查询 Administrator 实例
@@ -1169,85 +1250,86 @@ moderator_role.save()
 比如，版主 A 是摄影器材板块的版主，而版主 B 是手机平板板块的版主，现在新开放了一个电子数码版块，而需求规定 A 和 B 都同时具备管理电子数码板块的权限，但是 A 不具备管理手机平板版块的权限，反之亦然，那么就需要设置一个电子数码板块的版主角色（中间角色），同时让 A 和 B 拥有该角色即可。
 
 ```objc
-    // 新建 3 个角色实例
-    AVRole *photographicRole = //创建或者从服务端查询出 Photographic 角色实例
-    AVRole *mobileRole = //创建或从服务端查询出 Mobile 角色实例
-    AVRole *digitalRole = //创建或从服务端查询出 Digital 角色实例
-    
-    // photographicRole 和 mobileRole 继承了 digitalRole
-    [[digitalRole roles] addObject:photographicRole];
-    [[digitalRole roles] addObject:mobileRole];
+// 新建 3 个角色实例
+AVRole *photographicRole; //创建或者从服务端查询出 Photographic 角色实例
+AVRole *mobileRole; //创建或从服务端查询出 Mobile 角色实例
+AVRole *digitalRole; //创建或从服务端查询出 Digital 角色实例
 
-    [digitalRole saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-       
-        AVObject *photographicPost= [AVObject objectWithClassName:@"Post"];
-        AVObject *mobilePost = [AVObject objectWithClassName:@"Post"];
-        AVObject *digitalPost = [AVObject objectWithClassName:@"Post"];
-        //.....此处省略一些具体的值设定
-        
-        AVACL *photographicACL = [AVACL ACL];
-        [photographicACL setReadAccess:YES forRole:photographicRole];
-        [photographicACL setPublicReadAccess:YES];
-        [photographicACL setWriteAccess:YES forRole:photographicRole];
-        [photographicPost setACL:photographicACL];
-        
-        AVACL *mobileACL = [AVACL ACL];
-        [mobileACL setReadAccess:YES forRole:mobileRole];
-        [mobileACL setWriteAccess:YES forRole:mobileRole];
-        [mobilePost setACL:mobileACL];
-        
-        AVACL *digitalACL = [AVACL ACL];
-        [digitalACL setReadAccess:YES forRole:digitalRole];
-        [digitalPost setACL:digitalACL];
-        
-        // photographicPost 只有 photographicRole 可以读写
-        // mobilePost 只有 mobileRole 可以读写
-        // 而 photographicRole，mobileRole，digitalRole 均可以对 digitalPost 进行读写
-        [photographicPost saveInBackground];
-        [mobilePost saveInBackground];
-        [digitalPost saveInBackground];
-    }];
+// photographicRole 和 mobileRole 继承了 digitalRole
+[[digitalRole roles] addObject:photographicRole];
+[[digitalRole roles] addObject:mobileRole];
+
+[digitalRole saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    
+    AVObject *photographicPost= [AVObject objectWithClassName:@"Post"];
+    AVObject *mobilePost = [AVObject objectWithClassName:@"Post"];
+    AVObject *digitalPost = [AVObject objectWithClassName:@"Post"];
+    //.....此处省略一些具体的值设定
+    
+    AVACL *photographicACL = [AVACL ACL];
+    [photographicACL setReadAccess:YES forRole:photographicRole];
+    [photographicACL setPublicReadAccess:YES];
+    [photographicACL setWriteAccess:YES forRole:photographicRole];
+    [photographicPost setACL:photographicACL];
+    
+    AVACL *mobileACL = [AVACL ACL];
+    [mobileACL setReadAccess:YES forRole:mobileRole];
+    [mobileACL setWriteAccess:YES forRole:mobileRole];
+    [mobilePost setACL:mobileACL];
+    
+    AVACL *digitalACL = [AVACL ACL];
+    [digitalACL setReadAccess:YES forRole:digitalRole];
+    [digitalPost setACL:digitalACL];
+    
+    // photographicPost 只有 photographicRole 可以读写
+    // mobilePost 只有 mobileRole 可以读写
+    // 而 photographicRole，mobileRole，digitalRole 均可以对 digitalPost 进行读写
+    [photographicPost save];
+    [mobilePost save];
+    [digitalPost save];
+}];
 ```
 ```swift
-    let photographicRole: AVRole = <#An Role#>
-    let mobileRole: AVRole = <#An Role#>
-    let digitalRole: AVRole = <#An Role#>
-
-    digitalRole.roles().add(photographicRole)
-    digitalRole.roles().add(mobileRole)
-
-    digitalRole.saveInBackground { (succeeded, error) in
-        guard succeeded else {
-            return
+do {
+    var photographicRole: LCRole? //创建或者从服务端查询出 Photographic 角色实例
+    var mobileRole: LCRole? //创建或从服务端查询出 Mobile 角色实例
+    var digitalRole: LCRole? //创建或从服务端查询出 Digital 角色实例
+    
+    try digitalRole!.roles?.insert(photographicRole!)
+    try digitalRole!.roles?.insert(mobileRole!)
+    
+    _ = digitalRole!.save { result in
+        switch result {
+        case .success:
+            let photographicPost = LCObject(className: "Post")
+            let photographicACL = LCACL()
+            
+            photographicACL.setAccess([.read], allowed: true)
+            photographicACL.setAccess([.write], allowed: true, forRoleName: photographicRole!.name!.value)
+            photographicPost.ACL = photographicACL
+            
+            let mobilePost = LCObject(className: "Post")
+            let mobileACL = LCACL()
+            
+            mobileACL.setAccess([.read], allowed: true)
+            mobileACL.setAccess([.write], allowed: true, forRoleName: mobileRole!.name!.value)
+            mobilePost.ACL = mobileACL
+            
+            let digitalPost = LCObject(className: "Post")
+            let digitalACL = LCACL()
+            
+            digitalACL.setAccess([.read], allowed: true)
+            digitalACL.setAccess([.write], allowed: true, forRoleName: digitalRole!.name!.value)
+            digitalPost.ACL = digitalACL
+            
+            assert(LCObject.save([photographicPost, mobilePost, digitalPost]).isSuccess)
+        case .failure(error: let error):
+            print(error)
         }
-
-        let photographicPost = AVObject(className: "Post")
-        let photographicACL = AVACL()
-
-        photographicACL.setPublicReadAccess(true)
-        photographicACL.setWriteAccess(true, for: photographicRole)
-        photographicPost.acl = photographicACL
-
-        let mobilePost = AVObject(className: "Post")
-        let mobileACL = AVACL()
-
-        mobileACL.setPublicReadAccess(true)
-        mobileACL.setWriteAccess(true, for: mobileRole)
-        mobilePost.acl = mobileACL
-
-        let digitalPost = AVObject(className: "Post")
-        let digitalACL = AVACL()
-
-        digitalACL.setPublicReadAccess(true)
-        digitalACL.setWriteAccess(true, for: digitalRole)
-        digitalPost.acl = digitalACL
-
-        AVObject.saveAll([
-            photographicPost,
-            mobilePost,
-            digitalPost]
-        )
     }
+} catch {
+    print(error)
+}
 ```
 ```java
     // 新建 3个角色实例
@@ -1484,15 +1566,11 @@ update | 保存一个已经存在并且被修改的对象
 AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 query.includeACL = YES;
 [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        
+    
 }];
 ```
 ```swift
-    let query = AVQuery(className: "Todo")
-
-    query.includeACL = true
-    query.findObjectsInBackground { (objects, error) in
-    }
+// 暂不支持
 ```
 ```java
 AVQuery<AVObject> query = new AVQuery<>("Todo");
