@@ -58,6 +58,17 @@ Cloud::define("averageStars", function($params, $user) {
     }
 });
 ```
+
+PHP SDK 提供了 `Cloud::start` 函数，可以方便快捷地初始化云函数服务。
+例如，一个专门提供云函数服务的云引擎项目的 `index.php`：
+
+```php
+<?php
+use \LeanCloud\Engine\Cloud;
+require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../src/cloud.php'; // 其中包含云函数定义
+Cloud::start();
+```
 {% endblock %}
 
 {% block cloudFuncTimeout %}
