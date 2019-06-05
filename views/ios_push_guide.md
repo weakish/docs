@@ -26,6 +26,33 @@
 
 在保存 installation 前，要先从 APNs 注册推送所需的 device token，具体步骤：
 
+```swift
+import UserNotifications
+
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    
+    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+        switch settings.authorizationStatus {
+        case .authorized:
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        case .notDetermined:
+            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { (granted, error) in
+                if granted {
+                    DispatchQueue.main.async {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
+                }
+            }
+        default:
+            break
+        }
+    }
+    
+    return true
+}
+```
 ```objc
 #import <UserNotifications/UserNotifications.h>
 
@@ -93,7 +120,22 @@
 
 在 iOS 设备中，Installation 的类是 AVInstallation，并且是 AVObject 的子类，使用同样的 API 存储和查询。如果要访问当前应用的 Installation 对象，可以通过 `[AVInstallation currentInstallation]` 方法。当你第一次保存 AVInstallation 的时候，它会插入 `_Installation` 表，你可以在 {% if node=='qcloud' %}**控制台 > 存储 > 数据 > `_Installation`**{% else %}[控制台 > 存储 > 数据 > `_Installation`](/dashboard/data.html?appid={{appid}}#/_Installation){% endif %} 查看和查询。当 deviceToken 一被保存，你就可以向这台设备推送消息了。
 
-
+```swift
+func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    LCApplication.default.currentInstallation.set(
+        deviceToken: deviceToken,
+        apnsTeamId: "YOUR_APNS_TEAM_ID"
+    )
+    _ = LCApplication.default.currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+}
+```
 ```objc
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     AVInstallation *currentInstallation = [AVInstallation currentInstallation];
@@ -120,6 +162,23 @@ deviceProfile|设备对应的后台自定义证书名称，用于多证书推送
 
 同样，SDK 提供了相应的方法，用于在保存 installation 前构造它。例如，如果希望自定义 deviceProfile 字段，可以这样实现：
 
+```swift
+func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    LCApplication.default.currentInstallation.set(
+        deviceToken: deviceToken,
+        apnsTeamId: "YOUR_APNS_TEAM_ID"
+    )
+    LCApplication.default.currentInstallation.deviceProfile = "driver-push-certificate"
+    _ = LCApplication.default.currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+}
+```
 ```objc
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     [AVOSCloud handleRemoteNotificationsWithDeviceToken:deviceToken constructingInstallationWithBlock:^(AVInstallation *currentInstallation) {
@@ -142,6 +201,21 @@ deviceProfile|设备对应的后台自定义证书名称，用于多证书推送
 
 订阅 Giants 频道：
 
+```swift
+do {
+    try LCApplication.default.currentInstallation.append("channels", element: "Giants", unique: true)
+    _ = LCApplication.default.currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 // 当用户表示喜欢 Giants，则为其订阅该频道。
 AVInstallation *currentInstallation = [AVInstallation currentInstallation];
@@ -153,6 +227,21 @@ AVInstallation *currentInstallation = [AVInstallation currentInstallation];
 
 退订：
 
+```swift
+do {
+    try LCApplication.default.currentInstallation.remove("channels", element: "Giants")
+    _ = LCApplication.default.currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 AVInstallation *currentInstallation = [AVInstallation currentInstallation];
 [currentInstallation removeObject:@"Giants" forKey:@"channels"];
@@ -161,6 +250,9 @@ AVInstallation *currentInstallation = [AVInstallation currentInstallation];
 
 获取所有订阅的频道：
 
+```swift
+let subscribedChannels: LCArray? = LCApplication.default.currentInstallation.channels
+```
 ```objc
 NSArray *subscribedChannels = [AVInstallation currentInstallation].channels;
 ```
@@ -169,6 +261,9 @@ NSArray *subscribedChannels = [AVInstallation currentInstallation].channels;
 
 发送消息到刚才订阅的「Giants」频道：
 
+```swift
+// 暂不支持
+```
 ```objc
 // Send a notification to all devices subscribed to the "Giants" channel.
 AVPush *push = [[AVPush alloc] init];
@@ -179,6 +274,9 @@ AVPush *push = [[AVPush alloc] init];
 
 如果你想发送到多个频道，可以指定 channels 数组：
 
+```swift
+// 暂不支持
+```
 ```objc
 NSArray *channels = [NSArray arrayWithObjects:@"Giants", @"Mets", nil];
 AVPush *push = [[AVPush alloc] init];
@@ -193,10 +291,12 @@ AVPush *push = [[AVPush alloc] init];
 
 默认情况下，从客户端发起的推送都是使用你在消息菜单上传的生产证书，如果想使用开发证书，可以通过 `setProductionMode` 方法：
 
+```swift
+// 暂不支持
 ```
+```objc
 [AVPush setProductionMode:false];
 [AVPush.push sendPushInBackground];
-
 ```
 
 <div class="callout callout-info">为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，并在 **[控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list)** 页面中体现。因此，在使用开发证书推送时，请合理设置推送条件。</div>
@@ -212,6 +312,26 @@ AVPush *push = [[AVPush alloc] init];
 
 为 AVInstallation 添加三个新字段：
 
+```swift
+do {
+    let currentInstallation = LCApplication.default.currentInstallation
+    
+    try currentInstallation.set("scores", value: true)
+    try currentInstallation.set("gameResults", value: true)
+    try currentInstallation.set("injuryReports", value: true)
+        
+    _ = currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 // Store app language and version
 AVInstallation *installation = [AVInstallation currentInstallation];
@@ -225,6 +345,26 @@ AVInstallation *installation = [AVInstallation currentInstallation];
 
 你可以给 Installation 添加 owner 属性，比如当前的登录用户：
 
+```swift
+do {
+    let currentInstallation = LCApplication.default.currentInstallation
+    
+    if let currentUser = LCApplication.default.currentUser {
+        try currentInstallation.set("owner", value: currentUser)
+    }
+        
+    _ = currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
 ```objc
 // Saving the device's owner
 AVInstallation *installation = [AVInstallation currentInstallation];
@@ -237,6 +377,9 @@ AVInstallation *installation = [AVInstallation currentInstallation];
 一旦 Installation 保存了你的应用数据，你可以使用 AVQuery 来查询出设备的一个子集做推送。Installation 的查询跟其他对象的查询没有什么不同，只是使用特殊的静态方法
  `[AVInstallation query]` 创建查询对象：
 
+```swift
+// 暂不支持
+```
 ```objc
 // Create our Installation query
 AVQuery *pushQuery = [AVInstallation query];
@@ -251,6 +394,9 @@ AVPush *push = [[AVPush alloc] init];
 
 你也可以在查询中添加 channels 的条件：
 
+```swift
+// 暂不支持
+```
 ```objc
 // Create our Installation query
 AVQuery *pushQuery = [AVInstallation query];
@@ -303,6 +449,9 @@ AVPush *push = [[AVPush alloc] init];
 
 递增 badge 数字并播放声音：
 
+```swift
+// 暂不支持
+```
 ```objc
 NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
     @"The Mets scored! The game is now tied 1-1!", @"alert",
@@ -317,6 +466,9 @@ AVPush *push = [[AVPush alloc] init];
 
 当然，你还可以添加其他自定义的数据。你会在接收推送一节看到，当应用通过推送打开你的应用的时候，你就可以访问这些数据。当你要在用户打开通知的时候显示一个不同的 view controller 的时候，这特别有用。
 
+```swift
+// 暂不支持
+```
 ```objc
 NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
     @"Ricky Vaughn was injured in last night's game!", @"alert",
@@ -337,6 +489,9 @@ AVPush *push = [[AVPush alloc] init];
 
 AVPush 提供了两个方法来设置通知的过期日期，首先是 `expireAtDate:` 接收 NSDate 来告诉 LeanCloud 不要再去发送通知。
 
+```swift
+// 暂不支持
+```
 ```objc
 NSDateComponents *comps = [[NSDateComponents alloc] init];
 [comps setYear:2013];
@@ -356,6 +511,9 @@ AVPush *push = [[AVPush alloc] init];
 
 这个方法有个隐患，因为设备的时钟是无法保证精确的，你可能得到错误的结果。因此，AVPush 还提供了 `expireAfterTimeInterval` 方法，接收 NSTimeInterval 对象。通知将在指定间隔时间后失效：
 
+```swift
+// 暂不支持
+```
 ```objc
 // Create time interval
 NSTimeInterval interval = 60*60*24*7; // 1 week
@@ -374,6 +532,9 @@ AVPush *push = [[AVPush alloc] init];
 
 跨平台的应用，可能想指定发送的平台，比如 iOS 或者 Android:
 
+```swift
+// 暂不支持
+```
 ```objc
 AVQuery *query = [AVInstallation query];
 [query whereKey:@"channels" equalTo:@"suitcaseOwners"];
@@ -405,6 +566,9 @@ AVPush *iOSPush = [[AVPush alloc] init];
 
 由于 Apple 的对消息大小的限制，请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/APNsProviderAPI.html#//apple_ref/doc/uid/TP40008194-CH101-SW1)。
 
+```swift
+// 暂不支持
+```
 ```objc
 NSDictionary *data = @{
   @"alert": @"James commented on your photo!",
@@ -420,6 +584,16 @@ AVPush *push = [[AVPush alloc] init];
 
 当应用是被通知打开的时候，你可以通过 `application:didFinishLaunchingWithOptions:`方法的 `launchOptions` 参数所使用的 dictionary 访问到数据：
 
+```swift
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    
+    if let notification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+        print(notification)
+    }
+    
+    return true
+}
+```
 ```objc
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     . . .
@@ -448,6 +622,11 @@ AVPush *push = [[AVPush alloc] init];
 
 如果当通知到达的时候，你的应用已经在运行，对于 iOS10 以下，你可以通过 `application:didReceiveRemoteNotification:fetchCompletionHandler:` 方法的 `userInfo` 参数所使用 dictionary 访问到数据：
 
+```swift
+func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    // handle notification
+}
+```
 ```objc
 /*!
  * Required for iOS 7+
@@ -477,7 +656,16 @@ AVPush *push = [[AVPush alloc] init];
 
 iOS10 以上需要使用下面代理方法来获得 `userInfo` ：
 
- ```objc
+```swift
+func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    // handle notification
+}
+
+func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    // handle notification
+}
+```
+```objc
 /**
  * Required for iOS10+
  * 在前台收到推送内容, 执行的方法
@@ -508,7 +696,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     }
     completionHandler();
 }
- ```
+```
 
 你可以阅读 [Apple 本地化和推送的文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40008194-CH1-SW1) 来更多地了解推送通知。
 
