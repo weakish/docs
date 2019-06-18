@@ -1441,7 +1441,7 @@ fetchAllInBackground()
 {% block code_query_user %}
 
 ```java
-        AVQuery<AVUser> userQuery = new AVQuery<>("_User");
+        AVQuery<AVUser> userQuery = AVUser.getQuery();
 ```
 
 通过 objectId 查询用户时，若 objectId 不存在，会抛出异常 `AVException: Could not find user.` 

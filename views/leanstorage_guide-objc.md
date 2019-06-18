@@ -1394,7 +1394,7 @@ AVQuery *query = [AVQuery andQueryWithSubqueries:[NSArray arrayWithObjects:start
 {% block code_query_user %}
 
 ```objc
-  AVQuery *userQuery = [AVQuery queryWithClassName:@"_User"];
+  AVQuery *userQuery = [AVUser query];
 ```
 {% endblock %}
 
