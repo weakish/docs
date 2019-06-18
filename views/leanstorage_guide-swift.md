@@ -198,7 +198,7 @@ do {
 
 ```swift
 let query = LCQuery(className: "Todo")
-_ = query.get("OBJECT_ID") { (result) in
+_ = query.get("558e20cbe4b060308e3eb36c") { (result) in
     switch result {
     case .success(object: let object):
         if let title = object.get("title")?.stringValue {
@@ -728,7 +728,7 @@ do {
 let lcDictionary: LCDictionary = ["number": LCNumber(1), "string": LCString("abd")]
 ```
 
-注意：当使用数组字面量构造 `LCDictionary` 对象时，字典字面量的 value 类型必须是 `LCType`。
+注意：当使用字典字面量构造 `LCDictionary` 对象时，字典字面量的 value 类型必须是 `LCType`。
 
 #### LCDate
 `LCDate` 是 `NSDate` 类型的封装，它与 `NSDate` 相互转化的代码如下：
@@ -826,7 +826,7 @@ if let fileURL = Bundle.main.url(forResource: "LeanCloud", withExtension: "png")
 {% block code_file_image_thumbnail %}
 
 ```swift
-// Swift SDK not support
+// 暂不支持
 ```
 
 {% endblock %}
