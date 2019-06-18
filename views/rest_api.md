@@ -470,7 +470,8 @@ Postman 可直接导入 curl 命令。
 
 对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP header 的 Content-Type 需要设置为 `application/json`。
 
-用户验证通过 HTTP header 来进行，**X-LC-Id** 标明正在运行的是哪个应用，**X-LC-Key** 用来授权鉴定 endpoint：
+用户验证通过 HTTP header 来进行，**X-LC-Id** 标明正在运行的是哪个应用（应用的 App ID），
+**X-LC-Key** 用来授权鉴定 endpoint：
 
 ```
 curl -X PUT \
@@ -479,6 +480,14 @@ curl -X PUT \
   -H "Content-Type: application/json" \
   -d '{"content": "更新一篇博客的内容"}' \
   https://{{host}}/1.1/classes/Post/<objectId>
+```
+
+**X-LC-Key** 通常情况下是应用的 App Key，
+有些情况（需要超级权限的操作）下是应用的 Master Key。
+当 **X-LC-Key** 值为 Master Key 时，需要在其后添加 `,master` 后缀以示区分，例如：
+
+```
+X-LC-Key: {{masterkey}},master
 ```
 
 对于 JavaScript 使用，LeanCloud 支持跨域资源共享，所以你可以将这些 header 同 XMLHttpRequest 一同使用。
