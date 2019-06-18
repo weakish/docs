@@ -527,25 +527,6 @@ typedef NS_ENUM(NSInteger, YourCustomMessageType) {
     ```
 {% endblock %}
 
-{% block message_unread_message_count %}
-要开启未读消息，需要在 AVOSCloud 初始化语句后面加上：
-
-```objc
-[AVIMClient setUnreadNotificationEnabled:YES];
-```
-
-然后使用代理方法 `conversation:didUpdateForKey:` 来观察对话的 `unreadMessagesCount` 属性：
-
-```objc
-- (void)conversation:(AVIMConversation *)conversation didUpdateForKey:(NSString *)key {
-    if ([key isEqualToString:@"unreadMessagesCount"]) {
-        NSUInteger unreadMessagesCount = conversation.unreadMessagesCount;
-        /* 有未读消息产生，请更新 UI，或者拉取对话。 */
-    }
-}
-```
-{% endblock %}
-
 {% block message_Relation_intro %}
 ![message type diagram](images/message_type_diagram.png)
 {% endblock %}

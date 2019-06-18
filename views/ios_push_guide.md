@@ -699,7 +699,3 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 ```
 
 你可以阅读 [Apple 本地化和推送的文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40008194-CH1-SW1) 来更多地了解推送通知。
-
-## 离线消息重复推送
-
-请参考 [为什么在 iOS 上离线消息重复推送了两次？](realtime_guide-objc.html#duplicate-offline-message-notification)
