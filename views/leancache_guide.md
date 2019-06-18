@@ -84,7 +84,7 @@ LeanCache 不提供外网直接访问。如果需要进行简单的数据操作�
 ``` json
 "dependencies": {
   ...
-  "redis": "2.2.x",
+  "ioredis": "^4.9.0",
   ...
 }
 ```
@@ -92,10 +92,11 @@ LeanCache 不提供外网直接访问。如果需要进行简单的数据操作�
 然后可以使用下列代码获取 Redis 连接：
 
 ``` javascript
-var client = require('redis').createClient(process.env['REDIS_URL_<实例名称>']);
-// 建议增加 client 的 on error 事件处理，否则可能因为网络波动或 redis server 主从切换等原因造成短暂不可用导致应用进程退出。
+const Redis = require('ioredis')
+
+const client = new Redis(process.env['REDIS_URL_<实例名称>']);
 client.on('error', function(err) {
-  return console.error('redis err: %s', err);
+  return console.error('redis err: ', err);
 });
 ```
 
@@ -212,7 +213,7 @@ var bar = db.StringGet("foo");
 
 ```javascript
 // 在本地 process.env['REDIS_URL_<实例名称>'] 为 undefined，会连接默认的 127.0.0.1:6379
-var client = require('redis').createClient(process.env['REDIS_URL_<实例名称>']);
+const client = new Redis(process.env['REDIS_URL_<实例名称>']);
 ```
 
 如果部署到预备或生产环境时遇到类似 `redis err: Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379` 错误，请核实以上代码中 `REDIS_URL_<实例名称>` 这个环境变量的值是否替换正确，也可参考 [在云引擎中使用（Node.js 环境）](#在云引擎中使用_Node_js_环境_) 的示例。
