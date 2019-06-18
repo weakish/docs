@@ -164,7 +164,7 @@ import AV from 'leancloud-storage/dist/av-weapp.js'
 
 {{ docs.note("CocosCreator 项目默认没有 `package.json` 文件，可以在安装 SDK 前通过 `npm init -y` 命令创建。") }}
 
-如果你的 CocosCreator 项目需要发布为微信小程序，需要在构建发布到小程序之前修改 SDK 的引用路径：
+如果你的 CocosCreator 项目需要发布为微信小游戏，需要在构建发布到小游戏之前修改 SDK 的引用路径：
 
 ```diff
   // 存储服务 SDK  路径变更为
@@ -180,63 +180,34 @@ import AV from 'leancloud-storage/dist/av-weapp.js'
 + var { Realtime } = require('leancloud-realtime/dist/realtime.weapp.js');
 ```
 
-请注意，此改动会导致其他平台的产出（包括浏览器与模拟器的预览功能）不能正常工作，因此应该只在构建发布到小程序之前临时修改，并在发布之后修改回来。
+请注意，此改动会导致其他平台的产出（包括浏览器与模拟器的预览功能）不能正常工作，因此应该只在构建发布到小游戏之前临时修改，并在发布之后修改回来。
 
-在改动之后，CocosCreator 的控制台可能会出现 load script error，但不影响构建发布小程序，并且构建产出在小程序开发工具中运行也不会有异常。
+在改动之后，CocosCreator 的控制台可能会出现 load script error，但不影响构建发布小游戏，并且构建产出在小游戏开发工具中运行也不会有异常。
 
 ### LayaAir
 
-<a id="layaair" name="layaair"></a>根据你创建的项目类型与需要使用的服务，下载对应的 SDK 文件，移动到 `bin/libs/` 目录：
+<a id="layaair" name="layaair"></a>LayaAir 支持直接通过 npm 安装与引用 SDK，具体操作步骤请参考 [npm](#npm)。
 
-||小程序项目|普通项目|
-|--|:--:|:--:|
-|存储服务|[leancloud-storage-weapp.min.js][]|[leancloud-storage.min.js][]|
-|存储服务（LiveQuery）|[leancloud-storage-live-query-weapp.min.js][]|[leancloud-storage-live-query.min.js][]|
-|即时通讯服务|[leancloud-realtime-weapp.min.js][]|[leancloud-realtime.min.js][]|
+{{ docs.note("LayaAir 项目默认没有 `package.json` 文件，可以在安装 SDK 前通过 `npm init -y` 命令创建。") }}
 
-[leancloud-storage-weapp.min.js]: https://cdn.jsdelivr.net/combine/gh/leancloud/laya-weapp-module-wrapper@0.1.1/start.js,npm/leancloud-storage@{{jssdkversion}}/dist/av-weapp-min.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/end.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/_/leancloud-storage-weapp.min.js
-[leancloud-storage.min.js]: https://cdn.jsdelivr.net/combine/gh/leancloud/laya-weapp-module-wrapper@0.1.1/start.js,npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/end.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/_/leancloud-storage.min.js
-[leancloud-storage-live-query-weapp.min.js]: https://cdn.jsdelivr.net/combine/gh/leancloud/laya-weapp-module-wrapper@0.1.1/start.js,npm/leancloud-storage@{{jssdkversion}}/dist/av-live-query-weapp-min.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/end.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/_/leancloud-storage-live-query-weapp.min.js
-[leancloud-storage-live-query.min.js]: https://cdn.jsdelivr.net/combine/gh/leancloud/laya-weapp-module-wrapper@0.1.1/start.js,npm/leancloud-storage@{{jssdkversion}}/dist/av-live-query-min.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/end.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/_/leancloud-storage-live-query.min.js
-[leancloud-realtime-weapp.min.js]: https://cdn.jsdelivr.net/combine/gh/leancloud/laya-weapp-module-wrapper@0.1.1/start.js,npm/leancloud-realtime@{{jsimsdkversion}}/dist/realtime.weapp.min.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/end.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/_/leancloud-realtime-weapp.min.js
-[leancloud-realtime.min.js]: https://cdn.jsdelivr.net/combine/gh/leancloud/laya-weapp-module-wrapper@0.1.1/start.js,npm/leancloud-realtime@{{jsimsdkversion}}/dist/realtime.browser.min.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/end.js,gh/leancloud/laya-weapp-module-wrapper@0.1.1/_/leancloud-realtime.min.js
 
-在 `bin/index.html` 中项目「IDE 生成的 UI 文件」之前引入刚下载的 SDK 文件：
+如果你的 LayaAir 项目需要发布为微信小游戏，需要在构建发布到小游戏之前修改 SDK 的引用路径：
 
 ```diff
-	<!--提供了制作 UI 的各种组件实现-->
-    <script type="text/javascript" src="libs/laya.ui.js"></script>
-	<!--用户自定义顺序文件添加到这里-->
-	<!--jsfile--Custom-->
-+  	<!--LeanCloud 存储 SDK-->
-+  	<script src="libs/leancloud-storage-live-query-weapp.min.js"></script>
-+  	<!--LeanCloud 即时通讯 SDK-->
-+  	<script src="libs/leancloud-realtime-weapp.min.js"></script>
-	<!--jsfile--Custom-->
-	<!--IDE 生成的 UI 文件-->
-	<script src="../src/ui/layaUI.max.all.js"></script>
+  // 存储服务 SDK  路径变更为
+- import AV from 'leancloud-storage';
++ import AV from 'leancloud-storage/dist/av-weapp-min.js';
+  
+  // 带 LiveQuery 功能的存储 SDK 路径变更为
+- import AV from 'leancloud-storage/live-query';
++ import AV from 'leancloud-storage/dist/av-live-query-weapp-min.js';
+
+  // 即时通讯服务 SDK 路径变更为
+- import { Realtime } from 'leancloud-realtime';
++ import { Realtime } from 'leancloud-realtime/dist/realtime.weapp.js';
 ```
 
-{{ docs.note("小程序项目与普通项目使用的 SDK 是不一样的，建议小程序项目在使用浏览器进行调试时切换到普通项目 SDK。") }}
-
-此时在 `src` 目录下的代码中即可通过全局变量 `AV` 获得 SDK 的引用：
-
-```js
-// 存储服务
-var { Query, User } = AV;
-AV.init("{{appid}}", "{{appkey}}");
-// 即时通讯服务
-var { Realtime, TextMessage } = AV;
-```
-
-如果你创建的是 TypeScript 项目，或者希望得到 IDE 的自动提示能力，还需要下载 TypeScript 定义文件移动至 `libs` 目录。
-
-- 存储服务：[storage.d.ts](https://cdn.jsdelivr.net/npm/leancloud-storage@3.7.2/storage.d.ts)
-- 即时通讯服务：[realtime.d.ts](https://cdn.jsdelivr.net/gh/leancloud/js-realtime-sdk@ea3b7087809a9d76c237f9cf4548e06a94e2c33d/realtime.d.ts)
-
-{{ docs.note("如果同时使用两个 SDK，因为 namespace 冲突的问题，需要下载 [leancloud-all.d.ts](https://cdn.jsdelivr.net/combine/npm/leancloud-storage@3.7.2/storage.d.ts,gh/leancloud/js-realtime-sdk@ea3b7087809a9d76c237f9cf4548e06a94e2c33d/realtime.d.ts)，然后手动删除最后一行 `export as namespace AV;`。") }}
-
-你可以在 [这个示例项目](https://github.com/leancloud/laya-sdk-setup-sample/commit/533194407f127d412d4fa7e6c049ebe55bac4cbc) 中看到完整的改动。
+请注意，此改动会导致其他平台的产出（包括浏览器与模拟器的预览功能）不能正常工作，因此应该只在构建发布到小游戏之前临时修改，并在发布之后修改回来。
 
 
 ### Egret（白鹭引擎）
