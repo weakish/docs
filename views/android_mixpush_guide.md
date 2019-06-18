@@ -609,7 +609,7 @@ dependencies {
 
 ### 配置控制台（设置 FCM 的 ProjectId 及 私钥文件）
 
-在 [Firebase 控制台](https://console.firebase.google.com/) > **应用** > **云消息传递** > **网络推送证书** 可以获得服务端发送推送请求的私钥文件。将此 文件 及 ProjectId 通过 [LeanCloud 控制台][leancloud-console] > **消息** > **推送** > **设置** > **混合推送**，与 LeanCloud 应用关联。
+在 [Firebase 控制台](https://console.firebase.google.com/) > **项目设置** > **服务账号** > **Firebase Admin SDK** > **生成新的秘钥** 可以获得服务端发送推送请求的私钥文件。将此 文件 及 ProjectId 通过 [LeanCloud 控制台][leancloud-console] > **消息** > **推送** > **设置** > **混合推送**，与 LeanCloud 应用关联。
 
 
 ## 取消混合推送注册
