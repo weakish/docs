@@ -1426,7 +1426,7 @@ AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile", deviceId
 ```js
 var { Event } = require('leancloud-realtime');
 tom.on(Event.CONFLICT, function() {
-  // 弹出提示，告知当前用户的 clientId 在其他设备上登陆了
+  // 弹出提示，告知当前用户的 clientId 在其他设备上登录了
 });
 ```
 ```swift
@@ -1434,7 +1434,7 @@ func client(_ client: IMClient, event: IMClientEvent) {
     switch event {
     case .sessionDidClose(error: let error):
         if error.code == 4111 {
-            // 弹出提示，告知当前用户的 clientId 在其他设备上登陆了
+            // 弹出提示，告知当前用户的 clientId 在其他设备上登录了
         }
     default:
         break
@@ -1444,7 +1444,7 @@ func client(_ client: IMClient, event: IMClientEvent) {
 ```objc
 -(void)client:(AVIMClient *)client didOfflineWithError:(NSError *)error{
     if ([error code]  == 4111) {
-        // 适当的弹出友好提示，告知当前用户的 clientId 在其他设备上登陆了
+        // 适当的弹出友好提示，告知当前用户的 clientId 在其他设备上登录了
     }
 };
 ```
@@ -1460,7 +1460,7 @@ public class AVImClientManager extends AVIMClientEventHandler {
   @Override
   public void onClientOffline(AVIMClient avimClient, int i) {
     if(i == 4111){
-      // 适当地弹出友好提示，告知当前用户的 clientId 在其他设备上登陆了
+      // 适当地弹出友好提示，告知当前用户的 clientId 在其他设备上登录了
     }
   }
 }

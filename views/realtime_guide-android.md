@@ -2470,7 +2470,7 @@ public class AVImClientManager extends AVIMClientEventHandler {
   @Override
   public void onClientOffline(AVIMClient avimClient, int i) {
     if(i == 4111){
-      // 适当地弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
+      // 适当地弹出友好提示，告知当前用户的 Client Id 在其他设备上登录了
     }
   }
   ...
@@ -2489,7 +2489,7 @@ open(AVIMClientOpenOption operation, final AVIMClientCallback callback){}
 public void setForceSingleLogin(boolean forceSingleLogin) {}
 ```
 
-登录动作区分成两种不同的类型，强制登录和非强制登录。`forceSingleLogin` 选项设置登录是否为强制登陆。
+登录动作区分成两种不同的类型，强制登录和非强制登录。`forceSingleLogin` 选项设置登录是否为强制登录。
 
 - **强制登录**：无论当前设备是否曾被其他设备踢下线，都强制登录。
 - **非强制登录**：如果当前设备曾被其他设备踢下线，则登录时返回错误。

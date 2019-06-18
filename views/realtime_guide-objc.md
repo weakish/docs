@@ -1947,7 +1947,7 @@ AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mo
 ```objc
 -(void)client:(AVIMClient *)client didOfflineWithError:(NSError *)error{
     if ([error code]  == 4111) {
-        //适当的弹出友好提示，告知当前用户的 Client Id 在其他设备上登陆了
+        //适当的弹出友好提示，告知当前用户的 Client Id 在其他设备上登录了
     }
 };
 ```

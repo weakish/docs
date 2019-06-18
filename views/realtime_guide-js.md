@@ -1749,7 +1749,7 @@ realtime.createIMClient('Tom', { tag: 'Web' }).then(function(tom) {
 ```javascript
 var { Event } = require('leancloud-realtime');
 tom.on(Event.CONFLICT, function() {
-  // 弹出提示，告知当前用户的 Client Id 在其他设备上登陆了
+  // 弹出提示，告知当前用户的 Client Id 在其他设备上登录了
 });
 ```
 
