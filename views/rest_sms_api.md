@@ -245,8 +245,8 @@ curl -X POST \
 
 ```sh
 curl -X POST \
-  -H "X-LC-Id: xxxx" \
-  -H "X-LC-Key: xxxx" \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -d '{"mobilePhoneNumber":"186xxxxxxxx","smsCode":"123456", "password": "密码"}' \
   https://{{host}}/1.1/usersByMobilePhone

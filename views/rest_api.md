@@ -475,8 +475,8 @@ Postman 可直接导入 curl 命令。
 
 ```
 curl -X PUT \
-  -H "X-LC-Id: FFnN2hso42Wego3pWq4X5qlu" \
-  -H "X-LC-Key: UtOCzqb67d3sN12Kts4URwy8" \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -d '{"content": "更新一篇博客的内容"}' \
   https://{{host}}/1.1/classes/Post/<objectId>
@@ -498,7 +498,7 @@ X-LC-Key: {{masterkey}},master
 
 ```
 curl -X PUT \
-  -H "X-LC-Id: FFnN2hso42Wego3pWq4X5qlu" \
+  -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Sign: d5bcbb897e19b2f6633c716dfdfaf9be,1453014943466" \
   -H "Content-Type: application/json" \
   -d '{"content": "在 HTTP header 中使用 X-LC-Sign 来更新一篇博客的内容"}' \
