@@ -463,7 +463,7 @@ realtime.createIMClient('Jerry').then(function(jerry) {
 ```
 ```swift
 do {
-    let jerry = try IMClient(ID: "jerry")
+    let jerry = try IMClient(ID: "Jerry")
     jerry.open { (result) in
         switch result {
         case .success:
@@ -1349,7 +1349,7 @@ LeanCloud 即时通讯服务默认支持文本、文件、图像、音频、视�
 | --- | --- | --- |
 | `content`                  | `IMMessage.Content`    | 消息内容，支持 `String` 和 `Data` 两种格式。 |
 | `fromClientID`             | `String`               | 消息发送者的 `client ID`。 |
-| `currentClientID`          | `String`               | 消息接受者的 `client ID`。 |
+| `currentClientID`          | `String`               | 消息接收者的 `client ID`。 |
 | `conversationID`           | `String`               | 消息所属对话的 `conversation ID`。 |
 | `ID`                       | `String`               | 消息发送成功之后，由 LeanCloud 云端给每条消息赋予的唯一 `message ID`。 |
 | `sentTimestamp`            | `int64_t`              | 消息发送的时间。消息发送成功之后，由 LeanCloud 云端赋予的全局的时间戳。 |
@@ -1360,7 +1360,7 @@ LeanCloud 即时通讯服务默认支持文本、文件、图像、音频、视�
 | `mentionedMembers`         | `[String]`             | @ 会话成员。 |
 | `isCurrentClientMentioned` | `Bool`                 | 当前 `Client` 是否被 @。 |
 | `status`                   | `IMMessage.Status`     | 消息状态，有 6 种取值：<br/><br/>`none`（无状态）<br/>`sending`（发送中）<br/>`sent`（发送成功）<br/>`delivered`（已被接收）<br/>`read`（已被读）<br/>`failed`（发送失败） |
-| `ioType`                   | `IMMessage.IOType`     | 消息传输方向，有两种取值：<br/><br/>`in`（当前用户接受到的）<br/>`out`（由当前用户发出的） |
+| `ioType`                   | `IMMessage.IOType`     | 消息传输方向，有两种取值：<br/><br/>`in`（当前用户接收到的）<br/>`out`（由当前用户发出的） |
 
 {{ docs.langSpecEnd('swift') }}
 
@@ -1819,7 +1819,7 @@ await conversation.SendMessageAsync(audioMessage);
 var AV = require('leancloud-storage');
 var { LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
 
-var location = new AV.GeoPoint(31.3753285,120.9664658);
+var location = new AV.GeoPoint(31.3753285, 120.9664658);
 var message = new LocationMessage(location);
 message.setText('蛋糕店的位置');
 conversation.send(message).then(function() {
@@ -1959,7 +1959,7 @@ public static void unregisterMessageHandler(Class<? extends AVIMMessage> clazz, 
 - 首先解析消息的类型，然后找到开发者为这一类型所注册的处理响应 handler chain，再逐一调用这些 handler 的 `onMessage` 函数。
 - 如果没有找到专门处理这一类型消息的 handler，就会转交给 `defaultHandler` 处理。
 
-这样一来，在开发者为 `AVIMTypedMessage`（及其子类）指定了专门的 handler，也指定了全局的 `defaultHandler` 了的时候，如果发送端发送的是通用的 `AVIMMessage` 消息，那么接受端就是 `AVIMMessageManager#registerDefaultMessageHandler()` 中指定的 handler 被调用；如果发送的是 `AVIMTypedMessage`（及其子类）的消息，那么接受端就是 `AVIMMessageManager#registerMessageHandler()` 中指定的 handler 被调用。
+这样一来，在开发者为 `AVIMTypedMessage`（及其子类）指定了专门的 handler，也指定了全局的 `defaultHandler` 了的时候，如果发送端发送的是通用的 `AVIMMessage` 消息，那么接收端就是 `AVIMMessageManager#registerDefaultMessageHandler()` 中指定的 handler 被调用；如果发送的是 `AVIMTypedMessage`（及其子类）的消息，那么接收端就是 `AVIMMessageManager#registerMessageHandler()` 中指定的 handler 被调用。
 
 {{ docs.langSpecEnd('java') }}
 
