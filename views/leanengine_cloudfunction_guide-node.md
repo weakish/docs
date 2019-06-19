@@ -97,6 +97,15 @@ AV.Cloud.run('averageStars', {movie: '夏洛特烦恼'}, {remote: true}).then(fu
   // 失败
 });
 ```
+
+上面的 `remote` 选项实际上是作为 `AV.Cloud.run` 的可选参数 options 对象的属性传入的。
+这个 `options` 对象包括以下参数：
+
+- `remote?: boolean`：上面的例子用到的 `remote` 选项，默认为假。 
+- `user?: AV.User`：以特定的用户运行云函数（建议在 `remote` 为假时使用）。
+- `sessionToken?: string`：以特定的 `sessionToken` 调用云函数（建议在 `remote` 为真时使用）。
+- `req?: http.ClientRequest | express.Request`：为被调用的云函数提供 `remoteAddress` 等属性。
+
 {% endblock %}
 
 {% block cloudFuncTimeout %}
