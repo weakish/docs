@@ -100,6 +100,11 @@ app.use(AV.express());
 app.listen(process.env.LEANCLOUD_APP_PORT);
 ```
 
+其中，`AV.express` 接受一个可选参数 options，options 是一个对象，目前支持以下两个可选属性：
+
+- `onError`：全局错误处理函数，云函数（包括 Hook 函数）抛出异常时会调用该函数。该函数的使用场景包括统一发送错误报告。
+- `ignoreInvalidSessionToken`：布尔值，为真时忽略客户端发来的错误的 sessionToken （`X-LC-session` 头），为假时抛出 401 错误 `{"code": 211, "error": "Verify sessionToken failed, maybe login expired: ..."}`。客户端 SDK 发送请求时会统一发送 `X-LC-session` 头（其中指定了 `sessionToken`），`sessionToken` 可能因种种原因失效，而云函数在很多情况下并不关心 `sessionToken`。因此，云引擎提供了 `ignoreInvalidSessionToken` 这个选项，设为真时忽略 sessionToken 错误。反之，如果该选项设为假，客户端收到相应报错时，需要重新登录。
+
 你可以使用 express 的路由定义功能来提供自定义的 HTTP API：
 
 ```js
@@ -143,6 +148,8 @@ var app = koa();
 app.use(AV.koa());
 app.listen(process.env.LEANCLOUD_APP_PORT);
 ```
+
+`AV.koa` 同样接受可选参数 options，关于 options 对象的具体说明，请参考上节。
 
 你可以使用 koa 来渲染页面、提供自定义的 HTTP API：
 
