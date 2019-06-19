@@ -152,6 +152,13 @@ AV.Cloud.beforeSave('Review', function(request) {
 });
 ```
 
+上面的代码示例中，`request.object` 是被操作的 `AV.Object`。
+除了 `object` 之外，`request` 上还有一个属性：
+
+- `currentUser?: AV.User`，表示发起操作的用户。
+
+类似地，其他 hook 的 `request` 参数上也包括 `object` 和 `currentUser` 这两个属性。
+
 {{ docs.alert("在 2.0 之前的早期版本中，before 类 Hook 接受 `request` 和 `response` 两个参数，我们会继续兼容这种用法到下一个大版本，希望开发者尽快迁移到 Promise 风格的云函数上。之前版本的文档见《[Node SDK v1 API 文档](https://github.com/leancloud/leanengine-node-sdk/blob/v1/API.md)》。") }}
 
 {% endblock %}
@@ -255,6 +262,9 @@ AV.Cloud.onVerified('sms', function(request) {
   console.log('onVerified: sms, user: ' + request.object);
 });
 ```
+
+上面的代码示例中的 `object` 换成 `currentUser` 也可以。因为这里被操作的对象正好是发起操作的用户。
+下面的 `onLogin` 函数同理。
 {% endblock %}
 
 {% block onLoginExample %}
