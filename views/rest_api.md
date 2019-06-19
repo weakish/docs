@@ -32,7 +32,7 @@ Postman 可直接导入 curl 命令。
 
 [Postman]: https://forum.leancloud.cn/t/postman-rest-api/8638
 
-![Postman 中点击 Import 按钮，在「Paste Raw Text」标签中粘贴 curl 命令](../images/postman-import-curl.png)
+![Postman 中点击 Import 按钮，在「Paste Raw Text」标签中粘贴 curl 命令](images/postman-import-curl.png)
 
 ### 对象
 
