@@ -1561,6 +1561,25 @@ new AV.Query('Chapter').get(chapterIds[0]).then(function(chapter0) {
 });
 ```
 
+### async 和 await
+
+`async` 和 `await` 能让你以更接近同步代码的方式使用 Promise：
+
+```javascript
+async function example() {
+  try {
+    let query = new AV.Query('Test);
+    query.equalTo('name', 'hjiang');
+    let results = await query.find();
+    let obj = results[0];
+    obj.set('phone', '182xxxx5548');
+    return obj.save();
+  } catch(error) {
+    console.error(error);
+  }
+}
+```
+
 ### JavaScript Promise 迷你书
 
 如果你想更深入地了解和学习 Promise，包括如何对并行的异步操作进行控制，我们推荐阅读 [《JavaScript Promise迷你书（中文版）》](http://liubin.github.io/promises-book/) 这本书。
