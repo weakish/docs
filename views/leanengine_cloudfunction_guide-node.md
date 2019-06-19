@@ -54,6 +54,20 @@ AV.Cloud.define('averageStars', function(request) {
 * `sessionToken?: string`：客户端发来的 sessionToken（`X-LC-Session` 头）。
 * `meta: object`：有关客户端的更多信息，目前只有一个 `remoteAddress` 属性表示客户端的 IP。
 
+另外，`AV.Cloud.define` 还接受一个可选参数 `options` (位置在函数名称和调用函数之间)。
+这个 `options` 对象上的属性包括：
+
+- `fetchUser: boolean`：是否自动抓取客户端的用户信息，默认为真。设置为假时，`Request` 将不会有 `currentUser` 属性。
+- `internal: boolean`：是否只允许在云引擎内（使用 `AV.Cloud.run` 且未开启 `remote` 选项）或使用 master key （使用 `AV.Cloud.run` 时传入 `useMasterKey`）调用，不允许客户端直接调用。默认为假。
+
+例如，假设我们不希望客户端直接调用上述函数，也不关心客户端用户信息，那么上述函数的定义可以改写为：
+
+```nodejs
+AV.Cloud.define('averageStars', {fetchUser: false, internal: true}, function(request) {
+  // 定义同上
+});
+```
+
 如果云函数返回了一个 Promise，那么云函数会使用 Promise 成功结束后的结果作为成功响应；如果 Promise 中发生了错误，云函数会使用这个错误作为错误响应，对于使用 `AV.Cloud.Error` 构造的异常对象，我们认为是客户端错误，不会在标准输出打印消息，对于其他异常则会在标准输出打印调用栈，以便排查错误。
 
 我们推荐大家使用链式的 Promise 写法来完成业务逻辑，这样会极大地方便异步任务的处理和异常处理，**请注意一定要将 Promise 串联起来并在云函数中 return** 以保证上述逻辑正确工作，推荐阅读 [JavaScript Promise 迷你书](http://liubin.org/promises-book/) 来深入地了解 Promise。
