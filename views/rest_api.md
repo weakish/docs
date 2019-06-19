@@ -34,6 +34,11 @@ Postman 可直接导入 curl 命令。
 
 ![Postman 中点击 Import 按钮，在「Paste Raw Text」标签中粘贴 curl 命令](images/postman-import-curl.png)
 
+Postman 还支持自动生成多种语言（库）调用 REST API 的代码。
+
+![Postman 中点击 code，在弹出对话框中选择语言（库）](images/postman-generate-code.png)
+
+
 ### 对象
 
 <table>
