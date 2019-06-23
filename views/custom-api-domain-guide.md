@@ -26,8 +26,9 @@
 
 如上所述，你可以在控制台的「存储 -> 设置 -> 自定义 API 服务域名」中绑定一个 **已备案** 的域名：
 
+<img src="https://lc-3AJTBW5Q.cn-n1.lcfile.com/5adcfcf551aeca721aef/api-own-domain.png" width="963" height="467" alt="LeanCloud 设置 API 域名" class="alignnone size-medium" />
 
-填入要绑定的子域名（强烈建议使用子域名，例如 `xxx.example.com`，而不是直接绑定裸域名 `xxx.example.com`，以免影响 `xxx.example.com` 下其他子域名的解析），如果选择「启用 https」，那么还需要提交证书和私钥文件。然后点击「绑定」按钮即可。
+填入要绑定的子域名（强烈建议使用子域名，例如 `xxx.example.com`，而不是直接绑定裸域名 `example.com`，以免影响 `xxx.example.com` 下其他子域名的解析），如果选择「启用 https」，那么还需要提交证书和私钥文件。然后点击「绑定」按钮即可。
 
 域名绑定成功后，需要设置域名的 CNAME。控制台会提示 CNAME 的地址，按照控制台的提示到域名注册商或域名解析服务提供商处设置（如果自己架设域名解析服务器的话，请根据域名解析服务器文档配置）。
 
@@ -38,7 +39,7 @@
 那么对应的 DNS Zone 记录为：
 
 ```
-xxx.example.com.	3600	IN	CNAME	avoscloud.com.
+xxx.example.com.    3600    IN    CNAME    avoscloud.com.
 ```
 
 其中 3600 为 TTL，可根据自己的需要设置。
@@ -72,13 +73,6 @@ xxx.example.com.	3600	IN	CNAME	avoscloud.com.
 AV.init({
   // appId, appKey,
   serverURLs: 'https://xxx.example.com',
-  // 如果需要使用 LiveQuery，那么还需要加下面的配置
-  // LiveQuery 只支持开启 HTTPS 的自定义域名 
-  realtime: new AV._sharedConfig.liveQueryRealtime({
-    appId,
-    appKey,
-    server: 'xxx.example.com',
-  }),
 });
 ```
 
@@ -96,7 +90,6 @@ AV.init({
     engine: 'https://xxx.example.com',
     api: 'https://xxx.example.com',
   },
-  // LiveQuery 配置参考上文
 });
 ```
 
@@ -107,6 +100,20 @@ new Realtime({
   // appId, appKey,
   server: 'xxx.example.com',
 };
+```
+
+如果你使用了 LiveQuery 功能，还需要在初始化的时候额外指定 LiveQuery 模块的域名配置（需要版本 >= 3.5.0，需要启用 HTTPS 的自定义域名）：
+
+```js
+AV.init({
+  // appId, appKey,
+  // serverURLs,
+  realtime: new AV._sharedConfig.liveQueryRealtime({
+    appId,
+    appKey,
+    server: 'xxx.example.com',
+  }),
+});
 ```
 
 #### 微信小程序白名单中增加：
@@ -214,7 +221,32 @@ Client::setServerUrl("https://xxx.example.com")
 
 设置环境变量 `LC_API_SERVER` 为 `https://xxx.example.com`
 
-
 ## 云引擎
 
-云引擎自身可以绑定域名，云引擎内部访问 API 是通过内网，不受此次域名不可用事件影响，所以不用改动。
+云引擎自身可以绑定云引擎自定义域名，云引擎内部访问 API 是通过内网，所以我们强烈建议不要改动。
+（如果将云引擎内部运行的代码改用 API 自定义域名，反而无法走内网，会变成公网访问，影响性能。）
+
+当然，如果在云引擎托管网站，其中的客户端 JavaScript 访问 LeanCloud API，
+仍然需要按照上面 JavaScript SDK 中的方法切换域名。
+
+## 接入备案
+
+根据法律法规的规定，需要将域名备案接入 LeanCloud。
+
+如果您的主域名已在 LeanCloud 备案，那么其子域名无需再次备案。例如，之前主域名已在 LeanCloud 备案的情况下，您的域名 `example.com` 已在 LeanCloud 备案，那么绑定 `example.com` 下的子域名为 API 自定义域名无需再次备案。
+
+如果您的主域名未在 LeanCloud 备案，那么您需要接入绑定的  API 子域名。
+
+接入备案需要 **使用应用所属账号的绑定邮箱** 给 support@leancloud.rocks 信箱发送 **邮件主题为「【API 域名备案接入】企业名称」** 的邮件，提交相关资料：
+
+1. 网站备案号、ICP 备案密码
+2. 主办单位性质
+3. 需要接入备案的 API 子域名、电子邮箱、网站负责人手机号码、营业执照号码、法人代表身份证号码、网站负责人身份证号码
+4. 100 KB 以下，清晰可见的彩色扫描件图片：主办单位证件（企业营业执照，民办非企业单位上传组织机构代码证书）、法人代表身份证正反面、网站负责人的身份证正反面、域名证书。
+
+我们的工作人员收到资料并审核信息后会联系您，
+让您快递幕布照片和纸质资料，
+然后我们的工作人员会为您提交资料。
+待当地管局审核和通过后（一般 15 天左右），我们会通知您。
+
+由于目前华北节点仅支持绑定已备案域网站负责人名为 API 自定义域名，因此我们这里就不详细列出主办单位性质、幕布照片等的具体要求了，这些细节都和办理域名备案一样。办理备案接入和新办备案的区别主要是需要额外提供网站备案号、ICP 备案密码，办理期间不用关站。另外，办理接入备案也不会影响原接入服务商继续提供服务。
