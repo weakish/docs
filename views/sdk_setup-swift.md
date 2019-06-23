@@ -51,8 +51,8 @@ import LeanCloud
 ```swift
 do {
     try LCApplication.default.set(
-        id: "YOUR_APP_ID",
-        key: "YOUR_APP_KEY"
+        id: "{{appid}}",
+        key: "{{appkey}}"
     )
 } catch {
     fatalError("\(error)")
