@@ -1573,7 +1573,7 @@ async function example() {
     let results = await query.find();
     let obj = results[0];
     obj.set('phone', '182xxxx5548');
-    return obj.save();
+    return await obj.save();
   } catch(error) {
     console.error(error);
   }
