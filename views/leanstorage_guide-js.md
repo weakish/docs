@@ -1568,7 +1568,7 @@ new AV.Query('Chapter').get(chapterIds[0]).then(function(chapter0) {
 ```javascript
 async function example() {
   try {
-    let query = new AV.Query('Test);
+    let query = new AV.Query('Test');
     query.equalTo('name', 'hjiang');
     let results = await query.find();
     let obj = results[0];
