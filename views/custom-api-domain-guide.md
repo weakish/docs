@@ -1,3 +1,5 @@
+# API 自定义域名绑定指南
+
 现在华北节点支持绑定 API 自定义域名。你可以在控制台的「存储 -> 设置 -> 自定义 API 服务域名」中提供一个 **已备案** 的域名（如需开启 HTTPS 还需提供对应的证书）来自助绑定。
 
 ## 自定义域名的适用范围
@@ -26,7 +28,7 @@
 
 如上所述，你可以在控制台的「存储 -> 设置 -> 自定义 API 服务域名」中绑定一个 **已备案** 的域名：
 
-<img src="https://lc-3AJTBW5Q.cn-n1.lcfile.com/5adcfcf551aeca721aef/api-own-domain.png" width="963" height="467" alt="LeanCloud 设置 API 域名" class="alignnone size-medium" />
+![LeanCloud 设置 API 域名](images/api-own-domain.png)
 
 填入要绑定的子域名（强烈建议使用子域名，例如 `xxx.example.com`，而不是直接绑定裸域名 `example.com`，以免影响 `xxx.example.com` 下其他子域名的解析），如果选择「启用 https」，那么还需要提交证书和私钥文件。然后点击「绑定」按钮即可。
 
@@ -39,7 +41,7 @@
 那么对应的 DNS Zone 记录为：
 
 ```
-xxx.example.com.    3600    IN    CNAME    avoscloud.com.
+xxx.example.com.	3600	IN	CNAME	avoscloud.com.
 ```
 
 其中 3600 为 TTL，可根据自己的需要设置。
@@ -220,6 +222,7 @@ Client::setServerUrl("https://xxx.example.com")
 ### Python SDK
 
 设置环境变量 `LC_API_SERVER` 为 `https://xxx.example.com`
+
 
 ## 云引擎
 
