@@ -54,6 +54,20 @@ AV.Cloud.define('averageStars', function(request) {
 * `sessionToken?: string`：客户端发来的 sessionToken（`X-LC-Session` 头）。
 * `meta: object`：有关客户端的更多信息，目前只有一个 `remoteAddress` 属性表示客户端的 IP。
 
+另外，`AV.Cloud.define` 还接受一个可选参数 `options` (位置在函数名称和调用函数之间)。
+这个 `options` 对象上的属性包括：
+
+- `fetchUser: boolean`：是否自动抓取客户端的用户信息，默认为真。设置为假时，`Request` 将不会有 `currentUser` 属性。
+- `internal: boolean`：是否只允许在云引擎内（使用 `AV.Cloud.run` 且未开启 `remote` 选项）或使用 master key （使用 `AV.Cloud.run` 时传入 `useMasterKey`）调用，不允许客户端直接调用。默认为假。
+
+例如，假设我们不希望客户端直接调用上述函数，也不关心客户端用户信息，那么上述函数的定义可以改写为：
+
+```nodejs
+AV.Cloud.define('averageStars', {fetchUser: false, internal: true}, function(request) {
+  // 定义同上
+});
+```
+
 如果云函数返回了一个 Promise，那么云函数会使用 Promise 成功结束后的结果作为成功响应；如果 Promise 中发生了错误，云函数会使用这个错误作为错误响应，对于使用 `AV.Cloud.Error` 构造的异常对象，我们认为是客户端错误，不会在标准输出打印消息，对于其他异常则会在标准输出打印调用栈，以便排查错误。
 
 我们推荐大家使用链式的 Promise 写法来完成业务逻辑，这样会极大地方便异步任务的处理和异常处理，**请注意一定要将 Promise 串联起来并在云函数中 return** 以保证上述逻辑正确工作，推荐阅读 [JavaScript Promise 迷你书](http://liubin.org/promises-book/) 来深入地了解 Promise。
@@ -83,6 +97,15 @@ AV.Cloud.run('averageStars', {movie: '夏洛特烦恼'}, {remote: true}).then(fu
   // 失败
 });
 ```
+
+上面的 `remote` 选项实际上是作为 `AV.Cloud.run` 的可选参数 options 对象的属性传入的。
+这个 `options` 对象包括以下参数：
+
+- `remote?: boolean`：上面的例子用到的 `remote` 选项，默认为假。 
+- `user?: AV.User`：以特定的用户运行云函数（建议在 `remote` 为假时使用）。
+- `sessionToken?: string`：以特定的 `sessionToken` 调用云函数（建议在 `remote` 为真时使用）。
+- `req?: http.ClientRequest | express.Request`：为被调用的云函数提供 `remoteAddress` 等属性。
+
 {% endblock %}
 
 {% block cloudFuncTimeout %}
@@ -128,6 +151,13 @@ AV.Cloud.beforeSave('Review', function(request) {
   }
 });
 ```
+
+上面的代码示例中，`request.object` 是被操作的 `AV.Object`。
+除了 `object` 之外，`request` 上还有一个属性：
+
+- `currentUser?: AV.User`，表示发起操作的用户。
+
+类似地，其他 hook 的 `request` 参数上也包括 `object` 和 `currentUser` 这两个属性。
 
 {{ docs.alert("在 2.0 之前的早期版本中，before 类 Hook 接受 `request` 和 `response` 两个参数，我们会继续兼容这种用法到下一个大版本，希望开发者尽快迁移到 Promise 风格的云函数上。之前版本的文档见《[Node SDK v1 API 文档](https://github.com/leancloud/leanengine-node-sdk/blob/v1/API.md)》。") }}
 
@@ -232,6 +262,9 @@ AV.Cloud.onVerified('sms', function(request) {
   console.log('onVerified: sms, user: ' + request.object);
 });
 ```
+
+上面的代码示例中的 `object` 换成 `currentUser` 也可以。因为这里被操作的对象正好是发起操作的用户。
+下面的 `onLogin` 函数同理。
 {% endblock %}
 
 {% block onLoginExample %}
