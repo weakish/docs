@@ -59,9 +59,9 @@ xxx.example.com.	3600	IN	CNAME	avoscloud.com.
 
 ## REST API
 
-客户端访问 REST API，需要在代码中将 `api.leancloud.cn` 或 `{{appid 前八位}}.api.lncld.net` 域名替换为 `xxx.example.com`。
+客户端访问 REST API，需要在代码中将 `api.leancloud.cn` 或 `appid 前八位.api.lncld.net` 域名替换为 `xxx.example.com`。
 
-客户端通过 REST API 访问云函数，需要将 `{{appid 前八位}}.engine.lncld.net` 替换为 `xxx.example.com`。
+客户端通过 REST API 访问云函数，需要将 `appid 前八位.engine.lncld.net` 替换为 `xxx.example.com`。
 
 ## SDK
 
@@ -213,7 +213,7 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
 
 ```php
 use \LeanCloud\Client;
-Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
+Client::initialize(appId, appKey, masterKey);
 Client::setServerUrl("https://xxx.example.com")
 ```
 
