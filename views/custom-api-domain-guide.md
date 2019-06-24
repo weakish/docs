@@ -151,7 +151,7 @@ wss://cn-n1-wechat-mesos-cell-4.avoscloud.com
 // 配置 SDK 推送
 [AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModulePush];
 // 配置 SDK 云引擎
-[AVOSCloud setServerURLString:@"https://exmaple.com" forServiceModule:AVServiceModuleEngine];
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleEngine];
 // 配置 SDK 即时通讯
 [AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleRTM];
 // 初始化
@@ -252,4 +252,4 @@ Client::setServerUrl("https://xxx.example.com")
 然后我们的工作人员会为您提交资料。
 待当地管局审核和通过后（一般 15 天左右），我们会通知您。
 
-由于目前华北节点仅支持绑定已备案域网站负责人名为 API 自定义域名，因此我们这里就不详细列出主办单位性质、幕布照片等的具体要求了，这些细节都和办理域名备案一样。办理备案接入和新办备案的区别主要是需要额外提供网站备案号、ICP 备案密码，办理期间不用关站。另外，办理接入备案也不会影响原接入服务商继续提供服务。
+由于目前华北节点仅支持绑定已备案域名为 API 自定义域名，因此我们这里就不详细列出主办单位性质、幕布照片等的具体要求了，这些细节都和办理域名备案一样。办理备案接入和新办备案的区别主要是需要额外提供网站备案号、ICP 备案密码，办理期间不用关站。另外，办理接入备案也不会影响原接入服务商继续提供服务。
