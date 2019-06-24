@@ -118,6 +118,17 @@ AV.init({
 });
 ```
 
+多人在线对战 SDK：
+
+```js
+new Client({
+  appId,
+  appKey,
+  userId,
+  playServer: 'https://xxx.example.com/1/multiplayer/router',
+});
+```
+
 #### 微信小程序白名单中增加：
 
 ```
@@ -195,18 +206,25 @@ AVOSCloud.initialize(this,APP_ID,APP_KEY);
 
 ```cs
 AVClient.Initialize(new AVClient.Configuration {
-                ApplicationId = appId,
-                ApplicationKey = appKey,
-                ApiServer = new Uri("https://xxx.example.com"),
-                EngineServer = new Uri("https://xxx.example.com")
-            });
+  ApplicationId = appId,
+  ApplicationKey = appKey,
+  ApiServer = new Uri("https://xxx.example.com"),
+  EngineServer = new Uri("https://xxx.example.com")
+});
 // 通过 RTM Router 配置即时通讯
 var realtime = new AVRealtime(new AVRealtime.Configuration
-           {
-                ApplicationId = "app-id",
-                ApplicationKey = "app-key",
-                RTMRouter = new Uri("https://xxx.example.com")
-           });
+{
+  ApplicationId = "app-id",
+  ApplicationKey = "app-key",
+  RTMRouter = new Uri("https://xxx.example.com")
+});
+```
+
+多人在线对战, v0.5.0-alpha.0 及之后的版本
+
+```cs
+var client = new Client(appId, appKey, userId, playServer: "https://xxx.example.com/1/multiplayer/router");
+await client.Connect();
 ```
 
 ### PHP SDK
