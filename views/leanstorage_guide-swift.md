@@ -1784,17 +1784,27 @@ let query = LCQuery(className: "_User")
 
 要实现子类化，需要下面两个步骤：
 
-1. 继承 `LCObject`；
-2. 重载静态方法 `objectClassName`，返回的字符串是原先要传递给 `LCObject(className:)` 初始化方法的参数。如果不实现，默认返回的是类的名字。**请注意：`LCUser` 子类化后必须返回 `_User`**。
+1. 继承 `LCObject`
+2. 重载静态方法 `objectClassName`，返回的字符串是原先要传递给 `LCObject(className:)` 初始化方法的参数。如果不实现，默认返回的是类的名字。**请注意：`LCUser` 子类化后必须返回 `_User`**
+3. 注册子类。一般在 `application(_:didFinishLaunchingWithOptions:)` 方法中调用 `static func register()` 方法
 
 下面是实现 Student 子类化的例子：
 
 ```swift
 class Student: LCObject {
+
     @objc dynamic var name: LCString?
+
     override static func objectClassName() -> String {
         return "Student"
     }
+}
+
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
+    Student.register()
+    
+    return true
 }
 ```
 
