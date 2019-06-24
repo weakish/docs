@@ -212,8 +212,12 @@ AV.Cloud.beforeUpdate('Review', function(request) {
 {% block afterUpdateExample %}
 
 ```nodejs
-AV.Cloud.afterUpdate('Article', function(request) {
-  console.log('Updated article,the id is :' + request.object.id);
+AV.Cloud.afterUpdate('Review', function(request) {
+  if (request.object.updatedKeys.indexOf('comment') != -1) {
+    if (request.object.get('comment').length < 5) {
+      console.log("疑似灌水评论： " + comment + " 于点评 " + review.ObjectId)
+    }
+  }
 });
 ```
 {% endblock %}

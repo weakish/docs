@@ -285,6 +285,7 @@ cloud.AfterSave("_User", async user =>
 cloud.BeforeUpdate("Review", (AVObject review) =>
 {
     var updatedKeys = review.GetUpdatedKeys();
+    // 如果 comment 字段被修改了，检查该字段的长度
     if (updatedKeys.Contains("comment"))
     {
         var comment = review.Get<string>("comment");
@@ -297,9 +298,16 @@ cloud.BeforeUpdate("Review", (AVObject review) =>
 {% block afterUpdateExample %}
 
 ```cs
-cloud.BeforeUpdate.AfterSave("Article", article =>
+cloud.BeforeUpdate.AfterSave("Review", (AVObject review) =>
 {
-    Console.WriteLine(article.ObjectId);
+    var updatedKeys = review.GetUpdatedKeys();
+    if (updatedKeys.Contains("comment"))
+    {
+        var comment = review.Get<string>("comment");
+        if (comment.Length < 5 ) {
+            Console.WriteLine("疑似灌水评论： " + comment + " 于点评 " + review.ObjectId);
+        }
+    }
 });
 ```
 {% endblock %}

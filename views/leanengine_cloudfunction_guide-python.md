@@ -144,10 +144,7 @@ def after_user_save(user):
 @engine.before_update('Review')
 def before_hook_object_update(obj):
     # 如果 comment 字段被修改了，检查该字段的长度
-    if 'comment' not in obj.updated_keys:
-        # comment 字段没有修改，跳过检查
-        return
-    if len(obj.get('comment')) > 140:
+    if 'comment' in obj.updated_keys and len(obj.get('comment')) > 140:
         # 拒绝过长的修改
         raise leancloud.LeanEngineError(message='comment 长度不得超过 140 个字符')
 ```
@@ -157,12 +154,10 @@ def before_hook_object_update(obj):
 
 {% block afterUpdateExample %}
 ```python
-import leancloud
-
-
-@engine.after_update('Article')  # Article 为需要 hook 的 class 的名称
-def after_article_update(article):
-	print 'article with id {} updated!'.format(article.id)
+@engine.after_update('Review')
+def after_review_update(article):
+    if 'comment' in obj.updated_keys and len(obj.get('comment')) < 5:
+        print("疑似灌水评论： " + comment + " 于点评 " + review.ObjectId)
 ```
 {% endblock %}
 

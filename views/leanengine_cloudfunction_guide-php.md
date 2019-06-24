@@ -156,8 +156,7 @@ Cloud::afterSave("_User", function($userObj, $currentUser) {
 
 ```php
 Cloud::beforeUpdate("Review", function($review, $user) {
-    // 对象的 updateKeys 字段记录了本次将要修改的字段名列表，
-    // 可用于检测并拒绝对某些字段的修改
+    // 如果 comment 字段被修改了，检查该字段的长度
     if (in_array("comment", $review->updatedKeys) &&
         strlen($review->get("comment")) > 140) {
         throw new FunctionError("comment 长度不得超过 140 个字符");
@@ -171,9 +170,11 @@ Cloud::beforeUpdate("Review", function($review, $user) {
 {% block afterUpdateExample %}
 
 ```php
-Cloud::afterUpdate("Article", function($article, $user) {
-    // 输出日志到控制台
-    error_log("Article {$article->getObjectId()} has been updated.");
+Cloud::afterUpdate("Review", function($review, $user) {
+    if (in_array("comment", $review->updatedKeys) &&
+        strlen($review->get("comment")) < 5) {
+        error_log("疑似灌水评论： " . comment . " 于点评 " . review.ObjectId);
+    }
 });
 ```
 {% endblock %}

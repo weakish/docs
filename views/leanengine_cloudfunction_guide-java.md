@@ -145,6 +145,7 @@ EngineRequestContext 则可以获取额外的一些 metaData 信息
   public static AVObject reviewBeforeUpdateHook(AVObject review) throws Exception {
     List<String> updateKeys = EngineRequestContext.getUpdateKeys();
     for (String key : updateKeys) {
+      // 如果 comment 字段被修改了，检查该字段的长度
       if ("comment".equals(key) && review.getString("comment").length()>140) {
         throw new Exception("comment 长度不得超过 140 字符");
       }
@@ -157,9 +158,14 @@ EngineRequestContext 则可以获取额外的一些 metaData 信息
 {% block afterUpdateExample %}
 
 ```java
-  @EngineHook(className = "Article", type = EngineHookType.afterUpdate)
-  public static void articleAfterUpdateHook(AVObject article) throws Exception {
-    LogUtil.avlog.d("updated article,the id is:" + article.getObjectId());
+  @EngineHook(className = "Review", type = EngineHookType.afterUpdate)
+  public static void reviewAfterUpdateHook(AVObject review) throws Exception {
+    List<String> updateKeys = EngineRequestContext.getUpdateKeys();
+    for (String key : updateKeys) {
+      if ("comment".equals(key) && review.getString("comment").length()<5) {
+        LogUtil.avlog.d("疑似灌水评论： " + comment + " 于点评 " + review.ObjectId);
+      }
+    }
   }
 ```
 {% endblock %}
