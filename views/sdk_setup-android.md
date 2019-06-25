@@ -1,6 +1,5 @@
 {% extends "./sdk_setup.tmpl" %}
 {% set platform_name = "Android" %}
-{% set maven_uri = "http://mvn.leancloud.cn/nexus/content/repositories/public" %}
 {% import "views/_helper.njk" as docs %}
 {% from "views/_data.njk" import libVersion as version %}
 {% from "views/_data.njk" import androidSDKCompileInstructionLink as compileInstructionLink %}
@@ -69,51 +68,6 @@ dependencies {
 ```
 
 从 4.7.8 版本开始，我们已经把 SDK library 推送到了 maven central repository，推荐大家使用这种方式。
-同时，我们也搭建了 LeanCloud 的 [maven 仓库](http://mvn.leancloud.cn/nexus/)，以便在中央仓库访问不了的时候备用，如果要访问我们的 maven 仓库，需要在项目根目录下的 `build.gradle` 进行如下标准配置：
-
-<pre><code>
-buildscript {
-    repositories {
-        jcenter()
-        //这里是 LeanCloud 的包仓库
-        maven {
-            url "{{maven_uri}}"
-        }
-
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
-    }
-}
-
-allprojects {
-    repositories {
-        jcenter()
-        //这里是 LeanCloud 的包仓库
-        maven {
-            url "{{maven_uri}}"
-        }
-    }
-}
-</code></pre>
-
-同时请注意，同一个 library，在 LeanCloud maven 仓库里其版本号前面多了一个 `v`。例如中央仓库里版本号为 `4.7.8` 的 SDK，在 LeanCloud maven 仓库里其版本号为 `v4.7.8`，这一点请大家注意。
-
-如果使用 maven 中央仓库，依赖声明如下：
-```
-dependencies {
-    // LeanCloud 基础包
-    compile ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
-}
-```
-
-如果使用 LeanCloud 自建仓库，依赖声明如下：
-```
-dependencies {
-    // LeanCloud 基础包
-    compile ('cn.leancloud.android:avoscloud-sdk:v{{ version.leancloud }}')
-}
-```
 
 #### Eclipse
 
