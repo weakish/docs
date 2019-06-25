@@ -158,6 +158,20 @@ wss://cn-n1-wechat-mesos-cell-4.avoscloud.com
 [AVOSCloud setApplicationId:APP_ID clientKey:APP_KEY];
 ```
 
+过于老旧的 Objective C SDK 并不支持配置服务器地址，
+而部分旧版本 SDK 的 websocket 支持的 SSL pinning 特性可能导致配置服务器地址后即时通讯无法使用。
+所以我们建议升级 Objective C SDK 至最新版本 （11.6.3），这一版本是确定可用的。
+
+如果使用的 SDK 版本过旧，升级至最新版本暂时有困难的，推荐先升级至 8.2.3，这一版本 API 变动相对较小，同时没有实现 websocket SSL pinning 特性。8.2.3 进行如上配置后，log 信息里可能会有一些「未能找到使用指定主机名的服务器」的错误，其中：
+
+1. 请求路径是 `/route` 的错误可以忽略，这是 router 的请求，不影响正常使用。
+2. 请求路径是 `/stats` 的错误，这是统计功能的请求，统计服务已下线。如果代码中未移除统计相关代码，可在初始化配置中额外加入如下语句（加在 `[AVOSCloud setApplicationId ...`之前），避免 log 报错：
+
+```objc
+// 配置 SDK 统计
+[AVOSCloud setServerURLString:@"https://avoscloud.com" forServiceModule:AVServiceModuleStatistics];
+```
+
 #### Swift SDK （16.1.0 以上）
 
 ```swift
