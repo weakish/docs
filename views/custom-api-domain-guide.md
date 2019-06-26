@@ -1,36 +1,38 @@
 # API 自定义域名绑定指南
 
-现在华北节点支持绑定 API 自定义域名。你可以在控制台的「存储 -> 设置 -> 自定义 API 服务域名」中提供一个 **已备案** 的域名（如需开启 HTTPS 还需提供对应的证书）来自助绑定。
+现在华北节点支持自助绑定 API 自定义域名。你可以在控制台的「存储 -> 设置 -> 自定义 API 服务域名」中提供一个 **已备案** 的域名（如需开启 HTTPS 还需提供对应的证书）来自助绑定。
 
 ## 自定义域名的适用范围
 
-自定义域名目前可用于访问以下 API 服务：
+自定义域名目前可用于访问以下服务：
 
-- 数据存储
+- 结构化数据存储
 - 短信
 - 推送
 - 云函数
 
-自定义域名不适用以下 API 服务：
+自定义域名不适用以下服务：
 
-- 即时通讯的 web socket （绑定自定义域名后仍旧使用 `avoscloud.com`）
+- 即时通讯，Live Query 以及多人对战的 WebSocket 连接（绑定自定义域名后仍旧使用 LeanCloud 提供的域名，比如 `avoscloud.com`，`leancloud.cn`）
 
 另外，以下服务使用独立的自定义域名：
 
 - 云引擎网站托管
 - 文件存储服务
 
-换句话说，如果之前在这两个服务上绑定过自定义域名，现在想绑定 API 自定义域名，那么需要在 API 上绑定另一个域名（包括不同的子域名）。
+换句话说，如果之前在这两个服务上绑定过自定义域名，现在想绑定 API 自定义域名，那么需要在 API 上绑定另一个域名（可以是不同的子域名）。
 
-## CNAME 设置
+## 自定义域名的绑定步骤
 
 以下部分假定绑定的自定义域名是 `xxx.example.com`。
+
+### CNAME 设置
 
 如上所述，你可以在控制台的「存储 -> 设置 -> 自定义 API 服务域名」中绑定一个 **已备案** 的域名：
 
 ![LeanCloud 设置 API 域名](images/api-own-domain.png)
 
-填入要绑定的子域名（强烈建议使用子域名，例如 `xxx.example.com`，而不是直接绑定裸域名 `example.com`，以免影响 `xxx.example.com` 下其他子域名的解析），如果选择「启用 https」，那么还需要提交证书和私钥文件。然后点击「绑定」按钮即可。
+填入要绑定的子域名（强烈建议使用子域名，例如 `xxx.example.com`，而不是直接绑定二级域名（SLD，second-level domain）`example.com`，以免影响 `example.com` 下其他子域名的解析），如果选择「启用 https」，那么还需要提交证书和私钥文件。然后点击「绑定」按钮即可。
 
 域名绑定成功后，需要设置域名的 CNAME。控制台会提示 CNAME 的地址，按照控制台的提示到域名注册商或域名解析服务提供商处设置（如果自己架设域名解析服务器的话，请根据域名解析服务器文档配置）。
 
@@ -47,29 +49,26 @@ xxx.example.com.	3600	IN	CNAME	avoscloud.com.
 其中 3600 为 TTL，可根据自己的需要设置。
 大多数域名注册商或域名解析服务提供商都提供图形化的设置界面，按照其说明配置即可。
 
-## 更新应用代码
+### 更新代码
 
-绑定自定义域名后，需要更新应用的代码以使用自定义域名。
+绑定自定义域名后，需要更新代码以使用自定义域名。
 
-注意，绑定自定义域名后，原 `avoscloud.com` 域名仍然有效。
-换言之，绑定自定义域名后，既可以通过自定义域名访问 API 服务，也可以通过 `avoscloud.com` 域名访问 API 服务。
-所以，如果您之前已经按照临时解决方案在代码中切换域名至 `avoscloud.com`，那么不必担心绑定自定义域名会影响访问 API 服务，可以平滑过渡。
+**注意：**
+* 绑定自定义域名后，LeanCloud 提供的原域名（比如 `avoscloud.com`）仍然有效。换言之，绑定自定义域名后，不会导致使用原域名（比如 `avoscloud.com`）的应用或服务失效。
+* SDK 中，只有较新版本的 SDK 才支持设定 API 服务器地址。
 
 以下部分假定绑定的自定义域名是 `xxx.example.com`，且开启了 HTTPS。
 
-## REST API
+#### REST API
 
-客户端访问 REST API，需要在代码中将 `api.leancloud.cn` 或 `appid 前八位.api.lncld.net` 域名替换为 `xxx.example.com`。
+* 非云函数的访问，需要在代码中将 `api.leancloud.cn` 或 `<# appid 前八位 #>.api.lncld.net` 域名替换为 `xxx.example.com`。
+* 通过 REST API 访问云函数，需要将 `<# appid 前八位 #>.engine.lncld.net` 域名替换为 `xxx.example.com`。
 
-客户端通过 REST API 访问云函数，需要将 `appid 前八位.engine.lncld.net` 替换为 `xxx.example.com`。
+#### JavaScript SDK
 
-## SDK
+##### 存储 SDK（3.0.0 及以上支持，建议升级到 3.11.1 及以上，详情见下）
 
-客户端 SDK 需要进行如下修改：（注意，只有较新版本的 SDK 才支持设定 API 服务器地址）
-
-### JavaScript SDK
-
-存储 SDK（3.0.0 以上支持，建议升级到 3.11.1 以上，详情见下）
+**>= 3.5.5**（`< 3.11.1` 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败）
 
 ```js
 AV.init({
@@ -78,10 +77,7 @@ AV.init({
 });
 ```
 
-`>= 3.5.5, < 3.11.1` 的应用可能会碰到仍然使用缓存默认配置的 bug，
-更新后应用打开的第一次请求可能失败。
-
-`>= 3.0.0, < 3.5.5` 的应用 **不能按上述方法设置**，需要使用如下的写法：
+**>= 3.0.0, < 3.5.5**
 
 ```js
 AV.init({
@@ -95,7 +91,7 @@ AV.init({
 });
 ```
 
-即时通讯 SDK （4.0.0 以上支持，不支持未启用 HTTPS 的自定义域名）
+##### 即时通讯 SDK（4.0.0 及以上支持，**不支持未启用 HTTPS 的自定义域名**）
 
 ```js
 new Realtime({
@@ -104,7 +100,7 @@ new Realtime({
 };
 ```
 
-如果你使用了 LiveQuery 功能，还需要在初始化的时候额外指定 LiveQuery 模块的域名配置（需要版本 >= 3.5.0，需要启用 HTTPS 的自定义域名）：
+如果使用了 LiveQuery 功能，还需要在初始化的时候额外配置 LiveQuery 模块的域名（3.5.0 及以上支持，**不支持未启用 HTTPS 的自定义域名**）：
 
 ```js
 AV.init({
@@ -118,7 +114,18 @@ AV.init({
 });
 ```
 
-#### 微信小程序白名单中增加：
+##### 多人在线对战
+
+```js
+new Client({
+      appId,
+      appKey,
+      userId,
+      playServer: 'https://xxx.example.com',
+});
+```
+
+##### 微信小程序白名单中增加：
 
 ```
 存储：
@@ -126,24 +133,32 @@ request：https://xxx.example.com
 
 即时通讯：
 request：https://xxx.example.com/
-Socket：
-wss://cn-n1-cell1.avoscloud.com,
-wss://cn-n1-cell2.avoscloud.com,
-wss://cn-n1-cell5.avoscloud.com,
+WebSocket：
+wss://cn-n1-cell1.avoscloud.com
+wss://cn-n1-cell2.avoscloud.com
+wss://cn-n1-cell5.avoscloud.com
 wss://cn-n1-cell7.avoscloud.com
+wss://cn-n1-cell1.leancloud.cn
+wss://cn-n1-cell2.leancloud.cn
+wss://cn-n1-cell5.leancloud.cn
+wss://cn-n1-cell7.leancloud.cn
 
 多人在线对战：
-Request：https://game-router-cn-n1.avoscloud.com/
-Socket：
+request：https://xxx.example.com/
+WebSocket：
 wss://cn-n1-wechat-mesos-cell-1.avoscloud.com
 wss://cn-n1-wechat-mesos-cell-2.avoscloud.com
 wss://cn-n1-wechat-mesos-cell-3.avoscloud.com
 wss://cn-n1-wechat-mesos-cell-4.avoscloud.com
+wss://cn-n1-wechat-mesos-cell-1.leancloud.cn
+wss://cn-n1-wechat-mesos-cell-2.leancloud.cn
+wss://cn-n1-wechat-mesos-cell-3.leancloud.cn
+wss://cn-n1-wechat-mesos-cell-4.leancloud.cn
 ```
 
-### iOS SDK
-
 #### Objective-C SDK
+
+4.6.0 及以上支持（强烈建议升级到**最新版**，至少升级到 **8.2.3**，详情见下）
 
 ```objc
 // 配置 SDK 储存
@@ -156,21 +171,15 @@ wss://cn-n1-wechat-mesos-cell-4.avoscloud.com
 [AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleRTM];
 // 配置 SDK 统计
 [AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleStatistics];
-// 初始化
+// 初始化应用
 [AVOSCloud setApplicationId:APP_ID clientKey:APP_KEY];
 ```
 
-过于老旧的 Objective C SDK 并不支持配置服务器地址，
-而部分旧版本 SDK 的 websocket 支持的 SSL pinning 特性可能导致配置服务器地址后即时通讯无法使用。
-所以我们建议升级 Objective C SDK 至最新版本，这一版本是确定可用的。
+**部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版**
 
-如果使用的 SDK 版本过旧，升级至最新版本暂时有困难的，推荐先升级至 8.2.3，这一版本 API 变动相对较小，同时没有实现 websocket SSL pinning 特性。
+#### Swift SDK
 
-```objc
-
-```
-
-#### Swift SDK （16.1.0 以上）
+16.1.0 及以上支持
 
 ```swift
 let configuration = LCApplication.Configuration(
@@ -188,7 +197,9 @@ try LCApplication.default.set(
 )
 ```
 
-### Android SDK
+#### Android SDK
+
+4.4.4 及以上版本支持（建议升级到最新版）
 
 ```java
 // 配置 SDK 储存
@@ -199,13 +210,31 @@ AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.ENGINE, "https://xxx.example.com");
 AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.PUSH, "https://xxx.example.com");
 // 配置 SDK 即时通讯
 AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.RTM, "https://xxx.example.com");
-// 初始化
+// 初始化应用
 AVOSCloud.initialize(this,APP_ID,APP_KEY);
 ```
 
-### .NET SDK
+#### Java Unified SDK
+
+```java
+import cn.leancloud.core.AVOSService;
+
+// 配置 SDK 储存
+AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
+// 配置 SDK 云引擎
+AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
+// 配置 SDK 推送
+AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
+// 配置 SDK 即时通讯
+AVOSCloud.setServer(AVOSService.RTM, "https://xxx.example.com");
+// 初始化应用
+AVOSCloud.initialize(this,APP_ID,APP_KEY);
+```
+
+#### .NET SDK
 
 ```cs
+// 配置存储和云引擎
 AVClient.Initialize(new AVClient.Configuration {
                 ApplicationId = appId,
                 ApplicationKey = appKey,
@@ -221,7 +250,13 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
            });
 ```
 
-### PHP SDK
+##### 多人在线对战
+
+```cs
+var client = new Client(appId, appKey, userId, playServer: "https://xxx.example.com");
+```
+
+#### PHP SDK
 
 ```php
 use \LeanCloud\Client;
@@ -231,18 +266,15 @@ Client::setServerUrl("https://xxx.example.com")
 
 另外，PHP 也可以设置环境变量 `LEANCLOUD_API_SERVER` 为 `https://xxx.example.com` （设置环境变量后无需在初始化语句中调用 `setServerUrl`。
 
-### Python SDK
+#### Python SDK
 
 设置环境变量 `LC_API_SERVER` 为 `https://xxx.example.com`
 
+#### 云引擎
 
-## 云引擎
+云引擎自身可以绑定云引擎自定义域名，云引擎内部访问 API 是通过内网，所以我们强烈建议不要改动。（如果将云引擎内部运行的代码改用 API 自定义域名，反而无法走内网，会变成公网访问，影响性能。）
 
-云引擎自身可以绑定云引擎自定义域名，云引擎内部访问 API 是通过内网，所以我们强烈建议不要改动。
-（如果将云引擎内部运行的代码改用 API 自定义域名，反而无法走内网，会变成公网访问，影响性能。）
-
-当然，如果在云引擎托管网站，其中的客户端 JavaScript 访问 LeanCloud API，
-仍然需要按照上面 JavaScript SDK 中的方法切换域名。
+当然，如果在云引擎托管网站，其中的客户端 JavaScript 访问 LeanCloud API，仍然需要按照上面 JavaScript SDK 中的方法切换域名。
 
 ## 接入备案
 
