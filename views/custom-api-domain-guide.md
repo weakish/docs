@@ -24,7 +24,7 @@
 
 ## 自定义域名的绑定步骤
 
-*以下部分假定绑定的自定义域名是 `xxx.example.com`。*
+以下部分假定绑定的自定义域名是 `xxx.example.com`。
 
 ### CNAME 设置
 
@@ -57,7 +57,7 @@ xxx.example.com.	3600	IN	CNAME	avoscloud.com.
 * 绑定自定义域名后，LeanCloud 提供的原域名（比如 `avoscloud.com`）仍然有效。换言之，绑定自定义域名后，不会导致使用原域名（比如 `avoscloud.com`）的应用或服务失效。
 * SDK 中，只有较新版本的 SDK 才支持设定 API 服务器地址。
 
-*以下部分假定绑定的自定义域名是 `xxx.example.com`，且开启了 HTTPS。*
+以下部分假定绑定的自定义域名是 `xxx.example.com`，且开启了 HTTPS。
 
 #### REST API
 
@@ -158,7 +158,7 @@ wss://cn-n1-wechat-mesos-cell-4.leancloud.cn
 
 #### Objective-C SDK
 
-4.6.0 及以上支持（强烈建议升级到**最新版**或**最低 8.2.3**，详情见下）
+4.6.0 及以上支持（强烈建议升级到**最新版**，至少升级到 **8.2.3**，详情见下）
 
 ```objc
 // 配置 SDK 储存
@@ -175,7 +175,7 @@ wss://cn-n1-wechat-mesos-cell-4.leancloud.cn
 [AVOSCloud setApplicationId:APP_ID clientKey:APP_KEY];
 ```
 
-**部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请升级 SDK 到最新版或最低 8.2.3**
+**部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版**
 
 #### Swift SDK
 
@@ -274,7 +274,7 @@ Client::setServerUrl("https://xxx.example.com")
 
 云引擎自身可以绑定云引擎自定义域名，云引擎内部访问 API 是通过内网，所以我们强烈建议不要改动。（如果将云引擎内部运行的代码改用 API 自定义域名，反而无法走内网，会变成公网访问，影响性能。）
 
-当然，如果在云引擎托管网站，使用 JavaScript SDK 访问 LeanCloud API，仍然需要按照上面 JavaScript SDK 中的方法切换域名。
+当然，如果在云引擎托管网站，其中的客户端 JavaScript 访问 LeanCloud API，仍然需要按照上面 JavaScript SDK 中的方法切换域名。
 
 ## 接入备案
 
