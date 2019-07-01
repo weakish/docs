@@ -5,18 +5,16 @@ angular.module('app').controller('WeappDomainsCtrl', [
   '$timeout',
   '$compile',
   function ($http, $scope, $rootScope, $timeout, $compile) {
-      $scope.domains = {
-        request: ['正在获取配置'],
-        upload: '正在获取配置',
-        download: '正在获取配置'
-      };
-
       const APP_ROUTER_DOMAIN = 'app-router.leancloud.cn';
 
       $scope.$watch('pageState.currentApp',function(){
         var currentApp = $rootScope.pageState.currentApp;
         console.log($rootScope.pageState.currentApp);
-        $scope.domains.request = [];
+        $scope.domains = {
+          request: ['正在获取配置'],
+          upload: '正在获取配置',
+          download: '正在获取配置'
+        };  
         if (currentApp) {
           $http.get('/1.1/clients/self/apps/' + currentApp.app_id + '/platformCustomDomains').then(function (data) {
             if (data.data && data.data.length) {
