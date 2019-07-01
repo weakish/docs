@@ -6,28 +6,36 @@ angular.module('app').controller('WeappDomainsCtrl', [
     '$compile',
     function ($http, $scope, $rootScope, $timeout, $compile) {
         $scope.domains = {
+          request: ['正在获取配置'],
           upload: '正在获取配置',
           download: '正在获取配置'
         };
 
+        const APP_ROUTER_DOMAIN = 'app-router.leancloud.cn';
+
         $scope.$watch('pageState.currentApp',function(){
           var currentApp = $rootScope.pageState.currentApp;
           console.log($rootScope.pageState.currentApp);
+          $scope.domains.request = [];
           if (currentApp) {
-            // Magic: 通过 push_group 判断节点
-            var doamins = {
-              'g0': 'lncld.net',
-              'q0': 'lncldapi.com',
-              'a0': 'lncldglobal.com'
-            }
-            var domain = doamins[currentApp.push_group];
-            var suffix = currentApp.app_id.slice(0, 8).toLowerCase();
-            $scope.extraRequestDomains = [
-              suffix + '.api.' + domain,
-              suffix + '.engine.' + domain,
-              suffix + '.rtm.' + domain
-            ];
-            $scope.requestDomainsLength = 4;
+            $http.get(`/1.1/clients/self/apps/${currentApp.app_id}/platformCustomDomains`).then(data => {
+              if (data.data && data.data.length) {
+                $scope.domains.request.push(...data.data.map(domainInfo => domainInfo.domain));
+              } else {
+                return $http.get('https://app-router.leancloud.cn/2/route?appId=' + currentApp.app_id).then(data => {
+                  const {
+                    api_server,
+                    engine_server,
+                    rtm_router_server
+                  } = data.data;
+                  $scope.domains.request.push(...[APP_ROUTER_DOMAIN, api_server, engine_server, rtm_router_server]);
+                })
+              }
+            }).catch(e => {
+              $scope.domains.request.push('获取 request 域名异常')
+            })
+
+            $scope.domains.request = $scope.domains.request;
 
             AV.applicationId = undefined;
             AV.applicationKey = undefined;

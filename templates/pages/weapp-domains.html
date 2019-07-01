@@ -54,10 +54,10 @@ title: 小程序域名白名单配置
       <div class="step-content col-sm-12">
         <table>
           <tr>
-            <th rowspan="{{ requestDomainsLength }}" width="40%"><strong>request 域名</strong><small class="help-block text-warning mb-0">所列出的域名都要添加，缺一不可。</small></th>
-              <td>app-router.leancloud.cn</td>
+            <th rowspan="{{ domains.request.length }}" width="40%"><strong>request 域名</strong><small class="help-block text-warning mb-0">所列出的域名都要添加，缺一不可。</small></th>
+              <td>{{domains.request[0]}}</td>
           </tr>
-          <tr ng-repeat="domain in extraRequestDomains">
+          <tr ng-repeat="domain in domains.request.slice(1)">
             <td>{{domain}}</td>
           </tr>
           <tr>
