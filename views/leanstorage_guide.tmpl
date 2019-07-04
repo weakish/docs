@@ -6503,7 +6503,28 @@ _ = LCUser.logIn(username: "Tom", password: "cat!@#123") { result in
 LeanCloud 允许应用将用户账户与微信、QQ 等第三方平台关联起来，这样用户就可以直接用第三方账户登录应用。比如说允许用户使用微信登录，那么你的代码会像这样：
 
 {% if platform_name === "Objective-C" %}
-{# TODO #}
+```objc
+NSDictionary *authData = @{
+                            // 必须
+                            @"openid":@"OPENID",
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+
+                            // 可选
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"scope":@"SCOPE",
+                            };
+AVUser *user = [AVUser user];
+AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+[user loginWithAuthData:authData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+            NSLog(@"登录成功");
+        }else{
+            NSLog(@"登录失败：%@",error.localizedFailureReason);
+        }
+}];
+```
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
@@ -6517,7 +6538,11 @@ var authData = {
   refresh_token: 'REFRESH_TOKEN',
   scope:         'SCOPE'
 };
-AV.User.signUpOrlogInWithAuthData(authData, 'weixin');
+AV.User.loginWithAuthData(authData, 'weixin').then(function (s) {
+  // 登录成功
+}, function (error) {
+  // 登录失败
+});
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -6586,7 +6611,11 @@ AV.User.signUpOrlogInWithAuthData(authData, 'weixin');
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.signUpOrlogInWithAuthData(null, 'weixin');
+AV.User.loginWithAuthData(null, 'weixin').then(function (s) {
+  // 解除关联成功
+}, function (error) {
+  // 解除关联失败
+});
 ```
 {% endif %}
 {% if platform_name === "Python" %}
