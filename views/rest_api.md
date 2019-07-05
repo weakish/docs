@@ -122,7 +122,7 @@ Postman 还支持自动生成多种语言（库）调用 REST API 的代码。
     <tr>
       <td>/1.1/users/me</td>
       <td>GET</td>
-      <td>根据 <a href="leanstorage_guide-js.html#SessionToken">sessionToken</a> 获取用户信息</td>
+      <td>根据 <a href="leanstorage_guide-js.html#设置当前用户">sessionToken</a> 获取用户信息</td>
     </tr>
     <tr>
       <td>/1.1/users/&lt;objectId&gt;/refreshSessionToken</td>
@@ -1727,7 +1727,7 @@ https://{{host}}/1.1/login
 
 ### 已登录的用户信息
 
-用户成功注册或登录后，服务器会返回 sessionToken 并保存在本地，后续请求可以通过传递 sessionToken 来获取该用户信息（如访问权限等）。更多说明请参考 [存储 &middot; sessionToken](leanstorage_guide-js.html#SessionToken)。
+用户成功注册或登录后，服务器会返回 sessionToken 并保存在本地，后续请求可以通过传递 sessionToken 来获取该用户信息（如访问权限等）。更多说明请参考 [存储 &middot; 设置当前用户](leanstorage_guide-js.html#设置当前用户)。
 
 ```
 curl -X GET \

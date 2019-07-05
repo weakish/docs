@@ -253,7 +253,7 @@ tags:       ["工作", "销售"]
 
 `{{ baseObjectName }}` 还支持两种特殊的数据类型 `Pointer` 和 `File`，可以分别用来存储指向其他 `{{ baseObjectName }}` 的指针以及二进制数据。
 
-`{{ baseObjectName }}` 同时支持 `GeoPoint`，可以用来存储地理位置信息。参见 [GeoPoints](#geopoints)。
+`{{ baseObjectName }}` 同时支持 `GeoPoint`，可以用来存储地理位置信息。参见 [GeoPoint](#geopoint)。
 
 以下是一些示例：
 
@@ -4745,7 +4745,7 @@ async function example() {
 如果你想更深入地了解和学习 Promise，包括如何对并行的异步操作进行控制，我们推荐阅读 [JavaScript Promise迷你书（中文版）](http://liubin.github.io/promises-book/)这本书。
 {% endif %}
 
-## GeoPoints
+## GeoPoint
 
 LeanCloud 允许你通过将 `{{ geoPointObjectName }}` 关联到 `{{ baseObjectName }}` 的方式存储折射真实世界地理位置的经纬坐标，这样做可以让你查询包含一个点附近的坐标的对象。常见的使用场景有「查找附近的用户」和「查找附近的地点」。
 
@@ -4968,7 +4968,7 @@ query.whereKey("location", .locatedWithin(southwest: southwest, northeast: north
 ```
 {% endif %}
 
-### GeoPoints 的注意事项
+### GeoPoint 的注意事项
 
 使用地理位置需要注意以下方面：
 
