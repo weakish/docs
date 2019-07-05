@@ -4748,6 +4748,7 @@ _ = file.save { result in
 {% endif %}
 {% endif %}
 
+{% if node !== "qcloud" %}
 {% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Java" %}
 ### 图像缩略图
 
@@ -4795,6 +4796,7 @@ file.getThumbnailUrl(true, 100, 100);
 {% call docs.alertWrap() %}
 图片缩略图只支持华北节点的应用，华东和北美节点不支持。
 {% endcall %}
+{% endif %}
 {% endif %}
 
 {% if platform_name === "Objective-C" %}
@@ -5449,6 +5451,7 @@ assert(user.signUp().isSuccess)
 采用「用户名 + 密码」注册时需要注意：密码是以明文方式通过 HTTPS 加密传输给云端，云端会以密文存储密码，并且我们的加密算法是无法通过所谓「彩虹表撞库」获取的，这一点请开发者放心。换言之，用户的密码只可能用户本人知道，开发者不论是通过控制台还是 API 都是无法获取。另外我们需要强调 **在客户端，应用切勿再次对密码加密，这会导致 [重置密码](#重置密码) 等功能失效**。
 {% endcall %}
 
+{% if node !== "qcloud" %}
 #### 手机号注册
 
 对于移动应用来说，允许用户以手机号注册是个很常见的需求。实现该功能大致分两步，第一步是让用户提供手机号，点击「获取验证码」按钮后，该号码会收到一个六位数的验证码：
@@ -5562,6 +5565,7 @@ _ = LCSMSClient.verifyMobilePhoneNumber("+8618200008888", verificationCode: "123
 `{{ userObjectName }}` 接受的手机号以 `+` 和国家代码开头，后面紧跟着剩余的部分。手机号中不应含有任何划线、空格等非数字字符。例如，`+19490008888` 是一个合法的美国或加拿大手机号（`1` 是国家代码），`+8618200008888` 是一个合法的中国手机号（`86` 是国家代码）。
 
 请参阅短信 SMS 服务使用指南中的 [服务覆盖区域和价格](sms-guide.html#服务覆盖区域和价格) 以了解 LeanCloud 支持的国家和地区。
+{% endif %}
 
 ### 登录
 
@@ -5685,6 +5689,7 @@ _ = LCUser.logIn(email: "tom@leancloud.rocks", password: "cat!@#123") { result i
 ```
 {% endif %}
 
+{% if node !== "qcloud" %}
 #### 手机号登录
 
 如果应用允许用户以手机号注册，那么也可以让用户以手机号配合密码或短信验证码登录。下面的代码用手机号和密码登录一个账户：
@@ -5858,6 +5863,7 @@ _ = LCUser.logIn(mobilePhoneNumber: "+8618200008888", verificationCode: "123456"
 测试手机号还可用于将 iOS 应用提交到 App Store 进行审核的场景，因为审核人员可能因没有有效的手机号码而无法登录应用来进行评估审核。如果不提供一个测试手机号，应用有可能被拒绝。
 
 可参阅 [短信 SMS 服务使用指南](sms-guide.html) 来了解更多有关短信发送和接收的限制。
+{% endif %}
 
 #### 单设备登录
 
@@ -5919,6 +5925,7 @@ _ = LCUser.requestVerificationMail(email: "tom@leancloud.rocks") { result in
 
 用户点击邮件内的链接后，`emailVerified` 会变为 `true`。如果用户的 `email` 属性为空，则该属性永远不会为 `true`。
 
+{% if node !== "qcloud" %}
 ### 验证手机号
 
 和 [验证邮箱](#验证邮箱) 类似，应用还可以要求用户在登录或使用特定功能之前验证手机号。默认情况下，当用户注册或变更手机号后，`mobilePhoneVerified` 会被设为 `false`。在应用的 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 中，可以开启 **从客户端注册或更新手机号时，向注册手机号码发送验证短信** 选项，这样当用户注册或变更手机号时，会收到一条含有验证码的短信。在同一设置页面还可找到阻止未验证手机号的用户登录的选项。
@@ -6022,6 +6029,7 @@ _ = LCUser.verifyMobilePhoneNumber(mobilePhoneNumber: "+8618200008888", verifica
     }
 }
 ```
+{% endif %}
 {% endif %}
 
 {# ### CAPTCHA Code
@@ -6344,6 +6352,7 @@ _ = LCUser.requestPasswordReset(email: "tom@leancloud.rocks") { (result) in
 密码重置邮件的内容可在应用的 [控制台 > 设置 > 邮件模版](/dashboard/app.html?appid={{appid}}#/email) 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考 [自定义应用内用户重设密码和邮箱验证页面](https://blog.leancloud.cn/607/)。
 {% endcall %}
 
+{% if node !== "qcloud" %}
 除此之外，还可以用手机号重置密码：
 
 1. 用户输入注册的手机号，请求重置密码；
@@ -6458,6 +6467,7 @@ _ = LCUser.resetPassword(mobilePhoneNumber: "+8618200008888", verificationCode: 
 {% endif %}
 
 {# > Note that the messaging in either of the above flows will reference your app by the name that you specified when you created this app on LeanCloud. #}
+{% endif %}
 
 ### 用户的查询
 
@@ -6801,6 +6811,7 @@ _ = LCUser.logIn(username: "Tom", password: "cat!@#123") { result in
 
 对于给定的一个对象，可以指定哪些用户有权限读取或修改它。为实现该功能，每个对象都有一个由 `{% if platform_name === "Objective-C" %}AVACL{% endif %}{% if platform_name === "JavaScript" %}AV.ACL{% endif %}{% if platform_name === "Python" %}leancloud.ACL{% endif %}{% if platform_name === "PHP" %}ACL{% endif %}{% if platform_name === "Java" %}AVACL{% endif %}{% if platform_name === "Swift" %}LCACL{% endif %}` 对象组成的访问控制表。请参阅 [ACL 权限管理开发指南](acl-guide.html)。
 
+{% if node !== "qcloud" %}
 ### 第三方账户登录
 
 LeanCloud 允许应用将用户账户与微信、QQ 等第三方平台关联起来，这样用户就可以直接用第三方账户登录应用。比如说允许用户使用微信登录，那么你的代码会像这样：
@@ -7149,6 +7160,7 @@ AV.User.loginWithAuthData(null, 'weixin').then(function (s) {
 {% endif %}
 {% if platform_name === "Swift" %}
 {# TODO #}
+{% endif %}
 {% endif %}
 
 {% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Java" %}
@@ -7762,9 +7774,11 @@ assert(student.save().isSuccess)
 
 应用内搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [应用内搜索指南](app_search_guide.html).
 
+{% if node !== "qcloud" %}
 ## 应用内社交
 
 应用内社交，又称「事件流」，在应用开发中出现的场景非常多，包括用户间关注（好友）、朋友圈（时间线）、状态、互动（点赞）、私信等常用功能，请参考 [应用内社交模块](status_system.html).
+{% endif %}
 
 {% if platform_name === "JavaScript" %}
 ## Push 通知
