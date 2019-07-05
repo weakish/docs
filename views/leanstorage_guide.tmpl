@@ -156,7 +156,7 @@ do {
 
 ### 开启调试日志
 
-在应用开发阶段，可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口、浏览器 Console 或是 [LeanCloud 控制台 > 云引擎 > 应用日志](/cloud.html?appid={{appid}}#/log) 里面。
+在应用开发阶段，可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口、浏览器 Console 或是 [LeanCloud 控制台 > 云引擎 > 应用日志](/dashboard/cloud.html?appid={{appid}}#/log) 里面。
 
 {% if platform_name === "Objective-C" %}
 ```objc
@@ -171,7 +171,7 @@ do {
 DEBUG=leancloud* npm start
 ```
 
-若是在 [云引擎](leanengine_overview.html) 中使用 Node.js，可以到 [控制台 > 云引擎 > 设置 > 自定义环境变量](/cloud.html?appid={{appid}}#/conf) 里面添加一个新的变量，在第一栏填入 `DEBUG`，第二栏填入 `leancloud:*`（不要丢掉 `leancloud` 和 `*` 之间的冒号）。保存成功后，在本地通过 [命令行工具](leanengine_cli.html) 调试时，可以通过设置环境变量 `DEBUG=leancloud:*` 来让日志信息输出到 [LeanCloud 控制台 > 云引擎 > 应用日志](/cloud.html?appid={{appid}}#/log)：
+若是在 [云引擎](leanengine_overview.html) 中使用 Node.js，可以到 [控制台 > 云引擎 > 设置 > 自定义环境变量](/dashboard/cloud.html?appid={{appid}}#/conf) 里面添加一个新的变量，在第一栏填入 `DEBUG`，第二栏填入 `leancloud:*`（不要丢掉 `leancloud` 和 `*` 之间的冒号）。保存成功后，在本地通过 [命令行工具](leanengine_cli.html) 调试时，可以通过设置环境变量 `DEBUG=leancloud:*` 来让日志信息输出到 [LeanCloud 控制台 > 云引擎 > 应用日志](/dashboard/cloud.html?appid={{appid}}#/log)：
 
 ```sh
 DEBUG=leancloud:* lean up
@@ -222,7 +222,7 @@ LCApplication.logLevel = .all
 {% if platform_name === "JavaScript" %}
 ### Web 安全
 
-如果在前端使用 JavaScript SDK，当你准备正式发布的时候，请务必在 [控制台 > 设置 > 安全中心](/app.html?appid={{appid}}#/security) 中配置 **Web 安全域名**，这样可以防止其他人通过外网其他地址盗用你的服务器资源。
+如果在前端使用 JavaScript SDK，当你准备正式发布的时候，请务必在 [控制台 > 设置 > 安全中心](/dashboard/app.html?appid={{appid}}#/security) 中配置 **Web 安全域名**，这样可以防止其他人通过外网其他地址盗用你的服务器资源。
 
 不过这样做还不够，因为你的应用是暴露在公网上的，任何人都有可能伪造请求来绕过前面的防范措施。所以 LeanCloud 还提供了其他方法来保护你的应用安全。参见：
 
@@ -403,7 +403,7 @@ let installation : LCInstallation = LCInstallation()
 {% call docs.noteWrap() %}
 注意：时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
 
-[控制台 > 存储 > 数据](/data.html?appid={{appid}}#/) 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 [REST API](rest_api.html) 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
+[控制台 > 存储 > 数据](/dashboard/data.html?appid={{appid}}#/) 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 [REST API](rest_api.html) 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
 {% endcall %}
 
 若想了解 LeanCloud 是如何保护应用数据的，请阅读 [数据和安全](data_security.html)。
@@ -605,7 +605,7 @@ do {
 ```
 {% endif %}
 
-为了确认对象已经保存成功，我们可以到 [控制台 > 存储 > 数据 > `Todo`](/data.html?appid={{appid}}#/Todo) 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
+为了确认对象已经保存成功，我们可以到 [控制台 > 存储 > 数据 > `Todo`](/dashboard/data.html?appid={{appid}}#/Todo) 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
 
 ```json
 {
@@ -624,7 +624,7 @@ do {
 ```
 
 {% call docs.noteWrap() %}
-无需在 [控制台 > 存储 > 数据](/data.html?appid={{appid}}#/) 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
+无需在 [控制台 > 存储 > 数据](/dashboard/data.html?appid={{appid}}#/) 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
 {% endcall %}
 
 以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
@@ -1513,6 +1513,37 @@ _ = query.find { (result) in
 
 虽然上述方法可以在一次请求中包含多个操作，每一个分别的保存或同步操作在计费时依然会被算作一次请求，而所有的删除操作则会被合并为一次请求。
 
+{% if platform_name === "Objective-C" or platform_name === "Java" or platform_name === "Swift" %}
+### 后台运行
+
+细心的开发者已经发现，在所有的示例代码中几乎都是用了异步来访问 LeanStorage 云端，形如{% if platform_name === "Objective-C" %} `xxxxInBackground` {% endif %}{% if platform_name === "Java" %} `xxxxInBackground` {% endif %}{% if platform_name === "Swift" %}下面{% endif %}的用法都是提供给开发者在主线程调用用以实现后台运行的方法，因此开发者在主线程可以放心地调用这种命名方式的函数。另外，需要强调的是 **回调函数的代码是在主线程执行**。
+
+{% if platform_name === "Swift" %}
+```swift
+let todo = LCObject(className: "Todo")
+
+_ = todo.save { result in
+    switch result {
+    case .success:
+        break
+    case .failure(let error):
+        print(error)
+    }
+}
+```
+{% endif %}
+{% endif %}
+
+{% if platform_name === "Objective-C" or platform_name === "Java" %}
+### 离线存储对象
+
+大多数保存功能可以立刻执行，并通知应用「保存完毕」。不过若不需要知道保存完成的时间，则可使用 `saveEventually` 来代替。
+
+它的优点在于：如果用户目前尚未接入网络，`saveEventually` 会缓存设备中的数据，并在网络连接恢复后上传。如果应用在网络恢复之前就被关闭了，那么当它下一次打开时，LeanStorage 会再次尝试保存操作。
+
+所有 `saveEventually`（或 `deleteEventually`）的相关调用，将按照调用的顺序依次执行。因此，多次对某一对象使用 `saveEventually` 是安全的。
+{% endif %}
+
 ### 数据模型
 
 对象之间可以产生关联。拿一个博客应用来说，一个 `Post` 对象可以与许多个 `Comment` 对象产生关联。LeanCloud 支持三种关系：一对一、一对多、多对多。
@@ -1689,6 +1720,132 @@ try comment.set("post", value: post)
 {% call docs.noteWrap() %}
 我们知道设计数据模型并不容易，所以我们专门写了一篇 [数据模型设计指南](relation-guide.html) 来详细介绍这部分内容，推荐你去看一下。
 {% endcall %}
+
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Java" or platform_name === "Swift" %}
+### 序列化和反序列化
+
+在实际的开发中，把 `{{ baseObjectName }}` 当做参数传递的时候，会涉及到复杂对象的拷贝的问题，因此 `{{ baseObjectName }}` 也提供了序列化和反序列化的方法。
+
+序列化：
+
+{% if platform_name === "Objective-C" %}
+```objc
+AVObject *todo = [[AVObject alloc] initWithClassName:@"Todo"]; // 构建对象
+[todo setObject:@"马拉松报名" forKey:@"title"]; // 设置名称
+[todo setObject:@2 forKey:@"priority"]; // 设置优先级
+[todo setObject:[AVUser currentUser] forKey:@"owner"]; // 这里就是一个 Pointer 类型，指向当前登录的用户
+
+NSMutableDictionary *serializedJSONDictionary = [todo dictionaryForObject]; // 获取序列化后的字典
+NSError *err;
+NSData *jsonData = [NSJSONSerialization dataWithJSONObject:serializedJSONDictionary options:0 error:&err]; // 获取 JSON 数据
+NSString *serializedString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]; // 获取 JSON 字符串
+// serializedString 的内容是：{"title":"马拉松报名","className":"Todo","priority":2}
+```
+{% endif %}
+{% if platform_name === "JavaScript" %}
+```js
+var todo = new AV.Object('Todo'); // 构建对象
+todo.set('title', '马拉松报名'); // 设置名称
+todo.set('priority', 2); // 设置优先级
+todo.set('owner', AV.User.current()); // 这里就是一个 Pointer 类型，指向当前登录的用户
+
+// 将 AV.Object 对象反序列化成 JSON 对象
+var json = todo.toFullJSON();
+// 将 JSON 对象序列化为字符串
+var serializedString = JSON.stringify(json);
+```
+
+{% call docs.noteWrap() %}
+`AV.Object` 还提供了另一个方法 `toJSON()`。它们的区别是 `toJSON()` 得到的对象仅包含对象的 payload，一般用于展示，而 `toFullJSON()` 得到的对象包含了元数据，一般用于传输。在使用时请注意区分。
+{% endcall %}
+{% endif %}
+{% if platform_name === "Java" %}
+```java
+AVObject todo = new AVObject("Todo"); // 构建对象
+todo.put("title", "马拉松报名"); // 设置名称
+todo.put("priority", 2); // 设置优先级
+todo.put("owner", AVUser.getCurrentUser()); // 这里就是一个 Pointer 类型，指向当前登录的用户
+String serializedString = todo.toString();
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+do {
+    let todo = LCObject(className: "Todo")
+
+    try todo.set("title", value: "马拉松报名")
+    try todo.set("priority", value: 2)
+    try todo.set("owner", value: LCApplication.default.currentUser)
+
+    let data: Data
+    if #available(iOS 11.0, *) {
+        data = try NSKeyedArchiver.archivedData(withRootObject: todo, requiringSecureCoding: false)
+    } else {
+        data = NSKeyedArchiver.archivedData(withRootObject: todo)
+    }
+} catch {
+    print(error)
+}
+```
+{% endif %}
+
+反序列化：
+
+{% if platform_name === "Objective-C" %}
+```objc
+NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionaryWithCapacity:10];// 声明一个 NSMutableDictionary
+[objectDictionary setObject:@"马拉松报名" forKey:@"title"];
+[objectDictionary setObject:@2 forKey:@"priority"];
+[objectDictionary setObject:@"Todo" forKey:@"className"];
+
+AVObject *todo = [AVObject objectWithDictionary:objectDictionary]; // 由 NSMutableDictionary 转化一个 AVObject
+
+[todo saveInBackground]; // 保存到云端
+```
+{% endif %}
+{% if platform_name === "JavaScript" %}
+```js
+// 将字符串反序列化为 JSON 对象
+var json = JSON.parse(serializedString);
+// 将 JSON 对象反序列化成 AV.Object 对象
+var todo = AV.parse(json);
+```
+{% endif %}
+{% if platform_name === "Java" %}
+```java
+AVObject deserializedObject = AVObject.parseAVObject(serializedString);
+deserializedObject.save(); // 保存到服务端
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+do {
+    let todo = LCObject(className: "Todo")
+
+    try todo.set("title", value: "马拉松报名")
+    try todo.set("priority", value: 2)
+    try todo.set("owner", value: LCApplication.default.currentUser)
+
+    let data: Data
+    if #available(iOS 11.0, *) {
+        data = try NSKeyedArchiver.archivedData(withRootObject: todo, requiringSecureCoding: false)
+    } else {
+        data = NSKeyedArchiver.archivedData(withRootObject: todo)
+    }
+
+    let newTodo: LCObject? = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? LCObject
+} catch {
+    print(error)
+}
+```
+{% endif %}
+{% endif %}
+
+{% if platform_name === "Python" %}
+### 线程安全
+
+`leancloud.Object` 目前不是线程安全的，因此请避免多个线程修改同一个 `leancloud.Object` 实例的操作。如果遇到必须多线程操作的情况，需要根据情况加锁。
+{% endif %}
 
 ## 查询
 
@@ -3483,7 +3640,69 @@ let query = createdAtQuery.and(orQuery)
 ```
 {% endif %}
 
-{# ### Caching Results #}
+{% if platform_name === "Objective-C" %}
+### 缓存查询
+
+缓存一些查询的结果到磁盘上，这可以让你在离线的时候，或者应用刚启动，网络请求还没有足够时间完成的时候可以展现一些数据给用户。当缓存占用了太多空间的时候，LeanStorage 会自动清空缓存。
+
+默认情况下的查询不会使用缓存，除非你调用接口明确设置启用。例如，尝试从网络请求，如果网络不可用则从缓存数据中获取，可以这样设置：
+
+```objc
+AVQuery *query = [AVQuery queryWithClassName:@"Post"];
+query.cachePolicy = kAVCachePolicyNetworkElseCache;
+
+// 设置缓存有效期
+query.maxCacheAge = 24*3600;
+
+[query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+if (!error) {
+    // 成功找到结果，先找网络再访问磁盘
+} else {
+    // 无法访问网络，本次查询结果未做缓存
+}
+}];
+```
+
+#### 缓存策略
+
+为了满足多变的需求，SDK 默认提供了以下几种缓存策略：
+
+策略枚举 | 含义及解释
+--- | ---
+`kAVCachePolicyIgnoreCache`| **（默认缓存策略）**查询行为不从缓存加载，也不会将结果保存到缓存中。
+`kAVCachePolicyCacheOnly` | 查询行为忽略网络状况，只从缓存加载。如果没有缓存结果，该策略会产生 `AVError`。
+`kAVCachePolicyCacheElseNetwork` | 查询行为首先尝试从缓存加载，若加载失败，则通过网络加载结果。如果缓存和网络获取行为均为失败，则产生 `AVError`。
+`kAVCachePolicyNetworkElseCache` | 查询行为先尝试从网络加载，若加载失败，则从缓存加载结果。如果缓存和网络获取行为均为失败，则产生 `AVError`。
+`kAVCachePolicyCacheThenNetwork` | 查询先从缓存加载，然后从网络加载。在这种情况下，回调函数会被调用两次，第一次是缓存中的结果，然后是从网络获取的结果。因为它会在不同的时间返回两个结果，所以该策略不能与 `findObjects` 同时使用。
+
+#### 缓存相关的操作
+
+- 检查是否存在缓存查询结果：
+
+  ```objc
+  BOOL isInCache = [query hasCachedResult];
+  ```
+
+- 删除某一查询的任何缓存结果：
+
+  ```objc
+  [query clearCachedResult];
+  ```
+
+- 删除查询的所有缓存结果：
+
+  ```objc
+  [AVQuery clearAllCachedResults];
+  ```
+
+- 设定缓存结果的最长时限：
+
+  ```objc
+  query.maxCacheAge = 60 * 60 * 24; // 一天的总秒数
+  ```
+
+查询缓存也适用于 `AVQuery` 的辅助方法，包括 `getFirstObject` 和 `getObjectInBackground`。
+{% endif %}
 
 ### 查询性能优化
 
@@ -3509,7 +3728,7 @@ LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket �
 
 ### 启用 LiveQuery
 
-进入 [控制台 > 存储 > 设置](/storage.html?appid={{appid}}#/storage/conf)，在 **其他** 里面勾选 **启用 LiveQuery**{% if platform_name === "Objective-C" %}，然后将下面的 pod 添加到项目根目录下的 `Podfile` 即可：{% endif %}{% if platform_name === "JavaScript" %}，然后将下面的 npm 模块添加到项目中即可：{% endif %}{% if platform_name === "Java" %}即可。确保即时通信模块已被添加到 `AndroidManifest.xml`：{% endif %}
+进入 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf)，在 **其他** 里面勾选 **启用 LiveQuery**{% if platform_name === "Objective-C" %}，然后将下面的 pod 添加到项目根目录下的 `Podfile` 即可：{% endif %}{% if platform_name === "JavaScript" %}，然后将下面的 npm 模块添加到项目中即可：{% endif %}{% if platform_name === "Java" %}即可。确保即时通信模块已被添加到 `AndroidManifest.xml`：{% endif %}
 
 {% if platform_name === "Objective-C" %}
 ```ruby
@@ -4509,7 +4728,88 @@ _ = file.save { result in
 ```
 {% endif %}
 
-{# ### Retrieving Files #}
+{% if platform_name === "Objective-C" %}
+### 文件下载
+
+客户端 SDK 接口可以下载文件并把它缓存起来，只要文件的 URL 不变，那么一次下载成功之后，就不会再重复下载，目的是为了减少客户端的流量。
+
+{% if platform_name === "Objective-C" %}
+```objc
+[file downloadWithProgress:^(NSInteger number) {
+    // 下载的进度数据，number 介于 0 和 100
+} completionHandler:^(NSURL * _Nullable filePath, NSError * _Nullable error) {
+    // filePath 是文件下载到本地的地址
+}];
+```
+
+`filePath` 是一个相对路径，文件存储在缓存目录（使用缓存功能）或系统临时目录（不使用缓存功能）中。
+
+请注意代码中 `下载进度` 数据的读取。
+{% endif %}
+{% endif %}
+
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Java" %}
+### 图像缩略图
+
+保存图像时，如果想在下载原图之前先得到缩略图，方法如下：
+
+{% if platform_name === "Objective-C" %}
+```objc
+AVFile *file = [AVFile fileWithRemoteURL:[NSURL URLWithString:@"文件-url"]];
+[file getThumbnail:YES width:100 height:100 withBlock:^(UIImage *image, NSError *error) {
+    // 其他逻辑
+}];
+```
+{% endif %}
+{% if platform_name === "JavaScript" %}
+```js
+// 获得宽度为 100 像素，高度 200 像素的缩略图
+var url = file.thumbnailURL(100, 200);
+```
+{% endif %}
+{% if platform_name === "Python" %}
+```python
+avatar = leancloud.File.create_without_data('5732df1c1ea4930060ba4642')
+avatar.fetch()
+
+thumbnail_url = avatar.get_thumbnail_url(width=100, height=100)
+```
+{% endif %}
+{% if platform_name === "PHP" %}
+```php
+$file = File::createWithUrl("test.jpg", "文件-url");
+$file->getThumbnailUrl(100, 100);
+```
+{% endif %}
+{% if platform_name === "Java" %}
+```java
+AVFile file = new AVFile("test.jpg", "文件-url", new HashMap<String, Object>());
+file.getThumbnailUrl(true, 100, 100);
+```
+{% endif %}
+
+{% call docs.noteWrap() %}
+图片最大不超过 **20 MB** 才可以获取缩略图。
+{% endcall %}
+
+{% call docs.alertWrap() %}
+图片缩略图只支持华北节点的应用，华东和北美节点不支持。
+{% endcall %}
+{% endif %}
+
+{% if platform_name === "Objective-C" %}
+### 清除缓存
+
+AVFile 也提供了清除缓存的方法：
+
+```objc
+// 清除当前文件缓存
+- (void)clearPersistentCache;
+
+// 类方法, 清除所有缓存
++ (BOOL)clearAllPersistentCache;
+```
+{% endif %}
 
 ### 删除文件
 
@@ -4553,12 +4853,12 @@ file.delete()
 {% endif %}
 
 {% call docs.alertWrap() %}
-默认情况下，文件的删除权限是关闭的，需要进入 [控制台 > 存储 > 数据 > `_File`](/data.html?appid={{appid}}#/_File)，选择 **其他** > **权限设置** > **`delete`** 来开启。
+默认情况下，文件的删除权限是关闭的，需要进入 [控制台 > 存储 > 数据 > `_File`](/dashboard/data.html?appid={{appid}}#/_File)，选择 **其他** > **权限设置** > **`delete`** 来开启。
 {% endcall %}
 
 ### 启用 HTTPS 域名
 
-如果希望使用 HTTPS 域名来访问文件，需要进入 [控制台 > 存储 > 设置 > 自定义文件域名](/storage.html?appid={{appid}}#/storage/conf)，勾选 **启用 HTTPS 域名**。HTTPS 文件流量无免费的使用额度，收费标准将在该选项开启时显示。
+如果希望使用 HTTPS 域名来访问文件，需要进入 [控制台 > 存储 > 设置 > 自定义文件域名](/dashboard/storage.html?appid={{appid}}#/storage/conf)，勾选 **启用 HTTPS 域名**。HTTPS 文件流量无免费的使用额度，收费标准将在该选项开启时显示。
 
 「启用 HTTPS 域名」会影响到 API 返回的文件地址是 HTTPS 还是 HTTP 类型的 URL。需要注意的是，即使没有启用这一选项，终端仍然可以选择使用 HTTPS URL 来访问文件，但由此会产生 HTTPS 流量扣费。
 
@@ -4600,7 +4900,7 @@ LeanCloud 即时通讯组件也使用 `{{ fileObjectName }}` 来保存消息的�
 
 ### 设置自定义文件域名
 
-LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地访问到存储在云端的文件。但由于受网络法规的管控与限制，我们无法 100% 保证该公用域名随时可用。因此，强烈建议开发者 **使用自定义域名来访问自己的文件**，以避免公用域名不可用之时应用的体验会受到影响。请前往 [控制台 > 存储 > 设置 > 自定义文件域名](/storage.html?appid={{appid}}#/storage/conf) 设置自定义域名。
+LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地访问到存储在云端的文件。但由于受网络法规的管控与限制，我们无法 100% 保证该公用域名随时可用。因此，强烈建议开发者 **使用自定义域名来访问自己的文件**，以避免公用域名不可用之时应用的体验会受到影响。请前往 [控制台 > 存储 > 设置 > 自定义文件域名](/dashboard/storage.html?appid={{appid}}#/storage/conf) 设置自定义域名。
 
 注意，绑定域名的操作是不可逆的。绑定域名后无法取消绑定，但可以更换绑定的域名。
 
@@ -4975,6 +5275,9 @@ query.whereKey("location", .locatedWithin(southwest: southwest, northeast: north
 - 每个 `{{ baseObjectName }}` 数据对象中只能有一个 `{{ geoPointObjectName }}` 对象的属性。
 - 地理位置的点不能超过规定的范围。纬度的范围应该是在 `-90.0` 到 `90.0` 之间，经度的范围应该是在 `-180.0` 到 `180.0` 之间。如果添加的经纬度超出了以上范围，将导致程序错误。
 {# - Using the `near` constraint will also limit results to within 100 miles. #}
+{% if platform_name === "Objective-C" %}
+- iOS 8.0 之后，使用定位服务之前，需要调用 `[locationManager requestWhenInUseAuthorization]` 或 `[locationManager requestAlwaysAuthorization]` 来获取用户的「使用期授权」或「永久授权」，而这两个请求授权需要在 `info.plist` 里面对应添加 `NSLocationWhenInUseUsageDescription` 或 `NSLocationAlwaysUsageDescription` 的键值对，值为开启定位服务原因的描述。SDK 内部默认使用的是「使用期授权」。
+{% endif %}
 
 ## 用户
 
@@ -5444,7 +5747,7 @@ _ = LCUser.logIn(mobilePhoneNumber: "+8618200008888", password: "cat!@#123") { r
 {% endif %}
 
 {% call docs.noteWrap() %}
-默认情况下，LeanCloud 允许所有关联了手机号的用户直接以手机号登录，无论手机号是否 [通过验证](#验证手机号)。为了让应用更加安全，你可以选择只允许验证过手机号的用户通过手机号登录。可以在 [控制台 > 存储 > 设置](/storage.html?appid={{appid}}#/storage/conf) 里面开启该功能。
+默认情况下，LeanCloud 允许所有关联了手机号的用户直接以手机号登录，无论手机号是否 [通过验证](#验证手机号)。为了让应用更加安全，你可以选择只允许验证过手机号的用户通过手机号登录。可以在 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 里面开启该功能。
 {% endcall %}
 
 除此之外，还可以让用户通过短信验证码登录，适用于用户忘记密码且不愿重置密码的情况。和 [通过手机号注册](#手机号注册) 的步骤类似，首先让用户填写与账户关联的手机号码，然后在用户点击「获取验证码」后调用下面的方法：
@@ -5550,7 +5853,7 @@ _ = LCUser.logIn(mobilePhoneNumber: "+8618200008888", verificationCode: "123456"
 
 在开发过程中，可能会因测试目的而需要频繁地用手机号注册登录，然而运营商的发送频率限制往往会导致测试过程耗费较多的时间。
 
-为了解决这个问题，可以在 [控制台 > 消息 > 短信 > 设置](/messaging.html?appid={{appid}}#/message/sms/conf) 里面设置一个测试手机号，而云端会为该号码生成一个固定验证码。以后进行登录操作时，只要使用的是这个号码，云端就会直接放行，无需经过运营商网络。
+为了解决这个问题，可以在 [控制台 > 消息 > 短信 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf) 里面设置一个测试手机号，而云端会为该号码生成一个固定验证码。以后进行登录操作时，只要使用的是这个号码，云端就会直接放行，无需经过运营商网络。
 
 测试手机号还可用于将 iOS 应用提交到 App Store 进行审核的场景，因为审核人员可能因没有有效的手机号码而无法登录应用来进行评估审核。如果不提供一个测试手机号，应用有可能被拒绝。
 
@@ -5572,7 +5875,7 @@ _ = LCUser.logIn(mobilePhoneNumber: "+8618200008888", verificationCode: "123456"
 
 ### 验证邮箱
 
-可以通过要求用户在登录或使用特定功能之前验证邮箱的方式防止恶意注册。默认情况下，当用户注册或变更邮箱后，`emailVerified` 会被设为 `false`。在应用的 [控制台 > 存储 > 设置](/storage.html?appid={{appid}}#/storage/conf) 中，可以开启 **从客户端注册邮箱或者更新邮箱时，发送验证邮件** 选项，这样当用户注册或变更邮箱时，会收到一封含有验证链接的邮件。在同一设置页面还可找到阻止未验证邮箱的用户登录的选项。
+可以通过要求用户在登录或使用特定功能之前验证邮箱的方式防止恶意注册。默认情况下，当用户注册或变更邮箱后，`emailVerified` 会被设为 `false`。在应用的 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 中，可以开启 **从客户端注册邮箱或者更新邮箱时，发送验证邮件** 选项，这样当用户注册或变更邮箱时，会收到一封含有验证链接的邮件。在同一设置页面还可找到阻止未验证邮箱的用户登录的选项。
 
 如果用户忘记点击链接并且在未来某一时刻需要进行验证，可以用下面的代码发送一封新的邮件：
 
@@ -5618,7 +5921,7 @@ _ = LCUser.requestVerificationMail(email: "tom@leancloud.rocks") { result in
 
 ### 验证手机号
 
-和 [验证邮箱](#验证邮箱) 类似，应用还可以要求用户在登录或使用特定功能之前验证手机号。默认情况下，当用户注册或变更手机号后，`mobilePhoneVerified` 会被设为 `false`。在应用的 [控制台 > 存储 > 设置](/storage.html?appid={{appid}}#/storage/conf) 中，可以开启 **从客户端注册或更新手机号时，向注册手机号码发送验证短信** 选项，这样当用户注册或变更手机号时，会收到一条含有验证码的短信。在同一设置页面还可找到阻止未验证手机号的用户登录的选项。
+和 [验证邮箱](#验证邮箱) 类似，应用还可以要求用户在登录或使用特定功能之前验证手机号。默认情况下，当用户注册或变更手机号后，`mobilePhoneVerified` 会被设为 `false`。在应用的 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 中，可以开启 **从客户端注册或更新手机号时，向注册手机号码发送验证短信** 选项，这样当用户注册或变更手机号时，会收到一条含有验证码的短信。在同一设置页面还可找到阻止未验证手机号的用户登录的选项。
 
 可以随时用下面的代码发送一条新的验证码：
 
@@ -5917,7 +6220,7 @@ _ = LCUser.logIn(sessionToken: "anmlwi96s381m6ca7o7266pzf") { (result) in
 {% endcall %}
 
 {% call docs.noteWrap() %}
-如果在 [控制台 > 存储 > 设置](/storage.html?appid={{appid}}#/storage/conf) 中勾选了 **密码修改后，强制客户端重新登录**，那么当一个用户修改密码后，该用户的 session token 会被重置。此时需要让用户重新登录，否则会遇到 [`403 (Forbidden)`](error_code.html#_403) 错误。
+如果在 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 中勾选了 **密码修改后，强制客户端重新登录**，那么当一个用户修改密码后，该用户的 session token 会被重置。此时需要让用户重新登录，否则会遇到 [`403 (Forbidden)`](error_code.html#_403) 错误。
 {% endcall %}
 
 下面的代码检查 session token 是否有效：
@@ -6038,7 +6341,7 @@ _ = LCUser.requestPasswordReset(email: "tom@leancloud.rocks") { (result) in
 上面的代码会查询 `_User` 表中是否有对象的 `email` 属性与前面提供的邮箱匹配。如果有的话，则向该邮箱发送一封密码重置邮件。之前提到过，应用可以让 `username` 与 `email` 保持一致，也可以单独收集用户的邮箱并将其存为 `email`。
 
 {% call docs.noteWrap() %}
-密码重置邮件的内容可在应用的 [控制台 > 设置 > 邮件模版](/app.html?appid={{appid}}#/email) 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考 [自定义应用内用户重设密码和邮箱验证页面](https://blog.leancloud.cn/607/)。
+密码重置邮件的内容可在应用的 [控制台 > 设置 > 邮件模版](/dashboard/app.html?appid={{appid}}#/email) 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考 [自定义应用内用户重设密码和邮箱验证页面](https://blog.leancloud.cn/607/)。
 {% endcall %}
 
 除此之外，还可以用手机号重置密码：
@@ -6090,7 +6393,7 @@ _ = LCUser.requestPasswordReset(mobilePhoneNumber: "+8618200008888") { (result) 
 上面的代码会查询 `_User` 表中是否有对象的 `mobilePhoneNumber` 属性与前面提供的手机号匹配。如果有的话，则向该号码发送验证码短信。
 
 {% call docs.noteWrap() %}
-可以在 [控制台 > 存储 > 设置](/storage.html?appid={{appid}}#/storage/conf) 中设置只有在 `mobilePhoneVerified` 为 `true` 的情况下才能用手机号重置密码。
+可以在 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 中设置只有在 `mobilePhoneVerified` 为 `true` 的情况下才能用手机号重置密码。
 {% endcall %}
 
 用户输入验证码和新密码后，用下面的代码完成密码重置：
@@ -6578,9 +6881,17 @@ AV.User.loginWithAuthData(authData, 'weixin').then(function (s) {
 }
 ```
 
-默认情况下，`authData` 不会被返回给客户端，除非它属于当前用户。如需修改此行为，可进入 [控制台 > 存储 > 数据 > `_User`](/data.html?appid={{appid}}#/_User)，点击 `authData` 列表头旁边的箭头，点击 **编辑**，然后取消选中 **只限所属用户读写**，这样所有人就都能访问这条数据了。
+默认情况下，`authData` 不会被返回给客户端，除非它属于当前用户。如需修改此行为，可进入 [控制台 > 存储 > 数据 > `_User`](/dashboard/data.html?appid={{appid}}#/_User)，点击 `authData` 列表头旁边的箭头，点击 **编辑**，然后取消选中 **只限所属用户读写**，这样所有人就都能访问这条数据了。
 
 为确保每个 `{{ userObjectName }}` 只会关联每个平台一次，`_User` class 中每个用户的 `authData.<SERVICE_NAME>.openid` 需要保持独一无二。
+
+#### 配置平台账号
+
+开始使用前，需要在 [控制台 > 组件 > 社交](/dashboard/devcomponent.html?appid={{appid}}#/component/sns) 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。点击保存，自动生成 **回调 URL** 和 **登录 URL**。
+
+以微博开放平台举例，它需要单独配置 **回调 URL**。在微博开放平台的 **应用信息** > **高级信息** > **OAuth2.0 授权设置** 里的「授权回调页」中绑定生成的 **回调 URL**。测试阶段，在微博开放平台的 **应用信息** > **测试信息** 添加微博账号，在腾讯开放平台的 **QQ 登录** > **应用调试者** 里添加 QQ 账号即可。在应用通过审核后，可以获取公开的第三方登录能力。
+
+配置平台账号的目的在于创建 `{{ userObjectName }}` 时，LeanCloud 云端会使用相关信息去校验 `authData` 的合法性，确保 `{{ userObjectName }}` 实际对应着一个合法真实的用户，确保平台安全性。如果想关闭自动校验 `authData` 的功能，需要在 [控制台 > 组件 > 社交](/dashboard/devcomponent.html?appid={{appid}}#/component/sns) 中 **取消勾选**「第三方登录时，验证用户 AccessToken 合法性」。
 
 #### 鉴权数据
 
@@ -6600,7 +6911,216 @@ AV.User.loginWithAuthData(authData, 'weixin').then(function (s) {
 }
 ```
 
-云端会自动验证部分服务的 access token 的有效性以防止伪造请求。如果验证失败，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，你需要自己去验证 access token 的有效性。如果不希望云端自动验证 access token，可以在 [控制台 > 存储 > 设置](/storage.html?appid={{appid}}#/storage/conf) 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
+云端会自动验证部分服务的 access token 的有效性以防止伪造请求。如果验证失败，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，你需要自己去验证 access token 的有效性。如果不希望云端自动验证 access token，可以在 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
+
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" %}
+#### 扩展需求
+
+##### 新用户登录时必须填用户信息
+
+满足需求：一个新用户使用第三方账号授权拿到相关信息后，仍然需要设置账号相关的用户名、手机号、密码等重要信息后，才被允许登录成功。
+
+这时要使用 `loginWithauthData` 登录接口的 `failOnNotExist` 参数并将其设置为 `ture`。服务端会判断是否已存在能匹配上的 `authData`，否的话，返回 `211` 错误码和 `Could not find user` 报错信息。开发者根据这个 `211` 错误码，跳转到要求输入用户名、密码、手机号等信息的页面，实例化一个 `{{ userObjectName }}` 对象，保存上述补充数据，再次调用 `loginWithauthData` 接口进行登录，并 **不再传入 `failOnNotExist` 参数**。示例代码如下：
+
+{% if platform_name === "Objective-C" %}
+```objc
+NSDictionary *authData = @{
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"openid":@"OPENID",
+                            @"scope":@"SCOPE",
+                            };
+AVUser *user = [AVUser user];
+AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+option.failOnNotExist = true;
+[user loginWithAuthData:authData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // 你的逻辑
+    } else if ([error.domain isEqualToString:kLeanCloudErrorDomain] && error.code == 211) {
+        // 不存在 authData 的 AVUser 的实例，跳转到输入用户名、密码、手机号等业务页面
+    }
+}];
+
+// 跳转到输入用户名、密码、手机号等业务页面之后
+AVUser *user = [AVUser user];
+user.username = @"Tom";
+user.mobilePhoneNumber = @"+8618200008888";
+AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+[user loginWithAuthData:authData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            NSLog(@"登录成功");
+    }else{
+            NSLog(@"登录失败：%@",error.localizedFailureReason);
+    }
+}];
+```
+{% endif %}
+{% if platform_name === "JavaScript" %}
+```js
+var authData = {
+  access_token: 'ACCESS_TOKEN',
+  expires_in: 7200,
+  refresh_token: 'REFRESH_TOKEN',
+  openid: 'OPENID',
+  scope: 'SCOPE',
+};
+AV.User.loginWithAuthData(authData, 'weixin', { failOnNotExist: true }).then(function (s) {
+  // 登录成功
+}, function (error) {
+  // 登录失败
+  // 检查 error.code == 211，跳转到用户名、手机号等资料的输入页面
+});
+
+var user = new AV.User();
+// 设置用户名
+user.setUsername('Tom');
+// 设置密码
+user.setMobilePhoneNumber('+8618200008888');
+user.setPassword('cat!@#123');
+// 设置邮箱
+user.setEmail('tom@leancloud.rocks');
+user.loginWithAuthData(authData, 'weixin').then(function (loggedInUser) {
+  console.log(loggedInUser);
+}, function (error) {
+});
+```
+{% endif %}
+
+##### 接入 UnionID 体系
+
+随着第三方平台的账户体系变得日渐复杂，它们的 `authData` 出现了一些较大的变化。下面我们以最典型的微信开放平台为例来进行说明。
+
+当一个用户在移动应用内登录微信账号时，会被分配一个 OpenID；在微信小程序内登录账号时，又会被分配另一个不同的 OpenID。这样的架构会导致的问题是，使用同一个微信号的用户，也无法在微信开发平台下的移动应用和小程序之间互通。
+
+微信官方为了解决这个问题，引入 UnionID 的体系，即：**同一微信号，对同一个微信开放平台账号下的不同应用，不管是移动 app、网站应用还是小程序，UnionID 都是相同的。**也就是说，UnionID 可以作为用户的唯一标识。
+
+其他平台，如 QQ 的 UnionID 体系，和微信的设计保持一致。
+
+LeanCloud 支持 UnionID 体系。你只需要给 `loginWithauthData` 和 `associateWithauthData` 接口传入更多的参数，即可完成新 UnionID 体系的集成。
+
+要使用到的关键参数列表：
+
+参数名 | 类型 | 意义
+--- | ---- | ---
+`platform` | String | 平台，命名随意，如 `weixinapp`、`wxminiprogram`、`qqapp1` 等。
+`unionIdPlatform` | String | UnionID 平台，如 `weixin`、`weibo` 和 `qq` 等。
+`unionId` | String | 由 UnionID 平台提供。**需配合 `asMainAccount`、`unionIdPlatform` 一起使用**。
+`asMainAccount` | boolean | true 代表将 UnionID 绑定入当前 authData 并作为主账号，之后以该 UnionID 来识别。**需配合 `unionId`、`unionIdPlatform` 一起使用**。
+
+接入新 UnionID 系统时，每次传入的 `authData` 必须包含成对的平台 `uid` 或 `openid` 和平台 `unionid`。示例代码如下：
+
+{% if platform_name === "Objective-C" %}
+```objc
+NSDictionary *authData = @{
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"openid":@"OPENID",
+                            @"scope":@"SCOPE",
+                            @"unionid":@"o6_bmasdasdsad6_2sgVt7hMZOPfL"
+                            };
+AVUser *currentuser = [AVUser user];
+AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+option.unionId = authData[@"unionid"];
+option.isMainAccount = true;
+[currentuser loginWithAuthData:authData platformId:@"wxminiprogram1" options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+            NSLog(@"登录成功");
+        }else{
+            NSLog(@"登录失败：%@",error.localizedFailureReason);
+        }
+}];
+```
+{% endif %}
+{% if platform_name === "JavaScript" %}
+```js
+var authData = {
+  access_token: 'ACCESS_TOKEN',
+  expires_in: 7200,
+  refresh_token: 'REFRESH_TOKEN',
+  openid: 'OPENID',
+  scope: 'SCOPE',
+};
+
+AV.User.loginWithAuthDataAndUnionId(
+  authData,
+  'wxminiprogram1', 'o6_bmasdasdsad6_2sgVt7hMZOPfL',
+  {
+    unionIdPlatform: 'weixin',
+    asMainAccount: true,
+  }
+).then(function (user) {
+  // 绑定成功
+}, function (error) {
+  // 绑定失败 
+});
+```
+{% endif %}
+
+然后让我们来看看生成的 `authData` 的数据格式：
+
+```json
+{
+  "weixinapp1": {
+    "platform": "weixin",
+    "openid": "oTY851axxxgujsEl0f36Huxk",
+    "expires_in": 7200,
+    "main_account": true,
+    "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+    "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+  },
+  "_weixin_unionid": {
+    "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+  }
+}
+```
+
+当你想加入该 UnionID 下的一个新平台，比如 `miniprogram1` 时，再次登录后生成的数据为：
+
+```json
+{
+  "weixinapp1": {
+    "platform": "weixin",
+    "openid": "oTY851axxxgujsEl0f36Huxk",
+    "expires_in": 7200,
+    "main_account": true,
+    "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+    "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+  },
+  "_weixin_unionid": {
+    "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+  },
+  "miniprogram1": {
+    "platform": "weixin",
+    "openid": "ohxoK3ldpsGDGGSaniEEexxx",
+    "expires_in": 7200,
+    "main_account": true,
+    "access_token": "10_QfDeXVp8fUKMBYC_d4PKujpuLo3sBV_pxxxxIZivS77JojQPLrZ7OgP9PC9ZvFCXxIa9G6BcBn45wSBebsv9Pih7Xdr4-hzr5hYpUoSA",
+    "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+  }
+}
+```
+
+可以看到，最终该 `authData` 实际包含了来自 `weixin` 这个 UnionID 体系内的两个不同平台，`weixinapp1` 代表来自移动应用，`miniprogram1` 来自小程序。`_weixin_unionid` 这个字段的值就是用户在 `weixin` 这个 UnionID 平台的唯一标识 UnionID 值。
+
+当一个用户以来自 `weixinapp` 的 OpenID `oTY851axxxgujsEl0f36Huxk` 和 UnionID `ox7NLs06ZGfdxxxxxe0F1po78qE` 一起传入生成新的 `{{ userObjectName }}` 后，接下来这个用户以来自 `miniprogram` 不同的 OpenID `ohxoK3ldpsGDGGSaniEEexxx` 和同样的 UnionID `ox7NLs06ZGfdxxxxxe0F1po78qE` 一起传入时，LeanCloud 判定是同样的 UnionID，就直接把来自 `miniprogram` 的新用户数据加入到已有 `authData` 里了，不会再创建新的用户。
+
+这样一来，LeanCloud 后台通过识别平台性的用户唯一标识 UnionID，让来自同一个 UnionID 体系内的应用程序、小程序等不同平台的用户都绑定到了一个 `{{ userObjectName }}` 上，实现互通。
+
+##### 已有 authData 应用接入 UnionID
+
+先梳理一遍业务，看看是否在过去开发过程集成了移动应用程序、小程序等多个平台的 `authData`，导致同一个用户的数据已经被分别保存为不同的 `{{ userObjectName }}`。
+
+如果没有的话，直接按前面 [接入 UnionID 体系](#接入-unionid-体系) 小节的代码集成即可。
+
+如果有的话，需要确认自身的业务需要，确定要以哪个已有平台的账号为主。比如决定使用某个移动应用上生成的账号，则在该移动应用程序更新版本时，使用 `asMainAccount` 参数。这个移动应用带着 UnionID 登录匹配或创建的账号将作为主账号，之后所有这个 UnionID 的登录都会匹配到这个账号。
+
+请注意，在第二种情况下 `_User` 表里会剩下一些用户数据，也就是没有被选为主账号的、其他平台的同一个用户的旧账号数据。这部分数据会继续服务于已经发布的但仍然使用 OpenID 登录的旧版应用。
+{% endif %}
 
 #### 解除关联
 
@@ -6758,6 +7278,486 @@ if (currentUser.isAnonymous()) {
 
 随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，LeanCloud 支持基于角色的权限管理。请参阅 [ACL 权限管理开发指南](acl-guide.html)。
 
+{% if platform_name === "Objective-C" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Swift" %}
+## 子类化
+
+{% if platform_name === "Objective-C" %}
+子类化推荐给进阶的开发者在进行代码重构的时候做参考。你可以用 `AVObject` 访问到所有的数据，用 `objectForKey:` 获取任意字段。在成熟的代码中，子类化有很多优势，包括降低代码量，具有更好的扩展性，和支持自动补全。
+
+子类化是可选的，请对照下面的例子来加深理解：
+
+```
+AVObject *student = [AVObject objectWithClassName:@"Student"];
+[student setObject:@"小明" forKey:@"name"];
+[student saveInBackground];
+```
+
+可改写成：
+
+```
+Student *student = [Student object];
+student.name = @"小明";
+[student saveInBackground];
+```
+
+这样代码看起来是不是更简洁呢？
+
+### 子类化的实现
+
+要实现子类化，需要下面几个步骤：
+
+1. 导入 `AVObject+Subclass.h`；
+2. 继承 `AVObject` 并实现 `AVSubclassing` 协议；
+3. 实现类方法 `parseClassName`，返回的字符串是原先要传给 `initWithClassName:` 的参数，这样后续就不必再进行类名引用了。如果不实现，默认返回的是类的名字。**请注意：`AVUser` 子类化后必须返回 `_User`**；
+4. 在实例化子类之前调用 `[YourClass registerSubclass]`（**在应用当前生命周期中，只需要调用一次**。可在子类的 `+load` 方法或者 `UIApplication` 的 `-application:didFinishLaunchingWithOptions:` 方法里面调用）。
+
+下面是实现 `Student` 子类化的例子：
+
+```objc
+  // Student.h
+  #import <AVOSCloud/AVOSCloud.h>
+
+  @interface Student : AVObject <AVSubclassing>
+
+  @property(nonatomic,copy) NSString *name;
+
+  @end
+
+
+  // Student.m
+  #import "Student.h"
+
+  @implementation Student
+
+  @dynamic name;
+
+  + (NSString *)parseClassName {
+      return @"Student";
+  }
+
+  @end
+
+
+  // AppDelegate.m
+  #import <AVOSCloud/AVOSCloud.h>
+  #import "Student.h"
+
+  - (BOOL)application:(UIApplication *)application
+  didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [Student registerSubclass];
+    [AVOSCloud setApplicationId:appid clientKey:appkey];
+  }
+```
+
+### 属性
+
+为 `AVObject` 的子类添加自定义的属性和方法，可以更好地将这个类的逻辑封装起来。用 `AVSubclassing` 可以把所有的相关逻辑放在一起，这样不必再使用不同的类来区分业务逻辑和存储转换逻辑了。
+
+`AVObject` 支持动态 synthesizer，就像 `NSManagedObject` 一样。先正常声明一个属性，只是在 `.m` 文件中把 `@synthesize` 变成 `@dynamic`。
+
+请看下面的例子是怎么添加一个「年龄」属性：
+
+```objc
+  // Student.h
+  #import <AVOSCloud/AVOSCloud.h>
+
+  @interface Student : AVObject <AVSubclassing>
+
+  @property int age;
+
+  @end
+
+
+  // Student.m
+  #import "Student.h"
+
+  @implementation Student
+
+  @dynamic age;
+
+  …
+```
+
+这样就可以通过 `student.age = 19` 这样的方式来读写 `age` 字段了，当然也可以写成：
+
+```objc
+[student setAge:19]
+```
+
+**注意：属性名称保持首字母小写**（错误：`student.Age`；正确：`student.age`）。
+
+`NSNumber` 类型的属性可用 `NSNumber` 或者是它的原始数据类型（`int`、`long` 等）来实现。例如，`[student objectForKey:@"age"]` 返回的是 `NSNumber` 类型，而实际被设为 `int` 类型。
+
+你可以根据自己的需求来选择使用哪种类型。原始类型更为易用，而 `NSNumber` 支持 `nil` 值，这可以让结果更清晰易懂。
+
+**注意** 子类中，对于 `BOOL` 类型的字段，SDK 在 3.1.3.2 之前会将其保存为 Number 类型，3.1.3.2 之后将其正确保存为 `Bool` 类型。
+
+注意：`AVRelation` 同样可以作为子类化的一个属性来使用，比如：
+
+```objc
+@interface Student : AVUser <AVSubclassing>
+@property(retain) AVRelation *friends;
+  …
+@end
+
+@implementation Student
+@dynamic friends;
+  …
+```
+
+另外，值为 `Pointer` 的实例可用 `AVObject*` 来表示。例如，如果 `Student` 中 `bestFriend` 代表一个指向另一个 `Student` 的键，由于 `Student` 是一个 `AVObject`，因此在表示这个键的值的时候，可以用一个 `AVObject*` 来代替：
+
+```objc
+@interface Student : AVUser <AVSubclassing>
+@property(nonatomic, strong) AVObject *bestFriend;
+ …
+@end
+
+@implementation Student
+@dynamic bestFriend;
+  …
+```
+
+提示：当需要更新的时候，最后都要记得加上 `[student save]` 或者对应的后台存储函数进行更新，才会同步至服务器。
+
+如果要使用更复杂的逻辑而不是简单的属性访问，可以这样实现：
+
+```objc
+  @dynamic iconFile;
+
+  - (UIImageView *)iconView {
+    UIImageView *view = [[UIImageView alloc] initWithImage:kPlaceholderImage];
+    view.image = [UIImage imageNamed:self.iconFile];
+    return [view autorelease];
+  }
+
+```
+
+### 针对 AVUser 子类化的特别说明
+
+假如现在已经有一个基于 `AVUser` 的子类，如上面提到的 `Student`：
+
+```objc
+@interface Student : AVUser<AVSubclassing>
+@property (retain) NSString *displayName;
+@end
+
+
+@implementation Student
+@dynamic displayName;
++ (NSString *)parseClassName {
+    return @"_User";
+}
+@end
+```
+
+登录时需要调用 `Student` 的登录方法才能通过 `currentUser` 得到这个子类：
+
+```objc
+[Student logInWithUsernameInBackground:@"USER_NAME" password:@"PASSWORD" block:^(AVUser *user, NSError *error) {
+        Student *student = [Student currentUser];
+        student.displayName = @"YOUR_DISPLAY_NAME";
+    }];
+```
+
+同样需要调用 `[Student registerSubclass];`，确保在其它地方得到的对象是 `Student`，而非 `AVUser`。
+
+### 初始化子类
+
+创建一个子类实例，要使用 `object` 类方法。要创建并关联到已有的对象，请使用 `objectWithObjectId:` 类方法。
+
+### 子类查询
+
+使用类方法 `query` 可以得到这个子类的查询对象。
+
+例如，查询年龄小于 21 岁的学生：
+
+```objc
+  AVQuery *query = [Student query];
+  [query whereKey:@"age" lessThanOrEqualTo:@(21)];
+  [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    if (!error) {
+      Student *stu1 = [objects objectAtIndex:0];
+      // …
+    }
+  }];
+```
+{% endif %}
+{% if platform_name === "Python" %}
+LeanCloud 希望设计成能让人尽快上手并使用。你可以通过 `{{baseObjectName}}.get()` 方法访问所有的数据。但是在很多现有成熟的代码中，子类化能带来更多优点，诸如简洁、可扩展性以及 IDE 提供的代码自动完成的支持等等。子类化不是必须的，你可以将下列代码转化：
+
+```python
+import leancloud
+
+student = leancloud.Object.extend("Student")()
+student.set('name', '小明')
+student.save()
+```
+
+可改写成：
+
+```python
+import leancloud
+
+class Student(leancloud.Object):
+    pass
+
+student = Student()
+student.set('name', '小明')
+student.save()
+```
+
+### 子类化 `leancloud.Object`
+
+要实现子类化，需要下面几个步骤：
+
+1. 首先声明一个子类继承自 `leancloud.Object`；
+2. 子类化时如果有自定义的构造函数，需要在构造函数中调用父类的构造函数。
+
+下面是实现 `Student` 子类化的例子：
+
+```python
+import leancloud
+
+class Student(leancloud.Object):
+    pass
+
+student = Student()
+student.set('name', 'Tom')
+student.save()
+```
+
+### 访问器、修改器和方法
+
+添加方法到 `leancloud.Object` 的子类有助于封装类的逻辑。你可以将所有跟子类有关的逻辑放到一个地方，而不是分成多个类来分别处理业务逻辑和存储或转换逻辑。
+
+你可以很容易地为 `leancloud.Object` 子类添加访问器和修改器。像平常那样声明字段的 `getter` 和 `setter` 方法，但是通过 `leancloud.Object` 的 `get` 和 `set` 方法来实现它们。下面是这个例子为 `Student` 类创建了一个 `content` 的字段：
+
+```python
+import leancloud
+
+class Student(leancloud.Object):
+    @property
+    def content(self):
+        # 可以使用 property 装饰器，方便获取属性
+        return self.get('content')
+
+    @content.setter
+    def content(self, value):
+        # 同样可以给对象的 content 增加 setter
+        return self.set('content', value)
+```
+
+现在你就可以使用 `student.content` 方法来访问 `content` 字段，并通过 `student.content = "blah blah blah"` 来修改它，并且可以通过 IDE 或者 linter 在运行前就可以发现类型错误。
+
+如果你不仅需要一个简单的访问器，而是有更复杂的逻辑，你可以在子类化时定义和实现自己的方法。
+
+### 初始化子类
+
+你可以使用自定义的构造函数来创建子类对象。子类必须定义一个公开的默认构造函数，并且不修改任何父类 `leancloud.Object` 中的字段，这个默认构造函数将会被 SDK 使用来创建子类的强类型的对象。
+
+要创建一个到现有对象的引用，可以使用 `leancloud.Object.create_without_data()`：
+
+```python
+import leancloud
+
+Student = leancloud.Object.extend('Student')
+student = Student.create_without_data('573a8459df0eea005e6b711c')
+student.fetch()
+```
+
+### 查询子类
+
+你可以通过对象的 `query` 属性获取特定的子类的查询对象。下面的例子就查询了用户发表的所有微博列表：
+
+```python
+import leancloud
+
+query = leancloud.Query('Student')
+user_name = leancloud.User.get_current().get_username()
+query.equal_to('publeancloud.User', user_name)
+student_list = query.find()
+
+for student in student_list:
+    # 你的逻辑
+    pass
+```
+### User 的子类化
+
+leancloud.User 作为 `leancloud.Object` 的子类，同样允许子类化，你可以定义自己的 User 对象。需要继承 User，并且将子类的 `_class_name` 设为 `'_User'`：
+
+```python
+import leancloud
+
+class MyUser(leancloud.User):
+    def __init__(self):
+        leancloud.User.__init__(self)
+        self._class_name = '_User' # 这里要指定 _class_name 为 _User
+
+    def set_nickname(self, name):
+        self.set('nick_name', name)
+
+    def get_nickname(self):
+        return self.get('nick_name')
+```
+{% endif %}
+{% if platform_name === "PHP" %}
+LeanCloud 希望设计成能让人尽快上手并使用。你可以通过 `LeanObject#get` 方法访问所有的数据。但是在很多现有成熟的代码中，子类化能带来更多优点，诸如简洁、可扩展性以及 IDE 提供的代码自动完成的支持等等。子类化不是必须的，你可以将下列代码转化：
+
+```php
+$student = new LeanObject("Student");
+$student->set("name", "小明");
+$student->save();
+```
+
+可改写成：
+
+```php
+$student = new Student();
+$student->set("name", "小明");
+$student->save();
+```
+
+这样代码看起来是不是更简洁呢？
+
+### 子类化 AVObject
+
+要实现子类化，需要下面几个步骤：
+
+1. 首先声明一个子类继承自 `LeanObject`；
+2. 子类中声明静态字段 `protected static $className`，对应云端的数据表名；
+3. 建议不要重载构造函数 `__construct()`，如果一定需要构造，请确保其接受 2 个参数 `$className` 和 `$objectId`；
+4. 将子类注册到 `LeanObject`，如 `Student::registerClass();`。
+
+下面是实现 `Student` 子类化的例子：
+
+```php
+// Student.php
+use LeanCloud\LeanObject;
+
+class Student extends LeanObject {
+    protected static $className = "Student";
+}
+Student::registerClass();
+```
+
+### 访问器、修改器和方法
+
+添加方法到 `LeanObject` 的子类有助于封装类的逻辑。你可以将所有跟子类有关的逻辑放到一个地方，而不是分成多个类来分别处理商业逻辑和存储/转换逻辑。
+
+你可以很容易地添加访问器和修改器到你的 `LeanObject` 子类。像平常那样声明字段的 `getter` 和 `setter` 方法，但是通过 `LeanObject` 的 `get` 和 `set` 方法来实现它们。下面是这个例子为 `Student` 类创建了一个 `content` 的字段：
+
+```php
+// Student.php
+use LeanCloud\LeanObject;
+
+class Student extends LeanObject {
+    protected static $className = "Student";
+
+    public function setContent($value) {
+        $this->set("content", $value);
+        return $this; // 方便链式调用
+    }
+
+    public function getContent() {
+        return $this->get("content");
+    }
+}
+Student::registerClass();
+```
+
+现在你就可以使用 `$student->getContent()` 方法来访问 `content` 字段，并通过 `$student->setContent("blah blah blah")` 来修改它。
+
+各种数据类型的访问器和修改器都可以这样被定义，使用各种 `get()` 方法的变种，例如 `getInt()`，`getFile()` 或者 `getMap()`。
+
+如果你不仅需要一个简单的访问器，而是有更复杂的逻辑，你也可以实现自己的方法，例如：
+
+```php
+public function takeAccusation() {
+  // 处理用户举报，当达到某个条数的时候，自动打上屏蔽标志
+  $this->increment("accusation", 1);
+  if ($this->getAccusation() > 50) {
+    $this->setSpam(true);
+  }
+}
+```
+
+### 初始化子类
+
+你可以使用你自定义的构造函数来创建你的子类对象。`LeanObject` 已定义了默认的构造函数，如果需要重载构造函数，请注意其需要接收 2 个参数：`$className` 和 `$objectId`。这个构造函数将会被 SDK 使用来创建子类的对象。
+
+要创建一个到现有对象的引用，可以使用 `LeanObject::create("Student", "abc123")`：
+
+```php
+$student = LeanObject::create("Student", "573a8459df0eea005e6b711c");
+```
+
+### 查询子类
+
+你可以通过 `LeanObject#getQuery()` 方法获取特定的子类的查询对象。下面的例子就查询了用户发表的所有微博列表：
+
+```php
+$query = $post->getQuery();
+$query->equalTo("pubUser", User::getCurrentUser()->getUsername());
+$query->find();
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+子类化推荐给进阶的开发者在进行代码重构的时候做参考。你可以用 `LCObject` 访问到所有的数据，用 `get` 方法获取任意字段，用 `set` 方法给任意字段赋值；你也可以使用子类化来封装 `get` 以及 `set` 方法，增强编码体验。子类化有很多优势，包括减少代码的编写量，具有更好的扩展性，和支持自动补全等等。
+
+### 子类化的实现
+
+要实现子类化，需要下面两个步骤：
+
+1. 继承 `LCObject`；
+2. 重载静态方法 `objectClassName`，返回的字符串是原先要传递给 `LCObject(className:)` 初始化方法的参数。如果不实现，默认返回的是类的名字。**请注意：`LCUser` 子类化后必须返回 `_User`**；
+3. 注册子类。一般在 `application(_:didFinishLaunchingWithOptions:)` 方法中调用 `static func register()` 方法。
+
+下面是实现 `Student` 子类化的例子：
+
+```swift
+class Student: LCObject {
+
+    @objc dynamic var name: LCString?
+
+    override static func objectClassName() -> String {
+        return "Student"
+    }
+}
+
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
+    Student.register()
+    
+    return true
+}
+```
+
+### 将 Setter 以及 Getter 方法封装成属性
+
+可以将 `LCObject` 的 Setter 和 Getter 方法封装成属性，需使用 `@objc dynamic var` 来声明一个变量，**且该变量的类型为 [`LCValue`](#数据类型)**。
+
+如下所示，两段代码对 `name` 字段的赋值方式等价。
+
+```swift
+// Set name for LCObject
+do {
+    let student = LCObject(className: "Student")
+    try student.set("name", value: "小明")
+    assert(student.save().isSuccess)
+} catch {
+    print(error)
+}
+```
+```swift
+// Set name for Student
+let student = Student()
+student.name = "小明"
+assert(student.save().isSuccess)
+```
+{% endif %}
+{% endif %}
+
 ## 应用内搜索
 
 应用内搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [应用内搜索指南](app_search_guide.html).
@@ -6765,6 +7765,40 @@ if (currentUser.isAnonymous()) {
 ## 应用内社交
 
 应用内社交，又称「事件流」，在应用开发中出现的场景非常多，包括用户间关注（好友）、朋友圈（时间线）、状态、互动（点赞）、私信等常用功能，请参考 [应用内社交模块](status_system.html).
+
+{% if platform_name === "JavaScript" %}
+## Push 通知
+
+通过 JavaScript SDK 也可以向移动设备推送消息。
+
+一个简单例子推送给所有订阅了 `public` 频道的设备：
+
+```js
+AV.Push.send({
+  channels: [ 'public' ],
+  data: {
+    alert: 'public message'
+  }
+});
+```
+
+这就向订阅了 `public` 频道的设备发送了一条内容为 `public message` 的消息。
+
+如果希望按照某个 `_Installation` 表的查询条件来推送，例如推送给某个 `installationId` 的 Android 设备，可以传入一个 `AV.Query` 对象作为 `where` 条件：
+
+```js
+var query = new AV.Query('_Installation');
+query.equalTo('installationId', installationId);
+AV.Push.send({
+  where: query,
+  data: {
+    alert: 'Public message'
+  }
+});
+```
+
+`AV.Push` 的更多使用信息参考 API 文档 [AV.Push](https://leancloud.github.io/javascript-sdk/docs/AV.Push.html)。更多推送的查询条件和格式，请查阅 [消息推送指南](push_guide.html)。
+{% endif %}
 
 {% if platform_name === "JavaScript" %}
 ## WebView
