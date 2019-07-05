@@ -81,10 +81,6 @@ errors| | 本次推送过程中的错误信息。
 
 关于混合推送的接入方法和使用方式请阅读 [Android 混合推送使用文档](./android_push_guide.html#混合推送)。
 
-## Windows Phone 消息推送
-
-请阅读 [Windows Phone 推送开发文档](./dotnet_push_guide.html)。
-
 ## 云引擎和 JavaScript 创建推送
 
 请阅读 [JavaScript SDK 指南 &middot; Push 通知](./leanstorage_guide-js.html#Push_通知)。

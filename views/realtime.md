@@ -202,10 +202,6 @@ app_id:peer_id:watch_peer_ids:timestamp:nonce:su
 
 参考 [iOS 即时通讯开发指南](./ios_realtime.html)
 
-## Windows Phone 8.0 开发指南
-
-参考 [Windows Phone 8.0 开发指南](dotnet_realtime.html)
-
 ##  JavaScript 开发指南
 
 我们已经开源 JS Messaging SDK 了， 见 [leancloud/realtime-messaging-jssdk](https://github.com/leancloud/realtime-messaging-jssdk) 。
