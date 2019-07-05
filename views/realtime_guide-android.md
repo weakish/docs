@@ -2531,7 +2531,7 @@ AVIMClient.setAutoOpen(false);
 ```
 {% endblock %}
 
-{% block link_avquery_chache %}[存储指南 - AVQuery 缓存查询](leanstorage_guide-java.html#缓存查询) 一节。
+{% block link_avquery_chache %}[存储指南 - AVQuery 缓存查询](leanstorage_guide-android.html#缓存查询) 一节。
 {% endblock %}
 
 {% block code_recall_message %}

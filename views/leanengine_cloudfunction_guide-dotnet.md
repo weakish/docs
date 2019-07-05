@@ -6,7 +6,7 @@
 {% set productName = "LeanEngine" %}
 {% set storageName = "LeanStorage" %}
 {% set leanengine_middleware = "[LeanEngine dotNET SDK](https://github.com/leancloud/leanengine-dotNET-sdk/)" %}
-{% set storage_guide_url = "[.NET SDK](leanstorage_guide-java.html)" %}
+{% set storage_guide_url = "[.NET SDK](dotnet_guide.html)" %}
 {% set cloud_func_file = "https://github.com/leancloud/dotNET-getting-started/blob/master/web/HelloSample.cs" %}
 {% set runFuncName = "AVCloud.CallFunctionAsync" %}
 {% set defineFuncName = "EngineFunctionAttribute" %}
