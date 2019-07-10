@@ -68,7 +68,7 @@ LeanCloud 即时通讯服务提供的主要功能有：
 在 SDK 之外，我们也公开了一些 Demo 项目来帮助开发者快速熟悉我们的产品：
 
 * iOS 聊天应用：
-  * [ChatKit，自带 UI 的聊天工具包](chatkit-ios.html)
+  * [Chat Demo Swift](https://github.com/leancloud/swift-sdk-demo)
 
 * Android 聊天应用：
   * [ChatKit，自带 UI 的聊天工具包](chatkit-android.html)

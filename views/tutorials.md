@@ -26,27 +26,6 @@
 
 <a href="https://zhuanlan.zhihu.com/p/21399155" class="btn btn-default" target="_blank">阅读</a>
 
-<!-- ###  自带 UI 的聊天工具包 ChatKit
-
-<p class="text-muted">使用我们的 ChatKit，现成的代码，现成的 UI，为自己的应用加入常用的聊天功能只是分分钟的事。</p>
-
-<div class="row">
-  <div class="col-sm-6">
-    <div class="doc-hero-links">
-      <a href="chatkit-ios.html" class="doc-quick-start-btn">
-          iOS 教程
-      </a>
-    </div>
-  </div>
-  <div class="col-sm-6">
-    <div class="doc-hero-links">
-      <a href="chatkit-android.html" class="doc-quick-start-btn">
-        Android 教程
-      </a>
-    </div>
-  </div>
-</div> -->
-
 ## 第三方教程
 
 ### 为聊天接入表情云

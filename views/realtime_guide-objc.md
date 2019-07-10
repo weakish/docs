@@ -3,8 +3,7 @@
 {% set segment_code = 'objc' %}
 {% set sdk_name = platform_name + " SDK" %}
 
-{% block demo %}
-* [ChatKit-OC](https://github.com/leancloud/ChatKit-OC)（推荐）
+{% block demo_section %}
 {% endblock %}
 
 {% block setup_init %}

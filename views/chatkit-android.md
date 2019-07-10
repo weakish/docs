@@ -2,8 +2,6 @@
 {% import "views/_helper.njk" as docs %}
 # ChatKit 使用指南 &middot; Android
 
-> 如果需要了解 iOS 版本请点击: [ChatKit 使用指南 &middot; iOS](chatkit-ios.html)
-
 [ChatKit](https://github.com/leancloud/LeanCloudChatKit-Android) 是一个免费且开源的 UI 聊天组件，由 LeanCloud 官方推出，底层聊天服务基于 LeanCloud 的 IM 即时通讯服务 LeanMessage 而开发。它的最大特点是把聊天常用的一些功能配合 UI 一起提供给开发者，帮助开发者快速集成 IM 服务，轻松实现聊天功能。
 
 ChatKit 开源且提供完全自由的授权协议，开发者可以对其进行任意修改、扩展和二次封装，但是 LeanCloud 并不对 ChatKit 的二次开发提供技术支持。

@@ -46,13 +46,6 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         type: 'ios',
         qcloudShow: true
       },{
-        name: 'ChatKit 聊天 UI 组件',
-        desc: '一个免费开源的 UI 聊天组件，基于 LeanCloud 实时通信 IM 服务，支持 iOS 7+。它将聊天的常用功能和 UI 一起提供给开发者进行二次开发。',
-        downPath: '',
-        mdPath: 'https://github.com/leancloud/ChatKit-OC',
-        type: 'ios',
-        qcloudShow: true
-      },{
         name: 'SNS 第三方登录',
         desc: 'iOS 第三方登录示例 Demo',
         downPath: '',
