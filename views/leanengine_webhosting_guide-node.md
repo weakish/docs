@@ -64,7 +64,7 @@ Node.js 的 `package.json` 中可以指定 [很多选项](https://docs.npmjs.com
 - 如果你的应用目录中含有 `yarn.lock`，那么会使用 `yarn install` 代替 `npm install` 来安装依赖（需要 Node.js 4.8 以上）。
 - 如果你的应用目录中同时包含 `package-lock.json` 和 `yarn.lock`，云引擎会使用 `yarn install`。换言之，`yarn.lock` 优先。
 
-<div class="callout callout-info">注意 `package-lock.json` 和 `yarn.lock` 中包含了下载依赖的 URL，因此如果你生成 lock 文件时使用了 npmjs.org 的源，那么在中国节点的部署可能会变慢；反之如果生成时使用了 cnpmjs.org 的源，那么在美国节点的部署可能会变慢。如果不希望使用 `package-lock.json` 和 `yarn.lock`，请将它们加入 `.gitignore`（Git 部署时）或 `.leanengineignore`（命令行工具部署时）。</div>
+<div class="callout callout-info">注意 `yarn.lock` 中包含了下载依赖的 URL，因此如果你生成 lock 文件时使用了 npmjs.org 的源，那么在 LeanCloud 中国版的部署可能会变慢；反之如果生成时使用了 npm.taobao.org 的源，那么在 LeanCloud 国际版的部署可能会变慢。如果不希望使用 `yarn.lock`，请将它们加入 `.gitignore`（Git 部署时）或 `.leanengineignore`（命令行工具部署时）。</div>
 {% endblock %}
 
 {% block supported_frameworks %}
