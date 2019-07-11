@@ -50,7 +50,7 @@ AV.Cloud.define('averageStars', function(request) {
 `Request` 会作为参数传入到云函数中，Request 上的属性包括：
 
 * `params: object`：客户端发送的参数对象，当使用 `rpc` 调用时，也可能是 `AV.Object`。
-* `currentUser?: AV.User`：客户端所关联的用户（根据客户端发送的 `LC-Session` 头）。
+* `currentUser?: AV.User`：客户端所关联的用户（根据客户端发送的 `X-LC-Session` 头）。
 * `sessionToken?: string`：客户端发来的 sessionToken（`X-LC-Session` 头）。
 * `meta: object`：有关客户端的更多信息，目前只有一个 `remoteAddress` 属性表示客户端的 IP。
 

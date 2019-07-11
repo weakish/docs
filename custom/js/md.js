@@ -255,7 +255,7 @@ var codeBlockTabber = (function () {
 
   function toggleLangSpec(targetLang) {
     var currentLang = targetLang.split('-').pop();
-    var languageArray = ['js', 'objc', 'java', 'cs', 'android'];
+    var languageArray = ['js', 'objc', 'java', 'cs', 'android', 'swift'];
     languageArray.forEach(function (lang) {
       var langSpecStartClassName = `.lang-spec-${lang}-start`;
       var langSpecEndClassName = `.lang-spec-${lang}-end`;

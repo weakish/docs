@@ -1348,10 +1348,10 @@ LeanCloud 即时通讯服务默认支持文本、文件、图像、音频、视�
 | 属性 | 类型 | 描述 |
 | --- | --- | --- |
 | `content`                  | `IMMessage.Content`    | 消息内容，支持 `String` 和 `Data` 两种格式。 |
-| `fromClientID`             | `String`               | 消息发送者的 `client ID`。 |
-| `currentClientID`          | `String`               | 消息接收者的 `client ID`。 |
-| `conversationID`           | `String`               | 消息所属对话的 `conversation ID`。 |
-| `ID`                       | `String`               | 消息发送成功之后，由 LeanCloud 云端给每条消息赋予的唯一 `message ID`。 |
+| `fromClientID`             | `String`               | 消息发送者的 `clientId`。 |
+| `currentClientID`          | `String`               | 消息接收者的 `clientId`。 |
+| `conversationID`           | `String`               | 消息所属对话 ID。 |
+| `ID`                       | `String`               | 消息发送成功之后，由 LeanCloud 云端给每条消息赋予的唯一 ID。 |
 | `sentTimestamp`            | `int64_t`              | 消息发送的时间。消息发送成功之后，由 LeanCloud 云端赋予的全局的时间戳。 |
 | `deliveredTimestamp`       | `int64_t`              | 消息被对方接收到的时间戳。 |
 | `readTimestamp`            | `int64_t`              | 消息被对方阅读的时间戳。 |
@@ -1500,7 +1500,9 @@ conv.sendMessage(m, new AVIMConversationCallback() {
 });
 ```
 ```cs
-var image = new AVFile("screenshot.png", Path.Combine(Application.persistentDataPath, "screenshot.PNG"));
+var image = new AVFile("screenshot.png", "https://p.ssl.qhimg.com/dmfd/400_300_/t0120b2f23b554b8402.jpg");
+// 需要先保存为 AVFile 对象
+await image.SaveAsync();
 var imageMessage = new AVIMImageMessage();
 imageMessage.File = image;
 imageMessage.TextContent = "发自我的 Windows";

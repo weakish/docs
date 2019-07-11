@@ -369,12 +369,12 @@ B -->|afterDelete|C((done))
 {% block code_hook_conversation_started %}{% endblock %}
 
 #### {{hook_conversation_add}}
-向对话添加成员，在签名校验（如果开启）之后、实际加入之前，包括主动加入和被其他用户加入两种情况都会触发，**注意在创建对话时传入了其他用户的 Client Id 作为 Member 参数，不会触发 {{hook_conversation_add}} **。例如在云引擎中打印成员加入时的日志：
+向对话添加成员，在签名校验（如果开启）之后、实际加入之前，包括主动加入和被其他用户加入两种情况都会触发，**注意在创建对话时传入了其他用户的 `clientId` 作为 Member 参数，不会触发 {{hook_conversation_add}} **。例如在云引擎中打印成员加入时的日志：
 
 {% block code_hook_conversation_add %}{% endblock %}
 
 #### {{hook_conversation_remove}}
-从对话中踢出成员，在签名校验（如果开启）之后、实际踢出之前触发，用户自己退出对话不会触发。例如在踢出某一个成员时，在云引擎日志中打印出该成员的 Client Id：
+从对话中踢出成员，在签名校验（如果开启）之后、实际踢出之前触发，用户自己退出对话不会触发。例如在踢出某一个成员时，在云引擎日志中打印出该成员的 `clientId`：
 
 {% block code_hook_conversation_remove %}{% endblock %}
 

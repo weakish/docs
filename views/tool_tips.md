@@ -21,7 +21,7 @@
 * 如果你想做一个形如微博的 Feed 系统，也许你可以尝试使用我们的 [事件流系统](status_system.html)。
 * 我们提供简易的 [第三方登录组件](leanstorage_guide-js.html#第三方账户登录)。
 {% endif %}
-* [Android 应用代码混淆注意事项](android_faq.html#代码混淆怎么做)
+* [Android 应用代码混淆注意事项](faq.html#代码混淆怎么做)
 * [基于 LeanCloud 的一对多、多对多关系数据建模](https://blog.leancloud.cn/1723/)
 * [使用 LeanCloud JavaScript SDK 和 AngularJS 创建 一个 Todo Demo](https://blog.leancloud.cn/1541/)
 * 我们的数据存储服务提供地理位置信息查询，参考 SDK 开发指南，或者博文教程[《GEO Point 的使用》](https://blog.leancloud.cn/537/)。
