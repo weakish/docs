@@ -2,7 +2,7 @@
 {% import "views/_helper.njk" as docs %}
 # 即时通讯 REST API 使用指南 v1
 
-> 注意：部分新特性和 API，放在了 [即时通讯 REST API v2](./realtime_rest_api_2.html) 中，有需要的开发者参考我们的新版文档。
+> 注意：部分新特性和 API，放在了 [即时通讯 REST API v2](./realtime_rest_api_v2.html) 中，有需要的开发者参考我们的新版文档。
 
 ## 请求格式
 对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
