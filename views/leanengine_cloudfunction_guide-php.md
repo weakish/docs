@@ -85,7 +85,7 @@ Cloud::start();
 传递给云函数的参数依次为：
 
 * `$params: array`：客户端发送的参数。
-* `$user: User`：客户端所关联的用户（根据客户端发送的 `LC-Session` 头）。
+* `$user: User`：客户端所关联的用户（根据客户端发送的 `X-LC-Session` 头）。
 * `$meta: array`：有关客户端的更多信息，目前只有一个 `$meta['remoteAddress']` 属性表示客户端的 IP。
 
 {% endblock %}
