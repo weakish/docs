@@ -904,7 +904,7 @@ do {
 }];
 ```
 ```java
-tom.createChatRoom(null, "聊天室", null,
+tom.createChatRoom("聊天室", null,
     new AVIMConversationCreatedCallback() {
         @Override
         public void done(AVIMConversation conv, AVIMException e) {
