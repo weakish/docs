@@ -745,8 +745,6 @@ let value = lcDate.value
 
 {% block module_in_app_social %}{% endblock %}
 
-{% block text_sns %}{% endblock %}
-
 {% block text_feedback %}{% endblock %}
 
 {% block js_push_guide %}{% endblock %}
@@ -1852,3 +1850,230 @@ assert(todoFolder != nil)
 {% endblock %}
 
 {% block anonymous_user_save %}{% endblock %}
+
+{% block login_with_authdata %}
+
+```swift
+let authData: [String: Any] = [
+    "access_token": "ACCESS_TOKEN",
+    "expires_in": 7200,
+    "refresh_token": "REFRESH_TOKEN",
+    "openid": "OPENID",
+    "scope": "SCOPE"
+]
+let user = LCUser()
+user.logIn(authData: authData, platform: .weixin) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+{% endblock %}
+
+{% block login_with_authdata_result %}
+
+```
+{
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk",
+      "expires_in": 7200,
+      "access_token": "11_gaS_CfX47PH3n6g33zwONEyUsFRmiWJPIEcmWVzqS48JeZjpII6uRkTD6g36GY7_5pxKciSM-v8OGnYR26DC-VBffwMHaVx5_ik8FVQdE5Y"
+    }
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-05T10:13:26.310Z"
+}
+```
+
+{% endblock %}
+
+{% block associate_with_authdata %}
+
+```swift
+let authData: [String: Any] = [
+    "access_token": "ACCESS_TOKEN",
+    "expires_in": 7200,
+    "refresh_token": "REFRESH_TOKEN",
+    "openid": "OPENID",
+    "scope": "SCOPE"
+]
+do {
+    let user = LCApplication.default.currentUser
+    try user?.associate(authData: authData, platform: .qq) { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+{% endblock %}
+
+{% block associate_with_authdata_result %}
+
+```
+{
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "username": "y43mxrnj3kvrfkt8w5gezlep1",
+  "emailVerified": false,
+  "authData": {
+    "weixin": {
+      "access_token": "11_U4Nuh9PGpfuBJqtm7KniWn48rkJ7vBTCVN2beHcVvceswua2sLU_5Afq26ZJrRF0vpSX0xcDwI-zxeo3qcf-cMftjqEvWh7Vpp05bgxeWtc",
+      "expires_in": 7200,
+      "openid": "oTY851aFzn4TdDgujsEl0f36Huxk"
+    },
+    "qq": {
+      "openid": "0395BA18A5CD6255E5BA185E7BEBA242",
+      "expires_in": 7200,
+      "access_token": "11_CCveaBR_Lu0lmhff6NC33Lhx662zCnbzcSYhbYZQZ01YPdFav3sjhzjoM1hxs3AMMMydhguh2M0PumUaglpzuAlpzRzQn4vEXTRaZuovEnQ"
+    }
+  },
+  "mobilePhoneVerified": false,
+  "objectId": "5b3def469f545400310c939d",
+  "createdAt": "2018-07-05T10:13:26.310Z",
+  "updatedAt": "2018-07-06T07:46:58.097Z"
+}
+```
+
+{% endblock %}
+
+{% block login_with_authdata_without_fail %}
+
+```swift
+let authData: [String: Any] = [
+    "access_token": "ACCESS_TOKEN",
+    "expires_in": 7200,
+    "refresh_token": "REFRESH_TOKEN",
+    "openid": "OPENID",
+    "scope": "SCOPE"
+]
+let user = LCUser()
+user.logIn(authData: authData, platform: .weixin, options: [.failOnNotExist]) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        if error.code == 211 {
+            // 不存绑定了当前 AuthData 的 User 的实例
+            // 跳转到输入用户名、密码、手机号等业务页面
+            let user = LCUser()
+            user.username = "Tome"
+            user.password = "password"
+            user.mobilePhoneNumber = "12211112222"
+            user.logIn(authData: authData, platform: .weixin, completion: { (result) in
+                switch result {
+                case .success:
+                    assert(user.objectId != nil)
+                case .failure(error: let error):
+                    print(error)
+                }
+            })
+        }
+    }
+}
+```
+
+{% endblock %}
+
+{% block login_with_authdata_unionid %}
+
+```swift
+let authData: [String: Any] = [
+    "access_token": "ACCESS_TOKEN",
+    "expires_in": 7200,
+    "refresh_token": "REFRESH_TOKEN",
+    "openid": "OPENID",
+    "scope": "SCOPE",
+    "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
+]
+let user = LCUser()
+user.logIn(
+    authData: authData,
+    platform: .custom("weixinapp1"),
+    unionID: authData["unionid"] as? String,
+    unionIDPlatform: .weixin,
+    options: [.mainAccount])
+{ (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+{% endblock %}
+
+{% block login_with_authdata_unionid_result %}
+
+```
+"authData": {
+    "weixinapp1": {
+        "platform": "weixin",
+        "openid": "oTY851axxxgujsEl0f36Huxk",
+        "expires_in": 7200,
+        "main_account": true,
+        "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+        "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+        "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+}
+```
+
+{% endblock %}
+
+{% block login_with_authdata_unionid_result_more %}
+
+```
+"authData": {
+    "weixinapp1": {
+        "platform": "weixin",
+        "openid": "oTY851axxxgujsEl0f36Huxk",
+        "expires_in": 7200,
+        "main_account": true,
+        "access_token": "10_chx_dLz402ozf3TX1sTFcQQyfABgilOa-xxx-1HZAaC60LEo010_ab4pswQ",
+        "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "_weixin_unionid": {
+        "uid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    },
+    "miniprogram1": {
+        "platform": "weixin",
+        "openid": "ohxoK3ldpsGDGGSaniEEexxx",
+        "expires_in": 7200,
+        "main_account": true,
+        "access_token": "10_QfDeXVp8fUKMBYC_d4PKujpuLo3sBV_pxxxxIZivS77JojQPLrZ7OgP9PC9ZvFCXxIa9G6BcBn45wSBebsv9Pih7Xdr4-hzr5hYpUoSA",
+        "unionid": "ox7NLs06ZGfdxxxxxe0F1po78qE"
+    }
+}
+```
+
+{% endblock %}
