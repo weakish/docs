@@ -40,19 +40,19 @@ vendor | 厂商
 1. **注册华为账号**：在 [华为开发者联盟](http://developer.huawei.com/cn/consumer/) 注册华为开发者账号（[详细流程](https://developer.huawei.com/consumer/cn/devservice/doc/20300)）。
 2. **开发前准备**：接入华为 PUSH 之前，需要 [配置应用签名](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#2%20配置应用签名)。
 3. 登录 [华为开发者联盟](http://developer.huawei.com/cn/consumer/)，点击右上角「管理中心」，在管理中心 > 应用服务 > 开发服务 > 配置中 [开通推送服务](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#3%20开通推送服务)。
-3. **设置华为的 AppId 及 AppKey**：在华为开发者联盟 > 管理中心 > 开发服务 > Push 产品列表中选择目标产品。点进目标产品获取应用的服务信息 AppId 及 AppSecret，将此 AppId 及 AppSecret 通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
+4. **设置华为的 AppId 及 AppKey**：在华为开发者联盟 > 管理中心 > 开发服务 > Push 产品列表中选择目标产品。点进目标产品获取应用的服务信息 AppId 及 AppSecret，将此 AppId 及 AppSecret 通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
 
 ### 接入 SDK
 
 #### 获取 HMS SDK 和 HMS Agent SDK
-华为 HMS 推送 SDK 分为两部分，一个是 HMS SDK，一个是 HMS Agent SDK，两个 SDK 都要正确接入，且两者需要主版本号一致才能正常使用（当前 LeanCloud 混合推送基于 v2.6.1 这一主版本）。
+华为 HMS 推送 SDK 分为两部分，一个是 HMS SDK，一个是 HMS Agent SDK，两个 SDK 都要正确接入，且两者需要主版本号一致才能正常使用（当前 LeanCloud 混合推送基于 v2.6.3.306 这一版本）。可参考：[华为官方文档：消息推送服务开发准备](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent)。
 
 HMS SDK 可以直接通过 jar 包加入，解压 HMS SDK 目录如下表所示，需要将下面三个目录的文件拷贝到应用工程根目录，华为要求将 HMS 资源文件和证书文件打包到 apk 中。（[SDK 下载地址](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#4%20%E4%B8%8B%E8%BD%BDSDK)）
 
 目录 | 说明 | 使用方式
 ----|----|----
 libs/ | 包含 HMS 所有功能的 jar 包。通用包不再按照业务功能分成多个 jar 包，包含帐号、支付、消息、推送、游戏服务。 |请直接将 libs 目录拷贝到应用工程根目录
-res/ | HMS SDK 需要使用的资源目录，包含多国语言。应用如果不需要集成多种语言的，可以适当裁剪。但是必须保留默认语言和简体中文。 | 请直接将 res 目录拷贝到应用工程根目录
+res/ | HMS SDK 需要使用的资源目录，包含多国语言。应用如果不需要集成多种语言的，可以适当裁剪。但是必须保留默认语言和简体中文。 | 请直接将 res 目录拷贝到应用工程目录
 assets/ | HMS SDK 请求华为服务器需要使用的证书文件 | 请直接将 assets 目录拷贝到应用工程根目录
 
 HMS Agent SDK 需要下载解压之后把源码完全拷贝进入工程。HMS Agent SDK 包含帐号、支付、消息、推送、游戏等功能，如果只打算使用其中的推送功能，可以使用 HMS Agent SDK 压缩包中自带的 GetHMSAgent 脚本删除不需要的文件，具体步骤如下：
@@ -82,89 +82,139 @@ dependencies {
 然后配置相关 AndroidManifest，添加 Permission：
 
 ```xml
-    <!-- HMS-SDK引导升级HMS功能，访问OTA服务器需要网络权限 -->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- HMS-SDK引导升级HMS功能，保存下载的升级包需要SD卡写权限 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <!-- 检测网络状态 -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <!-- 检测wifi状态 -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <!-- 为了获取用户手机的IMEI，用来唯一的标识用户。 -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+<!-- HMS-SDK引导升级HMS功能，访问OTA服务器需要网络权限 -->
+<uses-permission android:name="android.permission.INTERNET"/>
+<!-- HMS-SDK引导升级HMS功能，保存下载的升级包需要SD卡写权限 -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<!-- 检测网络状态 -->
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<!-- 检测wifi状态 -->
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+<!-- HMS-SDK 为了获取用户手机的IMEI，用来唯一的标识用户。 -->
+<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
-    <!-- 如果是安卓8.0，应用编译配置的targetSdkVersion>=26，请务必添加以下权限 -->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+<!-- 如果是安卓8.0，应用编译配置的targetSdkVersion>=26，请务必添加以下权限 -->
+<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+
+<!-- HMS-SDK 接收PUSH TOKEN的广播以及PUSH消息需要定义该权限 ${PACKAGE_NAME} 要替换上您应用的包名 -->
+<permission
+    android:name="${PACKAGE_NAME}.permission.PROCESS_PUSH_MSG"
+    android:protectionLevel="signatureOrSystem"/>
+<!-- HMS-SDK 接收PUSH TOKEN的广播以及PUSH消息需要定义该权限 ${PACKAGE_NAME} 要替换上您应用的包名 -->
+<uses-permission android:name="${PACKAGE_NAME}.permission.PROCESS_PUSH_MSG" />
 ```
 
-再添加 service 与 receiver。开发者要将其中的 `<包名>` 替换为自己的应用的 package：
+再在 application 节点下添加 service 与 receiver。开发者要将其中的 `<包名>` 替换为自己的应用的 package：
 
 ```xml
-        <!-- 华为推送要求的设置（appId） -->
-        <meta-data
-            android:name="com.huawei.hms.client.appid"
-            android:value="<please use your HMS appId>">
-        </meta-data>
+<application
+   android:name="xxx.xxx.xxx.YourApplication">
+  <!-- 华为推送要求的设置（appId） -->
+  <meta-data
+    android:name="com.huawei.hms.client.appid"
+    android:value="<please use your HMS appId>">
+  </meta-data>
+  <!-- 配置华为移动服务版本 -->
+  <meta-data  
+    android:name="com.huawei.hms.version"  
+    android:value="2.6.3">
+  </meta-data>
 
-        <!-- 华为推送要求的 updateProvider -->
-        <provider
-            android:name="com.huawei.hms.update.provider.UpdateProvider"
-            android:authorities="<包名>.hms.update.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-        </provider>
+  <!-- 华为推送要求的 updateProvider，用于HMS SDK引导升级HMS APK，提供给系统安装器读取升级文件 -->
+  <!-- <包名> 用实际的应用包名替换 -->
+  <provider
+      android:name="com.huawei.hms.update.provider.UpdateProvider"
+      android:authorities="<包名>.hms.update.provider"
+      android:exported="false"
+      android:grantUriPermissions="true">
+  </provider>
 
-        <!-- 华为推送要求的 activity -->
-        <activity
-            android:name="com.huawei.hms.activity.BridgeActivity"
-            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            android:theme="@android:style/Theme.Translucent">
-            <meta-data
-                android:name="hwc-theme"
-                android:value="androidhwext:style/Theme.Emui.Translucent"/>
-        </activity>
+  <!-- 华为推送要求的 activity -->
+  <!-- BridgeActivity定义了HMS SDK中一些跳转所需要的透明页面 -->
+  <activity
+      android:name="com.huawei.hms.activity.BridgeActivity"
+      android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
+      android:excludeFromRecents="true"
+      android:exported="false"
+      android:hardwareAccelerated="true"
+      android:theme="@android:style/Theme.Translucent">
+      <meta-data
+          android:name="hwc-theme"
+          android:value="androidhwext:style/Theme.Emui.Translucent"/>
+  </activity>
 
-        <!-- 接收通道发来的通知栏消息 -->
-        <receiver android:name="com.huawei.hms.support.api.push.PushEventReceiver">
-            <intent-filter>
-                <action android:name="com.huawei.intent.action.PUSH"/>
-            </intent-filter>
-        </receiver>
+  <!-- AppUpdateActivity和PackageInstallActivity是 HMS SDK自升级接口所需要使用的页面 -->
+  <activity
+      android:name="com.huawei.updatesdk.service.otaupdate.AppUpdateActivity"
+      android:configChanges="orientation|screenSize"
+      android:exported="false"
+      android:theme="@style/upsdkDlDialog" >
+  
+      <meta-data
+          android:name="hwc-theme"
+          android:value="androidhwext:style/Theme.Emui.Translucent.NoTitleBar" />
+  </activity>
+        
+  <activity
+      android:name="com.huawei.updatesdk.support.pm.PackageInstallerActivity"
+      android:configChanges="orientation|keyboardHidden|screenSize"
+      android:exported="false"
+      android:theme="@style/upsdkDlDialog" >
+      <meta-data
+          android:name="hwc-theme"
+          android:value="androidhwext:style/Theme.Emui.Translucent" />
+  </activity>
+        
+  <!-- 解决华为移动服务升级问题的透明界面 -->
+  <activity
+    android:name="com.huawei.android.hms.agent.common.HMSAgentActivity"
+    android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
+    android:excludeFromRecents="true"
+    android:exported="false"
+    android:hardwareAccelerated="true"
+    android:theme="@android:style/Theme.Translucent" >
+    <meta-data
+        android:name="hwc-theme"
+        android:value="androidhwext:style/Theme.Emui.Translucent" />
+  </activity>
 
-        <!-- LeanCloud 自定义 receiver -->
-        <receiver android:name="com.avos.avoscloud.AVHMSPushMessageReceiver">
-            <intent-filter>
+  <!-- HMS-SDK 下载服务 -->
+  <service android:name="com.huawei.updatesdk.service.deamon.download.DownloadService"
+      android:exported="false"/>
 
-                <!-- 必须，用于接收TOKEN -->
-                <action android:name="com.huawei.android.push.intent.REGISTRATION"/>
-                <!-- 必须，用于接收消息 -->
-                <action android:name="com.huawei.android.push.intent.RECEIVE"/>
-                <!-- 可选，用于点击通知栏或通知栏上的按钮后触发onEvent回调 -->
-                <action android:name="com.huawei.android.push.intent.CLICK"/>
-                <!-- 可选，查看PUSH通道是否连接，不查看则不需要 -->
-                <action android:name="com.huawei.intent.action.PUSH_STATE"/>
-            </intent-filter>
-        </receiver>
+  <!-- LeanCloud 自定义 receiver -->
+  <!-- ${PACKAGE_NAME} 要替换上您应用的包名 -->
+  <receiver android:name="com.avos.avoscloud.AVHMSPushMessageReceiver"
+  android:permission="${PACKAGE_NAME}.permission.PROCESS_PUSH_MSG">
+      <intent-filter>
+         <!-- 必须,用于接收token -->
+         <action android:name="com.huawei.android.push.intent.REGISTRATION" />
+         <!-- 必须, 用于接收透传消息 -->
+         <action android:name="com.huawei.android.push.intent.RECEIVE" />
+         <!-- 必须, 用于接收通知栏消息点击事件 此事件不需要开发者处理，只需注册就可以 -->
+         <action android:name="com.huawei.intent.action.PUSH_DELAY_NOTIFY"/>
+      </intent-filter>
+  </receiver>
 
-        <!-- 开发者自定义的打开推送消息的目的 activity，如果不指定则默认是打开应用。-->
-        <activity android:name="<please use your own activity name>">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="lcpushscheme" android:host="cn.leancloud.push" android:path="/notify_detail"/>
-            </intent-filter>
-        </activity>
+  <!-- 开发者自定义的打开推送消息的目的 activity，如果不指定则默认是打开应用。-->
+  <activity android:name="<please use your own activity name>">
+      <intent-filter>
+          <action android:name="android.intent.action.VIEW" />
+          <category android:name="android.intent.category.DEFAULT" />
+          <data android:scheme="lcpushscheme" android:host="cn.leancloud.push" android:path="/notify_detail"/>
+      </intent-filter>
+  </activity>
 
+</application>
 ```
+
+如果开发者还使用了华为的其他服务（例如支付等），请参考华为[官方文档](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#4%20%E4%B8%8B%E8%BD%BDSDK)来调整 manifest 文件内容。
 
 ### 具体使用
 
-1. 在 `AVOSCloud.initialize` 时调用 `AVMixPushManager.registerHMSPush(context, profile)` 即可。参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
+1. 在 application 的 onCreate 方法中调用 `AVOSCloud.initialize` 完成初始化之后，增加 `AVMixPushManager.registerHMSPush(context, profile)` 完成 HMS 推送的初始化。参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
 
-2. 在应用启动的第一个页面的 `onCreate` 中调用 `AVMixPushManager.connectHMS(activity)` 即可。
+2. 务必在应用启动的首个 activity 的 `onCreate` 方法中调用 `AVMixPushManager.connectHMS(activity)` ，确保 HMS SDK 和 HMS APK 的连接。
 
 LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华为推送：
 
@@ -182,14 +232,14 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 
 华为推送消息，在用户点击了通知栏信息之后，默认是打开应用，用户也可以指定特定的 activity 来响应推送启动事件，开发者需要在 manifest 文件的 application 中定义如下的 activity：
 ```
-        <!-- 开发者自定义的打开推送消息的目的 activity，如果不指定则默认是打开应用。-->
-        <activity android:name="<please use your own activity name>">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="lcpushscheme" android:host="cn.leancloud.push" android:path="/notify_detail"/>
-            </intent-filter>
-        </activity>
+<!-- 开发者自定义的打开推送消息的目的 activity，如果不指定则默认是打开应用。-->
+<activity android:name="<please use your own activity name>">
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data android:scheme="lcpushscheme" android:host="cn.leancloud.push" android:path="/notify_detail"/>
+    </intent-filter>
+</activity>
 ```
 这里 intent-filter 的内容不能修改，在目标 activity 的 `onCreate` 函数中可以从 intent extra data 中通过 `content` key 可以获得推送内容（JSON 格式，包含 push 消息中所有自定义属性）。
 
