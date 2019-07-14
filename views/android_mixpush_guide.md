@@ -243,6 +243,27 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 ```
 这里 intent-filter 的内容不能修改，在目标 activity 的 `onCreate` 函数中可以从 intent extra data 中通过 `content` key 可以获得推送内容（JSON 格式，包含 push 消息中所有自定义属性）。
 
+在 HMS 推送中，我们是通过自定义 intent 参数来指定响应 activity 的，对应到华为的参数的话，是 action 内 type 为 1， param 内 intent 参数为您传递的自定义参数转为 json 的字符串（具体可参考华为文档[服务端发送 push 消息](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_api_reference_agent_s2)）。
+
+在 LeanCloud 后端发送这种推送的例子如下：
+```
+curl -X POST \
+  -H "X-LC-Id: {your app id}"          \
+  -H "X-LC-Key: {your app key}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {"channels" : ["public"]}
+        "data": {"alert" : "Hello from LeanCloud",
+                 "action" : {"type": 1,
+                             "param": {
+                                 "intent":"#Intent;compo=com.rvr/.Activity;S.W=U;end"
+                              }
+                            }
+                 }
+     }' \
+  https://api.leancloud.cn/1.1/push
+```
+
 ### 参考 demo
 我们提供了一个 [最新的华为推送 demo](https://github.com/leancloud/mixpush-demos/tree/master/huawei)，可供你在接入过程中参考。
 
