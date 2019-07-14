@@ -1650,12 +1650,12 @@ comment.save();
 ```swift
 do {
     // 创建 post
-    let post = AVObject(className: "Post")
+    let post = LCObject(className: "Post")
     try post.set("title", value: "饿了……")
     try post.set("content", value: "中午去哪吃呢？")
 
     // 创建 comment
-    let comment = AVObject(className: "Comment")
+    let comment = LCObject(className: "Comment")
     try comment.set("content", value: "当然是肯德基啦！")
 
     // 将 post 设为 comment 的一个属性值
