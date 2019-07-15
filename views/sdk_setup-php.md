@@ -16,7 +16,8 @@ composer require leancloud/leancloud-sdk
 
 
 - 如果 composer 访问 packagist 仓库有问题，需要[设置镜像][packagist-mirror]或者通过代理（设置 `http_proxy` 环境变量）访问。
-[packagist-mirror]: https://pkg.phpcomposer.com/
+
+[packagist-mirror]: https://mirrors.aliyun.com/composer/
 
 {% endblock %}
 

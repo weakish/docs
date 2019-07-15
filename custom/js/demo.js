@@ -229,6 +229,13 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         mdPath: 'https://github.com/leancloud/multiplayer-turn-based-game-demo',
         type: 'typescript',
         qcloudShow: true
+      },{
+        name: '猜拳游戏',
+        desc: 'LeanCloud Client Engine 服务端（Node.js）示例',
+        downPath: '',
+        mdPath: 'https://rpsgame.cn-e1.leanapp.cn/',
+        type: 'typescript',
+        qcloudShow: true
       }]
     }
     $scope.$watch('currentSDKType',function(){
