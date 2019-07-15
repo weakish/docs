@@ -1979,7 +1979,7 @@ user.logIn(authData: authData, platform: .weixin, options: [.failOnNotExist]) { 
         assert(user.objectId != nil)
     case .failure(error: let error):
         if error.code == 211 {
-            // 不存绑定了当前 AuthData 的 User 的实例
+            // 不存在绑定了当前 AuthData 的 User 的实例
             // 跳转到输入用户名、密码、手机号等业务页面
             let user = LCUser()
             user.username = "Tome"
