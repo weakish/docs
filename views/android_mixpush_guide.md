@@ -232,7 +232,7 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 
 华为推送消息，在用户点击了通知栏信息之后，默认是打开应用，用户也可以指定特定的 activity 来响应推送启动事件，开发者需要在 manifest 文件的 application 中定义如下的 activity：
 ```
-<!-- 开发者自定义的打开推送消息的目的 activity，如果不指定则默认是打开应用。-->
+<!-- (可选)开发者自定义的打开推送消息的目的 activity。-->
 <activity android:name="<please use your own activity name>">
     <intent-filter>
         <action android:name="android.intent.action.VIEW" />
@@ -241,10 +241,13 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
     </intent-filter>
 </activity>
 ```
-这里 intent-filter 的内容不能修改，在目标 activity 的 `onCreate` 函数中可以从 intent extra data 中通过 `content` key 可以获得推送内容（JSON 格式，包含 push 消息中所有自定义属性）。
+在目标 activity 的 `onCreate` 函数中可以从 intent extra data 中通过 `content` key 可以获得推送内容（JSON 格式，包含 push 消息中所有自定义属性）。
 
-在 HMS 推送中，我们是通过自定义 intent 参数来指定响应 activity 的，对应到华为的参数的话，是 action 内 type 为 1， param 内 intent 参数为您传递的自定义参数转为 json 的字符串（具体可参考华为文档[服务端发送 push 消息](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_api_reference_agent_s2)）。
-
+这里 intent-filter 的内容不能修改。在 HMS 推送中，我们是通过自定义 `intent` 参数来指定响应 activity 的（具体可参考华为文档[服务端发送 push 消息](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_api_reference_agent_s2)）。对于开发者[自定义的属性](https://leancloud.cn/docs/push_guide.html#hash1053488444)，在调用 HMS 推送接口的时候，LeanCloud 云端会使用固定的 intentUri pattern 来封装自定义属性，intentUri 的固定格式为：
+```
+intent://cn.leancloud.push/notify_detail#Intent;scheme=lcpushscheme;S.content=XXXX;launchFlags=0x10000000;end
+```
+其中 XXX 就是开发者自定义参数的 JSON 字符串做了 URL Encode 之后的值，只有这部分内容是开发者可以指定的。
 在 LeanCloud 后端发送这种推送的例子如下：
 ```
 curl -X POST \
@@ -253,15 +256,31 @@ curl -X POST \
   -H "Content-Type: application/json" \
   -d '{
         "where": {"channels" : ["public"]}
-        "data": {"alert" : "Hello from LeanCloud",
-                 "action" : {"type": 1,
-                             "param": {
-                                 "intent":"#Intent;compo=com.rvr/.Activity;S.W=U;end"
-                              }
-                            }
-                 }
+        "data": {"alert" : "消息内容",
+                 "title": "显示在通知栏的标题",
+                 "k1" : "v1",
+                 "k2" : "v2"}
      }' \
   https://api.leancloud.cn/1.1/push
+```
+
+LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为：
+```
+{"hps":
+  {"msg":
+    {"type":3,
+     "body": {
+       "title": "显示在通知栏的标题",
+       "content": "消息内容"},
+     "action" {
+       "type": 1,
+       "param": {
+         "intent": "intent://cn.leancloud.push/notify_detail?S.content=%7B%22k1%22%3A%22v1%22%2C%22k2%22%3A%22v2%22%7D#Intent;scheme=lcpushscheme;launchFlags=0x10000000;end"
+        }
+      }
+    }
+  }
+}
 ```
 
 ### 参考 demo
