@@ -914,14 +914,14 @@ $query->withinKilometers("whereCreated", $point, 2.0);
 {% block code_send_sms_code_for_loginOrSignup %}
 
 ```php
-User::requestLoginSmsCode("13577778888");
+SMS::requestSmsCode("13577778888");
 ```
 {% endblock %}
 
 {% block code_verify_sms_code_for_loginOrSignup %}
 
 ```php
-User::logInWithSmsCode("13577778888", "123456");
+User::signUpOrLoginByMobilePhone("13577778888", "123456");
 ```
 {% endblock %}
 
