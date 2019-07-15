@@ -468,29 +468,28 @@ dependencies {
 
 ## vivo 推送（beta）
 
-我们新推出了支持 vivo 手机的混合推送，当前该功能还处于 beta 阶段，可能存有缺陷，所以我们没有发布正式版 SDK，而是采用了源码配 demo 的形式来公开这一功能。欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
+我们新推出了支持 vivo 手机的混合推送，当前该功能还处于 beta 阶段，可能存有缺陷，欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
 
 - vivo 混合推送 SDK 源代码：可参照 [这里](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush)。
-- vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush-demos/tree/master/vivo)。在 demo 工程的 [app/libs](https://github.com/leancloud/mixpush-demos/tree/master/vivo/app/libs) 目录下，即可发现我们编译好的 `4.7.11-beta` 版本 SDK，大家可以拷贝到自己的工程中来直接使用。
+- vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush-demos/tree/master/vivo)。
 
 ### 环境配置
 要使用 vivo 官方推送服务，需要在 [vivo 开发者平台](https://dev.vivo.com.cn/home)注册一个账号，并创建好应用。
-这里假设大家已经完成上述操作，
-创建好了应用，并获取了 `appId` 和 `appKey`（请保存好这两个值，下一步接入的时候会用到。）
+这里假设大家已经完成上述操作，创建好了应用，并获取了 `appId` 、 `appKey`和`appSecret`（请保存好这几个值，下一步接入的时候会用到。）
 
 ### 接入 SDK
 当前版本的 SDK 是基于 vivo 官方文档 [push SDK 接入文档](https://dev.vivo.com.cn/documentCenter/doc/158) 封装而来，使用的 vivo push SDK 基线版本是 `2.3.4`。我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
 
-首先将 demo 工程 app/libs 目录下的所有 jar 包拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+首先将 demo 工程 app/libs 目录下的所有 jar 包（如有）拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
 ```
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.squareup.okhttp3:okhttp:3.8.1'
-    implementation 'com.alibaba:fastjson:1.2.37'
-    implementation 'org.java-websocket:Java-WebSocket:1.3.9'
-    implementation 'com.google.protobuf:protobuf-java:3.4.0'
-
-    implementation 'com.meizu.flyme.internet:push-internal:3.6.2@aar'
+    implementation ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
+    implementation ('cn.leancloud.android:avoscloud-push:{{ version.leancloud }}@aar'){transitive = true}
+    implementation ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar'){
+        exclude group:'cn.leancloud.android', module:'hmsagent'
+        exclude group:'com.huawei.android.hms', module:'push'
+    }
 ```
 
 接下来配置 AndroidManifest，添加权限声明：
@@ -595,6 +594,14 @@ public class AVMixPushManager {
 }
 ```
 
+
+
+#### 添加 vivo 推送配置
+
+在**应用控制台 - 消息 - 推送 - 设置** 页面开启混合推送服务，并且在「vivo 推送配置」一节设置好准备阶段申请好的「vivo appId」、「vivo appKey」和「vivo Secret」，就可以了。
+
+
+
 #### 响应通知栏消息的点击事件
 
 与其他厂商的混合推送机制一样，vivo 混合推送也是通过系统通道来下发消息，开发者调用 push API 发送消息时，其流程为：
@@ -628,6 +635,8 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 
 这样就完成了 vivo 推送的完整流程。
 
+
+
 ## Oppo 推送（beta）
 
 我们新推出了支持 Oppo 手机的混合推送，当前该功能还处于 beta 阶段，可能存有缺陷，欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
@@ -643,20 +652,24 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 - 在 [oppo 开放平台](https://open.oppomobile.com/)注册一个账号，并创建好应用。
 - 从 Oppo 官网下载 推送 SDK(地址如下：[Oppo Push 客户端 SDK](https://open.oppomobile.com/wiki/doc#id=10201))。LeanCloud 混合推送目前是基于 1.0.1 版本进行开发的，大家也可以从[混合推送源码](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush/libs)里得到这一版本的 jar 包。
 
-这里假设大家已经完成上述操作，创建好了应用，并获取了 `appId` 和 `appKey`（请保存好这两个值，下一步接入的时候会用到）。
+这里假设大家已经完成上述操作，创建好了应用，并获取了 `appId` 、 `appKey`和 `masterSecret`，请保存好这三个值，下一步接入的时候会用到：
+
+- SDK 初始化需要使用 `appId` 和 `appKey` 。
+- 服务端设置需要使用  `appKey`和 `masterSecret`。
 
 ### 接入 SDK
 当前版本的 SDK 是基于 oppo 官方文档 [push SDK 接入文档](https://open.oppomobile.com/wiki/doc#id=10196) 封装而来，我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/oppo/)）来解释整个接入流程。
 
-首先将 demo 工程 app/libs 目录下的所有 jar 包拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+首先将 demo 工程 app/libs 目录下的所有 jar 包（如有）拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
 ```
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation('cn.leancloud.android:avoscloud-sdk:4.7.15')
-    // 推送与即时通讯需要的包
-    implementation('cn.leancloud.android:avoscloud-mixpush:4.7.15@aar') { transitive = true }
-
-    implementation 'com.meizu.flyme.internet:push-internal:3.6.2@aar'
+implementation fileTree(dir: 'libs', include: ['*.jar'])
+implementation ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
+implementation ('cn.leancloud.android:avoscloud-push:{{ version.leancloud }}@aar'){transitive = true}
+implementation ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar'){
+  exclude group:'cn.leancloud.android', module:'hmsagent'
+  exclude group:'com.huawei.android.hms', module:'push'
+}
 ```
 
 接下来配置 AndroidManifest，添加权限声明：
@@ -688,7 +701,7 @@ android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
 
 #### 初始化
 
-与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行 vivo 推送的初始化：
+与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行 oppo 推送的初始化：
 
 ```java
 // Customized Push Adapter.
@@ -861,6 +874,12 @@ public class AVMixPushManager {
 
 AVMixPushManager 封装的这些接口与 oppo 官方文档的接口完全一致，可参考[官方文档-详细 API 说明](https://open.oppomobile.com/wiki/doc#id=10196) 来了解具体信息，也可以参考该文档里面的错误码定义来进行集成测试。
 
+#### 添加 oppo 推送配置
+
+在应用控制台 - 消息 - 推送 - 设置 页面开启混合推送服务，并且在「oppo 推送配置」一节设置好准备阶段申请好的「oppo app key」和「oppo master secret」，就可以了。
+
+
+
 
 #### 响应通知栏消息的点击事件
 
@@ -877,7 +896,9 @@ AVMixPushManager 封装的这些接口与 oppo 官方文档的接口完全一致
 	- 4，打开应用内页（activity）；
 	- 5，Intent scheme URL
 
-LeanCloud 将来会支持默认值之外的动作。
+LeanCloud 混合推送目前只支持默认动作（启动应用），将来会其他选项。
+
+
 
 
 ## FCM 推送（仅美国节点可用）
