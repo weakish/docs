@@ -188,7 +188,7 @@ Tom 完成了登录之后，就可以选择用户聊天了。现在他要给 Jer
 
 ```js
 // 创建与 Jerry 之间的对话
-tom.CreateConversationAsync({ // tom 是一个 IMClient 实例
+tom.createConversation({ // tom 是一个 IMClient 实例
   // 指定对话的成员除了当前用户 Tom（SDK 会默认把当前用户当做对话成员）之外，还有 Jerry
   members: ['Jerry'],
   // 对话名称
