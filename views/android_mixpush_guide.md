@@ -251,8 +251,8 @@ intent://cn.leancloud.push/notify_detail#Intent;scheme=lcpushscheme;S.content=XX
 在 LeanCloud 后端发送这种推送的例子如下：
 ```
 curl -X POST \
-  -H "X-LC-Id: {your app id}"          \
-  -H "X-LC-Key: {your app key}"        \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
   -H "Content-Type: application/json" \
   -d '{
         "where": {"channels" : ["public"]}
