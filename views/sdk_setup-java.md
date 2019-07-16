@@ -1,6 +1,6 @@
 {% extends "./sdk_setup.tmpl" %}
 {% set platform_name = "Java" %}
-{% set java_sdk_latest_version = '0.2.1' %}
+{% set currentVersion = "5.0.12" %}
 
 {% block language %}Java{% endblock %}
 
@@ -27,7 +27,7 @@ public class MyLeanCloudApp extends Application {
 }
 ```
 
-Then specify the permissions needed by the SDK and declare the `MyLeanCloudApp` class in `AndroidManifest.xml`:
+然后指定 SDK 需要的权限并在 `AndroidManifest.xml` 里面声明 `MyLeanCloudApp` 类：
 
 ```xml
 <!-- 基本模块（必须）START -->
