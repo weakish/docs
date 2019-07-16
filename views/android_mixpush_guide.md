@@ -652,9 +652,9 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 - 在 [oppo 开放平台](https://open.oppomobile.com/)注册一个账号，并创建好应用。
 - 从 Oppo 官网下载 推送 SDK(地址如下：[Oppo Push 客户端 SDK](https://open.oppomobile.com/wiki/doc#id=10201))。LeanCloud 混合推送目前是基于 1.0.1 版本进行开发的，大家也可以从[混合推送源码](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush/libs)里得到这一版本的 jar 包。
 
-这里假设大家已经完成上述操作，创建好了应用，并获取了 `appId` 、 `appKey`和 `masterSecret`，请保存好这三个值，下一步接入的时候会用到：
+这里假设大家已经完成上述操作，创建好了应用，并获取了 `appKey` 、 `appSecret`和 `masterSecret`，请保存好这三个值，下一步接入的时候会用到：
 
-- SDK 初始化需要使用 `appId` 和 `appKey` 。
+- SDK 初始化需要使用 `appKey` 和 `appSecret` 。
 - 服务端设置需要使用  `appKey`和 `masterSecret`。
 
 ### 接入 SDK
