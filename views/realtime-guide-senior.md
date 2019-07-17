@@ -46,7 +46,7 @@ LeanMessage Cluster-->终端: 4. 对请求的内容和签名进行验证，执�
 
 ### 签名格式说明
 
-下面我们详细说明一下不同操作的签名格式。
+下面我们详细说明一下不同操作的签名消息格式。
 
 #### 用户登录签名
 
@@ -80,7 +80,7 @@ appid:clientid:sorted_member_ids:timestamp:nonce
 
 #### 群组功能的签名
 
-在群组功能中，我们对 **加群**、**邀请** 和 **踢出群** 这三个动作也允许加入签名，签名格式是：
+在群组功能中，我们对 **加群**、**邀请** 和 **踢出群** 这三个动作也允许加入签名，签名的消息格式是：
 
 ```
 appid:clientid:convid:sorted_member_ids:timestamp:nonce:action
@@ -100,7 +100,7 @@ appid:client_id:convid:nonce:timestamp
 
 #### 黑名单的签名
 
-由于黑名单有两种情况，所以签名格式也有两种：
+由于黑名单有两种情况，所以签名的消息格式也有两种：
 
 1. `client` 对 `conversation`
 
