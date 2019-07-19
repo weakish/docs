@@ -286,7 +286,7 @@ LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slice
 ![image](images/geopoint_faq.png)
 
 
-## Android SDK
+## Java SDK
 
 ### 对 AVObject 对象使用 getDate("createdAt") 方法读取创建时间为什么会返回 null
 
@@ -296,7 +296,7 @@ LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slice
 
 请检查 AndroidManifest.xml 配置，确认 receiver 和 service 写在了 application 标签里，并且与 activity 平级。它们与 activity 同为四大组件之一，需要写在一起。
 
-### Anroid 设备每次启动时，installationId 为什么总会改变？如何才能不改变？
+### Android 设备每次启动时，installationId 为什么总会改变？如何才能不改变？
 可能有以下两种原因导致这种情况：
 * SDK 版本过旧，installationId 的生成逻辑在版本更迭中有修改。请更新至最新版本。
 * 代码混淆引起的，注意在 proguard 文件中添加 [LeanCloud SDK 的混淆排除](android_faq.html#代码混淆怎么做)。
@@ -357,6 +357,11 @@ LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slice
 
 ```
 
+### 出现 already has one request sending 错误是什么原因
+
+日志中出现了 `com.avos.avoscloud.AVException: already has one request sending` 的错误信息，这说明存在对同一个 `AVObject` 实例对象同时进行了 2 次异步的 `save` 操作。为防止数据错乱，LeanCloud SDK 对于这种同一数据的并发写入做了限制，所以抛出了这个异常。
+
+需要检查代码，通过打印 log 和断点的方式来定位究竟是由哪一行 `save` 所引发的。
 
 ## JavaScript SDK
 

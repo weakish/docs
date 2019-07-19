@@ -3374,7 +3374,7 @@ query.findInBackground(new AVIMConversationQueryCallback() {
 });
 ```
 
-各种查询缓存策略的行为可以参考 [存储指南 · AVQuery 缓存查询](leanstorage_guide-android.html#缓存查询) 一节。
+{# 各种查询缓存策略的行为可以参考 [存储指南 · AVQuery 缓存查询](leanstorage_guide-java.html#缓存查询) 一节。 #}
 
 {{ docs.langSpecEnd('java') }}
 

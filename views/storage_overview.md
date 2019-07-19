@@ -165,7 +165,7 @@ LeanCloud 平台保证 99.9% 的高可用性，并且数据访问方面保证了
 
 ### Android 开发指南
 
-详细请参看 [数据存储开发指南 · Android](leanstorage_guide-android.html)。
+详细请参看 [数据存储开发指南 · Java](leanstorage_guide-java.html)。
 
 ### Objective-C 开发指南
 

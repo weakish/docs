@@ -9,7 +9,6 @@
 {% set link_to_blog_password_reset = '关于自定义邮件模板和验证链接，请参考《[自定义应用内用户重设密码和邮箱验证页面](https://blog.leancloud.cn/607/)》。' %}
 {% set app_permission_link = "[控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)" %}
 {% set query_result_limit = "每次查询默认最多返回 100 条符合条件的结果，要更改这一数值，请参考 [限定结果返回数量](#限定返回数量)。" %}
-{% set tutorial_restaurant = '[《教程 · 开发餐厅座位预订系统》](app-sample-restaurant.html)'%}
 
 {% set query_result_limit = "每次查询默认最多返回 100 条符合条件的结果，要更改这一数值，请参考 [限定结果返回数量](#限定返回数量)。" %}
 
