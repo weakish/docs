@@ -328,6 +328,7 @@ AV.Cloud.beforeSave('Review', function(request) {
 
 * 在定义的函数会覆盖你之前用 Git 或命令行部署的项目。
 * 目前只能在线编写云函数和 Hook，不支持托管静态网页、编写动态路由。
+* 只能使用 SDK 和一些内置的模块（详见下节表格），无法引入其他模块作为依赖。
 
 在 **[控制台 > 云引擎 > 部署 > 在线编辑](/dashboard/cloud.html?appid={{appid}}#/deploy)** 标签页，可以：
 
