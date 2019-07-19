@@ -363,7 +363,9 @@ query.setQuery("age:(>=10 AND < 20)");//搜索年龄在[10,20)区间内的数据
   query.setQuery("qu?c*k");//此处?代表一个字符，*代表0个或者多个字符。类似正则表达式通配符
 ```
 
-更多更详细的语法资料，你可以参考 Elasticsearch 文档中 [Query-String-Syntax](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax) 一节。
+更多更详细的语法资料，你可以参考 Elasticsearch 文档中 [Query-String-Syntax] 一节。
+
+[Query-String-Syntax]: https://github.com/elastic/elasticsearch/blob/master/docs/reference/query-dsl/query-string-syntax.asciidoc
 
 #### iOS 集成
 
