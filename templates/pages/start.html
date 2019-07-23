@@ -8,6 +8,7 @@ title: SDK 安装指南
     <h3 class="no-padding-top">选择开发语言或平台</h3>
     <div class="step-content step1">
       <form class="custom-form-inline no-margin select-plat">
+
         <div class="radio custom-control">
           <label>
             <input type="radio" ng-model="selectedPlat" value="objc">
@@ -15,6 +16,7 @@ title: SDK 安装指南
             Objective-C
           </label>
         </div>
+
         <div class="radio custom-control">
           <label>
             <input type="radio" ng-model="selectedPlat" value="swift">
@@ -22,6 +24,7 @@ title: SDK 安装指南
             Swift
           </label>
         </div>
+
         <div class="radio custom-control">
           <label>
             <input type="radio" ng-model="selectedPlat" value="android">
@@ -37,6 +40,7 @@ title: SDK 安装指南
             JavaScript
           </label>
         </div>
+
         <div class="radio custom-control">
           <label>
             <input type="radio" ng-model="selectedPlat" value="python">
@@ -70,47 +74,36 @@ title: SDK 安装指南
         </div>
 
       </form>
-
-     <!-- <p class="step-desc">
-        每个平台提供对应的SDK。
-      </p>-->
     </div>
   </div>
 
-  <div class="step" >
+  <div class="step">
+
     <h3>选择 LeanCloud 应用</h3>
+
     <div ng-hide="user.username">
       <p>请先登录。</p>
-      <a ng-hide="user.username" ng-href="/login.html#/signin" class="btn  btn-primary ng-scope">登录</a>
+      <a ng-hide="user.username" ng-href="/login.html#/signin" class="btn btn-primary ng-scope">登录</a>
     </div>
+
     <div class="step-content" ng-show="apps" id="apps-select">
-      <select class="form-control" ng-model="pageState.currentApp"  ng-options="app.app_name  for app in apps">  </select>
+      <select class="form-control" ng-model="pageState.currentApp" ng-options="app.app_name for app in apps"> </select>
     </div>
 
     <div class="step-content" ng-hide="!user.username || apps">
       <form ng-hide="apps.all" class="form-inline">
-        <!-- <div class="form-group">
-          <input class="form-control" type="text" ng-model="appname" placeholder="应用名称">
-        </div> -->
-        <a ng-href="/applist.html#/newapp" class="btn  btn-primary create-app ng-scope" translate="ACTION_CREATE_APP">创建应用</a>
-        <p  class="help-block" style="">您目前还没有创建任何应用，需要先创建应用。</p>
+        <a ng-href="/applist.html#/newapp" class="btn btn-primary create-app ng-scope"
+          translate="ACTION_CREATE_APP">创建应用</a>
+        <p class="help-block">您目前还没有创建任何应用，需要先创建应用。</p>
       </form>
     </div>
+
   </div>
 
   <div class="spinner-wrap">
     <div class="spinner"></div>
   </div>
-    
-  <div id="start-main"></div>
-  
-  <!-- <div id="step4" class="step ">
-    <h3>相关文档和 Demo</h3>
 
-    <div class="step-content">
-      <a class="btn btn-default" href="{{links[selectedPlat].doc}}">详细开发指南</a>
-      <a class="btn btn-default" href="{{links[selectedPlat].demo}}">Demo 下载</a>
-    </div>
-  </div> -->
+  <div id="start-main"></div>
 
 </div>

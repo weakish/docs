@@ -1,18 +1,9 @@
-{% import "views/_storage.md" as storagePartial %}
 {% import "views/_data.njk" as data %}
 {% import "views/_helper.njk" as docs %}
-{% import "views/_data.njk" as data %}
-{% import "views/_sms.njk" as sms %}
-{% import "views/_parts.html" as include %}
 {% set segment_code ="dotnet" %}
-{% set middot = '·' %}
-{% set link_to_blog_password_reset = '关于自定义邮件模板和验证链接，请参考《[自定义应用内用户重设密码和邮箱验证页面](https://blog.leancloud.cn/607/)》。' %}
 {% set app_permission_link = "[控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)" %}
-{% set query_result_limit = "每次查询默认最多返回 100 条符合条件的结果，要更改这一数值，请参考 [限定结果返回数量](#限定返回数量)。" %}
 
-{% set query_result_limit = "每次查询默认最多返回 100 条符合条件的结果，要更改这一数值，请参考 [限定结果返回数量](#限定返回数量)。" %}
-
-#  数据存储开发指南 &middot; Unity
+# 数据存储开发指南 · Unity
 
 数据存储（LeanStorage）是 LeanCloud 提供的核心功能之一。下面我们用一个简单的示例来说明它的基本用法。
 
@@ -598,7 +589,7 @@ equipments.ForEach((equip) =>
     Debug.Log(equipName);
 });
 ```
-<div class="callout callout-info">{{query_result_limit}}</div>
+<div class="callout callout-info">每次查询默认最多返回 100 条符合条件的结果，要更改这一数值，请参考 [限定结果返回数量](#限定返回数量)。</div>
 
 查询攻击力大于等于 4 的 GameEquip：
 
@@ -1124,7 +1115,7 @@ await AVUser.RequestPasswordResetAsync("myemail@example.com");
 3. 用户点击重置密码链接后，一个特殊的页面会打开，让他们输入新密码；
 4. 用户的密码已被重置为新输入的密码。
 
-{{link_to_blog_password_reset}}
+关于自定义邮件模板和验证链接，请参考《[自定义应用内用户重设密码和邮箱验证页面](https://blog.leancloud.cn/607/)》。
 
 #### 手机号码重置密码
 用户需要先绑定手机号码才能使用这个功能。首先获取短信验证码：

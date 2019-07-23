@@ -1,37 +1,9 @@
-{% from 'views/_helper.njk' import 
-  alert  
-%}
-
-{% macro sdkSetupFAQ() -%}
-## 问题排查
-
-SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前，请先检查下安装的 SDK 是不是最新版本。
-
-### 401 Unauthorized
-
-如果 SDK 抛出 401 异常或者查看本地网络访问日志存在：
-
-```json
-{
-  "code": 401,
-  "error": "Unauthorized."
-}
-```
-则可认定为 App ID 或者 App Key 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 App ID 匹配 B 应用的 App Key，这样就会出现服务端鉴权失败的错误。
-
-### 客户端无法访问网络
-
-客户端尤其是手机端，应用在访问网络的时候需要申请一定的权限。
-{%- endmacro%}
-
 {% macro setService(service=api) %}
-
 <script type="text/javascript">
 angular.module("app").run(['$rootScope', function($rootScope) {
   $rootScope.service = '{{service}}';
 }]);
 </script>
-
 {% endmacro %}
 
 {% macro checkbox(checked=false) -%}
@@ -42,10 +14,6 @@ angular.module("app").run(['$rootScope', function($rootScope) {
   {% set borderColor = '#3090e4' %}
 {%- endif -%}
 <span class="checkbox" style="padding:1px 3px; background-color: {{ backgroundColor }}; color:white; display: inline; border:1px solid {{ borderColor }}; margin-right: 8px; border-radius: 2px; font-size: 12px;">&check;</span>
-{%- endmacro %}
-
-{% macro sectionTitle(slot='text',tag='div') -%}
-<{{tag}} class="section-title"><span style="font-size:16px;">{{slot}}</span></{{tag}}>
 {%- endmacro %}
 
 {% macro ops(prefix='', heading='') %}
@@ -70,80 +38,6 @@ BitOr  | 或运算   | `{{prefix}}op('BitOr', {'value': 0x0000000000000004})`
 BitXor | 异或运算 | `{{prefix}}op('BitXor', {'value': 0x0000000000000004})`
 {% endmacro %}
 
-{% macro debuglog(segment='', headingLevel='###') -%}
-{% set list = [
-   'all'
-  ,'objc'
-  ,'swift'
-  ,'java'
-  ,'android'
-  ,'javascript'
-  ,'js'
-  ,'php'
-  ,'python'
-] %}
-
-{% if list.indexOf(segment) != -1 -%}
-
-{{headingLevel}} 开启调试日志
-
-在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口，或是浏览器 Console 或是 LeanCloud 控制台的 [云引擎日志](/dashboard/cloud.html?appid={{appid}}#/log) 中。
-
-{% if segment == "all" or segment == "objc"  or segment == "objective-c" -%}
-```objc
-// 放在 SDK 初始化语句 [AVOSCloud setApplicationId:] 后面，只需要调用一次即可
-[AVOSCloud setAllLogsEnabled:YES];
-```
-{%- endif -%}
-{% if segment == "all" or segment == "swift" -%}
-```swift
-// 放在 SDK 初始化语句 LCApplication.default.set 前面，只需要调用一次即可
-LCApplication.logLevel = .all
-```
-{%- endif -%}
-{% if segment == "all" or segment == "java"  or segment == "android" -%}
-```java
-// 放在 SDK 初始化语句 AVOSCloud.initialize() 后面，只需要调用一次即可
-AVOSCloud.setDebugLogEnabled(true);
-```
-{%- endif -%}
-{% if segment == "all" or segment == "javascript" or segment == "js" -%}
-```js
-// Node.js 中设置环境变量 DEBUG=leancloud*
-// 通过 npm 启动应用时打开调试
-DEBUG=leancloud* npm start
-
-// 若使用云引擎 Node.js 环境，进入 LeanCloud 应用控制台 > 云引擎 > 设置 > 自定义环境变量，
-// 第一字段写 DEBUG，第二个字段写 leancloud:*，保存。（注意 leancloud 和 * 之间有个冒号）
-// 或使用云引擎 CLI 启动应用时打开调试，日志会输出到 应用控制台 > 云引擎 > 日志：
-DEBUG=leancloud:* lean up
-
-// 在浏览器的 Console 中设置 localStorage
-localStorage.setItem('debug', 'leancloud*');
-
-{{ debugLiveQuery() }}
-```
-{%- endif -%}
-{% if segment == "all" or segment == "python" -%}
-```python
-# 写在启动脚本的头部
-# 如果是在 LeanEngine 环境，启动脚本是 wsgi.py
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
-```
-{%- endif -%}
-{% if segment == "all" or segment == "php" -%}
-```php
-// 放在 SDK 初始化语句 Client::initialize() 后面，只需要调用一次即可
-Client::setDebug(true);
-```
-{%- endif %}
-
-{{ alert(turningOffDebuggingReminder()) }}
-{%- endif %}
-{%- endmacro %}
-
 {% macro retrieveAuthData(node, heading="") -%}
 {%- if heading != "" %}{{heading}}{%- endif %}
 
@@ -152,19 +46,4 @@ authData 的数据<u>默认为仅限其所属用户可读写</u>，也就是说�
 
 {% macro supportEmail() -%}
 <support@leancloud.rocks>
-{%- endmacro %}
-
-{% macro generalEmail() -%}
-<business@leancloud.rocks>
-{%- endmacro %}
-
-{% macro debugLiveQuery(verbose = false) -%}
-// 如果使用 LiveQuery，可以为其开启调试日志。
-{% if verbose -%}// 在浏览器的 Console 中设置 localStorage{%- endif %}
-localStorage.setItem('debug', 'LC*');
-{% if verbose -%}// {{ turningOffDebuggingReminder() }}{%- endif %}
-{%- endmacro %}
-
-{% macro turningOffDebuggingReminder() -%}
-在应用发布之前，请关闭调试日志，以免暴露敏感数据。
 {%- endmacro %}

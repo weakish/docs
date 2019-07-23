@@ -6,10 +6,6 @@
 当一个数据表的记录数超过 1 万时，开发者将无法自行为其创建索引（此前已创建的索引仍然会对超过 1 万条的数据生效）。商用版用户需要通过 [工单服务](https://leanticket.cn/tickets) 向我们提交创建申请（选择「建立索引」分类），开发版用户需要先升级到商用版才能提交创建申请。
 {% endmacro -%}
 
-{% macro androidSDKCompileInstructionLink(linkText) -%}
-<a escape-hash href="https://github.com/leancloud/android-sdk-all/blob/master/README.md#%E7%BC%96%E8%AF%91" target="_blank">{{ linkText }}</a>
-{% endmacro -%}
-
 {% macro relationDeprecated() -%}
 {{ alert("Relation 类型已被弃用。请使用 [中间表](relation-guide.html#使用中间表实现多对多关系_推荐_) 来完成对关联数据的查询、排序等复杂操作。") }}
 {%- endmacro %}
@@ -74,7 +70,6 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
     okhttp:     "3.8.0",
     okio:       "1.13.0"
 } %}
-
 
 {% macro cdn(collapsable = false) %}
 <div id="accordion-cdn">

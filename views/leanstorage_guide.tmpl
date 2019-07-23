@@ -131,9 +131,7 @@ do {
 我们为各个平台或者语言开发的 SDK 在底层都是通过 HTTPS 协议调用统一的 [REST API](rest_api.html)，提供完整的接口对数据进行各类操作。
 {% endcall %}
 
-## 起步
-
-### SDK 安装与初始化
+## SDK 安装与初始化
 
 {% if platform_name === "Objective-C" %}
 请阅读 [Objective-C 安装指南](sdk_setup-objc.html)。
@@ -154,73 +152,8 @@ do {
 请阅读 [Swift 安装指南](sdk_setup-swift.html)。
 {% endif %}
 
-### 开启调试日志
-
-在应用开发阶段，可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口、浏览器 Console 或是 [LeanCloud 控制台 > 云引擎 > 应用日志](/dashboard/cloud.html?appid={{appid}}#/log) 里面。
-
-{% if platform_name === "Objective-C" %}
-```objc
-// 放在 SDK 初始化语句 [AVOSCloud setApplicationId:] 后面，只需要调用一次即可
-[AVOSCloud setAllLogsEnabled:YES];
-```
-{% endif %}
 {% if platform_name === "JavaScript" %}
-如果使用的是 Node.js，可以在通过 npm 启动应用时设置环境变量 `DEBUG=leancloud*`：
-
-```sh
-DEBUG=leancloud* npm start
-```
-
-若是在 [云引擎](leanengine_overview.html) 中使用 Node.js，可以到 [控制台 > 云引擎 > 设置 > 自定义环境变量](/dashboard/cloud.html?appid={{appid}}#/conf) 里面添加一个新的变量，在第一栏填入 `DEBUG`，第二栏填入 `leancloud:*`（不要丢掉 `leancloud` 和 `*` 之间的冒号）。保存成功后，在本地通过 [命令行工具](leanengine_cli.html) 调试时，可以通过设置环境变量 `DEBUG=leancloud:*` 来让日志信息输出到 [LeanCloud 控制台 > 云引擎 > 应用日志](/dashboard/cloud.html?appid={{appid}}#/log)：
-
-```sh
-DEBUG=leancloud:* lean up
-```
-
-还可以设置 `localStorage` 来让日志打印到浏览器 Console：
-
-```js
-localStorage.setItem('debug', 'leancloud*');
-
-// 为 LiveQuery 启用日志
-localStorage.setItem('debug', 'LC*');
-```
-{% endif %}
-{% if platform_name === "Python" %}
-```python
-# 写在启动脚本的头部
-# 如果是在云引擎环境，启动脚本是 wsgi.py
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
-```
-{% endif %}
-{% if platform_name === "PHP" %}
-```php
-// 放在 SDK 初始化语句 Client::initialize() 后面，只需要调用一次即可
-Client::setDebug(true);
-```
-{% endif %}
-{% if platform_name === "Java" %}
-```java
-// 在 AVOSCloud.initialize() 之前调用
-AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
-// 或者 AVOSCloud.setLogLevel(AVLogger.Level.VERBOSE);
-```
-{% endif %}
-{% if platform_name === "Swift" %}
-```swift
-// 放在 SDK 初始化语句 LCApplication.default.set 前面，只需要调用一次即可
-LCApplication.logLevel = .all
-```
-{% endif %}
-
-{% call docs.alertWrap() %}
-在应用发布之前，请关闭调试日志，以免暴露敏感数据。
-{% endcall %}
-
-{% if platform_name === "JavaScript" %}
-### Web 安全
+## Web 安全
 
 如果在前端使用 JavaScript SDK，当你准备正式发布的时候，请务必在 [控制台 > 设置 > 安全中心](/dashboard/app.html?appid={{appid}}#/security) 中配置 **Web 安全域名**，这样可以防止其他人通过外网其他地址盗用你的服务器资源。
 
