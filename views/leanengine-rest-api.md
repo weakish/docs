@@ -11,6 +11,12 @@ LeanCloud 云端提供的统一的访问云函数的接口，所有的客户端 
 
 我们推荐使用 [Postman](http://www.getpostman.com/) 来调试 REST API，我们的社区中有一篇 [使用 Postman 调试 REST API 教程](https://forum.leancloud.cn/t/postman-rest-api/8638)。
 
+## Base URL
+
+LeanCloud 云函数的 base URL 同样为绑定的自定义域名，参见 [REST API 使用详解](rest_api.html#base-url)，
+但 LeanCloud 国际版云函数的 base URL 为 `appid前八位.engine.lncldglobal.com`,
+华北、华东节点的临时域名为 `appid前八位.engine.lncld.net`、`appid前八位.engine.lncldapi.com`。
+
 ## 预备环境和生产环境
 
 在客户端通过 REST API 调用云函数时，可以设置 HTTP 头 `X-LC-Prod` 来区分调用的环境。

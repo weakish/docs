@@ -251,7 +251,7 @@ module.exports = function(grunt) {
             masterkey: '{{masterkey}}',
             sign_masterkey: "{{sign_masterkey}}",
             sign_appkey: '{{sign_appkey}}',
-            host: '{{domain}}',
+            host: '$LC_API_HOST',
             engineDomain: engineDomainMap[grunt.option('theme')] || engineDomainMap['cn']
           }
         }
