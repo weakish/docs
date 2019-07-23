@@ -19,9 +19,9 @@ LeanCloud.Play.Logger.LogDelegate = (level, log) =>
     if (level == LogLevel.Debug) {
         Debug.LogFormat("[DEBUG] {0}", log);
     } else if (level == LogLevel.Warn) {
-        Debug.LogFormat("[WARN] {0}", log);
+        Debug.LogWarningFormat("[WARN] {0}", log);
     } else if (level == LogLevel.Error) {
-        Debug.LogFormat("[ERROR] {0}", log);
+        Debug.LogErrorFormat("[ERROR] {0}", log);
     }
 };
 ```
@@ -36,32 +36,8 @@ LeanCloud.Play.Logger.LogDelegate = (level, log) =>
 using LeanCloud.Play;
 ```
 
-通过 `private Play play = Play.Instance;` 获取客户端实例。
-
 ```cs
-// App Id
-var APP_ID = YOUR_APP_ID;
-// App Key
-var APP_KEY = YOUR_APP_KEY;
-// App 节点地区
-// Region.EastChina：华东节点
-// Region.NorthChina：华北节点
-// Region.NorthAmerica：美国节点
-var APP_REGION = YOUR_APP_REGION;
-// 初始化
-play.Init(APP_ID, APP_KEY, APP_REGION);
-```
-{% endblock %}
-
-
-
-{% block set_userid %}
-## 设置玩家 ID
-
-```cs
-var random = new System.Random();
-var randId = string.Format("{0}", random.Next(10000000));
-play.UserId = randId;
+var client = new Client(YOUR_APP_ID, YOUR_APP_KEY, "leancloud");
 ```
 {% endblock %}
 
@@ -69,24 +45,25 @@ play.UserId = randId;
 
 {% block connection %}
 ```cs
-play.Connect();
+try {
+    await client.Connect();
+} catch (PlayException e) {
+    // 连接失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
 ```
-连接完成后，会通过 `CONNECTED`（连接成功）或 `CONNECT_FAILED`（连接失败）事件来通知客户端。
-
 {% endblock %}
 
 
 
 {% block connectio_event %}
 ```cs
-play.On(LeanCloud.Play.Event.CONNECTED, (evtData) =>
-{
-    Debug.Log("connected");
-    // 根据当前时间（时，分）生成房间名称
-    var now = System.DateTime.Now;
-    var roomName = string.Format("{0}_{1}", now.Hour, now.Minute);
-    play.JoinOrCreateRoom(roomName);
-});
+try {
+    await client.JoinOrCreateRoom(roomName);
+} catch (PlayException e) {
+    // 创建或加入房间失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);    
+}
 ```
 
 `JoinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](multiplayer-guide-csharp.html#加入或创建指定房间) 获取更多关于 `JoinOrCreateRoom` 的用法。
@@ -97,16 +74,14 @@ play.On(LeanCloud.Play.Event.CONNECTED, (evtData) =>
 {% block join_room %}
 ```cs
 // 注册新玩家加入房间事件
-play.On(LeanCloud.Play.Event.PLAYER_ROOM_JOINED, (evtData) =>
-{
-    var newPlayer = evtData["newPlayer"] as Player;
+client.OnPlayerRoomJoined += (newPlayer) => {
     Debug.LogFormat("new player: {0}", newPlayer.UserId);
-    if (play.Player.IsMaster) {
+    if (client.Player.IsMaster) {
         // 获取房间内玩家列表
-        var playerList = play.Room.PlayerList;
+        var playerList = client.Room.PlayerList;
         for (int i = 0; i < playerList.Count; i++) {
             var player = playerList[i];
-            var props = new Dictionary<string, object>();
+            var props = new PlayObject();
             // 判断如果是房主，则设置 10 分，否则设置 5 分
             if (player.IsMaster) {
                 props.Add("point", 10);
@@ -115,9 +90,15 @@ play.On(LeanCloud.Play.Event.PLAYER_ROOM_JOINED, (evtData) =>
             }
             player.SetCustomProperties(props);
         }
-        // ...
+        var data = new PlayObject {
+            { "winnerId", client.Room.Master.ActorId }
+        };
+        var opts = new SendEventOptions {
+            ReceiverGroup = ReceiverGroup.All
+        };
+        client.SendEvent(GAME_OVER_EVENT, data, opts);
     }
-})
+};
 ```
 {% endblock %}
 
@@ -126,16 +107,15 @@ play.On(LeanCloud.Play.Event.PLAYER_ROOM_JOINED, (evtData) =>
 {% block player_custom_props_event %}
 ```cs
 // 注册「玩家属性变更」事件
-play.On(LeanCloud.Play.Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
-    var player = evtData["player"] as Player;
+client.OnPlayerCustomPropertiesChanged += (player, changedProps) => {
     // 判断如果玩家是自己，则做 UI 显示
     if (player.IsLocal) {
         // 得到玩家的分数
-        long point = (long)player.CustomProperties["point"];
+        long point = player.CustomProperties.GetInt("point");
         Debug.LogFormat("{0} : {1}", player.UserId, point);
-        this.scoreText.text = string.Format("Score: {0}", point);
+        scoreText.text = string.Format("Score: {0}", point);
     }
-});
+};
 ```
 {% endblock %}
 
@@ -143,14 +123,15 @@ play.On(LeanCloud.Play.Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
 
 {% block win %}
 ```cs
-if (play.Player.IsMaster) {
+if (client.Player.IsMaster) {
     // ...
-    var data = new Dictionary<string, object>();
-    data.Add("winnerId", play.Room.Master.ActorId);
-    var opts = new SendEventOptions();
-    opts.ReceiverGroup = ReceiverGroup.All;
-    byte winEventId = 2;
-    play.SendEvent(winEventId, data, opts);
+    var data = new PlayObject {
+        { "winnerId", client.Room.Master.ActorId }
+    };
+    var opts = new SendEventOptions {
+        ReceiverGroup = ReceiverGroup.All
+    };
+    client.SendEvent(GAME_OVER_EVENT, data, opts);
 }
 ```
 {% endblock %}
@@ -160,25 +141,21 @@ if (play.Player.IsMaster) {
 {% block custom_event %}
 ```cs
 // 注册自定义事件
-play.On(LeanCloud.Play.Event.CUSTOM_EVENT, (evtData) =>
-{
-    // 得到事件参数
-    var eventId = evtData["eventId"] as string;
-    if (eventId == "win") {
-        var eventData = evtData["eventData"] as Dictionary<string, object>;
+client.OnCustomEvent += (eventId, eventData, senderId) => {
+    if (eventId == GAME_OVER_EVENT) {
         // 得到胜利者 Id
-        int winnerId = (int)(long)eventData["winnerId"];
+        int winnerId = eventData.GetInt("winnerId");
         // 如果胜利者是自己，则显示胜利 UI；否则显示失败 UI
-        if (play.Player.ActorId == winnerId) {
+        if (client.Player.ActorId == winnerId) {
             Debug.Log("win");
-            this.resultText.text = "Win";
+            resultText.text = "Win";
         } else {
             Debug.Log("lose");
-            this.resultText.text = "Lose";
+            resultText.text = "Lose";
         }
-        play.Disconnect();
+        client.Close();
     }
-});
+};
 ```
 {% endblock %}
 

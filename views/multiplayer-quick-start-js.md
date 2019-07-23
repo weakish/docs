@@ -147,11 +147,6 @@ const client = new Client({
     appId: YOUR_APP_ID,
     // 设置 APP Key
     appKey: YOUR_APP_KEY,
-    // 设置节点地区
-    // EastChina：华东节点
-    // NorthChina：华北节点
-    // NorthAmerica：美国节点
-    region: Region.EastChina
     // 设置用户 id
     userId: 'leancloud'
     // 设置游戏版本号（选填，默认 0.0.1）

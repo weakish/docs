@@ -30,14 +30,18 @@
 {% block initialization %}
 {% endblock %}
 
+其中，
+`userId` 作为客户端的唯一标识连接至服务器。
+需要注意，这个 `userId` 有如下限制：
+- 只允许英文、数字与下划线	
+- 长度不能超过 32 字符	
+- 一个应用内全局唯一
+
+`gameVersion` 表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器。
+
 
 
 ## 连接
-{% block set_userid %}
-{% endblock %}
-
-{% block set_game_version %}
-{% endblock %}
 
 ### 建立连接
 
@@ -46,11 +50,7 @@
 {% block connection %}
 {% endblock %}
 
-{% block connection_with_gameversion %}
-{% endblock %}
 
-{% block connection_event %}
-{% endblock %}
 
 ## 大厅
 
@@ -69,14 +69,16 @@
 
 更多关于 `LobbyRoom`，请参考 [API 文档]({{lobby_room_url}})。
 
+### 相关事件
+
 {% block lobby_event %}
 {% endblock %}
+
 
 
 ## 房间匹配
 
 房间，是指产生玩家「战斗交互」的单位。比如斗地主的牌桌、MMO 的副本、微信游戏的对战 等，广义上都属于房间的范畴。
-
 玩家之间的战斗交互都是在房间内完成的。所以，玩家「如何进入房间」就成了房间匹配的关键。下面我们将从「创建房间」和「加入房间」两方面来分析一下常用的「房间匹配」功能。
 
 ### 创建房间
@@ -84,9 +86,6 @@
 我们可以这样简单的创建一个房间。创建房间的玩家为房主（[MasterClient](#MasterClient)），房主在创建房间成功的同时也意味着成功加入了该房间。
 
 {% block create_default_room %}
-{% endblock %}
-
-{% block create_room_events %}
 {% endblock %}
 
 我们也可以创建一个设定相关信息的房间。
@@ -135,9 +134,6 @@
 {% block join_room_api %}
 {% endblock %}
 
-{% block join_room_event %}
-{% endblock %}
-
 #### 随机加入房间
 
 有时候，我们不需要加入指定某个房间，而是随机加入「符合某些条件的房间」（甚至可以是没有条件），比如快速开始、快速匹配等，这时我们可以通过调用 `{{joinRandomRoom}}` 方法随机加入房间。
@@ -160,12 +156,9 @@
 {% block join_or_create_room_api %}
 {% endblock %}
 
-{% block join_or_create_room_events %}
-{% endblock %}
-
 ### 新玩家加入事件
 
-对于已经在房间的玩家，当有新玩家加入到房间时，服务端会派发 `PLAYER_ROOM_JOINED`（新玩家加入）事件通知客户端，客户端可以通过新玩家的属性，做一些显示逻辑。
+对于已经在房间的玩家，当有新玩家加入到房间时，服务端会派发 `{{PLAYER_ROOM_JOINED_EVENT}}`（新玩家加入）事件通知客户端，客户端可以通过新玩家的属性，做一些显示逻辑。
 
 {% block player_room_joined %}
 {% endblock %}
@@ -184,13 +177,17 @@
 {% block leave_room %}
 {% endblock %}
 
-房间里的其他玩家将会接收到 `PLAYER_ROOM_LEFT`（有玩家离开房间）事件。
+房间里的其他玩家将会接收到 `{{PLAYER_ROOM_LEFT_EVENT}}`（有玩家离开房间）事件。
 
 {% block player_room_left_event %}
 {% endblock %}
 
+
+### 相关事件
+
 {% block room_events %}
 {% endblock %}
+
 
 
 ## MasterClient
@@ -203,38 +200,43 @@
 * ...等等。
 
 ### MasterClient 位于玩家客户端
+
 您可以将 MasterClient 的逻辑写在客户端中，作为房间创建者的玩家终端会承担游戏运算。在这种情况下，多人对战为 MasterClient 提供了以下方便的功能：
 
 #### MasterClient 掉线转移
-当 MasterClient 掉线后，多人对战服务会指任一名新的玩家客户端为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。当 MasterClient 变化时，SDK 会派发 `MASTER_SWITCHED`（主机切换）事件通知客户端。
+
+当 MasterClient 掉线后，多人对战服务会指任一名新的玩家客户端为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。当 MasterClient 变化时，SDK 会派发 `{{MASTER_SWITCHED_EVENT}}`（主机切换）事件通知客户端。
+
+{% block master_switched %}
+{% endblock %}
+
+#### 相关事件
 
 {% block master_switched_event %}
 {% endblock %}
 
 #### 指定其他成员为 MasterClient
+
 在游戏过程中，MasterClient 如果不想再承担运算功能，可以调用以下方法主动将自己的角色转移给其他玩家客户端：
+
 {% block set_master %}
 {% endblock %}
 
-转移 MasterClient 身份后，房间内所有玩家都会收到 `MASTER_SWITCHED` 事件。
-
-#### 相关事件
-
-| 事件   | 参数     | 描述                                       |
-| ------------------------------------ | ------------------ | ---------------------------------------- |
-| MASTER_SWITCHED    | { player } | Master 更换                         |
+转移 MasterClient 身份后，房间内所有玩家都会收到 `{{MASTER_SWITCHED_EVENT}}` 事件。
 
 ### MasterClient 位于服务端
 
 为了确保游戏安全，防止用户作弊等，我们推荐您将 MasterClient 托管在 LeanCloud 提供的服务端 [Client Engine](client-engine.html) 中，同时做以下权限配置：
 
 #### MasterClient 掉线不转移
+
 将 MasterClient 放在服务端后，MasterClient 意外掉线时也不应当转移角色，此时需要在创建房间时指定 `FixedMaster` Flag：
 
 {% block master_fixed %}
 {% endblock %}
 
 ### MasterClient 的操作
+
 #### 设置房间是否开放
 
 MasterClient 可以设置房间是否开放，当房间关闭时，不允许其他玩家加入。
@@ -249,8 +251,24 @@ MasterClient 可以设置房间是否可见，当房间不可见时，这个房�
 {% block visible_room %}
 {% endblock %}
 
+#### 踢人
+
+MasterClient 可以把房间内的其他玩家踢出房间：
+
 {% block kick_player %}
 {% endblock %}
+
+踢出房间后，被踢的玩家会收到 `{{ROOM_KICKED_EVENT}}` 事件。
+
+{% block kick_event %}
+{% endblock %}
+
+同时 MasterClient 和其他还存在房间的玩家会收到 `{{PLAYER_ROOM_LEFT_EVENT}}` 事件：
+
+{% block kick_left_event %}
+{% endblock %}
+
+
 
 ## 自定义属性及同步
 
@@ -271,18 +289,16 @@ MasterClient 可以设置房间是否可见，当房间不可见时，这个房�
 
 注意：这个接口并不是直接设置「客户端中自定义属性的内存值」，而是发送修改自定义属性的消息，由服务端最终确定是否修改。
 
-当房间属性变化时，SDK 将派发 `ROOM_CUSTOM_PROPERTIES_CHANGED`（房间自定义属性）事件通知所有玩家客户端（包括自己）。
+当房间属性变化时，SDK 将派发 `{{ROOM_CUSTOM_PROPERTIES_CHANGED_EVENT}}`（房间自定义属性）事件通知所有玩家客户端（包括自己）。
 
 {% block custom_props_event %}
 {% endblock %}
-
 
 #### 只允许 MasterClient 修改房间属性
 默认情况下房间内所有 Client 都可以修改房间的自定义属性，如果您希望只允许 MasterClient 修改，可以在创建房间时指定 `MasterUpdateRoomProperties` Flag：
 
 {% block master_update_room_properties %}
 {% endblock %}
-
 
 ### 玩家自定义属性
 
@@ -316,10 +332,8 @@ CAS 全称为 Compare And Swap，即「检测并更新」的意思，用于避�
 
 ### 相关事件
 
-| 事件   | 参数     | 描述                                       |
-| ------------------------------------ | ------------------ | ---------------------------------------- |
-| ROOM_CUSTOM_PROPERTIES_CHANGED    | { changedProps } | 房间自定义属性变化                         |
-| PLAYER_CUSTOM_PROPERTIES_CHANGED   | { player, changedProps }  | 玩家自定义属性变化 |
+{% block set_player_custom_props_with_cas_event %}
+{% endblock %}
 
 
 
@@ -339,46 +353,50 @@ CAS 全称为 Compare And Swap，即「检测并更新」的意思，用于避�
 
 ### 接收自定义事件
 
-当事件发送成功后，事件接收者中的自定义事件 `CUSTOM_EVENT` 会被触发，此时可以根据 `eventId`（事件 ID）来处理不同事件。
+当事件发送成功后，事件接收者中的自定义事件 `{{CUSTOM_EVENT_EVENT}}` 会被触发，此时可以根据 `eventId`（事件 ID）来处理不同事件。
 
 {% block send_event_event %}
 {% endblock %}
 
-`event` 参数
+### `event` 参数
 
-| 事件   | 参数     | 描述                                       |
-| ------------------------------------ | ------------------ | ---------------------------------------- |
-| eventId    | Number/String | 事件 Id，用于表示事件                         |
-| eventData   | Object  | 事件参数 |
-| senderId   | Number  | 事件发送者 Id（玩家的 actorId） |
+{% block send_event_args %}
+{% endblock %}
 
+
+
+## 断线
+
+在网络不稳定的情况下，可能会被动断开连接，被动断开连接时 SDK 会向客户端派发 `{{DISCONNECTED_EVENT}}`（断开连接）事件，开发者可以在这里在 UI 上对玩家进行提示：
 
 {% block disconnect %}
 {% endblock %}
 
 
+
 ## 断线重连
+
 ### 在房间内保留断线用户
 
-网路不稳定、玩家将游戏置于后台等情况可能导致玩家掉线，玩家掉线时，其他在线玩家的 `PLAYER_ACTIVITY_CHANGED` 事件会被触发：
+网路不稳定、玩家将游戏置于后台等情况可能导致玩家掉线，玩家掉线时，其他在线玩家的 `{{PLAYER_ACTIVITY_CHANGED_EVENT}}` 事件会被触发：
 
 {% block player_activity_changed %}
 {% endblock %}
 
-如果玩家长时间内没有回到游戏，服务器会将玩家移除房间并销毁玩家数据，房间里的其他玩家将会接收到 `PLAYER_ROOM_LEFT`（有玩家离开房间）事件。
+如果玩家长时间内没有回到游戏，服务器会将玩家移除房间并销毁玩家数据，房间里的其他玩家将会接收到 `{{PLAYER_ROOM_LEFT_EVENT}}`（有玩家离开房间）事件。
 在创建房间时，我们可以通过 `{{playerTtl}}` 来设置「玩家掉线后的保留时间」，这样当玩家掉线时，在 `{{playerTtl}}` 时间内服务端会保留掉线玩家在房间内的数据，并等待该玩家恢复上线。
 
 {% block set_player_ttl %}
 {% endblock %}
 
-掉线玩家在 `{{playerTtl}}` 时间内回到房间时，其他玩家的 `PLAYER_ACTIVITY_CHANGED` 事件会被再次触发，开发者可以在这个事件中判断玩家的当前状态。
+掉线玩家在 `{{playerTtl}}` 时间内回到房间时，其他玩家的 `{{PLAYER_ACTIVITY_CHANGED_EVENT}}` 事件会被再次触发，开发者可以在这个事件中判断玩家的当前状态。
 
 {% block player_activity %}
 {% endblock %}
 
 ### 重新连接
 
-不论是由于网络原因或者用户主动断开连接，都可以通过下面的接口重新连接至服务器。
+用户断线后，可以通过下面的接口重新连接至服务器。
 
 {% block reconnect %}
 {% endblock %}
@@ -387,22 +405,42 @@ CAS 全称为 Compare And Swap，即「检测并更新」的意思，用于避�
 
 ### 回到房间
 
-当玩家连接至服务器以后，可以通过 `rejoin` 接口「再次回到某房间」。当该玩家在 `playerTtl` 时间内调用此接口，可以成功回到房间，如果超过 `playerTtl` 时间，则重回房间失败。
+当玩家连接至服务器以后，可以通过 `{{rejoin}}` 接口「再次回到某房间」。当该玩家在 `{{playerTtl}}` 时间内调用此接口，可以成功回到房间，如果超过 `{{playerTtl}}` 时间，则重回房间失败。
 
 {% block rejoin_room %}
 {% endblock %}
 
 ### 重连并回到房间
+
+这个接口相当于 `{{reconnect}}()` 和 `{{rejoinRoom}}()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
+
 {% block reconnect_and_rejoin %}
 {% endblock %}
+
+
+
+## 关闭
+
+开发者也可以通过下面的接口主动关闭 SDK。关闭后如果需要再次使用，需要重新实例化 Client。
+
+{% block close %}
+{% endblock %}
+
+
+
+## 错误处理
 
 {% block promise_error %}
 {% endblock %}
 
 ## 重大错误事件
+
 如果当前发生重大错误，这个事件轻易不会被触发，一旦触发请联系 LeanCloud 来处理。
+
 {% block error_event %}
 {% endblock %}
+
+
 
 ## API 文档
 
