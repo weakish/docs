@@ -18,18 +18,11 @@
 解压 game-standalone 和 Source Code ，把两个工程的文件放到同一个目录 `project` 下面：
 
 ```
-/project/game-standalone       // 本地服务器的核心代码。
-/project/multiplayer-server-plugin-getting-started-x.x     // 撰写自己逻辑的代码，最终要将其打好的包给到 game-standalone，x.x 为版本号。
+./project/game-standalone       // 本地服务器的核心代码。
+./project/multiplayer-server-plugin-getting-started-x.x     // 撰写自己逻辑的代码，最终要将其打好的包给到 game-standalone，x.x 为版本号。
 ```
 
 ### 安装依赖
-
-#### 安装 Plugin 的依赖：
-
-```
-cd multiplayer-server-plugin-getting-started
-mvn install
-```
 
 #### 安装 game-standalone 依赖：
 
@@ -46,6 +39,13 @@ Linux：Linux 下请自行安装 Python3、 Java 8 或以上版本。
 
 Windows：暂时不支持在 Windows 下启动服务器。
 
+#### 安装 Plugin 的依赖：
+
+```
+cd multiplayer-server-plugin-getting-started
+mvn install
+```
+
 ### 本地启动服务端
 
 #### 本地启动
@@ -57,7 +57,7 @@ cd project/game-standalone
 ./launch.sh
 ```
 
-服务启动后，命令行窗口会自动展示 Multiplayer Server 进程的 STDOUT 输出，不关心其输出时可以 CTRL + C 退出，Multiplayer Server 会在后台继续运行。
+服务启动后，命令行窗口会自动展示 Multiplayer Server 进程的标准输出，不关心其输出时可以 CTRL + C 退出，Multiplayer Server 会在后台继续运行。
 
 执行 `./launch.sh` 启动后，进入 `multiplayer-server-plugin-getting-started-x.x/integration-test-scripts` 测试服务是否顺利启动成功。
 
@@ -205,7 +205,7 @@ onCreateRoom 被触发
 plugin.log | game-server hook 输出的日志
 gc-XXX.current | GC 日志
 server.log | game-server 运行日志
-stdout.log | 进程的 STDOUT 输出
+stdout.log | 进程的标准输出
 event.log | 事件日志，如用户登录登出等
 
 ## 部署到云端
