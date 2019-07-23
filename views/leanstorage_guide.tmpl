@@ -738,7 +738,7 @@ let _ = query.get("582570f38ac247004f39c24b") { (result) in
 {% endif %}
 
 {% if platform_name === "JavaScript" or platform_name === "Python" or platform_name === "Swift" %}
-对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt`和`createdAt` 这三个内置属性的获取方法不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `{{ baseObjectName }}` 不存在这些属性。
+对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt`和`createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `{{ baseObjectName }}` 不存在这些属性。
 {% endif %}
 
 如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `{% if platform_name === "Objective-C" %}nil{% endif %}{% if platform_name === "JavaScript" %}undefined{% endif %}{% if platform_name === "Python" %}None{% endif %}{% if platform_name === "Java" %}null{% endif %}{% if platform_name === "Swift" %}nil{% endif %}`。
@@ -915,7 +915,7 @@ LeanCloud 会自动识别需要更新的属性并将对应的数据发往云端�
 
 通过传入 `query` 选项，可以按照指定条件去更新对象——当条件满足时，执行更新；条件不满足时，不执行更新并返回 `305` 错误。
 
-例如，用户的账务账户表 `Account` 有一个余额字段 `balance`，同时有多个请求要修改该字段值。为避免余额出现负值，只有当金额小于或等于余额的时候才能接受请求：
+例如，用户的账户表 `Account` 有一个余额字段 `balance`，同时有多个请求要修改该字段值。为避免余额出现负值，只有当金额小于或等于余额的时候才能接受请求：
 {% endif %}
 
 {% if platform_name === "Objective-C" %}
@@ -1070,22 +1070,22 @@ try post.increase("likes", by: 1)
 {% endif %}
 {% if platform_name === "JavaScript" %}
 - `AV.Object.add('arrayKey', value)`<br/>将指定对象附加到数组末尾。
-- `AV.Object.addUnique('arrayKey', value)`<br/>如果数组中不包含指定对象，将该对象加入数组，对象的插入位置是随机的。
+- `AV.Object.addUnique('arrayKey', value)`<br/>如果数组中不包含指定对象，则将该对象加入数组。对象的插入位置是随机的。
 - `AV.Object.remove('arrayKey', value)`<br/>从数组字段中删除指定对象的所有实例。
 {% endif %}
 {% if platform_name === "Python" %}
 - `add()`<br/>将指定对象附加到数组末尾。
-- `add_unique()`<br/>如果数组中不包含指定对象，将该对象加入数组，对象的插入位置是随机的。
+- `add_unique()`<br/>如果数组中不包含指定对象，则将该对象加入数组。对象的插入位置是随机的。
 - `remove()`<br/>从数组字段中删除指定对象的所有实例。
 {% endif %}
 {% if platform_name === "PHP" %}
 - `addIn()`<br/>将指定对象附加到数组末尾。
-- `addUniqueIn()`<br/>如果数组中不包含指定对象，将该对象加入数组，对象的插入位置是随机的。
+- `addUniqueIn()`<br/>如果数组中不包含指定对象，则将该对象加入数组。对象的插入位置是随机的。
 - `removeIn()`<br/>从数组字段中删除指定对象的所有实例。
 {% endif %}
 {% if platform_name === "Java" %}
 - `add()`<br/>将指定对象附加到数组末尾。
-- `addUnique()`<br/>如果数组中不包含指定对象，将该对象加入数组，对象的插入位置是随机的。
+- `addUnique()`<br/>如果数组中不包含指定对象，则将该对象加入数组。对象的插入位置是随机的。
 - `removeAll()`<br/>从数组字段中删除指定对象的所有实例。
 {% endif %}
 {% if platform_name === "Swift" %}
@@ -1724,7 +1724,7 @@ try comment.set("post", value: post)
 {% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Java" or platform_name === "Swift" %}
 ### 序列化和反序列化
 
-在实际的开发中，把 `{{ baseObjectName }}` 当做参数传递的时候，会涉及到复杂对象的拷贝的问题，因此 `{{ baseObjectName }}` 也提供了序列化和反序列化的方法。
+在实际的开发中，把 `{{ baseObjectName }}` 当作参数传递的时候，会涉及到复杂对象的拷贝的问题，因此 `{{ baseObjectName }}` 也提供了序列化和反序列化的方法。
 
 序列化：
 
@@ -7852,12 +7852,12 @@ assert(student.save().isSuccess)
 
 ## 应用内搜索
 
-应用内搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [应用内搜索指南](app_search_guide.html).
+应用内搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [应用内搜索指南](app_search_guide.html)。
 
 {% if node !== "qcloud" %}
 ## 应用内社交
 
-应用内社交，又称「事件流」，在应用开发中出现的场景非常多，包括用户间关注（好友）、朋友圈（时间线）、状态、互动（点赞）、私信等常用功能，请参考 [应用内社交模块](status_system.html).
+应用内社交，又称「事件流」，在应用开发中出现的场景非常多，包括用户间关注（好友）、朋友圈（时间线）、状态、互动（点赞）、私信等常用功能，请参考 [应用内社交模块](status_system.html)。
 {% endif %}
 
 {% if platform_name === "JavaScript" %}
