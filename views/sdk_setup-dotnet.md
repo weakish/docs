@@ -69,44 +69,25 @@ using LeanCloud;
 using LeanCloud.Realtime;
 ```
 
-### Unity
-
-#### 设置运行时环境
-
-在 Unity 的 Player Settings 中设置运行时环境为 .Net 4.x。
-
 #### 数据存储初始化
 
-初始化**必须**在 Unity Editor 上将 `AVInitializeBehaviour` 挂载在某一个 GameObject 下，如下图：
-
-![AVInitializeBehaviour](images/unity/avinitializebehaviour.png)
-
-#### 即时通讯初始化
-初始化**必须**在 Unity Editor 上将 `AVRealtimeInitializeBehavior` 挂载在某一个 GameObject 下，如下图：
-
-![AVRealtimeInitializeBehavior](images/unity/realtime-unity-setup.png)
-
-然后在任意一个 `MonoBehaviour` 启动的时候调用如下代码：
-
-```cs
-var realtime = new AVRealtime("{{appid}}", "{{appkey}}");
-```
-
-### .NET Framework & Xamarin
-在应用程序入口函数添加如下代码：
+在使用「数据存储」服务前，调用如下代码：
 
 ```cs
 // 如果只使用存储可以使用如下初始化代码 
 AVClient.Initialize("{{appid}}", "{{appkey}}");
 ```
 
-假设还需要使用聊天，请使用如下代码：
+#### 即时通讯初始化
+
+在使用「即时通讯」服务前，调用如下代码：
 
 ```cs
 var realtime = new AVRealtime("{{appid}}", "{{appkey}}");
 ```
 
 ### 开启调试日志
+
 在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口。
 
 ```cs
