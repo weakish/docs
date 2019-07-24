@@ -10,7 +10,7 @@
 - 如何集成 LeanCloud 用户系统，包括自动登录、unionid 绑定以及如何在登录后设置账号与密码以供用户在其他平台的 LeanTodo 应用上登录
 - 如何对云端数据进行查询、增加、修改与删除
 - 如何将查询结果数组绑定到视图层进行展示，以及如何在点击事件中得到对应的数组项
-- 如何使用 [LiveQuery](livequery-guide.html) 实现对查询结果的实时更新和多端同步
+- 如何使用 [LiveQuery](leanstorage_guide-js.html#livequery) 实现对查询结果的实时更新和多端同步
 - 如何集成微信支付
 
 你可以通过微信扫描以下二维码进入 Demo。 Demo 的源码与运行说明请参考 [https://github.com/leancloud/leantodo-weapp](https://github.com/leancloud/leantodo-weapp)。
