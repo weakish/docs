@@ -50,19 +50,6 @@ appid前八位.api.lncldglobal.com
 
 [api-domain]: custom-api-domain-guide.html
 
-建议在测试文档中的 curl 命令前设置如下环境变量
-（假定绑定的 API 域名为 `xxx.example.com`）：
-
-```sh
-export LC_API_HOST=xxx.example.com
-```
-
-Windows 环境将 `export` 换成 `set` 即可：
-
-```
-set LC_API_HOST=xxx.example.com
-```
-
 如果暂时没有绑定域名，可以临时使用如下域名（仅供测试和原型开发阶段使用，不保证可用性）：
 
 | 节点 | 临时域名 |
