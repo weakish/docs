@@ -236,7 +236,7 @@ git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 - 将 SDK 的 `xcodeproj` 文件直接添加到项目中。
 - 将 SDK 编译成 framework 再添加到项目中。
 
-##### 集成 xcodeproj
+##### 集成 `xcodeproj`
 
 将 `AVOS`/`AVOS.xcodeproj` 项目文件拖入项目，作为 subproject：
 
@@ -326,6 +326,7 @@ Eclipse 的导入与一般的 jar 导入无本质区别，因此不再赘述。
 #### 安装与引用 SDK
 
 ##### npm
+
 如果你的 Web 应用使用了 webpack 等前端打包工具，我们推荐使用包管理工具 npm 安装 SDK：
 
 ```bash
@@ -1067,7 +1068,7 @@ try {
     $testObject->save();
     echo "保存成功。";
 } catch (Exception $ex) {
-    echo "保存失败";
+    echo "保存失败。";
 }
 ```
 
@@ -1107,9 +1108,9 @@ await saveTask;
 
 SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前，请先检查下安装的 SDK 是不是最新版本。
 
-### 401 Unauthorized
+### `401 Unauthorized`
 
-如果 SDK 抛出 401 异常或者查看本地网络访问日志存在：
+如果 SDK 抛出 `401` 异常或者查看本地网络访问日志存在：
 
 ```json
 {
