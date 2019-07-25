@@ -593,7 +593,7 @@ $ npm install leancloud-realtime --save
 <!-- 等升级 Unity 即时通讯的文档后再增加这句话 -->
 <!-- - 支持 .NET 4.x。SDK 在 .NET 3.x 版本下仅做 Bug 维护，不再增加新版本，请大家尽快升级到 4.x 版本。 -->
 
-支持使用 Unity 开发的 iOS、Android、Windows Phone 8、Windows Store、Windows Desktop，以及网页游戏。
+支持使用 Unity 开发的 iOS、Android、UWP、Windows Desktop，以及网页游戏。
 
 #### 安装数据存储
 
@@ -610,7 +610,7 @@ $ npm install leancloud-realtime --save
 名称|模块描述|必选
 --|---|---
 `AssemblyLister.dll`|LeanCloud 依赖检测模块，它负责检查相关依赖是否正确加载|是
-`LeanCloud.Core.dll`|核心库，里面包含了 AVObject 和 AVUser 等所有内置类型的定义和序列化相关操作的功能|是
+`LeanCloud.Core.dll`|核心库，里面包含了 `AVObject` 和 `AVUser` 等所有内置类型的定义和序列化相关操作的功能|是
 `LeanCloud.Storage.dll`|存储库，里面包含本地缓存以及 HTTP 请求发送的实现|是
 `LeanCloud.Realtime.dll`|即时通讯库，里面包含了即时通讯协议的实现以及相关接口|否
 
@@ -620,7 +620,6 @@ $ npm install leancloud-realtime --save
 
 - Classic Desktop 4.5+
 - Windows 10
-- Windows Phone 不再支持
 - UWP 4.5+
 - .NET Core 2.0+
 

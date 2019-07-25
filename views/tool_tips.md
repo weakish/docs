@@ -16,7 +16,7 @@
 {% if node != 'qcloud' and node != 'us' %}
 * 我们提供短信服务，你可以使用短息服务发送手机验证码、手机登录验证码等。具体参考各 SDK 开发指南。
 {% endif %}
-* 我们提供了 iOS、Android、Windows Phone、JavaScript、Unity3D 等平台的 SDK，进入 [SDK 下载页面](sdk_down.html)。
+* 我们提供了 iOS、Android、JavaScript、Unity3D 等平台的 SDK，进入 [SDK 下载页面](sdk_down.html)。
 {% if node != 'qcloud' %}
 * 如果你想做一个形如微博的 Feed 系统，也许你可以尝试使用我们的 [事件流系统](status_system.html)。
 * 我们提供简易的 [第三方登录组件](leanstorage_guide-js.html#第三方账户登录)。
