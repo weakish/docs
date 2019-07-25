@@ -697,6 +697,7 @@ client.OnError += (code, detail) => {
 
 
 
+{% block serialization %}
 ## 序列化
 
 在新版 Play 中，我们提供了更丰富的同步数据的方式。主要包括容器类型（PlayObject/PlayArray）和自定义类型
@@ -806,3 +807,4 @@ CodecUtils.RegisterType(typeof(Hero), typeCode, Hero.Serialize, Hero.Deserialize
 ```
 
 其中 `typeCode` 是表示自定义类型的数字编码，在反序列化时会根据这个编码确定自定义类型。
+{% endblock %}

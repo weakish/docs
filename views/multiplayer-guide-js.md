@@ -716,6 +716,7 @@ client.on(Event.Error, ({ code, detail }) => {
 
 
 
+{% block serialization %}
 ## 序列化
 
 `javascript` 是弱类型语言，所以只要是 `Object/Array` 类型的数据，都可进行数据同步
@@ -781,3 +782,4 @@ registerType(Hero, typeCode, Hero.serialize, Hero.deserialize);
 ```
 
 其中 `typeCode` 是表示自定义类型的数字编码，在反序列化时会根据这个编码确定自定义类型。
+{% endblock %}
