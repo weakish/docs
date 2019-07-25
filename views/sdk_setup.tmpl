@@ -331,7 +331,7 @@ Eclipse 的导入与一般的 jar 导入无本质区别，因此不再赘述。
 ```bash
 # 存储服务（包括推送）
 $ npm install leancloud-storage --save
-#  即时通讯服务
+# 即时通讯服务
 $ npm install leancloud-realtime --save
 ```
 
@@ -376,7 +376,7 @@ var AV = require('leancloud-storage/live-query');
 
 ```html
 <script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-live-query-min.js"></script>
-<!-- 有了这一行，无需另外引入 av-min.js  -->
+<!-- 有了这一行，无需另外引入 av-min.js -->
 ```
 
 通过这种方式引入的 SDK 可以通过全局变量 `AV` 获得引用：
@@ -426,7 +426,7 @@ Node.js 中 SDK 的安装与引用也是通过包管理工具 npm，请参考 [n
 如果使用 [Taro](https://taro.jd.com/) 来开发小程序，通过 npm 安装 SDK 后，需要从指定路径引入小程序 SDK：
 
 ```js
-import AV from 'leancloud-storage/dist/av-weapp.js'
+import AV from 'leancloud-storage/dist/av-weapp.js';
 ```
 
 如果使用 TypeScript 开发，可以手动把 `leancloud-storage/storage.d.ts` 复制到 `leancloud-storage/dist/av-live-query-weapp.d.ts`。
