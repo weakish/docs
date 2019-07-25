@@ -240,11 +240,11 @@ git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 
 将 `AVOS`/`AVOS.xcodeproj` 项目文件拖入项目，作为 subproject：
 
-![img](images/quick_start/ios/subproject.png)
+![「AVOS.xcodeproj」会出现在项目根目录下。](images/quick_start/ios/subproject.png)
 
-接着为该项目设置 Build Phases，添加 **Link Binary With Libraries**：
+接着为该项目设置 Build Phases，在 **Link Binary With Libraries** 下面添加如下内容：
 
-![img](images/quick_start/ios/link-binary.png)
+![「Workspace」中的「AVOSCloud.framework from 'AVOSCloud-iOS' target in 'AVOS' project」和「AVOSCloudIM.framework from 'AVOSCloudIM-iOS' target in 'AVOS' project」。](images/quick_start/ios/link-binary.png)
 
 上图选择了支持 iOS 平台的 `AVOSCloud` 与 `AVOSCloudIM` 两个 frameworks 用来举例。请根据实际需要来选择支持的平台以及要使用的模块。
 
@@ -263,7 +263,7 @@ git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 
 就像下面这样：
 
-![img](images/quick_start/ios/system-dependency.png)
+![上面列出的这些 framework 和 library 出现在「Link Binary With Libraries」里面。](images/quick_start/ios/system-dependency.png)
 
 最后在 **Other Linker Flags** 中添加 `-ObjC`。
 
@@ -1102,7 +1102,7 @@ await saveTask;
 
 然后打开 [控制台 > 存储 > 数据 > `TestObject`](/dashboard/data.html?appid={{appid}}#/TestObject)，如果看到如下内容，说明 SDK 已经正确地执行了上述代码，安装完毕。
 
-![](images/testobject_saved.png)
+![数据表中出现一行「words」值为「Hello world!」的数据。](images/testobject_saved.png)
 
 如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
 
