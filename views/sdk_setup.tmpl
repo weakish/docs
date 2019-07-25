@@ -783,7 +783,7 @@ leancloud.init("{{appid}}", "{{appkey}}")
 
 ```php
 use \LeanCloud\Client;
-// 参数依次为 App Id、App Key、Master Key
+// 参数依次为 App ID、App Key、Master Key
 Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
 Client::setServerUrl("https://{{host}}"); // 0.7.0 及以上版本支持
 ```
@@ -804,7 +804,7 @@ public class MyLeanCloudApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // 提供 this、App Id 和 App Key 作为参数
+        // 提供 this、App ID 和 App Key 作为参数
         AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
     }
 }
