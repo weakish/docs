@@ -33,7 +33,7 @@
 
 
 {% block initialization %}
-导入需要的命名空间
+导入需要的命名空间。
 ```cs
 using LeanCloud.Play;
 ```
@@ -700,13 +700,13 @@ client.OnError += (code, detail) => {
 {% block serialization %}
 ## 序列化
 
-在新版 Play 中，我们提供了更丰富的同步数据的方式。主要包括容器类型（PlayObject/PlayArray）和自定义类型
+在新版 Play 中，我们提供了更丰富的同步数据的方式。主要包括容器类型（PlayObject/PlayArray）和自定义类型。
 
 ### PlayObject
 
-`PlayObject` 是用来替换旧版本中的 `Dictionary<string, object>` 类型的
+`PlayObject` 是用来替换旧版本中的 `Dictionary<string, object>` 类型的。
 
-`PlayObject` 实现了 `IDictionary<object, object>` 接口，在满足 `IDictionary` 接口的基础上，还提供了更方便的获取接口
+`PlayObject` 实现了 `IDictionary<object, object>` 接口，在满足 `IDictionary` 接口的基础上，还提供了更方便的获取接口。
 
 常用接口如下：
 
@@ -727,7 +727,7 @@ public T Get<T>(object key);
 
 ### PlayArray
 
-`PlayArray` 实现了 `IList` 接口，主要用于数组对象的同步，与 `PlayObject` 类似
+`PlayArray` 实现了 `IList` 接口，主要用于数组对象的同步，与 `PlayObject` 类似。
 
 常用接口如下：
 
@@ -750,7 +750,7 @@ public List<T> ToList<T>();
 
 ### 自定义类型
 
-`Play` 除了支持上述两种容器类型，还支持同步「自定义类型」的数据
+`Play` 除了支持上述两种容器类型，还支持同步「自定义类型」的数据。
 
 假设我们有一个 Hero 类型，包含 id, name, hp，定义如下：
 
@@ -766,7 +766,7 @@ class Hero {
 
 #### 实现序列化 / 反序列化方法
 
-序列化方法实现由开发者自由实现，可以使用 protobuf, thrift 等。只要满足 `Play` 支持的序列化和反序列化接口即可
+序列化方法实现由开发者自由实现，可以使用 protobuf, thrift 等。只要满足 `Play` 支持的序列化和反序列化接口即可。
 
 ```csharp
 public delegate byte[] SerializeMethod(object obj);
@@ -800,7 +800,7 @@ public static object Deserialize(byte[] bytes) {
 
 #### 注册自定义类型
 
-当实现了序列化方法，记得在使用前要先进行自定义类型的注册
+当实现了序列化方法，记得在使用前要先进行自定义类型的注册。
 
 ```csharp
 CodecUtils.RegisterType(typeof(Hero), typeCode, Hero.Serialize, Hero.Deserialize);
