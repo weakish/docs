@@ -256,28 +256,6 @@ AVPush.sendMessageInBackground("message to installation",  pushQuery, new SendCa
 });
 ```
 
-在 2.6.7 以后，我们加入了通过 CQL 来筛选推送目标的功能，主要代码如下：
-
-```java
-    AVPush push = new AVPush();
-    JSONObject data =
-        new JSONObject(
-            "{\"action\": \"com.avos.UPDATE_STATUS\", \"name\": \"Vaughn\", \"newsItem\": \"Man bites dog\"  }");
-    push.setData(data);
-    String installationId = AVInstallation.getCurrentInstallation().getInstallationId();
-    push.setCloudQuery("select * from _Installation where installationId ='" + installationId
-        + "'");
-    push.sendInBackground(new SendCallback() {
-
-      @Override
-      public void done(AVException e) {
-
-      }
-    });
-```
-
-<div class="callout callout-info">CQL 与 AVQuery 同时只能设置一个，并且 `setPushTarget` 类函数（`setPushToAndroid` / `setPushToIOS` / `setPushToWindowsPhone`）只能与 AVQuery 一起使用。在设置 CQL 时，只能在 CQL 语句中设定目标机器的类型。</div>
-
 ## 深入阅读：如何响应推送消息
 
 ### 消息格式

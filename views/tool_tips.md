@@ -9,7 +9,6 @@
 * 数据菜单左下角有 **数据导入** 菜单，可以导入符合我们 [预先定义格式](dashboard_guide.html#本地数据导入_LeanCloud) 的遗留系统的数据到 LeanCloud 平台。
 * 查询的时候如果想将关联 Pointer 类型带入查询结果，请使用 AV.Query 的 `includeKey` 方法指定字段名称。
 * 查询可以指定 skip 和 limit 做分页查询。
-* 你可以使用类似 SQL 的语法来查询 LeanCloud 数据，参考 [CQL 详细指南](cql_guide.html)。
 * 你可以在 [错误码详解](error_code.html) 文档里找到所有的错误代码和信息解释。
 * 你可以使用 [API 在线测试工具](/dashboard/apionline/index.html) 在线测试我们提供的开放 [REST API](rest_api.html)。
 * 我们的用户账户系统都自动做了密码加密存储，基于 SHA-512 加密算法，使用随机生成的 salt 加密。
