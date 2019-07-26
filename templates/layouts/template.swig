@@ -20,7 +20,7 @@
 
   <div class="row">
 
-    <div class="sidebar-gruntfile-trigger  col-sm-3" id="left-nav">
+    <div class="sidebar-gruntfile-trigger mobile-hide col-sm-3" id="left-nav">
 
       <div class="sidebar-affix-shadow sidebar-hover-off">
 
