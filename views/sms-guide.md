@@ -63,20 +63,26 @@ _ = LCSMSClient.requestShortMessage(
     }
 }
 ```
-```android
+```java
+// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
 AVSMSOption option = new AVSMSOption();
-option.setTemplateName("Register_Notice");  // 控制台预设的模板名称
-option.setSignatureName("LeanCloud");       // 控制台预设的短信签名
-// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板和签名
-AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option, new RequestMobileCodeCallback() {
-  @Override
-  public void done(AVException e) {
-    if (null == e) {
-      /* 请求成功 */
-    } else {
-      /* 请求失败 */
+option.setTemplateName("Register_Notice");// 控制台预设的模板名称
+option.setSignatureName("LeanCloud");// 控制台预设的短信签名
+AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
     }
-  }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
+    }
 });
 ```
 ```javascript
@@ -98,10 +104,6 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","Register_Notice",null,"LeanCloud").Co
     var result = t.Result;
     // result 为 True 则表示调用成功
 });
-```
-```java
-// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
-AVOSCloud.requestSMSCode("186xxxxxxxx", "Register_Notice", null);
 ```
 ```php
 // 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
@@ -193,20 +195,26 @@ _ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "186xxxxxxxx", variables:
     }
 }
 ```
-```android
+```java
 AVSMSOption option = new AVSMSOption();
-option.setTtl(10);                     // 验证码有效时间为 10 分钟
+option.setTtl(10);
 option.setApplicationName("应用名称");
 option.setOperation("某种操作");
-AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option, new RequestMobileCodeCallback() {
-  @Override
-  public void done(AVException e) {
-    if (null == e) {
-      /* 请求成功 */
-    } else {
-      /* 请求失败 */
+AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
     }
-  }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
+    }
 });
 ```
 ```javascript
@@ -231,10 +239,6 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","应用名称","某种操作",10).Cont
     }
 });
 ```
-```java
-// 下面参数中的 10 表示验证码有效时间为 10 分钟
-AVOSCloud.requestSMSCode("186xxxxxxxx", "应用名称", "某种操作", 10);
-```
 ```php
 $options = [
   "name" => "应用名称",
@@ -257,7 +261,7 @@ cloud.request_sms_code("186xxxxxxxx", sign="应用名称", params=options)
   
 4. **调用接口验证用户输入的验证码是否有效。**  
   注意，调用时需要确保验证码和手机号的参数顺序，我们假设验证码数字是「123456」。
-  
+
 ```objc
 [AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"186xxxxxxxx" callback:^(BOOL succeeded, NSError *error) {
     if(succeeded){
@@ -275,16 +279,22 @@ _ = LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456
     }
 }
 ```
-```android
-AVSMS.verifySMSCodeInBackground("123456", "186xxxxxxxx", new AVMobilePhoneVerifyCallback() {
-  @Override
-  public void done(AVException e) {
-    if (null == e) {
-      /* 验证成功 */
-    } else {
-      /* 验证失败 */
+```java 
+AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<AVNull>() {
+    @Override
+    public void onSubscribe(Disposable d) {
     }
-  }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to verify SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
+    }
 });
 ```
 ```javascript
@@ -301,14 +311,6 @@ AVCloud.VerifySmsCodeAsync("123456","186xxxxxxxx").ContinueWith(t =>{
         // 验证成功
     }
 });
-```
-```java
-try {
-  AVOSCloud.verifySMSCode('123456', '186xxxxxxxx');
-  /* 验证成功 */
-} catch (AVException ex) {
-  /* 验证失败 */
-}
 ```
 ```php
 // 注意，PHP SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
@@ -329,7 +331,7 @@ cloud.verify_sms_code('186xxxxxxxx', '123456')
 ```objc
 AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
 options.type = AVShortMessageTypeVoice;
-[AVSMS requestShortMessageForPhoneNumber:@"188xxxxxxxx"
+[AVSMS requestShortMessageForPhoneNumber:@"186xxxxxxxx"
         options:options
         callback:^(BOOL succeeded, NSError * _Nullable error) {
             if (succeeded) {
@@ -338,7 +340,7 @@ options.type = AVShortMessageTypeVoice;
 }];
 ```
 ```swift
-_ = LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "188xxxxxxxx") { (result) in
+_ = LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "186xxxxxxxx") { (result) in
     switch result {
     case .success:
         break
@@ -347,23 +349,29 @@ _ = LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "188xxxxxxxx") {
     }
 }
 ```
-```android
+```java
 AVSMSOption option = new AVSMSOption();
-option.setSmsType(AVSMSOption.AVSMS_TYPE.VOICE_SMS);
-AVSMS.requestSMSCodeInBackground("188xxxxxxxx", option, new RequestMobileCodeCallback() {
+option.setType(AVSMS.TYPE.VOICE_SMS);
+AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
     @Override
-    public void done(AVException e) {
-        if (null == e) {
-          // 发送成功
-        } else {
-          // 发送失败
-        }
+    public void onSubscribe(Disposable disposable) {
+    }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
     }
 });
 ```
 ```js
 AV.Cloud.requestSmsCode({
-  mobilePhoneNumber: 'xxxxxxxxx',
+  mobilePhoneNumber: '186xxxxxxxx',
   smsType: 'voice'
 }).then(function() {
   // 发送成功
@@ -372,12 +380,9 @@ AV.Cloud.requestSmsCode({
 });
 ```
 ```cs
-AVCloud.RequestVoiceCodeAsync ("18688888888").ContinueWith(t =>{
+AVCloud.RequestVoiceCodeAsync ("186xxxxxxxx").ContinueWith(t =>{
     // 发送成功
 });
-```
-```java
-AVOSCloud.requestVoiceCode("18688888888");
 ```
 ```php
 $options = [
@@ -410,16 +415,22 @@ _ = LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456
     }
 }
 ```
-```android
-AVSMS.verifySMSCodeInBackground("123456", "186xxxxxxxx", new AVMobilePhoneVerifyCallback() {
-  @Override
-  public void done(AVException e) {
-    if (null == e) {
-      /* 验证成功 */
-    } else {
-      /* 验证失败 */
+```java
+AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<AVNull>() {
+    @Override
+    public void onSubscribe(Disposable d) {
     }
-  }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to verify SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
+    }
 });
 ```
 ```js
@@ -436,14 +447,6 @@ AVCloud.VerifySmsCodeAsync("123456","186xxxxxxxx").ContinueWith(t =>{
         // 验证成功
     }
 });
-```
-```java
-try {
-  AVOSCloud.verifyCode('123456', '186xxxxxxxx');
-  /* 验证成功 */
-} catch (AVException ex) {
-  /* 验证失败 */
-}
 ```
 ```php
 SMS::verifySmsCode('186xxxxxxxx', '123456');
@@ -541,22 +544,28 @@ _ = LCSMSClient.requestShortMessage(
     }
 }
 ```
-```android
+```java
 AVSMSOption option = new AVSMSOption();
 option.setTemplateName("Order_Notice");
 option.setSignatureName("sign_BuyBuyBuy");
 Map<String, Object> parameters = new HashMap<String, Object>();
 parameters.put("order_id", "7623432424540");      // 使用实际的值来替换模板中的变量
 option.setEnvMap(parameters);
-AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option, new RequestMobileCodeCallback() {
-  @Override
-  public void done(AVException e) {
-    if (null == e) {
-      /* 请求成功 */
-    } else {
-      /* 请求失败 */
+AVSMS.requestSMSCodeInBackground("18804208562", option).subscribe(new Observer<AVNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
     }
-  }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
+    }
 });
 ```
 ```javascript
@@ -580,11 +589,6 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","Order_Notice",env,"sign_BuyBuyBuy").C
     var result = t.Result;
     // result 为 True 则表示调用成功
 });
-```
-```java
-Map<String, Object> parameters = new HashMap<String, Object>();
-parameters.put("order_id", "7623432424540");      // 使用实际的值来替换模板中的变量
-AVOSCloud.requestSMSCode("186xxxxxxxx", "Order_Notice", parameters);
 ```
 ```php
 $options = [
@@ -860,16 +864,24 @@ LCCaptchaClient.requestCaptcha(width: 100, height: 50) { (result) in
     }
 }
 ```
-```android
+```java
 AVCaptchaOption option = new AVCaptchaOption();
 option.setWidth(85);
 option.setHeight(30);
-AVCaptcha.requestCaptchaInBackground(option, new AVCallback<AVCaptchaDigest>() {
-  @Override
-  protected void internalDone0(AVCaptchaDigest captchaDigest, AVException exception) {
-    if (null == exception) {
-      // 请求成功，可以通过 captchaDigest.getUrl() 获取图片
-      }
+AVCaptcha.requestCaptchaInBackground(option).subscribe(new Observer<AVCaptchaDigest>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVCaptchaDigest avCaptchaDigest) {
+        Log.d("TAG","图片的 url 是：" + avCaptchaDigest.getCaptchaUrl());
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request Captcha. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
     }
 });
 ```
@@ -898,7 +910,6 @@ AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
 from leancloud import cloud
 captcha = cloud.request_captcha(width=100, height=50)
 ```
-
 #### 校验图形验证码
 
 获取图形验证码之后，将图形验证码的图像显示在客户端（iOS 和 Android 或者其他平台可以调用基础的图像控件展示该图片），等到用户输入完成之后，继续调用下一步的接口校验用户输入的是否合法。
@@ -922,14 +933,22 @@ LCCaptchaClient.verifyCaptcha(code: "code", captchaToken: "captcha.token") { (re
     }
 }
 ```
-```android
-AVCaptcha.verifyCaptchaCodeInBackground(code, captchaDigest, new AVCallback<String>() {
-  @Override
-  protected void internalDone0(String validateToken, AVException exception) {
-    if (null == exception) {
-      // 请求成功，validateToken 所请求的到的返回值
+```java
+AVCaptcha.verifyCaptchaCodeInBackground("123456",avCaptchaDigest).subscribe(new Observer<AVCaptchaValidateResult>() {
+    @Override
+    public void onSubscribe(Disposable d) {
     }
-  }
+    @Override
+    public void onNext(AVCaptchaValidateResult avCaptchaValidateResult) {
+        Log.d("TAG","Result: succeed to verify CaptchaCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to verify CaptchaCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
+    }
 });
 ```
 ```javascript
@@ -940,9 +959,6 @@ captcha.verify('这里填写用户输入的图形验证码，例如 AM8N').then(
 AVCloud.VerifyCaptchaAsync("这里填写用户输入的图形验证码，例如 AM8N",'这里填写上一步返回的 captchaToken').CotinuteWith(t =>{
     var validate_token = result;
 });
-```
-```java
-// Java SDK 暂不支持图形验证码
 ```
 ```php
 // PHP SDK 暂不支持图形验证码
@@ -987,20 +1003,26 @@ _ = LCSMSClient.requestShortMessage(
     }
 }
 ```
-```android
+```java
 AVSMSOption option = new AVSMSOption();
-option.setTemplateName("New_Series");
+option.setTemplateName("Order_Notice");
 option.setSignatureName("sign_BuyBuyBuy");
-option.setValidationToken("validateToken");
-AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option, new RequestMobileCodeCallback() {
-  @Override
-  public void done(AVException e) {
-    if (null == e) {
-      /* 请求成功 */
-    } else {
-      /* 请求失败 */
+option.setCaptchaValidateToken("validateToken");
+AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
     }
-  }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
+    }
 });
 ```
 ```javascript
@@ -1405,22 +1427,25 @@ user.email = LCString("hang@leancloud.rocks")
 user.mobilePhoneNumber = LCString("186xxxxxxxx")
 user.signUp()
 ```
-```android
+```java
 AVUser user = new AVUser();
 user.setUsername("hjiang");
 user.setPassword("f32@ds*@&dsa");
 user.setEmail("hang@leancloud.rocks");
 // 其他属性可以像其他AVObject对象一样使用put方法添加
 user.put("mobilePhoneNumber", "186-1234-0000");
-user.signUpInBackground(new SignUpCallback() {
-    public void done(AVException e) {
-        if (e == null) {
-            // successfully
-        } else {
-            // failed
-        }
+user.signUpInBackground().subscribe(new Observer<AVUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(AVUser user) {
+        // 注册成功
+        System.out.println("注册成功。objectId：" + user.getObjectId());
     }
+    public void onError(Throwable throwable) {
+        // 注册失败（通常是因为用户名已被使用）
+    }
+    public void onComplete() {}
 });
+
 ```
 ```javascript
 var user = new AV.User();
@@ -1438,9 +1463,6 @@ user.SignUpAsync().ContinueWith(t =>
 {
     // 注册成功之后云端会自动发送验证短信
 });
-```
-```java
-// Java SDK 与 Android 代码相同
 ```
 ```php
 $user = new User();
@@ -1476,15 +1498,21 @@ LCUser.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (res
    //验证结果
 }
 ```
-```android
-AVUser.verifyMobilePhoneInBackground("123456", new AVMobilePhoneVerifyCallback() {
+```java
+AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<AVNull>() {
     @Override
-    public void done(AVException e) {
-        if(e == null){
-            // 验证成功
-        } else {
-            Log.d("SMS", "Verified failed!");
-        }
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to verify SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
     }
 });
 ```
@@ -1503,9 +1531,6 @@ AVUser.VerifyMobilePhoneAsync("6位数字验证码", "186xxxxxxxx").ContinueWith
             // 验证成功
         }
     });
-```
-```java
-// Java SDK 与 Android 代码相同
 ```
 ```php
 User::verifyMobilePhone("6位数字验证码");
@@ -1540,15 +1565,21 @@ LCUser.requestVerificationCode(mobilePhoneNumber: "186xxxxxxxx") { (result) in
     }
 }
 ```
-```android
-AVUser.requestMobilePhoneVerifyInBackground("186xxxxxxxx", new RequestMobileCodeCallback() {
+```java
+AVUser.requestMobilePhoneVerifyInBackground("186xxxxxxxx").subscribe(new Observer<AVNull>() {
     @Override
-    public void done(AVException e) {
-        if(e == null){
-            // 调用成功
-        } else {
-            Log.d("SMS", "Send failed!");
-        }
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable e) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
     }
 });
 ```
@@ -1567,9 +1598,6 @@ AVUser.RequestMobilePhoneVerifyAsync("186xxxxxxxx").ContinueWith(t =>
         // 调用成功
     }
 });
-```
-```java
-// Java SDK 与 Android 代码相同
 ```
 ```php
 User::requestMobilePhoneVerify("186xxxxxxxx");
@@ -1598,15 +1626,21 @@ LCUser.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (res
     }
 }
 ```
-```android
-AVUser.verifyMobilePhoneInBackground("654321", new AVMobilePhoneVerifyCallback() {
+```java
+AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<AVNull>() {
     @Override
-    public void done(AVException e) {
-        if (e == null) {
-            // 验证成功
-        } else {
-            Log.d("SMS", "Verified failed!");
-        }
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to verify SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage();
+    }
+    @Override
+    public void onComplete() {
     }
 });
 ```
@@ -1625,9 +1659,6 @@ AVUser.VerifyMobilePhoneAsync("6位数字验证码").ContinueWith(t =>
             // 验证成功
         }
     });
-```
-```java
-// Java SDK 与 Android 代码相同
 ```
 ```php
 User::verifyMobilePhone("6位数字验证码");
