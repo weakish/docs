@@ -129,6 +129,7 @@ select * from GameScore where name not regexp 'dennis.*'
 ```
 
 正则匹配并非高效，因此我们**更推荐使用** [应用内全文搜索](app_search_guide.html)。
+另外，由于 CQL 实现上的问题，正则表达式中不能包含反斜杠。
 
 ### 值是否存在查询
 
