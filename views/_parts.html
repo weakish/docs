@@ -25,7 +25,7 @@ angular.module("app").run(['$rootScope', function($rootScope) {
 
 操作 | 说明 | 示例
 ---|---|---
-Delete | 删除对象的一个属性 | `{{prefix}}op('Delete', {})`
+Delete | 删除对象的一个属性 | `{{prefix}}op('Delete', {'delete': true})`
 Add | 在数组末尾添加对象 | `{{prefix}}op('Add',{'objects':['Apple','Google']})`
 AddUnique | 在数组末尾添加不会重复的对象，插入位置不定。| `{{prefix}}op('AddUnique', {'objects':['Apple','Google']})`
 Remove | 从数组中删除对象 | `{{prefix}}op('Remove',{'objects':['Apple','Google']})`
@@ -36,6 +36,8 @@ Decrement | 递减 | `{{prefix}}op('Decrement', {'amount': 50})`
 BitAnd | 与运算   | `{{prefix}}op('BitAnd', {'value': 0x0000000000000004})`
 BitOr  | 或运算   | `{{prefix}}op('BitOr', {'value': 0x0000000000000004})`
 BitXor | 异或运算 | `{{prefix}}op('BitXor', {'value': 0x0000000000000004})`
+
+注，由于 CQL 实现上有问题，删除对象属性的 `Delete` 操作也需要传入参数，不过参数名和参数值可以任意指定。
 {% endmacro %}
 
 {% macro retrieveAuthData(node, heading="") -%}
