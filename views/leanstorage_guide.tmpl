@@ -6801,10 +6801,14 @@ AV.User.loginWithAuthData(authData, 'weixin').then(function (user) {
 {% if platform_name === "Java" %}
 ```java
 Map<String, Object> authData = new HashMap<String, Object>();
+// 必须
 authData.put("expires_in", 7200);
 authData.put("openid", "OPENID");
 authData.put("access_token", "ACCESS_TOKEN");
 authData.put("platform", "weixin");
+//可选
+authData.put("refresh_token", "REFRESH_TOKEN");
+authData.put("scope", "SCOPE");
 AVUser.loginWithAuthData(authData, "weixin").subscribe(new Observer<AVUser>() {
     public void onSubscribe(Disposable disposable) {}
     public void onNext(AVUser avUser) {
