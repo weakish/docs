@@ -46,7 +46,7 @@ const {
   CreateRoomFlag,
 } = Play;
 ```
-注意：Cocos Creator 在构建「微信小游戏」项目时，无法将 `Play` 正常加载到全局变量中，因此需要先导入 `Play` 模块
+注意：Cocos Creator 在构建「微信小游戏」项目时，无法将 `Play` 正常加载到全局变量中，因此需要先导入 `Play` 模块。
 ```javascript
 const Play = require('./play');
 ```
@@ -712,4 +712,74 @@ client.on(Event.Error, ({ code, detail }) => {
 
 });
 ```
+{% endblock %}
+
+
+
+{% block serialization %}
+## 序列化
+
+`javascript` 是弱类型语言，所以只要是 `Object/Array` 类型的数据，都可进行数据同步。
+
+### 自定义类型
+
+假设我们有一个 Hero 类型，包含 id, name, hp，定义如下：
+
+```javascript
+class Hero {
+  constructor(id, name, hp) {
+    this._id = id;
+    this._name = name;
+    this._hp = hp;
+  }
+}
+```
+
+要同步 Hero 类型的数据，需要以下两步：
+
+#### 实现序列化 / 反序列化方法
+
+序列化方法实现由开发者自由实现，可以使用 protobuf, thrift 等。只要满足 `Play` 支持的序列化和反序列化接口即可。
+
+以下是通过 `Play` 提供的序列化 `Object` 的方式的示例：
+
+```javascript
+const {
+  serializeObject,
+  deserializeObject,
+} = Play;
+
+// 序列化
+static serialize(hero) {
+  // 可以筛选要序列化的字段
+  const obj = {
+    id: hero._id,
+    name: hero._name,
+    hp: hero._hp,
+  };
+  return serializeObject(obj);
+}
+
+// 反序列化
+static deserialize(bytes) {
+  const obj = deserializeObject(bytes);
+  const { id, name, hp } = obj;
+  const hero = new Hero(id, name, hp);
+  return hero;
+}
+```
+
+#### 注册自定义类型
+
+当实现了序列化方法，记得在使用前要先进行自定义类型的注册。
+
+```javascript
+const {
+  registerType
+} = Play;
+
+registerType(Hero, typeCode, Hero.serialize, Hero.deserialize);
+```
+
+其中 `typeCode` 是表示自定义类型的数字编码，在反序列化时会根据这个编码确定自定义类型。
 {% endblock %}

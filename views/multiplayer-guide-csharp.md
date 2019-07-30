@@ -33,7 +33,7 @@
 
 
 {% block initialization %}
-导入需要的命名空间
+导入需要的命名空间。
 ```cs
 using LeanCloud.Play;
 ```
@@ -693,4 +693,118 @@ client.OnError += (code, detail) => {
 
 };
 ```
+{% endblock %}
+
+
+
+{% block serialization %}
+## 序列化
+
+在新版 Play 中，我们提供了更丰富的同步数据的方式。主要包括容器类型（PlayObject/PlayArray）和自定义类型。
+
+### PlayObject
+
+`PlayObject` 是用来替换旧版本中的 `Dictionary<string, object>` 类型的。
+
+`PlayObject` 实现了 `IDictionary<object, object>` 接口，在满足 `IDictionary` 接口的基础上，还提供了更方便的获取接口。
+
+常用接口如下：
+
+```csharp
+// 基本类型
+public bool GetBool(object key);
+public int GetInt(object key);
+public float GetFloat(object key);
+...
+// 容器类型
+public PlayObject GetPlayObject(object key); // PlayObject 支持嵌套
+public PlayArray GetPlayArray(object key);
+public T Get<T>(object key);
+```
+
+[更多接口请参考](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1PlayObject.htm)
+
+
+### PlayArray
+
+`PlayArray` 实现了 `IList` 接口，主要用于数组对象的同步，与 `PlayObject` 类似。
+
+常用接口如下：
+
+```csharp
+// 基本类型
+public bool GetBool(int index);
+public int GetInt(int index);
+public float GetFloat(int index);
+...
+// 容器类型
+public PlayObject GetPlayObject(int index);
+public PlayArray GetPlayArray(int index);
+public T Get<T>(int index);
+// 转换接口
+public List<T> ToList<T>();
+```
+
+[更多接口请参考](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1PlayArray.htm)
+
+
+### 自定义类型
+
+`Play` 除了支持上述两种容器类型，还支持同步「自定义类型」的数据。
+
+假设我们有一个 Hero 类型，包含 id, name, hp，定义如下：
+
+```csharp
+class Hero {
+    int id;
+    string name;
+    int hp;
+}
+```
+
+要同步 Hero 类型的数据，需要以下两步：
+
+#### 实现序列化 / 反序列化方法
+
+序列化方法实现由开发者自由实现，可以使用 protobuf, thrift 等。只要满足 `Play` 支持的序列化和反序列化接口即可。
+
+```csharp
+public delegate byte[] SerializeMethod(object obj);
+public delegate object DeserializeMethod(byte[] bytes);
+```
+
+以下是通过 `Play` 提供的序列化 `PlayObject` 的方式的示例
+
+```csharp
+// 序列化方法
+public static byte[] Serialize(object obj) {
+    Hero hero = obj as Hero;
+    var playObject = new PlayObject {
+        { "id", hero.id },
+        { "name", hero.name },
+        { "hp", hero.hp },
+    };
+    return CodecUtils.SerializePlayObject(playObject);
+}
+// 反序列化方法
+public static object Deserialize(byte[] bytes) {
+    var playObject = CodecUtils.DeserializePlayObject(bytes);
+    Hero hero = new Hero {
+        id = playObject.GetInt("id"),
+        name = playObject.GetString("name"),
+        hp = playObject.GetInt("hp"),
+    };
+    return hero;
+}
+```
+
+#### 注册自定义类型
+
+当实现了序列化方法，记得在使用前要先进行自定义类型的注册。
+
+```csharp
+CodecUtils.RegisterType(typeof(Hero), typeCode, Hero.Serialize, Hero.Deserialize);
+```
+
+其中 `typeCode` 是表示自定义类型的数字编码，在反序列化时会根据这个编码确定自定义类型。
 {% endblock %}
