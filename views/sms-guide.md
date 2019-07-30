@@ -900,9 +900,6 @@ AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
   var captchaToken = captchaData.captchaToken;// 用来对应后面的验证接口，服务端用这个参数来匹配具体是哪一个图形验证码
 });
 ```
-```java
-// Java SDK 暂不支持图形验证码
-```
 ```php
 // PHP SDK 暂不支持图形验证码
 ```
@@ -1050,9 +1047,6 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","New_Series",null,"sign_BuyBuyBuy","�
     var result = t.Result;
     // result 为 True 则表示调用成功
 });
-```
-```java
-// Java SDK 暂不支持图形验证码
 ```
 ```php
 // PHP SDK 暂不支持图形验证码
@@ -1435,17 +1429,21 @@ user.setEmail("hang@leancloud.rocks");
 // 其他属性可以像其他AVObject对象一样使用put方法添加
 user.put("mobilePhoneNumber", "186-1234-0000");
 user.signUpInBackground().subscribe(new Observer<AVUser>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(AVUser user) {
-        // 注册成功
-        System.out.println("注册成功。objectId：" + user.getObjectId());
+    @Override
+    public void onSubscribe(Disposable d) {
     }
+    @Override
+    public void onNext(AVUser avUser) {
+        Log.d("TAG","注册成功");
+    }
+    @Override
     public void onError(Throwable throwable) {
-        // 注册失败（通常是因为用户名已被使用）
+        Log.d("TAG", "注册失败。cause：" + throwable.getMessage());
     }
-    public void onComplete() {}
+    @Override
+    public void onComplete() {
+    }
 });
-
 ```
 ```javascript
 var user = new AV.User();
