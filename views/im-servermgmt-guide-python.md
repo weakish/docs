@@ -60,6 +60,14 @@ Python SDK 暂不支持创建聊天室。
 conv.add_member("Tom")
 ```
 
+### 查询对话
+
+如前所述，`leancloud.Conversation` 是 Python SDK 中 `leancloud.Object` 的子类，可以像正常的 `leancloud.Object` 那样来创建、查询对话。参见 [Python 数据存储开发指南的查询章节](leanstorage_guide-python.html#查询)。
+
+```python
+query = leancloud.Conversation.query
+```
+
 ## 消息管理
 
 ### 发送消息
