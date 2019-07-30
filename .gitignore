@@ -11,7 +11,7 @@ custom/css/app-docs.css
 npm-debug.log
 .module-cache
 .idea
-
+.vscode/
 # ------------
 # use template
 # ------------
@@ -19,8 +19,3 @@ md/*.md
 md/start/*.md
 md/kb/*.md
 views/test.md
-
-.vscode/
-
-yarn.lock
-package-lock.json
