@@ -6869,7 +6869,27 @@ AV.User.loginWithAuthData(authData, 'weixin').then(function (user) {
 {# TODO #}
 {% endif %}
 {% if platform_name === "Android / Java" %}
-{# TODO #}
+```java
+Map<String, Object> authData = new HashMap<String, Object>();
+// 必须
+authData.put("expires_in", 7200);
+authData.put("openid", "OPENID");
+authData.put("access_token", "ACCESS_TOKEN");
+authData.put("platform", "weixin");
+//可选
+authData.put("refresh_token", "REFRESH_TOKEN");
+authData.put("scope", "SCOPE");
+AVUser.loginWithAuthData(authData, "weixin").subscribe(new Observer<AVUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(AVUser avUser) {
+       System.out.println("成功登录");
+    }
+    public void onError(Throwable throwable) {
+       System.out.println("尝试使用第三方账号登录，发生错误。");
+    }
+    public void onComplete() {}
+});
+```
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
