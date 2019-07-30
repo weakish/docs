@@ -412,7 +412,7 @@ AVFile构造函数的第一个参数指定文件名称，第二个构造函数�
 上例将文件命名为 `resume.txt`，这里需要注意两点：
 
 - 不必担心文件名冲突。每一个上传的文件都有惟一的 ID，所以即使上传多个文件名为 resume.txt 的文件也不会有问题。
-- 给文件添加扩展名非常重要。云端通过扩展名来判断文件类型，以便正确处理文件。所以要将一张 PNG 图片存到 AV.File 中，要确保使用 .png 扩展名。
+- 给文件添加扩展名非常重要。云端通过扩展名来判断文件类型，以便正确处理文件。所以要将一张 PNG 图片存到 AVFile 中，要确保使用 .png 扩展名。
 
 #### 从本地路径构建文件
 
@@ -459,7 +459,7 @@ class ProgressListener : System.IProgress<AVUploadProgressEventArgs> {
 
 ### 文件元数据
 
-AV.File 的 metaData 属性，可以用来保存和获取该文件对象的元数据信息。metaData 一旦保存到云端就无法再次修改。
+AVFile 的 metaData 属性，可以用来保存和获取该文件对象的元数据信息。metaData 一旦保存到云端就无法再次修改。
 
 ```cs
 // 保存 metaData
