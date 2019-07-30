@@ -72,19 +72,18 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
     okio:       "1.13.0"
 } %}
 
-{% macro cdn(collapsable = false) %}
+{% macro cdn(collapsable = false, file_object_name = "AVFile") %}
 <div id="accordion-cdn">
-  <p>中国节点的文件存储服务自带 CDN 加速访问。{% if node != 'qcloud' %}
-美国节点没有现成的 CDN 加速访问服务，需要用户自行配置{% if collapsable %}（<a class="accordion-toggle" data-toggle="collapse" parent="#accordion-cdn" escape-hash href="#collapse-cdn">步骤</a>）{% endif %}。</p>
+  <p>中国节点的文件存储服务自带 CDN 加速访问，但不包括海外 CDN 加速。商用版应用可发工单申请开启海外 CDN 加速（开启后海外访问文件 http/https 流量费用分别上调为 0.40 元/GB、0.60 元/GB。
+国际版没有现成的 CDN 加速访问服务，需要用户自行配置{% if collapsable %}（<a class="accordion-toggle" data-toggle="collapse" parent="#accordion-cdn" escape-hash href="#collapse-cdn">步骤</a>）{% endif %}。</p>
   <div id="collapse-cdn" class="panel-collapse collapse{% if not collapsable %} in{% endif %}">
     <p>以 CloudFront 加速服务为例，配置过程如下：</p>
     <ol>
     <li>阅读官方指南 <a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html">Getting Started with CloudFront</a>。</li>
     <li>创建一个 AWS 账户，开始使用 CloudFront 服务和付费。</li>
     <li>S3 的公共访问权限（read permission）已经被配置好，可以跳过指南中有关 S3 配置的部分（<a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html#GettingStartedUploadContent">Step 2: Upload your content to Amazon S3 and grant object permissions</a>。</li>
-    <li>CloudFront 配置中的 <strong>Origin Domain Name</strong> 请从 AVFile 的 URL 中获取，其他均可保持默认。</li>
+    <li>CloudFront 配置中的 <strong>Origin Domain Name</strong> 请从 {{ file_object_name }} 的 URL 中获取，其他均可保持默认。</li>
     </ol>
   </div>
 </div>
-{% endif %}
 {% endmacro %}

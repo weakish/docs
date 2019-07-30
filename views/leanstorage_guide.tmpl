@@ -1,4 +1,5 @@
 {% import "views/_helper.njk" as docs %}
+{% import "views/_data.njk" as data %}
 {% macro regex(useSingleQuotes = false) -%}
 ^((?!ticket).)*&dollar;{% if useSingleQuotes == true %}&apos;{% else %}&quot;{% endif %}
 {%- endmacro %}
@@ -4918,14 +4919,7 @@ LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地�
 
 ### CDN 加速
 
-中国节点的文件存储服务自带 CDN 加速访问。
-
-美国节点没有现成的 CDN 加速访问服务，需要用户自行配置。以 [CloudFront](https://aws.amazon.com/cloudfront/) 加速服务为例，配置过程如下：
-
-1. 阅读官方指南 [Getting Started with CloudFront](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html)。
-2. 创建一个 AWS 账户，开始使用 CloudFront 服务并付费。
-3. S3 的公共访问权限（read permission）已经被配置好，可以跳过指南中有关 S3 配置的部分（[Step 2: Upload your content to Amazon S3 and grant object permissions](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html#GettingStartedUploadContent)）。
-4. CloudFront 配置中的 **Origin Domain Name** 请从 `{{ fileObjectName }}` 的 URL 中获取，其他均可保持默认。
+{{ data.cdn(true, fileObjectName) }}
 
 {% if platform_name === "JavaScript" %}
 ## Promise
