@@ -114,6 +114,8 @@ select * from GameScore where createdAt < date('2011-08-20T02:06:57.931Z')
 select * from GameScore where name like 'dennis%'
 ```
 
+由于 CQL 实现上的问题，模糊查询中如果需要匹配括号，需要使用单字符范围，例如，匹配 `(xy)` 需要写成 `like '%xx[(]yy[)]%'`。
+
 `like` 本质上转化为 `regexp` 正则匹配来进行查询，因此上面的例子还可以写成：
 
 ```sql
@@ -129,6 +131,7 @@ select * from GameScore where name not regexp 'dennis.*'
 ```
 
 正则匹配并非高效，因此我们**更推荐使用** [应用内全文搜索](app_search_guide.html)。
+另外，由于 CQL 实现上的问题，正则表达式中不能包含反斜杠。
 
 ### 值是否存在查询
 

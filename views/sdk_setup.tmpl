@@ -10,7 +10,7 @@
 
 ## 获取 SDK
 
-{% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "Android" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Java" %}
+{% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "Android" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" %}
 获取 SDK 有多种方式，较为推荐的方式是通过包依赖管理工具下载最新版本。
 
 ### 包依赖管理工具安装
@@ -165,7 +165,7 @@ composer require leancloud/leancloud-sdk
 - `leancloud-sdk` 依赖 PHP 的 curl 扩展（常见 Linux 系统下一般需要安装 `php-curl` 这个包）。
 - 如果 composer 访问 packagist 仓库有问题，需要 [设置镜像](https://mirrors.aliyun.com/composer/) 或者通过代理（设置 `http_proxy` 环境变量）访问。
 {% endif %}
-{% if platform_name === "Java" %}
+{% if platform_name === "Android / Java" %}
 可以用以下任意包管理工具来安装 SDK。
 
 Maven：
@@ -791,7 +791,7 @@ Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
 Client::setServerUrl("https://{{host}}"); // 0.7.0 及以上版本支持
 ```
 {% endif %}
-{% if platform_name === "Java" %}
+{% if platform_name === "Android / Java" %}
 如果是一个普通 Java 项目，则在代码开头添加：
 
 ```java
@@ -934,7 +934,7 @@ logging.basicConfig(level=logging.DEBUG)
 Client::setDebug(true);
 ```
 {% endif %}
-{% if platform_name === "Java" %}
+{% if platform_name === "Android / Java" %}
 ```java
 // 在 AVOSCloud.initialize() 之前调用
 AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
@@ -1076,7 +1076,7 @@ try {
 
 保存后运行程序。
 {% endif %}
-{% if platform_name === "Java" %}
+{% if platform_name === "Android / Java" %}
 然后在项目中编写如下测试代码：
 
 ```java
