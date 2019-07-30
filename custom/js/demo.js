@@ -22,7 +22,6 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
       'android': 'Android',
       'unity': 'Unity',
       'python': 'Python',
-      'winphone': 'Windows Phone',
       'web': 'Web',
       'node': 'Node.js',
       'php': 'PHP',
@@ -32,6 +31,13 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
     }
     $scope.demos = {
       'ios': [{
+        name: 'Chat',
+        desc: '一个用 Swift 搭建的聊天应用。',
+        downPath: '',
+        mdPath: 'https://github.com/leancloud/swift-sdk-demo',
+        type: 'ios',
+        qcloudShow: true
+      },{
         name: '数据存储入门',
         desc: '本教程模拟商品发布的场景，讲解 LeanCloud 数据存储的核心用法。',
         downPath: '',

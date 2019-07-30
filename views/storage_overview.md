@@ -54,7 +54,7 @@ LeanCloud 对大部分场景下的后端需求进行了抽象和统一，我们�
 
 你可以把 LeanCloud 云端看成是一个面向对象的海量数据库，它与传统的关系型数据库的差异有：
 
-* 访问方式不一样，不需要任何 JDBC/ODBC 的驱动，直接通过 HTTP 协议来传输 JSON Object 即可，所以不光服务端可以使用，在客户端也可以直接访问。我们既提供各种平台原生 SDK（iOS、Android、JavaScript、PHP、Python、Java、Windows Phone、.Net、Unity3D、C++，以及社区贡献的其他语言 SDK）来帮助开发者简单集成数据存储服务，也提供开放的 REST API 供大家直接使用。
+* 访问方式不一样，不需要任何 JDBC/ODBC 的驱动，直接通过 HTTP 协议来传输 JSON Object 即可，所以不光服务端可以使用，在客户端也可以直接访问。我们既提供各种平台原生 SDK（iOS、Android、JavaScript、PHP、Python、Java、.Net、Unity3D、C++，以及社区贡献的其他语言 SDK）来帮助开发者简单集成数据存储服务，也提供开放的 REST API 供大家直接使用。
 * LeanCloud 对于数据的唯一格式要求是满足 JSON Object 的形式，存储新的对象类型时不需要预先在云端定义任何「表结构」，而且同一种数据类型里的键值也是允许随时增加的。这种 schema free 的设计，会给开发者带来最大的便利。
 * AVObject 之间没有了主键、外键的概念，也不支持跨表的 join 查询，取而代之的，我们提供另一种数据关联的机制，详见下文 [数据关联](#数据关联)。
 * 既然 AVObject 是面向对象设计的，它的查询就与传统 SQL 不一样，详见下文 [数据查询 AVQuery](#数据查询_AVQuery)。

@@ -4898,7 +4898,7 @@ LeanCloud 即时通讯组件也使用 `{{ fileObjectName }}` 来保存消息的�
 
 或者在 **Target** 的 **Info** 标签中修改配置：
 
-![](../images/ios_qiniu_http.png)
+![在「NSAppTransportSecurity > NSExceptionDomains > clouddn.com」下面分别添加「NSTemporaryExceptionAllowsInsecureHTTPLoads」和「NSIncludesSubdomains」两个 Boolean 字段并将它们的值设为 YES。](../images/ios_qiniu_http.png)
 
 你也可以根据项目需要，允许所有的 HTTP 访问，更多可参考 [iOS 9 适配系列教程](https://github.com/ChenYilong/iOS9AdaptationTips)。
 {% endif %}
