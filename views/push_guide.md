@@ -555,24 +555,6 @@ curl -X POST \
 
 上面的例子假设 installation 有个 owner 属性指向 `_User` 表的记录，并且用户有个 `location` 属性是 GeoPoint 类型，我们就可以根据地理信息位置做推送。
 
-#### 使用 CQL 查询推送
-
-上述 `where` 的查询条件都可以使用 [CQL](./cql_guide.html) 查询替代，例如查询某个设备推送：
-
-```sh
-curl -X POST \
--H "X-LC-Id: {{appid}}"          \
--H "X-LC-Key: {{appkey}}"        \
--H "Content-Type: application/json" \
--d '{
-      "cql":"select * from _Installation where installationId=\"xxxxxxxxxxxxx\"",
-      "data": {
-        "alert": "LeanCloud 向您问好！"
-      }
-    }' \
-https://{{host}}/1.1/push
-```
-
 #### 过期时间和定时推送
 
 `expiration_time` 属性用于指定消息的过期时间，如果客户端收到消息的时间超过这个绝对时间，那么消息将不显示给用户。`expiration_time` 是一个 UTC 时间的字符串，格式为 `YYYY-MM-DDTHH:MM:SS.MMMZ`。

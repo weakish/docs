@@ -432,18 +432,6 @@ query = query.Include("focusType");
 ```cs
 query = query.Include("focusType.girls");
 ```
-### CQL 查询
-Cloud Query Language（简称 CQL） 是 LeanCloud 为查询 API 定制的一套类似 SQL 查询语法的子集和变种，主要目的是降低大家学习 LeanCloud 查询的 API 的成本，可以使用传统的 SQL 语法来查询 LeanCloud 应用内的数据。
-
-在 .NET 中调用 CQL 查询很便捷，在 `AVQuery` 中有一个 `DoCloudQuery` 的静态方法，可以直接传入 sql 语句即可实现查询，如下：
-
-```cs
-await AVQuery<AVObject>.DoCloudQuery("select * from Character where age=37");
-```
-如此做即可，其后续的操作与以前习惯的 `AVQuery` 其他查询一样，只是我们提供了另一种方式便于长期累积关系型数据库知识的开发者可以迅速迁移到 LeanCloud 上，CQL 的语法和详细用法可以参照：[CQL 详细指南](./cql_guide.html)
-
-#### CQL 查询占位符
-
 
 ## 用户
 移动互联时代，把握住用户是核心的价值，任何一款APP都或多或少需要了解用户并且可能为用户建立一定的关系。例如，在社交软件中最基本就是要求用户注册和登录，哪怕是利用第三方（微博，QQ）API登录，都应该为用户在当前系统中再注册一次。LeanCloud已经在SDK中内嵌了关于用户这个较为特殊的对象的一些最基本的操作和数据服务。
