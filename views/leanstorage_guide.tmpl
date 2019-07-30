@@ -6801,20 +6801,20 @@ AV.User.loginWithAuthData(authData, 'weixin').then(function (user) {
 {% if platform_name === "Java" %}
 ```java
 Map<String, Object> authData = new HashMap<String, Object>();
-authData.put("expires_at", "2019-01-07T02:41:13.580Z");
+authData.put("expires_in", 7200);
 authData.put("openid", "OPENID");
 authData.put("access_token", "ACCESS_TOKEN");
 authData.put("platform", "weixin");
-AVUser.loginWithAuthData(authData, "weixin").subscribe(ObserverBuilder.buildSingleObserver(new LogInCallback() {
-    @Override
-    public void done(AVUser avUser, AVException e) {
-    if (null != e) {
-        log("尝试使用第三方账号登录，发生错误。cause：" + e.getMessage());
-    } else {
-        log("成功登录，当前用户：" + avUser);
+AVUser.loginWithAuthData(authData, "weixin").subscribe(new Observer<AVUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(AVUser avUser) {
+       System.out.println("成功登录");
     }
+    public void onError(Throwable throwable) {
+       System.out.println("尝试使用第三方账号登录，发生错误。");
     }
-}));
+    public void onComplete() {}
+});
 ```
 {% endif %}
 {% if platform_name === "Swift" %}
