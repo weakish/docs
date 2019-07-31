@@ -223,34 +223,9 @@ JavaScript SDK 0.5.5 版本开始支持离线数据分析。**请注意，离线
 
 任务如果能正常启动，将返回任务的 job id，后续可以拿这个 id 去查询任务状态和结果。
 
-### Job 完成
-
-在云引擎里，可以通过一个 hook 函数来监听 job 完成情况：
-
-```js
-AV.Insight.on('end', function(err, result) {
-    console.dir(result);
-});
-```
-
-目前仅支持 `end` 事件，当 job 完成（可能成功或者失败）就通知到这个 hook 函数，结果 result 里会包含 job id 以及任务状态信息：
-
-```
-{  
-  "id":        "29f24a909074453622856528359caddc",
-  "startTime": 1435569183000,
-  "endTime":   1435569185000,
-  "status":    "OK"
-}
-```
-
-如果 status 是 `OK` ，表示任务成功，其他状态包括 `RUNNING` 表示正在运行，以及 `ERROR` 表示本次任务失败，并将返回失败信息 `message`。
-
-如果任务成功，你可以拿 id 去主动查询任务结果，参见下文。
-
 ### Job 状态和结果查询
 
-在知道任务 id 的情况下（startJob 返回或者云引擎监听到任务完成），可以主动查询本次任务的结果：
+在知道任务 id 的情况下（startJob 返回），可以主动查询本次任务的结果：
 
 ```js
   var id = '已知任务 id';
@@ -274,5 +249,7 @@ result 是一个 JSON 对象，形如：
   ]
 }
 ```
+
+如果 `status` 是 `OK`，表示任务成功，其他状态包括 `RUNNING` 表示正在运行，以及 `ERROR` 表示本次任务失败，并将返回失败信息 message。
 
 `AV.Insight.JobQuery` 也可以设置 `skip` 和 `limit` 做分页查询。
