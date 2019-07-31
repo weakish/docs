@@ -104,6 +104,7 @@ RPC 调用时，不仅可以返回单个 AVObject，还可以返回包含 AVObje
 }
 ```
 
+在通过 SDK 进行 RPC 调用时，SDK 会据此自动反序列化。
 你还可以阅读以下云引擎开发指南来获取更多的信息。
 
 * [云引擎 Node.js 环境](leanengine_cloudfunction_guide-node.html)
