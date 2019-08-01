@@ -25,6 +25,8 @@ vendor | 厂商
 `HMS` | 华为 HMS 推送
 `mi`  | 小米推送
 `mz`  | 魅族推送
+`oppo`| Oppo 推送
+`vivo`| VIVO 推送
 
 ### 即时通讯的离线推送
 
