@@ -144,9 +144,9 @@ const { Client, Region, Event, ReceiverGroup, setAdapters, LogLevel, setLogger }
 ```javascript
 const client = new Client({
     // 设置 APP ID
-    appId: YOUR_APP_ID,
+    appId: {{appid}},
     // 设置 APP Key
-    appKey: YOUR_APP_KEY,
+    appKey: {{appkey}},
     // 设置用户 id
     userId: 'leancloud'
     // 设置游戏版本号（选填，默认 0.0.1）
