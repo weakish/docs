@@ -199,7 +199,7 @@ implementation 'cn.leancloud:storage-core:{{ version.unified }}'
 如果是 Android 项目，则换成以下这些包：
 
 ```groovy
-implementation 'cn.leancloud:storage-android:{{ version.unified }}' {
+implementation ('cn.leancloud:storage-android:{{ version.unified }}'){
     exclude group: 'com.alibaba', module: 'fastjson'
     exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
 }
