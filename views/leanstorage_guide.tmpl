@@ -822,8 +822,8 @@ _ = todo.fetch { result in
 ```
 {% endif %}
 
-{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Android / Java" %}
-刷新操作会强行使用云端的属性值覆盖本地的属性。因此如果本地有属性修改，**`{% if platform_name === "Objective-C" %}fetchInBackgroundWithBlock{% endif %}{% if platform_name === "JavaScript" %}fetch{% endif %}{% if platform_name === "Android / Java" %}fetchInBackground{% endif %}` 操作会丢弃这些修改**。为避免这种情况，你可以在刷新时指定 **需要刷新的属性**，这样只有指定的属性会被刷新（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`），其他属性不受影响。
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Android / Java" or platform_name === "Swift" %}
+刷新操作会强行使用云端的属性值覆盖本地的属性。因此如果本地有属性修改，**`{% if platform_name === "Objective-C" %}fetchInBackgroundWithBlock{% endif %}{% if platform_name === "JavaScript" %}fetch{% endif %}{% if platform_name === "Android / Java" %}fetchInBackground{% endif %}{% if platform_name === "Swift" %}fetch{% endif %}` 操作会丢弃这些修改**。为避免这种情况，你可以在刷新时指定 **需要刷新的属性**，这样只有指定的属性会被刷新（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`），其他属性不受影响。
 {% endif %}
 
 {% if platform_name === "Objective-C" %}
@@ -857,6 +857,20 @@ todo.fetchInBackground(keys).subscribe(new Observable<AVObject>() {
     public void onError(Throwable throwable) {}
     public void onComplete() {}
 });
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+let todo = LCObject(className: "Todo", objectId: "582570f38ac247004f39c24b")
+todo.fetch(keys: ["priority", "location"]) { (result) in
+    switch result {
+    case .success:
+        // 只有 priority 和 location 会被获取和刷新
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 {% endif %}
 
