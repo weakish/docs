@@ -53,6 +53,20 @@ SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云�
 ```objc
 [AVCloud setProductionMode:NO]; // 调用预备环境
 ```
+```swift
+// 调用预备环境
+do {
+    let environment: LCApplication.Environment = [.cloudEngineDevelopment]
+    let configuration = LCApplication.Configuration(environment: environment)
+    try LCApplication.default.set(
+        id: "APP_ID",
+        key: "APP_KEY",
+        configuration: configuration
+    )
+} catch {
+    print(error)
+}
+```
 ```android
 AVCloud.setProductionMode(false); // 调用预备环境
 ```
@@ -114,6 +128,16 @@ NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦�
                      // 处理报错
                    }
 }];
+```
+```swift
+LCEngine.run("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
+    switch result {
+    case .success(value: let resultValue):
+        print(resultValue)
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```android
 // 在 Android SDK 中，AVCloud 提供了一系列的静态方法来实现客户端调用云函数
@@ -185,6 +209,18 @@ NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦�
                      // 处理报错
                   }
 }];
+```
+```swift
+LCEngine.call("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
+    switch result {
+    case .success(object: let object):
+        if let object = object {
+            print(object)
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```android
 // 构建参数
