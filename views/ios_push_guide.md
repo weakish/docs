@@ -144,14 +144,6 @@ func application(_ application: UIApplication, didRegisterForRemoteNotifications
 }
 ```
 
-SDK 将以上逻辑封装成了简单的方法，以上代码等价于：
-
-```objc
-- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    [AVOSCloud handleRemoteNotificationsWithDeviceToken:deviceToken];
-}
-```
-
 可以像修改 AVObject 那样去修改 AVInstallation，但是有一些特殊字段可以帮你管理目标设备：
 
 字段|说明
@@ -262,7 +254,20 @@ NSArray *subscribedChannels = [AVInstallation currentInstallation].channels;
 发送消息到刚才订阅的「Giants」频道：
 
 ```swift
-// 暂不支持
+let messageData: [String: Any] = [
+    "alert": "Giants 太牛掰了"
+]
+
+let channels: [String] = ["Giants"]
+
+LCPush.send(data: messageData, channels: channels) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 // Send a notification to all devices subscribed to the "Giants" channel.
@@ -275,7 +280,20 @@ AVPush *push = [[AVPush alloc] init];
 如果你想发送到多个频道，可以指定 channels 数组：
 
 ```swift
-// 暂不支持
+let messageData: [String: Any] = [
+    "alert": "The Giants won against the Mets 2-3."
+]
+
+let channels: [String] = ["Giants", "Mets"]
+
+LCPush.send(data: messageData, channels: channels) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 NSArray *channels = [NSArray arrayWithObjects:@"Giants", @"Mets", nil];
@@ -292,7 +310,17 @@ AVPush *push = [[AVPush alloc] init];
 默认情况下，从客户端发起的推送都是使用你在消息菜单上传的生产证书，如果想使用开发证书，可以通过 `setProductionMode` 方法：
 
 ```swift
-// 暂不支持
+do {
+    let environment: LCApplication.Environment = [.pushDevelopment]
+    let configuration = LCApplication.Configuration(environment: environment)
+    try LCApplication.default.set(
+        id: "APP_ID",
+        key: "APP_KEY",
+        configuration: configuration
+    )
+} catch {
+    print(error)
+}
 ```
 ```objc
 [AVPush setProductionMode:false];
@@ -378,7 +406,21 @@ AVInstallation *installation = [AVInstallation currentInstallation];
  `[AVInstallation query]` 创建查询对象：
 
 ```swift
-// 暂不支持
+let query = LCQuery(className: "_Installation")
+query.whereKey("injuryReports", .equalTo(true))
+    
+let messageData: [String: Any] = [
+    "alert": "Willie Hayes injured by own pop fly."
+]
+
+LCPush.send(data: messageData, query: query) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 // Create our Installation query
@@ -395,7 +437,22 @@ AVPush *push = [[AVPush alloc] init];
 你也可以在查询中添加 channels 的条件：
 
 ```swift
-// 暂不支持
+let query = LCQuery(className: "_Installation")
+query.whereKey("channels", .equalTo("Giants"))
+query.whereKey("scores", .equalTo(true))
+    
+let messageData: [String: Any] = [
+    "alert": "Giants scored against the A's! It's now 2-2."
+]
+
+LCPush.send(data: messageData, query: query) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 // Create our Installation query
@@ -412,6 +469,28 @@ AVPush *push = [[AVPush alloc] init];
 
 如果你在 Installation 还保存了其他对象的关系，我们同样可以在查询条件中使用这些数据，例如，向靠近北京大学的设备推送消息：
 
+```swift
+let beijingUniversityLocation = LCGeoPoint(latitude: 39.9869, longitude: 116.3059)
+    
+let userQuery = LCQuery(className: "_User")
+userQuery.whereKey("location", .locatedNear(beijingUniversityLocation, minimal: nil, maximal: nil))
+
+let pushQuery = LCQuery(className: "_Installation")
+pushQuery.whereKey("user", .matchedQuery(userQuery))
+    
+let messageData: [String: Any] = [
+    "alert": "Free hotdogs at the AVOSCloud concession stand!"
+]
+
+LCPush.send(data: messageData, query: pushQuery) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
 ```objc
 // Find users near a given location
 AVQuery *userQuery = [AVUser query];
@@ -450,7 +529,22 @@ AVPush *push = [[AVPush alloc] init];
 递增 badge 数字并播放声音：
 
 ```swift
-// 暂不支持
+let channels: [String] = ["Mets"]
+
+let messageData: [String: Any] = [
+    "alert": "The Mets scored! The game is now tied 1-1!",
+    "badge": "Increment",
+    "sound": "cheering.caf"
+]
+
+LCPush.send(data: messageData, channels: channels) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -467,7 +561,22 @@ AVPush *push = [[AVPush alloc] init];
 当然，你还可以添加其他自定义的数据。你会在接收推送一节看到，当应用通过推送打开你的应用的时候，你就可以访问这些数据。当你要在用户打开通知的时候显示一个不同的 view controller 的时候，这特别有用。
 
 ```swift
-// 暂不支持
+let channels: [String] = ["Indians"]
+
+let messageData: [String: Any] = [
+    "alert": "Ricky Vaughn was injured in last night's game!",
+    "name": "Vaughn",
+    "newsItem": "Man bites dog"
+]
+
+LCPush.send(data: messageData, channels: channels) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -476,7 +585,6 @@ NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
     @"Man bites dog", @"newsItem",
     nil];
 AVPush *push = [[AVPush alloc] init];
-[push setQuery:injuryReportsQuery];
 [push setChannel:@"Indians"];
 [push setData:data];
 [push sendPushInBackground];
@@ -490,7 +598,20 @@ AVPush *push = [[AVPush alloc] init];
 AVPush 提供了两个方法来设置通知的过期日期，首先是 `expireAtDate:` 接收 NSDate 来告诉 LeanCloud 不要再去发送通知。
 
 ```swift
-// 暂不支持
+let expirationDate = Date(timeIntervalSinceNow: 600)
+
+let messageData: [String: Any] = [
+    "alert": "Season tickets on sale until October 12th"
+]
+
+LCPush.send(data: messageData, expirationDate: expirationDate) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 NSDateComponents *comps = [[NSDateComponents alloc] init];
@@ -504,7 +625,6 @@ NSDate *date = [gregorian dateFromComponents:comps];
 // Send push notification with expiration date
 AVPush *push = [[AVPush alloc] init];
 [push expireAtDate:date];
-[push setQuery:everyoneQuery];
 [push setMessage:@"Season tickets on sale until October 12th"];
 [push sendPushInBackground];
 ```
@@ -512,7 +632,20 @@ AVPush *push = [[AVPush alloc] init];
 这个方法有个隐患，因为设备的时钟是无法保证精确的，你可能得到错误的结果。因此，AVPush 还提供了 `expireAfterTimeInterval` 方法，接收 NSTimeInterval 对象。通知将在指定间隔时间后失效：
 
 ```swift
-// 暂不支持
+let expirationInterval: TimeInterval = 60*60*24*7
+
+let messageData: [String: Any] = [
+    "alert": "Season tickets on sale until October 18th"
+]
+
+LCPush.send(data: messageData, expirationInterval: expirationInterval) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 // Create time interval
@@ -521,7 +654,6 @@ NSTimeInterval interval = 60*60*24*7; // 1 week
 // Send push notification with expiration interval
 AVPush *push = [[AVPush alloc] init];
 [push expireAfterTimeInterval:interval];
-[push setQuery:everyoneQuery];
 [push setMessage:@"Season tickets on sale until October 18th"];
 [push sendPushInBackground];
 ```
@@ -533,7 +665,36 @@ AVPush *push = [[AVPush alloc] init];
 跨平台的应用，可能想指定发送的平台，比如 iOS 或者 Android:
 
 ```swift
-// 暂不支持
+let query = LCQuery(className: "_Installation")
+query.whereKey("channels", .equalTo("suitcaseOwners"))
+
+// Notification for Android users
+query.whereKey("deviceType", .equalTo("android"))
+let messageData: [String: Any] = [
+    "alert": "Your suitcase has been filled with tiny robots!"
+]
+LCPush.send(data: messageData, query: query) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+
+// Notification for iOS users
+query.whereKey("deviceType", .equalTo("ios"))
+let messageData: [String: Any] = [
+    "alert": "Your suitcase has been filled with tiny apples!"
+]
+LCPush.send(data: messageData, query: query) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 AVQuery *query = [AVInstallation query];
@@ -567,7 +728,19 @@ AVPush *iOSPush = [[AVPush alloc] init];
 由于 Apple 的对消息大小的限制，请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/APNsProviderAPI.html#//apple_ref/doc/uid/TP40008194-CH101-SW1)。
 
 ```swift
-// 暂不支持
+let messageData: [String: Any] = [
+    "alert": "James commented on your photo!",
+    "p": "vmRZXZ1Dvo" // Photo's object id
+]
+
+LCPush.send(data: messageData) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 NSDictionary *data = @{
@@ -575,7 +748,6 @@ NSDictionary *data = @{
   @"p": @"vmRZXZ1Dvo" // Photo's object id
 };
 AVPush *push = [[AVPush alloc] init];
-[push setQuery:photoOwnerQuery];
 [push setData:data];
 [push sendPushInBackground];
 ```
