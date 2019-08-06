@@ -61,8 +61,7 @@ xxx.example.com.	3600	IN	CNAME	avoscloud.com.
 
 #### REST API
 
-* 非云函数的访问，需要在代码中将 `api.leancloud.cn` 或 `<# appid 前八位 #>.api.lncld.net` 域名替换为 `xxx.example.com`。
-* 通过 REST API 访问云函数，需要将 `<# appid 前八位 #>.engine.lncld.net` 域名替换为 `xxx.example.com`。
+参考 [REST API 使用详解](rest_api.html#base-url) 配置。
 
 #### JavaScript SDK
 

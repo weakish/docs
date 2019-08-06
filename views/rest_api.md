@@ -38,6 +38,24 @@ Postman 还支持自动生成多种语言（库）调用 REST API 的代码。
 
 ![Postman 中点击 code，在弹出对话框中选择语言（库）](images/postman-generate-code.png)
 
+### Base URL
+
+文档中的所有 API URL 的 Base URL 为绑定的 [API 自定义域名][api-domain]。
+
+LeanCloud 国际版暂不支持绑定 API 自定义域名，需使用如下域名：
+
+```
+appid前八位.api.lncldglobal.com
+```
+
+[api-domain]: custom-api-domain-guide.html
+
+如果暂时没有绑定域名，可以临时使用如下域名（仅供测试和原型开发阶段使用，不保证可用性）：
+
+| 节点 | 临时域名 |
+| - | - |
+| 华北 | appid前八位.api.lncld.net |
+| 华东 | appid前八位.api.lncldapi.com |
 
 ### 对象
 
@@ -575,7 +593,7 @@ POST 和 PUT 请求可能触发[云引擎的 hook 函数][hooks]，可以通过�
 * `X-LC-Prod: 0` 表示调用预备环境
 * `X-LC-Prod: 1` 表示调用生产环境
 
-默认（未指定 `X-LC-Prod` 头）调用生产环境的 hook 函数。 
+默认（未指定 `X-LC-Prod` 头）调用生产环境的 hook 函数。
 
 [hooks]: https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html#hash1095356413
 
