@@ -1,3 +1,5 @@
+{% from "views/leanengine_plan.md" import leanengine_sleep %}
+
 # Client Engine 总览
 
 **在阅读本文档之前，请先阅读[多人在线对战服务总览](multiplayer.html)及 [MasterClient](multiplayer-guide-js.html#MasterClient) ，了解多人在线对战开发的基础结构。**
@@ -30,21 +32,27 @@ Client Engine 是 LeanCloud Play 提供的多人在线游戏 Client 托管方案
 
 * [回合制 Demo](game-demos.html#回合制 Demo)。
 
-## 价格及试用
+## 价格
 
-Client Engine 正在公测中，公测期间免费使用，开发版最大可使用 100% CPU，商用版最大可使用 200% CPU，如果您需要更高额度，请联系 support@leancloud.rocks。
+### 开发版
 
-开启试用：打开 LeanCloud 应用[控制台](/dashboard/app.html?appid={{appid}})，进入「Play」->「Client Engine」->「部署」页面，点击「试用 Client Engine」。
+开发版下提供「体验版」供开发者免费使用：
 
-未来收费方案如下：
+* 免费 50% CPU / 256M 内存。
+* 不提供预备环境。
+* 不支持自动扩容及负载均衡。
+* 强制休眠。
 
-按照 CCU 或 CPU 用量来计费，这里的 CCU 指的是托管在 Client Engine 中的同时在线的 Client 数量。
+休眠策略：
 
-* 开发版：免费 20CCU / 天（自然天，0:00 ~ 24:00），不支持自动扩容及负载均衡。
-* 商用版：计费时根据每天的峰值 CCU 和峰值 CPU 用量分别统计，只会选择其中较大的一个费用进行扣除，具体费用为：
-  * 每 100 CCU 国内节点 ¥4，美国节点 $1。
-  * 每 50% CPU 国内节点 ¥4，美国节点 $1。
+{{ leanengine_sleep(false) }}
 
-举例：例如您的应用当天在 Client Engine 中最高使用了 80 CCU，消耗 CPU 80%，按 CCU 计费为 4 元钱，按 CPU 收费为 8 元钱，实际收费为 8 元钱。
+### 商用版
 
-> 在正式收费之时，以上价格和标准可能会发生调整和变动，届时均以公布价格为准。
+商用版下可通过控制台从「体验版」升级到「标准版」，「标准版」提供预备环境，支持自动扩容及负载均衡，不会休眠。
+
+「标准版」按照「计算单元」扩容与计费。一个计算单元包含 100 CCU 和 50% CPU，我们会在任意一个指标用尽的时候自动增加计算单元。例如在某一时刻 Client Engine 消耗了 80 CCU 与 90% CPU，则此时系统会为其分配 2 个计算单元。
+
+系统会按照每天的计算单元用量峰值计费，单个计算单元的价格请参考[官网](https://leancloud.cn/pricing/)。例如国内节点的一个应用某天最多使用了 2 个计算单元，当天收费为 2 * 国内计算单元价格。
+
+<div class="callout callout-danger">注意：升级为「标准版」后不论是否使用，都会按照最低 1 个计算单元来提供服务并计费。</div>
