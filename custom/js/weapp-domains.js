@@ -18,8 +18,8 @@ angular.module('app').controller('WeappDomainsCtrl', [
         if (currentApp) {
           $http.get('/1.1/clients/self/apps/' + currentApp.app_id + '/platformCustomDomains').then(function (data) {
             if (data.data && data.data.length) {
-              data.data.map(function(domainInfo) {
-                $scope.domains.request.push(domainInfo.domain);
+              $scope.domains.request = data.data.map(function(domainInfo) {
+                return domainInfo.domain;
               });
             } else {
               return $http.get('https://app-router.leancloud.cn/2/route?appId=' + currentApp.app_id).then(function (data) {
@@ -29,10 +29,8 @@ angular.module('app').controller('WeappDomainsCtrl', [
           }).catch(function() {
             console.error(error);
             $scope.error = error;
-            $scope.domains.request.push('获取 request 域名异常')
+            $scope.domains.request = ['获取 request 域名异常'];
           })
-
-          $scope.domains.request = $scope.domains.request;
 
           AV.applicationId = undefined;
           AV.applicationKey = undefined;
