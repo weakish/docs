@@ -43,8 +43,9 @@
 
 ```js
 var realtime = new Realtime({
-  appId: 'your-app-id',
-  appKey: 'your-app-key',
+  appId: '{{appid}}',
+  appKey: '{{appkey}}',
+  server: 'https://xxx.example.com',
   plugins: [TypedMessagesPlugin], // 注册富媒体消息插件
 });
 // Tom 用自己的名字作为 clientId 来登录即时通讯服务
@@ -2036,10 +2037,6 @@ AVIMClient.Status != Online
 
 ```js
 // 在初始化 Realtime 时，需加载 TypedMessagesPlugin
-// var realtime = new Realtime({
-//   appId: appId,
-//   plugins: [TypedMessagesPlugin]
-// });
 var { Event, TextMessage } = require('leancloud-realtime');
 var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
 // 注册 MESSAGE 事件的 handler
