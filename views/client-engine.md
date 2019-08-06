@@ -1,3 +1,5 @@
+{% from "views/leanengine_plan.md" import leanengine_sleep %}
+
 # Client Engine 总览
 
 **在阅读本文档之前，请先阅读[多人在线对战服务总览](multiplayer.html)及 [MasterClient](multiplayer-guide-js.html#MasterClient) ，了解多人在线对战开发的基础结构。**
@@ -40,9 +42,10 @@ Client Engine 是 LeanCloud Play 提供的多人在线游戏 Client 托管方案
 * 不提供预备环境。
 * 不支持自动扩容及负载均衡。
 * 强制休眠。
-  * 如果应用最近半小时没有任何外部请求，则休眠。
-  * 休眠后如果有新的外部请求实例则马上启动。访问者的体验是第一个请求响应时间是 2 ~ 10 秒（视实例启动时间而定），后续访问响应速度恢复正常。
-  * 强制休眠：如果最近 24 小时内累计运行超过 18 小时，则强制休眠。此时新的请求会收到 503 的错误响应码。
+
+休眠策略：
+
+{{ leanengine_sleep() }}
 
 ### 商用版
 
