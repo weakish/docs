@@ -71,18 +71,20 @@ xxx.example.com.	3600	IN	CNAME	avoscloud.com.
 
 旧版本的 SDK 请参考以下方法配置（建议使用最新版本的 SDK）：
 
-**>= 3.5.5**（`< 3.11.1` 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败）
+<details>
 
-```js
+<p><code>>= 3.5.5, < 3.11.1</code> 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败</p>
+
+<pre><code>
 AV.init({
   // appId, appKey,
   serverURLs: 'https://xxx.example.com',
 });
-```
+</code></pre>
 
-**>= 3.0.0, < 3.5.5**
+<p><code>>= 3.0.0, < 3.5.5</code></p>
 
-```js
+<pre><code>
 AV.init({
   // appId, appKey,
   serverURLs: {
@@ -93,8 +95,12 @@ AV.init({
   },
 });
 ```
+</code></pre>
+
+</details>
 
 3.0.0 之前的即时通讯 SDK 不支持自定义域名。
+
 
 ##### 即时通讯 SDK
 
@@ -102,22 +108,28 @@ AV.init({
 
 旧版本的 SDK 请参考以下方法配置（建议使用最新版本的 SDK）：
 
-4.0.0 至 4.3.1 之间的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：
+<details>
 
-```js
+<p>4.0.0 至 4.3.1 之间的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：</p>
+
+<pre><code>
 new Realtime({
   // appId, appKey,
   server: 'xxx.example.com',
 };
 ```
+<code></pre>
+
+</details>
 
 4.0.0 之前的即时通讯 SDK 不支持自定义域名。
 
 如果使用了 LiveQuery 功能，建议使用 3.14.0 以上版本的存储 SDK。
+旧版本（3.5.0 至 3.13.2）的 SDK 还需要在初始化的时候额外配置 LiveQuery 模块的域名：
 
-如果使用的是 3.5.0 至 3.13.2 之间的存储 SDK，还需要在初始化的时候额外配置 LiveQuery 模块的域名（不支持未启用 HTTPS 的自定义域名）：
+<details>
 
-```js
+<pre><code>
 AV.init({
   // appId, appKey,
   // serverURLs,
@@ -127,7 +139,11 @@ AV.init({
     server: 'xxx.example.com',
   }),
 });
-```
+<code></pre>
+
+<p>3.5.0 至 3.13.2 之间的 SDK不支持未启用 HTTPS 的自定义域名。</p>
+
+</details>
 
 3.5.0 之前的存储 SDK 的 LiveQuery 不支持自定义域名。
 
