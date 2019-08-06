@@ -90,7 +90,17 @@ AV.init({
 });
 ```
 
-##### 即时通讯 SDK（4.0.0 及以上支持，**不支持未启用 HTTPS 的自定义域名**）
+##### 即时通讯 SDK（v5.0.0-alpha.2 及以上支持）
+
+
+```js
+new Realtime({
+  // appId, appKey,
+  server: 'https://xxx.example.com',
+};
+```
+
+4.0.0 至 4.3.1 之间的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：
 
 ```js
 new Realtime({
@@ -99,7 +109,11 @@ new Realtime({
 };
 ```
 
-如果使用了 LiveQuery 功能，还需要在初始化的时候额外配置 LiveQuery 模块的域名（3.5.0 及以上支持，**不支持未启用 HTTPS 的自定义域名**）：
+4.0.0 之前的即时通讯 SDK 不支持自定义域名。
+
+如果使用了 LiveQuery 功能，建议使用 3.14.0 以上版本的存储 SDK。
+
+如果使用的是 3.5.0 至 3.13.2 之间的存储 SDK，还需要在初始化的时候额外配置 LiveQuery 模块的域名（不支持未启用 HTTPS 的自定义域名）：
 
 ```js
 AV.init({
@@ -112,6 +126,8 @@ AV.init({
   }),
 });
 ```
+
+3.5.0 之前的存储 SDK 的 LiveQuery 不支持自定义域名。
 
 ##### 多人在线对战
 
