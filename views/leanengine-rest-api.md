@@ -56,7 +56,7 @@ https://{{host}}/1.1/functions/averageStars
 }
 ```
 
-有些时候我们希望使用 AVObject 作为云函数的参数，或者希望云函数返回一个 AVObject，这时我们可以使用 `POST /1.1/call/:name` 这个 API，云函数 SDK 会将参数解释为一个 AVObject，同时在返回 AVObject 时提供必要的元信息：
+有些时候我们希望使用 AVObject 作为云函数的参数，或者希望以 AVObject 为云函数的返回值，这时我们可以使用 `POST /1.1/call/:name` 这个 RPC 调用的 API，云函数 SDK 会将参数解释为一个 AVObject，同时在返回 AVObject 时提供必要的元信息：
 
 ```sh
 curl -X POST \
@@ -79,6 +79,32 @@ curl -X POST \
 }
 ```
 
+RPC 调用时，不仅可以返回单个 AVObject，还可以返回包含 AVObject 的数据结构。
+例如，假设有一个云函数返回一个数组，其中包含一个数字和一个 Todo 对象，那么 RPC 调用的结果为：
+
+```json
+{
+  "result": [
+    1,
+    {
+      "title": "工程师周会",
+      "createdAt": {
+        "__type": "Date",
+        "iso": "2019-04-28T08:34:12.932Z"
+      },
+      "updatedAt": {
+        "__type": "Date",
+        "iso": "2019-04-28T08:34:12.932Z"
+      },
+      "objectId": "5cc5658443e78cb53fe7b731",
+      "__type": "Object",
+      "className": "Todo"
+    }
+  ]
+}
+```
+
+在通过 SDK 进行 RPC 调用时，SDK 会据此自动反序列化。
 你还可以阅读以下云引擎开发指南来获取更多的信息。
 
 * [云引擎 Node.js 环境](leanengine_cloudfunction_guide-node.html)

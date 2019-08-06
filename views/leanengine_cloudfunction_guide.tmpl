@@ -169,7 +169,7 @@ cloudfunc.run('averageStars', movie='夏洛特烦恼')
 
 ### RPC 调用云函数
 
-RPC 调用云函数是指：云引擎会在这种调用方式下自动为 Http Response Body 做序列化，而 SDK 调用之后拿回的返回结果就是一个完整的 `AVObject`。
+RPC 调用云函数是指：云引擎会在这种调用方式下自动为 Http Response Body 做序列化，而 SDK 调用之后拿回的返回结果就是一个完整的 `AVObject` 或包含 `AVObject` 的数据结构。
 
 ```objc
 NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦恼"
