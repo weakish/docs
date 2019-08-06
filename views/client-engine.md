@@ -45,7 +45,7 @@ Client Engine 是 LeanCloud Play 提供的多人在线游戏 Client 托管方案
 
 休眠策略：
 
-{{ leanengine_sleep() }}
+{{ leanengine_sleep(false) }}
 
 ### 商用版
 
