@@ -65,7 +65,11 @@ xxx.example.com.	3600	IN	CNAME	avoscloud.com.
 
 #### JavaScript SDK
 
-##### 存储 SDK（3.0.0 及以上支持，建议升级到 3.11.1 及以上，详情见下）
+##### 存储 SDK
+
+请参考 [SDK 安装指南](sdk_setup-js.html#安装与引用 SDK) 配置。
+
+旧版本的 SDK 请参考以下方法配置（建议使用最新版本的 SDK）：
 
 **>= 3.5.5**（`< 3.11.1` 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败）
 
@@ -90,15 +94,13 @@ AV.init({
 });
 ```
 
-##### 即时通讯 SDK（v5.0.0-alpha.2 及以上支持）
+3.0.0 之前的即时通讯 SDK 不支持自定义域名。
 
+##### 即时通讯 SDK
 
-```js
-new Realtime({
-  // appId, appKey,
-  server: 'https://xxx.example.com',
-};
-```
+请参考 [即时通讯开发指南](realtime-guide-beginner.html#创建 IMClient) 配置。
+
+旧版本的 SDK 请参考以下方法配置（建议使用最新版本的 SDK）：
 
 4.0.0 至 4.3.1 之间的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：
 
@@ -131,14 +133,7 @@ AV.init({
 
 ##### 多人在线对战
 
-```js
-new Client({
-      appId,
-      appKey,
-      userId,
-      playServer: 'https://xxx.example.com',
-});
-```
+请参考 [入门指南](multiplayer-quick-start-js.html#初始化) 或 [开发指南](multiplayer-guide-js.html#初始化) 进行配置。
 
 ##### 微信小程序白名单中增加：
 
