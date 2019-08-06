@@ -258,6 +258,9 @@ AVPush.sendMessageInBackground("message to installation",  pushQuery, new SendCa
 
 ## 深入阅读：如何响应推送消息
 
+注意，以下内容不适用于混合推送。
+混合推送中，需要使用各厂商提供的机制指定特定的 activity 来响应推送消息，详见 [混合推送开发指南](android_mixpush_guide.html)。
+
 ### 消息格式
 具体的消息格式，可参考：[推送消息](push_guide.html#推送消息)。
 对于 Android 设备，默认的消息内容参数支持下列属性：
