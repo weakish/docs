@@ -210,6 +210,13 @@ AV.Cloud.define('querySomething', function(req, res) {
 });
 ```
 
+## RPC 调用云函数时，为什么会返回预期之外的空对象？
+
+使用 Node SDK 定义的云函数，如果返回一个不是 AVObject 的值，比如字符串、数字，RPC 调用得到的是空对象（`{}`）。
+类似地，如果返回一个包含非 AVObject 成员的数组，RPC 调用的结果中该数组的相应成员也会被序列化为 `{}`。
+这个问题将在 Node SDK 的下一个大版本（4.0）中修复。
+目前绕过这一个问题的方法是将返回结果放在对象（`{}`）中返回。 
+
 ## Gitlab 部署常见问题
 
 很多用户自己使用 [Gitlab](http://gitlab.org/) 搭建了自己的源码仓库，有时可能会遇到无法部署到 LeanCloud 的问题，即使设置了 Deploy Key，却仍然要求输入密码。
