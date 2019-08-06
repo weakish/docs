@@ -21,25 +21,16 @@ Android 的消息推送主要依赖客户端的 PushService 服务。PushService
 要接入推送服务，需要依赖 avoscloud-sdk 和 avoscloud-push 两个 library。首先打开 `app` 目录下的 `build.gradle` 进行如下配置：
 
 ```
-android {
-    //为了解决部分第三方库重复打包了META-INF的问题
-    packagingOptions{
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-    }
-    lintOptions {
-        abortOnError false
-    }
-}
-
 dependencies {
-    compile ('com.android.support:support-v4:21.0.3')
 
-    // LeanCloud 基础包
-    compile ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
+implementation('cn.leancloud:realtime-android:{{ version.unified }}') {
+    exclude group: 'com.alibaba', module: 'fastjson'
+    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+}
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+implementation 'com.alibaba:fastjson:1.1.70.android'
+implementation 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
 
-    // 推送与即时通讯需要的包
-    compile ('cn.leancloud.android:avoscloud-push:{{ version.leancloud }}@aar'){transitive = true}
 }
 ```
 
@@ -63,7 +54,7 @@ public class MyLeanCloudApp extends Application {
 请确保你的 `AndroidManifest.xml` 的 `<application>` 中包含如下内容：
 
 ```xml
-<service android:name="com.avos.avoscloud.PushService" />
+<service android:name="cn.leancloud.push.PushService" />
 ```
 
 同时设置了必要的权限：
@@ -77,7 +68,7 @@ public class MyLeanCloudApp extends Application {
 为了让应用能在关闭的情况下也可以收到推送，你需要在 `<application>` 中加入：
 
 ```xml
-<receiver android:name="com.avos.avoscloud.AVBroadcastReceiver">
+<receiver android:name="cn.leancloud.push.AVBroadcastReceiver">
     <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED" />
         <action android:name="android.intent.action.USER_PRESENT" />
@@ -91,43 +82,42 @@ public class MyLeanCloudApp extends Application {
 如果希望支持应用间的推送唤醒机制，即在同一设备上有两个使用了 LeanCloud 推送的应用，应用 A 被杀掉后，当应用 B 被唤醒时可以同时唤醒应用 A 的推送，可以这样配置：
 
 ```xml
-<service android:name="com.avos.avoscloud.PushService" android:exported="true"/>
+<service android:name="cn.leancloud.push.PushService" android:exported="true"/>
 ```
 
 #### 完整的 `AndroidManifest.xml`
 完整的 `AndroidManifest.xml` 文件配置示意如下：
 
 ```xml
-<!-- 基础模块（必须加入以下声明）START -->
+<!-- 基本模块（必须）START -->
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-<!-- 基础模块 END -->
+<!-- 基本模块 END -->
 
 <application
-  ...
+  …
   android:name=".MyLeanCloudApp" >
 
-  <!-- 即时通讯模块、推送（均需要加入以下声明） START -->
-  <!-- 即时通讯模块、推送都要使用 PushService -->
-  <service android:name="com.avos.avoscloud.PushService"/>
-  <receiver android:name="com.avos.avoscloud.AVBroadcastReceiver">
+  <!-- 即时通讯和推送 START -->
+  <!-- 即时通讯和推送都需要 PushService -->
+  <service android:name="cn.leancloud.push.PushService"/>
+  <receiver android:name="cn.leancloud.push.AVBroadcastReceiver">
     <intent-filter>
       <action android:name="android.intent.action.BOOT_COMPLETED"/>
       <action android:name="android.intent.action.USER_PRESENT"/>
       <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
     </intent-filter>
   </receiver>
-  <!-- 即时通讯模块、推送 END -->
+  <!-- 即时通讯和推送 END -->
 
-  <!-- 反馈组件（需要加入以下声明）START -->
+  <!-- 用户反馈 START -->
   <activity
-     android:name="com.avos.avoscloud.feedback.ThreadActivity" >
+     android:name="cn.leancloud.feedback.ThreadActivity" >
   </activity>
-  <!-- 反馈组件 END -->
-</application>
+  <!-- 用户反馈 END -->
 ```
 
 
@@ -144,15 +134,22 @@ AVInstallation.getCurrentInstallation().saveInBackground();
 **这段代码应该在应用启动的时候调用一次**，保证设备注册到 LeanCloud 云端。你可以监听调用回调，获取 installationId 做数据关联。
 
 ```java
-AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
-    public void done(AVException e) {
-        if (e == null) {
-            // 保存成功
-            String installationId = AVInstallation.getCurrentInstallation().getInstallationId();
-            // 关联  installationId 到用户表等操作……
-        } else {
-            // 保存失败，输出错误信息
-        }
+AVInstallation.getCurrentInstallation().saveInBackground().subscribe(new Observer<AVObject>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVObject avObject) {
+        // 关联 installationId 到用户表等操作。
+        String installationId = AVInstallation.getCurrentInstallation().getInstallationId();
+        System.out.println("保存成功：" + installationId );
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("保存失败，错误信息：" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
     }
 });
 ```
@@ -198,24 +195,32 @@ AVInstallation.getCurrentInstallation().saveInBackground();
 
 ## 推送消息
 
-
+ [控制台 > 消息 > 推送 > 设置 > 推送选项](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 中默认选中了 **禁止从客户端进行消息推送**，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。我们建议用户都将此限制启用。如果有需求要从客户端发推送，需要先打开这个限制。
+ 
 ### 推送给所有的设备
 
 ```java
 AVPush push = new AVPush();
-JSONObject object = new JSONObject();
-object.put("alert", "push message to android device directly");
+Map<String, Object> pushData = new HashMap<String, Object>();
+pushData.put("alert","push message to android device directly");
 push.setPushToAndroid(true);
-push.setData(object);
-push.sendInBackground(new SendCallback() {
+push.setData(pushData);
+push.sendInBackground().subscribe(new Observer<JSONObject>() {
     @Override
-    public void done(AVException e) {
-        if (e == null) {
-            // push successfully.
-        } else {
-            // something wrong.
-        }
-    });
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(JSONObject jsonObject) {
+        System.out.println("推送成功" + jsonObject);
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("推送失败，错误信息：" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 
 ### 发送给特定的用户
@@ -229,14 +234,20 @@ AVPush push = new AVPush();
 push.setQuery(pushQuery);
 push.setMessage("Push to channel.");
 push.setPushToAndroid(true);
-push.sendInBackground(new SendCallback() {
+push.sendInBackground().subscribe(new Observer<JSONObject>() {
     @Override
-    public void done(AVException e) {
-        if (e == null) {
-
-        }   else {
-
-        }
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(JSONObject jsonObject) {
+        System.out.println("推送成功" + jsonObject);
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("推送失败，错误信息：" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
     }
 });
 ```
@@ -248,10 +259,20 @@ AVQuery pushQuery = AVInstallation.getQuery();
 // 假设 THE_INSTALLATION_ID 是保存在用户表里的 installationId，
 // 可以在应用启动的时候获取并保存到用户表
 pushQuery.whereEqualTo("installationId", THE_INSTALLATION_ID);
-AVPush.sendMessageInBackground("message to installation",  pushQuery, new SendCallback() {
+AVPush.sendMessageInBackground("installationId1112",pushQuery).subscribe(new Observer() {
     @Override
-    public void done(AVException e) {
-
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(Object object) {
+        System.out.println("推送成功" + object);
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("推送失败，错误信息：" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
     }
 });
 ```
@@ -282,6 +303,7 @@ AVPush.sendMessageInBackground("message to installation",  pushQuery, new SendCa
 PushService 在发出通知栏消息的时候，会根据开发者调用 `PushService.setDefaultPushCallback(context, clazz)` 或者 `PushService.subscribe(context, "channel", clazz)` 设置的回调类，设置通知栏的响应类。
 
 在回调类的 onCreate 函数中开发者则可以通过如下代码获取推送消息的具体数据：
+
 ```
 public class CallbackActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
@@ -317,26 +339,12 @@ public class CallbackActivity extends Activity {
 
 ```java
 public class MyCustomReceiver extends BroadcastReceiver {
-    private static final String TAG = "MyCustomReceiver";
-
     @Override
     public void onReceive(Context context, Intent intent) {
-        LogUtil.log.d(TAG, "Get Broadcat");
-        try {
-            String action = intent.getAction();
-            String channel = intent.getExtras().getString("com.avos.avoscloud.Channel");
-            //获取消息内容
-            JSONObject json = new JSONObject(intent.getExtras().getString("com.avos.avoscloud.Data"));
-
-            Log.d(TAG, "got action " + action + " on channel " + channel + " with:");
-            Iterator itr = json.keys();
-            while (itr.hasNext()) {
-                String key = (String) itr.next();
-                Log.d(TAG, "..." + key + " => " + json.getString(key));
-            }
-        } catch (JSONException e) {
-            Log.d(TAG, "JSONException: " + e.getMessage());
-        }
+        // 获取推送消息数据
+        String message = intent.getStringExtra("com.avoscloud.Data");
+        String channel = intent.getStringExtra("com.avoscloud.Channel");
+        System.out.println("message=" + message + ", channel=" + channel);
     }
 }
 ```
