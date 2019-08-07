@@ -307,7 +307,7 @@ AVPush *push = [[AVPush alloc] init];
 
 ### 选择证书
 
-默认情况下，从客户端发起的推送都是使用你在消息菜单上传的生产证书，如果想使用开发证书，可以通过 `setProductionMode` 方法：
+默认情况下，从客户端发起的推送都是使用你在消息菜单上传的生产证书，如果想使用开发证书，可以通过如下方法：
 
 ```swift
 do {
@@ -402,8 +402,7 @@ AVInstallation *installation = [AVInstallation currentInstallation];
 
 ### 根据查询来推送消息
 
-一旦 Installation 保存了你的应用数据，你可以使用 AVQuery 来查询出设备的一个子集做推送。Installation 的查询跟其他对象的查询没有什么不同，只是使用特殊的静态方法
- `[AVInstallation query]` 创建查询对象：
+一旦 Installation 保存了你的应用数据，你可以使用 Query 来查询出设备的一个子集做推送。
 
 ```swift
 let query = LCQuery(className: "_Installation")
@@ -515,7 +514,7 @@ AVPush *push = [[AVPush alloc] init];
 
 ### 定制通知
 
-如果你不仅想发送一条文本消息，你需要一个 NSDictionary 来打包想发送的数据。这里有一些保留字段具有特殊含义：
+如果你不仅想发送一条文本消息，你可以构建自定义的推送数据。这里有一些保留字段具有特殊含义：
 
 保留字段|说明
 ---|---
@@ -595,7 +594,9 @@ AVPush *push = [[AVPush alloc] init];
 
 当设备关闭或者无法连接到网络的时候，推送通知就无法被送达。如果你有一条时间敏感的推送通知，不希望在太长时间后被用户读到，那么可以设置一个过期时间来避免打扰用户。
 
-AVPush 提供了两个方法来设置通知的过期日期，首先是 `expireAtDate:` 接收 NSDate 来告诉 LeanCloud 不要再去发送通知。
+Push 提供了设置通知的过期日期的方法。
+
+首先是指定过期时间来告诉 LeanCloud 不要再去发送通知。
 
 ```swift
 let expirationDate = Date(timeIntervalSinceNow: 600)
@@ -629,7 +630,7 @@ AVPush *push = [[AVPush alloc] init];
 [push sendPushInBackground];
 ```
 
-这个方法有个隐患，因为设备的时钟是无法保证精确的，你可能得到错误的结果。因此，AVPush 还提供了 `expireAfterTimeInterval` 方法，接收 NSTimeInterval 对象。通知将在指定间隔时间后失效：
+这个方法有个隐患，因为设备的时钟是无法保证精确的，你可能得到错误的结果。因此，Push 还提供了指定时间间隔方法，通知将在指定间隔时间后失效：
 
 ```swift
 let expirationInterval: TimeInterval = 60*60*24*7
