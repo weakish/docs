@@ -1561,7 +1561,11 @@ query.includeACL = YES;
 }];
 ```
 ```swift
-// 暂不支持
+let query = LCQuery(className: "Todo")
+query.includeACL = true
+_ = query.find { (result) in
+    
+}
 ```
 ```java
 AVQuery<AVObject> query = new AVQuery<>("Todo");

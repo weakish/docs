@@ -222,6 +222,22 @@ https://leancloud.cn/1.1/engine/groups/web/productionImage?token=YOURTOKEN&gitTa
 
 [AVCloud setProductionMode:NO]; // 预备环境
 ```
+```swift
+// 默认为生产环境
+
+// 预备环境
+do {
+    let environment: LCApplication.Environment = [.cloudEngineDevelopment]
+    let configuration = LCApplication.Configuration(environment: environment)
+    try LCApplication.default.set(
+        id: "APP_ID",
+        key: "APP_KEY",
+        configuration: configuration
+    )
+} catch {
+    print(error)
+}
+```
 ```js
 AV.setProduction(true); // 生产环境（默认）
 

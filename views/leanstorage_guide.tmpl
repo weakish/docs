@@ -822,8 +822,8 @@ _ = todo.fetch { result in
 ```
 {% endif %}
 
-{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Android / Java" %}
-刷新操作会强行使用云端的属性值覆盖本地的属性。因此如果本地有属性修改，**`{% if platform_name === "Objective-C" %}fetchInBackgroundWithBlock{% endif %}{% if platform_name === "JavaScript" %}fetch{% endif %}{% if platform_name === "Android / Java" %}fetchInBackground{% endif %}` 操作会丢弃这些修改**。为避免这种情况，你可以在刷新时指定 **需要刷新的属性**，这样只有指定的属性会被刷新（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`），其他属性不受影响。
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Android / Java" or platform_name === "Swift" %}
+刷新操作会强行使用云端的属性值覆盖本地的属性。因此如果本地有属性修改，**`{% if platform_name === "Objective-C" %}fetchInBackgroundWithBlock{% endif %}{% if platform_name === "JavaScript" %}fetch{% endif %}{% if platform_name === "Android / Java" %}fetchInBackground{% endif %}{% if platform_name === "Swift" %}fetch{% endif %}` 操作会丢弃这些修改**。为避免这种情况，你可以在刷新时指定 **需要刷新的属性**，这样只有指定的属性会被刷新（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`），其他属性不受影响。
 {% endif %}
 
 {% if platform_name === "Objective-C" %}
@@ -857,6 +857,20 @@ todo.fetchInBackground(keys).subscribe(new Observable<AVObject>() {
     public void onError(Throwable throwable) {}
     public void onComplete() {}
 });
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+let todo = LCObject(className: "Todo", objectId: "582570f38ac247004f39c24b")
+todo.fetch(keys: ["priority", "location"]) { (result) in
+    switch result {
+    case .success:
+        // 只有 priority 和 location 会被获取和刷新
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 {% endif %}
 
@@ -914,7 +928,7 @@ todo.save()
 
 LeanCloud 会自动识别需要更新的属性并将对应的数据发往云端，未更新的属性会保持原样。
 
-{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "Android / Java" %}
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "Android / Java" or platform_name === "Swift" %}
 #### 按条件更新对象
 
 通过传入 `query` 选项，可以按照指定条件去更新对象——当条件满足时，执行更新；条件不满足时，不执行更新并返回 `305` 错误。
@@ -1016,8 +1030,42 @@ account.saveInBackground(option).subscribe(new Observer<AVObject>() {
 });
 ```
 {% endif %}
+{% if platform_name === "Swift" %}
+```swift
+do {
+    let account = LCObject(className: "Account", objectId: "5745557f71cfe40068c6abe0")
+    // 对 balance 原子减少 100
+    let amount = -100
+    try account.increase("balance", by: amount)
+    // 设置条件
+    let query = LCQuery(className: "Account")
+    query.whereKey("balance", .greaterThanOrEqualTo(-amount))
+    let options: [LCObject.SaveOption] = [
+        .query(query),
+        // 操作结束后，返回最新数据。
+        // 如果是新对象，则所有属性都会被返回，
+        // 否则只有更新的属性会被返回。
+        .fetchWhenSave
+    ]
+    account.save(options: options) { (result) in
+        switch result {
+        case .success:
+            if let balance = account["balance"] {
+                print("当前余额为：\(balance)")
+            }
+        case .failure(error: let error):
+            if error.code == 305 {
+                print("余额不足，操作失败！")
+            }
+        }
+    }
+} catch {
+    print(error)
+}
+```
+{% endif %}
 
-{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "Android / Java" %}
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "Android / Java" or platform_name === "Swift" %}
 **`query` 选项只对已存在的对象有效**，不适用于尚未存入云端的对象。
 
 `query` 选项在有多个客户端需要更新同一属性的时候非常有用。相比于通过 `{{ baseQueryClassName }}` 查询 `{{ baseObjectName }}` 再对其进行更新的方法，这样做更加简洁，并且能够避免出现差错。
