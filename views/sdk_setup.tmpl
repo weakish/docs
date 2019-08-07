@@ -385,7 +385,11 @@ var AV = require('leancloud-storage/live-query');
 ```js
 // 存储服务
 var { Query, User } = AV;
-AV.init("{{appid}}", "{{appkey}}");
+AV.init({
+  appId: "{{appid}}",
+  appKey: "{{appkey}}",
+  serverURLs: "https://xxx.example.com",
+});
 // 即时通讯服务
 var { Realtime, TextMessage } = AV;
 ```
@@ -393,6 +397,13 @@ var { Realtime, TextMessage } = AV;
 ### Node.js
 
 <a id="node" name="node"></a>JavaScript SDK 也可以运行在 Node.js 运行环境中。如果希望在云引擎中访问我们的存储服务，请参照 [云引擎快速入门](leanengine_quickstart.html)，使用模板项目中提供的 `leanengine` 包接入存储服务。
+
+注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
+模板项目和[云引擎网站托管开发指南](leanengine_webhosting_guide-node.html)中的示例代码均未配置 API 自定义域名，
+请勿多此一举设置 serverURLs，否则会变成公网访问，影响性能。
+在使用命令行工具（`lean up`）本地调试云引擎托管项目时，虽然是公网访问，但命令行工具会自动设置相应的环境变量，供 SDK 访问 API，所以也不需要设置 serverURLs。
+
+在自己的服务器上使用 Node.js SDK，包括在自己的服务器上通过 Node.js SDK 调用云函数，需要在初始化 SDK 时配置 API 自定义域名。
 
 #### 安装与引用 SDK
 
@@ -541,7 +552,11 @@ import AV from 'leancloud-storage/dist/av-weapp.js';
 
 ```js
 var { Query, User } = AV;
-AV.init("{{appid}}", "{{appkey}}");
+AV.init({
+  appId: "{{appid}}",
+  appKey: "{{appkey}}",
+  serverURLs: "https://xxx.example.com",
+});
 ```
 
 {{ docs.note("目前在 Egret 平台上，我们只提供存储服务的 SDK（不含 LiveQuery 功能）。") }} 

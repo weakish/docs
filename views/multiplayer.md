@@ -37,6 +37,8 @@ const client = new Client({
     appId: {{appid}},
     // 设置 APP Key
     appKey: {{appkey}},
+    // 设置 Server
+    playServer: 'https://xxx.example.com',
     // 设置用户 id
     userId: 'leancloud'
     // 设置游戏版本号，选填，默认 0.0.1，不同版本的玩家不会匹配到同一个房间

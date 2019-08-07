@@ -65,20 +65,26 @@ xxx.example.com.	3600	IN	CNAME	avoscloud.com.
 
 #### JavaScript SDK
 
-##### 存储 SDK（3.0.0 及以上支持，建议升级到 3.11.1 及以上，详情见下）
+##### 存储 SDK
 
-**>= 3.5.5**（`< 3.11.1` 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败）
+请参考 [SDK 安装指南](sdk_setup-js.html#安装与引用 SDK) 配置。
 
-```js
+旧版本的 SDK 请参考以下方法配置（建议使用最新版本的 SDK）：
+
+<details>
+
+<p><code>>= 3.5.5, < 3.11.1</code> 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败</p>
+
+<pre><code>
 AV.init({
   // appId, appKey,
   serverURLs: 'https://xxx.example.com',
 });
-```
+</code></pre>
 
-**>= 3.0.0, < 3.5.5**
+<p><code>>= 3.0.0, < 3.5.5</code></p>
 
-```js
+<pre><code>
 AV.init({
   // appId, appKey,
   serverURLs: {
@@ -89,19 +95,41 @@ AV.init({
   },
 });
 ```
+</code></pre>
 
-##### 即时通讯 SDK（4.0.0 及以上支持，**不支持未启用 HTTPS 的自定义域名**）
+</details>
 
-```js
+3.0.0 之前的即时通讯 SDK 不支持自定义域名。
+
+
+##### 即时通讯 SDK
+
+请参考 [即时通讯开发指南](realtime-guide-beginner.html#创建 IMClient) 配置。
+
+旧版本的 SDK 请参考以下方法配置（建议使用最新版本的 SDK）：
+
+<details>
+
+<p>4.0.0 至 4.3.1 之间的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：</p>
+
+<pre><code>
 new Realtime({
   // appId, appKey,
   server: 'xxx.example.com',
 };
 ```
+<code></pre>
 
-如果使用了 LiveQuery 功能，还需要在初始化的时候额外配置 LiveQuery 模块的域名（3.5.0 及以上支持，**不支持未启用 HTTPS 的自定义域名**）：
+</details>
 
-```js
+4.0.0 之前的即时通讯 SDK 不支持自定义域名。
+
+如果使用了 LiveQuery 功能，建议使用 3.14.0 以上版本的存储 SDK。
+旧版本（3.5.0 至 3.13.2）的 SDK 还需要在初始化的时候额外配置 LiveQuery 模块的域名：
+
+<details>
+
+<pre><code>
 AV.init({
   // appId, appKey,
   // serverURLs,
@@ -111,18 +139,17 @@ AV.init({
     server: 'xxx.example.com',
   }),
 });
-```
+<code></pre>
+
+<p>3.5.0 至 3.13.2 之间的 SDK不支持未启用 HTTPS 的自定义域名。</p>
+
+</details>
+
+3.5.0 之前的存储 SDK 的 LiveQuery 不支持自定义域名。
 
 ##### 多人在线对战
 
-```js
-new Client({
-      appId,
-      appKey,
-      userId,
-      playServer: 'https://xxx.example.com',
-});
-```
+请参考 [入门指南](multiplayer-quick-start-js.html#初始化) 或 [开发指南](multiplayer-guide-js.html#初始化) 进行配置。
 
 ##### 微信小程序白名单中增加：
 
