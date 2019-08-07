@@ -148,4 +148,6 @@ messages = find_all(limit="1000")
 
 目前 Python SDK 只封装了即时通讯 REST API 的部分接口，缺少的功能目前需要通过直接调用 [REST API] 实现（例如，通过 Python 标准库的 `http.client` 调用）。
 
+如果需要在客户端接入即时通讯服务，请使用 Swift、Objective C、Android、JavaScript、C# SDK。
+
 [REST API]: https://leancloud.cn/docs/realtime_rest_api_v2.html

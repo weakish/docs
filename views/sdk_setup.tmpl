@@ -199,7 +199,7 @@ implementation 'cn.leancloud:storage-core:{{ version.unified }}'
 如果是 Android 项目，则换成以下这些包：
 
 ```groovy
-implementation 'cn.leancloud:storage-android:{{ version.unified }}' {
+implementation ('cn.leancloud:storage-android:{{ version.unified }}'){
     exclude group: 'com.alibaba', module: 'fastjson'
     exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
 }
@@ -786,6 +786,7 @@ leancloud.init("{{appid}}", "{{appkey}}")
 use \LeanCloud\Client;
 // 参数依次为 App ID、App Key、Master Key
 Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
+{{host}} = "xxx.example.com" // 假定绑定的 API 自定义域名为 xxx.example.com
 Client::setServerUrl("https://{{host}}"); // 0.7.0 及以上版本支持
 ```
 {% endif %}
@@ -959,6 +960,8 @@ AVRealtime.WebSocketLog(Debug.Log);
 ```sh
 ping "{{host}}"
 ```
+
+`{{host}}` 为绑定的 API 自定义域名。
 
 如果当前网路正常将会得到如下响应：
 
