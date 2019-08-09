@@ -4952,19 +4952,6 @@ LeanCloud 即时通讯组件也使用 `{{ fileObjectName }}` 来保存消息的�
 你也可以根据项目需要，允许所有的 HTTP 访问，更多可参考 [iOS 9 适配系列教程](https://github.com/ChenYilong/iOS9AdaptationTips)。
 {% endif %}
 
-### 设置自定义文件域名
-
-LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地访问到存储在云端的文件。但由于受网络法规的管控与限制，我们无法 100% 保证该公用域名随时可用。因此，强烈建议开发者 **使用自定义域名来访问自己的文件**，以避免公用域名不可用之时应用的体验会受到影响。请前往 [控制台 > 存储 > 设置 > 自定义文件域名](/dashboard/storage.html?appid={{appid}}#/storage/conf) 设置自定义域名。
-
-注意，绑定域名的操作是不可逆的。绑定域名后无法取消绑定，但可以更换绑定的域名。
-
-绑定自定义文件域名时，可以选择是否启用 HTTPS：
-
-- 不启用 HTTPS，则客户端只能通过 HTTP 访问。
-- 启用 HTTPS 后，客户端同时可以通过 HTTPS 和 HTTP 访问文件。但是，受限于文件服务提供商，国内节点应用，无论客户端使用 HTTP URL 还是 HTTPS URL 访问：
-  - 启用 HTTPS 域名的自定义文件域名的流量均按照 HTTPS 流量计费。
-  - 同理，应用控制台的文件流量统计也总是归入 HTTPS 流量。
-
 ### CDN 加速
 
 {{ data.cdn(true, fileObjectName) }}
