@@ -67,6 +67,13 @@ xxx.example.com.	3600	IN	CNAME	`leancloud.example`
 
 之前使用 LeanCloud 公共文件域名的旧应用，在绑定文件域名后，现存的使用公共域名的 URL 仍然可以访问。
 
+### 云引擎域名
+
+使用云引擎网站托管服务的应用，即申请了[云引擎内置域名](leanengine_webhosting_guide-node.html#设置域名)的应用，需要前往[应用控制台 > 账号设置 > 域名绑定](/dashboard/settings.html#/setting/domainbind)绑定云引擎域名。
+
+如前所述，仅使用云函数的应用，无需绑定云引擎域名。
+但是，需要绑定 API 域名。
+
 ## 自定义域名的适用范围
 
 自定义域名目前可用于访问以下服务：
