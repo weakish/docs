@@ -143,7 +143,21 @@ AV.User.logIn('username', 'password').then(function(user) {
 }).catch(console.error.bind(console));
 ```
 ```swift
-// 暂不支持
+_ = LCUser.logIn(username: "username", password: "password") { (result) in
+    switch result {
+    case .success(object: let user):
+        do {
+            let client = try IMClient(user: user)
+            client.open(completion: { (result) in
+                // 执行其他逻辑
+            })
+        } catch {
+            print(error)
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 // 以 AVUser 的用户名和密码登录到 LeanCloud 云端
