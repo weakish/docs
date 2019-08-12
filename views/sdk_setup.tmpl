@@ -1160,4 +1160,12 @@ dependencies {
 ```
 
 第二种情况则是由在 v3.13.+ 以后 Android SDK 引入了 Google ProtoBuf 来提高即时通讯模块的传输效率，随之而来的是类和方法数量的激增，超过了 Android 上存在着方法总数不能超过 65k 的上限而导致的。这个时候我们可以采用 Google 提出的 [解决方案](http://developer.android.com/intl/zh-cn/tools/building/multidex.html#about) 来解决这个问题。
+
+### 运行时遇到 `NoClassDefFoundError: java.util.Objects` 异常
+
+Android 4.4 之前（不含）不支持 `java.util.Objects`。
+如您的应用项目需要兼容 Android 4.4 之前的设备，请勿从[旧版 Android SDK]升级至 Java Unified SDK。
+
+[旧版 Android SDK]: https://github.com/leancloud/android-sdk-all/
+
 {% endif %}
