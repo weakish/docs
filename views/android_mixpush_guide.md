@@ -57,8 +57,8 @@ HMS SDK 可以直接通过 jar 包加入，解压 HMS SDK 目录如下表所示�
 
 目录 | 说明 | 使用方式
 ----|----|----
-libs/ | 包含 HMS 所有功能的 jar 包。通用包不再按照业务功能分成多个 jar 包，包含帐号、支付、消息、推送、游戏服务。 |请直接将 libs 目录拷贝到应用工程根目录
-res/ | HMS SDK 需要使用的资源目录，包含多国语言。应用如果不需要集成多种语言的，可以适当裁剪。但是必须保留默认语言和简体中文。 | 请直接将 res 目录拷贝到应用工程目录
+libs/ | 包含 HMS 所有功能的 jar 包。通用包不再按照业务功能分成多个 jar 包，包含帐号、支付、消息、推送、游戏服务。 |请直接将 libs 目录下的文件拷贝到应用工程 libs 目录
+res/ | HMS SDK 需要使用的资源目录，包含多国语言。应用如果不需要集成多种语言的，可以适当裁剪。但是必须保留默认语言和简体中文。 | 请直接将 res 目录下的文件拷贝到应用工程 res 目录
 assets/ | HMS SDK 请求华为服务器需要使用的证书文件 | 请直接将 assets 目录拷贝到应用工程根目录
 
 HMS Agent SDK 需要下载解压之后把源码完全拷贝进入工程。HMS Agent SDK 包含帐号、支付、消息、推送、游戏等功能，如果只打算使用其中的推送功能，可以使用 HMS Agent SDK 压缩包中自带的 GetHMSAgent 脚本删除不需要的文件，具体步骤如下：
@@ -75,14 +75,24 @@ HMS Agent SDK 需要下载解压之后把源码完全拷贝进入工程。HMS Ag
 
 #### 修改应用 manifest 配置
 
-首先导入 `avoscloud-mixpush` 包，修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+首先导入 `mixpush-android` 包，修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
 ```
 dependencies {
-    compile ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar'){
-        exclude group:'cn.leancloud.android', module:'hmsagent'
-    }
+//混合推送需要的包
+implementation('cn.leancloud:mixpush-android:{{ version.leancloud }}@aar') {
+    exclude group: 'com.alibaba', module: 'fastjson'
+    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+    exclude group:'cn.leancloud', module:'huawei-hmsagent'
 }
+//即时通信与推送需要的包
+implementation ('cn.leancloud:realtime-android:{{ version.leancloud }}'){
+    exclude group: 'com.alibaba', module: 'fastjson'
+    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+}
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+implementation 'com.alibaba:fastjson:1.1.70.android'
+implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 ```
 
 然后配置相关 AndroidManifest，添加 Permission：
@@ -190,7 +200,7 @@ dependencies {
 
   <!-- LeanCloud 自定义 receiver -->
   <!-- ${PACKAGE_NAME} 要替换上您应用的包名 -->
-  <receiver android:name="com.avos.avoscloud.AVHMSPushMessageReceiver"
+  <receiver android:name="cn.leancloud.AVHMSPushMessageReceiver"
   android:permission="${PACKAGE_NAME}.permission.PROCESS_PUSH_MSG">
       <intent-filter>
          <!-- 必须,用于接收token -->
@@ -302,11 +312,23 @@ LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为：
 
 ### 接入 SDK
 
-首先导入 `avoscloud-mixpush` 包。修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
+首先导入 `mixpush-android` 包。修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
 
 ```
 dependencies {
-    compile ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar')
+//混合推送需要的包
+implementation('cn.leancloud:mixpush-android:{{ version.leancloud }}@aar') {
+    exclude group: 'com.alibaba', module: 'fastjson'
+    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+}
+//即时通信与推送需要的包
+implementation ('cn.leancloud:realtime-android:{{ version.leancloud }}'){
+    exclude group: 'com.alibaba', module: 'fastjson'
+    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+}
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+implementation 'com.alibaba:fastjson:1.1.70.android'
+implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
 
@@ -368,7 +390,7 @@ dependencies {
 </receiver>
 
 <receiver
-  android:name="com.avos.avoscloud.AVMiPushMessageReceiver"
+  android:name="cn.leancloud.AVMiPushMessageReceiver"
   android:exported="true">
   <intent-filter>
       <action android:name="com.xiaomi.mipush.RECEIVE_MESSAGE"/>
@@ -413,12 +435,25 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用小
 
 ### 接入 SDK
 
-首先导入 `avoscloud-mixpush` 包。修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
+首先导入 `mixpush-android` 包。修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
 
 ```
 dependencies {
-    compile ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar')
-    compile ('com.meizu.flyme.internet:push-internal:3.6.+@aar')
+//魅族推送需要的包
+implementation 'com.meizu.flyme.internet:push-internal:3.6.+@aar'
+//混合推送需要的包
+implementation('cn.leancloud:mixpush-android:{{ version.leancloud }}@aar') {
+    exclude group: 'com.alibaba', module: 'fastjson'
+    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+}
+//即时通信与推送需要的包
+implementation ('cn.leancloud:realtime-android:{{ version.leancloud }}'){
+    exclude group: 'com.alibaba', module: 'fastjson'
+    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+}
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+implementation 'com.alibaba:fastjson:1.1.70.android'
+implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
 
@@ -442,7 +477,7 @@ dependencies {
 添加 service 与 receiver。开发者要将其中的 `<包名>` 替换为自己的应用对应的 package：
 
 ```xml
-<receiver android:name="com.avos.avoscloud.AVFlymePushMessageReceiver">
+<receiver android:name="cn.leancloud.AVFlymePushMessageReceiver">
     <intent-filter>
         <!-- 接收push消息 -->
         <action android:name="com.meizu.flyme.push.intent.MESSAGE" />
