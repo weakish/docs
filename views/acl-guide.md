@@ -208,11 +208,13 @@ _ = query.get("55f1572460b2ce30e8b7afde") { result in
 }
 ```
 ```java
-  AVQuery<AVUser> query = AVUser.getQuery();
-  query.getInBackground("55f1572460b2ce30e8b7afde", new FindCallback<AVUser>() {
+AVQuery<AVUser> query = AVUser.getQuery();
+query.getInBackground("55f1572460b2ce30e8b7afde").subscribe(new Observer<AVUser>() {
     @Override
-    public void done(AVUser anotherUser, AVException e) {
-      if(e == null){
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVUser anotherUser) {
         // 新建一个帖子对象
         AVObject post= new AVObject("Post");
         post.put("title","这是我的第二条发言，谢谢大家！");
@@ -229,11 +231,15 @@ _ = query.get("55f1572460b2ce30e8b7afde") { result in
 
         //保存到云端
         post.saveInBackground();
-      } else {
-        // handle exception
-      }
     }
-  });
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("errorMessage:" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+}
 ```
 ```js
   // 创建一个针对 User 的查询
@@ -525,27 +531,38 @@ do {
 ```
 ```java
   // 新建一个帖子对象
-  final AVObject post = new AVObject("Post");
-  post.put("title", "夏天吃什么夜宵比较爽？");
-  post.put("content", "求推荐啊！");
+final AVObject post = new AVObject("Post");
+post.put("title", "夏天吃什么夜宵比较爽？");
+post.put("content", "求推荐啊！");
 
-  AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
-  // 假设上一步创建的 Administrator 角色的 objectId 为 55fc0eb700b039e44440016c
-  roleQuery.getInBackground("55fc0eb700b039e44440016c", new GetCallback<AVRole>() {
+AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
+// 假设上一步创建的 Administrator 角色的 objectId 为 55fc0eb700b039e44440016c
+roleQuery.getInBackground("55fc0eb700b039e44440016c").subscribe(new Observer<AVRole>() {
     @Override
-    public void done(AVRole avRole, AVException e) {
-      //新建一个 ACL 实例
-      AVACL acl = new AVACL();
-      acl.setPublicReadAccess(true);// 设置公开的「读」权限，任何人都可阅读
-      acl.setRoleWriteAccess(avRole, true);// 为 Administrator 「写」权限
-      acl.setWriteAccess(AVUser.getCurrentUser(), true);// 为当前用户赋予「写」权限
-
-      // 以上代码的效果就是：只有 Post 作者（当前用户）和拥有 Administrator 角色的用户可以修改这条 Post，而所有人都可以读取这条 Post
-      post.setACL(acl);
-      post.saveInBackground();
+    public void onSubscribe(Disposable d) {
     }
-  });
+    @Override
+    public void onNext(AVRole avRole) {
+        //新建一个 ACL 实例
+        AVACL acl = new AVACL();
+        acl.setPublicReadAccess(true);// 设置公开的「读」权限，任何人都可阅读
+        acl.setRoleWriteAccess(avRole.toString(), true);// 为 Administrator 「写」权限
+        acl.setWriteAccess(AVUser.getCurrentUser(), true);// 为当前用户赋予「写」权限
+
+        // 以上代码的效果就是：只有 Post 作者（当前用户）和拥有 Administrator 角色的用户可以修改这条 Post，而所有人都可以读取这条 Post
+        post.setACL(acl);
+        post.saveInBackground();
+    }
+    @Override
+    public void onError(Throwable e) {
+    	System.out.println("errorMessage:" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
+
 ```js
   // 新建一个帖子对象
   var Post = AV.Object.extend('Post');
@@ -692,32 +709,50 @@ _ = roleQuery.find { result in
 }
 ```
 ```java
-  final AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
-  roleQuery.whereEqualTo("name","Administrator");
-  roleQuery.findInBackground(new FindCallback<AVRole>() {
+final AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
+roleQuery.whereEqualTo("name","Administrator");
+roleQuery.findInBackground().subscribe(new Observer<List<AVRole>>() {
     @Override
-    public void done(List<AVRole> list, AVException e) {
-      // 如果角色存在
-      if (list.size() > 0){
-        final AVRole administratorRole = list.get(0);
-        roleQuery.whereEqualTo("users",AVUser.getCurrentUser());
-        roleQuery.findInBackground(new FindCallback<AVRole>() {
-          @Override
-          public void done(List<AVRole> list, AVException e) {
-            if (list.size()  == 0){
-              administratorRole.getUsers().add(AVUser.getCurrentUser());// 赋予角色
-              administratorRole.saveInBackground();
-            }
-          }
-        });
-      }else {
-        // 角色不存在，就新建角色
-        AVRole administratorRole = new AVRole("Administrator");
-        administratorRole.getUsers().add(AVUser.getCurrentUser());// 赋予角色
-        administratorRole.saveInBackground();
-      }
+    public void onSubscribe(Disposable d) {
     }
-  });
+    @Override
+    public void onNext(List<AVRole> avRoles) {
+        // 如果角色存在
+        if (avRoles.size() > 0){
+            final AVRole administratorRole = avRoles.get(0);
+            roleQuery.whereEqualTo("users",AVUser.getCurrentUser());
+            roleQuery.findInBackground().subscribe(new Observer<List<AVRole>>() {
+                @Override
+                public void onSubscribe(Disposable d) { }
+                @Override
+                public void onNext(List<AVRole> list) {
+                    if (list.size()  == 0){
+                        administratorRole.getUsers().add(AVUser.getCurrentUser());// 赋予角色
+                        administratorRole.saveInBackground();
+                    }else {
+                        System.out.println("已经拥有 Administrator 角色了。");
+                    }
+                }
+                @Override
+                public void onError(Throwable e) { }
+                @Override
+                public void onComplete() { }
+            });
+        }else {
+            // 角色不存在，就新建角色
+            AVRole administratorRole = new AVRole("Administrator");
+            administratorRole.getUsers().add(AVUser.getCurrentUser());// 赋予角色
+            administratorRole.saveInBackground();
+        }
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("errorMessage:" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 ```js
   // 构建 AV.Role 的查询
@@ -837,28 +872,43 @@ _ = roleQuery.find { result in
 }
 ```
 ```java
-  final AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
-  roleQuery.whereEqualTo("name","Moderator");
-  roleQuery.findInBackground(new FindCallback<AVRole>() {
+final AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
+roleQuery.whereEqualTo("name","Moderator");
+roleQuery.findInBackground().subscribe(new Observer<List<AVRole>>() {
     @Override
-    public void done(List<AVRole> list, AVException e) {
-      if(list.size() > 0){
-        final AVRole moderatorRole= list.get(0);
-        roleQuery.whereEqualTo("users",AVUser.getCurrentUser());
-        roleQuery.findInBackground(new FindCallback<AVRole>() {
-          @Override
-          public void done(List<AVRole> list, AVException e) {
-            // 如果该用户确实拥有该角色，那么就剥夺
-            if(list.size() > 0) {
-              moderatorRole.getUsers().remove(AVUser.getCurrentUser());
-              moderatorRole.saveInBackground();
-            }
-          }
-        });
-      } else {
-      }
+    public void onSubscribe(Disposable d) { }
+    @Override
+    public void onNext(List<AVRole> avRoles) {
+        if(avRoles.size() > 0){
+            final AVRole moderatorRole= avRoles.get(0);
+            roleQuery.whereEqualTo("users",AVUser.getCurrentUser());
+            roleQuery.findInBackground().subscribe(new Observer<List<AVRole>>() {
+                @Override
+                public void onSubscribe(Disposable d) { }
+                @Override
+                public void onNext(List<AVRole> list) {
+                    // 如果该用户确实拥有该角色，那么就剥夺
+                    if(list.size() > 0) {
+                        moderatorRole.getUsers().remove(AVUser.getCurrentUser());
+                        moderatorRole.saveInBackground();
+                    }
+                }
+                @Override
+                public void onError(Throwable e) { }
+                @Override
+                public void onComplete() { }
+            });
+        }
     }
-  });
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("errorMessage:" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+
+    }
+});
 ```
 ```js
   // 构建 AV.Role 的查询
@@ -962,22 +1012,38 @@ _ = roleQuery.find { result in
 }
 ```
 ```java
-  AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
-  roleQuery.whereEqualTo("name", "Administrator");
-  roleQuery.findInBackground(new FindCallback<AVRole>() {
+AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
+roleQuery.whereEqualTo("name", "Administrator");
+roleQuery.findInBackground().subscribe(new Observer<List<AVRole>>() {
     @Override
-    public void done(List<AVRole> list, AVException e) {
-      AVRole administrator = list.get(0);
-      AVRelation userRelation= administrator.getUsers();
-      AVQuery<AVUser> query=userRelation.getQuery();
-      query.findInBackground(new FindCallback<AVUser>() {
-        @Override
-        public void done(List<AVUser> list, AVException e) {
-          // list 就是拥有该角色权限的所有用户了。
-        }
-      });
+    public void onSubscribe(Disposable d) {
     }
-  });
+    @Override
+    public void onNext(List<AVRole> avRoles) {
+        AVRole administrator = avRoles.get(0);
+        AVRelation userRelation= administrator.getUsers();
+        AVQuery<AVUser> query=userRelation.getQuery();
+        query.findInBackground().subscribe(new Observer<List<AVUser>>() {
+            @Override
+            public void onSubscribe(Disposable d) { }
+            @Override
+            public void onNext(List<AVUser> list) {
+                // list 就是拥有该角色权限的所有用户了。
+            }
+            @Override
+            public void onError(Throwable e) { }
+            @Override
+            public void onComplete() { }
+        });
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("errorMessage:" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 ```js
   // 新建针对 Role 的查询
@@ -1053,22 +1119,42 @@ if let user = LCApplication.default.currentUser {
 }
 ```
 ```java
-  // 第一种方式是通过 AVUser 内置的接口：
-  user.getRolesInBackground(new FindCallback<AVRole>() {
+ // 第一种方式是通过 AVUser 内置的接口：
+AVUser user = AVUser.getCurrentUser();
+user.getRolesInBackground().subscribe(new Observer<List<AVRole>>() {
     @Override
-    public void done(List<AVRole> avRoles, AVException avException) {
-        // avRoles 表示这个用户拥有的角色
-    });
-    
-  // 第二种方式是通过构建 AVQuery：
-  AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
-  roleQuery.whereEqualTo("users",user);
-  roleQuery.findInBackground(new FindCallback<AVRole>() {
-    @Override
-    public void done(List<AVRole> list, AVException e) {
-      // list 就是一个 AVRole 的 List，这些 AVRole 就是当前用户所在拥有的角色
+    public void onSubscribe(Disposable d) {
     }
-  });
+    @Override
+    public void onNext(List<AVRole> avRoles) {
+        // avRoles 表示这个用户拥有的角色
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+
+// 第二种方式是通过构建 AVQuery：
+AVQuery<AVRole> roleQuery = new AVQuery<AVRole>("_Role");
+roleQuery.whereEqualTo("users",user);
+roleQuery.findInBackground().subscribe(new Observer<List<AVRole>>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(List<AVRole> list) {
+        // list 就是一个 AVRole 的 List，这些 AVRole 就是当前用户所在拥有的角色
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 ```js
    //第一种是通过 AV.User 的内置接口：
@@ -1126,15 +1212,24 @@ _ = userQuery?.find { result in
 }
 ```
 ```java
-  AVRole moderatorRole= new AVRole("Moderator"); //根据 id 查询或者根据 name 查询出一个实例
-  AVRelation<AVUser> userRelation= moderatorRole.getUsers();
-  AVQuery<AVUser> userQuery = userRelation.getQuery();
-  userQuery.findInBackground(new FindCallback<AVUser>() {
+AVRole moderatorRole= new AVRole("Moderator"); //根据 id 查询或者根据 name 查询出一个实例
+AVRelation<AVUser> userRelation= moderatorRole.getUsers();
+AVQuery<AVUser> userQuery = userRelation.getQuery();
+userQuery.findInBackground().subscribe(new Observer<List<AVUser>>() {
     @Override
-    public void done(List<AVUser> list, AVException e) {
-      // list 就是拥有该角色权限的所有用户了。
+    public void onSubscribe(Disposable d) {
     }
-  });
+    @Override
+    public void onNext(List<AVUser> list) {
+        // list 就是拥有该角色权限的所有用户了。
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 ```js
   var roleQuery = new AV.Query(AV.Role);
@@ -1323,48 +1418,56 @@ do {
 }
 ```
 ```java
-    // 新建 3个角色实例
-  AVRole photographicRole = // 创建或者创建 Photographic 角色
-  AVRole mobileRole = // 创建或者创建 Mobile 角色
-  AVRole digitalRole = // 创建或者创建 Digital 角色
+   // 新建 3 个角色实例
+AVRole photographicRole; //创建或者从服务端查询出 Photographic 角色实例
+AVRole mobileRole; //创建或从服务端查询出 Mobile 角色实例
+AVRole digitalRole; //创建或从服务端查询出 Digital 角色实例
 
-  // photographicRole 和 mobileRole 继承了 digitalRole
-  digitalRole.getRoles().add(photographicRole);
-  digitalRole.getRoles().add(mobileRole);
+// photographicRole 和 mobileRole 继承了 digitalRole
+digitalRole.getRoles().add(photographicRole);
+digitalRole.getRoles().add(mobileRole);
 
-  digitalRole.saveInBackground(new SaveCallback() {
+digitalRole.saveInBackground().subscribe(new Observer<AVObject>() {
     @Override
-    public void done(AVException e) {
-
-      //新建 3 篇贴子，分别发在不同的板块上
-      AVObject photographicPost= new AVObject ("Post");
-      AVObject mobilePost = new AVObject("Post");
-      AVObject digitalPost = new AVObject("Post");
-      //.....此处省略一些具体的值设定
-
-      AVACL photographicACL = new AVACL();
-      photographicACL.setPublicReadAccess(true);
-      photographicACL.setRoleWriteAccess(photographicRole, true);
-      photographicPost.setACL(photographicACL);
-
-      AVACL mobileACL = new AVACL();
-      mobileACL.setPublicReadAccess(true);
-      mobileACL.setRoleWriteAccess(mobileRole, true);
-      mobilePost.setACL(mobileACL);
-
-      AVACL digitalACL = new AVACL();
-      digitalACL.setPublicReadAccess(true);
-      digitalACL.setRoleWriteAccess(digitalRole, true);
-      digitalPost.setACL(digitalACL);
-
-      // photographicPost 只有 photographicRole 可以读写
-      // mobilePost 只有 mobileRole 可以读写
-      // 而 photographicRole，mobileRole，digitalRole 均可以对 digitalPost 进行读写
-      photographicPost.saveInBackground();
-      mobilePost.saveInBackground();
-      digitalPost.saveInBackground();
+    public void onSubscribe(Disposable d) {
     }
-  });
+    @Override
+    public void onNext(AVObject avObject) {
+        //新建 3 篇贴子，分别发在不同的板块上
+        AVObject photographicPost= new AVObject ("Post");
+        AVObject mobilePost = new AVObject("Post");
+        AVObject digitalPost = new AVObject("Post");
+        //.....此处省略一些具体的值设定
+
+        AVACL photographicACL = new AVACL();
+        photographicACL.setPublicReadAccess(true);
+        photographicACL.setRoleWriteAccess(photographicRole, true);
+        photographicPost.setACL(photographicACL);
+
+        AVACL mobileACL = new AVACL();
+        mobileACL.setPublicReadAccess(true);
+        mobileACL.setRoleWriteAccess(mobileRole, true);
+        mobilePost.setACL(mobileACL);
+
+        AVACL digitalACL = new AVACL();
+        digitalACL.setPublicReadAccess(true);
+        digitalACL.setRoleWriteAccess(digitalRole, true);
+        digitalPost.setACL(digitalACL);
+
+        // photographicPost 只有 photographicRole 可以读写
+        // mobilePost 只有 mobileRole 可以读写
+        // 而 photographicRole，mobileRole，digitalRole 均可以对 digitalPost 进行读写
+        photographicPost.saveInBackground();
+        mobilePost.saveInBackground();
+        digitalPost.saveInBackground();
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 ```js
   //新建摄影器材版主角色
@@ -1570,11 +1673,19 @@ _ = query.find { (result) in
 ```java
 AVQuery<AVObject> query = new AVQuery<>("Todo");
 query.includeACL(true);
-query.findInBackground(new FindCallback<AVObject>() {
-     @Override
-     public void done(List<AVObject> list, AVException e) {
-                
-     }
+query.findInBackground().subscribe(new Observer<List<AVObject>>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(List<AVObject> avObjects) {
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
 });
 ```
 ```js
