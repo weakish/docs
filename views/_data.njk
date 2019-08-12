@@ -1,6 +1,4 @@
-{% from 'views/_helper.njk' import
-  alert
-%}
+{% from 'views/_helper.njk' import alert %}
 
 {% macro limitationsOnCreatingClassIndex() -%}
 当一个数据表的记录数超过 1 万时，开发者将无法自行为其创建索引（此前已创建的索引仍然会对超过 1 万条的数据生效）。商用版用户需要通过 [工单服务](https://leanticket.cn/tickets) 向我们提交创建申请（选择「建立索引」分类），开发版用户需要先升级到商用版才能提交创建申请。
