@@ -39,7 +39,7 @@ LeanCloud 服务涉及以下三种自定义域名：
 那么对应的 DNS Zone 记录为：
 
 ```
-xxx.example.com.	3600	IN	CNAME	`leancloud.example`
+xxx.example.com.	3600	IN	CNAME	leancloud.example.
 ```
 
 其中 3600 为 TTL，可根据自己的需要设置。
