@@ -9,7 +9,12 @@
 
 
 ### 实时对战 Demo
-这款 Demo 是类似于《球球大作战》这种类型游戏的精简版，使用[多人在线对战](multiplayer.html)来实现，实现语言为 JavaScript，花费时间约 8 天。该 Demo 主要演示了移动同步相关的逻辑，详情请点击[项目地址](https://github.com/onerain88/BallBattle)。
+这款 Demo 是类似于《球球大作战》这种类型游戏的精简版，使用[多人在线对战](multiplayer.html)来实现，分别使用 Cocos Creator（JavaScript） 和 Unity（C#） 实现，花费时间约 8 天。该 Demo 主要演示了移动同步相关的逻辑。详情请点击：
+
+[Cocos Creator 项目地址](https://github.com/onerain88/BallBattle)
+
+[Unity 项目地址](https://github.com/onerain88/BallBattle-Unity)
+
 
 ## 弱联网单机游戏
 

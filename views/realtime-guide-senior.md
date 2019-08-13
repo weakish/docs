@@ -166,7 +166,38 @@ realtime.createIMClient('Tom', {
 });
 ```
 ```swift
-// 暂不支持
+class SignatureDelegator: IMSignatureDelegate {
+    
+    func getClientOpenSignature(completion: (IMSignature) -> Void) {
+        // 基于 LeanCloud 云引擎的获取客户端登录签名的函数
+    }
+    
+    func client(_ client: IMClient, action: IMSignature.Action, signatureHandler: @escaping (IMClient, IMSignature?) -> Void) {
+        switch action {
+        case .open:
+            self.getClientOpenSignature { (signature) in
+                signatureHandler(client, signature)
+            }
+        case .createConversation(memberIDs: _):
+            break
+        case .add(memberIDs: _, toConversation: _):
+            break
+        case .remove(memberIDs: _, fromConversation: _):
+            break
+        case .conversationBlocking(_, blockedMemberIDs: _):
+            break
+        case .conversationUnblocking(_, unblockedMemberIDs: _):
+            break
+        }
+    }
+}
+
+do {
+    let signatureDelegator = SignatureDelegator()
+    let client = try IMClient(ID: "Tom", signatureDelegate: signatureDelegator)
+} catch {
+    print(error)
+}
 ```
 ```objc
 // AVIMSignatureDataSource 接口的主要方法
@@ -354,7 +385,21 @@ AV.User.logIn('username', 'password').then(function(user) {
 }).catch(console.error.bind(console));
 ```
 ```swift
-// 暂不支持
+_ = LCUser.logIn(username: "username", password: "password") { (result) in
+    switch result {
+    case .success(object: let user):
+        do {
+            let client = try IMClient(user: user)
+            client.open(completion: { (result) in
+                // 执行其他逻辑
+            })
+        } catch {
+            print(error)
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 // 以 AVUser 的用户名和密码登录到 LeanCloud 内建账户系统
@@ -426,7 +471,14 @@ LeanCloud 内置账户系统与即时通讯服务可以共享登录签名信息�
 async updateMemberRole(memberId, role);
 ```
 ```swift
-// 暂不支持
+/// Updating role of the member in the conversaiton.
+///
+/// - Parameters:
+///   - role: The role will be updated.
+///   - memberID: The ID of the member who will be updated.
+///   - completion: Result of callback.
+/// - Throws: If role parameter is owner, throw error.
+public func update(role: MemberRole, ofMember memberID: String, completion: @escaping (LCBooleanResult) -> Void) throws
 ```
 ```objc
 /**
@@ -468,7 +520,14 @@ public void updateMemberRole(final String memberId, final ConversationMemberRole
   async getAllMemberInfo({ noCache = false } = {})
   ```
   ```swift
-  // 暂不支持
+  /// Fetching the table of member infomation in the conversation.
+  /// The result will be cached by the property `memberInfoTable`.
+  ///
+  /// - Parameter completion: Result of callback.
+  public func fetchMemberInfoTable(completion: @escaping (LCBooleanResult) -> Void)
+
+  /// The table of member infomation.
+  public var memberInfoTable: [String : MemberInfo]? { get }
   ```
   ```objc
   /**
@@ -510,6 +569,14 @@ public void updateMemberRole(final String memberId, final ConversationMemberRole
    * @return {Promise.<ConversationMemberInfo>} 指定成员的对话属性
    */
   async getMemberInfo(memberId);
+  ```
+  ```swift
+  /// Get infomation of one member in the conversation.
+  ///
+  /// - Parameters:
+  ///   - memberID: The ID of the member.
+  ///   - completion: Result of callback.
+  public func getMemberInfo(by memberID: String, completion: @escaping (LCGenericResult<MemberInfo?>) -> Void)
   ```
   ```objc
   /**
@@ -566,7 +633,37 @@ async unmuteMembers(clientIds);
 async queryMutedMembers({ limit, next } = {});
 ```
 ```swift
-// 暂不支持
+/// Muting members in the conversation.
+///
+/// - Parameters:
+///   - members: The members will be muted.
+///   - completion: Result of callback.
+/// - Throws: When parameter `members` is empty.
+public func mute(members: Set<String>, completion: @escaping (MemberResult) -> Void) throws
+
+/// Unmuting members in the conversation.
+///
+/// - Parameters:
+///   - members: The members will be unmuted.
+///   - completion: Result of callback.
+/// - Throws: When parameter `members` is empty.
+public func unmute(members: Set<String>, completion: @escaping (MemberResult) -> Void) throws
+
+/// Get the muted members in the conversation.
+///
+/// - Parameters:
+///   - limit: Count limit.
+///   - next: Offset.
+///   - completion: Result of callback.
+/// - Throws: When parameter `limit` out of range.
+public func getMutedMembers(limit: Int = 50, next: String? = nil, completion: @escaping (LCGenericResult<MutedMembersResult>) -> Void) throws
+
+/// Check if one member has been muted in the conversation.
+///
+/// - Parameters:
+///   - ID: The ID of member.
+///   - completion: Result of callback.
+public func checkMuting(member ID: String, completion: @escaping (LCGenericResult<Bool>) -> Void)
 ```
 ```objc
 /**
@@ -667,7 +764,37 @@ async unblockMembers(clientIds);
 async queryBlockedMembers({ limit, next } = {});
 ```
 ```swift
-// 暂不支持
+/// Blocking members in the conversation.
+///
+/// - Parameters:
+///   - members: The members will be blocked.
+///   - completion: Result of callback.
+/// - Throws: When parameter `members` is empty.
+public func block(members: Set<String>, completion: @escaping (MemberResult) -> Void) throws
+
+/// Unblocking members in the conversation.
+///
+/// - Parameters:
+///   - members: The members will be unblocked.
+///   - completion: Result of callback.
+/// - Throws: When parameter `members` is empty.
+public func unblock(members: Set<String>, completion: @escaping (MemberResult) -> Void) throws
+
+/// Get the blocked members in the conversation.
+///
+/// - Parameters:
+///   - limit: Count limit.
+///   - next: Offset.
+///   - completion: Result of callback.
+/// - Throws: When limit out of range.
+public func getBlockedMembers(limit: Int = 50, next: String? = nil, completion: @escaping (LCGenericResult<BlockedMembersResult>) -> Void) throws
+
+/// Check if one member has been blocked in the conversation.
+///
+/// - Parameters:
+///   - ID: The ID of member.
+///   - completion: Result of callback.
+public func checkBlocking(member ID: String, completion: @escaping (LCGenericResult<Bool>) -> Void)
 ```
 ```objc
 /**

@@ -1,21 +1,19 @@
-{% import "views/_leanengine.njk" as LE %}
 {% import "views/_helper.njk" as docs %}
-{% set errorMessage_shortCircuited = 'timerAction short-circuited and no fallback available' %}
 
-# 云函数开发指南 &middot; {{platformName}}
+# 云函数开发指南 · {{platformName}}
 
-云函数是云引擎（{{productName}}）的一个子模块，请确保在阅读本文档之前已经阅读了 [云引擎服务概览](leanengine_overview.html)。
+云函数是云引擎（LeanEngine）的一个子模块，请确保在阅读本文档之前已经阅读了 [云引擎服务概览](leanengine_overview.html)。
 
 当你开发移动端应用时，可能会有下列需求：
 
-* 应用在多平台客户端（Android、iOS、浏览器等）中很多逻辑都是一样的，希望将这部分逻辑抽取出来只维护一份。
-* 有些逻辑希望能够较灵活的调整（比如某些个性化列表的排序规则），但又不希望频繁的更新和发布移动客户端。
-* 有些逻辑需要的数据量很大，或者运算成本高（比如某些统计汇总需求），不希望在移动客户端进行运算，因为这样会消耗大量的网络流量和手机运算能力。
-* 当应用执行特定操作时，由云端系统自动触发一段逻辑（称为 [Hook 函数](#Hook_函数)），例如用户注册后对该用户增加一些信息记录用于统计；或某业务数据发生变化后希望做一些别的业务操作。
-* 客户端提供能够越过 ACL 或表权限的限制，对数据进行操作。
-* 需要定时任务，比如每天凌晨清理垃圾注册账号等。
+- 应用在多平台客户端（Android、iOS、浏览器等）中很多逻辑都是一样的，希望将这部分逻辑抽取出来只维护一份。
+- 有些逻辑希望能够较灵活的调整（比如某些个性化列表的排序规则），但又不希望频繁的更新和发布移动客户端。
+- 有些逻辑需要的数据量很大，或者运算成本高（比如某些统计汇总需求），不希望在移动客户端进行运算，因为这样会消耗大量的网络流量和手机运算能力。
+- 当应用执行特定操作时，由云端系统自动触发一段逻辑（称为 [Hook 函数](#Hook_函数)），例如用户注册后对该用户增加一些信息记录用于统计；或某业务数据发生变化后希望做一些别的业务操作。
+- 客户端提供能够越过 ACL 或表权限的限制，对数据进行操作。
+- 需要定时任务，比如每天凌晨清理垃圾注册账号等。
 
-这时，你可以使用云引擎的云函数，云函数是一段部署在服务端的代码，编写 JavaScript、Python、PHP 或 Java 代码，并部署到我们的平台上，可以很好的完成上述需求。
+这时，你可以使用云引擎的云函数，云函数是一段部署在服务端的代码，编写 JavaScript、Python、PHP 或 Java 代码，并部署到我们的平台上，可以很好地完成上述需求。
 
 如果还不知道如何创建云引擎项目、本地调试并部署到云端，请阅读 [云引擎快速入门](leanengine_quickstart.html)。
 
@@ -29,17 +27,96 @@
 - [Java](leanengine_cloudfunction_guide-java.html){% if platformName === "Java" %}<span class="text-muted">（当前）</span>{% endif %}
 - [.NET](leanengine_cloudfunction_guide-dotnet.html){% if platformName === ".NET" %}<span class="text-muted">（当前）</span>{% endif %}
 
-{% block initialize %}
-{% endblock %}
+{% if platformName === "Python" %}
+## 初始化
+
+定义云函数 / Hook 函数都需要一个 `leancloud.Engine` 实例，你需要在项目中自己初始化此实例。
+
+```python
+# cloud.py
+import leancloud
+
+engine = leancloud.Engine()
+```
+
+```python
+# wsgi.py
+import leancloud
+from app import app
+from cloud import engine
+
+app = engine.wrap(app)
+```
+
+更多关于 **WSGI 函数** 的内容，请参考 [WSGI 接口](http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432012393132788f71e0edad4676a3f76ac7776f3a16000) 或者 [PEP333](https://www.python.org/dev/peps/pep-0333/)。
+{% endif %}
+{% if platformName === ".NET" %}
+## 安装和初始化
+
+首先需要了解如下两个库：
+
+- [`LeanCloud.Engine`](https://www.nuget.org/packages/LeanCloud.Engine/)
+  包含了实现云函数，Class Hook 的基础组件，它不依赖任何通讯协议，它只提供了自定义云函数和 Class Hook 的注册，绑定，响应，执行的逻辑，它是个核心库。
+
+- [`LeanCloud.Engine.Middleware.AspNetCore`](https://www.nuget.org/packages/LeanCloud.Engine.Middleware.AspNetCore/)
+  提供了通讯层来帮助 [`LeanCloud.Engine`](https://www.nuget.org/packages/LeanCloud.Engine/) 与 LeanCloud 其他服务模块（比如存储服务和实时通信服务）进行内网的通讯，它基于微软的 ASP.NET Core 来实现，它只是一种实现，如果有能力或者有兴趣的开发者实际上可以自己实现一个 Middleware。
+
+因此在任何一个 .NET Core 的项目都可以在安装 [`LeanCloud.Engine.Middleware.AspNetCore`](https://www.nuget.org/packages/LeanCloud.Engine.Middleware.AspNetCore/) 之后，部署到云引擎中，这样就可以让开发者在服务端用 .NET Core 来构建自己的服务端业务逻辑了。
+
+### 示例项目
+
+[dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 是一个简单的示例项目，开发者直接在云引擎控制台中通过 git 部署就可以直接部署，开始体验。
+
+或者也可以从 IDE 的新建项目开始：
+
+### 新建项目
+
+如下步骤和截图都来自于 Visual Studio for Mac（Visual Studio for Windows 自然更好）。
+
+使用 Visual Studio 新建项目：
+
+![leanengine-dotnet-vs-create-app-1.jpg](images/leanengine-dotnet-vs-create-app-1.png)
+
+选择 .NET Core 2.0，然后下一步输入：
+ 
+- **Project Name: web** 
+- **Solution Name: app**
+
+![leanengine-dotnet-vs-create-app-2.jpg](images/leanengine-dotnet-vs-create-app-2.png)
+
+**以上文件命名是硬性规定。**这一步是必须的，目的为了部署脚本的便捷和可控性，在可期的未来我们可以提供自定义的方式。
+
+然后为项目添加 [`LeanCloud.Engine.Middleware.AspNetCore`](https://www.nuget.org/packages/LeanCloud.Engine.Middleware.AspNetCore/) 的依赖，可以通过 Visual Studio 提供的 GUI 界面进行操作：**Add Packages…** > 输入 LeanCloud 关键字页面上会出现相关的列表 > **LeanCloud.Engine.Middleware.AspNetCore** > **Add Package**。
+
+或者直接在 `app/web` 目录下执行：
+
+```sh
+dotnet add package LeanCloud.Engine.Middleware.AspNetCore
+```
+
+最后一步，将 `app/` 文件夹目录下面的 `web/` 和 `app.sln` 移到顶层目录下（比如您的代码仓库对应的本地文件夹叫作 `myProjects/`），然后删除 `app/` 文件夹，保证它的文件结构如 [dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 一样。
+
+完成。
+
+只要您的项目满足如下目录结构都会被云引擎正确的识别为 .NET Core 项目：
+
+```
+├── app.sln  
+├── web
+    ├── MyHookFunctions.cs
+    ├── Program.cs
+    └── web.csproj
+└── README.md
+```
+
+示例项目 [dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 是推荐的模板。
+{% endif %}
+
 ## 切换云引擎环境
 
-云引擎应用有「生产环境」和「预备环境」之分。
-在云引擎通过 SDK 调用云函数时，包括显式调用以及隐式调用（由于触发 hook 条件导致 hook 函数被调用），
-SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云函数。
-例如，假定定义了 beforeDelete 云函数，在预备环境通过 SDK 删除一个对象，会触发预备环境的 beforeDelete hook 函数。
+云引擎应用有「生产环境」和「预备环境」之分。在云引擎通过 SDK 调用云函数时，包括显式调用以及隐式调用（由于触发 hook 条件导致 hook 函数被调用），SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云函数。例如，假定定义了 `beforeDelete` 云函数，在预备环境通过 SDK 删除一个对象，会触发预备环境的 `beforeDelete` hook 函数。
 
-在云引擎以外的环境通过 SDK 显式或隐式调用云函数时，`X-LC-Prod` 的默认值一般为 `1`，也就是调用生产环境。
-但由于历史原因，各 SDK 的具体行为有一些差异：
+在云引擎以外的环境通过 SDK 显式或隐式调用云函数时，`X-LC-Prod` 的默认值一般为 `1`，也就是调用生产环境。但由于历史原因，各 SDK 的具体行为有一些差异：
 
 - 在 Node.js、PHP、Java 这三个 SDK 下，默认总是调用生产环境的云函数。
 - 在 Python SDK 下，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数。
@@ -53,25 +130,41 @@ SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云�
 ```objc
 [AVCloud setProductionMode:NO]; // 调用预备环境
 ```
-```android
-AVCloud.setProductionMode(false); // 调用预备环境
+```swift
+// 调用预备环境
+do {
+    let environment: LCApplication.Environment = [.cloudEngineDevelopment]
+    let configuration = LCApplication.Configuration(environment: environment)
+    try LCApplication.default.set(
+        id: "APP_ID",
+        key: "APP_KEY",
+        configuration: configuration
+    )
+} catch {
+    print(error)
+}
 ```
-```php
-LeanClient::useProduction(false); // 调用预备环境
-```
-```nodejs
+```js
 AV.setProduction(false); // 调用预备环境
 ```
 ```python
 leancloud.use_production(False) # 调用预备环境
-# 注意：需要在 SDK 初始化语句（`leancloud.init`）之前调用。
+# 需要在 SDK 初始化语句 `leancloud.init` 之前调用
+```
+```php
+LeanClient::useProduction(false); // 调用预备环境
+```
+```java
+AVCloud.setProductionMode(false); // 调用预备环境
 ```
 
 [免费版云引擎](leanengine_plan.html#体验实例) 应用只有「生产环境」，因此请不要切换到预备环境。
 
 ## 云函数
 
-[示例项目](https://github.com/leancloud/{{gettingStartedName}}) 中 {{ cloud_func_file }} 文件定义了一个很简单的 `hello` 云函数。现在让我们看一个较复杂的例子来展示云引擎的用途。在云端进行计算的一个重要理由是，你不需要将大量的数据发送到设备上做计算，而是将这些计算放到服务端，并返回结果这一点点信息就好。
+[示例项目](https://github.com/leancloud/{% if platformName === "Node.js" %}node-js-getting-started{% endif %}{% if platformName === "Python" %}python-getting-started{% endif %}{% if platformName === "PHP" %}slim-getting-started{% endif %}{% if platformName === "Java" %}java-war-getting-started{% endif %}{% if platformName === ".NET" %}dotNET-getting-started{% endif %}) 中 `{% if platformName === "Node.js" %}cloud.js{% endif %}{% if platformName === "Python" %}cloud.py{% endif %}{% if platformName === "PHP" %}src/cloud.php{% endif %}{% if platformName === "Java" %}src/main/java/cn/leancloud/demo/todo/Cloud.java{% endif %}{% if platformName === ".NET" %}web/HelloSample.cs{% endif %}` 文件定义了一个很简单的 `hello` 云函数。在云端进行计算的一个重要理由是，你不需要将大量的数据发送到设备上做计算，而是将这些计算放到服务端，并返回结果这一点点信息就好。
+
+现在让我们看一个较复杂的例子来展示云引擎的用途。
 
 例如，你写了一个应用，让用户对电影评分，一个评分对象大概是这样：
 
@@ -85,21 +178,254 @@ leancloud.use_production(False) # 调用预备环境
 
 `stars` 表示评分，1-5。如果你想查找《夏洛特烦恼》这部电影的平均分，你可以找出这部电影的所有评分，并在设备上根据这个查询结果计算平均分。但是这样一来，尽管你只是需要平均分这样一个数字，却不得不耗费大量的带宽来传输所有的评分。通过云引擎，我们可以简单地传入电影名称，然后返回电影的平均分。
 
-Cloud 函数接收 JSON 格式的请求对象，我们可以用它来传入电影名称。整个 {{ storage_guide_url }} 都在云引擎运行环境上有效，可以直接使用，所以我们可以使用它来查询所有的评分。结合在一起，实现 `averageStars` 函数的代码如下：
+云函数接收 JSON 格式的请求对象，我们可以用它来传入电影名称。整个 {% if platformName === "Node.js" %}[LeanStorage JavaScript SDK](leanstorage_guide-js.html){% endif %}{% if platformName === "Python" %}[LeanStorage Python SDK](leanstorage_guide-python.html){% endif %}{% if platformName === "PHP" %}[LeanStorage PHP SDK](leanstorage_guide-php.html){% endif %}{% if platformName === "Java" %}[LeanStorage Java SDK](leanstorage_guide-java.html){% endif %}{% if platformName === ".NET" %}[LeanStorage .NET SDK](leanstorage_guide-dotnet.html){% endif %} 都在云引擎运行环境上有效，可以直接使用，所以我们可以使用它来查询所有的评分。结合在一起，实现 `averageStars` 函数的代码如下：
 
-{% block cloudFuncExample %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.define('averageStars', function (request) {
+  var query = new AV.Query('Review');
+  query.equalTo('movie', request.params.movie);
+  return query.find().then(function (results) {
+    var sum = 0;
+    for (var i = 0; i < results.length; i++) {
+      sum += results[i].get('stars');
+    }
+    return sum / results.length;
+  });
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def averageStars(movie, **params):
+    reviews = leancloud.Query(Review).equal_to('movie', movie).find()
+    result = sum(x.get('stars') for x in reviews)
+    return result
+```
+
+客户端 SDK 调用时，云函数的名称默认为 Python 代码中函数的名称。有时需要设置云函数的名称与 Python 代码中的函数名称不相同，可以在 `engine.define` 后面指定云函数名称，比如：
+
+```python
+@engine.define('averageStars')
+def my_custom_average_start(movie, **params):
+    pass
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+use \LeanCloud\Engine\Cloud;
+use \LeanCloud\Query;
+use \LeanCloud\CloudException;
+
+Cloud::define("averageStars", function($params, $user) {
+    $query = new Query("Review");
+    $query->equalTo("movie", $params["movie"]);
+    try {
+        $reviews = $query->find();
+    } catch (CloudException $ex) {
+        // 查询失败，将错误输出到日志
+        error_log($ex->getMessage());
+        return 0;
+    }
+    $sum = 0;
+    forEach($reviews as $review) {
+        $sum += $review->get("stars");
+    }
+    if (count($reviews) > 0) {
+         return $sum / count($reviews);
+    } else {
+         return 0;
+    }
+});
+```
+
+PHP SDK 提供了 `Cloud::start` 函数，可以方便快捷地初始化云函数服务。例如，一个专门提供云函数服务的云引擎项目的 `index.php`：
+
+```php
+<?php
+use \LeanCloud\Engine\Cloud;
+require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../src/cloud.php'; // 其中包含云函数定义
+Cloud::start();
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineFunction("averageStars")
+public static float getAverageStars(@EngineFunctionParam("movie") String movie)
+    throws AVException {
+  AVQuery<AVObject> query = new AVQuery("Review");
+  query.whereEqualTo("movie", movie);
+  List<AVObject> reviews = query.find();
+  int sum = 0;
+  if (reviews == null && reviews.isEmpty()) {
+    return 0;
+  }
+  for (AVObject review : reviews) {
+    sum += review.getInt("star");
+  }
+  return sum / reviews.size();
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+public class StaticSampleService
+{
+    [EngineFunction("averageStars")]
+    public static double AverageStars([EngineFunctionParameter("movie")]string movieName)
+    {
+        if (movieName == "夏洛特烦恼")
+            return 3.8;
+        return 0;
+    }
+}
+```
+
+而在程序启动的入口函数中添加如下代码来启用刚才编写的云函数：
+
+```cs
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        // 定义一个 Cloud 实例
+        var cloud = new Cloud();
+        // 将云函数注册到 cloud 实例上
+        cloud.UseFunction<StaticSampleService>();
+        // 启动实例
+        cloud.Start();
+    }
+}
+```
+
+### 更多云函数定义方式
+
+#### 实例方法搭配 EngineFunction 和 EngineFunctionParameter
+
+```cs
+public class MovieService
+{
+    // 可以注入一些判断变量
+    public List<string> ValidMovieNames { get; set; }
+    public MovieService(string[] someMovieNames)
+    {
+        ValidMovieNames = someMovieNames.ToList();
+    }
+
+    [EngineFunction("averageStars")]
+    public double AverageStars([EngineFunctionParameter("movieName")]string movieName)
+    {
+        // 如果要查询的电影并不在支持范围内，直接返回 0 分
+        if (!ValidMovieNames.Contains(movieName)) return 0;
+        if (movieName == "夏洛特烦恼")
+            return 3.8;
+        return 0;
+    }
+}
+
+// 定义一个 Cloud 实例
+var cloud = new Cloud();
+// 将云函数注册到 cloud 实例上
+cloud.UseFunction<MovieService>(new MovieService(new string[] { "夏洛特烦恼", "功夫", "大话西游之月光宝盒" }));
+// 如果并不想传入任何校验参数也可以直接调用如下代码
+// cloud.UseFunction<MovieService>();
+// 启动实例
+cloud.Start();
+```
+
+`MovieService` 是一个自定义的类，包含一个实例方法，并且这个实例方法可以通过类的构造函数来传入一些判断所需要的变量（依赖注入），这样可以应对一些变化的需求。
+
+#### 直接使用委托
+
+```cs
+public class SampleServices
+{
+    public static double AverageStars(string movieName)
+    {
+        if (movieName == "夏洛特烦恼")
+            return 3.8;
+        return 0;
+    }
+}
+// 然后注册
+cloud.Define<string, double>("averageStars", SampleServices.AverageStars);
+```
+{% endif %}
 
 ### 参数和返回值
 
-{% block cloudFuncParams %}{% endblock %}
+{% if platformName === "Node.js" %}
+`Request` 会作为参数传入到云函数中，`Request` 上的属性包括：
+
+- `params: object`：客户端发送的参数对象，当使用 `rpc` 调用时，也可能是 `AV.Object`。
+- `currentUser?: AV.User`：客户端所关联的用户（根据客户端发送的 `X-LC-Session` 头）。
+- `sessionToken?: string`：客户端发来的 `sessionToken`（`X-LC-Session` 头）。
+- `meta: object`：有关客户端的更多信息，目前只有一个 `remoteAddress` 属性表示客户端的 IP。
+
+另外，`AV.Cloud.define` 还接受一个可选参数 `options`（位置在函数名称和调用函数之间）。
+这个 `options` 对象上的属性包括：
+
+- `fetchUser: boolean`：是否自动抓取客户端的用户信息，默认为真。设置为假时，`Request` 将不会有 `currentUser` 属性。
+- `internal: boolean`：是否只允许在云引擎内（使用 `AV.Cloud.run` 且未开启 `remote` 选项）或使用 Master Key （使用 `AV.Cloud.run` 时传入 `useMasterKey`）调用，不允许客户端直接调用。默认为假。
+
+例如，假设我们不希望客户端直接调用上述函数，也不关心客户端用户信息，那么上述函数的定义可以改写为：
+
+```js
+AV.Cloud.define('averageStars', { fetchUser: false, internal: true }, function (request) {
+  // 定义同上
+});
+```
+
+如果云函数返回了一个 Promise，那么云函数会使用 Promise 成功结束后的结果作为成功响应；如果 Promise 中发生了错误，云函数会使用这个错误作为错误响应，对于使用 `AV.Cloud.Error` 构造的异常对象，我们认为是客户端错误，不会在标准输出打印消息，对于其他异常则会在标准输出打印调用栈，以便排查错误。
+
+我们推荐大家使用链式的 Promise 写法来完成业务逻辑，这样会极大地方便异步任务的处理和异常处理，**请注意一定要将 Promise 串联起来并在云函数中 return** 以保证上述逻辑正确工作，推荐阅读 [JavaScript Promise 迷你书](http://liubin.org/promises-book/) 来深入地了解 Promise。
+
+{% call docs.alertWrap() %}
+在 2.0 之前的早期版本中，云函数接受 `request` 和 `response` 两个参数，我们会继续兼容这种用法到下一个大版本，希望开发者尽快迁移到 Promise 风格的云函数上。之前版本的文档见《[Node SDK v1 API 文档](https://github.com/leancloud/leanengine-node-sdk/blob/v1/API.md)》。
+{% endcall %}
+{% endif %}
+{% if platformName === "Python" %}
+调用云函数时的参数会直接传递给云函数，因此直接声明这些参数即可。另外调用云函数时可能会根据不同情况传递不同的参数，这时如果定义云函数时没有声明这些参数，会触发 Python 异常，因此建议声明一个额外的关键字参数（关于关键字参数，请参考 [此篇文档](http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001431752945034eb82ac80a3e64b9bb4929b16eeed1eb9000) 中「关键字参数」一节）来保存多余的参数。
+
+```python
+@engine.define
+def my_cloud_func(foo, bar, baz, **params):
+    pass
+```
+
+除了调用云函数的参数之外，还可以通过 `engine.current` 对象，来获取到调用此云函数的客户端的其他信息。`engine.current` 对象上的属性包括：
+
+- `engine.current.user: leancloud.User`：客户端所关联的用户（根据客户端发送的 `LC-Session` 头）。
+- `engine.current.session_token: str`：客户端发来的 `sessionToken`（`X-LC-Session` 头）。
+- `engine.current.meta: dict`：有关客户端的更多信息，目前只有一个 `remote_address` 属性表示客户端的 IP。
+{% endif %}
+{% if platformName === "PHP" %}
+传递给云函数的参数依次为：
+
+- `$params: array`：客户端发送的参数。
+- `$user: User`：客户端所关联的用户（根据客户端发送的 `X-LC-Session` 头）。
+- `$meta: array`：有关客户端的更多信息，目前只有一个 `$meta['remoteAddress']` 属性表示客户端的 IP。
+{% endif %}
+{% if platformName === "Java" %}
+传递给云函数的参数依次为：
+
+- `@EngineFunctionParam`：客户端发送的参数。
+- `AVUser.getCurrentUser()`：客户端所关联的用户（根据客户端发送的 `LC-Session` 头）。
+- `EngineRequestContext`有关客户端的更多信息。
+{% endif %}
+{% if platformName === ".NET" %}
+正如前面的实例代码一样，在定义云函数时使用 `EngineFunctionParameter` 来进行参数的绑定，如果使用的是 [直接使用委托](#直接使用委托)，那么传入的参数只要按照顺序即可。
+
+此处要注意，如果函数本身是异步的（返回值是 `Task` 或者 `Task<T>`），在真正执行的时候也是会等待异步结果，然后再返回给客户端的，另外，如果在执行过程中产生了异常，请参考 [云函数错误响应码](#云函数错误响应码)。
+{% endif %}
 
 ### SDK 调用云函数
 
-LeanCloud 各个语言版本的 SDK 都提供了调用云函数的接口。
-
+LeanCloud 各个语言版本的 SDK 都提供了调用云函数的接口：
 
 ```objc
-// 在 iOS SDK 中，AVCloud 提供了一系列静态方法来实现客户端调用云函数
 // 构建传递给服务端的参数字典
 NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦恼"
                                                           forKey:@"movie"];
@@ -115,33 +441,30 @@ NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦�
                    }
 }];
 ```
-```android
-// 在 Android SDK 中，AVCloud 提供了一系列的静态方法来实现客户端调用云函数
-// 构建参数
-Map<String, String> dicParameters = new HashMap<String, String>();
-dicParameters.put("movie", "夏洛特烦恼");
-
-// 调用云函数 averageStars
-AVCloud.callFunctionInBackground("averageStars", dicParameters, new FunctionCallback() {
-    public void done(Object object, AVException e) {
-        if (e == null) {
-            // 处理返回结果
-        } else {
-            // 处理报错
-        }
+```swift
+LCEngine.run("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
+    switch result {
+    case .success(value: let resultValue):
+        print(resultValue)
+    case .failure(error: let error):
+        print(error)
     }
-});
+}
 ```
 ```js
-// 在 JavaScript 中 AV.Cloud 提供了一系列方法来调用云函数
 var paramsJson = {
   movie: "夏洛特烦恼"
 };
-AV.Cloud.run('averageStars', paramsJson).then(function(data) {
-  // 调用成功，得到成功的应答 data
-}, function(err) {
-  // 处理调用失败
+AV.Cloud.run('averageStars', paramsJson).then(function (data) {
+  // 处理结果
+}, function (err) {
+  // 处理报错
 });
+```
+```python
+from leancloud import cloudfunc
+
+cloudfunc.run('averageStars', movie='夏洛特烦恼')
 ```
 ```php
 use \LeanCloud\Engine\Cloud;
@@ -150,10 +473,21 @@ $params = array(
 );
 Cloud::run("averageStars", $params);
 ```
-```python
-from leancloud import cloudfunc
+```java
+// 构建传递给服务端的参数字典
+Map<String, String> dicParameters = new HashMap<String, String>();
+dicParameters.put("movie", "夏洛特烦恼");
 
-cloudfunc.run('averageStars', movie='夏洛特烦恼')
+// 调用指定名称的云函数 averageStars，并且传递参数
+AVCloud.callFunctionInBackground("averageStars", dicParameters, new FunctionCallback() {
+    public void done(Object object, AVException e) {
+        if (e == null) {
+            // 处理结果
+        } else {
+            // 处理报错
+        }
+    }
+});
 ```
 
 ### 通过 REST API 调用云函数
@@ -162,14 +496,81 @@ cloudfunc.run('averageStars', movie='夏洛特烦恼')
 
 ### 云引擎调用云函数
 
-在云引擎中可以使用 {{ runFuncName }} 调用 {{ defineFuncName }} 定义的云函数：
+在云引擎中可以使用 `{% if platformName === "Node.js" %}AV.Cloud.run{% endif %}{% if platformName === "Python" %}leancloud.cloudfunc.run{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::run{% endif %}{% if platformName === "Java" %}AVCloud.callFunction{% endif %}{% if platformName === ".NET" %}AVCloud.CallFunctionAsync{% endif %}` 调用 `{% if platformName === "Node.js" %}AV.Cloud.define{% endif %}{% if platformName === "Python" %}engine.define{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::define{% endif %}{% if platformName === "Java" %}@EngineFunction{% endif %}{% if platformName === ".NET" %}EngineFunctionAttribute{% endif %}` 定义的云函数：
 
-{% block runFuncExample %}
-{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.run('averageStars', {
+  movie: '夏洛特烦恼'
+}).then(function (data) {
+  // 调用成功，得到成功的应答 data
+}, function (error) {
+  // 处理调用失败
+});
+```
+
+云引擎中默认会直接进行一次本地的函数调用，而不会像客户端一样发起一个 HTTP 请求。如果你希望发起 HTTP 请求来调用云函数，可以传入一个 `remote: true` 的选项。当你在云引擎之外运行 Node.js SDK 时（包括在拓展分组的云引擎上调用主分组上的云函数时）这个选项非常有用：
+
+```js
+AV.Cloud.run('averageStars', { movie: '夏洛特烦恼' }, { remote: true }).then(function (data) {
+  // 成功
+}, function (error) {
+  // 处理调用失败
+});
+```
+
+上面的 `remote` 选项实际上是作为 `AV.Cloud.run` 的可选参数 options 对象的属性传入的。这个 `options` 对象包括以下参数：
+
+- `remote?: boolean`：上面的例子用到的 `remote` 选项，默认为假。 
+- `user?: AV.User`：以特定的用户运行云函数（建议在 `remote` 为假时使用）。
+- `sessionToken?: string`：以特定的 `sessionToken` 调用云函数（建议在 `remote` 为真时使用）。
+- `req?: http.ClientRequest | express.Request`：为被调用的云函数提供 `remoteAddress` 等属性。
+{% endif %}
+{% if platformName === "Python" %}
+```python
+from leancloud import cloudfunc
+
+cloudfunc.run('averageStars', movie='夏洛特烦恼')
+```
+
+但是这样调用会真的发起一次 HTTP 请求，去请求部署在云引擎上的云函数。如果想要直接调用本地（当前进程）中的云函数，或者发起调用就是在云引擎中，想要省去一次 HTTP 调用的开销，可以使用 `leancloud.cloudfunc.run.local` 来取代 `leanengine.cloudfunc.run`，这样会直接在当前进程中执行一个函数调用，而不会发起 HTTP 请求来调用此云函数。
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+try {
+    $result = Cloud::run("averageStars", array("movie" => "夏洛特烦恼"));
+} catch (\Exception $ex) {
+    // 云函数错误
+}
+```
+
+云引擎中默认会直接进行一次本地的函数调用，而不是像客户端一样发起一个 HTTP 请求。PHP 云引擎暂不支持发起 HTTP 请求来调用云函数。
+{% endif %}
+{% if platformName === "Java" %}
+```java
+Map<String, Object> params = new HashMap<String, Object>();
+params.put("movie", "夏洛特烦恼");
+try {
+  float result = AVCloud.callFunction("averageStars", params);
+} catch (AVException e) {
+  e.printStackTrace();
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+await AVCloud.CallFunctionAsync<double>("averageStars", new Dictionary<string, object>()
+{
+    { "movie", "夏洛特烦恼" }
+});
+```
+
+另外需要注意的是，**不推荐** 在云引擎中直接调用 `AVCloud.CallFunctionAsync`，因为 `AVCloud.CallFunctionAsync` 是从客户端发起的远程调用，会重新走一遍外网再回到云引擎。如果需要在本地调用，推荐直接在云引擎中使用 `Cloud.CallFunctionAsync`，它会直接从本地进行调用，性能更好。
+{% endif %}
 
 ### RPC 调用云函数
 
-RPC 调用云函数是指：云引擎会在这种调用方式下自动为 Http Response Body 做序列化，而 SDK 调用之后拿回的返回结果就是一个完整的 `AVObject` 或包含 `AVObject` 的数据结构。
+RPC 调用云函数是指：云引擎会在这种调用方式下自动为 HTTP Response Body 做序列化，而 SDK 调用之后拿回的返回结果就是一个完整的 `{% if platformName === "Node.js" %}AV.Object{% endif %}{% if platformName === "Python" %}leancloud.Object{% endif %}{% if platformName === "PHP" %}LeanObject{% endif %}{% if platformName === "Java" %}AVObject{% endif %}{% if platformName === ".NET" %}AVObject{% endif %}` 或包含这样的对象的数据结构：
 
 ```objc
 NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦恼"
@@ -179,38 +580,34 @@ NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦�
                   withParameters:parameters
                   block:^(id object, NSError *error) {
                   if(error == nil){
-                     // 处理结果
+                    // 处理结果
                   }
                   else {
-                     // 处理报错
+                    // 处理报错
                   }
 }];
 ```
-```android
-// 构建参数
-Map<String, String> dicParameters = new HashMap<String, String>();
-dicParameters.put("movie", "夏洛特烦恼");
-
-AVCloud.rpcFunctionInBackground("averageStars", dicParameters,
-    new FunctionCallback<AVObject>() {
-      @Override
-      public void done(AVObject object, AVException e) {
-        Assert.assertNull(e);
-      }
-    });
+```swift
+LCEngine.call("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
+    switch result {
+    case .success(object: let object):
+        if let object = object {
+            print(object)
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
-```php
-// PHP 暂不支持
-```
-```nodejs
+```js
 var paramsJson = {
   movie: "夏洛特烦恼"
 };
 
-AV.Cloud.rpc('averageStars', paramsJson).then(function(object) {
-  // 成功，如果云函数返回的是一个 AV.Object，回调参数中的 object 也会是一个 AV.Object
-}, function(error) {
-  // 失败
+AV.Cloud.rpc('averageStars', paramsJson).then(function (object) {
+  // 处理结果
+}, function (error) {
+  // 处理报错
 });
 ```
 ```python
@@ -218,33 +615,216 @@ from leancloud import cloudfunc
 
 cloudfunc.rpc('averageStars', movie='夏洛特烦恼')
 ```
+```java
+// 构建参数
+Map<String, String> dicParameters = new HashMap<String, String>();
+dicParameters.put("movie", "夏洛特烦恼");
+
+AVCloud.rpcFunctionInBackground("averageStars", dicParameters,
+  new FunctionCallback<AVObject>() {
+    @Override
+    public void done(AVObject object, AVException e) {
+      Assert.assertNull(e);
+    }
+  }
+);
+```
 
 ### 云函数错误响应码
 
-{% block errorCodeExample %}{% endblock %}
+可以根据 [HTTP status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) 自定义错误响应码。
 
-客户端收到的响应：`{"code":211,"error":"Could not find user"}`
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.define('errorCode', function (request) {
+  return AV.User.logIn('NotThisUser', 'P@ssword');
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def error_code(**params):
+    leancloud.User.login('not_this_user', 'P@ssword')
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define("errorCode", function($params, $user) {
+    User::logIn("not_this_user", "P@ssword");
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineFunction("errorCode")
+public static AVUser getCurrentUser() throws Exception {
+  AVUser u = AVUser.getCurrentUser();
+  if (u == null) {
+    throw new AVException(211, "Could not find the user.");
+  } else {
+    return u;
+  }
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+public class UserService
+{
+    [EngineFunction("errorCode")]
+    public async AVUser GetCurrentUser()
+    {
+        AVUser u = await AVUser.GetCurrentAsync()
+        if (u == null) 
+        {
+            throw new EngineException(211, "Could not find the user.");
+        } 
+        else 
+        {
+            return u;
+        }
+    }
+}
+```
+{% endif %}
 
-{% block errorCodeExample2 %}{% endblock %}
+客户端收到的响应：`{ "code": 211, "error": "Could not find the user." }`。
 
-客户端收到的响应： `{"code":123,"error":"自定义错误信息"}`
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.define('customErrorCode', function (request) {
+  throw new AV.Cloud.Error('自定义错误信息。', { code: 123 });
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+from leancloud import LeanEngineError
 
-{% block cloudFuncTimeout %}{% endblock %}
+@engine.define
+def custom_error_code(**params):
+    raise LeanEngineError(123, '自定义错误信息。')
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define("customErrorCode", function($params, $user) {
+    throw new FunctionError("自定义错误信息。", 123);
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineFunction()
+public static void customErrorCode() throws Exception {
+  throw new AVException(123, "自定义错误信息。");
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+[EngineFunction("customErrorCode")]
+public static Void CustomErrorCode(){
+throw new EngineException(123, "自定义错误信息。");
+}
+```
+{% endif %}
 
-{% block cloudFuncRegister %}{% endblock %}
+客户端收到的响应：`{ "code": 123, "error": "自定义错误信息。" }`。
+
+### 云函数超时
+
+云函数超时时间为 15 秒，如果超过阈值，客户端将收到 HTTP status code 为 `503` 的响应，body 为 `The request timed out on the server`。{% if platformName === "Node.js" %}服务端会出现类似这样的日志：`LeanEngine: /1.1/functions/<cloudFunc>: function timeout (15000ms)`。注意即使已经响应，此时云函数可能仍在执行，但执行完毕后的响应是无意义的（不会发给客户端，会在日志中打印一个 `Can't set headers after they are sent` 的异常）。{% endif %}{% if platformName === "Python" %}{# TODO #}{% endif %}{% if platformName === "PHP" %}服务端会出现类似这样的日志：`WARNING: [pool www] child ... exited on signal 9 (SIGKILL) after ... seconds from start`。{% endif %}{% if platformName === "Java" %}{# TODO #}{% endif %}{% if platformName === ".NET" %}{# TODO #}{% endif %}
+
+{% if platformName === "Node.js" %}
+#### 超时的处理方案
+
+我们建议将代码中的任务转化为异步队列处理。可以：
+
+1. 在存储服务中创建一个队列表，包含 `status` 列；
+2. 接到任务后，向队列表保存一条记录，`status` 值设置为 `处理中`，然后将请求结束掉，将队列对象的 `id` 发给客户端（旧版本的 SDK 使用 `response.success(id)`）：
+   ```js
+   return new Promise((resolve, reject) => {
+     resolve(id);
+   });
+   ```
+3. 当业务处理完毕，根据处理结果更新刚才的队列对象状态，将 `status` 字段设置为 `完成` 或者 `失败`；
+4. 在任何时候，在控制台通过队列 `id` 可以获取某个任务的执行结果，判断任务状态。
+{% endif %}
+{% if platformName === "Python" %}
+#### 超时的处理方案
+
+我们建议将代码中的任务转化为异步队列处理，以优化运行时间，避免云函数或定时任务发生超时。Python 运行环境使用了 `gevent` 作为 event loop，所以你可以根据情况自己 `gevent.spawn` 一个 `greenlet` 来处理异步逻辑。例如：
+
+```python
+def handle(req):
+    data = do_some_stuff()
+
+    @gevent.spawn
+    def stuff_should_be_executed_asynchronously():
+        resp = requests.get('http://time.consuming.api.com/foo', data=data)
+        do_more_stuff(resp.json)
+
+    return # 上面的函数会异步地执行，这里会直接返回
+```
+{% endif %}
+
+{% if platformName === "Python" %}
+### 分离云函数
+
+有时候可能需要将处理不同 class 的函数放到不同的文件中，方便管理：
+
+```python
+# Post.py
+import leancloud
+
+post_engine = leancloud.Engine()
+
+@post_engine.define
+def post_func():
+    pass
+```
+```python
+# Comment.py
+import leancloud
+
+comment_engine = leancloud.Engine()
+
+@comment_engine.define
+def comment_func():
+    pass
+```
+
+在 `cloud.py` 中引入它们：
+
+```python
+# cloud.py
+import leancloud
+from Post import post_engine
+from Comment import comment_engine
+
+engine = leancloud.Engine()
+
+# 将 post_engine 和 comment_engine 中的函数加载到 engine 里
+# 等同于在 cloud.py 这里注册 post_func 和 comment_func
+engine.register(post_engine)
+engine.register(comment_engine)
+```
+
+在使用 `engine.register` 函数过程中，请务必不要注册相同的函数名称。
+{% endif %}
 
 ## Hook 函数
 
-Hook 函数本质上是云函数，但它有固定的名称，定义之后会**由系统**在特定事件或操作（如数据保存前、保存后，数据更新前、更新后等等）发生时**自动触发**，而不是由开发者来控制其触发时机。
-
-需要注意：
+Hook 函数本质上是云函数，但它有固定的名称，定义之后会 **由系统** 在特定事件或操作（如数据保存前、保存后，数据更新前、更新后等等）发生时 **自动触发**，而不是由开发者来控制其触发时机。需要注意：
 
 - 通过控制台进行 [数据导入](dashboard_guide.html#本地数据导入_LeanCloud) 不会触发以下任何 hook 函数。
 - 使用 Hook 函数需要 [防止死循环调用](#防止死循环调用)。
 - `_Installation` 表暂不支持 Hook 函数。
 - Hook 函数只对当前应用的 Class 生效，[对绑定后的目标 Class 无效](app_data_share.html#云引擎_Hook_函数)。
 
-对于 before 类的 Hook（也包括 `{{hook_on_login}}`），如果返回了一个错误的话，这个操作就会被中断，你可以在这些 Hook 中主动抛出一个错误来拒绝掉某些操作；对于 after 类的 Hook（也包括 `{{hook_on_verified}}`），返回错误并不会影响操作的执行（因为其实操作已经执行完了）。
+对于 `before` 类的 Hook（也包括 `{% if platformName === "Node.js" %}onLogin{% endif %}{% if platformName === "Python" %}on_login{% endif %}{% if platformName === "PHP" %}onLogin{% endif %}{% if platformName === "Java" %}onLogin{% endif %}{% if platformName === ".NET" %}OnLogin{% endif %}`），如果返回了一个错误的话，这个操作就会被中断，你可以在这些 Hook 中主动抛出一个错误来拒绝掉某些操作。对于 `after` 类的 Hook（也包括 `{% if platformName === "Node.js" %}onVerified{% endif %}{% if platformName === "Python" %}on_verified{% endif %}{% if platformName === "PHP" %}onVerified{% endif %}{% if platformName === "Java" %}onVerified{% endif %}{% if platformName === ".NET" %}OnVerified{% endif %}`），返回错误并不会影响操作的执行（因为其实操作已经执行完了）。
 
 ```mermaid
 graph LR
@@ -276,154 +856,1632 @@ B -->|afterDelete|C((done))
 
 为了认证 Hook 调用者的身份，我们的 SDK 内部会确认请求确实是从云引擎内网的云存储组件发出的，如果认证失败，可能会出现 `Hook key check failed` 的提示，如果在本地调试时出现这样的错误，请确保是通过命令行工具启动调试的。
 
-### {{hook_before_save}}
+### `{% if platformName === "Node.js" %}beforeSave{% endif %}{% if platformName === "Python" %}before_save{% endif %}{% if platformName === "PHP" %}beforeSave{% endif %}{% if platformName === "Java" %}beforeSave{% endif %}{% if platformName === ".NET" %}BeforeSave{% endif %}`
+
 在创建新对象之前，可以对数据做一些清理或验证。例如，一条电影评论不能过长，否则界面上显示不开，需要将其截断至 140 个字符：
 
-{% block beforeSaveExample %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.beforeSave('Review', function (request) {
+  var comment = request.object.get('comment');
+  if (comment) {
+    if (comment.length > 140) {
+      // 截断并添加 '…'
+      request.object.set('comment', comment.substring(0, 140) + '…');
+    }
+  } else {
+    // 不保存数据，并返回错误
+    throw new AV.Cloud.Error('No comment provided!');
+  }
+});
+```
 
-### {{hook_after_save}}
+上面的代码示例中，`request.object` 是被操作的 `AV.Object`。除了 `object` 之外，`request` 上还有一个属性：
+
+- `currentUser?: AV.User`：发起操作的用户。
+
+类似地，其他 hook 的 `request` 参数上也包括 `object` 和 `currentUser` 这两个属性。
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.before_save('Review') # Review 为需要 hook 的 class 的名称
+def before_review_save(review):
+    comment = review.get('comment')
+    if not comment:
+        raise leancloud.LeanEngineError(message='No comment provided!')
+    if len(comment) > 140:
+        review.comment.set('comment', comment[:140] + '…')
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::beforeSave("Review", function($review, $user) {
+    $comment = $review->get("comment");
+    if ($comment) {
+        if (strlen($comment) > 140) {
+            // 截断并添加 '…'
+            $review->set("comment", substr($comment, 0, 140) . "…");
+        }
+    } else {
+        // 不保存数据，并返回错误
+        throw new FunctionError("No comment provided!", 101);
+    }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "Review", type = EngineHookType.beforeSave)
+public static AVObject reviewBeforeSaveHook(AVObject review) throws Exception {
+  if (AVUtils.isBlankString(review.getString("comment"))) {
+    throw new Exception("No comment provided!");
+  } else if (review.getString("comment").length() > 140) {
+    review.put("comment", review.getString("comment").substring(0, 140) + "…");
+  }
+  return review;
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.BeforeSave("Review", review =>
+{
+    var comment = review.Get<string>("comment");
+    if (comment.Length > 140) review["comment"] = comment.Substring(0, 140) + "…";
+});
+```
+{% endif %}
+
+### `{% if platformName === "Node.js" %}afterSave{% endif %}{% if platformName === "Python" %}after_save{% endif %}{% if platformName === "PHP" %}afterSave{% endif %}{% if platformName === "Java" %}afterSave{% endif %}{% if platformName === ".NET" %}AfterSave{% endif %}`
 
 在创建新对象后触发指定操作，比如当一条留言创建后再更新一下所属帖子的评论总数：
 
-{% block afterSaveExample %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.afterSave('Comment', function (request) {
+  var query = new AV.Query('Post');
+  return query.get(request.object.get('post').id).then(function (post) {
+    post.increment('comments');
+    return post.save();
+  });
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+import leancloud
 
-再如，在用户注册成功之后，给用户增加一个新的属性 from 并保存：
+@engine.after_save('Comment') # Comment 为需要 hook 的 class 的名称
+def after_comment_save(comment):
+    post = leancloud.Query('Post').get(comment.id)
+    post.increment('commentCount')
+    try:
+        post.save()
+    except leancloud.LeanCloudError:
+        raise leancloud.LeanEngineError(message='An error occurred while trying to save the post.')
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::afterSave("Comment", function($comment, $user) {
+    $query = new Query("Post");
+    $post = $query->get($comment->get("post")->getObjectId());
+    $post->increment("commentCount");
+    try {
+        $post->save();
+    } catch (CloudException $ex) {
+        throw new FunctionError("An error occurred while trying to save the post: " . $ex->getMessage());
+    }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "Review", type = EngineHookType.afterSave)
+public static void reviewAfterSaveHook(AVObject review) throws Exception {
+  AVObject post = review.getAVObject("post");
+  post.fetch();
+  post.increment("comments");
+  post.save();
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.AfterSave("Review", review =>
+{
+    var post = review.Get<AVObject>("post");
+    await post.FetchAsync();
+    post.Increment("comments");
+    await post.SaveAsync();
+});
+```
+{% endif %}
 
-{% block afterSaveExample2 %}{% endblock %}
+再如，在用户注册成功之后，给用户增加一个新的属性 `from` 并保存：
 
-### {{hook_before_update}}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.afterSave('_User', function (request) {
+  console.log(request.object);
+  request.object.set('from', 'LeanCloud');
+  return request.object.save().then(function (user) {
+    console.log('Success!');
+  });
+});
+```
 
-{% block beforeUpdate %}
+虽然对于 `after` 类的 Hook 我们并不关心返回值，但我们仍建议你返回一个 Promise，这样如果发生了非预期的错误，会自动在标准输出中打印异常信息和调用栈。
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.after_save('_User')
+def after_user_save(user):
+    print user
+    user.set('from', 'LeanCloud')
+    try:
+        user.save()
+    except LeanCloudError, e:
+        print 'Error: ', e
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::afterSave("_User", function($userObj, $currentUser) {
+    $userObj->set("from", "LeanCloud");
+    try {
+        $userObj->save();
+    } catch (CloudException $ex) {
+        throw new FunctionError("An error occurred while trying to save the user: " . $ex->getMessage());
+    }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "_User", type = EngineHookType.afterSave)
+public static void userAfterSaveHook(AVUser user) throws Exception {
+  user.put("from", "LeanCloud");
+  user.save();
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.AfterSave("_User", async user =>
+{
+    if (user is AVUser avUser)
+    {
+        avUser.Set("from", "LeanCloud");
+        await avUser.SaveAsync();
+    }
+});
+```
+{% endif %}
+
+### `{% if platformName === "Node.js" %}beforeUpdate{% endif %}{% if platformName === "Python" %}before_update{% endif %}{% if platformName === "PHP" %}beforeUpdate{% endif %}{% if platformName === "Java" %}beforeUpdate{% endif %}{% if platformName === ".NET" %}BeforeUpdate{% endif %}`
+
 在更新已存在的对象前执行操作，这时你可以知道哪些字段已被修改，还可以在特定情况下拒绝本次修改：
 
-{% block beforeUpdateExample %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.beforeUpdate('Review', function (request) {
+  // 如果 comment 字段被修改了，检查该字段的长度
+  if (request.object.updatedKeys.indexOf('comment') != -1) {
+    if (request.object.get('comment').length > 140) {
+      // 拒绝过长的修改
+      throw new AV.Cloud.Error('comment 长度不得超过 140 字符。');
+    }
+  }
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.before_update('Review')
+def before_hook_object_update(obj):
+    # 如果 comment 字段被修改了，检查该字段的长度
+    if 'comment' in obj.updated_keys and len(obj.get('comment')) > 140:
+        # 拒绝过长的修改
+        raise leancloud.LeanEngineError(message='comment 长度不得超过 140 字符。')
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::beforeUpdate("Review", function($review, $user) {
+    // 如果 comment 字段被修改了，检查该字段的长度
+    if (in_array("comment", $review->updatedKeys) &&
+        strlen($review->get("comment")) > 140) {
+        throw new FunctionError("comment 长度不得超过 140 字符。");
+    }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "Review", type = EngineHookType.beforeUpdate)
+public static AVObject reviewBeforeUpdateHook(AVObject review) throws Exception {
+  List<String> updateKeys = EngineRequestContext.getUpdateKeys();
+  for (String key : updateKeys) {
+    // 如果 comment 字段被修改了，检查该字段的长度
+    if ("comment".equals(key) && review.getString("comment").length()>140) {
+      throw new Exception("comment 长度不得超过 140 字符。");
+    }
+  }
+  return review;
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.BeforeUpdate("Review", (AVObject review) =>
+{
+    var updatedKeys = review.GetUpdatedKeys();
+    // 如果 comment 字段被修改了，检查该字段的长度
+    if (updatedKeys.Contains("comment"))
+    {
+        var comment = review.Get<string>("comment");
+        if (comment.Length > 140) throw new EngineException(400, "comment 长度不得超过 140 字符。");
+    }
+});
+```
+{% endif %}
 
-**注意**：传入的对象是一个尚未保存到数据库的临时对象，并不保证与最终储存到数据库的对象完全相同，这是因为修改中可能包含自增、数组增改、关系增改等原子操作。
-{% endblock %}
+{% call docs.noteWrap() %}
+对 `{% if platformName === "Node.js" %}request.object{% endif %}{% if platformName === "Python" %}obj{% endif %}{% if platformName === "PHP" %}$review{% endif %}{% if platformName === "Java" %}review{% endif %}{% if platformName === ".NET" %}review{% endif %}` 直接进行的修改不会被保存。如需拒绝修改，可以让函数返回一个错误。
+{% endcall %}
 
-### {{hook_after_update}}
+{% call docs.noteWrap() %}
+传入的对象是一个尚未保存到数据库的临时对象，并不保证与最终储存到数据库的对象完全相同，这是因为修改中可能包含自增、数组增改、关系增改等原子操作。
+{% endcall %}
 
-{{ docs.alert("本 Hook 使用不当可能会造成死循环，导致数据存储 API 的调用次数暴涨，甚至产生更多的费用。因此请仔细阅读 [防止死循环调用](#防止死循环调用) 部分，做出必要的调整和预防措施。") }}
+### `{% if platformName === "Node.js" %}afterUpdate{% endif %}{% if platformName === "Python" %}after_update{% endif %}{% if platformName === "PHP" %}afterUpdate{% endif %}{% if platformName === "Java" %}afterUpdate{% endif %}{% if platformName === ".NET" %}AfterUpdate{% endif %}`
 
-在更新已存在的对象后执行特定的动作。和 `beforeUpdate` 一样，你可以知道哪些字段已被修改。
+{% call docs.alertWrap() %}
+本 Hook 使用不当可能会造成死循环，导致数据存储 API 的调用次数暴涨，甚至产生更多的费用。因此请仔细阅读 [防止死循环调用](#防止死循环调用) 部分，做出必要的调整和预防措施。
+{% endcall %}
 
-{% block afterUpdateExample %}{% endblock %}
+在更新已存在的对象后执行特定的动作。和 `{% if platformName === "Node.js" %}beforeUpdate{% endif %}{% if platformName === "Python" %}before_update{% endif %}{% if platformName === "PHP" %}beforeUpdate{% endif %}{% if platformName === "Java" %}beforeUpdate{% endif %}{% if platformName === ".NET" %}BeforeUpdate{% endif %}` 一样，你可以知道哪些字段已被修改。
 
-{% block hookDeadLoop %}
-{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.afterUpdate('Review', function(request) {
+  if (request.object.updatedKeys.indexOf('comment') != -1) {
+    if (request.object.get('comment').length < 5) {
+      console.log(review.ObjectId + " 看起来像灌水评论：" + comment)
+    }
+  }
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.after_update('Review')
+def after_review_update(article):
+    if 'comment' in obj.updated_keys and len(obj.get('comment')) < 5:
+        print(review.ObjectId + " 看起来像灌水评论：" + comment)
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::afterUpdate("Review", function($review, $user) {
+    if (in_array("comment", $review->updatedKeys) &&
+        strlen($review->get("comment")) < 5) {
+        error_log(review.ObjectId . " 看起来像灌水评论：" . comment);
+    }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "Review", type = EngineHookType.afterUpdate)
+public static void reviewAfterUpdateHook(AVObject review) throws Exception {
+  List<String> updateKeys = EngineRequestContext.getUpdateKeys();
+  for (String key : updateKeys) {
+    if ("comment".equals(key) && review.getString("comment").length()<5) {
+      LogUtil.avlog.d(review.ObjectId + " 看起来像灌水评论：" + comment);
+    }
+  }
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.AfterUpdate("Review", (AVObject review) =>
+{
+    var updatedKeys = review.GetUpdatedKeys();
+    if (updatedKeys.Contains("comment"))
+    {
+        var comment = review.Get<string>("comment");
+        if (comment.Length < 5 ) {
+            Console.WriteLine(review.ObjectId + " 看起来像灌水评论：" + comment);
+        }
+    }
+});
+```
+{% endif %}
 
-### {{hook_before_delete}}
+#### 防止死循环调用
 
-在删除一个对象之前做一些检查工作，比如在删除一个相册 Album 前，先检查一下该相册中还有没有照片 Photo：
+你也许会好奇为什么可以在 `{% if platformName === "Node.js" %}afterUpdate{% endif %}{% if platformName === "Python" %}after_update{% endif %}{% if platformName === "PHP" %}afterUpdate{% endif %}{% if platformName === "Java" %}afterUpdate{% endif %}{% if platformName === ".NET" %}AfterUpdate{% endif %}` 中保存 `post` 而不会再次触发该 hook。这是因为云引擎对所有传入 `{% if platformName === "Node.js" %}request.object{% endif %}{% if platformName === "Python" %}leancloud.Object{% endif %}{% if platformName === "PHP" %}LeanObject{% endif %}{% if platformName === "Java" %}post{% endif %}{% if platformName === ".NET" %}Post{% endif %}` 的对象做了处理，以阻止死循环调用的产生。
 
-{% block beforeDeleteExample %}{% endblock %}
+不过请注意，以下情况还需要开发者自行处理：
 
-### {{hook_after_delete}}
+- 对传入的 `{% if platformName === "Node.js" %}request.object{% endif %}{% if platformName === "Python" %}leancloud.Object{% endif %}{% if platformName === "PHP" %}LeanObject{% endif %}{% if platformName === "Java" %}post{% endif %}{% if platformName === ".NET" %}Post{% endif %}` 对象进行 `fetch` 操作。
+- 重新构造传入的 `{% if platformName === "Node.js" %}request.object{% endif %}{% if platformName === "Python" %}leancloud.Object{% endif %}{% if platformName === "PHP" %}LeanObject{% endif %}{% if platformName === "Java" %}post{% endif %}{% if platformName === ".NET" %}Post{% endif %}` 对象，如使用 `{% if platformName === "Node.js" %}AV.Object.createWithoutData(){% endif %}{% if platformName === "Python" %}leancloud.Object.create_without_data(){% endif %}{% if platformName === "PHP" %}LeanObject::create(){% endif %}{% if platformName === "Java" %}AVObject.createWithoutData(String, String){% endif %}{% if platformName === ".NET" %}AVObject.CreateWithoutData(){% endif %}` 方法。
 
-在被删一个对象后执行操作，例如递减计数、删除关联对象等等。同样以相册为例，这次我们不在删除相册前检查是否还有照片，而是在删除后，同时删除相册中的照片：
+对于使用上述方式产生的对象，请根据需要自行调用 `{% if platformName === "Node.js" %}object.disableBeforeHook(){% endif %}{% if platformName === "Python" %}leancloud.Object.disable_before_hook(){% endif %}{% if platformName === "PHP" %}LeanObject->disableBeforeHook(){% endif %}{% if platformName === "Java" %}post.disableBeforeHook(){% endif %}{% if platformName === ".NET" %}post.DisableBeforeHook(){% endif %}` 或 `{% if platformName === "Node.js" %}object.disableAfterHook(){% endif %}{% if platformName === "Python" %}leancloud.Object.disable_after_hook(){% endif %}{% if platformName === "PHP" %}LeanObject->disableAfterHook(){% endif %}{% if platformName === "Java" %}post.disableAfterHook(){% endif %}{% if platformName === ".NET" %}post.DisableAfterHook(){% endif %}`：
 
-{% block afterDeleteExample %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+// 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
+request.object.set('foo', 'bar');
+request.object.save().then(function (obj) {
+  // 你的业务逻辑
+});
 
-### {{hook_on_verified}}
+// 如果有 fetch 操作，则需要在新获得的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+request.object.fetch().then(function (obj) {
+  obj.disableAfterHook();
+  obj.set('foo', 'bar');
+  return obj.save();
+}).then(function (obj) {
+  // 你的业务逻辑
+});
+
+// 如果是其他方式构建对象，则需要在新构建的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+var obj = AV.Object.createWithoutData('Post', request.object.id);
+obj.disableAfterHook();
+obj.set('foo', 'bar');
+obj.save().then(function (obj) {
+  // 你的业务逻辑
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.after_update('Post')
+def after_post_update(post):
+    # 直接修改并保存对象不会再次触发 after_update Hook 函数
+    post.set('foo', 'bar')
+    post.save()
+
+    # 如果有 fetch 操作，则需要在新获得的对象上调用 disable_after_hook 来确保不会再次触发 Hook 函数
+    post.fetch()
+    post.disable_after_hook()
+    post.set('foo', 'bar')
+
+    # 如果是其他方式构建对象，则需要在新构建的对象上调用 disable_after_hook 来确保不会再次触发 Hook 函数
+    post = leancloud.Object.extend('Post').create_without_data(post.id)
+    post.disable_after_hook()
+    post.save()
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::afterUpdate("Post", function($post, $user) {
+    // 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
+    $post->set('foo', 'bar');
+    $post->save();
+
+    // 如果有 fetch 操作，则需要在新获得的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+    $post->fetch();
+    $post->disableAfterHook();
+    $post->set('foo', 'bar');
+    $post->save();
+
+    // 如果是其他方式构建对象，则需要在新构建的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+    $post = LeanObject::create("Post", $post->getObjectId());
+    $post->disableAfterHook();
+    $post->save();
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className="Post", type = EngineHookType.afterUpdate)
+public static void afterUpdatePost(AVObject post) throws AVException {
+  // 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
+  post.put("foo", "bar");
+  post.save();
+
+  // 如果有 fetch 操作，则需要在新获得的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+  post.fetch();
+  post.disableAfterHook();
+  post.put("foo", "bar");
+
+  // 如果是其他方式构建对象，则需要在新构建的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+  post = AVObject.createWithoutData("Post", post.getObjectId());
+  post.disableAfterHook();
+  post.save();
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.AfterUpdate("Post", (EngineObjectHookDeltegateSynchronous)(async post =>
+    {
+        // 直接修改并保存对象不会再次触发 AfterUpdate Hook 函数
+        post["foo"] = "bar";
+        await post.SaveAsync();
+
+        // 如果有 FetchAsync 操作，则需要在新获得的对象上调用 DisableAfterHook 来确保不会再次触发 Hook 函数
+        await post.FetchAsync();
+        post.DisableAfterHook();
+        post["foo"] = "bar";
+
+        // 如果是其他方式构建对象，则需要在新构建的对象上调用 DisableAfterHook 来确保不会再次触发 Hook 函数
+        post = AVObject.CreateWithoutData<AVObject>(post.ObjectId);
+        post.DisableAfterHook();
+        await post.SaveAsync();
+    }));
+```
+{% endif %}
+
+### `{% if platformName === "Node.js" %}beforeDelete{% endif %}{% if platformName === "Python" %}before_delete{% endif %}{% if platformName === "PHP" %}beforeDelete{% endif %}{% if platformName === "Java" %}beforeDelete{% endif %}{% if platformName === ".NET" %}BeforeDelete{% endif %}`
+
+在删除一个对象之前做一些检查工作，比如在删除一个相册 `Album` 前，先检查一下该相册中还有没有照片 `Photo`：
+
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.beforeDelete('Album', function (request) {
+  // 查询 Photo 中还有没有属于这个相册的照片
+  var query = new AV.Query('Photo');
+  var album = AV.Object.createWithoutData('Album', request.object.id);
+  query.equalTo('album', album);
+  return query.count().then(function (count) {
+    if (count > 0) {
+      // delete 操作会被丢弃
+      throw new AV.Cloud.Error('Cannot delete an album if it still has photos in it.');
+    }
+  }, function (error) {
+    throw new AV.Cloud.Error('Error ' + error.code + ' occurred when finding photos: ' + error.message);
+  });
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+import leancloud
+
+@engine.before_delete('Album') # Album 为需要 hook 的 class 的名称
+def before_album_delete(album):
+    query = leancloud.Query('Photo')
+    query.equal_to('album', album)
+    try:
+        matched_count = query.count()
+    except leancloud.LeanCloudError:
+        raise engine.LeanEngineError(message='An error occurred with LeanEngine.')
+    if count > 0:
+        # delete 操作会被丢弃
+        raise engine.LeanEngineError(message='Cannot delete an album if it still has photos in it.')
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::beforeDelete("Album", function($album, $user) {
+    $query = new Query("Photo");
+    $query->equalTo("album", $album);
+    try {
+        $count = $query->count();
+    } catch (CloudException $ex) {
+        throw new FunctionError("An error occurred when getting photo count: {$ex->getMessage()}");
+    }
+    if ($count > 0) {
+        // delete 操作会被丢弃
+        throw new FunctionError("Cannot delete an album if it still has photos in it.");
+    }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "Album", type = EngineHookType.beforeDelete)
+public static AVObject albumBeforeDeleteHook(AVObject album) throws Exception {
+  AVQuery query = new AVQuery("Photo");
+  query.whereEqualTo("album", album);
+  int count = query.count();
+  if (count > 0) {
+    // delete 操作会被丢弃
+    throw new Exception("Cannot delete an album if it still has photos in it.");
+  } else {
+    return album;
+  }
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.BeforeDelete("Album", async album =>
+{
+    AVQuery<AVObject> query = new AVQuery<AVObject>("Photo");
+    query.WhereEqualTo("album", album);
+    int count = await query.CountAsync();
+    if (count > 0)
+    {
+        throw new Exception("Cannot delete an album if it still has photos in it.");
+    }
+    else
+    {
+        Console.WriteLine("Deleted.");
+    }
+});
+```
+{% endif %}
+
+### `{% if platformName === "Node.js" %}afterDelete{% endif %}{% if platformName === "Python" %}after_delete{% endif %}{% if platformName === "PHP" %}afterDelete{% endif %}{% if platformName === "Java" %}afterDelete{% endif %}{% if platformName === ".NET" %}AfterDelete{% endif %}`
+
+在一个对象后被删执行操作，例如递减计数、删除关联对象等等。同样以相册为例，这次我们不在删除相册前检查是否还有照片，而是在删除后，同时删除相册中的照片：
+
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.afterDelete('Album', function (request) {
+  var query = new AV.Query('Photo');
+  var album = AV.Object.createWithoutData('Album', request.object.id);
+  query.equalTo('album', album);
+  return query.find().then(function (posts) {
+    return AV.Object.destroyAll(posts);
+  }).catch(function (error) {
+    console.error('Error ' + error.code + ' occurred when finding photos: ' + error.message);
+  });
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+import leancloud
+
+@engine.after_delete('Album') # Album 为需要 hook 的 class 的名称
+def after_album_delete(album):
+    query = leancloud.Query('Photo')
+    query.equal_to('album', album)
+    try:
+        query.destroy_all()
+    except leancloud.LeanCloudError:
+        raise leancloud.LeanEngineError(message='An error occurred with LeanEngine.')
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::afterDelete("Album", function($album, $user) {
+    $query = new Query("Photo");
+    $query->equalTo("album", $album);
+    try {
+        $photos = $query->find();
+        LeanObject::destroyAll($photos);
+    } catch (CloudException $ex) {
+        throw new FunctionError("An error occurred when getting photo count: {$ex->getMessage()}");
+    }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "Album", type = EngineHookType.afterDelete)
+public static void albumAfterDeleteHook(AVObject album) throws Exception {
+  AVQuery query = new AVQuery("Photo");
+  query.whereEqualTo("album", album);
+  List<AVObject> result = query.find();
+  if (result != null && !result.isEmpty()) {
+    AVObject.deleteAll(result);
+  }
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.AfterDelete("Album", async album =>
+{
+    AVQuery<AVObject> query = new AVQuery<AVObject>("Photo");
+    query.WhereEqualTo("album", album);
+    var result = await query.FindAsync();
+    if (result != null && result.Count() != 0)
+    {
+        await AVObject.DeleteAllAsync(result);
+    }
+});
+```
+{% endif %}
+
+### `{% if platformName === "Node.js" %}onVerified{% endif %}{% if platformName === "Python" %}on_verified{% endif %}{% if platformName === "PHP" %}onVerified{% endif %}{% if platformName === "Java" %}onVerified{% endif %}{% if platformName === ".NET" %}OnVerified{% endif %}`
 
 当用户通过邮箱或者短信验证时，对该用户执行特定操作。比如：
 
-{% block onVerifiedExample %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onVerified('sms', function (request) {
+  console.log('User ' + request.object + ' is verified by SMS.');
+});
+```
+
+上面的代码示例中的 `object` 换成 `currentUser` 也可以。因为这里被操作的对象正好是发起操作的用户。
+下面的 `onLogin` 函数同理。
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.on_verified('sms')
+def on_sms_verified(user):
+    print user
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::onVerifed("sms", function($user, $meta) {
+    error_log("User {$user->getUsername()} is verified by SMS.");
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "_User", type = EngineHookType.onVerified)
+public static void userOnVerifiedHook(AVUser user) throws Exception {
+  LogUtil.avlog.d("User " + user.getObjectId() + " is verified by SMS.");
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.OnVerifiedSMS((AVUser user) =>
+{
+    Console.WriteLine("User is verified by sms.");
+});
+```
+{% endif %}
 
 函数的第一个参数是验证类型。短信验证为 `sms`，邮箱验证为 `email`。另外，数据库中相关的验证字段，如 `emailVerified` 不需要修改，系统会自动更新。
 
-### {{hook_on_login}}
+### `{% if platformName === "Node.js" %}onLogin{% endif %}{% if platformName === "Python" %}on_login{% endif %}{% if platformName === "PHP" %}onLogin{% endif %}{% if platformName === "Java" %}onLogin{% endif %}{% if platformName === ".NET" %}OnLogin{% endif %}`
 
 在用户登录之时执行指定操作，比如禁止在黑名单上的用户登录：
 
-{% block onLoginExample %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onLogin(function (request) {
+  // 因为此时用户还没有登录，所以用户信息是保存在 request.object 对象中
+  console.log('User ' + request.object + ' is trying to log in.');
+  if (request.object.get('username') === 'noLogin') {
+    // 如果是 error 回调，则用户无法登录（收到 401 响应）
+    throw new AV.Cloud.Error('Forbidden');
+  }
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.on_login
+def on_login(user):
+    print user
+    if user.get('username') == 'noLogin':
+      # 如果抛出 LeanEngineError，则用户无法登录（收到 401 响应）
+      raise LeanEngineError('Forbidden')
+    # 没有抛出异常，函数正常执行完毕的话，用户可以登录
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::onLogin(function($user) {
+    error_log("User {$user->getUsername()} is trying to log in.");
+    if ($user->get("blocked")) {
+        // 如果抛出异常，则用户无法登录（收到 401 响应）
+        throw new FunctionError("Forbidden");
+    }
+    // 没有抛出异常，函数正常执行完毕的话，用户可以登录
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "_User", type = EngineHookType.onLogin)
+public static AVUser userOnLoginHook(AVUser user) throws Exception {
+  if ("noLogin".equals(user.getUsername())) {
+    throw new Exception("Forbidden");
+  } else {
+    return user;
+  }
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.OnLogIn((AVUser user) =>
+{
+    Console.WriteLine("User logged in.");
+});
+```
+{% endif %}
 
-{% block realtime_hook %}
+{% if platformName === "Node.js" or platformName === "Python" or platformName === "PHP" or platformName === "Java" %}
 ### 即时通讯 Hook 函数
 
-请阅读 [即时通讯概览 &middot; 云引擎 Hook](realtime-guide-systemconv.html#万能的 Hook 机制) 来了解以下函数的相关参数和用法。
+请阅读 [即时通讯概览 · 云引擎 Hook](realtime-guide-systemconv.html#万能的 Hook 机制) 来了解以下函数的相关参数和用法。
 
-#### {{hook_message_received}}
+#### `{% if platformName === "Node.js" %}onIMMessageReceived{% endif %}{% if platformName === "Python" %}_messageReceived{% endif %}{% if platformName === "PHP" %}_messageReceived{% endif %}{% if platformName === "Java" %}messageReceived{% endif %}`
+
 在消息达到服务器、群组成员已解析完成、发送给收件人之前触发。例如，提前过滤掉聊天内容中的一些广告类的关键词：
 
-{% block code_hook_message_received %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMMessageReceived((request) => {
+    // request.params: {
+    //     fromPeer: 'Tom',
+    //     receipt: false,
+    //     groupId: null,
+    //     system: null,
+    //     content: '{"_lctext":"Hello!","_lctype":-1}',
+    //     convId: '5789a33a1b8694ad267d8040',
+    //     toPeers: ['Jerry'],
+    //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
+    //     bin: false,
+    //     transient: false,
+    //     sourceIP: '121.239.62.103',
+    //     timestamp: 1472200796764
+    // }
 
-#### {{hook_receiver_offline}}
+    let content = request.params.content;
+    console.log('content', content);
+    let processedContent = content.replace('中介', '**');
+    // 必须含有以下语句给服务端一个正确的返回，否则会引起异常
+    return {
+        content: processedContent
+    };
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _messageReceived(**params):
+    # params: {
+    #   'fromPeer': 'Tom',
+    #   'receipt': false,
+    #   'groupId': null,
+    #   'system': null,
+    #   'content': '{"_lctext":"Hello!","_lctype":-1}',
+    #   'convId': '5789a33a1b8694ad267d8040',
+    #   'toPeers': ['Jerry'],
+    #   '__sign': '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
+    #   'bin': false,
+    #   'transient': false,
+    #   'sourceIP': '121.239.62.103',
+    #   'timestamp': 1472200796764
+    # }
+    print('_messageReceived start')
+    content = json.loads(params['content'])
+    text = content._lctext
+    print('text:', text)
+    processed_content = text.replace('中介', '**')
+    print('_messageReceived end')
+    # 必须含有以下语句给服务端一个正确的返回，否则会引起异常
+    return {
+        'content': processed_content
+    }
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define("_messageReceived", function($params, $user) {
+    // params: {
+    //     fromPeer: 'Tom',
+    //     receipt: false,
+    //     groupId: null,
+    //     system: null,
+    //     content: '{"_lctext":"Hello!","_lctype":-1}',
+    //     convId: '5789a33a1b8694ad267d8040',
+    //     toPeers: ['Jerry'],
+    //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
+    //     bin: false,
+    //     transient: false,
+    //     sourceIP: '121.239.62.103',
+    //     timestamp: 1472200796764
+    // };
+
+    error_log('_messageReceived start');
+    $content = json_decode($params["content"], true);
+    $text = $content["_lctext"];
+    error_log($text);
+    $processedContent = preg_replace("中介", "**", $text);
+    // 必须含有以下语句给服务端一个正确的返回，否则会引起异常
+    return array("content" => $processedContent);
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.messageReceived)
+public static Map<String, Object> onMessageReceived(Map<String, Object> params) {
+  System.out.println(params);
+  Map<String, Object> result = new HashMap<String, Object>();
+  String content = (String)params.get("content");
+  Map<String,Object> contentMap = (Map<String,Object>)JSON.parse(content);
+  String text = (String)(contentMap.get("_lctext").toString());
+  String processedContent = text.replace("中介", "**");
+  result.put("content", processedContent);
+  return result;
+}
+```
+{% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMReceiversOffline{% endif %}{% if platformName === "Python" %}_receiversOffline{% endif %}{% if platformName === "PHP" %}_receiversOffline{% endif %}{% if platformName === "Java" %}receiversOffline{% endif %}`
+
 在消息发送完成时触发、对话中某些用户却已经下线，此时可以根据发送的消息来生成离线消息推送的标题等等。例如截取所发送消息的前 6 个字符作为推送的标题：
 
-{% block code_hook_receiver_offline %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMReceiversOffline((request) => {
+    let params = request.params;
+    let content = params.content;
 
-#### {{hook_message_sent}}
+    // params.content 为消息的内容
+    let shortContent = content;
+
+    if (shortContent.length > 6) {
+        shortContent = content.slice(0, 6);
+    }
+
+    console.log('shortContent', shortContent);
+
+    return {
+        pushMessage: JSON.stringify({
+            // 自增未读消息的数目
+            // 不想自增就设为数字
+            badge: "Increment",
+            sound: "default",
+            // 使用开发证书
+            _profile: "dev",
+            alert: shortContent
+        })
+    }
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _receiversOffline(**params):
+    print('_receiversOffline start')
+    # params['content'] 为消息内容
+    content = params['content']
+    short_content = content[:6]
+    print('short_content:', short_content)
+    payloads = {
+        # 自增未读消息的数目
+        # 不想自增就设为数字
+        'badge': 'Increment',
+        'sound': 'default',
+        # 使用开发证书
+        '_profile': 'dev',
+        'alert': short_content,
+    }
+    print('_receiversOffline end')
+    return {
+        'pushMessage': json.dumps(payloads),
+    }
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_receiversOffline', function($params, $user) {
+    error_log('_receiversOffline start');
+    // content 为消息内容
+    $shortContent = $params["content"];
+    if (strlen($shortContent) > 6) {
+        $shortContent = substr($shortContent, 0, 6);
+    }
+
+    $json = array(
+        // 自增未读消息的数目
+        // 不想自增就设为数字
+        "badge" => "Increment",
+        "sound" => "default",
+        // 使用开发证书
+        "_profile" => "dev",
+        "alert" => shortContent
+    );
+
+    $pushMessage = json_encode($json);
+    return array(
+        "pushMessage" => $pushMessage,
+    );
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.receiversOffline)
+public static Map<String, Object> onReceiversOffline(Map<String, Object> params) {
+  // content 为消息内容
+  String alert = (String)params.get("content");
+  if(alert.length() > 6){
+    alert = alert.substring(0, 6);
+  }
+  System.out.println(alert);
+  Map<String, Object> result = new HashMap<String, Object>();
+  JSONObject object = new JSONObject();
+  // 自增未读消息的数目
+  // 不想自增就设为数字
+  object.put("badge", "Increment");
+  object.put("sound", "default");
+  // 使用开发证书
+  object.put("_profile", "dev");
+  object.put("alert", alert);
+  result.put("pushMessage", object.toString());
+  return result;
+}
+```
+{% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMMessageSent{% endif %}{% if platformName === "Python" %}_messageSent{% endif %}{% if platformName === "PHP" %}_messageSent{% endif %}{% if platformName === "Java" %}messageSent{% endif %}`
+
 消息发送完成之后触发，例如消息发送完后，在云引擎中打印一下日志：
 
-{% block code_hook_message_sent %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMMessageSent((request) => {
+  console.log('params:', request.params);
 
-#### {{hook_conversation_start}}
+  // params: {
+  //   fromPeer: 'Tom',
+  //   receipt: false,
+  //   onlinePeers: [],
+  //   content: '12345678',
+  //   convId: '5789a33a1b8694ad267d8040',
+  //   msgId: 'fptKnuYYQMGdiSt_Zs7zDA',
+  //   __sign: '1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711',
+  //   bin: false,
+  //   transient: false,
+  //   sourceIP: '114.219.127.186',
+  //   offlinePeers: ['Jerry'],
+  //   timestamp: 1472703266522
+  // }
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _messageSent(**params):
+    print('_messageSent start')
+    print('params:', params)
+    print('_messageSent end')
+    return {}
+
+# _messageSent start
+# params: {
+#   '__sign': '1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711',
+#   'bin': False,
+#   'content': '12345678',
+#   'convId': '5789a33a1b8694ad267d8040',
+#   'fromPeer': 'Tom',
+#   'msgId': 'fptKnuYYQMGdiSt_Zs7zDA',
+#   'offlinePeers': ['Jerry'],
+#   'onlinePeers': [],
+#   'receipt': False,
+#   'sourceIP': '114.219.127.186',
+#   'timestamp': 1472703266522,
+#   'transient': False
+# }
+# _messageSent end
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_messageSent', function($params, $user) {
+    error_log('_messageSent start');
+    error_log('params:' . json_encode($params));
+    return array();
+
+    // _messageSent start
+    // params: {
+    //   fromPeer: 'Tom',
+    //   receipt: false,
+    //   onlinePeers: [],
+    //   content: '12345678',
+    //   convId: '5789a33a1b8694ad267d8040',
+    //   msgId: 'fptKnuYYQMGdiSt_Zs7zDA',
+    //   __sign: '1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711',
+    //   bin: false,
+    //   transient: false,
+    //   sourceIP: '114.219.127.186',
+    //   offlinePeers: ['Jerry'],
+    //   timestamp: 1472703266522
+    // }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.messageSent)
+public static Map<String, Object> onMessageSent(Map<String, Object> params) {
+  System.out.println(params);
+  Map<String, Object> result = new HashMap<String, Object>();
+  // …
+  return result;
+}
+```
+{% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMConversationStart{% endif %}{% if platformName === "Python" %}_conversationStart{% endif %}{% if platformName === "PHP" %}_conversationStart{% endif %}{% if platformName === "Java" %}conversationStart{% endif %}`
+
 创建对话，在签名校验（如果开启）之后、实际创建之前触发。例如对话创建时，在云引擎中打印一下日志：
 
-{% block code_hook_conversation_start %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMConversationStart((request) => {
+  let params = request.params;
+  console.log('params:', params);
 
-#### {{hook_conversation_started}}
+  // params: {
+  //     initBy: 'Tom',
+  //     members: ['Tom', 'Jerry'],
+  //     attr: {
+  //         name: 'Tom & Jerry'
+  //     },
+  //     __sign: '1472703266397,b57285517a95028f8b7c34c68f419847a049ef26'
+  // }
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _conversationStart(**params):
+    print('_conversationStart start')
+    print('params:', params)
+    print('_conversationStart end')
+    return {}
+
+# _conversationStart start
+# params: {
+#   '__sign': '1472703266397,b57285517a95028f8b7c34c68f419847a049ef26',
+#   'attr': {'name': 'Tom & Jerry'},
+#   'initBy': 'Tom',
+#   'members': ['Tom', 'Jerry']
+# }
+# _conversationStart end
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_conversationStart', function($params, $user) {
+    error_log('_conversationStart start');
+    error_log('params:' . json_encode($params));
+    return array();
+
+    // _conversationStart start
+    // params: {
+    //     initBy: 'Tom',
+    //     members: ['Tom', 'Jerry'],
+    //     attr: {
+    //         name: 'Tom & Jerry'
+    //     },
+    //     __sign: '1472703266397,b57285517a95028f8b7c34c68f419847a049ef26'
+    // }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.conversationStart)
+public static Map<String, Object> onConversationStart(Map<String, Object> params) {
+  System.out.println(params);
+  Map<String, Object> result = new HashMap<String, Object>();
+  // 如果创建者是 Tom 则拒绝创建对话
+  if ("Tom".equals(params.get("initBy"))) {
+    result.put("reject", true);
+    // 这个数字是由开发者自定义的
+    result.put("code", 9890);
+  }
+  return result;
+}
+```
+{% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMConversationStarted{% endif %}{% if platformName === "Python" %}_conversationStarted{% endif %}{% if platformName === "PHP" %}_conversationStarted{% endif %}{% if platformName === "Java" %}conversationStarted{% endif %}`
+
 创建对话完成触发。例如对话创建之后，在云引擎打印一下日志：
 
-{% block code_hook_conversation_started %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMConversationStarted((request) => {
+  let params = request.params;
+  console.log('params:', params);
 
-#### {{hook_conversation_add}}
-向对话添加成员，在签名校验（如果开启）之后、实际加入之前，包括主动加入和被其他用户加入两种情况都会触发，**注意在创建对话时传入了其他用户的 `clientId` 作为 Member 参数，不会触发 {{hook_conversation_add}} **。例如在云引擎中打印成员加入时的日志：
+  // params: {
+  //     convId: '5789a33a1b8694ad267d8040',
+  //     __sign: '1472723167361,f5ceedde159408002fc4edb96b72aafa14bc60bb'
+  // }
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _conversationStarted(**params):
+    print('_conversationStarted start')
+    print('params:', params)
+    print('_conversationStarted end')
+    return {}
 
-{% block code_hook_conversation_add %}{% endblock %}
+# _conversationStarted start
+# params: {
+#   '__sign': '1472723167361,f5ceedde159408002fc4edb96b72aafa14bc60bb',
+#   'convId': '5789a33a1b8694ad267d8040'
+# }
+# _conversationStarted end
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_conversationStarted', function($params, $user) {
+    error_log('_conversationStarted start');
+    error_log('params:' . json_encode($params));
+    return array();
 
-#### {{hook_conversation_remove}}
+    // _conversationStarted start
+    // params: {
+    //     convId: '5789a33a1b8694ad267d8040',
+    //     __sign: '1472723167361,f5ceedde159408002fc4edb96b72aafa14bc60bb'
+    // }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.conversationStarted)
+public static Map<String, Object> onConversationStarted(Map<String, Object> params) throws Exception {
+  System.out.println(params);
+  Map<String, Object> result = new HashMap<String, Object>();
+  String convId = (String)params.get("convId");
+  System.out.println(convId);
+  return result;
+}
+```
+{% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMConversationAdd{% endif %}{% if platformName === "Python" %}_conversationAdd{% endif %}{% if platformName === "PHP" %}_conversationAdd{% endif %}{% if platformName === "Java" %}conversationAdd{% endif %}`
+
+向对话添加成员，在签名校验（如果开启）之后、实际加入之前，包括主动加入和被其他用户加入两种情况都会触发。**注意如果在创建对话时传入了其他用户的 `clientId` 作为成员，则不会触发该 hook。**例如在云引擎中打印成员加入时的日志：
+
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMConversationAdd((request) => {
+  let params = request.params;
+  console.log('params:', params);
+
+  // params: {
+  //     initBy: 'Tom',
+  //     members: ['Mary'],
+  //     convId: '5789a33a1b8694ad267d8040',
+  //     __sign: '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0'
+  // }
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _conversationAdd(**params):
+    print('_conversationAdd start')
+    print('params:', params)
+    print('_conversationAdd end')
+    return {}
+
+# _conversationAdd start
+# params: {
+#   '__sign': '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0',
+#   'convId': '5789a33a1b8694ad267d8040',
+#   'initBy': 'Tom',
+#   'members': ['Mary']
+# }
+# _conversationAdd end
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_conversationAdd', function($params, $user) {
+    error_log('_conversationAdd start');
+    error_log('params:' . json_encode($params));
+    return array();
+
+    // _conversationAdd start
+    // params: {
+    //     initBy: 'Tom',
+    //     members: ['Mary'],
+    //     convId: '5789a33a1b8694ad267d8040',
+    //     __sign: '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0'
+    // }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.conversationAdd)
+public static Map<String, Object> onConversationAdd(Map<String, Object> params) {
+  System.out.println(params);
+  String[] members = (String[])params.get("members");
+  Map<String, Object> result = new HashMap<String, Object>();
+  System.out.println("members");
+  System.out.println(members);
+  // 如果创建者是 Tom 则拒绝新增成员
+  if ("Tom".equals(params.get("initBy"))) {
+    result.put("reject", true);
+    // 这个数字是由开发者自定义
+    result.put("code", 9890);
+  }
+  return result;
+}
+```
+{% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMConversationRemove{% endif %}{% if platformName === "Python" %}_conversationRemove{% endif %}{% if platformName === "PHP" %}_conversationRemove{% endif %}{% if platformName === "Java" %}conversationRemove{% endif %}`
+
 从对话中踢出成员，在签名校验（如果开启）之后、实际踢出之前触发，用户自己退出对话不会触发。例如在踢出某一个成员时，在云引擎日志中打印出该成员的 `clientId`：
 
-{% block code_hook_conversation_remove %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMConversationRemove((request) => {
+  let params = request.params;
+  console.log('params:', params);
+  console.log('Removed clientId:', params.members[0]);
 
-#### {{hook_conversation_update}}
+  // params: {
+  //     initBy: 'Tom',
+  //     members: ['Jerry'],
+  //     convId: '57c8f3ac92509726c3dadaba',
+  //     __sign: '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38'
+  // }
+  // Removed clientId: Jerry
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _conversationRemove(**params):
+    print('_conversationRemove start')
+    print('params:', params)
+    print('Removed clientId:', params['members'][0])
+    print('_conversationRemove end')
+    return {}
+
+# _conversationRemove start
+# params: {
+#   '__sign': '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38',
+#   'convId': '57c8f3ac92509726c3dadaba',
+#   'initBy': 'Tom',
+#   'members': ['Jerry']
+# }
+# Removed clientId: Jerry
+# _conversationRemove end
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_conversationRemove', function($params, $user) {
+
+    error_log('_conversationRemove start');
+    error_log('params:' . json_encode($params));
+    error_log('Removed clientId:' . $params['members'][0]);
+    return array();
+
+    // _conversationRemove start
+    // params: {
+    //     initBy: 'Tom',
+    //     members: ['Jerry'],
+    //     convId: '57c8f3ac92509726c3dadaba',
+    //     __sign: '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38'
+    // }
+    // Removed clientId: Jerry
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.conversationRemove)
+public static Map<String, Object> onConversationRemove(Map<String, Object> params) {
+  System.out.println(params);
+  String[] members = (String[])params.get("members");
+  Map<String, Object> result = new HashMap<String, Object>();
+  System.out.println("members");
+  // 如果创建者是 Tom 则拒绝踢出成员
+  if ("Tom".equals(params.get("initBy"))) {
+    result.put("reject", true);
+    // 这个数字是由开发者自定义
+    result.put("code", 9892);
+  }
+  return result;
+}
+```
+{% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMConversationUpdate{% endif %}{% if platformName === "Python" %}_conversationUpdate{% endif %}{% if platformName === "PHP" %}_conversationUpdate{% endif %}{% if platformName === "Java" %}conversationUpdate{% endif %}`
+
 修改对话属性、设置或取消对话消息提醒，在实际修改之前触发。例如在更新发生时，在云引擎日志中打印出对话的名称：
 
-{% block code_hook_conversation_update %}{% endblock %}
-{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMConversationUpdate((request) => {
+  let params = request.params;
+  console.log('params:', params);
+  console.log('name:', params.attr.name);
+
+  // params: {
+  //     convId: '57c9208292509726c3dadb4b',
+  //     initBy: 'Tom',
+  //     attr: {
+  //         name: 'Tom and Jerry',
+  //         type: 'public'
+  //     }
+  // }
+  // name: Tom and Jerry
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _conversationUpdate(**params):
+    print('_conversationUpdate start')
+    print('params:', params)
+    print('name:', params['attr']['name'])
+    print('_conversationUpdate end')
+    return {}
+
+# _conversationUpdate start
+# params: {
+#   '__sign': '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38',
+#   'convId': '57c8f3ac92509726c3dadaba',
+#   'initBy': 'Tom',
+#   'members': ['Jerry']
+# }
+# name: Tom and Jerry
+# _conversationUpdate end
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_conversationUpdate', function($params, $user) {
+    error_log('_conversationUpdate start');
+    error_log('params:' . json_encode($params));
+    error_log('name:' . $params['attr']['name']);
+    return array();
+
+    // _conversationUpdate start
+    // params: {
+    //     convId: '57c9208292509726c3dadb4b',
+    //     initBy: 'Tom',
+    //     attr: {
+    //         name: 'Tom and Jerry',
+    //         type: 'public'
+    //     }
+    // }
+    // name: Tom and Jerry
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.conversationUpdate)
+public static Map<String, Object> onConversationUpdate(Map<String, Object> params) {
+  System.out.println(params);
+  Map<String, Object> result = new HashMap<String, Object>();
+  Map<String,Object> attr = (Map<String,Object>)params.get("attr");
+  System.out.println(attr);
+  // Map<String,Object> attrMap = (Map<String,Object>)JSON.parse(attr);
+  String name = (String)attr.get("name");
+  // System.out.println(attrMap);
+  System.out.println(name);
+  // 如果创建者是 Tom 则拒绝修改属性
+  if ("Tom".equals(params.get("initBy"))) {
+    result.put("reject", true);
+    // 这个数字是由开发者自定义
+    result.put("code", 9893);
+  }
+  return result;
+}
+```
+{% endif %}
+{% endif %}
 
 ### Hook 函数错误响应码
 
-为 `{{hook_before_save}}` 这类的 hook 函数定义错误码，需要这样：
+为 `{% if platformName === "Node.js" %}beforeSave{% endif %}{% if platformName === "Python" %}before_save{% endif %}{% if platformName === "PHP" %}beforeSave{% endif %}{% if platformName === "Java" %}beforeSave{% endif %}{% if platformName === ".NET" %}BeforeSave{% endif %}` 这类的 hook 函数定义错误码，需要这样：
 
-{% block errorCodeExampleForHooks %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.beforeSave('Review', function (request) {
+  // 使用 JSON.stringify() 将 object 变为字符串
+  throw new AV.Cloud.Error(JSON.stringify({
+    code: 123,
+    message: 'An error occurred.'
+  }));
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.before_save('Review') # Review 为需要 hook 的 class 的名称
+def before_review_save(review):
+    comment = review.get('comment')
+    if not comment:
+      raise leancloud.LeanEngineError(
+        code=123,
+        message='An error occurred.'
+      )
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::beforeSave("Review", function($review, $user) {
+   $comment = $review->get("comment");
+   if (!$comment) {
+       throw new FunctionError(json_encode(array(
+           "code" => 123,
+           "message" => "An error occurred.",
+       )));
+   }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineHook(className = "Review", type = EngineHookType.beforeSave)
+public static AVObject reviewBeforeSaveHook(AVObject review) throws Exception {
+  throw new AVException(123, "An error occurred.");
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+cloud.BeforeSave("Review", (AVObject review) =>
+{
+    throw new EngineException(123, "An error occurred.");
+});
+```
+{% endif %}
 
-客户端收到的响应为：`Cloud Code validation failed. Error detail : {"code":123, "message": "自定义错误信息"}`，然后通过**截取字符串**的方式取出错误信息，再转换成需要的对象。
+客户端收到的响应为 `Cloud Code validation failed. Error detail: { "code": 123, "message": "An error occurred." }`。可通过 **截取字符串** 的方式取出错误信息，再转换成需要的对象。
 
 ### Hook 函数超时
 
-Hook 函数的超时时间为 3 秒。如果 Hook 函数被其他的云函数调用（比如因为 save 对象而触发 `beforeSave` 和 `afterSave`），那么它们的超时时间会进一步被其他云函数调用的剩余时间限制。
+Hook 函数的超时时间为 3 秒。如果 Hook 函数被其他的云函数调用（比如因为保存对象而触发 `{% if platformName === "Node.js" %}beforeSave{% endif %}{% if platformName === "Python" %}before_save{% endif %}{% if platformName === "PHP" %}beforeSave{% endif %}{% if platformName === "Java" %}beforeSave{% endif %}{% if platformName === ".NET" %}BeforeSave{% endif %}` 和 `{% if platformName === "Node.js" %}afterSave{% endif %}{% if platformName === "Python" %}after_save{% endif %}{% if platformName === "PHP" %}afterSave{% endif %}{% if platformName === "Java" %}afterSave{% endif %}{% if platformName === ".NET" %}AeforeSave{% endif %}`），那么它们的超时时间会进一步被其他云函数调用的剩余时间限制。
 
-例如，如果一个 `beforeSave` 函数是被一个已经运行了 13 秒的云函数触发，那么 `beforeSave` 函数就只剩下 2 秒的时间来运行。同时请参考 [云函数超时及处理方案](#云函数超时)。
+例如，如果一个 `{% if platformName === "Node.js" %}beforeSave{% endif %}{% if platformName === "Python" %}before_save{% endif %}{% if platformName === "PHP" %}beforeSave{% endif %}{% if platformName === "Java" %}beforeSave{% endif %}{% if platformName === ".NET" %}BeforeSave{% endif %}` 函数是被一个已经运行了 13 秒的云函数触发，那么 `{% if platformName === "Node.js" %}beforeSave{% endif %}{% if platformName === "Python" %}before_save{% endif %}{% if platformName === "PHP" %}beforeSave{% endif %}{% if platformName === "Java" %}beforeSave{% endif %}{% if platformName === ".NET" %}BeforeSave{% endif %}` 函数就只剩下 2 秒的时间来运行。同时请参考 [云函数超时及处理方案](#云函数超时)。
 
-{% block online_editor %}{% endblock %}
+{% if platformName === "Node.js" %}
+## 在线编写云函数
+
+很多人使用云引擎是为了在服务端提供一些个性化的方法供各终端调用，而不希望关心诸如代码托管、npm 依赖管理等问题。为此我们提供了在线维护云函数的功能。使用此功能需要注意：
+
+- 在定义的函数会覆盖你之前用 Git 或命令行部署的项目。
+- 目前只能在线编写云函数和 Hook，不支持托管静态网页、编写动态路由。
+- 只能使用 SDK 和一些内置的模块（详见下节表格），无法引入其他模块作为依赖。
+
+在 [控制台 > 云引擎 > 部署 > 在线编辑](/dashboard/cloud.html?appid={{appid}}#/deploy) 标签页，可以：
+
+- **创建函数**：指定函数类型、函数名称、函数体的具体代码、注释等信息，点击「保存」即可创建一个云函数。
+- **部署**：选择要部署的环境，点击「部署」即可看到部署过程和结果。
+- **预览**：会将所有函数汇总并生成一个完整的代码段，可以确认代码，或者将其保存为 `cloud.js` 覆盖项目模板的同名文件，即可快速的转换为使用项目部署。
+- **维护云函数**：可以编辑已有云函数，查看保存历史，以及删除云函数。
+
+{% call docs.alertWrap() %}
+云函数编辑之后需要点击 **部署** 才能生效。
+{% endcall %}
+
+### 在线编写的 SDK 版本
+
+目前在线编辑仅支持 Node.js，提供了 4 种 SDK 版本：
+
+在线编辑版本|Node.js SDK|JS SDK|Node.js|备注|可用依赖
+---|---|---|---|---|---
+v0|0.x|0.x|0.12|已不推荐使用|moment, request, underscore
+v1|1.x|1.x|4||async, bluebird, co, ejs, handlebars, joi, lodash, marked, moment, q, request, superagent, underscore
+v2|2.x|2.x|6|需要使用 Promise 写法|async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
+v3|3.x|3.x|8|需要使用 Promise 写法|async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
+
+**从 v0 升级到 v1：**
+
+- JS SDK 升级到了 [1.0](https://github.com/leancloud/javascript-sdk/releases/tag/v1.0.0)。
+- 需要从 `request.currentUser` 获取用户，而不是 `AV.User.current`。
+- 在调用 `AV.Cloud.run` 时需要手动传递 user 对象。
+
+**从 v1 升级到 v2：**
+
+- JS SDK 升级到 [2.0](https://github.com/leancloud/javascript-sdk/releases/tag/v2.0.0)（必须使用 Promise，不再支持 callback 风格）。
+- 删除了 `AV.Cloud.httpRequest`。
+- 在云函数中 **必须** 返回 Promise 作为云函数的值，抛出 `AV.Cloud.Error` 来表示错误。
+
+**从 v2 升级到 v3：**
+
+- JS SDK 升级到了 [3.0](https://github.com/leancloud/javascript-sdk/releases/tag/v3.0.0)（`AV.Object.toJSON` 的行为变化等）。
+{% endif %}
 
 ## 定时任务
 
-定时任务可以按照设定，以一定间隔自动完成指定动作，比如半夜清理过期数据，每周一向所有用户发送推送消息等等。定时任务的最小时间单位是**秒**，正常情况下时间误差都可以控制在秒级别。
+定时任务可以按照设定，以一定间隔自动完成指定动作，比如半夜清理过期数据，每周一向所有用户发送推送消息等等。定时任务的最小时间单位是 **秒**，正常情况下时间误差都可以控制在秒级别。
 
 定时任务是普通的云函数，也会遇到 [超时问题](#云函数超时)，具体请参考 [超时处理方案](#超时的处理方案)。
 
 {% call docs.noteWrap() %}
-一个定时器如果在 24 小时内收到了超过 30 次的 400 (Bad Request) 或 502 (Bad Gateway) 的应答，它将会被云引擎禁用，同时系统会向开发者发出相关的禁用通知邮件。在控制台的日志中，对应的错误信息为 [`{{ errorMessage_shortCircuited }}`](#错误信息)。
+一个定时器如果在 24 小时内收到了超过 30 次的 `400`（Bad Request）或 `502`（Bad Gateway）的应答，它将会被云引擎禁用，同时系统会向开发者发出相关的禁用通知邮件。在控制台的日志中，对应的错误信息为 [`timerAction short-circuited and no fallback available`](#错误信息)。
 {% endcall %}
 
-部署云引擎之后，进入 [控制台 > 云引擎 > 定时任务](/dashboard/cloud.html?appid={{appid}}#/task)，点击 **创建定时器**，然后设定执行的函数名称、执行环境等等。例如定义一个打印循环打印日志的任务 `log_timer`：
+部署云引擎之后，进入 [控制台 > 云引擎 > 定时任务](/dashboard/cloud.html?appid={{appid}}#/task)，点击 **创建定时器**，然后设定执行的函数名称、执行环境等等。例如定义一个打印循环打印日志的任务 `logTimer`：
 
-{% block timerExample %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.define('logTimer', function (request) {
+  console.log('This log is printed by logTimer.');
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def logTimer(movie, **params):
+    print 'This log is printed by logTimer.'
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define("logTimer", function($params, $user) {
+    error_log("This log is printed by logTimer.");
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@EngineFunction("logTimer")
+public static float logTimer throws Exception {
+  LogUtil.avlog.d("This log is printed by logTimer.");
+}
+```
+{% endif %}
+{% if platformName === ".NET" %}
+{# TODO #}
+{% endif %}
 
-定时器创建后，其状态为**未运行**，需要点击 <span class="label label-default">启用</span> 来激活。之后其执行日志可以在 **日志** 页面中查看。
+定时器创建后，其状态为 **未运行**，需要点击 <span class="label label-default">启用</span> 来激活。之后其执行日志可以在 **日志** 页面中查看。
 
 定时任务分为两类：
 
-* 使用 Cron 表达式安排调度
-* 以秒为单位的简单循环调度
+- 使用 Cron 表达式安排调度
+- 以秒为单位的简单循环调度
 
 以 Cron 表达式为例，比如每周一早上 8 点准时发送推送消息给用户：
 
-{% block timerExample2 %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.define('pushTimer', function(request){
+  return AV.Push.send({
+    channels: ['Public'],
+    data: {
+      alert: 'Public message'
+    }
+  });
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+{# TODO #}
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+use \LeanCloud\Push;
+
+Cloud::define("pushTimer", function($params, $user) {
+    $push = new Push(array("alert" => "Public message"));
+    $push->setChannels(array("Public"));
+    $push->send();
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+{# TODO #}
+{% endif %}
+{% if platformName === ".NET" %}
+{# TODO #}
+{% endif %}
 
 创建定时器的时候，选择 **Cron 表达式** 并填入 `0 0 8 ? * MON`。
 
@@ -434,6 +2492,7 @@ Cron 表达式的基本语法为：
 ```
 <秒> <分钟> <小时> <日期 day-of-month> <月份> <星期 day-of-week>
 ```
+
 位置|字段|约束|取值|可使用的特殊字符
 ---|---|---|---|---
 1|秒|必须|0-59|`, - * /`
@@ -447,49 +2506,94 @@ Cron 表达式的基本语法为：
 
 字符|含义|用法
 ---|---|---
-`*`|所有值|代表一个字段的所有可能取值。如将 `<分钟>` 设为 **\***，表示每一分钟。
-`?`|不指定值|用于可以使用该字符的两个字段中的一个，在一个表达式中只能出现一次。如任务执行时间为每月 10 号，星期几无所谓，那么表达式中 `<日期>` 设为 **10**，`<星期>` 设为 **?**。
-`-`|范围|如 `<小时>` 为 **10-12**，即10 点、11 点、12 点。
-`,`|<span class="text-nowrap">分隔多个值</span>|如 `<星期>` 为 **MON,WED,FRI**，即周一、周三、周五。
-`/`|增量|如 `<秒>` 设为 **0/15**，即从 0 秒开始，以 15 秒为增量，包括 0、15、30、45 秒；**5/15** 即 5、20、35、50 秒。**\*/** 与 **0/** 等效，如 `<日期>` 设为 **1/3**，即从每个月的第一天开始，每 3 天（即每隔 2 天）执行一次任务。
+`*`|所有值|代表一个字段的所有可能取值。如将 `<分钟>` 设为 `*`，表示每一分钟。
+`?`|不指定值|用于可以使用该字符的两个字段中的一个，在一个表达式中只能出现一次。如任务执行时间为每月 10 号，星期几无所谓，那么表达式中 `<日期>` 设为 `10`，`<星期>` 设为 `?`。
+`-`|范围|如 `<小时>` 为 `10-12`，即 10 点、11 点、12 点。
+`,`|<span class="text-nowrap">分隔多个值</span>|如 `<星期>` 为 `MON,WED,FRI`，即周一、周三、周五。
+`/`|增量|如 `<秒>` 设为 `0/15`，即从 0 秒开始，以 15 秒为增量，包括 0、15、30、45 秒；`5/15` 即 5、20、35、50 秒。`*/` 与 `0/` 等效，如 `<日期>` 设为 `1/3`，即从每个月的第一天开始，每 3 天（即每隔 2 天）执行一次任务。
 
-各字段以空格或空白隔开。JAN-DEC、SUN-SAT 这些值不区分大小写，比如 MON 和 mon 效果一样。
+各字段以空格或空白隔开。`JAN-DEC`、`SUN-SAT `这些值不区分大小写，比如 `MON` 和 `mon` 效果一样。
 
 举例如下：
 
 表达式|说明
 ---|---
-`0  */5 * * * ?`|每隔 5 分钟执行一次
+`0  */5 * * * ?`|每隔 5 分钟执行一次。
 `10 */5 * * * ?`|每隔 5 分钟执行一次，每次执行都在分钟开始的 10 秒，例如 10:00:10、10:05:10 等等。
 <code style="white-space:nowrap;">0 30 10-13 ? * WED,FRI</code>|每周三和每周五的 10:30、11:30、12:30、13:30 执行。
-`0 */30 8-9 5,20 * ?`| 每个月的 5 号和 20 号的 8 点和 10 点之间每隔 30 分钟执行一次，也就是 8:00、8:30、9:00 和 9:30。
+`0 */30 8-9 5,20 * ?`|每个月的 5 号和 20 号的 8 点和 10 点之间每隔 30 分钟执行一次，也就是 8:00、8:30、9:00 和 9:30。
 
-{{ LE.numberOfTimers() }}
+### 定时器数量
+
+生产环境和预备环境的定时器数量都限制在 6 个以内，也就是说你总共最多可以创建 12 个定时器。
 
 ### 错误信息
 
-定时器执行后的日志会记录在 [控制台 > 云引擎 > 日志](/dashboard/cloud.html?appid={{appid}}#/log) 中，以下为常见的错误信息及原因。
+定时器执行后的日志会记录在 [控制台 > 云引擎 > 日志](/dashboard/cloud.html?appid={{appid}}#/log) 中，以下为常见的错误信息及原因：
 
-- **timerAction timed-out and no fallback available**<br/>
-  某个定时器触发的云函数，因 15 秒内没有响应而超时（可参考 [对云函数调用超时的处理](#超时的处理方案)）。
-- **{{ errorMessage_shortCircuited }}**<br/>
-  某个定时器触发的云函数，因为太多次超时而停止触发。
+- **timerAction timed-out and no fallback available**<br>某个定时器触发的云函数，因 15 秒内没有响应而超时（可参考 [对云函数调用超时的处理](#超时的处理方案)）。
+- **timerAction short-circuited and no fallback available**<br>某个定时器触发的云函数因为太多次超时而停止触发。
 
 ## Master Key 和超级权限
 
-因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（Master Key），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据，当然这种方式也允许调用一些仅供 masterKey 使用的 API。开启 Master Key 的方法如下：
+因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（Master Key），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据，当然这种方式也允许调用一些仅供 Master Key 使用的 API。开启 Master Key 的方法如下：
 
-{% block useMasterKey %}{% endblock %}
+{% if platformName === "Node.js" %}
+```js
+// 通常位于 server.js
+AV.Cloud.useMasterKey();
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+# 通常位于 wsgi.py
+leancloud.use_master_key(True)
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+// 通常位于 src/app.php
+Client::useMasterKey(true);
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+// 通常位于 src/…/AppInitListener.java
+JavaRequestSignImplementation.instance().setUseMasterKey(true);
+```
+{% endif %}
+{% if platformName === ".NET" %}
+```cs
+AVClient.UseMasterKey = true;
+```
+{% endif %}
 
-{% if authOptionsGuide %}
-如果没有添加这些代码，默认是没有超级权限的，这意味着在云引擎中你也不能修改被 ACL 保护的数据，你需要在进行操作时手动指定 sessionToken，让操作以这个用户的权限来执行：
+{% if platformName === "Node.js" %}
+如果没有添加这些代码，默认是没有超级权限的，这意味着在云引擎中你也不能修改被 ACL 保护的数据，你需要在进行操作时手动指定 `sessionToken`，让操作以这个用户的权限来执行：
 
-{{ authOptionsGuide }}
+```js
+var post = new Post();
+post.save(
+  { author: user },
+  {
+    // 或者使用 request.sessionToken（网站托管中需启用 `Cloud.CookieSession`）
+    sessionToken: user.getSessionToken()
+  }
+);
+```
+
+或者你也可单独对某一个操作使用 Master Key，跳过权限检查：
+
+```js
+post.destroy({ useMasterKey: true });
+```
+
+当然你也可以在启用了超级权限的情况下使用 `useMasterKey: false` 来对单个操作关掉超级权限。
 
 那么究竟是否应该使用超级权限呢，我们的建议如下：
 
 - 如果你的云引擎代码中特权操作比较多、操作不属于用户的全局数据比较多，那么建议全局开启 Master Key，并自行做好对于用户请求的权限检查。
-- 如果你的云引擎代码中的请求通常和单个用户自己的数据相关、需要遵守 ACL，那么建议不开启 Master Key，将用户请求的 sessionToken 传入数据修改的相关操作（如 `save`）。
+- 如果你的云引擎代码中的请求通常和单个用户自己的数据相关、需要遵守 ACL，那么建议不开启 Master Key，将用户请求的 `sessionToken` 传入数据修改的相关操作（如 `save`）。
 {% endif %}
 
-关于云引擎上的权限问题，还可以参考 [ACL 与数据安全](acl-start.html) 和 [在云引擎中使用 ACL](acl_guide_leanengine.html)。
+关于云引擎上的权限问题，还可以参考 [ACL 权限管理开发指南](acl-start.html) 和 [在云引擎中使用 ACL](acl_guide_leanengine.html)。

@@ -217,23 +217,27 @@ RDBMS 中通过 Person_ID 域来连接 PERSON 表和 CAR 表，以此支持应�
     guangZhou.save()
 ```
 ```java
-    AVObject guangZhou = new AVObject("City");// 广州
-    guangZhou.put("name", "广州");
-
-    AVObject guangDong = new AVObject("Province");// 广东
-    guangDong.put("name", "广东");
-
-    guangZhou.put("dependent", guangDong);// 为广州设置 dependent 属性为广东
-
-    guangZhou.saveInBackground(new SaveCallback() {
-        @Override
-        public void done(AVException e) {
-            if (e == null) {
-                // 广州被保存成功
-            }
-        }
-    });
-    // 广东无需被单独保存，因为在保存广州的时候已经上传到云端。
+AVObject guangZhou = new AVObject("City");// 广州
+guangZhou.put("name", "广州");
+AVObject guangDong = new AVObject("Province");// 广东
+guangDong.put("name", "广东");
+guangZhou.put("dependent", guangDong);// 为广州设置 dependent 属性为广东
+guangZhou.saveInBackground().subscribe(new Observer<AVObject>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVObject avObject) {
+        // 广州被保存成功
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+// 广东无需被单独保存，因为在保存广州的时候已经上传到云端。
 ```
 ```js
     // 新建一个 AV.Object
@@ -355,15 +359,24 @@ RDBMS 中通过 Person_ID 域来连接 PERSON 表和 CAR 表，以此支持应�
     }
 ```
 ```java
-    // 假设东莞作为 City 对象存储的时候它的 objectId 是 568e743c00b09aa22162b11f，这个 objectId 可以在控制台查看
-    AVObject dongGuan = AVObject.createWithoutData("City", "568e743c00b09aa22162b11f");
-    dongGuan.fetchInBackground("dependent", new GetCallback<AVObject>() {
-        @Override
-        public void done(AVObject avObject, AVException e) {
-            // 获取广东省
-            AVObject province = avObject.getAVObject("dependent");
-        }
-    });
+// 假设东莞作为 City 对象存储的时候它的 objectId 是 568e743c00b09aa22162b11f，这个 objectId 可以在控制台查看
+AVObject dongGuan = AVObject.createWithoutData("City", "568e743c00b09aa22162b11f");
+dongGuan.fetchInBackground("dependent").subscribe(new Observer<AVObject>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVObject avObject) {
+        // 获取广东省
+        AVObject province = avObject.getAVObject("dependent");
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 ```js
     // 假设东莞作为 City 对象存储的时候它的 objectId 是 568e743c00b09aa22162b11f，这个  objectId 可以在控制台查看
@@ -429,25 +442,31 @@ RDBMS 中通过 Person_ID 域来连接 PERSON 表和 CAR 表，以此支持应�
     }
 ```
 ```java
-    AVQuery<AVObject> query = new AVQuery<>("City");
-
-    // 查询名字是广州的城市
-    query.whereEqualTo("name", "广州");
-
-    // 找出对应城市的省份
-    query.include("dependent");
-
-    query.findInBackground(new FindCallback<AVObject>() {
-        @Override
-        public void done(List<AVObject> list, AVException e) {
-            // list 的结果为 name 等于广州的城市的集合，当然我们知道现实中只存在一个广州市
-            for (AVObject city : list) {
-                // 并不需要网络访问
-                // 获取对应的省份
-                AVObject province = city.getAVObject("dependent");
-            }
+AVQuery<AVObject> query = new AVQuery<>("City");
+// 查询名字是广州的城市
+query.whereEqualTo("name", "广州");
+// 找出对应城市的省份
+query.include("dependent");
+query.findInBackground().subscribe(new Observer<List<AVObject>>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(List<AVObject> list) {
+        // list 的结果为 name 等于广州的城市的集合，当然我们知道现实中只存在一个广州市
+        for (AVObject city : list) {
+            // 并不需要网络访问
+            // 获取对应的省份
+            AVObject province = city.getAVObject("dependent");
         }
-    });
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 ```js
     var query = new AV.Query('City');
@@ -521,21 +540,27 @@ RDBMS 中通过 Person_ID 域来连接 PERSON 表和 CAR 表，以此支持应�
     }
 ```
 ```java
-    // 假设 GuangDong 的 objectId 为 56545c5b00b09f857a603632
-    AVObject guangDong = AVObject.createWithoutData("Province", "56545c5b00b09f857a603632");
-
-    AVQuery<AVObject> query = new AVQuery<>("City");
-
-    query.whereEqualTo("dependent", guangDong);
-
-    query.findInBackground(new FindCallback<AVObject>() {
-        @Override
-        public void done(List<AVObject> list, AVException e) {
-            for (AVObject city : list) {
-                // list 的结果为广东省下辖的所有城市
-            }
+// 假设 GuangDong 的 objectId 为 56545c5b00b09f857a603632
+AVObject guangDong = AVObject.createWithoutData("Province", "56545c5b00b09f857a603632");
+AVQuery<AVObject> query = new AVQuery<>("City");
+query.whereEqualTo("dependent", guangDong);
+query.findInBackground().subscribe(new Observer<List<AVObject>>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(List<AVObject> list) {
+        for (AVObject city : list) {
+            // list 的结果为广东省下辖的所有城市
         }
-    });
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 ```js
     // 假设 GuangDong 的 objectId 为 56545c5b00b09f857a603632
@@ -1014,29 +1039,35 @@ RDBMS 中通过 Person_ID 域来连接 PERSON 表和 CAR 表，以此支持应�
     }
 ```
 ```java
-    // 微积分课程
-    AVObject courseCalculus = AVObject.createWithoutData("Course", "562da3fdddb2084a8a576d49");
-
-    // 构建 StudentCourseMap 的查询
-    AVQuery<AVObject> query = new AVQuery<>("StudentCourseMap");
-
-    // 查询所有选择了线性代数的学生
-    query.whereEqualTo("course", courseCalculus);
-
-    // 执行查询
-    query.findInBackground(new FindCallback<AVObject>() {
-        @Override
-        public void done(List<AVObject> list, AVException e) {
-            // list 是所有 course 等于线性代数的选课对象
-            // 然后遍历过程中可以访问每一个选课对象的 student,course,duration,platform 等属性
-            for (AVObject studentCourseMap : list) {
-                AVObject student = studentCourseMap.getAVObject("student");
-                AVObject course = studentCourseMap.getAVObject("course");
-                ArrayList duration = (ArrayList) studentCourseMap.getList("duration");
-                String platform = studentCourseMap.getString("platform");
-            }
+// 微积分课程
+AVObject courseCalculus = AVObject.createWithoutData("Course", "562da3fdddb2084a8a576d49");
+// 构建 StudentCourseMap 的查询
+AVQuery<AVObject> query = new AVQuery<>("StudentCourseMap");
+// 查询所有选择了线性代数的学生
+query.whereEqualTo("course", courseCalculus);
+// 执行查询
+query.findInBackground().subscribe(new Observer<List<AVObject>>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(List<AVObject> list) {
+        // list 是所有 course 等于线性代数的选课对象
+        // 然后遍历过程中可以访问每一个选课对象的 student,course,duration,platform 等属性
+        for (AVObject studentCourseMap : list) {
+            AVObject student = studentCourseMap.getAVObject("student");
+            AVObject course = studentCourseMap.getAVObject("course");
+            ArrayList duration = (ArrayList) studentCourseMap.getList("duration");
+            String platform = studentCourseMap.getString("platform");
         }
-    });
+    }
+    @Override
+    public void onError(Throwable e) {
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 ```js
     // 微积分课程

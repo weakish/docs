@@ -43,8 +43,9 @@
 
 ```js
 var realtime = new Realtime({
-  appId: 'your-app-id',
-  appKey: 'your-app-key',
+  appId: '{{appid}}',
+  appKey: '{{appkey}}',
+  server: 'https://xxx.example.com',
   plugins: [TypedMessagesPlugin], // 注册富媒体消息插件
 });
 // Tom 用自己的名字作为 clientId 来登录即时通讯服务
@@ -142,7 +143,21 @@ AV.User.logIn('username', 'password').then(function(user) {
 }).catch(console.error.bind(console));
 ```
 ```swift
-// 暂不支持
+_ = LCUser.logIn(username: "username", password: "password") { (result) in
+    switch result {
+    case .success(object: let user):
+        do {
+            let client = try IMClient(user: user)
+            client.open(completion: { (result) in
+                // 执行其他逻辑
+            })
+        } catch {
+            print(error)
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 ```objc
 // 以 AVUser 的用户名和密码登录到 LeanCloud 云端
@@ -2036,10 +2051,6 @@ AVIMClient.Status != Online
 
 ```js
 // 在初始化 Realtime 时，需加载 TypedMessagesPlugin
-// var realtime = new Realtime({
-//   appId: appId,
-//   plugins: [TypedMessagesPlugin]
-// });
 var { Event, TextMessage } = require('leancloud-realtime');
 var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
 // 注册 MESSAGE 事件的 handler
