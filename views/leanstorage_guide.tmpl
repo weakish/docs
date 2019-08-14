@@ -3767,7 +3767,7 @@ if (!error) {
 - 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
 - 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
 
-{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Android / Java" %}
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Android / Java" or platform_name === "Swift" %}
 ## LiveQuery
 
 LiveQuery 衍生于 [`{{ baseQueryClassName }}`](#查询)，但功能更强大。它可以让你无需编写复杂的逻辑便可在客户端之间同步数据，这对于有实时数据同步需求的应用来说很有帮助。
@@ -3780,7 +3780,7 @@ LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket �
 
 ### 启用 LiveQuery
 
-进入 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf)，在 **其他** 里面勾选 **启用 LiveQuery**{% if platform_name === "Objective-C" %}，然后将下面的 pod 添加到项目根目录下的 `Podfile` 即可：{% endif %}{% if platform_name === "JavaScript" %}，然后将下面的 npm 模块添加到项目中即可：{% endif %}{% if platform_name === "Android / Java" %}即可。确保即时通信模块已被添加到 `AndroidManifest.xml`：{% endif %}
+进入 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf)，在 **其他** 里面勾选 **启用 LiveQuery**{% if platform_name === "Objective-C" %}，然后将下面的 pod 添加到项目根目录下的 `Podfile` 即可：{% endif %}{% if platform_name === "Swift" %}，然后导入 LeanCloud Swift SDK：{% endif %}{% if platform_name === "JavaScript" %}，然后将下面的 npm 模块添加到项目中即可：{% endif %}{% if platform_name === "Android / Java" %}即可。确保即时通信模块已被添加到 `AndroidManifest.xml`：{% endif %}
 
 {% if platform_name === "Objective-C" %}
 ```ruby
@@ -3788,6 +3788,11 @@ pod 'AVOSCloudLiveQuery'
 ```
 
 可以在 [SDK 安装与初始化](#SDK-安装与初始化) 中找到完整设置方法。
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+import LeanCloud
+```
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
@@ -3857,6 +3862,24 @@ self.liveQuery.delegate = self;
 }];
 ```
 {% endif %}
+{% if platform_name === "Swift" %}
+```swift
+do {
+    let query = LCQuery(className: "Employee")
+    self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in })
+    self.liveQuery.subscribe { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+{% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
 var query = new AV.Query('Employee');
@@ -3901,6 +3924,23 @@ self.liveQuery.delegate = self;
 }
 ```
 {% endif %}
+{% if platform_name === "Swift" %}
+```swift
+do {
+    let query = LCQuery(className: "Employee")
+    self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+        switch event {
+        case .create(object: let object):
+            print(object["firstName"] as Any) // Kelly
+        default:
+            break
+        }
+    })
+} catch {
+    print(error)
+}
+```
+{% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
 var query = new AV.Query('Employee');
@@ -3938,6 +3978,25 @@ liveQuery.subscribeInBackground(new AVLiveQuerySubscribeCallback() {
 ```objc
 - (void)liveQuery:(AVLiveQuery *)liveQuery objectDidUpdate:(id)updatedEmployee updatedKeys:(NSArray<NSString *> *)updatedKeys {
     NSLog(@"%@", updatedEmployee[@"team"]); // 财务
+}
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+do {
+    let query = LCQuery(className: "Employee")
+    self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+        switch event {
+        case let .update(object: object, updatedKeys: updatedKeys):
+            if let key = updatedKeys.first {
+                print(object[key] as Any) // 财务
+            }
+        default:
+            break
+        }
+    })
+} catch {
+    print(error)
 }
 ```
 {% endif %}
@@ -3983,6 +4042,18 @@ liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
 }
 ```
 {% endif %}
+{% if platform_name === "Swift" %}
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case .create(object: let object):
+        print("对象被创建。")
+    default:
+        break
+    }
+})
+```
+{% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
 liveQuery.on('create', function (object) {
@@ -4014,6 +4085,18 @@ liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
 }
 ```
 {% endif %}
+{% if platform_name === "Swift" %}
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case let .update(object: object, updatedKeys: updatedKeys):
+        print("对象被更新。")
+    default:
+        break
+    }
+})
+```
+{% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
 liveQuery.on('update', function (object, updatedKeys) {
@@ -4043,6 +4126,18 @@ liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
         NSLog(@"对象进入。");
     }
 }
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case let .enter(object: object, updatedKeys: updatedKeys):
+        print("对象进入。")
+    default:
+        break
+    }
+})
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
@@ -4080,6 +4175,18 @@ liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
 }
 ```
 {% endif %}
+{% if platform_name === "Swift" %}
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case let .leave(object: object, updatedKeys: updatedKeys):
+        print("对象离开。")
+    default:
+        break
+    }
+})
+```
+{% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
 liveQuery.on('leave', function (object, updatedKeys) {
@@ -4109,6 +4216,18 @@ liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
         NSLog(@"对象被删除。");
     }
 }
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case .delete(object: let object):
+        print("对象被删除。")
+    default:
+        break
+    }
+})
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
@@ -4142,6 +4261,18 @@ liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
 }
 ```
 {% endif %}
+{% if platform_name === "Swift" %}
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case .login(user: let user):
+        print("用户登录。")
+    default:
+        break
+    }
+})
+```
+{% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
 liveQuery.on('login', function (user) {
@@ -4173,6 +4304,18 @@ liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
         // 错误处理
     }
 }];
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+self.liveQuery.unsubscribe { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
