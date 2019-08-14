@@ -7047,7 +7047,6 @@ Map<String, Object> authData = new HashMap<String, Object>();
 authData.put("expires_in", 7200);
 authData.put("openid", "OPENID");
 authData.put("access_token", "ACCESS_TOKEN");
-authData.put("platform", "weixin");
 //可选
 authData.put("refresh_token", "REFRESH_TOKEN");
 authData.put("scope", "SCOPE");
@@ -7139,7 +7138,7 @@ user.logIn(authData: authData, platform: .weixin) { (result) in
 
 云端会自动验证部分服务的 access token 的有效性以防止伪造请求。如果验证失败，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，你需要自己去验证 access token 的有效性。如果不希望云端自动验证 access token，可以在 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
 
-{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Swift" %}
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Swift" or platform_name === "Android / Java" %}
 #### 扩展需求
 
 ##### 新用户登录时必须填用户信息
@@ -7249,6 +7248,61 @@ user.logIn(authData: authData, platform: .weixin, options: [.failOnNotExist]) { 
 }
 ```
 {% endif %}
+{% if platform_name === "Android / Java" %}
+```java
+Map<String, Object> authData = new HashMap<String, Object>();
+authData.put("expires_in", 7200);
+authData.put("openid", "OPENID");
+authData.put("access_token", "ACCESS_TOKEN");
+authData.put("refresh_token", "REFRESH_TOKEN");
+authData.put("scope", "SCOPE");
+Boolean failOnNotExist = true;
+AVUser user = new AVUser();
+user.loginWithAuthData(authData,"weixin",failOnNotExist).subscribe(new Observer<AVUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVUser avUser) {
+        System.out.println("存在匹配的用户，登录成功");
+    }
+    @Override
+    public void onError(Throwable e) {
+        AVException avException = new AVException(e);
+        int code = avException.getCode();
+        if (code == 211){
+            // 跳转到输入用户名、密码、手机号等业务页面
+        } else {
+            System.out.println("发生错误:" + e.getMessage());
+        }
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+
+// 跳转到输入用户名、密码、手机号等业务页面之后
+AVUser avUser = new AVUser();
+avUser.setUsername("Tom");
+avUser.setMobilePhoneNumber("+8618200008888");
+avUser.loginWithAuthData(authData, "weixin").subscribe(new Observer<AVUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVUser avUser) {
+        System.out.println("登录成功");
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("登录失败：" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+{% endif %}
 
 ##### 接入 UnionID 体系
 
@@ -7348,7 +7402,32 @@ user.logIn(
 }
 ```
 {% endif %}
-
+{% if platform_name === "Android / Java" %}
+```java
+Map<String, Object> authData = new HashMap<String, Object>();
+authData.put("expires_in", 7200);
+authData.put("openid", "OPENID");
+authData.put("access_token", "ACCESS_TOKEN");
+authData.put("refresh_token", "REFRESH_TOKEN");
+authData.put("scope", "SCOPE");
+AVUser.loginWithAuthData(authData, "weixinapp1","UnionId","weixin",true).subscribe(new Observer<AVUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVUser avUser) {
+        System.out.println("登录成功");
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("登录失败：" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+{% endif %}
 然后让我们来看看生成的 `authData` 的数据格式：
 
 ```json
@@ -7433,7 +7512,25 @@ AV.User.loginWithAuthData(null, 'weixin').then(function (s) {
 {# TODO #}
 {% endif %}
 {% if platform_name === "Android / Java" %}
-{# TODO #}
+```java
+AVUser avUser = AVUser.currentUser();
+avUser.dissociateWithAuthData("weixinapp1").subscribe(new Observer<AVUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(AVUser avUser) {
+        System.out.println("解绑成功");
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("解绑失败：" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
 {% endif %}
 {% if platform_name === "Swift" %}
 {# TODO #}
