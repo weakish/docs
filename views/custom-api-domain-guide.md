@@ -95,7 +95,7 @@ xxx.example.com.	3600	IN	CNAME	leancloud.example.
 
 已绑定自有域名的应用，旧版本客户端仍可继续访问原来由 LeanCloud 提供的域名，但我们不对共享域名的可用性做保证。
 
-目前，绑定 API 域名后，即时通讯，Live Query 以及多人对战的 WebSocket 连接暂时仍会使用共享域名。我们后续会支持这类 WebSocket 连接使用自有域名。
+目前，绑定 API 域名后，即时通讯，Live Query 以及多人对战的 WebSocket 连接暂时仍会使用共享域名。我们后续会支持这类 WebSocket 连接使用自有域名。另外，用户反馈组件暂时也仍然使用共享域名。
 
 国际版暂不支持绑定自有 API 域名。
 
