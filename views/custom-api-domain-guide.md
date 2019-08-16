@@ -361,3 +361,6 @@ Client::setServerUrl("https://xxx.example.com")
 没有商用版应用的用户如果需要协助备案或接入备案，需要支付 600 元服务费。请[在此提交备案相关资料][temp]，同时发送邮件至 support@leancloud.rocks 和我们联系。有商用版应用的用户此项服务免费。
 
 [temp]: https://jinshuju.net/f/17C29c
+
+华东节点底层 IaaS 服务商（腾讯云）暂不支持通过 LeanCloud 以用户主体身份进行备案接入。
+因此，希望在华东节点所在机房做备案接入或直接办理新备案的用户，可以自行创建腾讯云账号并通过腾讯云完成备案。
