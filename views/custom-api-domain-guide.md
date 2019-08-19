@@ -362,5 +362,5 @@ Client::setServerUrl("https://xxx.example.com")
 
 [temp]: https://jinshuju.net/f/17C29c
 
-华东节点底层 IaaS 服务商（腾讯云）暂不支持通过 LeanCloud 以用户主体身份进行备案接入。
+华东节点底层 IaaS 服务商（腾讯云）暂不支持通过 LeanCloud 以用户主体身份提交备案资料。
 因此，希望在华东节点所在机房做备案接入或直接办理新备案的用户，可以自行创建腾讯云账号并通过腾讯云完成备案。商用版应用用户可提交工单获取备案所需授权码。
