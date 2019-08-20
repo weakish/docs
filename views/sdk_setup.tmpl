@@ -28,13 +28,10 @@ LeanCloud Java SDK 主要包含以下几个 library，其层次结构以及平�
   - AVIMMessage 以及多种子类化的多媒体消息
   - 等等
 
-### 云引擎使用的包
-- engine-core：是 LeanCloud 云引擎项目需要依赖的包。
-
 ### Android 特有的包
 - storage-android：是 storage-core 在 Android 平台的定制化实现，接口与 storage-core 完全相同。
 - realtime-android：是 realtime-core 在 Android 平台的定制化实现，并且增加 Android 推送相关接口。
-- mixpush-android：是 LeanCloud 混合推送的 library，支持华为、小米、魅族的官方推送。
+- mixpush-android：是 LeanCloud 混合推送的 library，支持华为、小米、魅族、vivo 以及 oppo 的官方推送。
 - leancloud-fcm：是 Firebase Cloud Messaging 的封装 library，供美国节点的 app 使用推送服务。
 
 
@@ -45,7 +42,6 @@ Java SDK 一共包含如下几个模块：
 ---|---|---|---
 ./core | storage-core，存储核心 library | java | 无，它是 LeanCloud 最核心的 library
 ./realtime | realtime-core，LiveQuery 与实时通讯核心 library | java | storage-core
-./leanengine | engine-core，云引擎 library | java | storage-core
 ./android-sdk/storage-android | storage-android，Android 存储 library | Android | storage-core
 ./android-sdk/realtime-android | realtime-android，Android 推送、LiveQuery、即时通讯 library | Android | storage-android, realtime-core
 ./android-sdk/mixpush-android | Android 混合推送 library | Android | realtime-android
@@ -258,7 +254,7 @@ Example for Maven：
 <dependency>
     <groupId>cn.leancloud</groupId>
     <artifactId>realtime-core</artifactId>
-    <version>{currentVersion}</version>
+    <version>{{ version.unified }}</version>
 </dependency>
 ```
 
@@ -295,17 +291,6 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 implementation 'com.alibaba:fastjson:1.1.70.android'
 implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 ```
-
-#### 云引擎项目
-Example for Maven：
-
-```
-<dependency>
-    <groupId>cn.leancloud</groupId>
-    <artifactId>engine-core</artifactId>
-    <version>{{ version.unified }}</version>
-</dependency>
-```
 {% endif %}
 
 ### 手动安装
@@ -314,16 +299,15 @@ Example for Maven：
 {% if platform_name === "Android / Java" %}
 #### 从源码编译
 
-To check out and build the LeanCloud Java SDK source, issue the following commands:
+可以执行以下命令获取 Java SDK 并安装：
 ```
-$ git clone git@github.com:leancloud/java-sdk-all.git
-$ cd java-sdk-all/
+$ git clone https://github.com/leancloud/java-unified-sdk.git
+$ cd java-unified-sdk/
 $ mvn clean install
 ```
-
-To build Android SDK source, issue the following commands:
+获取和安装 Android SDK：
 ```
-$ cd java-sdk-all/
+$ cd java-unified-sdk/
 $ cd android-sdk/
 $ gradle clean assemble
 ```
@@ -929,26 +913,6 @@ Client::setServerUrl("https://{{host}}"); // 0.7.0 及以上版本支持
 ```java
 AVOSCloud.initialize("{{appid}}", "{{appkey}}");
 ```
-### 云引擎项目初始化
-在 `ServletContextListener` 子类的 `contextInitialized` 方法中，按照如下流程进行初始化：
-``` java
-@Override
-public void contextInitialized(ServletContextEvent arg0) {
-  // 注册子类化
-  AVObject.registerSubclass(Todo.class);
-
-  // 可选步骤，设置访问云引擎实例的开发版标志
-  if ("development".equals(appEnv) && "true".equals(haveStaging) || "stage".equals(appEnv)) {
-    AVCloud.setProductionMode(false);
-  }
-  // 初始化AVOSCloud，请保证在整个项目中间只初始化一次
-  LeanEngine.initialize(”{your_appId}“, ”{your_appKey}“, ”{your_appMasterKey}“);
-  // 在请求签名中使用masterKey以激活云代码的最高权限
-  JavaRequestSignImplementation.instance().setUseMasterKey(true);
-  // 向云引擎注册云函数
-  LeanEngine.register(Cloud.class);
-}
-```
 ### Android 平台初始化
 
 如果是一个 Android 项目，则向 `Application` 类的 `onCreate` 方法添加：
@@ -995,17 +959,6 @@ public class MyLeanCloudApp extends Application {
   <!-- 即时通讯和推送 END -->
 </application>
 
-```
-## 指定服务节点
-
-SDK 的初始化方法默认使用中国华北节点，如需切换到其他可用节点，请参考如下用法：
-``` java
-// 在 AVOSCloud.initialize 之前调用
-// 可选的节点有：
-//    REGION.NorthChina - 华北节点，默认节点
-//    REGION.EastChina  - 华东节点
-//    REGION.NorthAmerica - 北美节点
-AVOSCloud.setRegion(AVOSCloud.REGION.NorthChina);
 ```
 {% endif %}
 {% if platform_name === ".NET" %}
