@@ -55,9 +55,9 @@ LeanCloud 的每一个账户都可以创建多个应用。同一个应用可以�
   ![unity-init](images/unity-init.png)
 
 
-默认中国大陆节点对应的 `Region` 是 `Public_CN`,如果是北美节点请选择 `Public_US`。
+默认国内版对应的 `Region` 是 `Public_CN`，国际版请选择 `Public_US`。
 
-{% if node != 'qcloud' %}注意，目前 LeanCloud 的节点上的数据是相互隔离的，换言之，您在中国节点上注册的应用无法访问美国节点，反之亦然。
+{% if node != 'qcloud' %}注意，国内版和国际版独立运营，数据隔离。
 {% endif %}
 
 ## 对象
