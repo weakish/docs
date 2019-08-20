@@ -119,7 +119,7 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         name: '短信验证码',
         desc: '使用 LeanCloud 发送和验证短信验证码。',
         downPath: '',
-        mdPath: 'https://github.com/leancloud/android-sms-demo',
+        mdPath: 'https://github.com/leancloud/unified_sdk_simple_demo',
         type: 'android',
         qcloudShow: false
       }],
