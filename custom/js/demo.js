@@ -95,13 +95,6 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         type: 'android',
         qcloudShow: true
       },{
-        name: 'WeShare',
-        desc: '使用 LeanCloud 应用内社交组件打造的类似朋友圈的分享小应用，具备时间线、发文字发图、点赞、关注等功能。',
-        downPath: '',
-        mdPath: 'https://github.com/leancloud/WeShare',
-        type: 'android',
-        qcloudShow: false
-      },{
         name: 'LeanPush Demo',
         desc: '一个使用了 LeanCloud 推送消息服务的简单 Demo，直接在客户端推送消息，并自己接收。',
         downPath: '',
