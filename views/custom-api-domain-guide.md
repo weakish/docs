@@ -39,7 +39,7 @@ LeanCloud 服务涉及以下三种自定义域名：
 那么对应的 DNS Zone 记录为：
 
 ```
-xxx.example.com.	3600	IN	CNAME	`leancloud.example`
+xxx.example.com.	3600	IN	CNAME	leancloud.example.
 ```
 
 其中 3600 为 TTL，可根据自己的需要设置。
@@ -95,7 +95,7 @@ xxx.example.com.	3600	IN	CNAME	`leancloud.example`
 
 已绑定自有域名的应用，旧版本客户端仍可继续访问原来由 LeanCloud 提供的域名，但我们不对共享域名的可用性做保证。
 
-目前，绑定 API 域名后，即时通讯，Live Query 以及多人对战的 WebSocket 连接暂时仍会使用共享域名。我们后续会支持这类 WebSocket 连接使用自有域名。
+目前，绑定 API 域名后，即时通讯，Live Query 以及多人对战的 WebSocket 连接暂时仍会使用共享域名。我们后续会支持这类 WebSocket 连接使用自有域名。另外，用户反馈组件暂时也仍然使用共享域名。
 
 国际版暂不支持绑定自有 API 域名。
 
@@ -361,3 +361,6 @@ Client::setServerUrl("https://xxx.example.com")
 没有商用版应用的用户如果需要协助备案或接入备案，需要支付 600 元服务费。请[在此提交备案相关资料][temp]，同时发送邮件至 support@leancloud.rocks 和我们联系。有商用版应用的用户此项服务免费。
 
 [temp]: https://jinshuju.net/f/17C29c
+
+华东节点底层 IaaS 服务商（腾讯云）暂不支持通过 LeanCloud 以用户主体身份提交备案资料。
+因此，希望在华东节点所在机房做备案接入或直接办理新备案的用户，可以自行创建腾讯云账号并通过腾讯云完成备案。商用版应用用户可提交工单获取备案所需授权码。
