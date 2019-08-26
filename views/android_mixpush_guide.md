@@ -80,13 +80,13 @@ HMS Agent SDK 需要下载解压之后把源码完全拷贝进入工程。HMS Ag
 ```
 dependencies {
 //混合推送需要的包
-implementation('cn.leancloud:mixpush-android:{{ version.leancloud }}@aar') {
+implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
     exclude group: 'com.alibaba', module: 'fastjson'
     exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
     exclude group:'cn.leancloud', module:'huawei-hmsagent'
 }
 //即时通信与推送需要的包
-implementation ('cn.leancloud:realtime-android:{{ version.leancloud }}'){
+implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
     exclude group: 'com.alibaba', module: 'fastjson'
     exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
 }
@@ -317,12 +317,12 @@ LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为：
 ```
 dependencies {
 //混合推送需要的包
-implementation('cn.leancloud:mixpush-android:{{ version.leancloud }}@aar') {
+implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
     exclude group: 'com.alibaba', module: 'fastjson'
     exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
 }
 //即时通信与推送需要的包
-implementation ('cn.leancloud:realtime-android:{{ version.leancloud }}'){
+implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
     exclude group: 'com.alibaba', module: 'fastjson'
     exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
 }
@@ -442,12 +442,12 @@ dependencies {
 //魅族推送需要的包
 implementation 'com.meizu.flyme.internet:push-internal:3.6.+@aar'
 //混合推送需要的包
-implementation('cn.leancloud:mixpush-android:{{ version.leancloud }}@aar') {
+implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
     exclude group: 'com.alibaba', module: 'fastjson'
     exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
 }
 //即时通信与推送需要的包
-implementation ('cn.leancloud:realtime-android:{{ version.leancloud }}'){
+implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
     exclude group: 'com.alibaba', module: 'fastjson'
     exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
 }
