@@ -773,13 +773,13 @@ PM> Install-Package LeanCloud.Realtime
 [AVOSCloud setApplicationId:@"{{appid}}" clientKey:@"{{appkey}}"];
 ```
 
-在 **v11.4.0 版本以前** 使用 **美国节点** 需要增加以下代码：
+在 **v11.4.0 版本以前** 使用 **国际版** 需要增加以下代码：
 
 ```objc
 [AVOSCloud setServiceRegion:AVServiceRegionUS];
 ```
 
-在 **v11.4.0 版本及之后** 使用 **美国节点** 无需增加上述代码，SDK 会自动判断 Region。
+在 **v11.4.0 版本及之后** 使用 **国际版** 无需增加上述代码，SDK 会自动判断 Region。
 
 {{ docs.alert("在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Region 的初始化。") }}
 {% endif %}

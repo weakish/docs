@@ -942,9 +942,9 @@ LeanCloud 混合推送目前只支持默认动作（启动应用），将来会�
 
 
 
-## FCM 推送（仅美国节点可用）
+## FCM 推送（仅国际版可用）
 
-{{ docs.alert("FCM 推送仅支持部署在 LeanCloud 美国节点上的应用使用。") }}
+{{ docs.alert("FCM 推送仅支持部署在 LeanCloud 国际版上的应用使用。") }}
 
 [FCM](https://firebase.google.com/docs/cloud-messaging)（Firebase Cloud Messaging）是 Google/Firebase 提供的一项将推送通知消息发送到手机的服务。接入时后台需要配置连接 FCM 服务器需要的推送 key 和证书，FCM 相关的 token 由 LeanCloud SDK 来申请。
 
@@ -1188,7 +1188,7 @@ dependencies {
 
 注意，LeanCloud 云端只有在以下三个条件都满足的情况下，才会默认走 GCM 通道。
 
-- LeanCloud 美国节点
+- LeanCloud 国际版
 - 调用 `AVOSCloud.setGcmOpen(true)`
 - manifest 正确填写
 

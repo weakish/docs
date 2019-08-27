@@ -21,13 +21,13 @@ title: 小程序域名白名单配置
   </div>
 
   <div class="step">
-    <h3>2. 选择应用节点</h3>
+    <h3>2. 选择应用所属节点、版本</h3>
     <div class="row">
       <div class="step-content col-sm-12">
         <ul>
           <li>{% if node !== undefined %}<a href="https://leancloud.cn/docs/weapp-domains.html">{% endif %}华北节点{% if node !== undefined %}</a>{% endif %}{% if node === undefined %}<span class="text-muted">（当前）</span>{% endif %}</li>
           <li>{% if node !== 'qcloud' %}<a href="https://tab.leancloud.cn/docs/weapp-domains.html">{% endif %}华东节点{% if node !== 'qcloud' %}</a>{% endif %}{% if node === 'qcloud' %}<span class="text-muted">（当前）</span>{% endif %}</li>
-          <li>{% if node !== 'us' %}<a href="https://us.leancloud.cn/docs/weapp-domains.html">{% endif %}美国节点{% if node !== 'us' %}</a>{% endif %}{% if node === 'us' %}<span class="text-muted">（当前）</span>{% endif %}</li>
+          <li>{% if node !== 'us' %}<a href="https://us.leancloud.cn/docs/weapp-domains.html">{% endif %}国际版{% if node !== 'us' %}</a>{% endif %}{% if node === 'us' %}<span class="text-muted">（当前）</span>{% endif %}</li>
         </ul>
       </div>
     </div>

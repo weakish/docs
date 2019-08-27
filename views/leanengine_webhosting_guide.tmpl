@@ -104,7 +104,7 @@ lean deploy
 
 - `http://myapp.leanapp.cn`（中国华北节点）
 - `http://myapp.cn-e1.leanapp.cn`（中国华东节点）
-- `http://myapp.avosapps.us`（美国节点）
+- `http://myapp.avosapps.us`（国际版）
 
 {% call docs.noteWrap() %}
 DNS 可能需要等待几个小时后才能生效。
@@ -157,7 +157,7 @@ Node.js 的 `package.json` 中可以指定 [很多选项](https://docs.npmjs.com
 - 如果你的应用目录中同时包含 `package-lock.json` 和 `yarn.lock`，云引擎会使用 `yarn install`。换言之，`yarn.lock` 优先。
 
 {% call docs.noteWrap() %}
-注意 `yarn.lock` 中包含了下载依赖的 URL，因此如果你生成 lock 文件时使用了 npmjs.org 的源，那么在 LeanCloud 中国版的部署可能会变慢；反之如果生成时使用了 npm.taobao.org 的源，那么在 LeanCloud 国际版的部署可能会变慢。如果不希望使用 `yarn.lock`，请将它们加入 `.gitignore`（Git 部署时）或 `.leanengineignore`（命令行工具部署时）。
+注意 `yarn.lock` 中包含了下载依赖的 URL，因此如果你生成 lock 文件时使用了 npmjs.org 的源，那么在 LeanCloud 国内版的部署可能会变慢；反之如果生成时使用了 npm.taobao.org 的源，那么在 LeanCloud 国际版的部署可能会变慢。如果不希望使用 `yarn.lock`，请将它们加入 `.gitignore`（Git 部署时）或 `.leanengineignore`（命令行工具部署时）。
 {% endcall %}
 {% endif %}
 {% if platformName === "Python" %}
@@ -1682,7 +1682,7 @@ systemDependencies:
 `LEANCLOUD_API_SERVER` | 访问存储服务时使用的地址（类似于 `https://api.leancloud.cn`）。该值会因为所在数据中心等原因导致不一样，所以使用 REST API 请求存储服务或 LeanCloud 其他服务时请使用此环境变量的值。在云引擎中 **不要** 直接使用 `https://api.leancloud.cn`。
 `LEANCLOUD_AVAILABLE_CPUS` | 云引擎实例可用 CPU 的数量，高规格实例（如：2 CPU 1024 MB 内存）时该值大于 1。应用可以根据该值启动对应数量的线程或者进程。在云引擎中 **不要** 直接使用操作系统 CPU 核数，否则可能启动过多的进程导致超出实例规格而异常退出。
 `LEANCLOUD_APP_GROUP`| 云引擎实例所在的组。当使用云引擎 [组管理](leanengine_plan.html#组管理) 功能时，该值为组的名称。
-`LEANCLOUD_REGION` | 云引擎服务所在区域，值为 `CN` 或 `US`，分别表示国内节点和美国节点。
+`LEANCLOUD_REGION` | 云引擎服务所在区域，值为 `CN` 或 `US`，分别表示国内版和国际版。
 
 {% call docs.noteWrap() %}
 旧版云引擎使用的以 `LC_` 开头的环境变量（如 `LC_APP_ID`）已经被弃用。为了保证代码兼容性，`LC_` 变量在一段时间内依然有效，但未来可能会完全失效。为了避免报错，建议使用 `LEANCLOUD_` 变量来替换。

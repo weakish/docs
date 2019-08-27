@@ -1078,7 +1078,7 @@ cloud.request_sms_code("186xxxxxxxx",
 {# 被 https://blog.leancloud.cn/4818/ 引用，修改标题时注意更新博客链接 #}
 ### 服务覆盖区域和价格
 
-<a id="pricing"></a>以下金额为每条短信的价格，美国节点以美元计费，其他节点以人民币计费。列表中未包含的国家或区域，请在论坛或工单中提问确认。
+<a id="pricing"></a>以下金额为每条短信的价格，国际版以美元计费，国内版以人民币计费。列表中未包含的国家或区域，请在论坛或工单中提问确认。
 
 <script src="custom/js/lib/jquery.dataTables.min.js"></script>
 
@@ -1294,7 +1294,7 @@ var smsPrices = [ { CountryNumber: 1,
     UnitPrice: 0.73,
     USUnitPrice: 0.1038 } ];
 
-var nodes = [{ code: "cn", name: "华北节点"},{ code: "tab", name: "华东节点"  },{ code: "us", name: "美国节点"  }];
+var nodes = [{ code: "cn", name: "华北节点"},{ code: "tab", name: "华东节点"  },{ code: "us", name: "国际版"  }];
 
 for (var j = 0; j < smsPrices.length; j++){
     smsPrices[j].nodes = {};
@@ -1313,7 +1313,7 @@ for (var j = 0; j < smsPrices.length; j++){
             <th>国家代号</th>
             <th>华北节点</th>
             <th>华东节点</th>
-            <th>美国节点</th>
+            <th>国际版</th>
         </tr>
     </thead>
     <tbody>
