@@ -1,5 +1,6 @@
 {% set var_app_domain = '{应用的域名}' %}
 {% import "views/_helper.njk" as docs %}
+{% from "views/_data.njk" import libVersion as version %}
 
 # 网站托管开发指南 · {{platformName}}
 
@@ -615,20 +616,20 @@ leancloud.use_master_key(False)
   ```
 {% endif %}
 {% if platformName === "Java" %}
-云引擎使用 [LeanEngine Java SDK](https://github.com/leancloud/leanengine-java-sdk) 来代替 [Java 存储 SDK](https://github.com/leancloud/java-sdk)。前者依赖了后者，并增加了云函数和 Hook 函数的支持，因此开发者可以直接使用 [LeanCloud 的存储服务](leanstorage_guide-java.html) 来存储自己的数据。
+云引擎项目直接依赖于 [Java Unified SDK](https://github.com/leancloud/java-unified-sdk) 的 [engine-core](https://github.com/leancloud/java-unified-sdk/tree/master/leanengine) 模块，engine-core 又依赖于存储核心模块 storage-core。因此开发者可以直接使用 [LeanCloud 的存储服务](leanstorage_guide-java.html) 来存储自己的数据。
 
-如果使用项目框架作为基础开发，[LeanEngine Java SDK](https://github.com/leancloud/leanengine-java-sdk) 默认是配置好的，可以根据示例程序的方式直接使用。
+如果使用项目框架作为基础开发，[LeanEngine Java SDK](https://github.com/leancloud/java-unified-sdk/tree/master/leanengine) 默认是配置好的，可以根据示例程序的方式直接使用。
 
 如果是自定义项目，则需要自己配置：
 
-- 配置依赖：在 `pom.xml` 中增加依赖配置来增加 [LeanEngine Java SDK](https://github.com/leancloud/leanengine-java-sdk) 的依赖：
+- 配置依赖：在 `pom.xml` 中增加依赖配置来增加 LeanEngine Java SDK 的依赖：
 
   ```xml
   <dependencies>
     <dependency>
       <groupId>cn.leancloud</groupId>
-      <artifactId>leanengine</artifactId>
-      <version>0.1.11</version>
+      <artifactId>engine-core</artifactId>
+      <version>{{ version.unified }}</version>
     </dependency>
   </dependencies>
   ```
@@ -636,8 +637,10 @@ leancloud.use_master_key(False)
 - 初始化：在正式使用数据存储之前，你需要使用自己的 App Key 进行初始化中间件：
 
   ```java
-  import com.avos.avoscloud.internal.impl.JavaRequestSignImplementation;
-  import cn.leancloud.LeanEngine;
+  import cn.leancloud.AVCloud;
+  import cn.leancloud.core.AVOSCloud;
+  import cn.leancloud.core.RequestSignImplementation;
+  import cn.leancloud.AVObject;
 
   // 从 LEANCLOUD_APP_ID 这个环境变量中获取应用 App ID 的值
   String appId = System.getenv("LEANCLOUD_APP_ID");
@@ -651,7 +654,7 @@ leancloud.use_master_key(False)
   LeanEngine.initialize(appId, appKey, appMasterKey);
 
   // 如果不希望使用 Master Key 权限，可以将下面一行删除
-  JavaRequestSignImplementation.instance().setUseMasterKey(true);
+  RequestSignImplementation.setMasterKey(appMasterKey);
   ```
 {% endif %}
 {% if platformName === ".NET" %}
@@ -711,7 +714,7 @@ app.get('/1.1/_ops/functions/metadatas', function(req, res) {
 ```
 {% endif %}
 {% if platformName === "Java" %}
-如果未使用 [LeanEngine Java SDK](https://github.com/leancloud/leanengine-java-sdk)，则需要自己实现该 URL 的处理，比如这样：
+如果未使用 [LeanEngine Java SDK](https://github.com/leancloud/java-unified-sdk/tree/master/leanengine)，则需要自己实现该 URL 的处理，比如这样：
 
 ```java
 // 健康监测 router
