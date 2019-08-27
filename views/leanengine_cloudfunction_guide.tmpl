@@ -1,4 +1,5 @@
 {% import "views/_helper.njk" as docs %}
+{% from "views/_data.njk" import libVersion as version %}
 
 # 云函数开发指南 · {{platformName}}
 
@@ -479,14 +480,26 @@ Map<String, String> dicParameters = new HashMap<String, String>();
 dicParameters.put("movie", "夏洛特烦恼");
 
 // 调用指定名称的云函数 averageStars，并且传递参数
-AVCloud.callFunctionInBackground("averageStars", dicParameters, new FunctionCallback() {
-    public void done(Object object, AVException e) {
-        if (e == null) {
-            // 处理结果
-        } else {
-            // 处理报错
-        }
-    }
+AVCloud.callFunctionInBackground("averageStars", dicParameters).subscribe(new Observer<Object>() {
+  @Override
+  public void onSubscribe(Disposable disposable) {
+
+  }
+
+  @Override
+  public void onNext(Object object) {
+    // succeed.
+  }
+
+  @Override
+  public void onError(Throwable throwable) {
+    // failed.
+  }
+
+  @Override
+  public void onComplete() {
+
+  }
 });
 ```
 
@@ -551,7 +564,7 @@ try {
 Map<String, Object> params = new HashMap<String, Object>();
 params.put("movie", "夏洛特烦恼");
 try {
-  float result = AVCloud.callFunction("averageStars", params);
+  float result = AVCloud.callFunctionInBackground("averageStars", params).blockingFirst();
 } catch (AVException e) {
   e.printStackTrace();
 }
@@ -620,14 +633,27 @@ cloudfunc.rpc('averageStars', movie='夏洛特烦恼')
 Map<String, String> dicParameters = new HashMap<String, String>();
 dicParameters.put("movie", "夏洛特烦恼");
 
-AVCloud.rpcFunctionInBackground("averageStars", dicParameters,
-  new FunctionCallback<AVObject>() {
-    @Override
-    public void done(AVObject object, AVException e) {
-      Assert.assertNull(e);
-    }
+AVCloud.callRPCInBackground("averageStars", dicParameters).subscribe(new Observer<AVObject>() {
+  @Override
+  public void onSubscribe(Disposable disposable) {
+
   }
-);
+
+  @Override
+  public void onNext(AVObject avObject) {
+    // succeed.
+  }
+
+  @Override
+  public void onError(Throwable throwable) {
+    // failed
+  }
+
+  @Override
+  public void onComplete() {
+
+  }
+});
 ```
 
 ### 云函数错误响应码
@@ -913,7 +939,7 @@ Cloud::beforeSave("Review", function($review, $user) {
 ```java
 @EngineHook(className = "Review", type = EngineHookType.beforeSave)
 public static AVObject reviewBeforeSaveHook(AVObject review) throws Exception {
-  if (AVUtils.isBlankString(review.getString("comment"))) {
+  if (StringUtil.isEmpty(review.getString("comment"))) {
     throw new Exception("No comment provided!");
   } else if (review.getString("comment").length() > 140) {
     review.put("comment", review.getString("comment").substring(0, 140) + "…");
@@ -1179,7 +1205,7 @@ public static void reviewAfterUpdateHook(AVObject review) throws Exception {
   List<String> updateKeys = EngineRequestContext.getUpdateKeys();
   for (String key : updateKeys) {
     if ("comment".equals(key) && review.getString("comment").length()<5) {
-      LogUtil.avlog.d(review.ObjectId + " 看起来像灌水评论：" + comment);
+      LOGGER.d(review.ObjectId + " 看起来像灌水评论：" + comment);
     }
   }
 }
@@ -1515,7 +1541,7 @@ Cloud::onVerifed("sms", function($user, $meta) {
 ```java
 @EngineHook(className = "_User", type = EngineHookType.onVerified)
 public static void userOnVerifiedHook(AVUser user) throws Exception {
-  LogUtil.avlog.d("User " + user.getObjectId() + " is verified by SMS.");
+  LOGGER.d("User " + user.getObjectId() + " is verified by SMS.");
 }
 ```
 {% endif %}
@@ -2559,7 +2585,7 @@ Client::useMasterKey(true);
 {% if platformName === "Java" %}
 ```java
 // 通常位于 src/…/AppInitListener.java
-JavaRequestSignImplementation.instance().setUseMasterKey(true);
+RequestSignImplementation.setMasterKey(appMasterKey);
 ```
 {% endif %}
 {% if platformName === ".NET" %}

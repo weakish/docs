@@ -89,7 +89,7 @@ do {
   
   
   post.setACL(acl);// 将 ACL 实例赋予 Post对象
-  post.saveInBackground();// 保存
+  post.saveInBackground().blockingSubscribe();// 保存
 ```
 ```js
   // 新建一个帖子对象
@@ -421,7 +421,7 @@ do {
   // 新建一个角色，并把为当前用户赋予该角色
   AVRole administrator= new AVRole("Administrator",roleACL);//新建角色
   administrator.getUsers().add(AVUser.getCurrentUser());//为当前用户赋予该角色
-  administrator.saveInBackground();//保存到云端
+  administrator.saveInBackground().blockingSubscribe();//保存到云端
 ```
 ```js
   // 新建一个角色，并把为当前用户赋予该角色
@@ -1291,7 +1291,7 @@ do {
 
   // 向 moderatorRole 的 roles（AVRelation） 中添加 administratorRole
   moderatorRole.getRoles().add(administratorRole);
-  moderatorRole.saveInBackground();
+  moderatorRole.saveInBackground().blockingSubscribe();
 ```
 ```js
   // 建立版主和论坛管理员之间的从属关系

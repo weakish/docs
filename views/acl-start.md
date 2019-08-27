@@ -33,7 +33,7 @@ AVObject post = new AVObject("Post");
 post.put("title", "大家好，我是新人");
 post.put("content", "我喜欢看新闻和阅读报纸。");
 
-post.saveInBackground();
+post.saveInBackground().blockingSubscribe();
 ```
 ```javascript
   // 新建一个帖子对象
@@ -109,7 +109,7 @@ acl.setWriteAccess(AVUser.getCurrentUser(), true);   //而这里设置了 Post �
 
 post.setACL(acl);//设置 ACL
 
-post.saveInBackground();
+post.saveInBackground().blockingSubscribe();
 ```
 ```javascript
   // 新建一个帖子对象
