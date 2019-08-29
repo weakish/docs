@@ -235,19 +235,22 @@ wss://cn-n1-wechat-mesos-cell-4.leancloud.cn
 
 **部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版。**
 
-4.6.0 之下的版本不支持自定义域名。
+4.6.0 之前的版本不支持自定义域名。
 
 #### Swift SDK
 
 请参考 [SDK 安装指南](sdk_setup-swift.html#初始化) 配置。
 
-16.1.0 之下的版本不支持自定义域名。
+16.1.0 之前的版本不支持自定义域名。
 
-#### Android SDK
+#### Java Unified SDK
 
-4.4.4 及以上版本支持（建议升级到最新版）
+Java Unified SDK 请参考 [SDK 安装指南](sdk_setup-java.html#初始化) 配置。 
 
-```java
+老的 Android SDK 请参考以下方法配置：
+
+<details>
+<pre><code>
 // 配置 SDK 储存
 AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.API, "https://xxx.example.com");
 // 配置 SDK 云引擎
@@ -257,27 +260,12 @@ AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.PUSH, "https://xxx.example.com");
 // 配置 SDK 即时通讯
 AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.RTM, "https://xxx.example.com");
 // 初始化应用
-AVOSCloud.initialize(this,APP_ID,APP_KEY);
-```
+AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
+</code></pre>
 
-#### Java Unified SDK
+4.4.4 之前的版本不支持自定义域名。
 
-```java
-import cn.leancloud.core.AVOSService;
-
-// 配置 SDK 储存
-AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
-// 配置 SDK 云引擎
-AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
-// 配置 SDK 推送
-AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
-// 配置 SDK 即时通讯
-AVOSCloud.setServer(AVOSService.RTM, "https://xxx.example.com");
-// 初始化应用
-AVOSCloud.initialize(this,APP_ID,APP_KEY);
-```
-
-云引擎内部访问 API 是通过内网，**请勿在云引擎网站托管的 Java 项目中 setServer**，否则请求会走公网，影响性能。
+</details>
 
 #### .NET SDK
 
