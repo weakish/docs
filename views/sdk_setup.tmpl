@@ -770,6 +770,17 @@ PM> Install-Package LeanCloud.Realtime
 然后粘贴下列代码到 `application:didFinishLaunchingWithOptions:` 方法中：
 
 ```objc
+// 配置 SDK 储存
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleAPI];
+// 配置 SDK 推送
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModulePush];
+// 配置 SDK 云引擎
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleEngine];
+// 配置 SDK 即时通讯
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleRTM];
+// 配置 SDK 统计
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleStatistics];
+// 初始化应用
 [AVOSCloud setApplicationId:@"{{appid}}" clientKey:@"{{appkey}}"];
 ```
 

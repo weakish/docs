@@ -231,24 +231,11 @@ wss://cn-n1-wechat-mesos-cell-4.leancloud.cn
 
 #### Objective-C SDK
 
-4.6.0 及以上支持（强烈建议升级到**最新版**，至少升级到 **8.2.3**，详情见下）
+请参考 [SDK 安装指南](sdk_setup-objc.html#初始化) 配置。
 
-```objc
-// 配置 SDK 储存
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleAPI];
-// 配置 SDK 推送
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModulePush];
-// 配置 SDK 云引擎
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleEngine];
-// 配置 SDK 即时通讯
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleRTM];
-// 配置 SDK 统计
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleStatistics];
-// 初始化应用
-[AVOSCloud setApplicationId:APP_ID clientKey:APP_KEY];
-```
+**部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版。**
 
-**部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版**
+4.6.0 之下的版本不支持自定义域名。
 
 #### Swift SDK
 
