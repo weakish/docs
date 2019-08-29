@@ -269,28 +269,7 @@ AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 
 #### .NET SDK
 
-```cs
-// 配置存储和云引擎
-AVClient.Initialize(new AVClient.Configuration {
-                ApplicationId = appId,
-                ApplicationKey = appKey,
-                ApiServer = new Uri("https://xxx.example.com"),
-                EngineServer = new Uri("https://xxx.example.com")
-            });
-// 通过 RTM Router 配置即时通讯
-var realtime = new AVRealtime(new AVRealtime.Configuration
-           {
-                ApplicationId = "app-id",
-                ApplicationKey = "app-key",
-                RTMRouter = new Uri("https://xxx.example.com")
-           });
-```
-
-##### 多人在线对战
-
-```cs
-var client = new Client(appId, appKey, userId, playServer: "https://xxx.example.com");
-```
+请参考 [SDK 安装指南](sdk_setup-dotnet.html#初始化) 配置。 
 
 #### PHP SDK
 

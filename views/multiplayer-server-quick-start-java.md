@@ -252,7 +252,7 @@ const client = new Client({
 ```
 
 ```cs
-var client = new Client({{appid}}, {{appkey}}, userId);
+var client = new Client({{appid}}, {{appkey}}, userId, playServer: "https://xxx.example.com");
 await client.Connect();
 ```
 
