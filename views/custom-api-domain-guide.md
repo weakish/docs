@@ -239,23 +239,9 @@ wss://cn-n1-wechat-mesos-cell-4.leancloud.cn
 
 #### Swift SDK
 
-16.1.0 及以上支持
+请参考 [SDK 安装指南](sdk_setup-swift.html#初始化) 配置。
 
-```swift
-let configuration = LCApplication.Configuration(
-    customizedServers: [
-        .api("https://xxx.example.com"),
-        .engine("https://xxx.example.com"),
-        .push("https://xxx.example.com"),
-        .rtm("https://xxx.example.com")
-    ]
-)
-try LCApplication.default.set(
-    id: "APP_ID",
-    key: "APP_KEY",
-    configuration: configuration
-)
-```
+16.1.0 之下的版本不支持自定义域名。
 
 #### Android SDK
 
