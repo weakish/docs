@@ -273,15 +273,9 @@ AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 
 #### PHP SDK
 
-```php
-use \LeanCloud\Client;
-Client::initialize(appId, appKey, masterKey);
-Client::setServerUrl("https://xxx.example.com")
-```
+请参考 [SDK 安装指南](sdk_setup-php.html#初始化) 配置。 
 
-另外，PHP 也可以设置环境变量 `LEANCLOUD_API_SERVER` 为 `https://xxx.example.com` （设置环境变量后无需在初始化语句中调用 `setServerUrl`。
-
-云引擎内部访问 API 是通过内网，**请勿在云引擎网站托管的 PHP 项目中 setServerUrl**，否则请求会走公网，影响性能。
+0.7.0 之前版本不支持自定义域名。
 
 #### Python SDK
 
