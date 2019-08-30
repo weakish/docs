@@ -816,6 +816,24 @@ public static String hello(@EngineFunctionParam("name") String name) {
 ```
 {% endif %}
 
+{% if platformName === ".NET" %}
+我们建议将代码中的任务转化为异步队列处理，以优化运行时间，避免云函数或定时任务发生超时。例如：
+
+```cs
+private async static void TimeConsumingTask()
+{
+  await Task.Delay(20 * 1000);
+  Console.WriteLine("task done");
+}
+[EngineFunction("hello")]
+public static string Hello()
+{
+  Task.Run(() => TimeConsumingTask());
+  return "Hello World!";
+}
+```
+{% endif %}
+
 {% if platformName === "Python" %}
 ### 分离云函数
 
