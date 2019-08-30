@@ -762,6 +762,7 @@ throw new EngineException(123, "自定义错误信息。");
 ### 云函数超时
 
 云函数超时时间为 15 秒，如果超过阈值，客户端将收到 HTTP status code 为 `503` 的响应，body 为 `The request timed out on the server`。{% if platformName === "Node.js" %}服务端会出现类似这样的日志：`LeanEngine: /1.1/functions/<cloudFunc>: function timeout (15000ms)`。注意即使已经响应，此时云函数可能仍在执行，但执行完毕后的响应是无意义的（不会发给客户端，会在日志中打印一个 `Can't set headers after they are sent` 的异常）。{% endif %}{% if platformName === "Python" %}{# TODO #}{% endif %}{% if platformName === "PHP" %}服务端会出现类似这样的日志：`WARNING: [pool www] child ... exited on signal 9 (SIGKILL) after ... seconds from start`。{% endif %}{% if platformName === "Java" %}{# TODO #}{% endif %}{% if platformName === ".NET" %}{# TODO #}{% endif %}
+除了 `503` 错误外，有些情况下客户端也可能收到其他报错，如 `524` 或 `141`。
 
 {# PHP 没有靠谱的异步处理方案 #}
 {% if platformName !== "PHP" %}
