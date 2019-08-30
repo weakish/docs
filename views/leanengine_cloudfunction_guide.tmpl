@@ -763,8 +763,12 @@ throw new EngineException(123, "自定义错误信息。");
 
 云函数超时时间为 15 秒，如果超过阈值，客户端将收到 HTTP status code 为 `503` 的响应，body 为 `The request timed out on the server`。{% if platformName === "Node.js" %}服务端会出现类似这样的日志：`LeanEngine: /1.1/functions/<cloudFunc>: function timeout (15000ms)`。注意即使已经响应，此时云函数可能仍在执行，但执行完毕后的响应是无意义的（不会发给客户端，会在日志中打印一个 `Can't set headers after they are sent` 的异常）。{% endif %}{% if platformName === "Python" %}{# TODO #}{% endif %}{% if platformName === "PHP" %}服务端会出现类似这样的日志：`WARNING: [pool www] child ... exited on signal 9 (SIGKILL) after ... seconds from start`。{% endif %}{% if platformName === "Java" %}{# TODO #}{% endif %}{% if platformName === ".NET" %}{# TODO #}{% endif %}
 
-{% if platformName === "Node.js" %}
+{# PHP 没有靠谱的异步处理方案 #}
+{% if platformName !== "PHP" %}
 #### 超时的处理方案
+{% endif %}
+
+{% if platformName === "Node.js" %}
 
 我们建议将代码中的任务转化为异步队列处理。可以：
 
@@ -779,7 +783,6 @@ throw new EngineException(123, "自定义错误信息。");
 4. 在任何时候，在控制台通过队列 `id` 可以获取某个任务的执行结果，判断任务状态。
 {% endif %}
 {% if platformName === "Python" %}
-#### 超时的处理方案
 
 我们建议将代码中的任务转化为异步队列处理，以优化运行时间，避免云函数或定时任务发生超时。Python 运行环境使用了 `gevent` 作为 event loop，所以你可以根据情况自己 `gevent.spawn` 一个 `greenlet` 来处理异步逻辑。例如：
 
