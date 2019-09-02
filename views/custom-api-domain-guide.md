@@ -359,7 +359,7 @@ Client::setServerUrl("https://xxx.example.com")
 
 商用版应用的域名如果没有 ICP 备案，或者需要接入备案，请进入 [应用控制台 > 账号设置 > 域名备案](/dashboard/settings.html#/setting/domainrecord)，按照步骤填写资料。
 
-没有商用版应用的用户如果需要协助备案或接入备案，需要支付 600 元服务费。请[在此提交备案相关资料][temp]，同时发送邮件至 support@leancloud.rocks 和我们联系。有商用版应用的用户此项服务免费。
+没有商用版应用的用户只能绑定已备案的域名。文件域名可以直接绑定已备案的域名。云引擎、API 域名可以先绑定已备案的域名，进行测试开发。在产品正式上线时，升级应用为商用版，通过控制台接入备案。
 
 [temp]: https://jinshuju.net/f/17C29c
 
