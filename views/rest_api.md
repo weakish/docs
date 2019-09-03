@@ -2891,8 +2891,15 @@ curl -X GET \
 1. 每一个 AVObject 类只能包含一个 AVGeoPoint 对象的键值。
 2. Points 不应该等于或者超出它的界. 纬度不应该是 -90.0 或者 90.0，经度不应该是 -180.0 或者 180.0。试图在 GeoPoint 上使用超出范围内的经度和纬度会导致问题.
 
-{% if node != 'qcloud' %}
 ## 用户反馈组件 API
+
+{% if node == 'qcloud' %}
+{% set feedback_host = "tab.leancloud.cn" %}
+{% elif node == 'us' %}
+{% set feedback_host = "us.leancloud.cn" %}
+{% else %}
+{% set feedback_host = "api.leancloud.cn" %}
+{% endif %}
 
 提交一条新的用户反馈：
 
@@ -2906,7 +2913,7 @@ curl -X POST \
          "content" : "反馈的文字内容",
          "contact" : "联系方式、QQ 或者邮箱手机等"
        }' \
-  https://{{host}}/1.1/feedback
+  https://{{feedback_host}}/1.1/feedback
 ```
 
 提交后的用户反馈在可以在 [控制台 >（选择应用）> 组件 > 用户反馈](/dashboard/devcomponent.html?appid={{appid}}#/component/feedback) 里看到。
@@ -2918,7 +2925,7 @@ curl -X GET \
 -H "X-LC-Id:{{appid}}" \
 -H "X-LC-Key:{{appkey}}" \
 -H "Content-Type: application/json" \
-https://{{host}}/1.1/feedback
+https://{{feedback_host}}/1.1/feedback
 ```
 
 获取一条反馈里面的信息：
@@ -2928,7 +2935,7 @@ curl -X GET \
 -H "X-LC-Id:{{appid}}" \
 -H "X-LC-Key:{{appkey}}" \
 -H "Content-Type: application/json" \
-https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
+https://{{feedback_host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
 
 将 `<:feedback_objectId>` 替换为 feedback 的 objectId（可以从上述的「获取所有的反馈」这个查询中得到 objectId）。
@@ -2943,7 +2950,7 @@ curl -X POST \
 -H "X-LC-Key:{{appkey}}"\
  -H "Content-Type: application/json" \
 -d '{"type":"dev","content":"感谢您的反馈！我们正在修复您所述的问题，修复后再通知您。", "attachment":"{{url}}"}' \
-https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
+https://{{feedback_host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
 
 用户为一条已经存在的反馈增加一条回复：
@@ -2954,10 +2961,9 @@ curl -X POST \
 -H "X-LC-Key:{{appkey}}"\
  -H "Content-Type: application/json" \
 -d '{"type":"user","content":"我刚才又试了下，现在没问题了！耶~", "attachment":"{{url}}"}' \
-https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
+https://{{feedback_host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
 
-{% endif %}
 
 {% if node!='qcloud' %}
 ## 短信验证 API
