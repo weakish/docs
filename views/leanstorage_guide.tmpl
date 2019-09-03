@@ -7097,7 +7097,7 @@ user.logIn(authData: authData, platform: .weixin) { (result) in
   "createdAt":    "2018-05-21T09:33:26.406Z",
   "updatedAt":    "2018-05-21T09:33:26.575Z",
   "sessionToken": "…",
-  // 默认情况 authData 不会出现在这里
+  // authData 通常不会返回
   // 继续阅读以了解其中原因
   "authData": {
     // …
@@ -7106,7 +7106,7 @@ user.logIn(authData: authData, platform: .weixin) { (result) in
 }
 ```
 
-默认情况下，`authData` 不会被返回给客户端，除非它属于当前用户。如需修改此行为，可进入 [控制台 > 存储 > 数据 > `_User`](/dashboard/data.html?appid={{appid}}#/_User)，点击 `authData` 列表头旁边的箭头，点击 **编辑**，然后取消选中 **只限所属用户读写**，这样所有人就都能访问这条数据了。
+出于安全考虑，`authData` 不会被返回给客户端，除非它属于当前用户。
 
 为确保每个 `{{ userObjectName }}` 只会关联每个平台一次，`_User` class 中每个用户的 `authData.<SERVICE_NAME>.openid` 需要保持独一无二。
 
