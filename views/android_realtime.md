@@ -267,7 +267,7 @@ group.join();
 ```
 对于之前已经加入过的群组，只要没有显式调用过quit()，**并不需要在重新上线以后反复 join**。只要在`session.open` 以后，就能收到来自群组的消息。
 
-AVQuery 查询参考 [数据存储开发指南](./leanstorage_guide-android.html#查询)。
+AVQuery 查询参考 [数据存储开发指南](./leanstorage_guide-java.html#查询)。
 
 ### 发送消息
 

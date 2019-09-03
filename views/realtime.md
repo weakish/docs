@@ -218,7 +218,7 @@ LeanChat 用到了大多数即时通讯组件的提供的接口与功能，通�
 
 * `Msg` 对象，它代表一个具体的消息对象，`Msg`对象可转换成 `Json`文本，发送给对方，对方接收到后可转换成 `Msg` 对象。可参考 [Msg.java](https://github.com/leancloud/leanchat-android/blob/master/src/com/avoscloud/chat/entity/Msg.java)。
 * `messages` 表，用来保存消息，字段基本和 `Msg`对象的成员一一对应。可参考 [DBMsg.java](https://github.com/leancloud/leanchat-android/blob/master/src/com/avoscloud/chat/db/DBMsg.java)。
-* 音频、图片消息的发送，用到了[AVFile](./leanstorage_guide-android.html#文件)，通过相应的函数创建、上传`AVFile`，得到 `url`之后作为 `Msg` 对象的一部分发送给对方。
+* 音频、图片消息的发送，用到了[AVFile](./leanstorage_guide-java.html#文件)，通过相应的函数创建、上传`AVFile`，得到 `url`之后作为 `Msg` 对象的一部分发送给对方。
 
 除了上述代码，Android 项目中，推荐阅读 [MsgReceiver.java](https://github.com/leancloud/leanchat-android/blob/master/src/com/avoscloud/chat/service/receiver/MsgReceiver.java)与 [ChatService.java](https://github.com/leancloud/leanchat-android/blob/master/src/com/avoscloud/chat/service/ChatService.java)。iOS 项目中，推荐阅读 [CDSessionManager.m](https://github.com/leancloud/leanchat-ios/blob/master/AVOSChatDemo/service/CDSessionManager.m)与 [CDDatabaseService.m](https://github.com/leancloud/leanchat-ios/blob/master/AVOSChatDemo/service/CDDatabaseService.m)。
 
