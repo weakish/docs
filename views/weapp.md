@@ -468,7 +468,7 @@ const realtime = getApp().realtime;
   });
   ```
 
-富媒体消息的用法请参考 [即时通讯开发指南 - 富媒体消息](realtime_guide-js.html#富媒体消息)。
+富媒体消息的用法请参考 [即时通讯开发指南 - 富媒体消息](realtime-guide-beginner.html#文本之外的聊天消息)。
 
 ### 数据绑定
 
