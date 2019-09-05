@@ -144,7 +144,6 @@ AV.init({
     api: 'https://xxx.example.com',
   },
 });
-```
 </code></pre>
 
 <p>3.0.0 之前的即时通讯 SDK 不支持自定义域名。</p>
@@ -167,7 +166,6 @@ new Realtime({
   // appId, appKey,
   server: 'xxx.example.com',
 };
-```
 <code></pre>
 
 </details>
