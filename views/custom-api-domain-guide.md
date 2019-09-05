@@ -123,7 +123,7 @@ xxx.example.com.	3600	IN	CNAME	leancloud.example.
 
 <details>
 
-<p><code>>= 3.5.5, < 3.11.1</code> 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败</p>
+<p><code>&gt;=3.5.5, &lt;3.11.1</code> 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败</p>
 
 <pre><code>
 AV.init({
@@ -132,7 +132,7 @@ AV.init({
 });
 </code></pre>
 
-<p><code>>= 3.0.0, < 3.5.5</code></p>
+<p><code>&gt;= 3.0.0, &lt;3.5.5</code></p>
 
 <pre><code>
 AV.init({
@@ -146,7 +146,7 @@ AV.init({
 });
 </code></pre>
 
-<p>3.0.0 之前的即时通讯 SDK 不支持自定义域名。</p>
+<p><code>&lt;3.0.0</code> 的即时通讯 SDK 不支持自定义域名。</p>
 </details>
 
 
@@ -159,7 +159,7 @@ AV.init({
 
 <details>
 
-<p>4.0.0 至 4.3.1 之间的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：</p>
+<p><code>&gt;=4.0.0, &lt;=4.3.1</code> 之间的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：</p>
 
 <pre><code>
 new Realtime({
@@ -168,14 +168,11 @@ new Realtime({
 };
 <code></pre>
 
-</details>
 
-4.0.0 之前的即时通讯 SDK 不支持自定义域名。
+<p><code>&lt;4.0.0</code> 的即时通讯 SDK 不支持自定义域名。</p>
 
-如果使用了 LiveQuery 功能，建议使用 3.14.0 以上版本的存储 SDK。
-旧版本（3.5.0 至 3.13.2）的 SDK 还需要在初始化的时候额外配置 LiveQuery 模块的域名：
-
-<details>
+<p>如果使用了 LiveQuery 功能，建议使用<code>&gt;=3.14.0</code> 的存储 SDK。
+旧版本（<code>&gt;=3.5.0, &lt;=3.13.2</code>）的 SDK 还需要在初始化的时候额外配置 LiveQuery 模块的域名：</p> 
 
 <pre><code>
 AV.init({
@@ -189,9 +186,9 @@ AV.init({
 });
 <code></pre>
 
-<p>3.5.0 至 3.13.2 之间的 SDK不支持未启用 HTTPS 的自定义域名。</p>
+<p><code>&gt;=3.5.0, &lt;3.13.2</code> 之间的 SDK 不支持未启用 HTTPS 的自定义域名。</p>
 
-<p>3.5.0 之前的存储 SDK 的 LiveQuery 不支持自定义域名。</p>
+<p><code>&lt;3.5.0</code> 存储 SDK 的 LiveQuery 不支持自定义域名。</p>
 
 </details>
 
@@ -236,13 +233,13 @@ wss://cn-n1-wechat-mesos-cell-4.leancloud.cn
 
 **部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版。**
 
-4.6.0 之前的版本不支持自定义域名。
+`<4.6.0` 的版本不支持自定义域名。
 
 #### Swift SDK
 
 请参考 [SDK 安装指南](sdk_setup-swift.html#初始化) 配置。
 
-16.1.0 之前的版本不支持自定义域名。
+`<16.1.0` 的版本不支持自定义域名。
 
 #### Java Unified SDK
 
@@ -264,7 +261,7 @@ AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.RTM, "https://xxx.example.com");
 AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 </code></pre>
 
-4.4.4 之前的版本不支持自定义域名。
+<p><code>&lt;4.4.4</code> 的版本不支持自定义域名。</p>
 
 </details>
 
@@ -276,7 +273,7 @@ AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 
 请参考 [SDK 安装指南](sdk_setup-php.html#初始化) 配置。 
 
-0.7.0 之前版本不支持自定义域名。
+`<0.7.0` 版本不支持自定义域名。
 
 #### Python SDK
 
