@@ -75,7 +75,7 @@ xxx.example.com.	3600	IN	CNAME	leancloud.example.
 
 使用云引擎网站托管服务的应用，即申请了[云引擎内置域名](leanengine_webhosting_guide-node.html#设置域名)的应用，需要前往[应用控制台 > 账号设置 > 域名绑定](/dashboard/settings.html#/setting/domainbind)绑定云引擎域名。
 
-如前所述，仅使用云函数的应用，无需绑定云引擎域名，不过需要绑定 API 域名。
+如前所述，仅使用云函数（包括 hook 函数）的应用，无需绑定云引擎域名，不过需要绑定 API 域名。
 
 华北节点支持以下功能：
 
@@ -89,7 +89,7 @@ xxx.example.com.	3600	IN	CNAME	leancloud.example.
 如果你使用了以下服务：
 
 - 结构化数据存储
-- 云函数
+- 云函数（包括 hook 函数）
 - 即时通讯
 
 那么你需要前往[应用控制台 > 设置 > 域名绑定](/dashboard/app.html?appid={{appid}}#/domains) 绑定 API 域名。
