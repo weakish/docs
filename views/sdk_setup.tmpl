@@ -774,7 +774,7 @@ PM> Install-Package LeanCloud.Realtime
 [AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleAPI];
 // 配置 SDK 推送
 [AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModulePush];
-// 配置 SDK 云引擎
+// 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
 [AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleEngine];
 // 配置 SDK 即时通讯
 [AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleRTM];
@@ -942,7 +942,7 @@ import cn.leancloud.core.AVOSService;
 
 // 配置 SDK 储存
 AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
-// 配置 SDK 云引擎
+// 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
 AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
 // 配置 SDK 推送
 AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
@@ -971,7 +971,7 @@ public class MyLeanCloudApp extends Application {
         super.onCreate();
         // 配置 SDK 储存
         AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
-        // 配置 SDK 云引擎
+        // 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
         AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
         // 配置 SDK 推送
         AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
