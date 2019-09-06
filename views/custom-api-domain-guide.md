@@ -159,7 +159,7 @@ AV.init({
 
 <details>
 
-<p><code>&gt;=4.0.0, &lt;=4.3.1</code> 之间的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：</p>
+<p><code>&gt;=4.0.0, &lt;=4.3.1</code> 的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：</p>
 
 <pre><code>
 new Realtime({
@@ -186,7 +186,7 @@ AV.init({
 });
 <code></pre>
 
-<p><code>&gt;=3.5.0, &lt;3.13.2</code> 之间的 SDK 不支持未启用 HTTPS 的自定义域名。</p>
+<p><code>&gt;=3.5.0, &lt;3.13.2</code> 的 SDK 不支持未启用 HTTPS 的自定义域名。</p>
 
 <p><code>&lt;3.5.0</code> 存储 SDK 的 LiveQuery 不支持自定义域名。</p>
 
