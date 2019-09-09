@@ -1860,7 +1860,7 @@ AVObject *todo = [AVObject objectWithDictionary:objectDictionary]; // 由 NSMuta
 // 将字符串反序列化为 JSON 对象
 var json = JSON.parse(serializedString);
 // 将 JSON 对象反序列化成 AV.Object 对象
-var todo = AV.parse(json);
+var todo = AV.parseJSON(json);
 ```
 {% endif %}
 {% if platform_name === "Android / Java" %}
