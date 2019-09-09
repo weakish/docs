@@ -2940,7 +2940,7 @@ https://{{feedback_host}}/1.1/feedback/<:feedback_objectId>/threads
 
 将 `<:feedback_objectId>` 替换为 feedback 的 objectId（可以从上述的「获取所有的反馈」这个查询中得到 objectId）。
 和其他查询类 API 一样，你可以用 `skip` 和 `limit` 分页。
-不过 `limit` 的默认值是 500，这是针对用户反馈这一使用场景做的调整，确保绝大多数情况下一次请求即可获取整个会话。
+不过 `limit` 的默认值是 1000，这是针对用户反馈这一使用场景做的调整，确保绝大多数情况下一次请求即可获取整个会话。
 
 客服为一条已经存在的反馈增加一条回复：
 
