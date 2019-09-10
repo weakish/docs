@@ -302,30 +302,31 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 {
   "aps": {
      "alert": {
-       "title":               "标题",
-       "title-loc-key":       "",
-       "title-loc-args":      [""],
-       "subtitle":            "附标题",
-       "subtitle-loc-key":    "",
-       "subtitle-loc-args":   [""],
-       "body":                "消息内容",
-       "action-loc-key":      "",
-       "loc-key":             "",
-       "loc-args":            [""],
-       "launch-image":        "",
-       "summary-arg":         "",
-       "summary-arg-count":   1
+       "title":               字符串类型，表示推送内容标题，
+       "title-loc-key":       字符串列表，详情请参看 Apple 关于推送提醒本地化的说明，
+       "title-loc-args":      字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明， 
+       "subtitle":            字符串类型，表示推送内容副标题,
+       "subtitle-loc-key":    字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
+       "subtitle-loc-args":   字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
+       "body":                字符串类型，表示消息内容,
+       "action-loc-key":      字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
+       "loc-key":             字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
+       "loc-args":            字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
+       "launch-image":        字符串类型，设置点击推送后启动图片文件名， 
+       "summary-arg":         字符串类型，用于设置 Summary，
+       "summary-arg-count":   数字类型，用于设置 Summary 参数数量
      }
-     "category":          "通知类型",
-     "thread-id":         "通知分类名称",
-     "badge":             数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
-     "sound":             "声音文件名，前提在应用里存在",
-     "content-available": 数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载,
-     "mutable-content":   数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用
+     "category":              字符串类型，通知类型,
+     "thread-id":             字符串类型，通知分类名称,
+     "badge":                 数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
+     "sound":                 字符串或 JSON 类型，指定推送声音信息,
+     "content-available":     数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载,
+     "mutable-content":       数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用
    }
-   "custom-key":          "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-   "collapse-id":         "对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅",
-   "apns-priority":       数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅
+   "collapse-id":             字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅，
+   "apns-priority":           数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅
+   "apns-push-type":          字符串类型，用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert"，
+   "custom-key":              由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
 
