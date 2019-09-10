@@ -329,16 +329,16 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 }
 ```
 
-##### Android 设备推送消息内容
+##### Android 设备通用推送消息内容
 
 如果是 Android 设备，默认的消息栏通知消息内容参数支持下列属性：
 
 ```
 {
-  "alert":      "消息内容",
-  "title":      "显示在通知栏的标题",
-  "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-  "silent":     true/false // 用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒
+  "alert":      字符串类型，表示消息内容,
+  "title":      字符串类型，表示显示在通知栏的标题,
+  "silent":     布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒,
+  "custom-key": 由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
 
@@ -346,49 +346,71 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 
 ```
 {
-  "alert":      "消息内容",
-  "title":      "显示在通知栏的标题",
-  "action":     "com.your_company.push",
-  "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-  "silent":     true/false // 用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒
+  "alert":      字符串类型，表示消息内容,
+  "title":      字符串类型，表示显示在通知栏的标题,
+  "action":     字符串类型，注册 Receiver 时提供的 action name,
+  "silent":     布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒,
+  "custom-key": 由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
+
+关于自定义 Receiver 请参看[自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
+
+##### Windows Phone 设备推送消息内容
 
 Windows Phone 设备类似，也支持 `title` 和 `alert`，同时支持 `wp-param` 用于定义打开通知的时候打开的是哪个 Page：
 
 ```
 {
-  "alert":      "消息内容",
-  "title":      "显示在通知栏的标题",
+  "alert":      字符串类型，表示消息内容,
+  "title":      字符串类型，表示显示在通知栏的标题,
   "wp-param":   "/chat.xaml?NavigatedFrom=Toast Notification"
 }
 ```
 
-但是如果想一次 push 调用**推送不同的数据给不同类型的设备**，消息内容参数同时支持设定设备特定消息，例如：
+##### 为多种类型设备设置不同推送内容
+
+单次推送中，如果查询覆盖的目标推送设备包含多种类型，如既包含 iOS 设备，又包含 LeanCloud 自有渠道的 Android 设备，又有混合推送的小米华为设备等，可以为不同推送设备单独填写推送内容参数，我们会按照设备类型取出对应设备类型的推送内容来发推送，例如：
 
 ```
 {
   "ios": {
-    "alert":             "消息内容",
-     "badge":             数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以设置为 "Increment" 这个字符串（大小写敏感）,
-     "sound":             "声音文件名，前提在应用里存在",
-     "content-available": "如果你在使用 Newsstand, 设置为 1 来开始一次后台下载",
-     "custom-key":        "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
-   },
-   "android": {
-     "alert":             "消息内容",
-     "title":             "显示在通知栏的标题",
+    "alert":             "Hello iOS",
+     "badge":             "Increment",
+     "custom-key":        "custom-value"
+  },
+  "android": {
+     "alert":             "Hello LeanCloud",
      "action":            "com.your_company.push",
-     "custom-key":        "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-     "silent":            true/false // 用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒
-   },
-   "wp":{
-     "alert":             "消息内容",
-     "title":             "显示在通知栏的标题",
+     "custom-key":        "custom-value"
+  },
+  "mi": {
+     "alert":             "Hello Mi",
+     "custom-key":        "custom-value"
+  },
+  "hms": {
+     "alert":             "Hello Huawei",
+     "custom-key":        "custom-value"
+  },
+  "wp":{
+     "alert":             "Hello Windows Phone",
      "wp-param":          "/chat.xaml?NavigatedFrom=Toast Notification"
-   }
+  }
 }
 ```
+
+其中属性名称和推送平台对应关系如下：
+
+属性名称 | 平台
+-------- | ----
+ios | Apple APNs
+android | LeanCloud 自有 Android 平台
+mi | 小米推送
+hms | 华为 HMS 推送
+mz | 魅族推送
+vivo | vivo 推送
+oppo | oppo 推送
+wp  | Windows Phone
 
 #### iOS 测试和生产证书区分
 
