@@ -19,6 +19,26 @@ Key|Value|含义|来源
 
 部分管理性质的接口需要使用master key。
 
+### Base URL
+
+#### 国内节点
+文档中的所有 API URL 的 Base URL 为绑定的 [API 自定义域名](custom-api-domain-guide.html)。
+
+如果暂时没有绑定域名，可以临时使用如下域名（仅供测试和原型开发阶段使用，不保证可用性）：
+
+| 节点 | 临时域名 |
+| - | - |
+| 华北 | appid前八位.api.lncld.net |
+| 华东 | appid前八位.api.lncldapi.com |
+
+#### 国际节点
+LeanCloud 国际版暂不支持绑定 API 自定义域名，需使用如下域名：
+
+```
+appid前八位.api.lncldglobal.com
+```
+
+
 ### 请求 url 中的变量
 
 本文档中请求 url 中需要的填充的变量有：
