@@ -2587,7 +2587,7 @@ AVQuery<AVObject> query = new AVQuery<>("Todo");
 query.selectKeys(Arrays.asList("title", "content"));
 query.getFirstInBackground().subscribe(new Observer<AVObject>() {
     public void onSubscribe(Disposable disposable) {}
-    public void onNext(List<AVObject> todo) {
+    public void onNext(AVObject todo) {
         String title = todo.getString("title"); // √
         String content = todo.getString("content"); // √
         String notes = todo.getString("notes"); // 会报错
