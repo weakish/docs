@@ -21,9 +21,7 @@
 * 我们提供简易的 [第三方登录组件](leanstorage_guide-js.html#第三方账户登录)。
 {% endif %}
 * [Android 应用代码混淆注意事项](faq.html#代码混淆怎么做)
-* [基于 LeanCloud 的一对多、多对多关系数据建模](https://blog.leancloud.cn/1723/)
-* [使用 LeanCloud JavaScript SDK 和 AngularJS 创建 一个 Todo Demo](https://blog.leancloud.cn/1541/)
-* 我们的数据存储服务提供地理位置信息查询，参考 SDK 开发指南，或者博文教程[《GEO Point 的使用》](https://blog.leancloud.cn/537/)。
+* 我们的数据存储服务提供地理位置信息查询，参考 SDK 开发指南，或者博文教程[《GEO Point 的使用》](https://leancloudblog.com/geo-point-de-shi-yong/)。
 * 在应用设置菜单里，可以找到 **数据导出** 功能，你可以完整导出应用的数据。
 * 你可以在某个 class 的其他菜单里找到权限设置、Class 绑定等高级功能。
 * 在应用设置的 **邮件模板** 菜单，你可以编辑并保存发送给注册用户的邮箱验证邮件模板等。
@@ -108,5 +106,5 @@
 * 使用 [fir.im](http://fir.im/) 分发测试你的应用。
 * 不知道怎么使用 LeanCloud？各种 [Demo](demo.html) 等你来拿。
 * 所有 SDK 都提供 [API 文档](index.html)，开发指南没有覆盖的 API 介绍都可以在里面找到解释。
-* 关注我们的 [博客](https://blog.leancloud.cn/) 和 [微博](http://weibo.com/avoscloud)，获取 LeanCloud 最新消息。
+* 关注我们的 [博客](https://leancloudblog.com/) 和 [微博](http://weibo.com/avoscloud)，获取 LeanCloud 最新消息。
 * 在应用设置的基本设置菜单里，可以更改应用名称，提交应用图标，申请发布到 [应用墙](https://leancloud.cn/customers.html)。

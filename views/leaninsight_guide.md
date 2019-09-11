@@ -4,7 +4,7 @@
 
 针对大规模数据的分析任务一般都比较耗时。LeanCloud 为开发者提供了部分兼容 SQL 语法的离线数据分析功能。所谓「离线分析」，是指运行分析程序的机器和服务 API 请求的机器是分开的，这样可以尽量减少线上集群的压力，也就是说，使用离线分析并不会影响或牺牲线上正式数据的访问性能。
 
-{% if node == 'qcloud' and node == 'us' %}离线分析的数据来源就是线上实时数据。{% else %}离线分析的数据来源，对于普通表来说就是线上实时数据，而对于 [日志表](https://blog.leancloud.cn/3838/) 则是**前一天的数据备份（并非最新的在线数据）**，这一点需要大家注意。
+{% if node == 'qcloud' and node == 'us' %}离线分析的数据来源就是线上实时数据。{% else %}离线分析的数据来源，对于普通表来说就是线上实时数据，而对于 [日志表](https://leancloudblog.com/shu-ju-cun-chu-zhi-chi-xin-lei-xing-zhuan-wei-ri-zhi-xing-cun-chu-xu-qiu-you-hua/) 则是**前一天的数据备份（并非最新的在线数据）**，这一点需要大家注意。
 {% endif %}
 另外，离线分析仅支持 `SELECT` 语句，不支持 `UPDATE`、`INSERT`、`DELETE` 等语句，所以它不会更新或修改数据源，开发者可以放心使用。
 
@@ -194,7 +194,7 @@ select sum(upvotes) from Post
 select count(*) as `count`, pubUser from Post group by pubUser
 ```
 
-更多例子可以参考我们的博客文章[《LeanCloud 离线数据分析功能介绍》](https://blog.leancloud.cn/2559/)。
+更多例子可以参考我们的博客文章[《LeanCloud 离线数据分析功能介绍》](https://leancloudblog.com/leancloud-chi-xian-shu-ju-fen-xi-gong-neng-jie-shao/)。
 
 ## 云引擎和 JavaScript SDK 调用
 

@@ -251,8 +251,8 @@ LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数�
 
 ### 如何在 App 邮件内完全使用自己的品牌
 
-请参考博文 [《自定义应用内用户重设密码和邮箱验证页面》](http://blog.leancloud.cn/blog/2014/01/09/zi-ding-yi-ying-yong-nei-yong-hu-zhong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
-
+请参考博文 [《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
+  
 ### 创建唯一索引失败
 
 请确认想要创建索引的列没有已经存在的重复值。
@@ -263,7 +263,7 @@ LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数�
 
 ### 如何在应用之间共享数据
 
-请参考我们的博客文章 [《2014 年 3 月第 4 周更新日志》](http://blog.leancloud.cn/blog/2014/03/31/2014nian-3yue-di-4zhou-avos-cloud-geng-xin/)。
+请参考[控制台指南](dashboard_guide.html#应用之间共享部分数据)绑定 Class。
 
 ## iOS/macOS SDK
 
