@@ -180,5 +180,5 @@ Certificate chain
 - 在 Android 或 iOS 上可以使用 [HE.NET Network Tools](http://networktools.he.net/) 提供的 DNS、Ping 和 Traceroute（类似 mtr）。
 
 ----------
-相关文档：[中国移动运营商网络问题的诊断和投诉](https://blog.leancloud.cn/1683)
+相关文档：[中国移动运营商网络问题的诊断和投诉](https://leancloudblog.com/zhong-guo-yi-dong-yun-ying-shang-wang-luo-wen-ti-de-zhen-duan-he-tou-su/)
 

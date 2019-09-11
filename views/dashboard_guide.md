@@ -45,7 +45,7 @@
 ![storage - create class](images/dash_storage_data1.png)
 
 {% if node != 'qcloud' and node != 'us' %}
-在接下来的创建 Class 页面中，我们可以指定 Class 名字，也可以选择 Class 类型：普通表或 [日志表](https://blog.leancloud.cn/3838/)
+在接下来的创建 Class 页面中，我们可以指定 Class 名字，也可以选择 Class 类型：普通表或 [日志表](https://leancloudblog.com/shu-ju-cun-chu-zhi-chi-xin-lei-xing-zhuan-wei-ri-zhi-xing-cun-chu-xu-qiu-you-hua/)
 {% endif %}。
 
 <div class="callout callout-danger">每个应用最多可以创建 300 个 Class。</div>
