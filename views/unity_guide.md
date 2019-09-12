@@ -322,7 +322,7 @@ await equip.SaveAsync();
 要实现子类化，需要下面几个步骤：
 
 1. 首先声明一个子类继承自 AVObject；
-2. 为 `class` 添加 `[AVClassName("xxx")]`。它的值必须是一个字符串，也就是你过去传入 AVObject 构造函数的类名。这样以来，后续就不需要再在代码中出现这个字符串类名；
+2. 为 `class` 添加 `[AVClassName("xxx")]`。它的值必须是一个字符串，也就是你过去传入 AVObject 构造函数的类名。这样一来，后续就不需要再在代码中出现这个字符串类名；
 3. 实现自定义属性的 `get` 及 `set` 方法;
 4. 在应用初始化的地方，在系统启动时注册子类 `AVObject.RegisterSubclass<yourClassName>();`。
 

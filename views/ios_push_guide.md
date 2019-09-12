@@ -377,7 +377,7 @@ do {
 
 频道对于大多数应用来说可能就足够了。但是某些情况下，你可能需要更高精度的定向推送。LeanCloud 允许你通过 AVQuery API 查询 Installation 列表，并向指定条件的 query 推送消息。
 
-因为 Installation 同时是 Object 的子类，因此你可以保存任何数据类型到 Installation，并将它和你的其他应用数据对象关联起来，这样以来，你可以非常灵活地向你用户群做定制化、动态的推送。
+因为 Installation 同时是 Object 的子类，因此你可以保存任何数据类型到 Installation，并将它和你的其他应用数据对象关联起来，这样一来，你可以非常灵活地向你用户群做定制化、动态的推送。
 
 ### 保存 Installation 数据
 
