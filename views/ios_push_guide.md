@@ -118,7 +118,16 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 
-在 iOS 设备中，Installation 的类是 AVInstallation，并且是 AVObject 的子类，使用同样的 API 存储和查询。如果要访问当前应用的 Installation 对象，可以通过 `[AVInstallation currentInstallation]` 方法。当你第一次保存 AVInstallation 的时候，它会插入 `_Installation` 表，你可以在 {% if node=='qcloud' %}**控制台 > 存储 > 数据 > `_Installation`**{% else %}[控制台 > 存储 > 数据 > `_Installation`](/dashboard/data.html?appid={{appid}}#/_Installation){% endif %} 查看和查询。当 deviceToken 一被保存，你就可以向这台设备推送消息了。
+在 iOS 设备中，Installation 的类是 Object 的子类，使用同样的 API 存储和查询。如果要访问当前应用的 Installation 对象，可以通过如下方法。
+
+```swift
+let installation = LCApplication.default.currentInstallation
+```
+```objc
+AVInstallation *installation = [AVInstallation defaultInstallation];
+```
+
+当你第一次保存 Installation 的时候，它会插入 `_Installation` 表，你可以在 {% if node=='qcloud' %}**控制台 > 存储 > 数据 > `_Installation`**{% else %}[控制台 > 存储 > 数据 > `_Installation`](/dashboard/data.html?appid={{appid}}#/_Installation){% endif %} 查看和查询。当 deviceToken 一被保存，你就可以向这台设备推送消息了。
 
 ```swift
 func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -137,18 +146,34 @@ func application(_ application: UIApplication, didRegisterForRemoteNotifications
 }
 ```
 ```objc
+// SDK Version >= 11.6.7
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    AVInstallation *currentInstallation = [AVInstallation currentInstallation];
-    [currentInstallation setDeviceTokenFromData:deviceToken];
-    [currentInstallation saveInBackground];
+    AVInstallation *installation = [AVInstallation defaultInstallation];
+    [installation setDeviceTokenFromData:deviceToken teamId:@"YOUR_APNS_TEAM_ID"];
+    [installation saveInBackground];
+}
+
+// SDK Version <= 11.6.6
+- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSUInteger dataLength = deviceToken.length;
+    if (dataLength > 0) {
+        const unsigned char *dataBuffer = deviceToken.bytes;
+        NSMutableString *hexString = [NSMutableString stringWithCapacity:(dataLength * 2)];
+        for (int i = 0; i < dataLength; ++i) {
+            [hexString appendFormat:@"%02.2hhx", dataBuffer[i]];
+        }
+        AVInstallation *installation = [AVInstallation defaultInstallation];
+        [installation setDeviceToken:[hexString copy]];
+        [installation saveInBackground];
+    }
 }
 ```
 
-可以像修改 AVObject 那样去修改 AVInstallation，但是有一些特殊字段可以帮你管理目标设备：
+可以像修改 Object 那样去修改 Installation，但是有一些特殊字段可以帮你管理目标设备：
 
 字段|说明
 ---|---
-badge|应用图标旁边的红色数字，修改 AVInstallation 的这个值将修改应用的 badge。修改应该保存到服务器，以便为以后做 badge 增量式的推送做准备。
+badge|应用图标旁边的红色数字，修改 Installation 的这个值将修改应用的 badge。修改应该保存到服务器，以便为以后做 badge 增量式的推送做准备。
 channels|当前设备所订阅的频道数组
 deviceProfile|设备对应的后台自定义证书名称，用于多证书推送
 
@@ -172,10 +197,28 @@ func application(_ application: UIApplication, didRegisterForRemoteNotifications
 }
 ```
 ```objc
+// SDK Version >= 11.6.7
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    [AVOSCloud handleRemoteNotificationsWithDeviceToken:deviceToken constructingInstallationWithBlock:^(AVInstallation *currentInstallation) {
-        currentInstallation.deviceProfile = @"driver-push-certificate";
-    }];
+    AVInstallation *installation = [AVInstallation defaultInstallation];
+    [installation setDeviceTokenFromData:deviceToken teamId:@"YOUR_APNS_TEAM_ID"];
+    [installation setDeviceProfile:@"driver-push-certificate"];
+    [installation saveInBackground];
+}
+
+// SDK Version <= 11.6.6
+- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSUInteger dataLength = deviceToken.length;
+    if (dataLength > 0) {
+        const unsigned char *dataBuffer = deviceToken.bytes;
+        NSMutableString *hexString = [NSMutableString stringWithCapacity:(dataLength * 2)];
+        for (int i = 0; i < dataLength; ++i) {
+            [hexString appendFormat:@"%02.2hhx", dataBuffer[i]];
+        }
+        AVInstallation *installation = [AVInstallation defaultInstallation];
+        [installation setDeviceToken:[hexString copy]];
+        [installation setDeviceProfile:@"driver-push-certificate"];
+        [installation saveInBackground];
+    }
 }
 ```
 
@@ -210,7 +253,7 @@ do {
 ```
 ```objc
 // 当用户表示喜欢 Giants，则为其订阅该频道。
-AVInstallation *currentInstallation = [AVInstallation currentInstallation];
+AVInstallation *currentInstallation = [AVInstallation defaultInstallation];
 [currentInstallation addUniqueObject:@"Giants" forKey:@"channels"];
 [currentInstallation saveInBackground];
 ```
@@ -235,7 +278,7 @@ do {
 }
 ```
 ```objc
-AVInstallation *currentInstallation = [AVInstallation currentInstallation];
+AVInstallation *currentInstallation = [AVInstallation defaultInstallation];
 [currentInstallation removeObject:@"Giants" forKey:@"channels"];
 [currentInstallation saveInBackground];
 ```
@@ -246,7 +289,7 @@ AVInstallation *currentInstallation = [AVInstallation currentInstallation];
 let subscribedChannels: LCArray? = LCApplication.default.currentInstallation.channels
 ```
 ```objc
-NSArray *subscribedChannels = [AVInstallation currentInstallation].channels;
+NSArray *subscribedChannels = [AVInstallation defaultInstallation].channels;
 ```
 
 ### 发送消息到频道
@@ -334,11 +377,11 @@ do {
 
 频道对于大多数应用来说可能就足够了。但是某些情况下，你可能需要更高精度的定向推送。LeanCloud 允许你通过 AVQuery API 查询 Installation 列表，并向指定条件的 query 推送消息。
 
-因为 AVInstallation 同时是 AVObject 的子类，因此你可以保存任何数据类型到 AVInstallation，并将它和你的其他应用数据对象关联起来，这样以来，你可以非常灵活地向你用户群做定制化、动态的推送。
+因为 Installation 同时是 Object 的子类，因此你可以保存任何数据类型到 Installation，并将它和你的其他应用数据对象关联起来，这样以来，你可以非常灵活地向你用户群做定制化、动态的推送。
 
 ### 保存 Installation 数据
 
-为 AVInstallation 添加三个新字段：
+为 Installation 添加三个新字段：
 
 ```swift
 do {
@@ -362,7 +405,7 @@ do {
 ```
 ```objc
 // Store app language and version
-AVInstallation *installation = [AVInstallation currentInstallation];
+AVInstallation *installation = [AVInstallation defaultInstallation];
 
 //字段依次为：比赛分数、比赛结果、受伤报告
 [installation setObject:@(YES) forKey:@"scores"];
@@ -395,7 +438,7 @@ do {
 ```
 ```objc
 // Saving the device's owner
-AVInstallation *installation = [AVInstallation currentInstallation];
+AVInstallation *installation = [AVInstallation defaultInstallation];
 [installation setObject:[AVUser currentUser] forKey:@"owner"];
 [installation saveInBackground];
 ```
