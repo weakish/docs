@@ -1,6 +1,6 @@
 # iOS 消息推送开发指南
 
-本文介绍了如何在 iOS 设备中使用 LeanCloud 的推送功能。请先阅读我们的博客文章《[细说 iOS 消息推送](https://blog.leancloud.cn/1163/)》，再通过 [消息推送概览](push_guide.html) 了解和巩固相关概念。
+本文介绍了如何在 iOS 设备中使用 LeanCloud 的推送功能。请先阅读 [消息推送概览](push_guide.html) 了解相关概念。
 
 ## iOS 流程简介
 

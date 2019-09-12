@@ -83,7 +83,23 @@ AVObject *post = [AVObject objectWithClassName:@"Post"];
  AVObject post = new AVObject('Post');
  post.put('title', '大家好，我是新人');
 
- post.saveInBackground();// 保存
+ post.saveInBackground().subscribe(new Observer<AVObject>(){
+  @Override
+  public void onSubscribe(Disposable disposable) {
+  }
+
+  @Override
+  public void onNext(AVObject object) {
+  }
+
+  @Override
+  public void onError(Throwable throwable) {
+  }
+
+  @Override
+  public void onComplete() {
+  }
+ });// 保存
 ```
 
 第四步，打开控制台，查看新增的 `Post` 的对象中的 ACL 的值：

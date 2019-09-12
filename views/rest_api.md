@@ -1808,7 +1808,7 @@ emailVerified 字段有 3 种状态可以参考：
 2. **false**：User 对象最后一次被更新的时候，用户并没有确认过他的 email 地址。如果你看到 emailVerified 为 false 的话，你可以考虑刷新 User 对象或者再次请求验证用户邮箱。
 3. **null**：User对象在 email 验证没有打开的时候就已经创建了，或者 User 没有 email。
 
-关于自定义邮件模板和验证链接请看博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://blog.leancloud.cn/607/)。
+关于自定义邮件模板和验证链接请看博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
 
 ### 请求验证 Email
 
@@ -1838,7 +1838,7 @@ curl -X POST \
 
 如果成功的话，返回的值是一个 JSON 对象。
 
-关于自定义邮件模板和验证链接请看这篇博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://blog.leancloud.cn/607/)。
+关于自定义邮件模板和验证链接请看这篇博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
 
 {% if node!='qcloud' %}
 ### 手机号码验证
@@ -2891,8 +2891,15 @@ curl -X GET \
 1. 每一个 AVObject 类只能包含一个 AVGeoPoint 对象的键值。
 2. Points 不应该等于或者超出它的界. 纬度不应该是 -90.0 或者 90.0，经度不应该是 -180.0 或者 180.0。试图在 GeoPoint 上使用超出范围内的经度和纬度会导致问题.
 
-{% if node != 'qcloud' %}
 ## 用户反馈组件 API
+
+{% if node == 'qcloud' %}
+{% set feedback_host = "tab.leancloud.cn" %}
+{% elif node == 'us' %}
+{% set feedback_host = "us.leancloud.cn" %}
+{% else %}
+{% set feedback_host = "api.leancloud.cn" %}
+{% endif %}
 
 提交一条新的用户反馈：
 
@@ -2906,7 +2913,7 @@ curl -X POST \
          "content" : "反馈的文字内容",
          "contact" : "联系方式、QQ 或者邮箱手机等"
        }' \
-  https://{{host}}/1.1/feedback
+  https://{{feedback_host}}/1.1/feedback
 ```
 
 提交后的用户反馈在可以在 [控制台 >（选择应用）> 组件 > 用户反馈](/dashboard/devcomponent.html?appid={{appid}}#/component/feedback) 里看到。
@@ -2918,7 +2925,7 @@ curl -X GET \
 -H "X-LC-Id:{{appid}}" \
 -H "X-LC-Key:{{appkey}}" \
 -H "Content-Type: application/json" \
-https://{{host}}/1.1/feedback
+https://{{feedback_host}}/1.1/feedback
 ```
 
 获取一条反馈里面的信息：
@@ -2928,12 +2935,12 @@ curl -X GET \
 -H "X-LC-Id:{{appid}}" \
 -H "X-LC-Key:{{appkey}}" \
 -H "Content-Type: application/json" \
-https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
+https://{{feedback_host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
 
 将 `<:feedback_objectId>` 替换为 feedback 的 objectId（可以从上述的「获取所有的反馈」这个查询中得到 objectId）。
 和其他查询类 API 一样，你可以用 `skip` 和 `limit` 分页。
-不过 `limit` 的默认值是 500，这是针对用户反馈这一使用场景做的调整，确保绝大多数情况下一次请求即可获取整个会话。
+不过 `limit` 的默认值是 1000，这是针对用户反馈这一使用场景做的调整，确保绝大多数情况下一次请求即可获取整个会话。
 
 客服为一条已经存在的反馈增加一条回复：
 
@@ -2943,7 +2950,7 @@ curl -X POST \
 -H "X-LC-Key:{{appkey}}"\
  -H "Content-Type: application/json" \
 -d '{"type":"dev","content":"感谢您的反馈！我们正在修复您所述的问题，修复后再通知您。", "attachment":"{{url}}"}' \
-https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
+https://{{feedback_host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
 
 用户为一条已经存在的反馈增加一条回复：
@@ -2954,10 +2961,9 @@ curl -X POST \
 -H "X-LC-Key:{{appkey}}"\
  -H "Content-Type: application/json" \
 -d '{"type":"user","content":"我刚才又试了下，现在没问题了！耶~", "attachment":"{{url}}"}' \
-https://{{host}}/1.1/feedback/<:feedback_objectId>/threads
+https://{{feedback_host}}/1.1/feedback/<:feedback_objectId>/threads
 ```
 
-{% endif %}
 
 {% if node!='qcloud' %}
 ## 短信验证 API

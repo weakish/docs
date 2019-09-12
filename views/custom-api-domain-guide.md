@@ -20,7 +20,7 @@ LeanCloud 服务涉及以下三种自定义域名：
 说明：
 
 0. 每个域名只能绑定到一个应用的一种服务，可以使用同一主域名下不同的子域名。
-1. API 域名需要启用 SSL，绑定时会自动申请 SSL 证书，当然你也可以自行上传证书。华东节点自动申请 SSL 证书的功能尚未开发完成，目前华东节点控制台暂时可以选择不启用 SSL。
+1. API 域名需要启用 SSL，绑定时会自动申请 SSL 证书，当然你也可以自行上传证书。
 2. 为了避免影响同一域名下的其他子域名的解析，文件域名和 API 域名不支持直接绑定裸域名（例如 `example.com`）。
 3. 考虑到部分用户希望云引擎网站托管的 URL 尽量简短，云引擎网站托管服务支持直接绑定裸域名，直接绑定时使用 A 记录（其他情况下域名绑定均使用 CNAME）。由于 IP 可能发生变动，因此我们不建议在云引擎网站托管服务上直接绑定裸域名。
 4. 绑定目标中的「分组」指应用下的云引擎实例分组的生产环境。
@@ -63,9 +63,8 @@ xxx.example.com.	3600	IN	CNAME	leancloud.example.
   - 启用 HTTPS 域名的自定义文件域名的流量均按照 HTTPS 流量计费。
   - 同理，应用控制台的文件流量统计也总是归入 HTTPS 流量。
 
-更换文件域名后，之前保存在 `_File` 表中的文件 URL 不会自动更新。
-类似地，即时通讯历史消息中的 URL 也不会自动更新。
-所以，更换文件域名后，需要在客户端自行实现相应的替换逻辑。
+更换文件域名后，之前保存在 `_File` 表中的文件 URL 会自动更新。
+即时通讯历史消息中的 URL 不会自动更新。类似地，如果开发者把文件 URL 单独保存在别的地方，更换文件域名后，需要在客户端自行实现相应的替换逻辑。
 
 之前使用 LeanCloud 公共文件域名的旧应用，在绑定文件域名后，现存的使用共享域名的 URL 仍然可以访问。
 
@@ -75,9 +74,12 @@ xxx.example.com.	3600	IN	CNAME	leancloud.example.
 
 使用云引擎网站托管服务的应用，即申请了[云引擎内置域名](leanengine_webhosting_guide-node.html#设置域名)的应用，需要前往[应用控制台 > 账号设置 > 域名绑定](/dashboard/settings.html#/setting/domainbind)绑定云引擎域名。
 
-如前所述，仅使用云函数的应用，无需绑定云引擎域名，不过需要绑定 API 域名。
+如前所述，仅使用云函数（包括 hook 函数）的应用，无需绑定云引擎域名，不过需要绑定 API 域名。
 
-云引擎测试环境实例目前还无法在开发者控制台自助绑定域名，我们会尽快解决。
+华北节点支持以下功能：
+
+- `stg-` 开头的自定义域名（例如 `stg-xxx.example.com`）会被自动地绑定到预备环境。
+- 控制台绑定域名时，可以自动申请 SSL 证书。相应地，`/.well-known/acme-challenge/` 路径用于验证，开发者无法使用该路径。
 
 国际版同样支持绑定云引擎域名（无需备案）。
 
@@ -86,11 +88,11 @@ xxx.example.com.	3600	IN	CNAME	leancloud.example.
 如果你使用了以下服务：
 
 - 结构化数据存储
-- 云函数
+- 云函数（包括 hook 函数）
 - 即时通讯
 
 那么你需要前往[应用控制台 > 设置 > 域名绑定](/dashboard/app.html?appid={{appid}}#/domains) 绑定 API 域名。
-（华东节点前往[应用控制台 > 存储 > 设置 >  自定义 API 服务域名](https://tab.leancloud.cn/storage.html?appid={{appid}}#/storage/conf) 绑定 API 域名。） 
+（华东节点暂不支持 API 域名绑定。） 
 
 只使用推送和短信功能的应用目前不强制要求绑定域名，但我们仍然建议用户绑定自己的 API 域名，以免受到共享域名可用性的影响。
 
@@ -120,7 +122,7 @@ xxx.example.com.	3600	IN	CNAME	leancloud.example.
 
 <details>
 
-<p><code>>= 3.5.5, < 3.11.1</code> 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败</p>
+<p><code>&gt;=3.5.5, &lt;3.11.1</code> 的版本可能会碰到仍然使用缓存默认配置的 bug，它可能会导致更新后的第一次请求失败</p>
 
 <pre><code>
 AV.init({
@@ -129,7 +131,7 @@ AV.init({
 });
 </code></pre>
 
-<p><code>>= 3.0.0, < 3.5.5</code></p>
+<p><code>&gt;= 3.0.0, &lt;3.5.5</code></p>
 
 <pre><code>
 AV.init({
@@ -141,12 +143,11 @@ AV.init({
     api: 'https://xxx.example.com',
   },
 });
-```
 </code></pre>
 
+<p><code>&lt;3.0.0</code> 的即时通讯 SDK 不支持自定义域名。</p>
 </details>
 
-3.0.0 之前的即时通讯 SDK 不支持自定义域名。
 
 
 ##### 即时通讯 SDK
@@ -157,24 +158,20 @@ AV.init({
 
 <details>
 
-<p>4.0.0 至 4.3.1 之间的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：</p>
+<p><code>&gt;=4.0.0, &lt;=4.3.1</code> 的即时通讯 SDK 的 server 参数只能填写域名（不含协议），不支持未启用 HTTPS 的自定义域名：</p>
 
 <pre><code>
 new Realtime({
   // appId, appKey,
   server: 'xxx.example.com',
 };
-```
 <code></pre>
 
-</details>
 
-4.0.0 之前的即时通讯 SDK 不支持自定义域名。
+<p><code>&lt;4.0.0</code> 的即时通讯 SDK 不支持自定义域名。</p>
 
-如果使用了 LiveQuery 功能，建议使用 3.14.0 以上版本的存储 SDK。
-旧版本（3.5.0 至 3.13.2）的 SDK 还需要在初始化的时候额外配置 LiveQuery 模块的域名：
-
-<details>
+<p>如果使用了 LiveQuery 功能，建议使用<code>&gt;=3.14.0</code> 的存储 SDK。
+旧版本（<code>&gt;=3.5.0, &lt;=3.13.2</code>）的 SDK 还需要在初始化的时候额外配置 LiveQuery 模块的域名：</p> 
 
 <pre><code>
 AV.init({
@@ -188,11 +185,11 @@ AV.init({
 });
 <code></pre>
 
-<p>3.5.0 至 3.13.2 之间的 SDK不支持未启用 HTTPS 的自定义域名。</p>
+<p><code>&gt;=3.5.0, &lt;3.13.2</code> 的 SDK 不支持未启用 HTTPS 的自定义域名。</p>
+
+<p><code>&lt;3.5.0</code> 存储 SDK 的 LiveQuery 不支持自定义域名。</p>
 
 </details>
-
-3.5.0 之前的存储 SDK 的 LiveQuery 不支持自定义域名。
 
 ##### 多人在线对战
 
@@ -231,50 +228,26 @@ wss://cn-n1-wechat-mesos-cell-4.leancloud.cn
 
 #### Objective-C SDK
 
-4.6.0 及以上支持（强烈建议升级到**最新版**，至少升级到 **8.2.3**，详情见下）
+请参考 [SDK 安装指南](sdk_setup-objc.html#初始化) 配置。
 
-```objc
-// 配置 SDK 储存
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleAPI];
-// 配置 SDK 推送
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModulePush];
-// 配置 SDK 云引擎
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleEngine];
-// 配置 SDK 即时通讯
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleRTM];
-// 配置 SDK 统计
-[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleStatistics];
-// 初始化应用
-[AVOSCloud setApplicationId:APP_ID clientKey:APP_KEY];
-```
+**部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版。**
 
-**部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版**
+`<4.6.0` 的版本不支持自定义域名。
 
 #### Swift SDK
 
-16.1.0 及以上支持
+请参考 [SDK 安装指南](sdk_setup-swift.html#初始化) 配置。
 
-```swift
-let configuration = LCApplication.Configuration(
-    customizedServers: [
-        .api("https://xxx.example.com"),
-        .engine("https://xxx.example.com"),
-        .push("https://xxx.example.com"),
-        .rtm("https://xxx.example.com")
-    ]
-)
-try LCApplication.default.set(
-    id: "APP_ID",
-    key: "APP_KEY",
-    configuration: configuration
-)
-```
+`<16.1.0` 的版本不支持自定义域名。
 
-#### Android SDK
+#### Java Unified SDK
 
-4.4.4 及以上版本支持（建议升级到最新版）
+Java Unified SDK 请参考 [SDK 安装指南](sdk_setup-java.html#初始化) 配置。 
 
-```java
+老的 Android SDK 请参考以下方法配置：
+
+<details>
+<pre><code>
 // 配置 SDK 储存
 AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.API, "https://xxx.example.com");
 // 配置 SDK 云引擎
@@ -284,64 +257,22 @@ AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.PUSH, "https://xxx.example.com");
 // 配置 SDK 即时通讯
 AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.RTM, "https://xxx.example.com");
 // 初始化应用
-AVOSCloud.initialize(this,APP_ID,APP_KEY);
-```
+AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
+</code></pre>
 
-#### Java Unified SDK
+<p><code>&lt;4.4.4</code> 的版本不支持自定义域名。</p>
 
-```java
-import cn.leancloud.core.AVOSService;
-
-// 配置 SDK 储存
-AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
-// 配置 SDK 云引擎
-AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
-// 配置 SDK 推送
-AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
-// 配置 SDK 即时通讯
-AVOSCloud.setServer(AVOSService.RTM, "https://xxx.example.com");
-// 初始化应用
-AVOSCloud.initialize(this,APP_ID,APP_KEY);
-```
-
-云引擎内部访问 API 是通过内网，**请勿在云引擎网站托管的 Java 项目中 setServer**，否则请求会走公网，影响性能。
+</details>
 
 #### .NET SDK
 
-```cs
-// 配置存储和云引擎
-AVClient.Initialize(new AVClient.Configuration {
-                ApplicationId = appId,
-                ApplicationKey = appKey,
-                ApiServer = new Uri("https://xxx.example.com"),
-                EngineServer = new Uri("https://xxx.example.com")
-            });
-// 通过 RTM Router 配置即时通讯
-var realtime = new AVRealtime(new AVRealtime.Configuration
-           {
-                ApplicationId = "app-id",
-                ApplicationKey = "app-key",
-                RTMRouter = new Uri("https://xxx.example.com")
-           });
-```
-
-##### 多人在线对战
-
-```cs
-var client = new Client(appId, appKey, userId, playServer: "https://xxx.example.com");
-```
+请参考 [SDK 安装指南](sdk_setup-dotnet.html#初始化) 配置。 
 
 #### PHP SDK
 
-```php
-use \LeanCloud\Client;
-Client::initialize(appId, appKey, masterKey);
-Client::setServerUrl("https://xxx.example.com")
-```
+请参考 [SDK 安装指南](sdk_setup-php.html#初始化) 配置。 
 
-另外，PHP 也可以设置环境变量 `LEANCLOUD_API_SERVER` 为 `https://xxx.example.com` （设置环境变量后无需在初始化语句中调用 `setServerUrl`。
-
-云引擎内部访问 API 是通过内网，**请勿在云引擎网站托管的 PHP 项目中 setServerUrl**，否则请求会走公网，影响性能。
+`<0.7.0` 版本不支持自定义域名。
 
 #### Python SDK
 
@@ -355,11 +286,13 @@ Client::setServerUrl("https://xxx.example.com")
 
 主域名已在 LeanCloud 备案的情况下，子域名不需要额外备案或接入备案；主域名在别处备案的，如需在云引擎、API 使用子域名，还需在 LeanCloud 接入备案子域名。
 
+同一个网站（应用）可以有多个接入商，不会冲突。已备案的域名可以先在控制台绑定，再接入备案。办理接入备案期间域名、服务可以正常使用。
+
 云引擎域名备案之前要求云引擎已经部署，并且网站内容和备案申请的内容一致。
 
 商用版应用的域名如果没有 ICP 备案，或者需要接入备案，请进入 [应用控制台 > 账号设置 > 域名备案](/dashboard/settings.html#/setting/domainrecord)，按照步骤填写资料。
 
-没有商用版应用的用户如果需要协助备案或接入备案，需要支付 600 元服务费。请[在此提交备案相关资料][temp]，同时发送邮件至 support@leancloud.rocks 和我们联系。有商用版应用的用户此项服务免费。
+没有商用版应用的用户只能绑定已备案的域名。文件域名可以直接绑定已备案的域名。云引擎、API 域名可以先绑定已备案的域名，进行测试开发。在产品正式上线时，升级应用为商用版，通过控制台接入备案。
 
 [temp]: https://jinshuju.net/f/17C29c
 

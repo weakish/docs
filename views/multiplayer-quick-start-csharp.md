@@ -37,7 +37,7 @@ using LeanCloud.Play;
 ```
 
 ```cs
-var client = new Client({{appid}}, {{appkey}}, "leancloud");
+var client = new Client({{appid}}, {{appkey}}, "leancloud", playServer: "https://xxx.example.com");
 ```
 {% endblock %}
 

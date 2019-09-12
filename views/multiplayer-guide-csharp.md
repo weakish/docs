@@ -39,7 +39,7 @@ using LeanCloud.Play;
 ```
 接着我们需要实例化一个在线对战 SDK 的客户端对象。
 ```cs
-var client = new Client({{appid}}, {{appkey}}, userId, gameVersion: "0.0.1");
+var client = new Client({{appid}}, {{appkey}}, userId, playServer: "https://xxx.example.com", gameVersion: "0.0.1");
 ```
 {% endblock %}
 

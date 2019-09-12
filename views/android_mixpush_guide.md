@@ -298,6 +298,52 @@ LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为：
   }
 }
 ```
+### 华为推送自定义 Receiver
+如果你想推送消息，但不显示在 Android 系统的通知栏中，而是执行应用程序预定义的逻辑，可以 [自定义 Receiver](android_push_guide.html#自定义_Receiver)。华为混合推送自定义 Receiver 需要继承 AVHMSPushMessageReceiver，在收到透传消息的回调方法 `onPushMsg` 获取推送消息数据。
+你的 Receiver 可以按照如下方式实现：
+
+```java
+public class MyHuaweiReceiver extends AVHMSPushMessageReceiver {
+    @Override
+    public boolean onPushMsg(Context context, byte[] msg, Bundle bundle) {
+        try {
+            String content = "--- 收到推送消息：--- " + new String(msg, "UTF-8");
+            System.out.println("TAG:" + content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}
+```
+
+AndroidManifest.xml 中把 AVHMSPushMessageReceiver 替换为你自定义的 MyHuaweiReceiver。
+ 		
+```xml
+<!-- LeanCloud 自定义 receiver -->
+<!-- ${PACKAGE_NAME} 要替换上您应用的包名 -->
+<receiver android:name="${PACKAGE_NAME}.MyHuaweiReceiver"
+    android:permission="${PACKAGE_NAME}.permission.PROCESS_PUSH_MSG">
+    <intent-filter>
+        <!-- 必须,用于接收token -->
+        <action android:name="com.huawei.android.push.intent.REGISTRATION" />
+        <!-- 必须, 用于接收透传消息 -->
+        <action android:name="com.huawei.android.push.intent.RECEIVE" />
+        <!-- 必须, 用于接收通知栏消息点击事件 此事件不需要开发者处理，只需注册就可以 -->
+        <action android:name="com.huawei.intent.action.PUSH_DELAY_NOTIFY"/>
+    </intent-filter>
+</receiver>
+```
+推送的内容如下
+
+```json
+{
+  "alert":      "消息内容",
+  "title":      "显示在通知栏的标题",
+  "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
+  "silent":     true  //silent 属性，是透传消息与通知栏消息的标志
+}
+```
 
 ### 参考 demo
 我们提供了一个 [最新的华为推送 demo](https://github.com/leancloud/mixpush-demos/tree/master/huawei)，可供你在接入过程中参考。
@@ -942,9 +988,9 @@ LeanCloud 混合推送目前只支持默认动作（启动应用），将来会�
 
 
 
-## FCM 推送（仅美国节点可用）
+## FCM 推送（仅国际版可用）
 
-{{ docs.alert("FCM 推送仅支持部署在 LeanCloud 美国节点上的应用使用。") }}
+{{ docs.alert("FCM 推送仅支持部署在 LeanCloud 国际版上的应用使用。") }}
 
 [FCM](https://firebase.google.com/docs/cloud-messaging)（Firebase Cloud Messaging）是 Google/Firebase 提供的一项将推送通知消息发送到手机的服务。接入时后台需要配置连接 FCM 服务器需要的推送 key 和证书，FCM 相关的 token 由 LeanCloud SDK 来申请。
 
@@ -1188,7 +1234,7 @@ dependencies {
 
 注意，LeanCloud 云端只有在以下三个条件都满足的情况下，才会默认走 GCM 通道。
 
-- LeanCloud 美国节点
+- LeanCloud 国际版
 - 调用 `AVOSCloud.setGcmOpen(true)`
 - manifest 正确填写
 

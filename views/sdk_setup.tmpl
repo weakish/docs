@@ -770,16 +770,27 @@ PM> Install-Package LeanCloud.Realtime
 然后粘贴下列代码到 `application:didFinishLaunchingWithOptions:` 方法中：
 
 ```objc
+// 配置 SDK 储存
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleAPI];
+// 配置 SDK 推送
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModulePush];
+// 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleEngine];
+// 配置 SDK 即时通讯
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleRTM];
+// 配置 SDK 统计
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleStatistics];
+// 初始化应用
 [AVOSCloud setApplicationId:@"{{appid}}" clientKey:@"{{appkey}}"];
 ```
 
-在 **v11.4.0 版本以前** 使用 **美国节点** 需要增加以下代码：
+在 **v11.4.0 版本以前** 使用 **国际版** 需要增加以下代码：
 
 ```objc
 [AVOSCloud setServiceRegion:AVServiceRegionUS];
 ```
 
-在 **v11.4.0 版本及之后** 使用 **美国节点** 无需增加上述代码，SDK 会自动判断 Region。
+在 **v11.4.0 版本及之后** 使用 **国际版** 无需增加上述代码，SDK 会自动判断 Region。
 
 {{ docs.alert("在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Region 的初始化。") }}
 {% endif %}
@@ -793,10 +804,19 @@ import LeanCloud
 然后粘贴下列代码到 `application(_:didFinishLaunchingWithOptions:)` 函数内：
 
 ```swift
+let configuration = LCApplication.Configuration(
+    customizedServers: [
+        .api("https://xxx.example.com"),
+        .engine("https://xxx.example.com"),
+        .push("https://xxx.example.com"),
+        .rtm("https://xxx.example.com")
+    ]
+)
 do {
     try LCApplication.default.set(
         id: "{{appid}}",
-        key: "{{appkey}}"
+        key: "{{appkey}}",
+        configuration: configuration
     )
 } catch {
     fatalError("\(error)")
@@ -901,9 +921,16 @@ leancloud.init("{{appid}}", "{{appkey}}")
 use \LeanCloud\Client;
 // 参数依次为 App ID、App Key、Master Key
 Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
-{{host}} = "xxx.example.com" // 假定绑定的 API 自定义域名为 xxx.example.com
-Client::setServerUrl("https://{{host}}"); // 0.7.0 及以上版本支持
+${{host}} = "xxx.example.com" // 假定绑定的 API 自定义域名为 xxx.example.com
+Client::setServerUrl("https://${{host}}");
 ```
+
+
+注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
+模板项目和[云引擎网站托管开发指南](leanengine_webhosting_guide-php.html)中的示例代码均未配置 API 自定义域名，
+请勿多此一举 setServerUrl，否则会变成公网访问，影响性能。
+在使用命令行工具（`lean up`）本地调试云引擎托管项目时，虽然是公网访问，但命令行工具会自动设置相应的环境变量，供 SDK 访问 API，所以也不需要 setServerUrl。
+
 {% endif %}
 {% if platform_name === "Android / Java" %}
 ### Java 平台初始化代码
@@ -911,8 +938,26 @@ Client::setServerUrl("https://{{host}}"); // 0.7.0 及以上版本支持
 如果是一个普通 Java 项目，则在代码开头添加：
 
 ```java
+import cn.leancloud.core.AVOSService;
+
+// 配置 SDK 储存
+AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
+// 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
+AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
+// 配置 SDK 推送
+AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
+// 配置 SDK 即时通讯
+AVOSCloud.setServer(AVOSService.RTM, "https://xxx.example.com");
 AVOSCloud.initialize("{{appid}}", "{{appkey}}");
 ```
+
+注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
+模板项目和[云引擎网站托管开发指南](leanengine_webhosting_guide-java.html)中的示例代码均未配置 API 自定义域名，
+请勿多此一举 setServer，否则会变成公网访问，影响性能。
+在使用命令行工具（`lean up`）本地调试云引擎托管项目时，虽然是公网访问，但命令行工具会自动设置相应的环境变量，供 SDK 访问 API，所以也不需要 setServer。
+
+在自己的服务器上通过 Java SDK 调用云函数，需要在初始化 SDK 时配置 API 自定义域名。
+
 ### Android 平台初始化
 
 如果是一个 Android 项目，则向 `Application` 类的 `onCreate` 方法添加：
@@ -924,6 +969,15 @@ public class MyLeanCloudApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        // 配置 SDK 储存
+        AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
+        // 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
+        AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
+        // 配置 SDK 推送
+        AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
+        // 配置 SDK 即时通讯
+        AVOSCloud.setServer(AVOSService.RTM, "https://xxx.example.com"); 
+
         // 提供 this、App ID 和 App Key 作为参数
         // 注意这里千万不要调用 cn.leancloud.core.AVOSCloud 的 initialize 方法，否则会出现 NetworkOnMainThread 等错误。
         AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
@@ -976,15 +1030,31 @@ using LeanCloud.Realtime;
 在使用「数据存储」服务前，调用如下代码：
 
 ```cs
-AVClient.Initialize("{{appid}}", "{{appkey}}");
+AVClient.Initialize(new AVClient.Configuration {
+                ApplicationId = "{{appid}}",
+                ApplicationKey = "{{appkey}}",
+                ApiServer = new Uri("https://xxx.example.com"),
+                EngineServer = new Uri("https://xxx.example.com")
+            });
 ```
+
+
+注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
+模板项目和[云引擎网站托管开发指南](leanengine_webhosting_guide-dotnet.html)中的示例代码均未配置 API 自定义域名，
+请勿多此一举设置 ApiServer，否则会变成公网访问，影响性能。
+在使用命令行工具（`lean up`）本地调试云引擎托管项目时，虽然是公网访问，但命令行工具会自动设置相应的环境变量，供 SDK 访问 API，所以也不需要设置 ApiServer。
 
 ### 即时通讯初始化
 
 在使用「即时通讯」服务前，调用如下代码：
 
 ```cs
-var realtime = new AVRealtime("{{appid}}", "{{appkey}}");
+var realtime = new AVRealtime(new AVRealtime.Configuration
+           {
+                ApplicationId = "{{appid}}",
+                ApplicationKey = "{{appkey}}",
+                RTMRouter = new Uri("https://xxx.example.com")
+           });
 ```
 {% endif %}
 

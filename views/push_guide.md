@@ -185,80 +185,35 @@ curl -X PUT \
 
 ### 推送消息
 
-通过 `POST /1.1/push` 来推送消息给设备，`push` 接口支持下列属性：
+本接口用于根据提供的查询条件，给在 _Installation 表内所有符合查询条件的有效设备记录发推送消息。例如下面是给所有在 _Installation 表中 "channels" 字段包含 "public" 值的有效设备推送一条内容为 "Hello from LeanCloud" 的消息。
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {"channels" : ["public"]}
+        "data": {"alert" : "Hello from LeanCloud"}
+     }' \
+  https://{{host}}/1.1/push
+```
+
+本接口支持的参数如下：
 
 名称| 约束 | 描述
 ---|--- | ---
 data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容_Data)。请注意，整个 JSON 字符串不能超过 4096 个字符。
-channels| 可选 | 推送给哪些频道，将作为条件加入 where 对象。
 where| 可选 | 检索 `_Installation` 表使用的查询条件，JSON 对象。
+channels| 可选 | 推送给哪些频道，将作为条件加入 where 对象。
 expiration_interval| 可选 | 消息过期的相对时间，从调用 API 的时间开始算起，单位是秒。
 expiration_time| 可选 | 消息过期的绝对日期时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"
 notification_id | 可选 | 自定义推送 id，最长 16 个字符且只能由英文字母和数字组成，不提供该参数时我们会为每个推送请求随机分配一个唯一的推送 id，用于区分不同推送。我们会根据推送 id 来统计推送的目标设备数和最终消息到达数，并展示在 [推送记录](#Notification) 当中。用户自定义推送 id 可以将多个不同的请求并入同一个推送 id 下从而整体统计出这一批推送请求的目标设备数和最终消息到达数。
-prod| 可选 | **仅对 iOS 有效**。设置使用开发证书（**dev**）还是生产证书（**prod**）。当设备设置了 deviceProfile 时我们优先按照 deviceProfile 指定的证书推送。
 push_time| 可选 | 设置定时推送的发送时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"。请注意发送时间与当前时间如果小于 1 分钟则推送会立即发出，不会遵循 push_time 参数要求。
 req_id | 可选 | 自定义请求 id，最长 16 个字符且只能由英文字母和数字组成。5 分钟内带有相同 req_id 的不同推送请求我们认为是重复请求，只会发一次推送。用户可以在请求中带着唯一的 req_id 从而在接口出现超时等异常时将请求重发一次，以避免漏掉失败的推送请求。并且由于前后两次请求中 req_id 相同，我们会自动过滤重复的推送请求以保证每个目标终端用户最多只会收到一次推送消息。**重发过频或次数过多会影响正常的消息推送**，请注意控制。
-topic | 可选 | installation 的 apnsTopic，iOS Token Authentication 鉴权需要该字段。iOS SDK 会自动读取 iOS app 的 bundle ID，但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK; 2. 不使用 iOS SDK （如 React Native）；3. 推送目标设备使用的 topic 与 iOS Bundle ID 不同。
-apns_team_id | 可选 | Apple 不支持在一次推送中向从属于不同 Team Id 的设备发推送。在使用 iOS Token Authentication 的鉴权方式后，如果应用配置了多个不同 Team Id 的 Private Key，请填写该参数，并通过 where 查询条件保证单次推送请求的目标设备均属于本参数指定的 Team Id，以保证推送正常进行。
-
-此接口受频率限制，限制如下：
-
-|商用版（每应用）|开发版（每应用）|
-|----------|---------------|
-|最大 9600 次/分钟，默认 600 次/分钟|60 次/分钟|
-
-超过频率限制后 1 分钟内 LeanCloud 会拒绝请求持续返回 429 错误码，一分钟后会重新处理请求。
-
-商用版应用默认上限可以在[控制台 > 消息 >  推送 > 设置 > 消息推送 API 调用频率上限][dashboard-push-limit]修改（最高可设置为 9600 次/ 分钟）。
-修改上限后，按照每日调用频率峰值实行阶梯收费，阶梯单元 600 次/分钟，第一阶（峰值在 600 次/分钟以下）免费，第二阶收费 60 元（国际版为 20 美元），之后每阶收费递增 30 元（10 美元），如下表所示：
-
-[dashboard-push-limit]: /dashboard/messaging.html?appid={{appid}}#/message/push/conf
-
-| 每分钟调用频率 | 费用 |
-| - | - |
-| 0 ～ 600 | 免费 |
-| 601 ~ 1200 | ¥60 元 / 天 |
-| 1201 ~ 1800 | ¥90 元 / 天 |
-| 1801 ~ 2400 | ¥120 元 / 天 |
-| 2401 ~ 3000 | ¥150 元 / 天 |
-| 3001 ~ 3600 | ¥180 元 / 天 |
-| 3601 ~ 4200 | ¥210 元 / 天 |
-| 4201 ~ 4800 | ¥240 元 / 天 |
-| 4801 ~ 5400 | ¥270 元 / 天 |
-| 5401 ~ 6000 | ¥300 元 / 天 |
-| 6001 ~ 6600 | ¥330 元 / 天 |
-| 6601 ~ 7200 | ¥360 元 / 天 |
-| 7201 ~ 7800 | ¥390 元 / 天 |
-| 7801 ~ 8400 | ¥420 元 / 天 |
-| 8401 ~ 9000 | ¥450 元 / 天 |
-| 9001 ~ 9600 | ¥480 元 / 天 |
-
-国际版
-
-| 每分钟调用频率 | 费用 |
-| - | - |
-| 0 ～ 600 | 免费 |
-| 601 ~ 1200 | $20 USD / 天 |
-| 1201 ~ 1800 | $30 USD / 天 |
-| 1801 ~ 2400 | $40 USD / 天 |
-| 2401 ~ 3000 | $50 USD / 天 |
-| 3001 ~ 3600 | $60 USD / 天 |
-| 3601 ~ 4200 | $70 USD / 天 |
-| 4201 ~ 4800 | $80 USD / 天 |
-| 4801 ~ 5400 | $90 USD / 天 |
-| 5401 ~ 6000 | $100 USD / 天 |
-| 6001 ~ 6600 | $110 USD / 天 |
-| 6601 ~ 7200 | $120 USD / 天 |
-| 7201 ~ 7800 | $130 USD / 天 |
-| 7801 ~ 8400 | $140 USD / 天 |
-| 8401 ~ 9000 | $150 USD / 天 |
-| 9001 ~ 9600 | $160 USD / 天 |
-
-开发版应用调用此接口每日推送人次总量限制为 1 万，商用版应用无限制，但每日推送总量超过 100 万人次（国际版 10 万人次）后，超限部分将以 0.5 元/万人次的标准收费（国际版 0.02 美元/万人次），其中不足一万人次的部分，按一万人次计算。
-
-每日调用频率峰值和推送人次可在[控制台 > 消息 > 推送 > 统计][dashboard-push-stats] 中查看。
-
-[dashboard-push-stats]:  /dashboard/messaging.html?appid={{appid}}#/message/push/stat
+prod| 可选 | ***仅对 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS  推送时，该参数用于设置将推送发至 APNs 的开发环境（***dev***）还是生产环境（***prod***）。当使用证书鉴权方式发 iOS 推送时，该参数用于设置使用开发证书（***dev***）还是生产证书（***prod***）。在使用证书鉴权方式下，当设备在 Installation 记录中设置了 deviceProfile 时我们优先按照 deviceProfile 指定的证书推送。
+topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 APNs  Topic 做鉴权。一般情况下，iOS SDK 会自动读取 iOS app 的 bundle ID 作为 topic 存入 Installation 记录的 apnsTopic 字段，所以推送请求中无需带有该参数。但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK; 2. 不使用 iOS SDK （如 React Native）；3. 推送目标设备使用的 topic 与 iOS Bundle ID 不同。
+apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一般情况下如果您配置的所有 Team ID 下的 APNs Topic 均不重复，或在存储 Installation 时主动设置过 apnsTeamId 值，则无需提供本参数，我们会为每个设备匹配对应的 Team ID 来发推送。否则必须提供本参数且需要通过 where 查询条件保证单次推送请求的目标设备均属于本参数指定的 Team Id，以保证推送正常进行。
 
 #### master key 校验
 
@@ -284,20 +239,24 @@ curl -X POST \
 
 #### 消息内容 Data
 
+##### iOS 设备推送消息内容
+
 对于 iOS 设备，消息内容参数 data 内属性可以是：
 
 ```
 {
-  "alert":             "消息内容",
-  "category":          "通知类型",
-  "thread-id":         "通知分类名称",
+  "alert":             字符串或 JSON 类型，表示消息内容，下面详述 JSON 类型时支持的属性,
+  "category":          字符串类型，通知类型,
+  "thread-id":         字符串类型，通知分类名称,
   "badge":             数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
-  "sound":             "声音文件名，前提在应用里存在",
+  "sound":             字符串或 JSON 类型，指定推送声音信息，下面详述 JSON 类型时支持的属性，
   "content-available": 数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载,
   "mutable-content":   数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用,
-  "custom-key":        "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-  "collapse-id":       "对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅",
-  "apns-priority":     数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅
+  "collapse-id":       字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅，
+  "apns-priority":     数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅，
+  "apns-push-type":    字符串类型，用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert"，
+  "url-args":          字符串列表类型，用于 Safari 推送，详情见 APNs 文档关于 url-args 参数的描述，
+  "custom-key":        由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
 
@@ -306,20 +265,36 @@ curl -X POST \
 ```
 {
   "alert": {
-    "title":               "标题",
-    "title-loc-key":       "",
-    "sub-title":           "附标题",
-    "sub-title-loc-key":   "",
-    "body":                "消息内容",
-    "action-loc-key":      "",
-    "loc-key":             "",
-    "loc-args":            [""],
-    "launch-image":        ""
+    "title":               字符串类型，表示推送内容标题，
+    "title-loc-key":       字符串列表，详情请参看 Apple 关于推送提醒本地化的说明，
+    "title-loc-args":      字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明， 
+    "subtitle":            字符串类型，表示推送内容副标题,
+    "subtitle-loc-key":    字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
+    "subtitle-loc-args":   字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
+    "body":                字符串类型，表示消息内容,
+    "action-loc-key":      字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
+    "loc-key":             字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
+    "loc-args":            字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
+    "launch-image":        字符串类型，设置点击推送后启动图片文件名， 
+    "summary-arg":         字符串类型，用于设置 Summary，
+    "summary-arg-count":   数字类型，用于设置 Summary 参数数量
    }
 }
 ```
 
-data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html)，以及 [Apple 官方关于 Request Header 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)。
+iOS 支持通过 sound 参数设置推送声音，可以是字符串类型的声音文件名，指向一个在应用内存在的声音文件，或是 JSON 类型：
+
+```
+{
+  "sound": {
+    "name":         字符串类型的声音文件名，指向一个在应用内存在的声音文件,
+    "critical":     数字类型，只能为 0 或 1，1 表示使用 "Critical" 提示音，默认为 0，
+    "volume":       指定声音大小，必须为 0 到 1 之间的小数
+  } 
+}
+```
+
+data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html)，[Apple 关于推送提醒本地化的文档](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html#//apple_ref/doc/uid/TP40008194-CH10-SW9)，以及 [Apple 官方关于 Request Header 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)。
 
 另外，我们也支持按照上述 Apple 官方文档的方式构造推送参数，如：
 
@@ -327,37 +302,44 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 {
   "aps": {
      "alert": {
-       "title":               "标题",
-       "title-loc-key":       "",
-       "sub-title":           "附标题",
-       "sub-title-loc-key":   "",
-       "body":                "消息内容",
-       "action-loc-key":      "",
-       "loc-key":             "",
-       "loc-args":            [""],
-       "launch-image":        ""
+       "title":               字符串类型，表示推送内容标题，
+       "title-loc-key":       字符串列表，详情请参看 Apple 关于推送提醒本地化的说明，
+       "title-loc-args":      字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明， 
+       "subtitle":            字符串类型，表示推送内容副标题,
+       "subtitle-loc-key":    字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
+       "subtitle-loc-args":   字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
+       "body":                字符串类型，表示消息内容,
+       "action-loc-key":      字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
+       "loc-key":             字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
+       "loc-args":            字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
+       "launch-image":        字符串类型，设置点击推送后启动图片文件名， 
+       "summary-arg":         字符串类型，用于设置 Summary，
+       "summary-arg-count":   数字类型，用于设置 Summary 参数数量
      }
-     "category":          "通知类型",
-     "thread-id":         "通知分类名称",
-     "badge":             数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
-     "sound":             "声音文件名，前提在应用里存在",
-     "content-available": 数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载,
-     "mutable-content":   数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用
+     "category":              字符串类型，通知类型,
+     "thread-id":             字符串类型，通知分类名称,
+     "badge":                 数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
+     "sound":                 字符串或 JSON 类型，指定推送声音信息,
+     "content-available":     数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载,
+     "mutable-content":       数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用
    }
-   "custom-key":          "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-   "collapse-id":         "对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅",
-   "apns-priority":       数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅
+   "collapse-id":             字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅，
+   "apns-priority":           数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅
+   "apns-push-type":          字符串类型，用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert"，
+   "custom-key":              由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
+
+##### Android 设备通用推送消息内容
 
 如果是 Android 设备，默认的消息栏通知消息内容参数支持下列属性：
 
 ```
 {
-  "alert":      "消息内容",
-  "title":      "显示在通知栏的标题",
-  "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-  "silent":     true/false // 用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒
+  "alert":      字符串类型，表示消息内容,
+  "title":      字符串类型，表示显示在通知栏的标题,
+  "silent":     布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒,
+  "custom-key": 由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
 
@@ -365,49 +347,71 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 
 ```
 {
-  "alert":      "消息内容",
-  "title":      "显示在通知栏的标题",
-  "action":     "com.your_company.push",
-  "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-  "silent":     true/false // 用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒
+  "alert":      字符串类型，表示消息内容,
+  "title":      字符串类型，表示显示在通知栏的标题,
+  "action":     字符串类型，注册 Receiver 时提供的 action name,
+  "silent":     布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒,
+  "custom-key": 由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
+
+关于自定义 Receiver 请参看[自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
+
+##### Windows Phone 设备推送消息内容
 
 Windows Phone 设备类似，也支持 `title` 和 `alert`，同时支持 `wp-param` 用于定义打开通知的时候打开的是哪个 Page：
 
 ```
 {
-  "alert":      "消息内容",
-  "title":      "显示在通知栏的标题",
+  "alert":      字符串类型，表示消息内容,
+  "title":      字符串类型，表示显示在通知栏的标题,
   "wp-param":   "/chat.xaml?NavigatedFrom=Toast Notification"
 }
 ```
 
-但是如果想一次 push 调用**推送不同的数据给不同类型的设备**，消息内容参数同时支持设定设备特定消息，例如：
+##### 为多种类型设备设置不同推送内容
+
+单次推送中，如果查询条件覆盖的目标推送设备包含多种类型，如既包含 iOS 设备，又包含 LeanCloud 自有渠道的 Android 设备，又有混合推送的小米华为设备等，可以为不同推送设备单独填写推送内容参数，我们会按照设备类型取出对应设备类型的推送内容来发推送，例如：
 
 ```
 {
   "ios": {
-    "alert":             "消息内容",
-     "badge":             数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以设置为 "Increment" 这个字符串（大小写敏感）,
-     "sound":             "声音文件名，前提在应用里存在",
-     "content-available": "如果你在使用 Newsstand, 设置为 1 来开始一次后台下载",
-     "custom-key":        "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
-   },
-   "android": {
-     "alert":             "消息内容",
-     "title":             "显示在通知栏的标题",
-     "action":            "com.your_company.push",
-     "custom-key":        "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-     "silent":            true/false // 用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒
-   },
-   "wp":{
-     "alert":             "消息内容",
-     "title":             "显示在通知栏的标题",
-     "wp-param":          "/chat.xaml?NavigatedFrom=Toast Notification"
-   }
+    "alert":             "Hello iOS",
+    "badge":             "Increment",
+    "custom-key":        "custom-value"
+  },
+  "android": {
+    "alert":             "Hello LeanCloud",
+    "action":            "com.your_company.push",
+    "custom-key":        "custom-value"
+  },
+  "mi": {
+    "alert":             "Hello Mi",
+    "custom-key":        "custom-value"
+  },
+  "hms": {
+    "alert":             "Hello Huawei",
+    "custom-key":        "custom-value"
+  },
+  "wp":{
+    "alert":             "Hello Windows Phone",
+    "wp-param":          "/chat.xaml?NavigatedFrom=Toast Notification"
+  }
 }
 ```
+
+其中属性名称和推送平台对应关系如下：
+
+属性名称 | 平台
+-------- | ----
+ios | Apple APNs
+android | LeanCloud 自有 Android 平台
+mi | 小米推送
+hms | 华为 HMS 推送
+mz | 魅族推送
+vivo | vivo 推送
+oppo | oppo 推送
+wp  | Windows Phone
 
 #### iOS 测试和生产证书区分
 
@@ -784,16 +788,104 @@ curl -X DELETE \
   https://{{host}}/1.1/scheduledPushMessages/:id
 ```
 
-## 限制
+## 限制与费用
 
-* 为避免给大量早已不再活跃的用户发消息，我们限制只能给 `_Installation` 表内 `updatedAt` 时间在最近三个月以内的设备推送消息。我们会在根据推送查询条件查出目标设备后自动将不符合条件的设备从目标设备中剔除，并且被剔除的设备不会计入 [控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 内的目标设备数中。商用版用户如有特别需求，可提交工单联系我们付费延长有效期（最长可延长至一年）。
-* 为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，在 [控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 中的 **状态** 一栏显示「错误」，提示信息为「dev profile disabled for massive push」。因此，在使用开发证书推送时，请合理设置推送条件。
+### 推送消息接口
+
+[推送消息接口](#推送消息)的调用受频率限制，限制如下：
+
+|商用版（每应用）|开发版（每应用）|
+|----------|---------------|
+|最大 9600 次/分钟，默认 600 次/分钟|60 次/分钟|
+
+超过频率限制后 1 分钟内 LeanCloud 会拒绝请求持续返回 429 错误码，一分钟后会重新处理请求。
+
+商用版应用默认上限可以在 [控制台 > 消息 > 推送 > 设置 > 推送选项 > 消息推送 API 调用频率上限][dashboard-push-config] 修改。
+按照每日调用频率峰值实行阶梯收费，费用如下：
+
+| 每分钟调用频率 | 费用 |
+| - | - |
+| 0 ～ 600 | 免费 |
+| 601 ~ 1200 | ¥60 元 / 天 |
+| 1201 ~ 1800 | ¥90 元 / 天 |
+| 1801 ~ 2400 | ¥120 元 / 天 |
+| 2401 ~ 3000 | ¥150 元 / 天 |
+| 3001 ~ 3600 | ¥180 元 / 天 |
+| 3601 ~ 4200 | ¥210 元 / 天 |
+| 4201 ~ 4800 | ¥240 元 / 天 |
+| 4801 ~ 5400 | ¥270 元 / 天 |
+| 5401 ~ 6000 | ¥300 元 / 天 |
+| 6001 ~ 6600 | ¥330 元 / 天 |
+| 6601 ~ 7200 | ¥360 元 / 天 |
+| 7201 ~ 7800 | ¥390 元 / 天 |
+| 7801 ~ 8400 | ¥420 元 / 天 |
+| 8401 ~ 9000 | ¥450 元 / 天 |
+| 9001 ~ 9600 | ¥480 元 / 天 |
+
+国际版
+
+| 每分钟调用频率 | 费用 |
+| - | - |
+| 0 ～ 600 | 免费 |
+| 601 ~ 1200 | $20 USD / 天 |
+| 1201 ~ 1800 | $30 USD / 天 |
+| 1801 ~ 2400 | $40 USD / 天 |
+| 2401 ~ 3000 | $50 USD / 天 |
+| 3001 ~ 3600 | $60 USD / 天 |
+| 3601 ~ 4200 | $70 USD / 天 |
+| 4201 ~ 4800 | $80 USD / 天 |
+| 4801 ~ 5400 | $90 USD / 天 |
+| 5401 ~ 6000 | $100 USD / 天 |
+| 6001 ~ 6600 | $110 USD / 天 |
+| 6601 ~ 7200 | $120 USD / 天 |
+| 7201 ~ 7800 | $130 USD / 天 |
+| 7801 ~ 8400 | $140 USD / 天 |
+| 8401 ~ 9000 | $150 USD / 天 |
+| 9001 ~ 9600 | $160 USD / 天 |
+
+每日调用频率峰值可在 [控制台 > 消息 > 推送 > 统计 > API 请求频率峰值][dashboard-push-statistics] 中查看。
+
+### 每日推送人次
+
+限制如下：
+
+|商用版（每应用每天）|开发版（每应用每天）|
+|----------|---------------|
+|最大无上限，默认 100 万人次|1 万人次|
+
+达到限制后，当天将无法再推送消息。
+
+商用版应用默认上限可以在 [控制台 > 消息 > 推送 > 设置 > 推送选项 > 每日推送上限][dashboard-push-config] 修改。
+费用如下（其中不足一万人次的部分，按一万人次计算）：
+
+| 每日推送人次 | 费用 |
+| - | - |
+| 小于等于 100 万的部分 | 免费 |
+| 大于 100 万的部分 | ¥0.5 元 / 万人次 |
+
+国际版
+
+| 每日推送人次 | 费用 |
+| - | - |
+| 小于等于 10 万的部分 | 免费 |
+| 大于 10 万的部分 | $0.02 USD / 万人次 |
+
+每日推送人次可在 [控制台 > 消息 > 推送 > 统计 > 推送人次][dashboard-push-statistics] 中查看。
+
+[dashboard-push-config]: /dashboard/messaging.html?appid={{appid}}#/message/push/conf
+[dashboard-push-statistics]: /dashboard/messaging.html?appid={{appid}}#/message/push/stat
+
+### 其它
+
+* 为避免给大量早已不再活跃的用户发消息，我们限制只能给 `_Installation` 表内 `updatedAt` 时间在最近三个月以内的设备推送消息。我们会在根据推送查询条件查出目标设备后自动将不符合条件的设备从目标设备中剔除，并且被剔除的设备不会计入 [控制台 > 消息 > 推送记录][dashboard-push-list] 内的目标设备数中。商用版用户如有特别需求，可提交工单联系我们付费延长有效期（最长可延长至一年）。
+* 为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，在 [控制台 > 消息 > 推送记录][dashboard-push-list] 中的 **状态** 一栏显示「错误」，提示信息为「dev profile disabled for massive push」。因此，在使用开发证书推送时，请合理设置推送条件。
 * Apple 对推送消息大小有限制，对 iOS 推送请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html)。
 * 如果使用了 Android 的混合推送，请注意华为推送对消息大小有限制。为保证推送消息能被正常发送，我们要求 data + channels 参数须小于 4096 字节，超过限制会导致推送无法正常发送，请尽量减小发送数据大小。
 * 每个开发版应用处在待发队列中的定时推送数量最多 10 条，每个商用版应用处在待发队列中的定时推送数量最多 1000 条。
 
+如果推送失败，在 [控制台 > 消息 > 推送记录 > 状态][dashboard-push-list] 一栏中会看到错误提示。
 
-如果推送失败，在 [控制台 > 消息 > 推送记录 > 状态](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 一栏中会看到错误提示。
+[dashboard-push-list]: /dashboard/messaging.html?appid={{appid}}#/message/push/list
 
 ## Installation 自动过期和清理
 

@@ -4,9 +4,7 @@
 
 ## 创建项目
 
-### 使用命令行创建项目（推荐）
-
-在本地创建项目需要使用 LeanCloud 官方命令行工具，请根据 [命令行工具使用指南 &middot; 安装](leanengine_cli.html#安装命令行工具) 部分安装该工具，并确保你已经在本地机器上可以成功运行命令行工具：
+请根据 [命令行工具使用指南 &middot; 安装](leanengine_cli.html#安装命令行工具) 安装 LeanCloud 官方命令行工具，并确保你已经在本地机器上可以成功运行命令行工具：
 
 ```
 lean help
@@ -19,33 +17,6 @@ lean help
 lean init
 ```
 然后根据提示输入相关信息即可。
-
-### 从项目模板创建
-
-从 Github 迁出示例项目，该项目可以作为一个你应用的基础：
-
-```javascript
-git clone https://github.com/leancloud/node-js-getting-started.git
-cd node-js-getting-started
-```
-```python
-git clone https://github.com/leancloud/python-getting-started.git
-cd python-getting-started
-```
-```php
-git clone https://github.com/leancloud/slim-getting-started.git
-cd slim-getting-started
-```
-```java
-git clone https://github.com/leancloud/java-war-getting-started.git
-cd java-war-getting-started
-```
-
-然后添加应用 appId 等信息到该项目：
-
-```
-lean switch
-```
 
 ## 本地运行
 

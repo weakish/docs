@@ -1860,7 +1860,7 @@ AVObject *todo = [AVObject objectWithDictionary:objectDictionary]; // 由 NSMuta
 // 将字符串反序列化为 JSON 对象
 var json = JSON.parse(serializedString);
 // 将 JSON 对象反序列化成 AV.Object 对象
-var todo = AV.parse(json);
+var todo = AV.parseJSON(json);
 ```
 {% endif %}
 {% if platform_name === "Android / Java" %}
@@ -2587,7 +2587,7 @@ AVQuery<AVObject> query = new AVQuery<>("Todo");
 query.selectKeys(Arrays.asList("title", "content"));
 query.getFirstInBackground().subscribe(new Observer<AVObject>() {
     public void onSubscribe(Disposable disposable) {}
-    public void onNext(List<AVObject> todo) {
+    public void onNext(AVObject todo) {
         String title = todo.getString("title"); // √
         String content = todo.getString("content"); // √
         String notes = todo.getString("notes"); // 会报错
@@ -6524,7 +6524,7 @@ _ = LCUser.requestPasswordReset(email: "tom@leancloud.rocks") { (result) in
 上面的代码会查询 `_User` 表中是否有对象的 `email` 属性与前面提供的邮箱匹配。如果有的话，则向该邮箱发送一封密码重置邮件。之前提到过，应用可以让 `username` 与 `email` 保持一致，也可以单独收集用户的邮箱并将其存为 `email`。
 
 {% call docs.noteWrap() %}
-密码重置邮件的内容可在应用的 [控制台 > 设置 > 邮件模版](/dashboard/app.html?appid={{appid}}#/email) 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考 [自定义应用内用户重设密码和邮箱验证页面](https://blog.leancloud.cn/607/)。
+密码重置邮件的内容可在应用的 [控制台 > 设置 > 邮件模版](/dashboard/app.html?appid={{appid}}#/email) 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考 [自定义应用内用户重设密码和邮箱验证页面](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
 {% endcall %}
 
 {% if node !== "qcloud" %}
@@ -7097,7 +7097,7 @@ user.logIn(authData: authData, platform: .weixin) { (result) in
   "createdAt":    "2018-05-21T09:33:26.406Z",
   "updatedAt":    "2018-05-21T09:33:26.575Z",
   "sessionToken": "…",
-  // 默认情况 authData 不会出现在这里
+  // authData 通常不会返回
   // 继续阅读以了解其中原因
   "authData": {
     // …
@@ -7106,7 +7106,7 @@ user.logIn(authData: authData, platform: .weixin) { (result) in
 }
 ```
 
-默认情况下，`authData` 不会被返回给客户端，除非它属于当前用户。如需修改此行为，可进入 [控制台 > 存储 > 数据 > `_User`](/dashboard/data.html?appid={{appid}}#/_User)，点击 `authData` 列表头旁边的箭头，点击 **编辑**，然后取消选中 **只限所属用户读写**，这样所有人就都能访问这条数据了。
+出于安全考虑，`authData` 不会被返回给客户端，除非它属于当前用户。
 
 为确保每个 `{{ userObjectName }}` 只会关联每个平台一次，`_User` class 中每个用户的 `authData.<SERVICE_NAME>.openid` 需要保持独一无二。
 
