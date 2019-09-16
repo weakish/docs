@@ -30,20 +30,27 @@ LeanCloud 服务涉及以下三种自定义域名：
 
 绝大部分情况下，绑定域名均需要设置 CNAME，因此这里我们简单解释下如何设置 CNAME。
 
-域名绑定成功后，需要设置域名的 CNAME。控制台会提示 CNAME 的地址，按照控制台的提示到域名注册商或域名解析服务提供商处设置（如果自己架设域名解析服务器的话，请根据域名解析服务器文档配置）。
+绑定域名过程中，需要设置域名的 CNAME。控制台会提示 CNAME 的地址，按照控制台的提示到域名注册商或域名解析服务提供商处设置（如果自己架设域名解析服务器的话，请根据域名解析服务器文档配置）。
 
-例如，控制台提示：
-
-> 域名绑定成功后，请将域名 `CNAME` 到 `leancloud.example`
+例如，按控制台提示输入待绑定域名 `xxx.example.com` 后，控制台会首先检查备案，检查通过后， 会显示「等待配置 CNAME」及 CNAME 值。
+假设控制台显示「CNAME: yyy.zzz.com」
 
 那么对应的 DNS Zone 记录为：
 
 ```
-xxx.example.com.	3600	IN	CNAME	leancloud.example.
+xxx.example.com.	3600	IN	CNAME	yyy.zzz.com.
 ```
 
 其中 3600 为 TTL，可根据自己的需要设置。
 大多数域名注册商或域名解析服务提供商都提供图形化的设置界面，按照其说明配置即可。
+
+![以 DnsPod 添加 CNAME 记录为例](images/dnspod-add-cname-record.png)
+
+设置完成后，需要等待一段时间，CNAME 记录生效后，LeanCloud 控制台会显示「已绑定」。
+
+如果长时间卡在「等待配置 CNAME 阶段」，那么请点击「等待配置 CNAME 阶段」后的问号图标，依其提示运行相应的 dig 命令检查 CNAME 记录是否生效。
+如 dig 命令查不到相应的 CNAME 记录，请返回域名商控制台检查配置是否正确，如仍有疑问，请联系域名商客服。
+如 dig 命令能查到预期的 CNAME 记录，但控制台仍显示「等待配置 CNAME 阶段」，请通过工单或 <support@leancloud.rocks> 联系我们。
 
 ## 文件域名
 
