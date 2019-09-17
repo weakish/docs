@@ -26,34 +26,6 @@ LeanCloud 服务涉及以下三种自定义域名：
 4. 绑定目标中的「分组」指应用下的云引擎实例分组的生产环境。
 5. 可绑定多个域名指在一个应用（文件域名、API 域名）或分组（云引擎域名）上可以绑定多个域名。
 
-## CNAME 设置
-
-绝大部分情况下，绑定域名均需要设置 CNAME，因此这里我们简单解释下如何设置 CNAME。
-
-绑定域名过程中，需要设置域名的 CNAME。控制台会提示 CNAME 的地址，按照控制台的提示到域名注册商或域名解析服务提供商处设置（如果自己架设域名解析服务器的话，请根据域名解析服务器文档配置）。
-
-例如，按控制台提示输入待绑定域名 `xxx.example.com` 后，控制台会首先检查备案，检查通过后， 会显示「等待配置 CNAME」及 CNAME 值。
-假设控制台显示「CNAME: yyy.zzz.com」：
-
-![控制台域名绑定界面](images/dashboard-domain-setup.png)
-
-那么对应的 DNS Zone 记录为：
-
-```
-xxx.example.com.	3600	IN	CNAME	yyy.zzz.com.
-```
-
-其中 3600 为 TTL，可根据自己的需要设置。
-大多数域名注册商或域名解析服务提供商都提供图形化的设置界面，按照其说明配置即可。
-
-![以 DnsPod 添加 CNAME 记录为例](images/dnspod-add-cname-record.png)
-
-设置完成后，需要等待一段时间，CNAME 记录生效后，LeanCloud 控制台会显示「已绑定」。
-
-如果长时间卡在「等待配置 CNAME 阶段」，那么请点击「等待配置 CNAME 阶段」后的问号图标，依其提示运行相应的 dig 命令检查 CNAME 记录是否生效。
-如 dig 命令查不到相应的 CNAME 记录，请返回域名商控制台检查配置是否正确，如仍有疑问，请联系域名商客服。
-如 dig 命令能查到预期的 CNAME 记录，但控制台仍显示「等待配置 CNAME 阶段」，请通过工单或 <support@leancloud.rocks> 联系我们。
-
 ## 文件域名
 
 如果你的应用使用了 LeanCloud 文件服务，请前往 [控制台 > 存储 > 设置 > 自定义文件域名](/dashboard/storage.html?appid={{appid}}#/storage/conf) 绑定文件域名。
@@ -289,6 +261,34 @@ AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 
 云引擎内部访问 API 是通过内网，**云引擎网站托管的 Python 项目无需配置**，否则请求会走公网，影响性能。
 
+## CNAME 设置
+
+绝大部分情况下，绑定域名均需要设置 CNAME，因此这里我们简单解释下如何设置 CNAME。
+
+绑定域名过程中，需要设置域名的 CNAME。控制台会提示 CNAME 的地址，按照控制台的提示到域名注册商或域名解析服务提供商处设置（如果自己架设域名解析服务器的话，请根据域名解析服务器文档配置）。
+
+例如，按控制台提示输入待绑定域名 `xxx.example.com` 后，控制台会首先检查备案，检查通过后， 会显示「等待配置 CNAME」及 CNAME 值。
+假设控制台显示「CNAME: yyy.zzz.com」：
+
+![控制台域名绑定界面](images/dashboard-domain-setup.png)
+
+那么对应的 DNS Zone 记录为：
+
+```
+xxx.example.com.	3600	IN	CNAME	yyy.zzz.com.
+```
+
+其中 3600 为 TTL，可根据自己的需要设置。
+大多数域名注册商或域名解析服务提供商都提供图形化的设置界面，按照其说明配置即可。
+
+![以 DnsPod 添加 CNAME 记录为例](images/dnspod-add-cname-record.png)
+
+设置完成后，需要等待一段时间，CNAME 记录生效后，LeanCloud 控制台会显示「已绑定」。
+
+如果长时间卡在「等待配置 CNAME 阶段」，那么请点击「等待配置 CNAME 阶段」后的问号图标，依其提示运行相应的 dig 命令检查 CNAME 记录是否生效。
+如 dig 命令查不到相应的 CNAME 记录，请返回域名商控制台检查配置是否正确，如仍有疑问，请联系域名商客服。
+如 dig 命令能查到预期的 CNAME 记录，但控制台仍显示「等待配置 CNAME 阶段」，请通过工单或 <support@leancloud.rocks> 联系我们。
+
 ## 备案
 
 根据工信部规定，在 LeanCloud 绑定的文件域名、云引擎域名、API 域名，需要在 LeanCloud 新增备案或者接入备案。
@@ -333,7 +333,7 @@ AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 或者，如果你同时也是 LeanCloud 底层 IaaS 服务商（华北节点为 UCloud）的用户，那么也可以自行在底层 IaaS 服务商接入备案。
 
 华东节点底层 IaaS 服务商（腾讯云）暂不支持通过 LeanCloud 以用户主体身份提交备案资料。
-因此，希望在华东节点所在机房做备案接入或直接办理新备案的用户，可以自行创建腾讯云账号并通过腾讯云完成备案。商用版应用用户可提交工单获取备案所需授权码。
+因此，希望在华东节点所在机房做备案接入或直接办理新备案的用户，可以自行创建腾讯云账号并通过腾讯云完成备案。如需授权码，商用版应用用户可提交工单获取。
 
 ## 推荐阅读
 
