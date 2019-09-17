@@ -293,8 +293,6 @@ AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 
 根据工信部规定，在 LeanCloud 绑定的文件域名、云引擎域名、API 域名，需要在 LeanCloud 新增备案或者接入备案。
 
-2. 主域名在别处备案，使用子域名在 LeanCloud 绑定文件域名，无需接入备案，但绑定云引擎域名、API 域名需要在 LeanCloud 接入备案。例如，假设你的主域名 `example.com` 是在别处备案的，那么绑定 `file.example.com` 为文件域名无需接入备案，直接在控制台绑定即可。但是在控制台绑定  `web.example.com` 为云引擎域名，绑定 `api.example.com` 为 API 域名后，需要在 LeanCloud 接入备案。
-
 ### 新增备案
 
 如果你的主域名没有备案（没有 ICP 备案号），那么主域名本身及其子域名均无法在控制台绑定。
@@ -302,7 +300,6 @@ AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 
 如果你的主域名没有备案，我们建议你通过 LeanCloud 新增备案。
 主域名在 LeanCloud 备案后，使用子域名在 LeanCloud 绑定文件域名、云引擎域名、API 域名不需要额外备案或接入备案。
-例如，假设你的主域名 `example.com` 是在 LeanCloud 备案的，那么绑定 `file.example.com` 为文件域名，绑定 `web.example.com` 为云引擎域名，绑定 `api.example.com` 为 API 域名，都不需要额外备案或接入备案，直接在控制台绑定即可。
 
 商用版应用请进入 [应用控制台 > 账号设置 > 域名备案](/dashboard/settings.html#/setting/domainrecord)，按照步骤填写资料，并根据控制台提示进行新增备案。
 
@@ -324,8 +321,9 @@ AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 - 和新增备案不同，接入备案可以在服务上线后进行，不要求关站或停止解析，不影响当前网站访问。
 - 一般而言，网站使用的所有云服务商皆需备案或接入备案（在使用的第一家云服务商处新增备案，在其他云服务商接入备案）。
 
-因此，如果你的主域名已在别处备案（有 ICP 备案号），那么你在 LeanCloud 控制台绑定 API 域名或云引擎域名后，需要在 LeanCloud 接入备案。
-由于 CDN 服务一般不需要接入备案，因此，你在 LeanCloud 控制台绑定文件域名后无需接入备案。
+因此，如果你的主域名之前通过 LeanCloud 新增备案，那么不需要再操心接入备案事项。
+如果你的主域名是通过其他云服务商新增备案，那么你在 LeanCloud 控制台绑定 API 域名或云引擎域名后，需要在 LeanCloud 接入备案。
+由于 CDN 服务一般不需要接入备案，因此，如果该子域名仅用于 LeanCloud 文件域名，那么无需在 LeanCloud 接入备案。
 
 商用版应用如需接入备案，请先在 LeanCloud 控制台完成相应域名的绑定，
 然后进入 [应用控制台 > 账号设置 > 域名备案](/dashboard/settings.html#/setting/domainrecord)，按照步骤填写资料，并根据控制台提示进行接入备案。
