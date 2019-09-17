@@ -33,7 +33,9 @@ LeanCloud 服务涉及以下三种自定义域名：
 绑定域名过程中，需要设置域名的 CNAME。控制台会提示 CNAME 的地址，按照控制台的提示到域名注册商或域名解析服务提供商处设置（如果自己架设域名解析服务器的话，请根据域名解析服务器文档配置）。
 
 例如，按控制台提示输入待绑定域名 `xxx.example.com` 后，控制台会首先检查备案，检查通过后， 会显示「等待配置 CNAME」及 CNAME 值。
-假设控制台显示「CNAME: yyy.zzz.com」
+假设控制台显示「CNAME: yyy.zzz.com」：
+
+![控制台域名绑定界面](images/dashboard-domain-setup.png)
 
 那么对应的 DNS Zone 记录为：
 
