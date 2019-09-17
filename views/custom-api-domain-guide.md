@@ -71,6 +71,7 @@ LeanCloud 服务涉及以下三种自定义域名：
 - 结构化数据存储
 - 云函数（包括 hook 函数）
 - 即时通讯
+- 多人在线对战、排行榜
 
 那么你需要前往[应用控制台 > 设置 > 域名绑定](/dashboard/app.html?appid={{appid}}#/domains) 绑定 API 域名。
 （华东节点暂不支持 API 域名绑定。） 
