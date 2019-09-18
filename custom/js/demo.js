@@ -103,7 +103,7 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         qcloudShow: true
       },{
         name: 'Android MixPush Demo',
-        desc: '使用 Android 混合推送服务的简单 Demo',
+        desc: '使用 Android 混合推送服务的简单 Demo。',
         downPath: '',
         mdPath: 'https://github.com/leancloud/mixpush-demos',
         type: 'android',
