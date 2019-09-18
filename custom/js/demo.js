@@ -102,8 +102,15 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         type: 'android',
         qcloudShow: true
       },{
+        name: 'Android MixPush Demo',
+        desc: '使用 Android 混合推送服务的简单 Demo。',
+        downPath: '',
+        mdPath: 'https://github.com/leancloud/mixpush-demos',
+        type: 'android',
+        qcloudShow: true
+      },{
         name: 'SNS 第三方登录',
-        desc: 'Android 第三方登录示例 Demo',
+        desc: 'Android 第三方登录示例 Demo。',
         downPath: '',
         mdPath: 'https://github.com/leancloud/LeanCloudSNSDemo-Android',
         type: 'android',
