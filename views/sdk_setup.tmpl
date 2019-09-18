@@ -1076,8 +1076,8 @@ LCApplication.logLevel = .all
 {% endif %}
 {% if platform_name === "Android" %}
 ```java
-// 放在 SDK 初始化语句 AVOSCloud.initialize() 后面，只需要调用一次即可
-AVOSCloud.setDebugLogEnabled(true);
+// 放在 SDK 初始化语句 AVOSCloud.initialize() 前面，只需要调用一次即可
+AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}

@@ -79,20 +79,21 @@ HMS Agent SDK 需要下载解压之后把源码完全拷贝进入工程。HMS Ag
 
 ```
 dependencies {
-//混合推送需要的包
-implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-    exclude group:'cn.leancloud', module:'huawei-hmsagent'
+  //混合推送需要的包
+  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+      exclude group:'cn.leancloud', module:'huawei-hmsagent'
+  }
+  //即时通信与推送需要的包
+  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'com.alibaba:fastjson:1.1.70.android'
+  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
-//即时通信与推送需要的包
-implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-}
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-implementation 'com.alibaba:fastjson:1.1.70.android'
-implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 ```
 
 然后配置相关 AndroidManifest，添加 Permission：
@@ -362,19 +363,19 @@ AndroidManifest.xml 中把 AVHMSPushMessageReceiver 替换为你自定义的 MyH
 
 ```
 dependencies {
-//混合推送需要的包
-implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-}
-//即时通信与推送需要的包
-implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-}
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-implementation 'com.alibaba:fastjson:1.1.70.android'
-implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
+  //混合推送需要的包
+  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  //即时通信与推送需要的包
+  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'com.alibaba:fastjson:1.1.70.android'
+  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
 
@@ -485,21 +486,21 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用小
 
 ```
 dependencies {
-//魅族推送需要的包
-implementation 'com.meizu.flyme.internet:push-internal:3.6.+@aar'
-//混合推送需要的包
-implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-}
-//即时通信与推送需要的包
-implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-}
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-implementation 'com.alibaba:fastjson:1.1.70.android'
-implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
+  //魅族推送需要的包
+  implementation 'com.meizu.flyme.internet:push-internal:3.6.+@aar'
+  //混合推送需要的包
+  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  //即时通信与推送需要的包
+  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'com.alibaba:fastjson:1.1.70.android'
+  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
 
@@ -570,13 +571,21 @@ implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 首先将 demo 工程 app/libs 目录下的所有 jar 包（如有）拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
 ```
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
-    implementation ('cn.leancloud.android:avoscloud-push:{{ version.leancloud }}@aar'){transitive = true}
-    implementation ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar'){
-        exclude group:'cn.leancloud.android', module:'hmsagent'
-        exclude group:'com.huawei.android.hms', module:'push'
-    }
+dependencies {
+  //混合推送需要的包
+  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  //即时通信与推送需要的包
+  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'com.alibaba:fastjson:1.1.70.android'
+  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
+}
 ```
 
 接下来配置 AndroidManifest，添加权限声明：
@@ -625,6 +634,9 @@ implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行 vivo 推送的初始化：
 
 ```java
+import cn.leancloud.AVOSCloud;
+import cn.leancloud.AVMixPushManager;
+
 public class MyApp extends Application {
   // 请替换成您自己的 appId 和 appKey
   private static final String LC_APP_ID = "xxx";
@@ -635,7 +647,7 @@ public class MyApp extends Application {
     super.onCreate();
 
     //开启调试日志
-    AVOSCloud.setDebugLogEnabled(true);
+    AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
 
     // AVOSCloud SDK 初始化
     AVOSCloud.initialize(this,LC_APP_ID,LC_APP_KEY);
@@ -705,7 +717,7 @@ public class AVMixPushManager {
 ```java
 import android.content.Context;
 
-import com.avos.avoscloud.AVVIVOPushMessageReceiver;
+import cn.leancloud.AVVIVOPushMessageReceiver;
 import com.vivo.push.model.UPSNotificationMessage;
 
 import java.util.logging.Level;
@@ -750,12 +762,20 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 首先将 demo 工程 app/libs 目录下的所有 jar 包（如有）拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
 ```
-implementation fileTree(dir: 'libs', include: ['*.jar'])
-implementation ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
-implementation ('cn.leancloud.android:avoscloud-push:{{ version.leancloud }}@aar'){transitive = true}
-implementation ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar'){
-  exclude group:'cn.leancloud.android', module:'hmsagent'
-  exclude group:'com.huawei.android.hms', module:'push'
+dependencies {
+  //混合推送需要的包
+  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  //即时通信与推送需要的包
+  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'com.alibaba:fastjson:1.1.70.android'
+  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
 
@@ -791,6 +811,8 @@ android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
 与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行 oppo 推送的初始化：
 
 ```java
+import cn.leancloud.AVOPPOPushAdapter;
+
 // Customized Push Adapter.
 public class MyPushAdapter extends AVOPPOPushAdapter {
   @Override
@@ -842,6 +864,10 @@ public class MyPushAdapter extends AVOPPOPushAdapter {
   }
 }
 
+// Application Class.
+import cn.leancloud.AVOSCloud;
+import cn.leancloud.AVMixPushManager;
+
 // Customized Application.
 public class MyApp extends Application {
   // 请替换成您自己的 appId 和 appKey
@@ -855,7 +881,7 @@ public class MyApp extends Application {
     super.onCreate();
 
     //开启调试日志
-    AVOSCloud.setDebugLogEnabled(true);
+    AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
 
     // AVOSCloud SDK 初始化
     AVOSCloud.initialize(this,LC_APP_ID,LC_APP_KEY);
@@ -1004,7 +1030,23 @@ FCM 客户端需要在运行 Android 4.0 或更高版本且安装了 Google Play
 
 ```xml
 dependencies {
-    compile ('cn.leancloud.android:avoscloud-fcm:{{ version.leancloud }}@aar')
+  implementation('cn.leancloud:leancloud-fcm:{{ version.unified }}@aar') {
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  //即时通信与推送需要的包
+  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
+      exclude group: 'com.alibaba', module: 'fastjson'
+      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+  }
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'com.alibaba:fastjson:1.1.70.android'
+  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
+
+  implementation 'com.google.firebase:firebase-core:15.0.2'
+  implementation 'com.google.firebase:firebase-iid:15.0.2'
+  implementation 'com.google.firebase:firebase-messaging:15.0.2'
+  implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
 }
 ```
 
@@ -1015,12 +1057,12 @@ dependencies {
 将以下内容添加至您应用的 `AndroidManifest`文件中：
 - LeanCloud PushService 服务。
 ```
-<service android:name="com.avos.avoscloud.PushService"/>
+<service android:name="cn.leancloud.push.PushService"/>
 ```
 - `AVFirebaseMessagingService` 的服务。如果您希望在后台进行除接收应用通知之外的消息处理，则必须添加此服务。要接收前台应用中的通知、接收数据有效负载以及发送上行消息等，您必须继承此服务。
 ```
 <service
-  android:name="com.avos.avoscloud.AVFirebaseMessagingService">
+  android:name="cn.leancloud.AVFirebaseMessagingService">
  <intent-filter>
   <action android:name="com.google.firebase.MESSAGING_EVENT"/>
  </intent-filter>
@@ -1029,7 +1071,7 @@ dependencies {
 - `AVFirebaseInstanceIdService` 的服务，用于处理注册令牌的创建、轮替和更新。如果要发送至特定设备或者创建设备组，则必须添加此服务。
 ```
 <service
-  android:name="com.avos.avoscloud.AVFirebaseInstanceIDService">
+  android:name="cn.leancloud.AVFirebaseInstanceIDService">
  <intent-filter>
   <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
  </intent-filter>
