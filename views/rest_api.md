@@ -40,15 +40,8 @@ Postman 还支持自动生成多种语言（库）调用 REST API 的代码。
 
 ### Base URL
 
-文档中的所有 API URL 的 Base URL 为绑定的 [API 自定义域名][api-domain]。
-
-LeanCloud 国际版暂不支持绑定 API 自定义域名，需使用如下域名：
-
-```
-appid前八位.api.lncldglobal.com
-```
-
-[api-domain]: custom-api-domain-guide.html
+#### 华北节点和华东节点
+文档中的所有 API URL 的 Base URL 为绑定的 [API 自定义域名](custom-api-domain-guide.html)。
 
 如果暂时没有绑定域名，可以临时使用如下域名（仅供测试和原型开发阶段使用，不保证可用性）：
 
@@ -56,6 +49,14 @@ appid前八位.api.lncldglobal.com
 | - | - |
 | 华北 | appid前八位.api.lncld.net |
 | 华东 | appid前八位.api.lncldapi.com |
+
+#### 国际版
+LeanCloud 国际版暂不支持绑定 API 自定义域名，需使用如下域名：
+
+```
+appid前八位.api.lncldglobal.com
+```
+
 
 ### 对象
 
