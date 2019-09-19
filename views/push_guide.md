@@ -204,7 +204,7 @@ curl -X POST \
 名称| 约束 | 描述
 ---|--- | ---
 data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容_Data)。请注意，整个 JSON 字符串不能超过 4096 个字符。
-where| 可选 | 检索 `_Installation` 表使用的查询条件，JSON 对象。
+where| 可选 | 检索 `_Installation` 表使用的查询条件，JSON 对象。如果查询条件内包含日期或二进制等需要做编码的特殊类型数据，查询条件内需要包含编码后的数据。如查询 `createdAt` 字段大于某个时间的设备，where 条件需要为 `{"createdAt":{"$gte":{"__type":"Date","iso":"2015-06-21T18:02:52.249Z"}}}`。更多信息请参看：[数据编码说明](./rest_api.html#数据类型)
 channels| 可选 | 推送给哪些频道，将作为条件加入 where 对象。
 expiration_interval| 可选 | 消息过期的相对时间，从调用 API 的时间开始算起，单位是秒。
 expiration_time| 可选 | 消息过期的绝对日期时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"
