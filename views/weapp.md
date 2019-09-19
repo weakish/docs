@@ -20,11 +20,20 @@
 ## 准备工作
 ### 创建应用
 - 如果你还没有创建过 LeanCloud 应用，请登录 LeanCloud 控制台 [创建一个新应用](/dashboard/applist.html#/newapp)。
-- 如果你还没有小程序帐号，请访问 [微信公众平台](https://mp.weixin.qq.com) 注册一个小程序帐号。如果你不需要进行真机调试可以跳过这一步。
+- 如果你还没有小程序帐号，请访问 [微信公众平台] 注册一个小程序帐号。如果你不需要进行真机调试可以跳过这一步。
 - 下载 [小程序开发工具](https://mp.weixin.qq.com/debug/wxadoc/dev/devtools/download.html)，按照 [小程序开发教程](https://mp.weixin.qq.com/debug/wxadoc/dev/) 创建一个项目。
 
+[微信公众平台]: https://mp.weixin.qq.com
+
 ### 配置域名白名单
-请按照 [小程序域名白名单配置](weapp-domains.html) 的步骤配置。如果你不需要进行真机调试可以跳过这一步（可在开发者工具的 **详情** > **项目设置** 中勾选**不校验安全域名、TLS 版本以及 HTTPS 证书**）。
+
+如果你不需要进行真机调试可以跳过这一步（可在开发者工具的 **详情** > **项目设置** 中勾选**不校验安全域名、TLS 版本以及 HTTPS 证书**）。
+
+前往 [LeanCloud 控制台 > 设置 > 应用 Keys > 域名白名单][weapp-domains]，获取域名白名单（不同应用对应不同的域名）。
+
+[weapp-domains]: https://leancloud.cn/dashboard/app.html?appid={{appid}}#/key
+
+登录[微信公众平台]，前往 **设置 > 开发设置 > 服务器配置 > 「修改」** 链接，**增加**上述域名白名单中的域名。
 
 ### 安装与初始化 SDK
 
