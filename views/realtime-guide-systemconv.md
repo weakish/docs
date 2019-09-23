@@ -47,6 +47,15 @@
 * **_conversationUpdate**<br/>
   修改对话属性、设置或取消对话消息提醒，在实际修改之前调用。开发者在这里可以为新的「对话」添加其他内部属性，或完成操作鉴权，以及其他类似操作。
 
+### 客户端 Hook
+
+在客户端上线和下线的时候，可以触发 Hook 函数：
+
+* **_clientOnline**<br/>
+  客户端上线，客户端登录成功后调用。
+* **_clientOffline**<br/>
+  客户端下线，客户端登出成功或意外下线后调用。
+
 ### Hook 与云引擎的关系
 
 因为 Hook 发生在即时通讯的在线处理环节，而即时通讯服务端每秒钟需要处理的消息和对话事件数量远超大家的想象，出于性能考虑，我们要求开发者使用 [LeanCloud 云引擎](leanengine_overview.html) 来实现 Hook 函数，为此我们也提供了多种服务端 SDK 供大家选择：
@@ -109,7 +118,7 @@ AV.Cloud.onIMMessageReceived((request) => {
     //     receipt: false,
     //     groupId: null,
     //     system: null,
-    //     content: '{"_lctext":"来我们去XX传奇玩吧","_lctype":-1}',
+    //     content: '{"_lctext":"来我们去 XX 传奇玩吧","_lctype":-1}',
     //     convId: '5789a33a1b8694ad267d8040',
     //     toPeers: ['Jerry'],
     //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
@@ -121,7 +130,7 @@ AV.Cloud.onIMMessageReceived((request) => {
 
     let content = request.params.content;
     console.log('content', content);
-    let processedContent = content.replace('XX传奇', '**');
+    let processedContent = content.replace('XX 传奇', '**');
     // 必须含有以下语句给服务端一个正确的返回，否则会引起异常
   return {
     content: processedContent
@@ -136,7 +145,7 @@ def _messageReceived(**params):
     #     'receipt': false,
     #     'groupId': null,
     #     'system': null,
-    #     'content': '{"_lctext":"来我们去XX传奇玩吧","_lctype":-1}',
+    #     'content': '{"_lctext":"来我们去 XX 传奇玩吧","_lctype":-1}',
     #     'convId': '5789a33a1b8694ad267d8040',
     #     'toPeers': ['Jerry'],
     #     '__sign': '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
@@ -149,7 +158,7 @@ def _messageReceived(**params):
     content = json.loads(params['content'])
     text = content._lctext
     print('text:', text)
-    processed_content = text.replace('XX传奇', '**')
+    processed_content = text.replace('XX 传奇', '**')
     print('_messageReceived end')
     # 必须含有以下语句给服务端一个正确的返回，否则会引起异常
     return {
@@ -163,7 +172,7 @@ Cloud::define("_messageReceived", function($params, $user) {
     //     receipt: false,
     //     groupId: null,
     //     system: null,
-    //     content: '{"_lctext":"来我们去XX传奇玩吧","_lctype":-1}',
+    //     content: '{"_lctext":"来我们去 XX 传奇玩吧","_lctype":-1}',
     //     convId: '5789a33a1b8694ad267d8040',
     //     toPeers: ['Jerry'],
     //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
@@ -177,7 +186,7 @@ Cloud::define("_messageReceived", function($params, $user) {
     $content = json_decode($params["content"], true);
     $text = $content["_lctext"];
     error_log($text);
-    $processedContent = preg_replace("XX传奇", "**", $text);
+    $processedContent = preg_replace("XX 传奇", "**", $text);
     return array("content" => $processedContent);
 });
 ```
@@ -194,7 +203,7 @@ Cloud::define("_messageReceived", function($params, $user) {
     // 读取文本内容
     String text = (String)(contentMap.get("_lctext").toString());
     // 过滤广告内容
-    String processedContent = text.replace("XX中介", "**");
+    String processedContent = text.replace("XX 中介", "**");
     // 将过滤之后的内容发还给服务端
     result.put("content",processedContent);
     return result;
@@ -571,6 +580,40 @@ Cloud::define('_messageSent', function($params, $user) {
 
 `mute` 和 `attr` 参数互斥，不能同时返回。并且返回值必须与请求对应，请求中如果带着 `attr`，则返回值中只有 `attr` 参数有效，返回 `mute` 会被丢弃。同理，请求中如果带着 `mute`，返回值中如果有 `attr` 则 `attr` 会被丢弃。
 
+#### `_clientOnline`
+
+在客户端登录成功后调用。
+
+参数:
+
+参数 | 说明
+----- | ------
+peerId | 登录者的 ID
+sourceIP | 登录者的 IP
+tag | 可选，不传或者值为 "default" 表示主动登录时不会根据 tag 踢其它设备下线，其它情况下会踢当前登录的相同 tag 的设备下线
+reconnect | 可选，标识客户端本次登录是否是自动重连，没有 reconnect 或值为 0 表示主动登录，值为 1 表示自动重连
+
+返回:
+
+这个 hook 不会对返回值进行检查。
+
+#### `_clientOffline`
+
+在客户端登出成功或意外下线后调用。
+
+参数:
+
+参数 | 说明
+----- | ------
+peerId | 登出者的 ID
+closeCode | 登出的方式，1 代表用户主动登出，2 代表连接断开，3 代表用户由于 `tag` 冲突被踢下线，4 代表用户被 API 踢下线
+closeMsg | 对登出方式的描述信息
+sourceIP | 可选，执行关闭会话操作的用户的 IP，连接断开时不传递此参数
+tag | 可选，由用户在会话创建时传递而来，不传或者值为 `default` 表示主动登录时不会根据 tag 踢其它设备下线，其它情况下会踢当前登录的相同 tag 的设备下线
+
+返回:
+
+这个 hook 不会对返回值进行检查。
 
 ## 「系统对话」的使用
 
