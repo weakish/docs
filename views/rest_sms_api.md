@@ -189,14 +189,14 @@ curl -X POST \
 
 短信模板的语法遵循 [Handlebars](http://handlebarsjs.com/)，举例如下：
 
-<samp class="bubble" ng-non-bindable>Hi {{ docs.mustache("username") }}，欢迎注册{{ docs.mustache("name") }}应用。您可以通过验证码：{{ docs.mustache("code") }} 进行注册。本条短信将在{{ docs.mustache("ttl") }}分钟后自行销毁，请尽快使用【签名】
+<samp class="bubble" ng-non-bindable>Hi {{ docs.mustache("{username}") }}，欢迎注册{{ docs.mustache("{name}") }}应用。您可以通过验证码：{{ docs.mustache("{code}") }} 进行注册。本条短信将在{{ docs.mustache("{ttl}") }}分钟后自行销毁，请尽快使用【签名】
 </samp>
 
 * **code** 是我们帮你生成的验证码，可以通过 `/1.1/verifySmsCode/<code>` 校验。
 * **ttl** 是短信有效期，单位分钟，默认为 10 分钟。
 * **name** 是应用名称
 
-这三个内置字段会自动填充，你当然也可以添加自定义变量，形如 {{ docs.mustache("var") }}。
+这三个内置字段会自动填充，你当然也可以添加自定义变量，形如 {{ docs.mustache("{var}") }}。
 
 ### 短信模板审核
 
@@ -571,7 +571,7 @@ curl -X POST \
 
 1. 模板用途明确：通知类短信，比如活动通知、消息通知等。或者验证类短信，要求有验证码。
 2. 短信用途不得违反国家法律法规，下列短信是严格禁止的：房产类、中奖类、违法类（谣言、诈骗等）、赌博类等。
-3. [模板语法正确](sms-guide.html#模板变量)：我们仅支持 handlebars 语法，变量是以两个大括号括起来，类似 {{ docs.mustache("var") }}。
+3. [模板语法正确](sms-guide.html#模板变量)：我们仅支持 handlebars 语法，变量是以三个大括号括起来，类似 {{ docs.mustache("{var}") }}。
 4. 默认短信签名是应用名，你也可以在模板里设置短信签名，签名的要求请参考 [短信签名说明](sms-guide.html#短信签名)。
 
 如果你创建的短信模板被拒绝，请注意查收邮件，查看里面的拒绝原因等。如果还有疑问，请及时与我们联系。

@@ -503,7 +503,7 @@ cloud.verify_sms_code('186xxxxxxxx', '123456')
 假设提交的短信模板的类型为「通知类」，内容如下：
 
 {% call docs.bubbleWrap() -%}
-尊敬的的用户，您的订单号：{{ docs.mustache("order_id") }} 正在派送，请保持手机畅通，我们的快递员随时可能与您联系，感谢您的订阅。 
+尊敬的的用户，您的订单号：{{ docs.mustache("{order_id}") }} 正在派送，请保持手机畅通，我们的快递员随时可能与您联系，感谢您的订阅。 
 {% endcall %}
 
 并且模板名称为 `Order_Notice`，并且为已经拥有了一个审核通过的签名叫做「天天商城」，签名的名称叫做 `sign_BuyBuyBuy` ，当模板通过审批后就可以调用如下代码发送这条通知类的短信：
@@ -622,7 +622,7 @@ cloud.request_sms_code("186xxxxxxxx",
 在模板中还可以使用<u>系统预留变量</u>，在短信发送时，它们会被自动填充，开发者**无法**对其重新赋值：
 
 {% call docs.bubbleWrap() -%}
-欢迎注册{{ docs.mustache("name") }}应用！请使用验证码{{ docs.mustache("code") }}来完成注册。该验证码将在{{ docs.mustache("ttl") }}分钟后失效，请尽快使用。
+欢迎注册{{ docs.mustache("{name}") }}应用！请使用验证码{{ docs.mustache("{code}") }}来完成注册。该验证码将在{{ docs.mustache("{ttl}") }}分钟后失效，请尽快使用。
 {% endcall %}
 
 - `name`：应用名称
@@ -638,7 +638,7 @@ cloud.request_sms_code("186xxxxxxxx",
 【正确范例】
 
 {% call docs.bubbleWrap() -%}
-XX房东您好，租客{{ docs.mustache("guest_name") }}（手机号码：{{ docs.mustache("guest_phone") }}）于{{ docs.mustache("payment_create_time") }}向您支付了房租。租金为{{ docs.mustache("rent_price") }}元，房屋地址在{{ docs.mustache("rent_addr") }}。请关注微信公众号：XX租房。XX租房APP下载地址：http://example.com/download.html
+XX房东您好，租客{{ docs.mustache("{guest_name}") }}（手机号码：{{ docs.mustache("{guest_phone}") }}）于{{ docs.mustache("{payment_create_time}") }}向您支付了房租。租金为{{ docs.mustache("{rent_price}") }}元，房屋地址在{{ docs.mustache("{rent_addr}") }}。请关注微信公众号：XX租房。XX租房APP下载地址：http://example.com/download.html
 {% endcall %}
 
 #### 链接
@@ -646,7 +646,7 @@ XX房东您好，租客{{ docs.mustache("guest_name") }}（手机号码：{{ doc
 短信中的 URL 不允许**全部**设置为变量，这样是为了确保安全，防止病毒以及不良信息的传播。错误范例如下：
 
 {% call docs.bubbleWrap() -%}
-尊敬的会员您好，您的订单（订单号{{ docs.mustache("orderId") }}）已确认支付。5周年庆新品降价！大牌奢品上演底价争霸，低至2折！BV低至888元！阿玛尼低至199元！都彭长款钱包仅售499元！杜嘉班纳休闲鞋仅售1399元！周年庆家居专场千元封顶现已开启！{{ docs.mustache("download_link") }} 客服电话400-881-6609 回复TD退订
+尊敬的会员您好，您的订单（订单号{{ docs.mustache("{orderId}") }}）已确认支付。5周年庆新品降价！大牌奢品上演底价争霸，低至2折！BV低至888元！阿玛尼低至199元！都彭长款钱包仅售499元！杜嘉班纳休闲鞋仅售1399元！周年庆家居专场千元封顶现已开启！{{ docs.mustache("{download_link}") }} 客服电话400-881-6609 回复TD退订
 {% endcall %}
 
 {{ docs.alert("以上通知内容包含了象 <u>打折</u>、<u>降价</u>、<u>仅售</u> 这类营销推广的敏感词语，容易导致审批无法通过，因此请谨慎使用或改用 [营销类短信](#营销短信)。") }}
@@ -654,7 +654,7 @@ XX房东您好，租客{{ docs.mustache("guest_name") }}（手机号码：{{ doc
 但是 URL 中可以包含变量，比如：
 
 {% call docs.bubbleWrap() -%}
-亲，您的宝贝已上路，快递信息可以通过以下链接查询：http://www.sf-express.com/cn/#search/{{ docs.mustache("bill_number") }} 
+亲，您的宝贝已上路，快递信息可以通过以下链接查询：http://www.sf-express.com/cn/#search/{{ docs.mustache("{bill_number}") }} 
 {% endcall %}
 
 #### 通知类模板
@@ -662,7 +662,7 @@ XX房东您好，租客{{ docs.mustache("guest_name") }}（手机号码：{{ doc
 【正确范例】
 
 {% call docs.bubbleWrap() -%}
-恭喜您获得关注广州体彩微信送“排列三”的活动彩票，您的号码是第{{ docs.mustache("phase") }}期的：{{ docs.mustache("num") }}。开奖时间为{{ docs.mustache("date") }}，请关注公众号—开奖信息查询中奖状态。
+恭喜您获得关注广州体彩微信送“排列三”的活动彩票，您的号码是第{{ docs.mustache("{phase}") }}期的：{{ docs.mustache("{num}") }}。开奖时间为{{ docs.mustache("{date}") }}，请关注公众号—开奖信息查询中奖状态。
 {% endcall %}
 
 〖错误范例〗
