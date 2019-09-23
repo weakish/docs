@@ -47,14 +47,14 @@
 * **_conversationUpdate**<br/>
   修改对话属性、设置或取消对话消息提醒，在实际修改之前调用。开发者在这里可以为新的「对话」添加其他内部属性，或完成操作鉴权，以及其他类似操作。
 
-### Client Hook
+### 客户端 Hook
 
-在用户上线和下线的时候，可以触发 Hook 函数：
+在客户端上线和下线的时候，可以触发 Hook 函数：
 
 * **_clientOnline**<br/>
-  用户上线，IMClient open 成功后调用。
+  客户端上线，客户端登录成功后调用。
 * **_clientOffline**<br/>
-  用户下线，IMClient close 成功后调用。
+  客户端下线，客户端登出成功或意外下线后调用。
 
 ### Hook 与云引擎的关系
 
@@ -582,7 +582,7 @@ Cloud::define('_messageSent', function($params, $user) {
 
 #### `_clientOnline`
 
-在 IMClient open 成功后调用。
+在客户端登录成功后调用。
 
 参数:
 
@@ -599,7 +599,7 @@ reconnect | 可选，标识客户端本次登录是否是自动重连，没有 r
 
 #### `_clientOffline`
 
-在 IMClient close 成功后调用。
+在客户端登出成功或意外下线后调用。
 
 参数:
 
@@ -614,7 +614,6 @@ tag | 可选，由用户在会话创建时传递而来，不传或者值为 `def
 返回:
 
 这个 hook 不会对返回值进行检查。
-
 
 ## 「系统对话」的使用
 
