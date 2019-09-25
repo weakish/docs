@@ -157,7 +157,3 @@ lean deploy --prod 1
 你也可以在 [控制台 > 云引擎 > 设置](/dashboard/cloud.html?appid={{appid}}#/conf) 的「Web 主机域名」部分，申请一个云引擎开发域名。
 然后通过控制台生成的域名访问你的应用。
 注意，该域名仅供开发测试期间使用，不保证可用性，3 个月后可能被停用，网站正式上线前请绑定自定义域名。
-
-{% call docs.noteWrap() %}
-DNS 可能需要等待几个小时后才能生效。
-{% endcall %}
