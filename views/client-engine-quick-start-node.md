@@ -91,7 +91,7 @@ lean up
 lean deploy
 ```
 
-在浏览器中登录 LeanCloud 控制台，进入 Play - Client Engine - 设置，在「Web 主机域名」中设置二级域名，通过 `http://stg-<YOUR-APP-DOMAIN>.{{engineDomain}}` 访问预备环境。
+在浏览器中登录 LeanCloud 控制台，进入 Play - Client Engine - 设置，在「Web 主机域名」中设置开发域名，通过 `http://stg-<YOUR-APP-DOMAIN>.{{engineDomain}}` 访问预备环境。
 
 例如填写 `myapp`，设置成功后通过 `http://stg-myapp.{{engineDomain}}`访问，此时可以看到 Client Engine 服务端正在运行的文本。
 

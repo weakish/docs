@@ -24,61 +24,19 @@
 
 ## 从示例项目开始
 
-将示例代码 {% if platformName === "Node.js" %}[`node-js-getting-started`](https://github.com/leancloud/node-js-getting-started){% endif %}{% if platformName === "Python" %}[`python-getting-started`](https://github.com/leancloud/python-getting-started){% endif %}{% if platformName === "PHP" %}[`slim-getting-started`](https://github.com/leancloud/slim-getting-started){% endif %}{% if platformName === "Java" %}[`java-war-getting-started`](https://github.com/leancloud/java-war-getting-started){% endif %}{% if platformName === ".NET" %}[`dotNET-getting-started`](https://github.com/leancloud/dotNET-getting-started){% endif %} 克隆到本地：
+我们为云引擎支持的各种语言准备了示例项目，建议从示例项目着手开始开发。
 
-{% if platformName === "Node.js" %}
-```sh
-git clone https://github.com/leancloud/node-js-getting-started.git
-```
-{% endif %}
-{% if platformName === "Python" %}
-```sh
-git clone https://github.com/leancloud/python-getting-started.git
-```
-{% endif %}
-{% if platformName === "PHP" %}
-```sh
-git clone https://github.com/leancloud/slim-getting-started.git
-```
-{% endif %}
-{% if platformName === "Java" %}
-```sh
-git clone https://github.com/leancloud/java-war-getting-started.git
-```
-{% endif %}
-{% if platformName === ".NET" %}
+{% if platformName !== ".NET" %}
+
+要理解如何从示例项目开始开发云引擎项目，本地调试，部署到云端，请先阅读 [云引擎快速入门](leanengine_quickstart.html)。
+
+{% else %}
+
+将示例代码 [dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started) 克隆到本地：
+
 ```sh
 git clone https://github.com/leancloud/dotNET-getting-started.git
 ```
-{% endif %}
-
-{% if platformName === "Node.js" %}
-在根目录执行如下命令安装依赖：
-
-```sh
-npm install
-```
-{% endif %}
-{% if platformName === "Python" %}
-在本地运行 LeanEngine Python 应用，首先需要这几个依赖：
-
-- **`python`**：请确保本地安装的 Python 版本与线上使用的相同，以免不同版本之间的兼容性导致问题。推荐使用 [`pyenv`](https://github.com/pyenv/pyenv) 来管理本地 Python 版本。
-- **`pip`**：用来安装第三方依赖。
-- **`virtualenv`**：可选，建议使用 `virtualenv` 或者类似的工具来创建一个独立的 Python 环境，以免项目使用到的依赖与系统／其他项目的版本产生冲突。
-
-请确保以上依赖都已经在本机上安装就绪，然后在项目目录下执行如下命令，来安装项目用到的第三方依赖：
-
-```sh
-pip install -r requirements.txt
-```
-{% endif %}
-{% if platformName === "PHP" %}
-使用 `composer` 安装第三方依赖：
-
-```sh
-composer install
-```
-{% endif %}
 
 ### 本地运行和调试
 
@@ -98,21 +56,26 @@ lean up
 lean deploy
 ```
 
-### 设置域名
+如果生产环境是标准实例，需要加上 `--prod 1` 参数，指定部署到生产环境：
 
-你可以在 [控制台 > 云引擎 > 设置](/dashboard/cloud.html?appid={{appid}}#/conf) 的「Web 主机域名」部分，填写一个自定义的二级域名，例如你设置了 `myapp`，那么你就可以通过我们的二级域名来访问你的网站了：
+```
+lean deploy --prod 1
+```
 
-- `http://myapp.leanapp.cn`（中国华北节点）
-- `http://myapp.cn-e1.leanapp.cn`（中国华东节点）
-- `http://myapp.avosapps.us`（国际版）
+你可以在控制台[绑定云引擎域名][engine-domain]，绑定域名后，即可通过绑定域名访问你的应用。
+例如，假定你在控制台绑定了 `web.example.com` 这个域名，即可通过 `https://web.example.com` 访问你的应用（生产环境）。
+
+[engine-domain]: custom-api-domain-guide.html#云引擎域名
+
+你也可以在 [控制台 > 云引擎 > 设置](/dashboard/cloud.html?appid={{appid}}#/conf) 的「Web 主机域名」部分，申请一个云引擎开发域名。
+然后通过控制台生成的域名访问你的应用。
+注意，该域名仅供开发测试期间使用，不保证可用性，3 个月后可能被停用，网站正式上线前请绑定自定义域名。
 
 {% call docs.noteWrap() %}
 DNS 可能需要等待几个小时后才能生效。
 {% endcall %}
 
-我们的二级域名是默认有 HTTPS 支持的。
-
-如果你的应用在 30 天内无访问且没有购买标准实例，二级域名有可能会被回收。
+{% endif %}
 
 ## 项目骨架
 
@@ -1433,7 +1396,7 @@ LeanEngine.setHttpsRedirectEnabled(true);
 ```
 {% endif %}
 
-部署并发布到生产环境之后，访问你的 LeanEngine 网站二级域名都会强制通过 HTTPS 访问。
+部署并发布到生产环境之后，访问你的 LeanEngine 网站都会强制通过 HTTPS 访问。
 
 {% if platformName === "Node.js" %}
 ### 多进程运行

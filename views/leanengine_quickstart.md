@@ -4,7 +4,7 @@
 
 ## 创建项目
 
-请根据 [命令行工具使用指南 &middot; 安装](leanengine_cli.html#安装命令行工具) 安装 LeanCloud 官方命令行工具，并确保你已经在本地机器上可以成功运行命令行工具：
+请根据 [命令行工具使用指南 &middot; 安装](leanengine_cli.html#安装命令行工具) 安装最新版的 LeanCloud 官方命令行工具，并确保你已经在本地机器上可以成功运行命令行工具：
 
 ```
 lean help
@@ -143,10 +143,21 @@ $app->get('/', function (Request $request, Response $response) {
 lean deploy
 ```
 
-如果你设置了 [二级域名](leanengine_webhosting_guide-node.html#设置域名)，即可通过 `http://${your_app_domain}.{{engineDomain}}` 访问你应用的生产环境。
-
-如果生产环境是标准实例，`lean deploy` 会先部署到预备环境（`http://stg-${your_app_domain}.{{engineDomain}}`），你可以再运行一下 `lean publish` 来部署到生产环境：
+如果生产环境是标准实例，需要加上 `--prod 1` 参数，指定部署到生产环境：
 
 ```
-lean publish
+lean deploy --prod 1
 ```
+
+你可以在控制台[绑定云引擎域名][engine-domain]，绑定域名后，即可通过绑定域名访问你的应用。
+例如，假定你在控制台绑定了 `web.example.com` 这个域名，即可通过 `https://web.example.com` 访问你的应用（生产环境）。
+
+[engine-domain]: custom-api-domain-guide.html#云引擎域名
+
+你也可以在 [控制台 > 云引擎 > 设置](/dashboard/cloud.html?appid={{appid}}#/conf) 的「Web 主机域名」部分，申请一个云引擎开发域名。
+然后通过控制台生成的域名访问你的应用。
+注意，该域名仅供开发测试期间使用，不保证可用性，3 个月后可能被停用，网站正式上线前请绑定自定义域名。
+
+{% call docs.noteWrap() %}
+DNS 可能需要等待几个小时后才能生效。
+{% endcall %}

@@ -234,7 +234,7 @@ avoscloud
 这样就可以在本地完成 **授权** > **回调** > **发微博** 的流程。
 
 ## 部署项目
-回到 LeanCloud 控制台，选择刚创建的应用，再选择 [**存储** > **云引擎** > **设置** > Web 主机域名](/dashboard/cloud.html?appid={{appid}}#/conf)，在这里为该应用设置二级域名。
+回到 LeanCloud 控制台，选择刚创建的应用，再选择 [**存储** > **云引擎** > **设置** > Web 主机域名](/dashboard/cloud.html?appid={{appid}}#/conf)，在这里为该应用设置开发域名。
 
 ![domain_setting](images/console-webhosting-field.png)
 
@@ -280,4 +280,4 @@ passport.use(new WeiboStrategy({
 
 ## 云端测试
 
-打开所设置的二级域名的首页（本例所用的地址为 <http://weibotest.leanapp.cn>），就可以进行实际测试了。
+打开所设置的开发域名的首页（本例所用的地址为 <http://weibotest.leanapp.cn>），就可以进行实际测试了。

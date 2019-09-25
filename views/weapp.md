@@ -490,12 +490,12 @@ const realtime = getApp().realtime;
 在开始之前，请确保已经在微信小程序后台开启了「微信支付」功能，然后按照下面的步骤配置云引擎环境变量：
 
 1. 进入应用控制台 - 云引擎 - 设置
-2. 设置应用的二级域名并保存
+2. 设置应用的开发域名并保存
 3. 添加并保存以下环境变量
   - `WEIXIN_APPID`：小程序 AppId
   - `WEIXIN_MCHID`：微信支付商户号
   - `WEIXIN_PAY_SECRET`：微信支付 API 密钥（[微信商户平台](https://pay.weixin.qq.com) - 账户设置 - API安全 - 密钥设置）
-  - `WEIXIN_NOTIFY_URL`：`https://{{yourdomain}}.{{engineDomain}}/weixin/pay-callback`，其中 `yourdomain` 是第二步中设置的二级域名
+  - `WEIXIN_NOTIFY_URL`：`https://{{yourdomain}}.{{engineDomain}}/weixin/pay-callback`，其中 `yourdomain` 是第二步中设置的开发域名
 
 <details>
 <summary>查看示例</summary>
