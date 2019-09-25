@@ -864,6 +864,200 @@ var query = new AVQuery<AVObject>("GameEquip").OrderBy("attackValue").OrderByDes
 - 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
 - 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
 
+
+## LiveQuery
+
+LiveQuery 衍生于 [AVQuery](#查询)，它可以让你无需编写复杂的逻辑便可在客户端之间同步数据，这对于有实时数据同步需求的应用来说很有帮助。
+
+设想你正在开发一个多人协作同时编辑一份文档的应用，单纯地使用 `AVQuery` 并不是最好的做法，因为它只具备主动拉取的功能，而应用并不知道什么时候该去拉取。想要解决这个问题，就要用到 LiveQuery 了。借助 LiveQuery，你可以订阅所有需要保持同步的 `AVQuery`。订阅成功后，一旦有符合 `AVQuery` 的 `AVObject` 发生变化，云端就会主动、实时地将信息通知到客户端。
+
+LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket 的处理会比较复杂，而我们将其封装成了一个简单的 API 供你直接使用，无需关注背后的原理。
+
+### 启用 LiveQuery
+请参考 [SDK 安装文档](sdk_setup-dotnet.html#LiveQuery)。
+
+### 效果示例
+下面是在使用了 LiveQuery 的网页应用和手机应用中分别操作，数据保持同步的效果：
+<div style="border:2px solid #ccc; margin-bottom:1em;">
+  <video src="https://lc-lhzo7z96.cn-n1.lcfile.com/1496988080458" controls autoplay muted preload="auto" width="100%" height="100%" >
+    HTML5 Video is required for this demo, which your browser doesn't support.
+  </video>
+</div>
+
+### 构建订阅
+
+LiveQuery 的核心用法是定义一个查询，然后订阅符合这个查询条件的对象的变化。例如有一个 `Todo` 表记录着所有待办任务，我们订阅这个表中的数据变化。
+
+#### create
+
+`create` 指的是所有新增的数据事件，例如订阅所有新增的 `Todo`。例如在其他客户端新增一个 `Todo` 后，自动在当前客户端做出更新：
+
+```cs
+// 构建 Todo 查询
+var query = new AVQuery<AVObject>("Todo").WhereEqualTo("state", "doing");
+// 订阅这个查询条件
+var livequery = await query.SubscribeAsync();
+livequery.OnLiveQueryReceived += (sender, e) => 
+{
+    if(e.Scope == "create")
+    {
+        doingList.Add(e.Payload);
+    }
+};
+```
+
+在上方代码中，首先构建了一个 Query，然后订阅这个 Query 并接收事件。当表中新增的数据符合这个 Query 时，`create`s 事件会被触发。例如其他客户端运行下面的代码会触发 `create` 事件：
+
+```cs
+var testObj = new AVObject("Todo");
+testObj["state"] = "doing";
+await testObj.SaveAsync();
+```
+
+#### update
+
+update 事件的触发时机为：表中有符合条件的数据被更新，更新后的数据依然符合匹配的 Query 条件。比如我们订阅 `Todo` 表中处在 `doing` 状态的数据的 `update` 事件：
+
+```cs
+// 构建 Todo 查询
+var query = new AVQuery<AVObject>("Todo").WhereEqualTo("state", "doing");
+// 订阅这个查询条件
+var livequery = await query.SubscribeAsync();
+livequery.OnLiveQueryReceived += (sender, e) => 
+{
+    if(e.Scope == "update")
+    {
+        foreach(var key in e.Keys)
+        {
+          var data = e.Payload.Get<string>(key);
+        }
+    }
+};
+```
+
+在上方代码中，首先构建了一个 Query，然后订阅这个 Query 并接收事件。其他客户端更新一条处在 `doing` 状态的 `todo` 数据的 `title`时，会触发这个 `update` 事件：
+
+```cs
+// 假设有一条 doing 状态的 Todo 的 objectId 5915bb92a22b9d005804a4ee
+var oneDoing = AVObject.CreateWithoutData("Todo", "5915bb92a22b9d005804a4ee");
+oneDoing["title"] = "修改标题";
+await oneDoing.SaveAsync();
+```
+
+注意，在更新数据的代码中，我们只修改了 `title` 字段，没有修改 `state` 字段。如果 `state` 字段的值被修改了，`update` 事件不会被触发，会触发 [`leave`](#leave) 事件。
+
+#### enter
+enter 事件的触发时机为：表中已有的一条数据更新之前不符合条件，在更新数据后，符合当前订阅指定的 Query 条件。例如我们监听 `Todo` 表中 `state` 状态从 `doing` 变为 `done` 的事件：
+
+```cs
+// 构建 Todo 查询
+var query = new AVQuery<AVObject>("Todo").WhereEqualTo("state", "done");
+// 订阅这个查询条件
+var livequery = await query.SubscribeAsync();
+livequery.OnLiveQueryReceived += (sender, e) => 
+{
+    if(e.Scope == "enter")
+    {
+        doingList.Add(e.Payload);
+    }
+};
+```
+
+在上方代码中，首先构建了一个 Query，然后订阅这个 Query 并接收事件。其他客户端将一条 `todo` 的 `state` 从 `doing` 修改为 `done` 时，会触发当前 `enter` 事件：
+
+```cs
+// 假设有一条 doing 状态的 Todo 的 objectId 5915bb92a22b9d005804a4ee
+var todo = AVObject.CreateWithoutData("Todo", "5915bb92a22b9d005804a4ee");
+todo["state"] = "done";
+await todo.SaveAsync();
+```
+
+这条 todo 的数据更新后，符合了订阅时的查询条件，enter 事件被触发。
+
+请注意明确区分 `create` 和 `enter` 的不同行为：
+
+ - `create`：对象从无到创建，并且符合查询条件。
+ - `enter`：对象原来就存在，但是修改之前不符合查询条件，修改之后符合了查询条件。
+
+#### leave
+
+与 `enter` 相反，当对象从符合条件变为不符合条件的时候，之前的查询条件订阅会触发 `leave` 事件。例如，我们现在订阅处在 `doing` 状态的 `leave` 事件：
+
+```cs
+// 构建 Todo 查询
+var query = new AVQuery<AVObject>("Todo").WhereEqualTo("state", "doing");
+// 订阅这个查询条件
+var livequery = await query.SubscribeAsync();
+livequery.OnLiveQueryReceived += (sender, e) => 
+{
+    if(e.Scope == "leave")
+    {
+        doingList.Remove(e.Payload);
+    }
+};
+```
+
+在上方代码中，首先构建了一个 Query，然后订阅这个 Query 并接收事件。其他客户端将一条 `todo` 的 `state` 从 `doing` 修改为 `done` 时，会触发当前 `leave` 事件：
+
+```cs
+// 假设有一条 doing 状态的 Todo 的 objectId 5915bb92a22b9d005804a4ee
+var todo = AVObject.CreateWithoutData("Todo", "5915bb92a22b9d005804a4ee");
+todo["state"] = "done";
+await todo.SaveAsync();
+```
+
+这条 `todo` 的数据更新后，不再匹配原有的 `state` 为 `doing` 的查询条件，此时原有的查询条件会触发 `leave` 事件。
+
+#### delete
+delete 事件的触发时机为：符合当前订阅条件的数据被删除。例如，我们现在订阅 `todo` 这个表的 `delete` 事件：
+
+```cs
+// 构建 Todo 查询
+var query = new AVQuery<AVObject>("Todo");
+// 订阅这个查询条件
+var livequery = await query.SubscribeAsync();
+livequery.OnLiveQueryReceived += (sender, e) => 
+{
+    if(e.Scope == "delete")
+    {
+        // objectId 为被删除的 AVObject 的 id     
+        Debug.Log(e.Payload.ObjectId);
+    }
+};
+```
+在上方代码中，首先构建了一个 Query，然后订阅这个 Query 并接收事件。其他客户端删掉一条 `todo` 时，会触发当前的 `delete` 事件：
+
+```cs
+var todo = AVObject.CreateWithoutData("Todo", "591d9b302f301e006be22c83");
+await todo.DeleteAsync();
+```
+
+### 取消订阅
+取消订阅指针对某一个或者某一些 LiveQuery，不再希望云端将数据变更推送到客户端。
+
+```cs
+await liveQuery.UnsubscribeAsync();
+```
+
+### 连接被断开
+
+可能存在 LiveQuery 连接被断开的情况：
+
+1. 网络异常或者网络切换，非预期性断开。
+2. 退出应用、关机或者打开飞行模式等，用户在应用外的操作导致断开。
+
+如上几种情况开发者无需做额外的操作，只要切回应用，SDK 会自动重新订阅，数据变更会继续推送到客户端。
+
+而另外一种极端情况——**当用户在移动端使用手机的进程管理工具，杀死了进程或者直接关闭了网页的情况下**，SDK 无法自动重新订阅，此时需要开发者根据实际情况实现重新订阅。
+
+### 注意事项
+为了避免内存泄漏，SDK 不会缓存 AVLiveQuery 对象，所以请在开发时注意 AVLiveQuery 对象的生命周期。
+
+### LiveQuery 使用误区
+
+因为 LiveQuery 的实时性，很多用户会试着用 LiveQuery 来实现一个简单的聊天功能。我们不建议这样做，因为使用 LiveQuery 构建聊天服务会承担额外的存储成本，产生的费用会增加，并且后期维护的难度非常大（聊天记录，对话维护之类的代码会很混乱）。如果您需要实现聊天功能，请使用[即时通讯服务](realtime_v2.html)。
+
+
 ## 用户
 用户系统几乎是每款应用都要加入的功能。除了基本的注册、登录和密码重置，移动端开发还会使用手机号一键登录、短信验证码登录等功能。LeanStorage 提供了一系列接口来帮助开发者快速实现各种场景下的需求。
 

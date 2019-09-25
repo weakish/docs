@@ -702,6 +702,7 @@ $ npm install leancloud-realtime --save
 
 {{ docs.note("通过 Node.js `require` 方法引入的 SDK 与通过浏览器 `script` 标签引入的 SDK 是两个不同的 SDK，需要各自分别初始化，并且不能混用。") }}
 {% endif %}
+
 {% if platform_name === ".NET" %}
 ### Unity
 
@@ -713,7 +714,7 @@ $ npm install leancloud-realtime --save
 
 #### 安装数据存储
 
-请下载 [Unity Storage](https://releases.leanapp.cn/#/leancloud/unity-sdk/releases) 最新版本的 zip 包，解压之后导入到你的 Unity 项目中。
+请下载 [Unity Storage](https://releases.leanapp.cn/#/leancloud/unity-sdk/releases) 最新版本的 zip 包，解压之后导入到你的 Unity 项目中。如果需要使用 LiveQuery，还需要安装下面的即时通讯 SDK。
 
 #### 安装即时通讯
 
@@ -723,12 +724,12 @@ $ npm install leancloud-realtime --save
 
 安装包解压之后，每一个依赖的详细说明如下：
 
-名称|模块描述|必选
---|---|---
-`AssemblyLister.dll`|LeanCloud 依赖检测模块，它负责检查相关依赖是否正确加载|是
-`LeanCloud.Core.dll`|核心库，里面包含了 `AVObject` 和 `AVUser` 等所有内置类型的定义和序列化相关操作的功能|是
-`LeanCloud.Storage.dll`|存储库，里面包含本地缓存以及 HTTP 请求发送的实现|是
-`LeanCloud.Realtime.dll`|即时通讯库，里面包含了即时通讯协议的实现以及相关接口|否
+名称|模块描述
+--|---
+`AssemblyLister.dll`|LeanCloud 依赖检测模块，它负责检查相关依赖是否正确加载
+`LeanCloud.Core.dll`|核心库，里面包含了 `AVObject` 和 `AVUser` 等所有内置类型的定义和序列化相关操作的功能
+`LeanCloud.Storage.dll`|存储库，里面包含本地缓存以及 HTTP 请求发送的实现
+`LeanCloud.Realtime.dll`|即时通讯库，里面包含了即时通讯协议的实现以及相关接口。存储的 LiveQuery 也依赖于这个库。
 
 ### .NET Framework & Xamarin
 
@@ -1044,17 +1045,30 @@ AVClient.Initialize(new AVClient.Configuration {
 请勿多此一举设置 ApiServer，否则会变成公网访问，影响性能。
 在使用命令行工具（`lean up`）本地调试云引擎托管项目时，虽然是公网访问，但命令行工具会自动设置相应的环境变量，供 SDK 访问 API，所以也不需要设置 ApiServer。
 
+#### LiveQuery
+在安装[即时通讯 SDK](#安装即时通讯) 后，需要进入 [控制台 > 存储 > 设置](https://leancloud.cn/dashboard/storage.html?appid={{appid}}#/storage/conf)，在 **其他** 里面勾选 **启用 LiveQuery**，然后按照下面的代码初始化。
+
+```cs
+Websockets.Net.WebsocketConnection.Link(); // Unity 下不需要此行设置
+var realtime = new AVRealtime(new AVRealtime.Configuration {
+    ApplicationId = appId,
+    ApplicationKey = appKey,
+    RTMRouter = new Uri("https://xxx.example.com")
+});
+AVLiveQuery.Channel = realtime;
+```
+
 ### 即时通讯初始化
 
 在使用「即时通讯」服务前，调用如下代码：
 
 ```cs
 var realtime = new AVRealtime(new AVRealtime.Configuration
-           {
-                ApplicationId = "{{appid}}",
-                ApplicationKey = "{{appkey}}",
-                RTMRouter = new Uri("https://xxx.example.com")
-           });
+{
+    ApplicationId = "{{appid}}",
+    ApplicationKey = "{{appkey}}",
+    RTMRouter = new Uri("https://xxx.example.com")
+});
 ```
 {% endif %}
 
