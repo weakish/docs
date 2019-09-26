@@ -176,7 +176,9 @@ AVClient.Initialize(new AVClient.Configuration
 {
     ApplicationId = {{appid}},
     ApplicationKey = {{appkey}},
-    MasterKey = {{masterkey}}
+    MasterKey = {{masterkey}},
+    ApiServer = new Uri("https://xxx.example.com"),
+    EngineServer = new Uri("https://xxx.example.com")
 });
 AVClient.UseMasterKey = true;
 ```

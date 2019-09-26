@@ -1031,12 +1031,7 @@ using LeanCloud.Realtime;
 在使用「数据存储」服务前，调用如下代码：
 
 ```cs
-AVClient.Initialize(new AVClient.Configuration {
-                ApplicationId = "{{appid}}",
-                ApplicationKey = "{{appkey}}",
-                ApiServer = new Uri("https://xxx.example.com"),
-                EngineServer = new Uri("https://xxx.example.com")
-            });
+AVClient.Initialize("{{appid}}", "{{appkey}}", "https://xxx.example.com");
 ```
 
 
