@@ -176,36 +176,15 @@ AV.init({
 
 请参考 [入门指南](multiplayer-quick-start-js.html#初始化) 或 [开发指南](multiplayer-guide-js.html#初始化) 进行配置。
 
-##### 微信小程序白名单中增加：
+##### 微信小程序白名单
 
-```
-存储：
-request：https://xxx.example.com
+前往 [LeanCloud 控制台 > 设置 > 应用 Keys > 域名白名单][weapp-domains]，获取域名白名单（不同应用对应不同的域名）。
 
-即时通讯：
-request：https://xxx.example.com/
-WebSocket：
-wss://cn-n1-cell1.avoscloud.com
-wss://cn-n1-cell2.avoscloud.com
-wss://cn-n1-cell5.avoscloud.com
-wss://cn-n1-cell7.avoscloud.com
-wss://cn-n1-cell1.leancloud.cn
-wss://cn-n1-cell2.leancloud.cn
-wss://cn-n1-cell5.leancloud.cn
-wss://cn-n1-cell7.leancloud.cn
+[weapp-domains]: https://leancloud.cn/dashboard/app.html?appid={{appid}}#/key
 
-多人在线对战：
-request：https://xxx.example.com/
-WebSocket：
-wss://cn-n1-wechat-mesos-cell-1.avoscloud.com
-wss://cn-n1-wechat-mesos-cell-2.avoscloud.com
-wss://cn-n1-wechat-mesos-cell-3.avoscloud.com
-wss://cn-n1-wechat-mesos-cell-4.avoscloud.com
-wss://cn-n1-wechat-mesos-cell-1.leancloud.cn
-wss://cn-n1-wechat-mesos-cell-2.leancloud.cn
-wss://cn-n1-wechat-mesos-cell-3.leancloud.cn
-wss://cn-n1-wechat-mesos-cell-4.leancloud.cn
-```
+登录[微信公众平台]，前往 **设置 > 开发设置 > 服务器配置 > 「修改」** 链接，**增加**上述域名白名单中的域名。
+
+
 
 #### Objective-C SDK
 
