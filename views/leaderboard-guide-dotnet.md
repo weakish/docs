@@ -178,7 +178,8 @@ AVClient.Initialize(new AVClient.Configuration
     ApplicationKey = {{appkey}},
     MasterKey = {{masterkey}},
     ApiServer = new Uri("https://xxx.example.com"),
-    EngineServer = new Uri("https://xxx.example.com")
+    EngineServer = new Uri("https://xxx.example.com"),
+    PushServer = new Uri("https://xxx.example.com")
 });
 AVClient.UseMasterKey = true;
 ```

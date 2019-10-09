@@ -257,7 +257,8 @@ AVClient.Initialize(new AVClient.Configuration {
                 ApplicationId = "{{appid}}",
                 ApplicationKey = "{{appkey}}",
                 ApiServer = new Uri("https://xxx.example.com"),
-                EngineServer = new Uri("https://xxx.example.com")
+                EngineServer = new Uri("https://xxx.example.com"),
+                PushServer = new Uri("https://xxx.example.com")
 });
 <code></pre>
 </details>
