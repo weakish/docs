@@ -6215,6 +6215,8 @@ LeanCloud CAPTCHA aims to keep bots or other automated software from engaging in
 
 LeanCloud offers CAPTCHA as a free service to make your app's more bot-proof. #}
 
+{% if platform_name !== "Swift" %}
+
 ### 当前用户
 
 用户登录后，SDK 会自动将会话信息存储到客户端，这样用户在下次打开客户端时无需再次登录。下面的代码检查是否有已经登录的用户：
@@ -6468,6 +6470,8 @@ if (authenticated) {
 ```swift
 {# TODO #}
 ```
+{% endif %}
+
 {% endif %}
 
 ### 重置密码
