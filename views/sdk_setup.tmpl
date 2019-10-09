@@ -805,22 +805,13 @@ import LeanCloud
 然后粘贴下列代码到 `application(_:didFinishLaunchingWithOptions:)` 函数内：
 
 ```swift
-let configuration = LCApplication.Configuration(
-    customizedServers: [
-        .api("https://xxx.example.com"),
-        .engine("https://xxx.example.com"),
-        .push("https://xxx.example.com"),
-        .rtm("https://xxx.example.com")
-    ]
-)
 do {
     try LCApplication.default.set(
-        id: "{{appid}}",
-        key: "{{appkey}}",
-        configuration: configuration
-    )
+        id: {{appid}},
+        key: {{appkey}},
+        serverURL: "https://xxx.example.com")
 } catch {
-    fatalError("\(error)")
+    print(error)
 }
 ```
 {% endif %}
