@@ -190,7 +190,26 @@ AV.init({
 
 请参考 [SDK 安装指南](sdk_setup-objc.html#初始化) 配置。
 
-**部分旧版本 SDK（< 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版。**
+`<12.0.0` 的版本请参考以下方法配置：
+
+<details>
+<pre><code>
+// 配置 SDK 储存
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleAPI];
+// 配置 SDK 推送
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModulePush];
+// 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleEngine];
+// 配置 SDK 即时通讯
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleRTM];
+// 配置 SDK 统计
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleStatistics];
+// 初始化应用
+[AVOSCloud setApplicationId:@"{{appid}}" clientKey:@"{{appkey}}"];
+</code></pre>
+
+<strong>部分旧版本 SDK（&lt; 8.2.3）存在 SSL Pinning，它可能导致配置后的自定义服务器地址无法使用，如果出现了「证书非法」的相关错误，请至少升级 SDK 到 8.2.3，建议升级至最新版。</strong>
+</details>
 
 `<4.6.0` 的版本不支持自定义域名。
 
