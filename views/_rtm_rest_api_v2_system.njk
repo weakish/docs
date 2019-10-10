@@ -2,10 +2,12 @@
 
 ### 创建服务号
 
+在 `_Conversation` 表默认 ACL 权限下本接口要求使用 master key。
+
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
   -d '{"name":"My First Service-conversation"}' \
   https://{{host}}/1.2/rtm/service-conversations
@@ -20,10 +22,12 @@ curl -X POST \
 
 ### 查询服务号
 
+在 `_Conversation` 表默认 ACL 权限下本接口要求使用 master key。
+
 ```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
   -G \
   --data-urlencode 'where={"name": "service"}' \
   --data-urlencode 'skip=1' \
@@ -45,10 +49,12 @@ where | 可选 | 参考 [数据存储 - 查询](rest_api.html#查询)。
 
 ### 更新服务号
 
+在 `_Conversation` 表默认 ACL 权限下本接口要求使用 master key。
+
 ```sh
 curl -X PUT \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
   -d '{"name":"Updated Service-conversation"}' \
   https://{{host}}/1.2/rtm/service-conversations/{conv_id}
@@ -62,10 +68,12 @@ curl -X PUT \
 
 ### 删除服务号
 
+在 `_Conversation` 表默认 ACL 权限下本接口要求使用 master key。
+
 ```sh
 curl -X DELETE \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
   https://{{host}}/1.2/rtm/service-conversations/{conv_id}
 ```
 
