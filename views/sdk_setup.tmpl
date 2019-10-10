@@ -485,11 +485,6 @@ var AV = require('leancloud-storage/live-query');
 ```js
 // 存储服务
 var { Query, User } = AV;
-AV.init({
-  appId: "{{appid}}",
-  appKey: "{{appkey}}",
-  serverURLs: "https://xxx.example.com",
-});
 // 即时通讯服务
 var { Realtime, TextMessage } = AV;
 ```
@@ -860,12 +855,10 @@ public class MyLeanCloudApp extends Application {
 如果是在前端项目里面直接通过 CDN 加载的 LeanCloud JavaScript SDK，那么可以在页面加载的时候调用初始化的函数 `AV.init`：
 
 ```js
-var APP_ID = '{{appid}}';
-var APP_KEY = '{{appkey}}';
-
 AV.init({
-  appId: APP_ID,
-  appKey: APP_KEY
+  appId: "{{appid}}",
+  appKey: "{{appkey}}",
+  serverURLs: "https://xxx.example.com"
 });
 ```
 
@@ -875,12 +868,10 @@ AV.init({
 var AV = require('leancloud-storage');
 var { Realtime } = require('leancloud-realtime'); // 若不使用即时通讯服务，则无需引入
 
-var APP_ID = '{{appid}}';
-var APP_KEY = '{{appkey}}';
-
 AV.init({
-  appId: APP_ID,
-  appKey: APP_KEY
+  appId: "{{appid}}",
+  appKey: "{{appkey}}",
+  serverURLs: "https://xxx.example.com"
 });
 ```
 {% endif %}
@@ -1075,10 +1066,13 @@ AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
-如果使用的是 Node.js，可以在通过 npm 启动应用时设置环境变量 `DEBUG=leancloud*`：
+如果使用的是 Node.js，可以在通过 npm 启动应用时设置环境变量 `DEBUG=leancloud*`（存储）、`DEBUG=LC*`（即时通讯）：
 
 ```sh
+// 存储
 DEBUG=leancloud* npm start
+// 即时通讯
+DEBUG=LC* npm start
 ```
 
 若是在 [云引擎](leanengine_overview.html) 中使用 Node.js，可以到 [控制台 > 云引擎 > 设置 > 自定义环境变量](/dashboard/cloud.html?appid={{appid}}#/conf) 里面添加一个新的变量，在第一栏填入 `DEBUG`，第二栏填入 `leancloud:*`（不要丢掉 `leancloud` 和 `*` 之间的冒号）。保存成功后，在本地通过 [命令行工具](leanengine_cli.html) 调试时，可以通过设置环境变量 `DEBUG=leancloud:*` 来让日志信息输出到 [LeanCloud 控制台 > 云引擎 > 应用日志](/dashboard/cloud.html?appid={{appid}}#/log)：
@@ -1092,9 +1086,27 @@ DEBUG=leancloud:* lean up
 ```js
 localStorage.setItem('debug', 'leancloud*');
 
-// 为 LiveQuery 启用日志
+// 为即时通讯、 LiveQuery 启用日志
 localStorage.setItem('debug', 'LC*');
 ```
+
+除了在 Node.js 中使用环境变量，在浏览器中使用 localStorage 启用调试模式外，新版本的 SDK 还支持在代码中启用、停用调试模式。
+
+存储服务可以按照以下方式启用、停用调试模式（javascript-sdk `>= v3.14.0`）：
+
+```js
+AV.debug.enable();  // 启用
+AV.debug.disable(); // 停用
+```
+
+即时通讯服务可以按照以下方式启用、停用调试模式（js-realtime-sdk `>= v5.0.0-alpha.1`）：
+
+```js
+const { debug } = require('leancloud-realtime');
+debug.enable();  // 启用
+debug.disable(); // 停用
+```
+
 {% endif %}
 {% if platform_name === "Python" %}
 ```python
