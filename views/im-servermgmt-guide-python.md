@@ -3,6 +3,13 @@
 Python 的数据存储 SDK，基于 REST API 封装了一组对话及消息管理的接口。这部分接口主要用来在服务器或者云引擎中对[即时通讯](realtime_v2.html)的对话或者消息进行管理。
 
 SDK 的安装及初始化请参考[安装指南](sdk_setup-python.html)。
+注意，由于服务端的许多接口都是管理接口，Conversation 类的默认 ACL 限制很严，因此一般初始化 SDK 时需要使用 Master Key：
+
+```python
+import leancloud
+
+leancloud.init("{{appid}}", master_key="{{masterkey}}")
+```
 
 ## 对话管理
 
@@ -15,7 +22,13 @@ conv.save()
 same_conv = leancloud.Conversation.query.get(conv.id)
 ```
 
-`leancloud.Conversation` 的查询与修改等操作，也受限于 LeanCloud 存储服务的 Class 权限设置与 ACL 权限设置。因此创建对话时，请确保当前权限设置正确，以免造成数据泄漏。
+`leancloud.Conversation` 的查询与修改等操作，也受限于 LeanCloud 存储服务的 Class 权限设置与 ACL 权限设置。
+请确保当前权限设置正确，以免造成数据泄漏。
+
+默认的 ACL 为所有用户无法新建、更新、删除对话，无法添加新字段，也无法查询对话或通过对话的 objectId 获取对话。
+注意，以上 ACL 仅适用于通过即时通讯的 REST API 访问
+（包括调用 Python SDK 提供的方法，因为 Python SDK 封装了即时通讯 REST API 的接口），
+不适用于 Swift、Objective C、Android、JavaScript、C# 等客户端 SDK。
 
 ### 对话属性
 
