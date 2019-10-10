@@ -1,35 +1,80 @@
 # iOS 消息推送开发指南
 
-本文介绍了如何在 iOS 设备中使用 LeanCloud 的推送功能。请先阅读 [消息推送概览](push_guide.html) 了解相关概念。
+本文介绍了如何在 iOS 设备中使用 LeanCloud 的推送功能。建议先阅读 [消息推送概览](push_guide.html) 了解相关概念。
+
+## 配置 APNs 推送证书
+
+配置 APNs 证书是使用推送服务的前提，详情请参考 [iOS 推送证书设置指南](ios_push_cert.html)。
 
 ## iOS 流程简介
 
-首先注册 APNs 申请 deviceToken：
+首先，注册 APNs 申请 Token，并将其保存到云端：
 
 <img src="images/apns-registration.svg" class="img-responsive" alt="">
 
-开发者调用 LeanCloud SDK 提供的接口发送推送消息：
+然后，调用 LeanCloud 提供的接口发送推送消息：
 
 <img src="images/push-workflow-ios.svg" class="img-responsive" alt="">
 
-## 配置 iOS 推送证书
+## Installation
 
-配置 iOS 证书是关键的步骤，请参考 [iOS 推送证书设置指南](ios_push_cert.html)。
+Installation 是 Object 的子类，使用 Installation 对象来保存推送所需的 token 以及其它数据。
 
-## 多证书场景
-
-对于一些应用，他们在发布和上架时分为不同的版本（司机版、乘客版），但数据和消息是互通的，这种场景下我们允许应用上传多个自定义证书并对不同的设备设置 `deviceProfile`，从而可以用合适的证书给不同版本的应用推送。
-
-当你上传自定义证书时会被要求输入「证书类型」，即 deviceProfile 的名字。当 installation 上保存了 deviceProfile 时，我们将忽略原先的开发和生产证书设置，而直接按照 deviceProfile 推送。
-
-## 保存 Installation
-
-在保存 installation 前，要先从 APNs 注册推送所需的 device token，具体步骤：
+SDK 提供默认的 Installation 对象，并**会在默认对象保存成功后持久缓存其数据**。一般情况下，使用默认对象保存 device token。默认对象的获取方式如下：
 
 ```swift
+let installation = LCApplication.default.currentInstallation
+```
+```objc
+AVInstallation *installation = [AVInstallation defaultInstallation];
+```
+
+除了默认的 Installation 对象，你也可以构造新的 Installation 对象，用来存储其它特殊类型的 token（诸如 VoIP 等），构造方式如下：
+
+```swift
+let installation = LCInstallation()
+```
+```objc
+AVInstallation *installation = [[AVInstallation alloc] init];
+```
+
+> **SDK 即时通讯模块会使用默认 Installation 对象的 device token。如需使用即时通讯的离线推送功能，请确保默认 Installation 对象成功保存了 device token。**
+
+Installation 对象的默认字段如下所示：
+
+字段|类型|说明
+---|---|---
+deviceToken|String|推送所需的 Token
+apnsTeamId|String|推送所需的 Team ID
+badge|Number|对应应用通知的标记，主要用于通知标记清零
+channels|Array|订阅频道数组
+deviceProfile|String|自定义证书名称，主要用于多证书推送
+deviceType|String|设备类型，SDK 会自动设置该属性，一般情况下不要随意更改
+apnsTopic|String|应用的 Bundle Identifier，SDK 会自动设置该属性，一般情况下不要随意更改
+timeZone|String|设备所处时区，SDK 会自动设置该属性，一般情况下不要随意更改
+
+可以在 {% if node=='qcloud' %}**控制台 > 存储 > 数据 > `_Installation`**{% else %}[控制台 > 存储 > 数据 > `_Installation`](/dashboard/data.html?appid={{appid}}#/_Installation){% endif %} 查看所有保存成功的 Installation 对象的数据。
+
+### 注册 APNs 获取 Token
+
+在保存 installation 前，要先注册 APNs 来获取推送所需的 token，以 User Notification 为例，具体步骤如下：
+
+```swift
+import LeanCloud
 import UserNotifications
 
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
+    // should setup application firstly.
+    do {
+        try LCApplication.default.set(
+            id: {{appid}},
+            key: {{appkey}},
+            serverURL: "https://xxx.example.com")
+    } catch {
+        print(error)
+        return false
+    }
     
     UNUserNotificationCenter.current().getNotificationSettings { (settings) in
         switch settings.authorizationStatus {
@@ -54,173 +99,85 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 ```objc
+#import <AVOSCloud/AVOSCloud.h>
 #import <UserNotifications/UserNotifications.h>
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [self registerForRemoteNotification];
-    . . .
-}
-
-/**
- * 初始化UNUserNotificationCenter
- */
-- (void)registerForRemoteNotification {
-    // iOS10 兼容
-    if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.0) {
-        // 使用 UNUserNotificationCenter 来管理通知
-        UNUserNotificationCenter *uncenter = [UNUserNotificationCenter currentNotificationCenter];
-        // 监听回调事件
-        [uncenter setDelegate:self];
-        //iOS10 使用以下方法注册，才能得到授权
-        [uncenter requestAuthorizationWithOptions:(UNAuthorizationOptionAlert+UNAuthorizationOptionBadge+UNAuthorizationOptionSound)
-                                completionHandler:^(BOOL granted, NSError * _Nullable error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[UIApplication sharedApplication] registerForRemoteNotifications];
-            });
-                                
-            //TODO:授权状态改变
-            NSLog(@"%@" , granted ? @"授权成功" : @"授权失败");
-        }];
-        // 获取当前的通知授权状态, UNNotificationSettings
-        [uncenter getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
-            NSLog(@"%s\nline:%@\n-----\n%@\n\n", __func__, @(__LINE__), settings);
-            /*
-             UNAuthorizationStatusNotDetermined : 没有做出选择
-             UNAuthorizationStatusDenied : 用户未授权
-             UNAuthorizationStatusAuthorized ：用户已授权
-             */
-            if (settings.authorizationStatus == UNAuthorizationStatusNotDetermined) {
-                NSLog(@"未选择");
-            } else if (settings.authorizationStatus == UNAuthorizationStatusDenied) {
-                NSLog(@"未授权");
-            } else if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
-                NSLog(@"已授权");
-            }
-        }];
-    }
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    if ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0) {
-        UIUserNotificationType types = UIUserNotificationTypeAlert |
-                                       UIUserNotificationTypeBadge |
-                                       UIUserNotificationTypeSound;
-        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:types categories:nil];
-        
-        [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-    } else {
-        UIRemoteNotificationType types = UIRemoteNotificationTypeBadge |
-                                         UIRemoteNotificationTypeAlert |
-                                         UIRemoteNotificationTypeSound;
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:types];
-    }
-#pragma clang diagnostic pop
+    
+    // should setup application firstly.
+    [AVOSCloud setApplicationId:{{appid}}
+                      clientKey:{{appkey}}
+                serverURLString:@"https://xxx.example.com"];
+    
+    [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        switch ([settings authorizationStatus]) {
+            case UNAuthorizationStatusAuthorized:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[UIApplication sharedApplication] registerForRemoteNotifications];
+                });
+                break;
+            case UNAuthorizationStatusNotDetermined:
+                [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:(UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                    if (granted) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [[UIApplication sharedApplication] registerForRemoteNotifications];
+                        });
+                    }
+                }];
+                break;
+            default:
+                break;
+        }
+    }];
+    
+    return YES;
 }
 ```
 
-在 iOS 设备中，Installation 的类是 Object 的子类，使用同样的 API 存储和查询。如果要访问当前应用的 Installation 对象，可以通过如下方法。
+### 保存 Token
 
-```swift
-let installation = LCApplication.default.currentInstallation
-```
-```objc
-AVInstallation *installation = [AVInstallation defaultInstallation];
-```
-
-当你第一次保存 Installation 的时候，它会插入 `_Installation` 表，你可以在 {% if node=='qcloud' %}**控制台 > 存储 > 数据 > `_Installation`**{% else %}[控制台 > 存储 > 数据 > `_Installation`](/dashboard/data.html?appid={{appid}}#/_Installation){% endif %} 查看和查询。当 deviceToken 一被保存，你就可以向这台设备推送消息了。
+注册 APNs 成功后，系统会通过 `didRegisterForRemoteNotificationsWithDeviceToken` 函数返回 deviceToken。一般情况，在该函数里保存 deviceToken 和 apnsTeamId 即可。保存方式如下：
 
 ```swift
 func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    
     LCApplication.default.currentInstallation.set(
         deviceToken: deviceToken,
-        apnsTeamId: "YOUR_APNS_TEAM_ID"
-    )
-    _ = LCApplication.default.currentInstallation.save({ (result) in
+        apnsTeamId: "YOUR_APNS_TEAM_ID")
+    LCApplication.default.currentInstallation.save { (result) in
         switch result {
         case .success:
             break
         case .failure(error: let error):
             print(error)
         }
-    })
-}
-```
-```objc
-// SDK Version >= 11.6.7
-- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    AVInstallation *installation = [AVInstallation defaultInstallation];
-    [installation setDeviceTokenFromData:deviceToken teamId:@"YOUR_APNS_TEAM_ID"];
-    [installation saveInBackground];
-}
-
-// SDK Version <= 11.6.6
-- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    NSUInteger dataLength = deviceToken.length;
-    if (dataLength > 0) {
-        const unsigned char *dataBuffer = deviceToken.bytes;
-        NSMutableString *hexString = [NSMutableString stringWithCapacity:(dataLength * 2)];
-        for (int i = 0; i < dataLength; ++i) {
-            [hexString appendFormat:@"%02.2hhx", dataBuffer[i]];
-        }
-        AVInstallation *installation = [AVInstallation defaultInstallation];
-        [installation setDeviceToken:[hexString copy]];
-        [installation saveInBackground];
     }
 }
 ```
-
-可以像修改 Object 那样去修改 Installation，但是有一些特殊字段可以帮你管理目标设备：
-
-字段|说明
----|---
-badge|应用图标旁边的红色数字，修改 Installation 的这个值将修改应用的 badge。修改应该保存到服务器，以便为以后做 badge 增量式的推送做准备。
-channels|当前设备所订阅的频道数组
-deviceProfile|设备对应的后台自定义证书名称，用于多证书推送
-
-同样，SDK 提供了相应的方法，用于在保存 installation 前构造它。例如，如果希望自定义 deviceProfile 字段，可以这样实现：
-
-```swift
-func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-    LCApplication.default.currentInstallation.set(
-        deviceToken: deviceToken,
-        apnsTeamId: "YOUR_APNS_TEAM_ID"
-    )
-    LCApplication.default.currentInstallation.deviceProfile = "driver-push-certificate"
-    _ = LCApplication.default.currentInstallation.save({ (result) in
-        switch result {
-        case .success:
-            break
-        case .failure(error: let error):
-            print(error)
-        }
-    })
-}
-```
 ```objc
-// SDK Version >= 11.6.7
-- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    AVInstallation *installation = [AVInstallation defaultInstallation];
-    [installation setDeviceTokenFromData:deviceToken teamId:@"YOUR_APNS_TEAM_ID"];
-    [installation setDeviceProfile:@"driver-push-certificate"];
-    [installation saveInBackground];
-}
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
-// SDK Version <= 11.6.6
-- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    NSUInteger dataLength = deviceToken.length;
-    if (dataLength > 0) {
-        const unsigned char *dataBuffer = deviceToken.bytes;
-        NSMutableString *hexString = [NSMutableString stringWithCapacity:(dataLength * 2)];
-        for (int i = 0; i < dataLength; ++i) {
-            [hexString appendFormat:@"%02.2hhx", dataBuffer[i]];
+    [[AVInstallation defaultInstallation] setDeviceTokenFromData:deviceToken
+                                                          teamId:@"YOUR_APNS_TEAM_ID"];
+    [[AVInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            // save succeeded
+        } else if (error) {
+            NSLog(@"%@", error);
         }
-        AVInstallation *installation = [AVInstallation defaultInstallation];
-        [installation setDeviceToken:[hexString copy]];
-        [installation setDeviceProfile:@"driver-push-certificate"];
-        [installation saveInBackground];
-    }
+    }];
 }
 ```
+
+## 多证书场景
+
+对于一些应用，他们在发布和上架时分为不同的版本（司机版、乘客版），但数据和消息是互通的，这种场景下我们允许应用上传多个自定义证书并对不同的设备设置 `deviceProfile`，从而可以用合适的证书给不同版本的应用推送。
+
+当你上传自定义证书时会被要求输入「证书类型」，即 deviceProfile 的名字。当 Installation 上保存了 deviceProfile 时，我们将忽略原先的开发和生产证书设置，而直接按照 deviceProfile 推送。
+
+## 特殊推送类型
+
+对于诸如 VoIP 这类的特殊推送，由于其使用的 apnsTopic 并不是应用的 Bundle Identifier，所以在保存 token 前，需要修改 apnsTopic 为其指定的值。
 
 ## 发送推送消息
 
