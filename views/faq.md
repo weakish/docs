@@ -238,7 +238,7 @@ LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数�
 - 使用 [increment](leanstorage_guide-js.html#更新计数器)（原子计数器）可以原子地更新数字字段。
 - [唯一索引](dashboard_guide.html#给某个_Class_数据建索引) 可以保证在一个字段上有同样值的对象只有一个。
 - [按条件更新对象](leanstorage_guide-js.html#按条件更新对象) 可以仅在满足某个查询条件时进行更新操作；在这个特性的基础上，你可以自己实现更加复杂的 [两阶段提交](http://www.howardliu.cn/translation-perform-two-phase-commits-in-mongodb/)。
-- 在云引擎上还可以借助 [LeanCache](leancache_guide.html) 来实现自定义的 [排他锁](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/lean-cache/redlock.js)。
+- 在云引擎上还可以借助 [LeanCache](leancache_guide.html) 来实现自定义的 [排他锁](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/redlock.js)。
 
 关于这个话题我们还录制了一期公开课视频：[在 LeanCloud 上解决数据一致性问题](https://www.bilibili.com/video/av12823801/)，其中有对上面这些特性的详细介绍，和解决常见场景的实例教程（包括实现两阶段提交）。
 
