@@ -183,6 +183,34 @@ func application(_ application: UIApplication, didRegisterForRemoteNotifications
 
 发送 iOS 推送消息，可以通过 REST API，或者我们的消息推送 web 平台，请进入你的应用管理界面查看。
 
+### 推送环境
+
+推送环境有**测试**和**生产**两种。
+
+* 测试环境的推送消息只能发送给测试环境的 iOS 应用（比如通过 Xcode 安装的 App）
+* 生产环境的推送消息只能发送给生产环境的 iOS 应用（通过 App Store，Ad-Hoc 或者 TestFlight 发布的正式版 App）
+
+通过 SDK 使用 `Push` 发起的推送默认使用生产环境，如果要切换到测试环境，方式如下：
+
+```swift
+do {
+    let environment: LCApplication.Environment = [.pushDevelopment]
+    let configuration = LCApplication.Configuration(environment: environment)
+    try LCApplication.default.set(
+        id: {{appid}},
+        key: {{appkey}},
+        serverURL: "https://xxx.example.com",
+        configuration: configuration)
+} catch {
+    print(error)
+}
+```
+```objc
+[AVPush setProductionMode:false];
+```
+
+<div class="callout callout-info">为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，并在 **[控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list)** 页面中体现。因此，在使用开发证书推送时，请合理设置推送条件。</div>
+
 ## 使用频道
 
 使用频道（channel）可以实现「发布—订阅」的模型。设备订阅某个频道，然后发送消息的时候指定要发送的频道即可。
@@ -304,31 +332,6 @@ AVPush *push = [[AVPush alloc] init];
 [push setMessage:@"The Giants won against the Mets 2-3."];
 [push sendPushInBackground];
 ```
-
-### 选择证书
-
-默认情况下，从客户端发起的推送都是使用你在消息菜单上传的生产证书，如果想使用开发证书，可以通过如下方法：
-
-```swift
-do {
-    let environment: LCApplication.Environment = [.pushDevelopment]
-    let configuration = LCApplication.Configuration(environment: environment)
-    try LCApplication.default.set(
-        id: "APP_ID",
-        key: "APP_KEY",
-        configuration: configuration
-    )
-} catch {
-    print(error)
-}
-```
-```objc
-[AVPush setProductionMode:false];
-[AVPush.push sendPushInBackground];
-```
-
-<div class="callout callout-info">为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，并在 **[控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list)** 页面中体现。因此，在使用开发证书推送时，请合理设置推送条件。</div>
-
 
 ## 高级定向发送
 
