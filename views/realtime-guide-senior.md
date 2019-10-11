@@ -168,26 +168,21 @@ realtime.createIMClient('Tom', {
 ```swift
 class SignatureDelegator: IMSignatureDelegate {
     
+    // 基于 LeanCloud 云引擎的获取客户端登录签名的函数
     func getClientOpenSignature(completion: (IMSignature) -> Void) {
-        // 基于 LeanCloud 云引擎的获取客户端登录签名的函数
+        // 具体实现可以参考章节「云引擎签名范例」
     }
     
     func client(_ client: IMClient, action: IMSignature.Action, signatureHandler: @escaping (IMClient, IMSignature?) -> Void) {
         switch action {
         case .open:
+            // 开启了签名认证的模块，需返回对应的签名
             self.getClientOpenSignature { (signature) in
                 signatureHandler(client, signature)
             }
-        case .createConversation(memberIDs: _):
-            break
-        case .add(memberIDs: _, toConversation: _):
-            break
-        case .remove(memberIDs: _, fromConversation: _):
-            break
-        case .conversationBlocking(_, blockedMemberIDs: _):
-            break
-        case .conversationUnblocking(_, unblockedMemberIDs: _):
-            break
+        default:
+            // 没有开启签名认证的模块，需返回 nil
+            signatureHandler(client, nil)
         }
     }
 }
@@ -200,25 +195,31 @@ do {
 }
 ```
 ```objc
-// AVIMSignatureDataSource 接口的主要方法
-/*!
- 对一个操作进行签名。注意：本调用会在后台线程被执行
- @param clientId - 操作发起人的 ID
- @param conversationId － 操作所属对话的 ID
- @param action － @see AVIMSignatureAction
- @param clientIds － 操作目标的 ID 列表
- @return 一个 AVIMSignature 签名对象
- */
+// 实现 AVIMSignatureDataSource 协议
 - (AVIMSignature *)signatureWithClientId:(NSString *)clientId
-                          conversationId:(NSString * _Nullable)conversationId
+                          conversationId:(NSString *)conversationId
                                   action:(AVIMSignatureAction)action
-                       actionOnClientIds:(NSArray<NSString *> * _Nullable)clientIds;
+                       actionOnClientIds:(NSArray<NSString *> *)clientIds
+{
+    if (action == AVIMSignatureActionOpen) {
+        // 开启了签名认证的模块，需返回对应的签名
+        AVIMSignature *signature;
+        /*
+         ...
+         ...
+         具体实现可以参考章节「云引擎签名范例」
+         */
+        return signature;
+    } else {
+        // 没有开启签名认证的模块，需返回 nil
+        return nil;
+    }
+}
 
-
-// 客户端只需要实现 AVIMSignatureDataSource 协议接口，并绑定到 AVIMClient 实例即可。
+// 设置协议代理者
 AVIMClient *imClient = [[AVIMClient alloc] initWithClientId:@"Tom"];
-imClient.delegate = self;
-imClient.signatureDataSource = signatureDelegate;
+imClient.delegate = delegator;
+imClient.signatureDataSource = signatureDelegator;
 ```
 ```java
 // 这是一个依赖云引擎完成签名的示例
