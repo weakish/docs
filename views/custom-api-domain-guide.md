@@ -246,11 +246,57 @@ do {
 
 #### Java Unified SDK
 
-Java Unified SDK 请参考 [SDK 安装指南](sdk_setup-java.html#初始化) 配置。 
+Java Unified SDK （ `>= 6.0.0`） 请参考 [SDK 安装指南](sdk_setup-java.html#初始化) 配置。 
+
+旧版本 SDK 请参考以下方法配置：
+
+
+<details>
+
+Java Unified SDK (`< 6.0.0`)：
+
+如果是一个普通 Java 项目，则在代码开头添加：
+
+<pre><code>
+import cn.leancloud.core.AVOSService;
+// 配置 SDK 储存
+AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
+// 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
+AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
+// 配置 SDK 推送
+AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
+// 配置 SDK 即时通讯
+AVOSCloud.setServer(AVOSService.RTM, "https://xxx.example.com");
+AVOSCloud.initialize("{{appid}}", "{{appkey}}");
+</code></pre>
+
+如果是一个 Android 项目，则向 `Application` 类的 `onCreate` 方法添加：
+
+<pre><code>
+import cn.leancloud.AVOSCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // 配置 SDK 储存
+        AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
+        // 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
+        AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
+        // 配置 SDK 推送
+        AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
+        // 配置 SDK 即时通讯
+        AVOSCloud.setServer(AVOSService.RTM, "https://xxx.example.com"); 
+
+        // 提供 this、App ID 和 App Key 作为参数
+        // 注意这里千万不要调用 cn.leancloud.core.AVOSCloud 的 initialize 方法，否则会出现 NetworkOnMainThread 等错误。
+        AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
+    }
+}
+</code></pre>
 
 老的 Android SDK 请参考以下方法配置：
 
-<details>
 <pre><code>
 // 配置 SDK 储存
 AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.API, "https://xxx.example.com");
@@ -264,7 +310,7 @@ AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.RTM, "https://xxx.example.com");
 AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 </code></pre>
 
-<p><code>&lt;4.4.4</code> 的版本不支持自定义域名。</p>
+<p><code>&lt;4.4.4</code> 的 Android SDK 不支持自定义域名。</p>
 
 </details>
 
