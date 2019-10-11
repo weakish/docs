@@ -3770,7 +3770,7 @@ if (!error) {
 {% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Android / Java" or platform_name === "Swift" %}
 ## LiveQuery
 
-LiveQuery 衍生于 [`{{ baseQueryClassName }}`](#查询)，但功能更强大。它可以让你无需编写复杂的逻辑便可在客户端之间同步数据，这对于有实时数据同步需求的应用来说很有帮助。
+LiveQuery 衍生于 [`{{ baseQueryClassName }}`](#查询)，并为其带来了更强大的功能。它可以让你无需编写复杂的逻辑便可在客户端之间同步数据，这对于有实时数据同步需求的应用来说很有帮助。
 
 设想你正在开发一个多人协作同时编辑一份文档的应用，单纯地使用 `{{ baseQueryClassName }}` 并不是最好的做法，因为它只具备主动拉取的功能，而应用并不知道什么时候该去拉取。
 
@@ -3854,7 +3854,7 @@ var AV = require('leancloud-storage/live-query');
 
 {% if platform_name === "Objective-C" %}
 ```objc
-AVQuery *query = [AVQuery queryWithClassName:@"Employee"];
+AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 self.liveQuery = [[AVLiveQuery alloc] initWithQuery:query];
 self.liveQuery.delegate = self;
 [self.liveQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
@@ -3865,7 +3865,7 @@ self.liveQuery.delegate = self;
 {% if platform_name === "Swift" %}
 ```swift
 do {
-    let query = LCQuery(className: "Employee")
+    let query = LCQuery(className: "Todo")
     self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in })
     self.liveQuery.subscribe { (result) in
         switch result {
@@ -3882,7 +3882,7 @@ do {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Employee');
+var query = new AV.Query('Todo');
 query.subscribe().then(function (liveQuery) {
   // 订阅成功
 });
@@ -3890,7 +3890,7 @@ query.subscribe().then(function (liveQuery) {
 {% endif %}
 {% if platform_name === "Android / Java" %}
 ```java
-AVQuery<AVObject> query = new AVQuery<>("Employee");
+AVQuery<AVObject> query = new AVQuery<>("Todo");
 AVLiveQuery liveQuery = AVLiveQuery.initWithQuery(query);
 liveQuery.subscribeInBackground(new AVLiveQuerySubscribeCallback() {
     @Override
@@ -3907,11 +3907,11 @@ liveQuery.subscribeInBackground(new AVLiveQuerySubscribeCallback() {
 LiveQuery 不支持内嵌查询，也不支持返回指定属性。
 {% endcall %}
 
-订阅成功后，就可以接收到和 `{{ baseObjectName }}` 相关的更新了。假如在另一个客户端上创建了一个 `Employee` 对象，对象的 `firstName` 设为 `Kelly`，那么下面的代码可以获取到这个新的 `Employee`：
+订阅成功后，就可以接收到和 `{{ baseObjectName }}` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
 
 {% if platform_name === "Objective-C" %}
 ```objc
-AVQuery *query = [AVQuery queryWithClassName:@"Employee"];
+AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 self.liveQuery = [[AVLiveQuery alloc] initWithQuery:query];
 self.liveQuery.delegate = self;
 [self.liveQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
@@ -3919,7 +3919,7 @@ self.liveQuery.delegate = self;
 }];
 - (void)liveQuery:(AVLiveQuery *)liveQuery objectDidCreate:(id)object {
     if (liveQuery == self.liveQuery) {
-        NSLog(@"%@", object[@"firstName"]); // Kelly
+        NSLog(@"%@", object[@"title"]); // Kelly
     }
 }
 ```
@@ -3927,11 +3927,11 @@ self.liveQuery.delegate = self;
 {% if platform_name === "Swift" %}
 ```swift
 do {
-    let query = LCQuery(className: "Employee")
+    let query = LCQuery(className: "Todo")
     self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
         switch event {
         case .create(object: let object):
-            print(object["firstName"] as Any) // Kelly
+            print(object["title"] as Any) // 更新作品集
         default:
             break
         }
@@ -3943,22 +3943,22 @@ do {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Employee');
+var query = new AV.Query('Todo');
 query.subscribe().then(function (liveQuery) {
-  liveQuery.on('create', function (newEmployee) {
-    console.log(newEmployee.get('firstName')); // Kelly
+  liveQuery.on('create', function (newTodo) {
+    console.log(newTodo.get('title')); // 更新作品集
   });
 });
 ```
 {% endif %}
 {% if platform_name === "Android / Java" %}
 ```java
-AVQuery<AVObject> query = new AVQuery<>("Employee");
+AVQuery<AVObject> query = new AVQuery<>("Todo");
 AVLiveQuery liveQuery = AVLiveQuery.initWithQuery(query);
 liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
     @Override
-    public void onObjectCreated(AVObject newEmployee) {
-        System.out.println(newEmployee.getString("firstName")); // Kelly
+    public void onObjectCreated(AVObject newTodo) {
+        System.out.println(newTodo.getString("title")); // 更新作品集
     }
 });
 liveQuery.subscribeInBackground(new AVLiveQuerySubscribeCallback() {
@@ -3972,24 +3972,24 @@ liveQuery.subscribeInBackground(new AVLiveQuerySubscribeCallback() {
 ```
 {% endif %}
 
-此时如果有人把 `Employee` 的 `team` 改为 `财务`，那么下面的代码可以获取到本次更新：
+此时如果有人把 `Todo` 的 `content` 改为 `把我最近画的插画放上去`，那么下面的代码可以获取到本次更新：
 
 {% if platform_name === "Objective-C" %}
 ```objc
-- (void)liveQuery:(AVLiveQuery *)liveQuery objectDidUpdate:(id)updatedEmployee updatedKeys:(NSArray<NSString *> *)updatedKeys {
-    NSLog(@"%@", updatedEmployee[@"team"]); // 财务
+- (void)liveQuery:(AVLiveQuery *)liveQuery objectDidUpdate:(id)updatedTodo updatedKeys:(NSArray<NSString *> *)updatedKeys {
+    NSLog(@"%@", updatedTodo[@"content"]); // 把我最近画的插画放上去
 }
 ```
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
 do {
-    let query = LCQuery(className: "Employee")
+    let query = LCQuery(className: "Todo")
     self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
         switch event {
         case let .update(object: object, updatedKeys: updatedKeys):
             if let key = updatedKeys.first {
-                print(object[key] as Any) // 财务
+                print(object[key] as Any) // 把我最近画的插画放上去
             }
         default:
             break
@@ -4002,8 +4002,8 @@ do {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-liveQuery.on('update', function (updatedEmployee, updatedKeys) {
-  console.log(updatedEmployee.get('team')); // 财务
+liveQuery.on('update', function (updatedTodo, updatedKeys) {
+  console.log(updatedTodo.get('content')); // 把我最近画的插画放上去
 });
 ```
 {% endif %}
@@ -4011,8 +4011,8 @@ liveQuery.on('update', function (updatedEmployee, updatedKeys) {
 ```java
 liveQuery.setEventHandler(new AVLiveQueryEventHandler() {
     @Override
-    public void onObjectUpdated(AVObject updatedEmployee, List<String> updatedKeys) {
-        System.out.println(updatedEmployee.getString("team")); // 财务
+    public void onObjectUpdated(AVObject updatedTodo, List<String> updatedKeys) {
+        System.out.println(updatedTodo.getString("content")); // 把我最近画的插画放上去
     }
 });
 ```
