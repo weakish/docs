@@ -1577,10 +1577,10 @@ do {
     let environment: LCApplication.Environment = [.cloudEngineDevelopment]
     let configuration = LCApplication.Configuration(environment: environment)
     try LCApplication.default.set(
-        id: "APP_ID",
-        key: "APP_KEY",
-        configuration: configuration
-    )
+        id: {{appid}},
+        key: {{appkey}},
+        serverURL: "https://xxx.example.com",
+        configuration: configuration)
 } catch {
     print(error)
 }
