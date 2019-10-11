@@ -318,6 +318,20 @@ AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
 
 请参考 [SDK 安装指南](sdk_setup-dotnet.html#初始化) 配置。 
 
+`< v20190925.1` 的版本请参考以下方法配置：
+
+<details>
+<pre><code>
+AVClient.Initialize(new AVClient.Configuration {
+                ApplicationId = "{{appid}}",
+                ApplicationKey = "{{appkey}}",
+                ApiServer = new Uri("https://xxx.example.com"),
+                EngineServer = new Uri("https://xxx.example.com"),
+                PushServer = new Uri("https://xxx.example.com")
+});
+<code></pre>
+</details>
+
 #### PHP SDK
 
 请参考 [SDK 安装指南](sdk_setup-php.html#初始化) 配置。 
