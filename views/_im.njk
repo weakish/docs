@@ -90,6 +90,11 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
     desc: "Session 没有打开就发送消息，或执行其他操作。常见的错误场景是调用 open session 后直接发送消息，正确的用法是在 Session 打开的回调里执行。"
   },
   {
+    code: "4106",
+    message: "BLACKLISTED",
+    desc: "用户被列入黑名单，禁止使用即时通讯服务。"
+  },
+  {
     code: "4107",
     message: "READ_TIMEOUT",
     desc: "读超时，云端长时间没有收到客户端的数据，切断连接。SDK 包装了心跳包的机制，出现此错误通常是网络问题。SDK 会自动重连，无需人工干预。"
@@ -140,6 +145,11 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
     desc: "应用单位时间内发送消息量超过限制，消息被拒绝。"
   },
   {
+    code: "4117",
+    message: "UNBIND_INSTALLATION_FAILED",
+    desc: "通过即时通讯 SDK 退出登录时，解除退出登录用户与当前使用设备的绑定关系失败。"
+  },
+  {
     code: "4200",
     message: "INTERNAL_ERROR",
     desc: "服务器内部错误，如果反复出现请收集相关线索并 [创建工单](https://leanticket.cn/t/leancloud)，我们会尽快解决。"
@@ -148,6 +158,11 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
     code: "4201",
     message: "SEND_MESSAGE_TIMEOUT",
     desc: "通过 API 发送消息超时。"
+  },
+  {
+    code: "4300",
+    message: "CONVERSATION_INTERNAL_ERROR",
+    desc: "跟对话操作相关的服务器内部错误。如果反复出现请收集相关线索并 [创建工单](https://leanticket.cn/t/leancloud)，我们会尽快解决。"
   },
   {
     code: "4301",
@@ -240,6 +255,41 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
     desc: "对话操作超出了 API 请求限制，需要提升应用级别。"
   },
   {
+    code: "4319",
+    message: "SYSTEM_CONVERSATION_SUBTOPICS_FULL",
+    desc: "系统对话 Topic 数量达到上限。"
+  },
+  {
+    code: "4320",
+    message: "CONVERSATION_OPERATION_UNAUTHORIZED",
+    desc: "没有权限做指定对话操作。"
+  },
+  {
+    code: "4321",
+    message: "UNKNOWN_CONVERSATION_ROLE",
+    desc: "未知对话角色。"
+  },
+  {
+    code: "4322",
+    message: "CONVERSATION_MEMBER_IN_ROLE_FULL",
+    desc: "指定角色成员在对话中数量已达上限。"
+  },
+  {
+    code: "4323",
+    message: "TEMPORARY_CONVERSATION_EXPIRED",
+    desc: "临时对话已过期。"
+  },
+  {
+    code: "4324",
+    message: "CONVERSATION_NEED_OWNER",
+    desc: "对话内必须有「所有者」角色，如果某操作会引起对话「所有者」丢失则会提示该错误。"
+  },
+  {
+    code: "4325",
+    message: "CONVERSATION_MEMBER_INFO_FEATURE_DISABLED",
+    desc: "未开启「对话成员属性」功能。"
+  },
+  {
     code: "4401",
     message: "INVALID_MESSAGING_TARGET",
     desc: "发送消息的对话不存在，或当前用户不在对话中。"
@@ -258,7 +308,67 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
     code: "4404",
     message: "MESSAGE_NOT_FOUND",
     desc: "找不到被操作的消息"
-  }
+  },
+  {
+    code: "4405",
+    message: "MESSAGE_UPDATE_REJECTED_BY_APP",
+    desc: "修改或撤回消息操作被 Hook 拒绝。"
+  },
+  {
+    code: "4406",
+    message: "MESSAGE_EDIT_DISABLED",
+    desc: "未开启「允许通过 SDK 编辑消息」功能。"
+  },
+  {
+    code: "4407",
+    message: "MESSAGE_RECALL_DISABLED",
+    desc: "未开启「允许通过 SDK 撤回消息」功能。"
+  },
+  {
+    code: "4408",
+    message: "MESSAGE_MODIFIED_BY_CENSORSHIP",
+    desc: "消息中包含敏感词而被修改。"
+  },
+  {
+    code: "4501",
+    message: "PUBSUB_INTERNAL_ERROR",
+    desc: "广播消息相关的服务器内部错误。如果反复出现请收集相关线索并 [创建工单](https://leanticket.cn/t/leancloud)，我们会尽快解决。"
+  },
+  {
+    code: "4521",
+    message: "PUBSUB_INTERNAL_ERROR",
+    desc: "广播消息相关的服务器内部错误。如果反复出现请收集相关线索并 [创建工单](https://leanticket.cn/t/leancloud)，我们会尽快解决。"
+  },
+  {
+    code: "4543",
+    message: "BLACKLIST_FULL",
+    desc: "黑名单数量已达上限"
+  },
+  {
+    code: "4544",
+    message: "BLACKLIST_FEATURE_DISABLED",
+    desc: "未开启「黑名单」功能。"
+  },
+  {
+    code: "4546",
+    message: "BLACKLIST_SIGNATURE_FAILED",
+    desc: "「黑名单」功能签名失败。"
+  },
+  {
+    code: "4548",
+    message: "BLOCKED_BY_CONV",
+    desc: "因用户被加入对话黑名单，无法执行本次操作。"
+  },
+  {
+    code: "4561",
+    message: "SILIENCED_MEMBER_LIST_FULL",
+    desc: "对话禁言成员数已达上限。"
+  },
+  {
+    code: "4563",
+    message: "SILIENCED",
+    desc: "用户被加入禁言列表而无法发送消息。"
+  },
 ] %}
 
 {% if format == 'table' %}
