@@ -162,7 +162,7 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
   {
     code: "4300",
     message: "CONVERSATION_INTERNAL_ERROR",
-    desc: "跟对话操作相关的服务器内部错误。如果反复出现请收集相关线索并 [创建工单](https://leanticket.cn/t/leancloud)，我们会尽快解决。"
+    desc: "对话操作引起服务器内部错误。如果反复出现请收集相关线索并 [创建工单](https://leanticket.cn/t/leancloud)，我们会尽快解决。"
   },
   {
     code: "4301",
@@ -255,14 +255,9 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
     desc: "对话操作超出了 API 请求限制，需要提升应用级别。"
   },
   {
-    code: "4319",
-    message: "SYSTEM_CONVERSATION_SUBTOPICS_FULL",
-    desc: "系统对话 Topic 数量达到上限。"
-  },
-  {
     code: "4320",
     message: "CONVERSATION_OPERATION_UNAUTHORIZED",
-    desc: "没有权限做指定对话操作。"
+    desc: "用户在目标对话内所属角色权限不足以执行当前操作。"
   },
   {
     code: "4321",
@@ -272,7 +267,7 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
   {
     code: "4322",
     message: "CONVERSATION_MEMBER_IN_ROLE_FULL",
-    desc: "指定角色成员在对话中数量已达上限。"
+    desc: "目标对话内指定角色成员数量已达上限。"
   },
   {
     code: "4323",
@@ -282,7 +277,7 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
   {
     code: "4324",
     message: "CONVERSATION_NEED_OWNER",
-    desc: "对话内必须有「所有者」角色，如果某操作会引起对话「所有者」丢失则会提示该错误。"
+    desc: "对话内必须有「所有者」角色，如果当前操作会引起对话「所有者」丢失则会提示该错误。"
   },
   {
     code: "4325",
@@ -330,19 +325,9 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
     desc: "消息中包含敏感词而被修改。"
   },
   {
-    code: "4501",
-    message: "PUBSUB_INTERNAL_ERROR",
-    desc: "广播消息相关的服务器内部错误。如果反复出现请收集相关线索并 [创建工单](https://leanticket.cn/t/leancloud)，我们会尽快解决。"
-  },
-  {
-    code: "4521",
-    message: "PUBSUB_INTERNAL_ERROR",
-    desc: "广播消息相关的服务器内部错误。如果反复出现请收集相关线索并 [创建工单](https://leanticket.cn/t/leancloud)，我们会尽快解决。"
-  },
-  {
     code: "4543",
     message: "BLACKLIST_FULL",
-    desc: "黑名单数量已达上限"
+    desc: "黑名单已满，无法继续增添项目进黑名单。"
   },
   {
     code: "4544",
@@ -357,7 +342,7 @@ ack-at | 消息送达到目标设备上的 Unix 时间戳（毫秒），但并�
   {
     code: "4548",
     message: "BLOCKED_BY_CONV",
-    desc: "因用户被加入对话黑名单，无法执行本次操作。"
+    desc: "因用户被加入目标对话黑名单，无法执行本次操作。"
   },
   {
     code: "4561",
