@@ -2261,7 +2261,7 @@ public static Map<String, Object> onConversationRemove(Map<String, Object> param
 
 #### `{% if platformName === "Node.js" %}onIMConversationUpdate{% endif %}{% if platformName === "Python" %}_conversationUpdate{% endif %}{% if platformName === "PHP" %}_conversationUpdate{% endif %}{% if platformName === "Java" %}conversationUpdate{% endif %}`
 
-修改对话属性、设置或取消对话消息提醒，在实际修改之前触发。例如在更新发生时，在云引擎日志中打印出对话的名称：
+修改对话名称、自定义属性，设置或取消对话消息提醒，在实际修改之前触发。例如在更新发生时，在云引擎日志中打印出对话的名称：
 
 {% if platformName === "Node.js" %}
 ```js
