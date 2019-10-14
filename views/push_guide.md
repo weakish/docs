@@ -256,6 +256,7 @@ curl -X POST \
   "apns-priority":     数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅，
   "apns-push-type":    字符串类型，用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert"，
   "url-args":          字符串列表类型，用于 Safari 推送，详情见 APNs 文档关于 url-args 参数的描述，
+  "target-content-id": 字符串类型，详情见 APNs 文档关于 target-content-id 参数的描述，
   "custom-key":        由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
@@ -325,7 +326,7 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
    }
    "collapse-id":             字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅，
    "apns-priority":           数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅
-   "apns-push-type":          字符串类型，用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert"，
+   "apns-push-type":          字符串类型，用于设置推送展示类型，只能为 "background"，"voip"，"complication"，"fileprovider"，"mdm"，"alert"，默认为 "alert"，
    "custom-key":              由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
