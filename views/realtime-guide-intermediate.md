@@ -261,111 +261,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 终端用户在消息发送之后，还可以对自己已经发送的消息进行修改（`Conversation#updateMessage` 方法）或撤回（`Conversation#recallMessage` 方法），目前即时通讯服务端并没有在时效性上进行限制，不过只允许用户修改或撤回自己发出去的消息，对别人的消息进行修改或撤回是被禁止的。
 
-如果 Tom 要 ***撤回一条自己之前发送过的消息***，示例代码如下：
-
-```js
-conversation.recall(oldMessage).then(function(recalledMessage) {
-  // 撤回成功
-  // recalledMessage 是一个 RecalledMessage
-}).catch(function(error) {
-  // 异常处理
-});
-```
-```swift
-do {
-    try conversation.recall(message: oldMessage, completion: { (result) in
-        switch result {
-        case .success(value: let recalledMessage):
-            print(recalledMessage)
-        case .failure(error: let error):
-            print(error)
-        }
-    })
-} catch {
-    print(error)
-}
-```
-```objc
-AVIMMessage *oldMessage = <#MessageYouWantToRecall#>;
-
-[conversation recallMessage:oldMessage callback:^(BOOL succeeded, NSError * _Nullable error, AVIMRecalledMessage * _Nullable recalledMessage) {
-    if (succeeded) {
-        NSLog(@"消息已被撤回。");
-    }
-}];
-```
-```java
-conversation.recallMessage(message, new AVIMMessageRecalledCallback() {
-    @Override
-    public void done(AVIMRecalledMessage recalledMessage, AVException e) {
-        if (null == e) {
-            // 消息撤回成功，可以更新 UI
-        }
-    }
-});
-```
-```cs
-await conversation.RecallAsync(message);
-```
-
-Tom 成功调用 `recallMessage` 方法之后，对话内的其他成员会接收到 `MESSAGE_RECALL` 的事件：
-
-```js
-var { Event } = require('leancloud-realtime');
-conversation.on(Event.MESSAGE_RECALL, function(recalledMessage, reason) {
-  // recalledMessage 为已撤回的消息
-  // 在视图层可以通过消息的 ID 找到原来的消息并用 recalledMessage 替换
-  // reason (可选) 为撤回消息的原因，详见下文修改消息部分的说明。
-});
-```
-```swift
-func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
-    switch event {
-    case .message(event: let messageEvent):
-        switch messageEvent {
-        case let .updated(updatedMessage: updatedMessage, reason: _):
-            if let recalledMessage = updatedMessage as? IMRecalledMessage {
-                print(recalledMessage)
-            }
-        default:
-            break
-        }
-    default:
-        break
-    }
-}
-```
-```objc
-/* 实现 delegate 方法，以处理消息修改和撤回的事件 */
-- (void)conversation:(AVIMConversation *)conversation messageHasBeenUpdated:(AVIMMessage *)message {
-    /* 有消息被修改或撤回 */
-
-    switch (message.mediaType) {
-    case kAVIMMessageMediaTypeRecalled:
-        NSLog(@"message 是一条撤回消息");
-        break;
-    default:
-        NSLog(@"message 是一条更新消息");
-        break;
-    }
-}
-```
-```java
-void onMessageRecalled(AVIMClient client, AVIMConversation conversation, AVIMMessage message) {
-  // message 即为被撤回的消息
-}
-```
-```cs
-tom.OnMessageRecalled += Tom_OnMessageRecalled;
-private void Tom_OnMessageRecalled(object sender, AVIMMessagePatchEventArgs e)
-{
-    // e.Messages 为被修改的消息，它是一个集合，SDK 可能会合并多次的消息撤回统一分发
-}
-```
-
-对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部需要保证数据的一致性，所以会先从缓存中删除这条消息记录，然后再通知应用层。对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（此时消息列表中的消息会直接变少，或者显示撤回提示）。
-
-Tom 除了撤回消息之外，还可以 ***直接修改原来的消息***。这时候不是直接在老的消息对象上修改，而是像发新消息一样创建一个消息实例，然后调用 `Conversation#updateMessage(oldMessage, newMessage)` 方法来向云端提交请求，示例代码如下：
+如果 Tom 想要 ***修改已经发送的消息***，那么并不是直接在老的消息对象上修改，而是像发新消息一样创建一个消息实例，然后调用 `Conversation#updateMessage(oldMessage, newMessage)` 方法来向云端提交请求，示例代码如下：
 
 ```js
 var newMessage = new TextMessage('new message');
@@ -480,6 +376,110 @@ tom.OnMessageUpdated += (sender, e) => {
 对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（这时候消息列表会出现内容变化）。
 
 如果系统修改了消息（例如触发了内置的敏感词过滤功能，或者云引擎的 hook 函数），对话成员（包括发送者）同样会收到 `MESSAGE_UPDATE` 事件。
+
+除了修改消息，Tom 还可以 ***撤回一条自己之前发送过的消息***，示例代码如下：
+
+```js
+conversation.recall(oldMessage).then(function(recalledMessage) {
+  // 撤回成功
+  // recalledMessage 是一个 RecalledMessage
+}).catch(function(error) {
+  // 异常处理
+});
+```
+```swift
+do {
+    try conversation.recall(message: oldMessage, completion: { (result) in
+        switch result {
+        case .success(value: let recalledMessage):
+            print(recalledMessage)
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
+```objc
+AVIMMessage *oldMessage = <#MessageYouWantToRecall#>;
+
+[conversation recallMessage:oldMessage callback:^(BOOL succeeded, NSError * _Nullable error, AVIMRecalledMessage * _Nullable recalledMessage) {
+    if (succeeded) {
+        NSLog(@"消息已被撤回。");
+    }
+}];
+```
+```java
+conversation.recallMessage(message, new AVIMMessageRecalledCallback() {
+    @Override
+    public void done(AVIMRecalledMessage recalledMessage, AVException e) {
+        if (null == e) {
+            // 消息撤回成功，可以更新 UI
+        }
+    }
+});
+```
+```cs
+await conversation.RecallAsync(message);
+```
+
+Tom 成功调用 `recallMessage` 方法之后，对话内的其他成员会接收到 `MESSAGE_RECALL` 的事件：
+
+```js
+var { Event } = require('leancloud-realtime');
+conversation.on(Event.MESSAGE_RECALL, function(recalledMessage, reason) {
+  // recalledMessage 为已撤回的消息
+  // 在视图层可以通过消息的 ID 找到原来的消息并用 recalledMessage 替换
+  // reason (可选) 为撤回消息的原因，详见下文修改消息部分的说明。
+});
+```
+```swift
+func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+    switch event {
+    case .message(event: let messageEvent):
+        switch messageEvent {
+        case let .updated(updatedMessage: updatedMessage, reason: _):
+            if let recalledMessage = updatedMessage as? IMRecalledMessage {
+                print(recalledMessage)
+            }
+        default:
+            break
+        }
+    default:
+        break
+    }
+}
+```
+```objc
+/* 实现 delegate 方法，以处理消息修改和撤回的事件 */
+- (void)conversation:(AVIMConversation *)conversation messageHasBeenUpdated:(AVIMMessage *)message {
+    /* 有消息被修改或撤回 */
+
+    switch (message.mediaType) {
+    case kAVIMMessageMediaTypeRecalled:
+        NSLog(@"message 是一条撤回消息");
+        break;
+    default:
+        NSLog(@"message 是一条更新消息");
+        break;
+    }
+}
+```
+```java
+void onMessageRecalled(AVIMClient client, AVIMConversation conversation, AVIMMessage message) {
+  // message 即为被撤回的消息
+}
+```
+```cs
+tom.OnMessageRecalled += Tom_OnMessageRecalled;
+private void Tom_OnMessageRecalled(object sender, AVIMMessagePatchEventArgs e)
+{
+    // e.Messages 为被修改的消息，它是一个集合，SDK 可能会合并多次的消息撤回统一分发
+}
+```
+
+对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部需要保证数据的一致性，所以会先从缓存中删除这条消息记录，然后再通知应用层。对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（此时消息列表中的消息会直接变少，或者显示撤回提示）。
 
 ### 暂态消息
 
