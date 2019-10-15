@@ -3,6 +3,8 @@
 
 {{ docs.defaultLang('js') }}
 
+{{ docs.useIMLangSpec()}}
+
 # 三，安全与签名、黑名单和权限管理、玩转聊天室和临时对话
 
 ## 本章导读
@@ -1249,7 +1251,7 @@ tom.open(new AVIMClientCallback(){
 ### 消息内容的实时过滤
 
 对于开放聊天室来说，内容的审核和实时过滤是产品运营上的一个基本要求。我们即时通讯服务默认提供了敏感词过滤的功能，多人的 **普通对话、聊天室和系统对话里面的消息都会进行实时过滤**。
-命中的敏感词将会被替换为 `***`。对话成员（包括发送者）会收到 `MESSAGE_UPDATE` 事件。
+命中的敏感词将会被替换为 `***`。对话成员（包括发送者）会收到 `MESSAGE_UPDATE` 事件，应用可以在客户端[监听该事件](realtime-guide-intermediate.html#消息的撤回和修改)，实现相应的业务逻辑。
 
 过滤的词库由 LeanCloud 统一提供，在 [控制台 > 消息 > 即时通讯 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中开启「消息敏感词实时过滤功能」即可使用。同时我们也支持开发者自定义敏感词词库，只需上传敏感词文件即可。
 
