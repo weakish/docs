@@ -242,7 +242,7 @@ adb shell am start -W -a "android.intent.action.VIEW"  \
 
 ##### 添加依赖
 
-在 storage-core library 中已经办好了应用内搜索与 UI 无关的接口，在 leancloud-search library 中我们加入了一个 SearchActivity UI 类，主要是用来演示搜索结果的展示。大家可以根据自己的需要选择不同的 library 依赖：
+在 storage-core library 中已经包含了应用内搜索与 UI 无关的接口，在 leancloud-search library 中我们加入了一个 SearchActivity UI 类，主要是用来演示搜索结果的展示。大家可以根据自己的需要选择不同的 library 依赖：
 1. 如果希望直接使用我们的 SearchActivity 类来展示搜索结果，可以从 leancloud-search 开始依赖；
 2. 如果希望自己定制搜索和结果页面，可以借鉴 SearchActivity 的实现，自己实现 UI 层逻辑，而从 storage-core 开始依赖。
 
@@ -325,7 +325,7 @@ searchQuery.setSortBuilder(builder);
 由于每个应用的数据、UI展现要求都有很大的差别，所以单一的搜索组件界面仅仅能够满足较为简单的要求，所以我们将数据接口和 UI 展示进行了分离，开发者可以在 AVSearchQuery 中配置展示的 `title` 和 `highlights` 属性，来动态改变 SearchActivity 中展示的内容。配置 API 如下：
 ```
   /**
-   * 此选项为AVOSCloud SearchActivity使用 指定Title所对应的Field
+   * 指定 Title 所对应的 Field。
    *
    * @param titleAttribute
    */
@@ -333,7 +333,7 @@ searchQuery.setSortBuilder(builder);
 
   /**
    * 设置返回的高亮语法，默认为"*"
-   * 语法规则可以参考　　http://www.elasticsearch.org/guide/en/elasticsearch/reference/current
+   * 语法规则可以参考 http://www.elasticsearch.org/guide/en/elasticsearch/reference/current
    * /search-request-highlighting.html#highlighting-settings
    *
    * @param hightlights
