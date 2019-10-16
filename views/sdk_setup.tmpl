@@ -56,50 +56,27 @@ Java SDK 一共包含如下几个模块：
 ### 包依赖管理工具安装
 
 {% if platform_name === "Objective-C" %}
-通过 [CocoaPods](http://www.cocoapods.org) 安装可以最大化地简化安装过程。
+通过 [CocoaPods](https://cocoapods.org) 安装可以最大化地简化安装过程。
 
-首先，在项目根目录下的 `Podfile` 文件中添加以下 pods：
+首先，确保开发环境中已经安装了最新版 `pod`。如果没有，请参考官网的 [INSTALL](https://cocoapods.org) 文档。
 
-```ruby
-pod 'AVOSCloud'   # 数据存储、短信、社交、云引擎调用等基础服务模块
-pod 'AVOSCloudIM' # 即时通讯模块
-```
-
-如需使用 [LiveQuery](leanstorage_guide-js.html#livequery)，还需添加以下 pod：
-
-```ruby
-pod 'AVOSCloudLiveQuery'
-```
-
-{% call docs.noteWrap() %}
-从 v3.4.0 开始，不再根据平台区分 pod 名称。同一个模块在所有平台上的 pod 名称相同。CocoaPods 会根据 `Podfile` 中的 `platform` 信息安装相应的源文件。带有平台后缀的旧的 pod，例如 `AVOSCloud-watchOS`、`AVOSCloudIM-OSX` 等不再更新。如果要更新到 v3.4.0 及以后的版本，请将 pod 的平台后缀去掉。
-{% endcall %}
-
-然后在项目根目录执行 `pod install` 命令，执行成功后，SDK 就集成到项目中了。
-{% endif %}
-{% if platform_name === "Swift" %}
-[CocoaPods](https://cocoapods.org) 是开发 macOS 和 iOS 应用程序的一个第三方库的依赖管理工具，通过它可以定义自己的依赖关系（称作 pods），并且随着时间的推移，它会让整个开发环境中对第三方库的版本管理变得非常方便。具体可以参考 [Using CocoaPods](https://guides.cocoapods.org/using/index.html)。
-
-首先确保开发环境中已经安装了 Ruby（macOS 系统自带 Ruby，建议安装 Xcode，Xcode 附带的 Ruby 版本较新），然后执行以下命令安装 cocoapods：
+接着，在项目根目录下通过命令行工具执行下列命令生成 `Podfile` 文件：
 
 ```sh
-$ sudo gem install cocoapods
+$ pod init
 ```
 
-如果遇到网络问题无法从国外主站上直接下载，我们推荐一个国内的镜像：[RubyGems 镜像](https://gems.ruby-china.com/)。
-
-在项目根目录下创建一个名为 `Podfile` 的文件（无扩展名），并添加以下内容：
+参考 [GET STARTED](https://cocoapods.org) 文档，在 `Podfile` 文件中的 `target` 里添加以下 pod 依赖：
 
 ```ruby
-target 'YOUR_APP_TARGET' do # 替换 YOUR_APP_TARGET 为你的应用名称。
-    use_frameworks!
-    inhibit_all_warnings!
-
-    pod 'LeanCloud', '~> SDK_VERSION' # 一般替换 SDK_VERSION 为最新版本的号码，最新版可以在 https://github.com/leancloud/swift-sdk/releases 查看到。
-end
+pod 'AVOSCloud'           # 数据存储、短信、推送、云引擎等基础服务模块，必选
+pod 'AVOSCloudIM'         # 即时通讯模块，可选
+pod 'AVOSCloudLiveQuery'  # LiveQuery 模块，可选
 ```
 
-执行以下命令中的任意一条来集成 SDK：
+> **注意**，`AVOSCloudIM` 依赖了 `AVOSCloud`，`AVOSCloudLiveQuery` 依赖了 `AVOSCloudIM`，所以不同模块的版本号必需保持一致。
+
+最后，在项目根目录下执行下列任意命令，集成最新的 SDK：
 
 ```sh
 $ pod update
@@ -111,9 +88,53 @@ $ pod update
 $ pod install --repo-update
 ```
 
-它们的区别详见 [官方文档](https://guides.cocoapods.org/using/pod-install-vs-update.html)。
+集成 SDK 成功后，使用项目根目录下 **`<项目名称>.xcworkspace`** 来打开项目。
+{% endif %}
+{% if platform_name === "Swift" %}
+通过 [CocoaPods](https://cocoapods.org) 或者 [Swift Package Manager](https://developer.apple.com/documentation/swift_packages) 安装可以最大化地简化安装过程。
+
+#### CocoaPods
+
+首先，确保开发环境中已经安装了最新版 `pod`。如果没有，请参考官网的 [INSTALL](https://cocoapods.org) 文档。
+
+接着，在项目根目录下通过命令行工具执行下列命令生成 `Podfile` 文件：
+
+```sh
+$ pod init
+```
+
+参考 [GET STARTED](https://cocoapods.org) 文档，在 `Podfile` 文件中的 `target` 里添加 pod 依赖：
+
+```ruby
+pod 'LeanCloud'
+```
+
+或者使用 [Subspecs](https://guides.cocoapods.org/syntax/podspec.html#subspec) 方式：
+
+```ruby
+pod 'LeanCloud/Foundation' # 数据存储、短信、推送、云引擎等基础服务模块，必选
+pod 'LeanCloud/RTM'        # 即时通讯、LiveQuery 模块，可选
+```
+
+> **注意**，`LeanCloud/RTM` 依赖了 `LeanCloud/Foundation`，所以不同模块的版本号必需保持一致。
+
+最后，在项目根目录下执行下列任意命令，集成最新的 SDK：
+
+```sh
+$ pod update
+```
+
+或者
+
+```sh
+$ pod install --repo-update
+```
 
 集成 SDK 成功后，使用项目根目录下 **`<项目名称>.xcworkspace`** 来打开项目。
+
+#### Swift Package Manager
+
+参考 [Apple 官方提供的集成文档](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app)，添加 [Swift SDK Repo](https://github.com/leancloud/swift-sdk) 即可。
 {% endif %}
 {% if platform_name === "Android" %}
 #### Gradle
@@ -316,58 +337,24 @@ $ gradle clean assemble
 {% if platform_name === "Objective-C" %}
 #### 下载源码
 
-首先将 SDK 仓库 clone 到项目根目录：
-
-```sh
-git clone "https://github.com/leancloud/objc-sdk.git" leancloud-objc-sdk
-```
-
-然后 checkout 版本。SDK 的版本号是通过 tag 标记的，可以使用以下命令 checkout 最新版本：
-
-```sh
-cd leancloud-objc-sdk
-git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
-```
+在 SDK 下载页面，下载最新版的源码。
 
 #### 集成 SDK
 
-将 SDK 集成到到项目中有以下两种方式，**任选一种即可**：
-
-- 将 SDK 的 `xcodeproj` 文件直接添加到项目中。
-- 将 SDK 编译成 framework 再添加到项目中。
-
-##### 集成 `xcodeproj`
-
-将 `AVOS`/`AVOS.xcodeproj` 项目文件拖入项目，作为 subproject：
+将 `AVOS`/`AVOS.xcodeproj` 项目文件拖入示例项目，作为 subproject：
 
 ![「AVOS.xcodeproj」会出现在项目根目录下。](images/quick_start/ios/subproject.png)
 
-接着为该项目设置 Build Phases，在 **Link Binary With Libraries** 下面添加如下内容：
+接着为示例项目连接依赖库，在 **xcodeproj > target > general > frameworks** 添加如下内容：
 
-![「Workspace」中的「AVOSCloud.framework from 'AVOSCloud-iOS' target in 'AVOS' project」和「AVOSCloudIM.framework from 'AVOSCloudIM-iOS' target in 'AVOS' project」。](images/quick_start/ios/link-binary.png)
+![「AVOSCloud.framework」，「AVOSCloudIM.framework」和「AVOSCloudLiveQuery.framework。」](images/quick_start/ios/link-binary.png)
 
-上图选择了支持 iOS 平台的 `AVOSCloud` 与 `AVOSCloudIM` 两个 frameworks 用来举例。请根据实际需要来选择支持的平台以及要使用的模块。
-
-#### 添加系统依赖
-
-然后添加 SDK 依赖的系统 framework 和 library：
-
-  * `libz`
-  * `libc++`
-  * `libicucore`
-  * `libsqlite3`
-  * `SystemConfiguration.framework`
-  * `MobileCoreServices.framework`
-  * `CoreTelephony.framework`
-  * `CoreLocation.framework`
-
-就像下面这样：
-
-![上面列出的这些 framework 和 library 出现在「Link Binary With Libraries」里面。](images/quick_start/ios/system-dependency.png)
-
-最后在 **Other Linker Flags** 中添加 `-ObjC`。
+> 上图选择了 iOS 平台的 `AVOSCloud`，`AVOSCloudIM` 以及 `AVOSCloudLiveQuery` 三个 framework。请根据实际需要来选择支持的平台以及要使用的模块。
 
 这样就集成完毕了。
+{% endif %}
+{% if platform_name === "Swift" %}
+> 下载 Swift SDK 源码后，也需要等待 Swift Package Manager 下载并集成其它依赖，所以推荐直接使用 Swift Package Manager。
 {% endif %}
 {% if platform_name === "Android" %}
 对照以下包文件及其对应的功能模块，开发者可以自行 [编译源代码](https://github.com/leancloud/android-sdk-all/blob/master/README.md#%E7%BC%96%E8%AF%91) 来得到所需的包文件。
@@ -754,30 +741,24 @@ PM> Install-Package LeanCloud.Realtime
 
 ## 初始化
 
-首先进入 [控制台 > 设置 > 应用 Key](/dashboard/app.html?appid={{appid}}#/key) 来获取 App ID 以及 App Key。
+首先进入 [控制台 > 设置 > 应用 Key](/dashboard/app.html?appid={{appid}}#/key) 来获取 **App ID**，**App Key** 以及**服务器地址**。
 
 {% if platform_name === "Objective-C" %}
-打开 `AppDelegate` 文件，导入基础模块：
+打开 `AppDelegate` 文件，导入基础模块头文件：
 
 ```objc
 #import <AVOSCloud/AVOSCloud.h>
 ```
 
-然后粘贴下列代码到 `application:didFinishLaunchingWithOptions:` 方法中：
+然后在 `application:didFinishLaunchingWithOptions:` 方法中设置 App ID，App Key 以及服务器地址：
 
 ```objc
-[AVOSCloud setApplicationId:@"{{appid}}" clientKey:@"{{appkey}}" serverURLString:@"https://xxx.example.com"];
+[AVOSCloud setApplicationId:{{appid}}
+                  clientKey:{{appkey}}
+            serverURLString:"https://xxx.example.com"];
 ```
 
-在 **v11.4.0 版本以前** 使用 **国际版** 需要增加以下代码：
-
-```objc
-[AVOSCloud setServiceRegion:AVServiceRegionUS];
-```
-
-在 **v11.4.0 版本及之后** 使用 **国际版** 无需增加上述代码，SDK 会自动判断 Region。
-
-{{ docs.alert("在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Region 的初始化。") }}
+{{ docs.alert("在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Server URL 的初始化。") }}
 {% endif %}
 {% if platform_name === "Swift" %}
 打开 `AppDelegate.swift` 文件，添加下列导入语句到头部：
@@ -786,7 +767,7 @@ PM> Install-Package LeanCloud.Realtime
 import LeanCloud
 ```
 
-然后粘贴下列代码到 `application(_:didFinishLaunchingWithOptions:)` 函数内：
+然后在 `application(_:didFinishLaunchingWithOptions:)` 函数内设置 App ID，App Key 以及服务器地址：
 
 ```swift
 do {
@@ -798,6 +779,8 @@ do {
     print(error)
 }
 ```
+
+{{ docs.alert("在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Server URL 的初始化。") }}
 {% endif %}
 {% if platform_name === "Android" %}
 然后新建一个 Java Class，名字叫做 **MyLeanCloudApp**，让它继承自 **Application** 类，实例代码如下：
@@ -1028,13 +1011,13 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
 
 {% if platform_name === "Objective-C" %}
 ```objc
-// 放在 SDK 初始化语句 [AVOSCloud setApplicationId:] 后面，只需要调用一次即可
+// 在 Application 初始化代码执行之前执行
 [AVOSCloud setAllLogsEnabled:YES];
 ```
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-// 放在 SDK 初始化语句 LCApplication.default.set 前面，只需要调用一次即可
+// 在 Application 初始化代码执行之前执行
 LCApplication.logLevel = .all
 ```
 {% endif %}
@@ -1153,7 +1136,7 @@ round-trip min/avg/max/stddev = 6.288/7.984/9.689/0.997 ms
 ```
 
 {% if platform_name === "Objective-C" %}
-下面来试着向 LeanCloud 云端保存一条数据，将下面的代码拷贝到 `viewDidLoad` 方法或其他在应用运行时会被调用的方法中：
+下面来试着向 LeanCloud 云端保存一条数据，将下面的代码拷贝到 `viewDidLoad` 方法或其它在应用运行时会被调用的方法中：
 
 ```objc
 AVObject *testObject = [AVObject objectWithClassName:@"TestObject"];
@@ -1164,19 +1147,15 @@ AVObject *testObject = [AVObject objectWithClassName:@"TestObject"];
 然后，点击 `Run` 运行调试，真机和虚拟机均可。
 {% endif %}
 {% if platform_name === "Swift" %}
-然后在项目中编写如下测试代码：
+下面来试着向 LeanCloud 云端保存一条数据，将下面的代码拷贝到 `viewDidLoad` 函数或其它在应用运行时会被调用的函数中：
 
 ```swift
 do {
     let testObject = LCObject(className: "TestObject")
     try testObject.set("words", value: "Hello world!")
-    _ = testObject.save { result in
-        switch result {
-        case .success:
-            break
-        case .failure(let error):
-            print(error)
-        }
+    let result = testObject.save()
+    if let error = result.error {
+        print(error)
     }
 } catch {
     print(error)
