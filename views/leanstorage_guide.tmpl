@@ -4974,7 +4974,8 @@ thumbnail_url = avatar.get_thumbnail_url(width=100, height=100)
 {% if platform_name === "PHP" %}
 ```php
 $file = File::createWithUrl("test.jpg", "文件-url");
-$file->getThumbnailUrl(100, 100);
+// 获得宽度为 100 像素，高度 200 像素的缩略图 
+$file->getThumbUrl(100, 200);
 ```
 {% endif %}
 {% if platform_name === "Android / Java" %}
