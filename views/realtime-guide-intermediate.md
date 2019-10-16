@@ -255,13 +255,11 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 }
 ```
 
-### 消息的撤回和修改
+### 修改消息
 
-> 需要在 [控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 中启用「允许通过 SDK 编辑消息」和「允许通过 SDK 撤回消息」。
+在 [控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 启用 「允许通过 SDK 编辑消息」后，终端用户可以对自己已经发送的消息进行修改（`Conversation#updateMessage` 方法）。目前即时通讯服务端并没有在时效性上进行限制，不过只允许用户修改自己发出去的消息，不允许修改别人的消息。
 
-终端用户在消息发送之后，还可以对自己已经发送的消息进行修改（`Conversation#updateMessage` 方法）或撤回（`Conversation#recallMessage` 方法），目前即时通讯服务端并没有在时效性上进行限制，不过只允许用户修改或撤回自己发出去的消息，对别人的消息进行修改或撤回是被禁止的。
-
-如果 Tom 想要 ***修改已经发送的消息***，那么并不是直接在老的消息对象上修改，而是像发新消息一样创建一个消息实例，然后调用 `Conversation#updateMessage(oldMessage, newMessage)` 方法来向云端提交请求，示例代码如下：
+修改已经发送的消息，并不是直接在老的消息对象上修改，而是像发新消息一样创建一个消息实例，然后调用 `Conversation#updateMessage(oldMessage, newMessage)` 方法来向云端提交请求，示例代码如下：
 
 ```js
 var newMessage = new TextMessage('new message');
@@ -315,7 +313,7 @@ var newMessage = new AVIMTextMessage("修改后的消息内容");
 await conversation.UpdateAsync(oldMessage, newMessage);
 ```
 
-Tom 将消息修改成功之后，对话内的其他成员会立刻接收到 `MESSAGE_UPDATE` 事件：
+消息修改成功之后，对话内的其他成员会立刻接收到 `MESSAGE_UPDATE` 事件：
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -377,7 +375,13 @@ tom.OnMessageUpdated += (sender, e) => {
 
 如果系统修改了消息（例如触发了内置的敏感词过滤功能，或者云引擎的 hook 函数），对话成员（包括发送者）同样会收到 `MESSAGE_UPDATE` 事件。
 
-除了修改消息，Tom 还可以 ***撤回一条自己之前发送过的消息***，示例代码如下：
+### 撤回消息
+
+除了修改消息，终端用户还可以撤回一条自己之前发送过的消息。
+和修改消息类似，这一功能需要在控制台启用（[控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 启用「允许通过 SDK 撤回消息」）。
+同样，即时通讯服务端并没有在时效性上进行限制，不过只允许用户撤回自己发出去的消息，不允许撤回别人的消息。
+
+撤回消息调用 `Conversation#recallMessage` 方法，示例代码如下：
 
 ```js
 conversation.recall(oldMessage).then(function(recalledMessage) {
@@ -424,7 +428,7 @@ conversation.recallMessage(message, new AVIMMessageRecalledCallback() {
 await conversation.RecallAsync(message);
 ```
 
-Tom 成功调用 `recallMessage` 方法之后，对话内的其他成员会接收到 `MESSAGE_RECALL` 的事件：
+成功撤回消息后，对话内的其他成员会接收到 `MESSAGE_RECALL` 的事件：
 
 ```js
 var { Event } = require('leancloud-realtime');
