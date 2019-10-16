@@ -298,7 +298,7 @@ public class KeepAliveSignatureFactory implements SignatureFactory {
 }
 
 // 将签名工厂类的实例绑定到 AVIMClient 上
-AVIMClient.setSignatureFactory(new KeepAliveSignatureFactory());
+AVIMOptions.getGlobalOptions().setSignatureFactory(new KeepAliveSignatureFactory());
 ```
 ```cs
 // 基于云引擎完成签名的 ISignatureFactory 接口实现

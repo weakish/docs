@@ -1301,7 +1301,7 @@ do {
 [AVIMClient setUnreadNotificationEnabled:YES];
 ```
 ```java
-AVIMClient.setUnreadNotificationEnabled(true);
+AVIMOptions.getGlobalOptions().setUnreadNotificationEnabled(true);
 ```
 ```cs
 // 暂不支持
