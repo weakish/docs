@@ -192,6 +192,33 @@ AVInstallation.getCurrentInstallation().saveInBackground();
 
 在调用 `AVOSCloud.initialize` 之后，需要调用 `PushService.setDefaultChannelId(context, channelid)` 设置通知展示的默认 `channel`，否则消息无法展示。Channel ID 的解释请阅读 Google 官方文档 [Creating a notification](https://developer.android.com/training/notify-user/channels.html)。
 
+另外，我们的推送服务也支持多个推送 Channel。在客户端，开发者可以通过调用 `PushService` 的如下方法创建新的通知 Channel（也可以自己调用底层 API 创建）：
+```
+  public static void createNotificationChannel(Context context, String channelId, String channelName,
+                                            String description, int importance,
+                                            boolean enableLights, int lightColor,
+                                            boolean enableVibration, long[] vibrationPattern)
+```
+
+记下这里的 `channelId`，因为之后发送推送通知的时候，我们还需要用到它。在发送推送请求的时候，通过 `_notificationChannel` 这个自定义的关键字可以选择不同的 channel 进行消息展示。
+
+例如如下的请求会在客户端通知 id 为 “1” 的通道进行显示：
+
+```
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {"key" : "value"}
+        "data": {
+          "alert": "消息内容",
+          "title": "显示在通知栏的标题",
+          "_notificationChannel": "1"
+        }
+     }' \
+  https://{{host}}/1.1/push
+```
 
 ## 推送消息
 

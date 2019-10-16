@@ -1,4 +1,5 @@
 {% import "views/_helper.njk" as docs %}
+{% from "views/_data.njk" import libVersion as version %}
 # 应用内搜索和 DeepLink 开发指南
 
 在应用内使用全文搜索是一个很常见的需求。例如一个阅读类的应用，里面有很多有价值的文章，开发者会提供一个搜索框，让用户键入关键字后就能查找到应用内相关的文章，并按照相关度排序，就好像我们打开浏览器用 Google 搜索关键字一样。
@@ -188,6 +189,8 @@ https://{{host}}/1.1/go/com.leancloud.todo/classes/Todo/5371f3a9e4b02f7aee2c9a18
   }
 ```
 
+开发者可以参考我们的示例代码：[ResultItemActivity.java](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/leancloud-search-sample/src/main/java/cn/leancloud/demo/leancloud_search_sample/ResultItemActivity.java)。
+
 我们通过 adb 的 am 命令来测试配置是否有效，如果能够正常地调用 `CreateTodo`页面，则证明配置正确：
 
 ``` sh
@@ -237,13 +240,23 @@ adb shell am start -W -a "android.intent.action.VIEW"  \
 
 #### Android 集成
 
-##### 导入SDK
+##### 添加依赖
 
-下载 [应用内搜索模块](sdk_down.html)，解压缩 `avossearch.zip`，将 `libs` 下的 `avossearch-v{version}.jar` 包加入你的 `libs` 下面。
+在 storage-core library 中已经办好了应用内搜索与 UI 无关的接口，在 leancloud-search library 中我们加入了一个 SearchActivity UI 类，主要是用来演示搜索结果的展示。大家可以根据自己的需要选择不同的 library 依赖：
+1. 如果希望直接使用我们的 SearchActivity 类来展示搜索结果，可以从 leancloud-search 开始依赖；
+2. 如果希望自己定制搜索和结果页面，可以借鉴 SearchActivity 的实现，自己实现 UI 层逻辑，而从 storage-core 开始依赖。
 
-之后，你需要将 `res` 下的资源文件夹拷贝并且合并到你工程的 `res` 目录下，更改资源文件的内容并不影响 SDK 工作，但是请不要改动资源的文件名和文件内资源 ID。
-
-应用内搜索组件的资源文件都以 `leancloud_search` 开头。
+下面的示例我们按照第一种方式来进行说明。首先，修改项目的 build.gradle 文件，增加如下内容：
+```
+    implementation("cn.leancloud:leancloud-search:{{ version.unified }}@aar")
+    implementation("cn.leancloud:storage-android:{{ version.unified }}")
+    implementation("cn.leancloud:storage-core:{{ version.unified }}") {
+        exclude group: 'com.alibaba', module: 'fastjson'
+        exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+    }
+    implementation "com.alibaba:fastjson:1.1.71.android"
+    implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
+```
 
 ##### 添加代码，实现基础功能
 
@@ -252,13 +265,17 @@ adb shell am start -W -a "android.intent.action.VIEW"  \
 打开 `AndroidManifest.xml` 文件，在里面添加需要用到的 activity 和需要的权限:
 
 ``` xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <application...>
-     <activity
-      android:name="com.avos.leancloud.search.SearchActivity">
-     </activity>
-  </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <application...>
+       <activity
+        android:name="cn.leancloud.search.SearchActivity">
+       </activity>
+    </application>
 ```
 
 注：由于一些 UI 的原因，**应用内搜索的最低 API level 要求是 12**，如你需要更低的版本支持，请参照文档中的高级定制部分进行开发。
@@ -268,7 +285,11 @@ adb shell am start -W -a "android.intent.action.VIEW"  \
 ``` java
 AVSearchQuery searchQuery = new AVSearchQuery("keyword");
 SearchActivity.setHighLightStyle("<font color='#E68A00'>");//通过这个方法，你可以像指定html tag一样设定搜索匹配字符的高亮风格
-searchQuery.search();//即可打开一个显式搜索结果的Activity
+SearchActivity activity = new SearchActivity();
+activity.setSearchQuery(searchQuery);
+Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+intent.putExtra(AVSearchQuery.DATA_EXTRA_SEARCH_KEY, JSON.toJSONString(searchQuery));
+startActivity(intent);//即可打开一个显式搜索结果的Activity
 ```
 
 ###### 结果排序
@@ -301,32 +322,26 @@ searchQuery.setSortBuilder(builder);
 
 ##### 高级定制指南
 
-由于每个应用的数据、UI展现要求都有很大的差别，所以单一的搜索组件界面仅仅能够满足较为简单的要求，所以我们将数据接口开放出来以便你能够方便的定制属于你自己的应用内搜索结果页面。
-
-``` java
-    AVSearchQuery search = new AVSearchQuery("test-query");
-    search.setLimit(100);
-    search.findInBackgroud(new FindCallback<AVObject>() {
-
-    @Override
-    public void done(List<AVObject> objects, AVException exception) {
-      if (exception == null) {
-       //你可以使用 objects来展现自己的UI
-       for(AVObject o : objects){
-        //这里可以得到搜索结果和你的应用所对应的AppUrl
-        String appUrl = o.getString(AVConstants.AVSEARCH_APP_URL);
-        //这里可以得到搜索结果对应的语法高亮
-        Map<String,List<String>> resultHighLights = ((Map<String, List<String>>)) o.get(AVConstants.AVSEARCH_HIGHTLIGHT);
-       }
-      } else {
-       //Exception happened
-      }
-      }
-    }
-    });
+由于每个应用的数据、UI展现要求都有很大的差别，所以单一的搜索组件界面仅仅能够满足较为简单的要求，所以我们将数据接口和 UI 展示进行了分离，开发者可以在 AVSearchQuery 中配置展示的 `title` 和 `highlights` 属性，来动态改变 SearchActivity 中展示的内容。配置 API 如下：
 ```
+  /**
+   * 此选项为AVOSCloud SearchActivity使用 指定Title所对应的Field
+   *
+   * @param titleAttribute
+   */
+  public void setTitleAttribute(String titleAttribute);
 
-你也可以参考 [我们的 `SearchActivity`](https://github.com/leancloud/leancloud-sdk/blob/master/android/avossearch/src/com/avos/avoscloud/search/SearchActivity.java) 来更好的指定你自己的搜索结果页面。
+  /**
+   * 设置返回的高亮语法，默认为"*"
+   * 语法规则可以参考　　http://www.elasticsearch.org/guide/en/elasticsearch/reference/current
+   * /search-request-highlighting.html#highlighting-settings
+   *
+   * @param hightlights
+   */
+  public void setHightLights(String hightlights);
+
+```
+也可以参考 [我们的 `SearchActivity`](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/leancloud-search/src/main/java/cn/leancloud/search/SearchActivity.java) 来更好的指定你自己的搜索结果页面。
 
 ##### 分页查询
 

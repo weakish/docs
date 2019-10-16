@@ -373,8 +373,8 @@ dependencies {
       exclude group: 'com.alibaba', module: 'fastjson'
       exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
   }
-  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-  implementation 'com.alibaba:fastjson:1.1.70.android'
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+  implementation 'com.alibaba:fastjson:1.1.71.android'
   implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
@@ -471,6 +471,17 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用小
 ### 小米推送通知栏消息的点击事件
 
 当小米通知栏消息被点击后，如果已经设置了 [自定义 Receiver](android_push_guide.html#自定义_Receiver)，则 SDK 会发送一个 action 为 `com.avos.avoscloud.mi_notification_action` 的 broadcast。如有需要，开发者可以通过订阅此消息获取点击事件，否则 SDK 会默认打开 [启动推送服务](android_push_guide.html#启动推送服务) 对应设置的 Activity。
+
+### 小米推送国际版的使用
+
+MIUI 国际版也可以使用小米推送，LeanCloud 混合推送也进行了支持。与国内版不同的是，国际版的开发者，在 `AVOSCloud.initialize` 时需要调用以下函数：
+
+```java
+AVMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
+```
+
+之后的使用就和国内版本一样了。
+
 
 ## 魅族推送
 
