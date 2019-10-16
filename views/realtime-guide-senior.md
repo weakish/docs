@@ -1253,7 +1253,7 @@ tom.open(new AVIMClientCallback(){
 对于开放聊天室来说，内容的审核和实时过滤是产品运营上的一个基本要求。我们即时通讯服务默认提供了敏感词过滤的功能，多人的 **普通对话、聊天室和系统对话里面的消息都会进行实时过滤**。
 命中的敏感词将会被替换为 `***`。对话成员（包括发送者）会收到 `MESSAGE_UPDATE` 事件，应用可以在客户端[监听该事件](realtime-guide-intermediate.html#修改消息)，实现相应的业务逻辑。
 
-过滤的词库由 LeanCloud 统一提供。商用版应用还支持由开发者追加自定义敏感词词库，只需在 [控制台 > 消息 > 即时通讯 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 开启「自定义消息敏感词实时过滤」，并上传敏感词文件。
+过滤的词库由 LeanCloud 统一提供。商用版应用还支持开发者使用自定义敏感词词库，只需在 [控制台 > 消息 > 即时通讯 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 开启「自定义消息敏感词实时过滤」，并上传敏感词文件。开发者上传的自定义敏感词词库会替换 LeanCloud 提供的默认词库。
 
 如果开发者有较为复杂的过滤需求，我们推荐使用 [云引擎 hook `_messageReceived`](realtime-guide-systemconv.html#_messageReceived) 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
 
