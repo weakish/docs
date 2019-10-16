@@ -1481,7 +1481,46 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 
 尽管即时通讯服务默认已经包含了丰富的消息类型，但是我们依然支持开发者根据业务需要扩展自己的消息类型，例如允许用户之间发送名片、红包等等。这里「名片」和「红包」就可以是应用层定义的自己的消息类型。
 
-### 扩展机制说明
+### 自定义消息属性
+
+即时通讯 SDK 默认提供了多种消息类型用来满足常见的需求：
+
+- `TextMessage` 文本消息
+- `ImageMessage` 图像消息
+- `AudioMessage` 音频消息
+- `VideoMessage` 视频消息
+- `FileMessage` 普通文件消息(.txt/.doc/.md 等各种)
+- `LocationMessage` 地理位置消息
+
+这些消息类型还支持应用层设置若干 key-value 自定义属性来实现扩展。譬如有一条文本消息需要附带城市信息，这时候开发者使用消息类中预留的 `attributes` 属性就可以保存额外信息了。
+
+```js
+var messageWithCity = new TextMessage("天气太冷了");
+messageWithCity.setAttributes({ city: "北京" });
+```
+```swift
+let messageWithCity = IMTextMessage(text: "天气太冷了")
+messageWithCity.attributes = ["city": "北京"];
+```
+```objc
+NSDictionary *attributes = @{ @"city": @"北京" };
+AVIMTextMessage *messageWithCity = [AVIMTextMessage messageWithText:@"天气太冷了" attributes:attributes];
+```
+```java
+AVIMTextMessage messageWithCity = new AVIMTextMessage();
+messageWithCity.setText("天气太冷了");
+HashMap<String,Object> attr = new HashMap<String,Object>();
+attr.put("city", "北京");
+messageWithCity.setAttrs(attr);
+```
+```cs
+var messageWithCity = new AVIMTextMessage("天气太冷了");
+messageWithCity["city"] = "北京";
+```
+
+### 自定义消息类型
+
+在默认的消息类型完全无法满足需求的时候，可以实现和使用自定义的消息类型。
 
 {{ docs.langSpecStart('js') }}
 
@@ -1695,21 +1734,6 @@ void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
 ```
 
 自定义消息的接收，可以参看 [前一章：再谈接收消息](realtime-guide-beginner.html#再谈接收消息)。
-
-### 什么时候需要自定义消息
-
-即时通讯 SDK 默认提供了多种消息类型用来满足常见的需求：
-
-- `TextMessage` 文本消息
-- `ImageMessage` 图像消息
-- `AudioMessage` 音频消息
-- `VideoMessage` 视频消息
-- `FileMessage` 普通文件消息(.txt/.doc/.md 等各种)
-- `LocationMessage` 地理位置消息
-
-这些消息类型还支持应用层设置若干 key-value 自定义属性来实现扩展。譬如有一条图像消息，除了文本之外，还需要附带地理位置信息，这时候开发者使用消息类中预留的 `attributes` 属性就可以保存额外信息了，并不需要去实现一个复杂的自定义消息。
-
-因此，我们建议只有在默认的消息类型完全无法满足需求的时候，才去使用自定义的消息类型。
 
 ## 进一步阅读
 
