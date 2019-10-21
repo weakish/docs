@@ -376,7 +376,7 @@ xxx.example.com.	3600	IN	CNAME	yyy.zzz.com.
 
 ## 备案
 
-根据工信部规定，在 LeanCloud 华北、华东节点绑定的文件域名、云引擎域名、API 域名，需要在 LeanCloud 新增备案或者接入备案。
+根据工信部规定，在 LeanCloud 华北、华东节点绑定的文件域名、云引擎域名、API 域名，都需要备案。
 
 ### 新增备案
 
