@@ -449,6 +449,17 @@ var AV = require('leancloud-storage/live-query');
 // 有了这一行，无需另外 require('leancloud-storage')
 ```
 
+TypeScript 项目可以使用如下方式获得引用：
+
+```ts
+// 存储服务
+import * as AV from 'leancloud-storage'
+// 即时通讯服务
+import { Realtime, TextMessage } from 'leancloud-realtime'; 
+// 需要使用存储服务的 LiveQuery 功能（无需另外引用 `leancloud-storage`）
+import * as AV from 'leancloud-storage/live-query'
+```
+
 ##### CDN
 
 你也可以直接在页面中通过 `script` 标签引入我们的 SDK：
@@ -835,22 +846,9 @@ public class MyLeanCloudApp extends Application {
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
-如果是在前端项目里面直接通过 CDN 加载的 LeanCloud JavaScript SDK，那么可以在页面加载的时候调用初始化的函数 `AV.init`：
+无论是在前端项目里面直接通过 CDN 加载的 LeanCloud JavaScript SDK， 还是通过 npm 安装的 SDK，都可以在页面加载的时候调用初始化的函数 `AV.init`：
 
 ```js
-AV.init({
-  appId: "{{appid}}",
-  appKey: "{{appkey}}",
-  serverURLs: "https://xxx.example.com"
-});
-```
-
-如果是使用 npm 安装的 SDK，用法是一样的，但是注意需要通过 `require` 获得 SDK 的引用：
-
-```js
-var AV = require('leancloud-storage');
-var { Realtime } = require('leancloud-realtime'); // 若不使用即时通讯服务，则无需引入
-
 AV.init({
   appId: "{{appid}}",
   appKey: "{{appkey}}",
