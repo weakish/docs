@@ -6216,8 +6216,6 @@ LeanCloud CAPTCHA aims to keep bots or other automated software from engaging in
 
 LeanCloud offers CAPTCHA as a free service to make your app's more bot-proof. #}
 
-{% if platform_name !== "Swift" %}
-
 ### 当前用户
 
 用户登录后，SDK 会自动将会话信息存储到客户端，这样用户在下次打开客户端时无需再次登录。下面的代码检查是否有已经登录的用户：
@@ -6226,6 +6224,15 @@ LeanCloud offers CAPTCHA as a free service to make your app's more bot-proof. #}
 ```objc
 AVUser *currentUser = [AVUser currentUser];
 if (currentUser != nil) {
+    // 跳到首页
+} else {
+    // 显示注册或登录页面
+}
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+if let user = LCApplication.default.currentUser {
     // 跳到首页
 } else {
     // 显示注册或登录页面
@@ -6273,11 +6280,6 @@ if (currentUser != null) {
 }
 ```
 {% endif %}
-{% if platform_name === "Swift" %}
-```swift
-let currentUser = LCApplication.default.currentUser
-```
-{% endif %}
 
 会话信息会长期有效，直到用户主动登出：
 
@@ -6287,6 +6289,14 @@ let currentUser = LCApplication.default.currentUser
 
 // currentUser 变为 nil
 AVUser *currentUser = [AVUser currentUser];
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+LCUser.logOut()
+
+// currentUser 变为 nil
+let currentUser = LCApplication.default.currentUser
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
@@ -6321,14 +6331,6 @@ AVUser.logOut();
 AVUser currentUser = AVUser.getCurrentUser();
 ```
 {% endif %}
-{% if platform_name === "Swift" %}
-```swift
-LCUser.logOut()
-
-// currentUser 变为 nil
-let currentUser = LCApplication.default.currentUser
-```
-{% endif %}
 
 ### 设置当前用户
 
@@ -6336,7 +6338,7 @@ let currentUser = LCApplication.default.currentUser
 
 以下是一些应用可能需要用到 session token 的场景：
 
-- 应用根据以前缓存的 session token 登录（可以用 `{% if platform_name === "Objective-C" %}{# TODO #}{% endif %}{% if platform_name === "JavaScript" %}AV.User.current().getSessionToken(){% endif %}{% if platform_name === "Python" %}leancloud.User.get_current().get_session_token(){% endif %}{% if platform_name === "PHP" %}User::getCurrentSessionToken(){% endif %}{% if platform_name === "Android / Java" %}AVUser.getCurrentUser().getSessionToken(){% endif %}{% if platform_name === "Swift" %}LCApplication.default.currentUser?.sessionToken{% endif %}` 获取到当前用户的 session token）。
+- 应用根据以前缓存的 session token 登录（可以用 `{% if platform_name === "Objective-C" %}[AVUser currentUser].sessionToken{% endif %}{% if platform_name === "JavaScript" %}AV.User.current().getSessionToken(){% endif %}{% if platform_name === "Python" %}leancloud.User.get_current().get_session_token(){% endif %}{% if platform_name === "PHP" %}User::getCurrentSessionToken(){% endif %}{% if platform_name === "Android / Java" %}AVUser.getCurrentUser().getSessionToken(){% endif %}{% if platform_name === "Swift" %}LCApplication.default.currentUser?.sessionToken?.value{% endif %}` 获取到当前用户的 session token）。
 - 应用内的某个 WebView 需要知道当前登录的用户。
 - 在服务端登录后，返回 session token 给客户端，客户端根据返回的 session token 登录。
 
@@ -6351,6 +6353,20 @@ let currentUser = LCApplication.default.currentUser
         // session token 无效
     }
 }];
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+_ = LCUser.logIn(sessionToken: "anmlwi96s381m6ca7o7266pzf") { (result) in
+    switch result {
+    case .success(object: let user):
+        // 登录成功
+        print(user)
+    case .failure(error: let error):
+        // session token 无效
+        print(error)
+    }
+}
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
@@ -6386,20 +6402,6 @@ AVUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe
 });
 ```
 {% endif %}
-{% if platform_name === "Swift" %}
-```swift
-_ = LCUser.logIn(sessionToken: "anmlwi96s381m6ca7o7266pzf") { (result) in
-    switch result {
-    case .success(object: let user):
-        // 登录成功
-        print(user)
-    case .failure(error: let error):
-        // session token 无效
-        print(error)
-    }
-}
-```
-{% endif %}
 
 {% call docs.alertWrap() %}
 请避免在外部浏览器使用 URL 来传递 session token，以防范信息泄露风险。
@@ -6422,6 +6424,19 @@ NSString *token = currentUser.sessionToken;
         // session token 无效
     }
 }];
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+if let sessionToken = LCApplication.default.currentUser?.sessionToken?.value {
+    _ = LCUser.logIn(sessionToken: sessionToken) { (result) in
+        if result.isSuccess {
+            // session token 有效
+        } else {
+            // session token 无效
+        }
+    }
+}
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
@@ -6466,13 +6481,6 @@ if (authenticated) {
     // session token 无效
 }
 ```
-{% endif %}
-{% if platform_name === "Swift" %}
-```swift
-{# TODO #}
-```
-{% endif %}
-
 {% endif %}
 
 ### 重置密码
