@@ -3707,11 +3707,11 @@ query.cachePolicy = kAVCachePolicyNetworkElseCache;
 query.maxCacheAge = 24*3600;
 
 [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-if (!error) {
-    // 成功找到结果，先找网络再访问磁盘
-} else {
-    // 无法访问网络，本次查询结果未做缓存
-}
+    if (!error) {
+        // 成功找到结果，先找网络再访问磁盘
+    } else {
+        // 无法访问网络，本次查询结果未做缓存
+    }
 }];
 ```
 
@@ -3754,6 +3754,66 @@ if (!error) {
   ```
 
 查询缓存也适用于 `AVQuery` 的辅助方法，包括 `getFirstObject` 和 `getObjectInBackground`。
+{% endif %}
+{% if platform_name === "Swift" %}
+### 缓存查询
+
+缓存一些查询的结果到本地，这可以让你在无网络的时候展现一些数据给用户。
+
+默认情况下 SDK 不会缓存查询结果，可以在 SDK 初始化时配置 `HTTPURLCache` 来开启查询结果缓存：
+
+```swift
+do {
+    var configuration = LCApplication.Configuration.default
+    configuration.HTTPURLCache = URLCache(
+        // 内存缓存容量，100 MB
+        memoryCapacity: 100 * 1024 * 1024,
+        // 磁盘缓存容量，100 MB
+        diskCapacity: 100 * 1024 * 1024,
+        // `nil` 表示使用系统默认的缓存路径，你也可以自定义路径
+        diskPath: nil)
+    try LCApplication.default.set(
+        id: {{appid}},
+        key: {{appkey}},
+        serverURL: "https://xxx.example.com",
+        configuration: configuration)
+} catch {
+    print(error)
+}
+```
+
+默认情况下，SDK 的查询接口不会查询缓存，可以通过设置接口的 `cachePolicy` 来改变查询行为：
+
+```swift
+query.find(cachePolicy: .onlyCache) { (result) in
+    switch result {
+    case .success(objects: let objects):
+        print(objects)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+#### 缓存策略
+
+为了满足多变的需求，SDK 提供了以下几种缓存策略：
+
+策略枚举 | 含义及解释
+--- | ---
+`onlyNetwork`| **（默认缓存策略）**只从网络加载查询结果。
+`onlyCache` | 只从本地缓存加载查询结果。
+`networkElseCache` | 先从网络加载查询结果，如果失败，再从本地缓存加载查询结果。
+
+#### 缓存相关的操作
+
+可以参考 Apple 官方文档中[关于 URLCache 的描述](https://developer.apple.com/documentation/foundation/urlcache)。
+
+例如，清除所有本地缓存：
+
+```swift
+LCApplication.default.configuration.HTTPURLCache?.removeAllCachedResponses()
+```
 {% endif %}
 
 ### 查询性能优化
