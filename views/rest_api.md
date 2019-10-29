@@ -2050,8 +2050,6 @@ LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾�
   )
 }}
 
-{{ include.retrieveAuthData(node, "#### 获取 authData") }}
-
 #### 注册和登录
 
 使用一个连接服务来注册用户并登录，同样使用 POST 请求 users，只是需要提供 `authData` 字段。例如，使用新浪微博账户注册或者登录用户：
