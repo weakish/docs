@@ -226,10 +226,6 @@ LeanCloud 数据存储的查询接口不支持这些函数，可以查询到客�
 1. 对老的数据做一次更新，查询出 key 不存在（whereDoesNotExist）的记录，再更新回去。
 2. 查询条件加上 or 查询，or key 不存在（whereDoesNotExist）。
 
-### User 表中有 authData 数据，但是当前登录用户无法获取 authData 数据
-
-{{ include.retrieveAuthData(node) }}
-
 ### 如何解决数据一致性或事务需求？
 
 LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数据一致性的特性，可以解决大部分的一致性需求：

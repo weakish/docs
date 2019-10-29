@@ -40,12 +40,6 @@ BitXor | 异或运算 | `{{prefix}}op('BitXor', {'value': 0x0000000000000004})`
 注，由于 CQL 实现上有问题，删除对象属性的 `Delete` 操作也需要传入参数，不过参数名和参数值可以任意指定。
 {% endmacro %}
 
-{% macro retrieveAuthData(node, heading="") -%}
-{%- if heading != "" %}{{heading}}{%- endif %}
-
-authData 的数据<u>默认为仅限其所属用户可读写</u>，也就是说其他用户无法以 fetch 或 query 来获取。要更改这一默认行为，需要进入 {% if node == 'qcloud' %}**应用控制台** > **存储** > **_User**{% else %}[应用控制台 > 存储 > _User 表](/dashboard/data.html?appid={% raw %}{{{% endraw %}appid{% raw %}}}{% endraw %}#/_User){% endif %}，点击 authData 字段右侧的箭头，选择 **编辑**，关掉「列属性」里的「只限所属用户读写」选项才能获取到。
-{% endmacro %}
-
 {% macro supportEmail() -%}
 <support@leancloud.rocks>
 {%- endmacro %}
