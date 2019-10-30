@@ -135,6 +135,56 @@ $app->get('/', function (Request $request, Response $response) {
 
 详细的实现细节请阅读源代码，里面有完整的代码以及注释帮助开发者理解如何在 LeanEngine 上编写符合自己项目需求的代码。
 
+### 新建一个云函数
+
+云引擎的云函数功能可以实现一些由于种种原因（避免重复、方便更新、降低客户端计算和传输开销、保证安全性等）更适合在服务端实现的逻辑。
+
+例如，编写一个新建 Todo 的云函数：
+
+```js
+// 在项目的 cloud.js 文件中新增一个云函数定义
+AV.Cloud.define('createTodo', async (request) => {
+  const Todo = AV.Object.extend('Todo');
+  const todo = new Todo();
+  todo.set('content', request.params.content);
+  return todo.save();
+});
+```
+```python
+# 在项目的 cloud.py 文件中新增一个云函数定义
+@engine.define('createTodo')
+def create_todo(content, **params):
+  import leancloud
+  todo = leancloud.Object.extend('Todo')()
+  todo.set('content', content)
+  return todo.save()
+```
+```php
+// 在项目的 src/cloud.php 文件中新增一个云函数定义
+use \LeanCloud\LeanObject;
+Cloud::define("createTodo", function($params, $user) {
+    $todo = new LeanObject("Todo");
+    $todo->set("content", $params["content"]);
+    $todo->save();
+});
+```
+```java
+// 在项目的 src/main/java/cn/leancloud/demo/todo/Cloud.java 文件开头导入云函数定义中用到的类
+import cn.leancloud.AVException;
+import cn.leancloud.AVObject;
+// 在上述文件的 Cloud 类中新增一个方法
+@EngineFunction("createTodo")
+public static void createTodo(@EngineFunctionParam("content") String content)
+    throws AVException {
+  AVObject todo = new AVObject("Todo");
+  todo.put("content", content);
+  todo.save();   
+}
+```
+
+还有一类特殊的云函数是由云端系统在特定事件发生时自动触发，这类云函数称为 Hook 函数。
+想要了解 Hook 函数的详情以及如何调用我们上面定义的 `createTodo` 云函数，请参考 [云函数开发指南](leanengine_cloudfunction_guide-node.html)。
+
 ## 部署到云端
 
 使用免费版的应用可以直接部署到生产环境：
