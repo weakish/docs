@@ -226,6 +226,12 @@ LeanCloud 数据存储的查询接口不支持这些函数，可以查询到客�
 1. 对老的数据做一次更新，查询出 key 不存在（whereDoesNotExist）的记录，再更新回去。
 2. 查询条件加上 or 查询，or key 不存在（whereDoesNotExist）。
 
+### 如何重命名 Class？
+
+LeanCloud 不支持重命名 Class。
+你可以新建一个 Class，利用[数据导入导出](rest_api.html#数据导出_API)功能从旧 Class 导出数据，然后导入到新 Class。
+导出导入期间不要往旧 Class 写数据，或者在旧 Class 和新 Class 双写数据，以避免数据不一致。
+
 ### 如何解决数据一致性或事务需求？
 
 LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数据一致性的特性，可以解决大部分的一致性需求：
