@@ -85,3 +85,22 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
   </div>
 </div>
 {% endmacro %}
+
+{# 之前按服务拆分 api 和 engine 是计划未来优化不同服务的请求处理。
+但实际上目前的现状是两者可以互相访问，即通过 api 子域名可以调用云函数，通过 engine 子域名也可以访问其他服务的 REST API。
+国内版因为要求用户绑自定义域名，所以也就自然而然不存在这一拆分了，
+因为对于绑定了自定义域名的应用而言，云函数 REST API 的 Base URL 和其他 REST API 服务的 Base URL 一样，都使用自定义域名。
+国际版因为不要求绑定自定义域名，所以根据 @jysperm 的建议，还是推荐用户按服务使用不同的共享域名。#}
+{% macro baseurl(service = "api") %}
+文档中{{ "云函数的" if service === "engine" else " API" }} Base URL 为绑定的 [API 自定义域名](custom-api-domain-guide.html)，
+可以在「控制台 > 设置 > 应用 Keys > 服务器地址」查看。
+
+如果暂时没有绑定域名，华北、华东节点可以使用临时的测试域名，具体域名见「控制台 > 设置 > 应用 Keys > 服务器地址」。
+该域名仅供测试和原型开发阶段使用，不保证可用性，请在正式发布前为应用绑定 API 自定义域名。
+
+LeanCloud 国际版不要求绑定自定义域名。除了使用自定义域名外，也可以使用如下共享域名：
+
+```
+appid前八位.{{service}}.lncldglobal.com
+```
+{% endmacro %}
