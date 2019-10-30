@@ -500,7 +500,7 @@ const realtime = getApp().realtime;
 <details>
 <summary>查看示例</summary>
 <p>
-<img src="../images/dash-leanengine-setting.png" alt="控制台截屏" />
+<img src="images/dash-leanengine-setting.png" alt="控制台截屏" />
 </p>
 </details>
 

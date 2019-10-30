@@ -226,10 +226,6 @@ LeanCloud 数据存储的查询接口不支持这些函数，可以查询到客�
 1. 对老的数据做一次更新，查询出 key 不存在（whereDoesNotExist）的记录，再更新回去。
 2. 查询条件加上 or 查询，or key 不存在（whereDoesNotExist）。
 
-### User 表中有 authData 数据，但是当前登录用户无法获取 authData 数据
-
-{{ include.retrieveAuthData(node) }}
-
 ### 如何重命名 Class？
 
 LeanCloud 不支持重命名 Class。

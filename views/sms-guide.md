@@ -572,7 +572,7 @@ AVSMS.requestSMSCodeInBackground("18804208562", option).subscribe(new Observer<A
 AV.Cloud.requestSmsCode({
 mobilePhoneNumber: '186xxxxxxxx',
 template: 'Order_Notice',
-sign:'sign_BuyBuyBuy'
+sign:'sign_BuyBuyBuy',
 order_id: '7623432424540'}).then(function(){
       //调用成功
     }, function(err){
