@@ -81,3 +81,9 @@ server.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0',
 超过 30 秒的常见原因是启动命令中混合了构建操作，这种情况需要修改启动命令，参见「scripts.start」一节。
 除此以外，也可以考虑调整云引擎实例规格，加大内存。
 因为大多数情况下，内存越多，应用启动越快。
+
+### 示例
+
+[nest-getting-started] 是一个适用于云引擎的模板项目，使用 Nest.js（Fastify）框架。
+
+[nest-getting-started]: https://github.com/weakish/nest-getting-started
