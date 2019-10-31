@@ -12,9 +12,7 @@
 
 如果你想要在云引擎上托管基于其他 Node 框架开发的网站项目，需要对代码和配置文件进行如下调整：
 
-### package.json
-
-#### 指定 Node 版本
+### 指定 Node 版本
 
 出于兼容性考虑，云引擎默认使用的 Node.js 版本过于老旧（`0.12`）。
 所以需要在 `package.json` 中指定较新的 Node 版本：
@@ -25,7 +23,7 @@
 },
 ```
 
-#### 修改监听地址、端口
+### 修改监听地址、端口
 
 云引擎需要 web 服务监听在 `0.0.0.0` 上，端口为云引擎开放给外网的端口（云引擎平台的环境变量 `LEANCLOUD_APP_PORT`）。
 而大多数 Node 框架默认监听 `127.0.0.1:3000` 或 `0.0.0.0:3000` 上，因此需要修改。
@@ -48,12 +46,12 @@ server.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0',
 经过上述两项调整后，大部分 Node 框架都可以在云引擎上成功运行。
 少数框架还需要进一步调整。
 
-#### 添加依赖项
+### 添加依赖项
 
 云引擎不会安装 `devDependencies` 依赖。
 因此，某些依赖项需要视情况在 `dependencies` 中额外添加，比如依赖（dependency）的 peer dependencies 需要添加到 `dependencies` 中。
 
-#### `scripts.start`
+### `scripts.start`
 
 云引擎会根据 `package.json` 中 `scripts.start` 指定的命令启动应用（如未指定，则会使用 `node server.js` 作为启动命令）。
 大部分 Node 框架都会提供默认的 `scripts.start`，无需额外配置。
@@ -72,7 +70,7 @@ server.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0',
 "prepublish": "nest build",
 ```
 
-#### 健康监测
+### 健康监测
 
 云引擎在应用启动时，会每秒检查应用是否启动成功。
 健康检查的 URL 为 `/` 和 `/__engine/1/ping`，两者之一返回 `HTTP 200` 就视为成功。
