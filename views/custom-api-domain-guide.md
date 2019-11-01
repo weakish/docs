@@ -88,7 +88,7 @@ LeanCloud 服务涉及以下三种自定义域名：
 
 ### 更新代码
 
-绑定自有 API 域名后，需要更新代码以使用自定义域名。
+绑定自有 API 域名后，需要更新客户端代码以使用自定义域名。
 
 以下部分假定绑定的自定义域名是 `xxx.example.com`，且开启了 HTTPS。
 
@@ -256,24 +256,7 @@ Java Unified SDK （ `>= 6.0.0`） 请参考 [SDK 安装指南](sdk_setup-java.h
 
 <details>
 
-Java Unified SDK (`< 6.0.0`)：
-
-如果是一个普通 Java 项目，则在代码开头添加：
-
-<pre><code>
-import cn.leancloud.core.AVOSService;
-// 配置 SDK 储存
-AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
-// 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
-AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
-// 配置 SDK 推送
-AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
-// 配置 SDK 即时通讯
-AVOSCloud.setServer(AVOSService.RTM, "https://xxx.example.com");
-AVOSCloud.initialize("{{appid}}", "{{appkey}}");
-</code></pre>
-
-如果是一个 Android 项目，则向 `Application` 类的 `onCreate` 方法添加：
+使用 Java Unified SDK (`< 6.0.0`) 的 Android 项目，需在 `Application` 类的 `onCreate` 方法添加：
 
 <pre><code>
 import cn.leancloud.AVOSCloud;
@@ -335,17 +318,12 @@ AVClient.Initialize(new AVClient.Configuration {
 <code></pre>
 </details>
 
-#### PHP SDK
+#### PHP & Python SDK
 
-请参考 [SDK 安装指南](sdk_setup-php.html#初始化) 配置。 
+注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
+模板项目和云引擎网站托管开发指南中的示例代码均未配置 API 自定义域名，请勿多此一举设置自定义域名，否则会变成公网访问，影响性能。
 
-`<0.7.0` 版本不支持自定义域名。
-
-#### Python SDK
-
-设置环境变量 `LC_API_SERVER` 为 `https://xxx.example.com`。
-
-云引擎内部访问 API 是通过内网，**云引擎网站托管的 Python 项目无需配置**，否则请求会走公网，影响性能。
+在云引擎以外的服务端使用 PHP 或 Python SDK，可以不配置 API 自定义域名。
 
 ## CNAME 设置
 
