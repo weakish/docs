@@ -3,7 +3,7 @@
 云引擎的 Node.js 环境为流行的 Node 框架 [Express] 和 [Koa] 提供了集成支持，
 可以在通过命令行工具创建项目（`lean init`）时选取。
 
-[Expresss]: https://github.com/leancloud/node-js-getting-started
+[Express]: https://github.com/leancloud/node-js-getting-started
 [Koa]: https://github.com/leancloud/koa-getting-started
 
 你也可以在云引擎的 Node.js 环境中使用其他 Node 框架。
@@ -30,7 +30,7 @@
 
 例如，[fastify] 框架默认监听 `127.0.0.1`：
 
-[fastify]: 
+[fastify]: https://www.fastify.io/
 
 ```js
 // server.js
