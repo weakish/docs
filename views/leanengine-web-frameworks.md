@@ -19,7 +19,7 @@
 
 ```json
 "engines": {
-        "node": "12.x"
+  "node": "12.x"
 },
 ```
 
@@ -40,7 +40,7 @@ fastify.listen(3000, (err, address) => { /* 略 */ })
 需要修改为：
 
 ```js
-server.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0', (err, addr) => { /* 略 */ }) 
+fastify.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0', (err, addr) => { /* 略 */ }) 
 ```
 
 经过上述两项调整后，大部分 Node 框架都可以在云引擎上成功运行。
