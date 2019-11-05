@@ -43,6 +43,15 @@ fastify.listen(3000, (err, address) => { /* 略 */ })
 fastify.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0', (err, addr) => { /* 略 */ }) 
 ```
 
+有的框架除了通过代码修改监听地址外，也支持在启动命令上添加额外参数指定监听地址。
+例如，默认监听 `0.0.0.0:3000` 的 [micro] 框架支持通过指定 `--listen` 参数修改监听地址：
+
+```sh
+"start": "micro --listen tcp://0.0.0.0:$LEANCLOUD_APP_PORT",
+```
+
+[micro]: https://github.com/zeit/micro
+
 经过上述两项调整后，大部分 Node 框架都可以在云引擎上成功运行。
 少数框架还需要进一步调整。
 
@@ -81,9 +90,3 @@ fastify.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0'
 超过 30 秒的常见原因是启动命令中混合了构建操作，这种情况需要修改启动命令，参见「scripts.start」一节。
 除此以外，也可以考虑调整云引擎实例规格，加大内存。
 因为大多数情况下，内存越多，应用启动越快。
-
-### 示例
-
-[nest-getting-started] 是一个适用于云引擎的模板项目，使用 Nest.js（Fastify）框架。
-
-[nest-getting-started]: https://github.com/weakish/nest-getting-started
