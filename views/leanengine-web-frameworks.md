@@ -28,9 +28,9 @@
 云引擎需要 web 服务监听在 `0.0.0.0` 上，端口为云引擎开放给外网的端口（云引擎平台的环境变量 `LEANCLOUD_APP_PORT`）。
 而大多数 Node 框架默认监听 `127.0.0.1:3000` 或 `0.0.0.0:3000` 上，因此需要修改。
 
-例如，[fastify] 框架默认监听 `127.0.0.1`：
+例如，[Fastify] 框架默认监听 `127.0.0.1`：
 
-[fastify]: https://www.fastify.io/
+[Fastify]: https://www.fastify.io/
 
 ```js
 // server.js
@@ -44,13 +44,13 @@ fastify.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0'
 ```
 
 有的框架除了通过代码修改监听地址外，也支持在启动命令上添加额外参数指定监听地址。
-例如，默认监听 `0.0.0.0:3000` 的 [micro] 框架支持通过指定 `--listen` 参数修改监听地址：
+例如，默认监听 `0.0.0.0:3000` 的 [Micro] 框架支持通过指定 `--listen` 参数修改监听地址：
 
 ```sh
 "start": "micro --listen tcp://0.0.0.0:$LEANCLOUD_APP_PORT",
 ```
 
-[micro]: https://github.com/zeit/micro
+[Micro]: https://github.com/zeit/micro
 
 经过上述两项调整后，大部分 Node 框架都可以在云引擎上成功运行。
 少数框架还需要进一步调整。
@@ -83,10 +83,55 @@ fastify.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0'
 
 云引擎在应用启动时，会每秒检查应用是否启动成功。
 健康检查的 URL 为 `/` 和 `/__engine/1/ping`，两者之一返回 `HTTP 200` 就视为成功。
-由于绝大部分项目都会实现 `/` 这个路由，所以一般无需专门实现健康检查的逻辑。
+另外，如果项目不使用云函数，还要求 `/__engine/1/ping` 返回 `HTTP 404`。
+由于绝大部分项目都会实现 `/` 这个路由，并在未定义的路由上返回 404 错误，所以一般无需专门实现健康检查的逻辑。
 
 不过，应用必须在 30 秒内通过健康检测，否则会被云引擎认为启动失败。
 正常情况下，应用启动时间很少超过 30 秒。
 超过 30 秒的常见原因是启动命令中混合了构建操作，这种情况需要修改启动命令，参见「scripts.start」一节。
 除此以外，也可以考虑调整云引擎实例规格，加大内存。
 因为大多数情况下，内存越多，应用启动越快。
+
+## 云函数
+
+如果要使用云函数，需要接入云引擎 Node.js SDK 的中间件。
+云引擎 Node.js SDK 默认为 Express 和 Koa 提供了集成支持。
+由于不少 Node.js 框架都是对 Express 和 Koa 的封装，许多 Node.js 框架兼容 Express 的中间件，
+因此在这些框架上使用云函数很方便。
+
+例如，在兼容 Express 中间件的 Fastify 框架中使用云函数：
+
+```js
+// 引入云引擎 SDK
+const AV = require('leanengine');
+// 云函数在 cloud.js 中定义
+require('./cloud');
+
+// 初始化云引擎 SDK
+AV.init({
+  appId: process.env.LEANCLOUD_APP_ID,
+  appKey: process.env.LEANCLOUD_APP_KEY,
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY
+});
+AV.Cloud.useMasterKey();
+
+// 引入 fastify
+const fastify = require('fastify')({
+  logger: true
+})
+
+// 加载云引擎 SDK 提供的 Express 中间件
+fastify.use(AV.express())
+```
+
+接入云引擎中间件后，云引擎 SDK 会自动处理 `/__engine/1/ping` 的路由，声明项目支持云函数。
+
+如果框架不兼容 Express 或 Koa 的中间件的话，需要自行实现云引擎中间件。
+可以参考[云引擎 Node.js SDK 中的相关代码][code]。
+
+[code]: https://github.com/leancloud/leanengine-node-sdk/blob/master/lib/frameworks.js
+
+## 示例
+
+- [micro-getting-started] -  在云引擎上部署 [Micro] 框架的模板项目，支持网站托管功能。
+- [fastify-getting-started] - 在云引擎上部署 [Fastify] 框架的模板项目，支持网站托管和云函数功能。
