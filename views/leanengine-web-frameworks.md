@@ -1,7 +1,7 @@
 # 在云引擎中使用其他 Node 框架
 
 云引擎的 Node.js 环境为流行的 Node 框架 [Express] 和 [Koa] 提供了集成支持，
-可以在通过命令行工具创建项目（`lean init`）时选取。
+通过命令行工具创建项目（`lean init`）时可以选取相应的模板项目。
 
 [Express]: https://github.com/leancloud/node-js-getting-started
 [Koa]: https://github.com/leancloud/koa-getting-started
@@ -52,7 +52,7 @@ fastify.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0'
 
 [Micro]: https://github.com/zeit/micro
 
-经过上述两项调整后，大部分 Node 框架都可以在云引擎上成功运行。
+指定 Node.js 版本、监听地址后，大部分 Node 框架都可以在云引擎上成功运行。
 少数框架还需要进一步调整。
 
 ### 添加依赖项
@@ -135,3 +135,6 @@ fastify.use(AV.express())
 
 - [micro-getting-started] -  在云引擎上部署 [Micro] 框架的模板项目，支持网站托管功能。
 - [fastify-getting-started] - 在云引擎上部署 [Fastify] 框架的模板项目，支持网站托管和云函数功能。
+
+[micro-getting-started]: https://github.com/weakish/micro-getting-started
+[fastify-getting-started]: https://github.com/weakish/fastify-getting-started
