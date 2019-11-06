@@ -83,7 +83,7 @@ fastify.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0'
 
 云引擎在应用启动时，会每秒检查应用是否启动成功。
 健康检查的 URL 为 `/` 和 `/__engine/1/ping`，两者之一返回 `HTTP 200` 就视为成功。
-另外，如果项目不使用云函数，还要求 `/__engine/1/ping` 返回 `HTTP 404`。
+另外，如果项目不使用云函数，还要求 `/1.1/functions/_ops/metadatas` 返回 `HTTP 404`。
 由于绝大部分项目都会实现 `/` 这个路由，并在未定义的路由上返回 404 错误，所以一般无需专门实现健康检查的逻辑。
 
 不过，应用必须在 30 秒内通过健康检测，否则会被云引擎认为启动失败。
@@ -124,7 +124,7 @@ const fastify = require('fastify')({
 fastify.use(AV.express())
 ```
 
-接入云引擎中间件后，云引擎 SDK 会自动处理 `/__engine/1/ping` 的路由，声明项目支持云函数。
+接入云引擎中间件后，云引擎 SDK 会自动处理 `/1.1/functions/_ops/metadatas` 的路由，声明项目支持云函数。
 
 如果框架不兼容 Express 或 Koa 的中间件的话，需要自行实现云引擎中间件。
 可以参考[云引擎 Node.js SDK 中的相关代码][code]。
