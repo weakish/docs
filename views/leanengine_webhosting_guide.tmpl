@@ -1648,6 +1648,7 @@ systemDependencies:
 `LEANCLOUD_AVAILABLE_CPUS` | 云引擎实例可用 CPU 的数量，高规格实例（如：2 CPU 1024 MB 内存）时该值大于 1。应用可以根据该值启动对应数量的线程或者进程。在云引擎中 **不要** 直接使用操作系统 CPU 核数，否则可能启动过多的进程导致超出实例规格而异常退出。
 `LEANCLOUD_APP_GROUP`| 云引擎实例所在的组。当使用云引擎 [组管理](leanengine_plan.html#组管理) 功能时，该值为组的名称。
 `LEANCLOUD_REGION` | 云引擎服务所在区域，值为 `CN` 或 `US`，分别表示国内版和国际版。
+`LEANCLOUD_VERSION_TAG` | 云引擎实例部署的版本号
 
 {% call docs.noteWrap() %}
 旧版云引擎使用的以 `LC_` 开头的环境变量（如 `LC_APP_ID`）已经被弃用。为了保证代码兼容性，`LC_` 变量在一段时间内依然有效，但未来可能会完全失效。为了避免报错，建议使用 `LEANCLOUD_` 变量来替换。
