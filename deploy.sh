@@ -13,17 +13,20 @@ rm -rf "$DIST"/*
 rm -rf dist/*
 rm -rf md/*
 
+node --version
+npm --version
+
 npm install
 
 export DOC_ENV="$TARGET"
 export DOC_COMMENT_TOKEN="$DOC_COMMENT_TOKEN"
 
 if [ "$TARGET" = "qcloud" ]; then
-    grunt build --theme=qcloud
+    npx grunt build --theme=qcloud
 elif [ "$TARGET" = "us" ]; then
-    grunt build --theme=us --no-comments
+    npx grunt build --theme=us --no-comments
 else
-    grunt build
+    npx grunt build
 fi
 
 cp -r dist/* "$DIST"
