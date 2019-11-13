@@ -53,7 +53,6 @@ brew upgrade
 安装成功之后，直接在 terminal 终端运行 `lean help`，输出帮助信息：
 
 ```sh
-$ lean help
  _                        ______ _                 _
 | |                      / _____) |               | |
 | |      ____ ____ ____ | /     | | ___  _   _  _ | |
@@ -67,7 +66,7 @@ USAGE:
    lean [global options] command [command options] [arguments...]
 
 VERSION:
-   0.20.1
+   0.21.0
 
 COMMANDS:
      login    Log in to LeanCloud
@@ -84,12 +83,10 @@ COMMANDS:
      env      Output environment variables used by the current project
      cache    LeanCache shell
      cql      Start CQL interactive mode
-     search   Search development docs
-     help, h  Show all commands
+     help, h  Show all commands or help info for one command
 
 GLOBAL OPTIONS:
    --version, -v  print the version
-
 ```
 
 简单介绍下主要的子命令：
@@ -109,14 +106,12 @@ GLOBAL OPTIONS:
 `debug` | 单独运行云函数调试功能，而不在本地运行项目本身
 `env` | 显示当前项目的环境变量
 `cache` | LeanCache 命令行
-`cql` | 交互式 CQL
-
 
 可以通过 `--version` 选项查看版本：
 
 ```sh
 $ lean --version
-lean version 0.20.0
+lean version 0.21.0
 ```
 
 `lean command -h` 可以查看子命令的帮助信息，例如：
@@ -270,7 +265,7 @@ $ lean deploy --prod 1
 
 ```sh
 $ lean deploy
-[INFO] Current CLI tool version:  0.20.0
+[INFO] Current CLI tool version:  0.21.0
 [INFO] Retrieving app info ...
 [INFO] Preparing to deploy AwesomeApp(xxxxxx) to region: cn group: web staging
 [INFO] Python runtime detected
@@ -335,7 +330,7 @@ $ lean publish
 
 ```sh
 $ lean publish
-[INFO] Current CLI tool version:  0.20.0
+[INFO] Current CLI tool version:  0.21.0
 [INFO] Retrieving app info ...
 [INFO] Deploying AwesomeApp(xxxxxx) to region: cn group: web production
 [REMOTE] 开始部署 20181207-115634 到 web1,web2
