@@ -5004,7 +5004,7 @@ _ = file.save { result in
 {% endif %}
 
 {% if node !== "qcloud" %}
-{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" %}
+{% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" %}
 ### 图像缩略图
 
 保存图像时，如果想在下载原图之前先得到缩略图，方法如下：
@@ -5015,6 +5015,14 @@ AVFile *file = [AVFile fileWithRemoteURL:[NSURL URLWithString:@"文件-url"]];
 [file getThumbnail:YES width:100 height:100 withBlock:^(UIImage *image, NSError *error) {
     // 其他逻辑
 }];
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+// 基于原图大小，按指定百分比缩放到 25%
+let scaledURL = file.thumbnailURL(.scale(0.25))
+// 按指定宽高值强行缩略，获得宽度为 100 像素，高度 200 像素的缩略图
+let sizedURL = file.thumbnailURL(.size(width: 100, height: 200))
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
