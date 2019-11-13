@@ -386,11 +386,19 @@ $ lean logs -f
 $ lean logs --from=2017-07-01 --to=2017-07-07
 ```
 
+单独使用 `--from` 参数导出某一天的日志：
+
+```
+$ lean logs --from=2017-07-01
+```
+
 另外可以配合重定向功能，将一段时间内的 JSON 格式日志导出到文件，再配合本地工具进行查看：
 
 ```
 $ lean logs --from=2017-07-01 --to=2017-07-07 --format=json > leanengine.logs
 ```
+
+`--from`、`--to` 的时区为本地时区（运行 lean-cli 命令行工具的机器的本地时区）。
 
 ## 查看 LeanStorage 状态报告
 
