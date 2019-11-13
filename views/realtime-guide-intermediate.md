@@ -1064,7 +1064,7 @@ Will 消息有 **如下限制**：
 
 有时你可能需要将发送失败的消息临时保存到客户端本地的缓存中，等到合适时机再进行处理。例如，将由于网络突然中断而发送失败的消息先保留下来，在消息列表中展示这种消息时，额外添加出错的提示符号和重发按钮，待网络恢复后再由用户选择是否重发。
 
-即时通讯 Android 和 iOS SDK 默认提供了消息本地缓存的功能，消息缓存中保存的都是已经成功上行到云端的消息，并且能够保证和云端的数据同步。为了方便开发者，SDK 也支持将一时失败的消息加入到缓存中。
+即时通讯 Java, Objective-C, Swift SDK 默认提供了消息本地缓存的功能，消息缓存中保存的都是已经成功上行到云端的消息，并且能够保证和云端的数据同步。为了方便开发者，SDK 也支持将一时失败的消息加入到缓存中。
 
 将消息加入缓存的代码如下：
 
@@ -1072,7 +1072,18 @@ Will 消息有 **如下限制**：
 // 暂不支持
 ```
 ```swift
-// 暂不支持
+do {
+    try conversation.insertFailedMessageToCache(failedMessage) { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 ```objc
 [conversation addMessageToCache:message];
@@ -1090,7 +1101,18 @@ conversation.addToLocalCache(message);
 // 暂不支持
 ```
 ```swift
-// 暂不支持
+do {
+    try conversation.removeFailedMessageFromCache(failedMessage) { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 ```objc
 [conversation removeMessageFromCache:message];
@@ -1102,7 +1124,7 @@ conversation.removeFromLocalCache(message);
 // 暂不支持
 ```
 
-从缓存中取出来的消息，在 UI 展示的时候可以根据 `message.status` 的属性值来做不同的处理，`status` 属性为 `AVIMMessageStatusFailed` 时即表示是发送失败了的本地消息，这时可以在消息旁边显示一个重新发送的按钮。通过将失败消息加入到 SDK 缓存中，还有一个好处就是，消息从缓存中取出来再次发送，不会造成服务端消息重复，因为 SDK 有做专门的去重处理。
+从缓存中取出来的消息，在 UI 展示的时候可以根据 `message.status` 的属性值来做不同的处理，`status` 属性为 `failed` 时即表示是发送失败了的本地消息，这时可以在消息旁边显示一个重新发送的按钮。通过将失败消息加入到 SDK 缓存中，还有一个好处就是，消息从缓存中取出来再次发送，不会造成服务端消息重复，因为 SDK 有做专门的去重处理。
 
 ## 离线推送通知
 
