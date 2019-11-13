@@ -294,7 +294,7 @@ LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slice
 ### Android 设备每次启动时，installationId 为什么总会改变？如何才能不改变？
 可能有以下两种原因导致这种情况：
 * SDK 版本过旧，installationId 的生成逻辑在版本更迭中有修改。请更新至最新版本。
-* 代码混淆引起的，注意在 proguard 文件中添加 [LeanCloud SDK 的混淆排除](android_faq.html#代码混淆怎么做)。
+* 代码混淆引起的，注意在 proguard 文件中添加 [LeanCloud SDK 的混淆排除](faq.html#代码混淆怎么做)。
 
 ### 代码混淆怎么做
 为了保证 SDK 在代码混淆后能正常运作，需要保证部分类和第三方库不被混淆，参考下列配置：
@@ -312,6 +312,12 @@ LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slice
 -dontwarn com.alibaba.fastjson.**
 -keep class com.alibaba.fastjson.** { *;}
 
+-dontwarn org.ligboy.retrofit2.**
+-keep class org.ligboy.retrofit2.** { *;}
+
+-dontwarn io.reactivex.rxjava2.**
+-keep class io.reactivex.rxjava2.** { *;}
+
 -dontwarn sun.security.**
 -keep class sun.security.** { *; }
 
@@ -320,6 +326,9 @@ LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slice
 
 -dontwarn com.avos.**
 -keep class com.avos.** { *;}
+
+-dontwarn cn.leancloud.**
+-keep class cn.leancloud.** { *;}
 
 -keep public class android.net.http.SslError
 -keep public class android.webkit.WebViewClient
