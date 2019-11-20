@@ -82,6 +82,12 @@ api-ucloud.leancloud.cn. 353    IN  A   106.75.95.142
 
 如果你的设备全部存在连通性问题，可以尝试使用第三方服务的解析结果进行对比（例如 [digwebinterface.com](https://www.digwebinterface.com/?hostnames=api.leancloud.cn&type=&ns=resolver&useresolver=8.8.4.4)）。
 
+Windows 系统下没有预装 `dig` 命令，可以使用 nslookup：
+
+```
+nslookup -debug api.leancloud.cn 
+```
+
 ### 延迟和丢包诊断
 
 {{ docs.note("需要注意 LeanCloud 的服务器并不是全部支持 ping 检测，因此建议优先使用 curl 检测。") }} 
