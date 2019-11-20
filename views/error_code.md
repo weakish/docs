@@ -16,7 +16,7 @@
 
 ## 1
 * 信息 - `Internal server error. No information available.`
-* 含义 - 服务器内部错误或者参数错误，一般是因为传入了错误的参数，或者没有在本文档里明确定义的运行时错误，都会以代码 1 指代。
+* 含义 - 服务器内部错误或者参数错误，一般是因为传入了错误的参数，或者没有在本文档里明确定义的运行时错误，都会以代码 1 指代。有时错误信息会指明具体原因，例如 `International SMS is disabled, please enable it in console.` 就表示在控制台没有开启国际短信开关的情况下试图发送国际短信。
 
 ## 100
 
