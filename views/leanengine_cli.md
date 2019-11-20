@@ -53,7 +53,6 @@ brew upgrade
 安装成功之后，直接在 terminal 终端运行 `lean help`，输出帮助信息：
 
 ```sh
-$ lean help
  _                        ______ _                 _
 | |                      / _____) |               | |
 | |      ____ ____ ____ | /     | | ___  _   _  _ | |
@@ -67,7 +66,7 @@ USAGE:
    lean [global options] command [command options] [arguments...]
 
 VERSION:
-   0.20.1
+   0.21.0
 
 COMMANDS:
      login    Log in to LeanCloud
@@ -84,12 +83,10 @@ COMMANDS:
      env      Output environment variables used by the current project
      cache    LeanCache shell
      cql      Start CQL interactive mode
-     search   Search development docs
-     help, h  Show all commands
+     help, h  Show all commands or help info for one command
 
 GLOBAL OPTIONS:
    --version, -v  print the version
-
 ```
 
 简单介绍下主要的子命令：
@@ -109,14 +106,12 @@ GLOBAL OPTIONS:
 `debug` | 单独运行云函数调试功能，而不在本地运行项目本身
 `env` | 显示当前项目的环境变量
 `cache` | LeanCache 命令行
-`cql` | 交互式 CQL
-
 
 可以通过 `--version` 选项查看版本：
 
 ```sh
 $ lean --version
-lean version 0.20.0
+lean version 0.21.0
 ```
 
 `lean command -h` 可以查看子命令的帮助信息，例如：
@@ -145,6 +140,8 @@ $ lean login
 ```
 
 然后按照提示选择区域并输入 LeanCloud 用户名和密码完成登录。
+
+如果同时使用多个区域，那么可以多次运行 `lean login`，每次选择不同的区域，并使用相应的用户名、密码登录。
 
 以 GitHub、微博或 QQ 这种第三方登录方式来注册 LeanCloud 账户的用户，如果未曾设置过账户密码，需要先使用 [忘记密码](/dashboard/login.html#/forgotpass) 功能重新设置一个密码，再进行登录。
 
@@ -270,7 +267,7 @@ $ lean deploy --prod 1
 
 ```sh
 $ lean deploy
-[INFO] Current CLI tool version:  0.20.0
+[INFO] Current CLI tool version:  0.21.0
 [INFO] Retrieving app info ...
 [INFO] Preparing to deploy AwesomeApp(xxxxxx) to region: cn group: web staging
 [INFO] Python runtime detected
@@ -335,7 +332,7 @@ $ lean publish
 
 ```sh
 $ lean publish
-[INFO] Current CLI tool version:  0.20.0
+[INFO] Current CLI tool version:  0.21.0
 [INFO] Retrieving app info ...
 [INFO] Deploying AwesomeApp(xxxxxx) to region: cn group: web production
 [REMOTE] 开始部署 20181207-115634 到 web1,web2
@@ -389,11 +386,19 @@ $ lean logs -f
 $ lean logs --from=2017-07-01 --to=2017-07-07
 ```
 
+单独使用 `--from` 参数导出某一天的日志：
+
+```
+$ lean logs --from=2017-07-01
+```
+
 另外可以配合重定向功能，将一段时间内的 JSON 格式日志导出到文件，再配合本地工具进行查看：
 
 ```
 $ lean logs --from=2017-07-01 --to=2017-07-07 --format=json > leanengine.logs
 ```
+
+`--from`、`--to` 的时区为本地时区（运行 lean-cli 命令行工具的机器的本地时区）。
 
 ## 查看 LeanStorage 状态报告
 
