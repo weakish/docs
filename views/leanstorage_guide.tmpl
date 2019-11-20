@@ -4686,7 +4686,9 @@ file.saveInBackground().subscribe(new Observer<AVFile>() {
 _ = file.save { result in
     switch result {
     case .success:
-        print("文件保存完成。objectId：" + file.objectId)
+        if let value = file.objectId?.value {
+            print("文件保存完成。objectId: \(value)")
+        }
     case .failure(error: let error):
         // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
         print(error)
@@ -5566,7 +5568,7 @@ user.password = @"cat!@#123";
 
 // 可选
 user.email = @"tom@leancloud.rocks";
-user.phoneNumber = @"+8618200008888";
+user.mobilePhoneNumber = @"+8618200008888";
 
 // 设置其他属性的方法跟 AVObject 一样
 [user setObject:@"secret" forKey:@"gender"];
