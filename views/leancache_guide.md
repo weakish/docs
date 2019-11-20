@@ -89,12 +89,12 @@ LeanCache 不提供外网直接访问。如果需要进行简单的数据操作�
 }
 ```
 
-然后可以使用下列代码获取 Redis 连接：
+然后可以使用下列代码获取 Redis 连接：（假定实例名称为 `MYCACHE`）
 
 ``` javascript
 const Redis = require('ioredis')
 
-const client = new Redis(process.env['REDIS_URL_<实例名称>']);
+const client = new Redis(process.env['REDIS_URL_MYCACHE']);
 client.on('error', function(err) {
   return console.error('redis err: ', err);
 });
@@ -111,13 +111,13 @@ leancloud-sdk>=1.0.9
 redis
 ```
 
-然后可以使用下列代码获取 Redis 连接：
+然后可以使用下列代码获取 Redis 连接：（假定实例名称为 `MYCACHE`）
 
 ``` python
 import os
 import redis
 
-r = redis.from_url(os.environ.get("REDIS_URL_<实例名称>"))
+r = redis.from_url(os.environ.get("REDIS_URL_MYCACHE"))
 ```
 
 ### 在云引擎中使用（PHP 环境）
@@ -128,11 +128,11 @@ r = redis.from_url(os.environ.get("REDIS_URL_<实例名称>"))
 composer require 'predis/predis:1.1.*'
 ```
 
-然后在 PHP 应用中通过环境变量获取 Redis 地址并创建链接，如：
+然后在 PHP 应用中通过环境变量获取 Redis 地址并创建链接，如：（假定实例名称为 `MYCACHE`）
 
 ```php
 use Predis;
-$redis = new Predis\Client(getenv("REDIS_URL_<实例名称>"));
+$redis = new Predis\Client(getenv("REDIS_URL_MYCACHE"));
 $redis->ping();
 ```
 
@@ -148,10 +148,10 @@ $redis->ping();
 </dependency>
 ```
 
-从环境变量中获取链接字符串，然后再创建 redis client 实例即可。
+从环境变量中获取链接字符串，然后再创建 redis client 实例即可。（假定实例名称为 `MYCACHE`）
 
 ```java
-String redisUrl = System.getenv("REDIS_URL_<实例名称>");
+String redisUrl = System.getenv("REDIS_URL_MYCACHE");
 Jedis jedis = new Jedis(redisUrl);
 jedis.set("foo", "bar");
 String value = jedis.get("foo");
@@ -213,7 +213,7 @@ var bar = db.StringGet("foo");
 
 ```javascript
 // 在本地 process.env['REDIS_URL_<实例名称>'] 为 undefined，会连接默认的 127.0.0.1:6379
-const client = new Redis(process.env['REDIS_URL_<实例名称>']);
+const client = new Redis(process.env['REDIS_URL_MYCACHE']); // 假定实例名称为 MYCACHE
 ```
 
 如果部署到预备或生产环境时遇到类似 `redis err: Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379` 错误，请核实以上代码中 `REDIS_URL_<实例名称>` 这个环境变量的值是否替换正确，也可参考 [在云引擎中使用（Node.js 环境）](#在云引擎中使用_Node_js_环境_) 的示例。
