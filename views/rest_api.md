@@ -867,7 +867,7 @@ curl -X PUT \
 ```
 --- issue #2227 remove relation --- #}
 
-#### 按条件更新对象
+#### 有条件更新对象
 
 假设从某个账户对象 Account 的余额中扣除一定金额，但是要求余额要大于等于被扣除的金额才允许操作，那么就需要通过 `where` 参数为更新操作加上限定条件 `balance >= amount`：
 
@@ -918,7 +918,7 @@ curl -X PUT \
   https://{{host}}/1.1/classes/Post/<objectId>
 ```
 
-#### 按条件删除对象
+#### 有条件删除对象
 
 为请求增加 `where` 参数即可以按指定的条件来删除对象。例如删除点击量 clicks 为 0 的帖子：
 
