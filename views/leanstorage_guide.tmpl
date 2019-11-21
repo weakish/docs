@@ -384,21 +384,56 @@ testObject.save();
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-let number       : LCNumber       = 42
-let bool         : LCBool         = true
-let string       : LCString       = "foo"
+/* 所有的 LC 数据类型都遵循 LCValue 协议，即它们也都是 LCValue 类型 */
+
+// 构建 LC 基础类型
+let number       : LCNumber       = LCNumber(42)
+let bool         : LCBool         = LCBool(true)
+let string       : LCString       = LCString("foo")
 let dictionary   : LCDictionary   = LCDictionary(["name": string, "count": number])
 let array        : LCArray        = LCArray([number, bool, string])
-let data         : LCData         = LCData()
-let date         : LCDate         = LCDate()
+let emptyData    : LCData         = LCData(Data())
+let currentDate  : LCDate         = LCDate(Date())
 let null         : LCNull         = LCNull()
 let geoPoint     : LCGeoPoint     = LCGeoPoint(latitude: 45, longitude: -45)
 let acl          : LCACL          = LCACL()
+
+// LC 基础类型转换为 Swift 标准数据类型
+let swiftInt:        Int?              = number.intValue
+let swiftDouble:     Double            = number.value
+let swiftBool:       Bool              = bool.value
+let swiftString:     String            = string.value
+let swiftDictionary: [String: LCValue] = dictionary.value
+let swiftArray:      [LCValue]         = array.value
+
+// 构建 LC 对象类型
 let object       : LCObject       = LCObject()
-let relation     : LCRelation     = object.relationForKey("elements")
+let relation     : LCRelation     = object.relationForKey("elements") // LCRelation 没有继承 LCObject
 let user         : LCUser         = LCUser()
 let file         : LCFile         = LCFile()
 let installation : LCInstallation = LCInstallation()
+
+/* LC 对象类型的 Setter 方法 */
+
+// 1. 调用 set(_:value:) 函数，此方式会检查 value 是否有效
+do {
+    try object.set("number", value: 42)
+    try object.set("number", value: LCNumber(42))
+} catch {
+    print(error)
+}
+
+// 2. subscript 方式，此方式不会检查 value 是否有效
+object["number"] = 42.lcValue
+object["number"] = LCNumber(42)
+
+/* LC 对象类型的 Getter 方法 */
+
+// 1. 调用 get(_:) 函数
+let getNumber1: LCNumber? = object.get("number") as? LCNumber
+
+// 2. subscript 方式
+let getNumber2: LCNumber? = object["number"] as? LCNumber
 ```
 {% endif %}
 
@@ -927,9 +962,20 @@ todo.save();
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-let todo = LCObject(className: "Todo", objectId: "582570f38ac247004f39c24b")
-todo.set("content", value: "这周周会改到周三下午三点。")
-todo.save()
+do {
+    let todo = LCObject(className: "Todo", objectId: "582570f38ac247004f39c24b")
+    try todo.set("content", value: "这周周会改到周三下午三点。")
+    todo.save { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 {% endif %}
 
@@ -1148,12 +1194,12 @@ try post.increase("likes", by: 1)
 - `removeAll()`<br/>从数组字段中删除指定对象的所有实例。
 {% endif %}
 {% if platform_name === "Swift" %}
-- `append(String, element: LCType)`<br/>将指定对象附加到数组末尾。
-- `append(String, element: LCType, unique: Bool)`<br/>将指定对象附加到数组末尾，并且可以设置一个 `unique` 的 `bool` 值表示只是确保唯一，不会重复添加。
-- `append(String, elements: [LCType])`<br/>将指定对象数组附加到数组末尾。
-- `append(String, elements: [LCType], unique: Bool)`<br/>将指定对象数组附加到数组末尾，并且可以设置一个 `unique` 的 `bool` 值表示只是确保唯一，不会重复添加。
-- `remove(String, element: LCType)`<br/>从数组字段中删除指定对象的所有实例。
-- `remove(String, elements: [LCType])`<br/>从数组字段中删除指定的对象数组。
+- `append(String, element: LCValue)`<br/>将指定对象附加到数组末尾。
+- `append(String, element: LCValue, unique: Bool)`<br/>将指定对象附加到数组末尾，并且可以设置一个 `unique` 的 `bool` 值表示只是确保唯一，不会重复添加。
+- `append(String, elements: [LCValue])`<br/>将指定对象数组附加到数组末尾。
+- `append(String, elements: [LCValue], unique: Bool)`<br/>将指定对象数组附加到数组末尾，并且可以设置一个 `unique` 的 `bool` 值表示只是确保唯一，不会重复添加。
+- `remove(String, element: LCValue)`<br/>从数组字段中删除指定对象的所有实例。
+- `remove(String, elements: [LCValue])`<br/>从数组字段中删除指定的对象数组。
 {% endif %}
 
 例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
@@ -4752,11 +4798,22 @@ todo.save();
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-let todo = LCObject(className: "Todo")
-todo.set("title", value: "买蛋糕")
-// attachments 是一个 Array 属性
-todo.append("attachments", element: file)
-todo.save()
+do {
+    if let _ = file.objectId?.value {
+        let todo = LCObject(className: "Todo")
+        try todo.set("attachments", value: file)
+        todo.save { (result) in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 {% endif %}
 
@@ -5676,21 +5733,32 @@ user.signUpInBackground().subscribe(new Observer<AVUser>() {
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-// 创建实例
-let user = LCUser()
-
-// 等同于 user.set("username", value: "Tom")
-user.username = LCString("Tom")
-user.password = LCString("cat!@#123")
-
-// 可选
-user.set("email", value: "tom@leancloud.rocks")
-user.set("mobilePhoneNumber", value: "+8618200008888")
-
-// 设置其他属性的方法跟 LCObject 一样
-user.set("gender", value: "secret")
-
-assert(user.signUp().isSuccess)
+do {
+    // 创建实例
+    let user = LCUser()
+    
+    // 等同于 user.set("username", value: "Tom")
+    user.username = LCString("Tom")
+    user.password = LCString("cat!@#123")
+    
+    // 可选
+    user.email = LCString("tom@leancloud.rocks")
+    user.mobilePhoneNumber = LCString("+8618200008888")
+    
+    // 设置其他属性的方法跟 LCObject 一样
+    try user.set("gender", value: "secret")
+    
+    _ = user.signUp { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
 ```
 {% endif %}
 
@@ -6867,28 +6935,34 @@ book.saveInBackground().subscribe(new Observer<AVObject>() {
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-let book = LCObject(className: "Book")
-let author = LCApplication.default.currentUser
-book.set("title", value: "我的第五本书")
-book.set("author", value: author)
-_ = book.save { result in
-    switch result {
-    case .success:
-        // 获取所有该作者写的书
-        let query = LCQuery(className: "Book")
-        query.whereKey("author", .equalTo(author))
-        _ = query.find { result in
-            switch result {
-            case .success(objects: let books):
-                // books 是包含同一作者所有 Book 对象的数组
-                break
-            case .failure(error: let error):
-                print(error)
-            }
-        }
-    case .failure(error: let error):
-        print(error)
+do {
+    guard let author = LCApplication.default.currentUser else {
+        return
     }
+    let book = LCObject(className: "Book")
+    try book.set("title", value: "我的第五本书")
+    try book.set("author", value: author)
+    _ = book.save { result in
+        switch result {
+        case .success:
+            // 获取所有该作者写的书
+            let query = LCQuery(className: "Book")
+            query.whereKey("author", .equalTo(author))
+            _ = query.find { result in
+                switch result {
+                case .success(objects: let books):
+                    // books 是包含同一作者所有 Book 对象的数组
+                    break
+                case .failure(error: let error):
+                    print(error)
+                }
+            }
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
 }
 ```
 {% endif %}
@@ -8226,7 +8300,7 @@ do {
 ```swift
 // Set name for Student
 let student = Student()
-student.name = "小明"
+student.name = LCString("小明")
 assert(student.save().isSuccess)
 ```
 {% endif %}
