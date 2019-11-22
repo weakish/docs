@@ -143,8 +143,6 @@ $ lean login
 
 如果同时使用多个区域，那么可以多次运行 `lean login`，每次选择不同的区域，并使用相应的用户名、密码登录。
 
-以 GitHub、微博或 QQ 这种第三方登录方式来注册 LeanCloud 账户的用户，如果未曾设置过账户密码，需要先使用 [忘记密码](/dashboard/login.html#/forgotpass) 功能重新设置一个密码，再进行登录。
-
 ### 切换账户
 
 要切换到另一账户，重新执行 `lean login` 即可。
@@ -352,16 +350,17 @@ $ lean publish
 
 ```sh
 $ lean logs
-2016-05-16 16:03:53 [PROD] [INFO]
-2016-05-16 16:03:53 [PROD] [INFO] > playground@1.0.0 start /home/leanengine/app
-2016-05-16 16:03:53 [PROD] [INFO] > node server.js
-2016-05-16 16:03:53 [PROD] [INFO]
-2016-05-16 16:03:54 [PROD] [INFO] Node app is running, port: 3000
-2016-05-16 16:03:54 [PROD] [INFO] connected to redis server
-2016-05-16 16:03:54 [PROD] [INFO] 实例启动成功：{"runtime":"nodejs-v4.4.3","version":"0.4.0"}
-2016-05-16 16:03:54 [PROD] [INFO] 正在统一切换新旧实例 ...
-2016-05-16 16:03:55 [PROD] [INFO] 正在更新云函数信息 ...
-2016-05-16 16:03:55 [PROD] [INFO] 部署完成：2 个实例部署成功
+      2019-11-20 17:17:12  Deploying 20191120-171431 to web1
+      2019-11-20 17:17:12  Creating new instance ...
+      2019-11-20 17:17:22  Starting new instance ...
+web1  2019-11-20 17:17:22  
+web1  2019-11-20 17:17:22  > node-js-getting-started@1.0.0 start /home/leanengine/app
+web1  2019-11-20 17:17:22  > node server.js
+web1  2019-11-20 17:17:22  
+web1  2019-11-20 17:17:23  Node app is running on port: 3000
+      2019-11-20 17:17:23  Instance started: {"runtime":"nodejs-v12.13.1","version":"3.4.0"}
+      2019-11-20 17:17:23  Updating cloud functions metadata ...
+      2019-11-20 17:17:23  Deploy finished: 1 instances deployed
 ```
 
 默认返回最新的 30 条，最新的在最下面。
