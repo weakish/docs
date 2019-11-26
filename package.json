@@ -20,7 +20,7 @@
     "email": false
   },
   "devDependencies": {
-    "assemble": "~0.4.33",
+    "assemble": "git+https://github.com/assemble/grunt-assemble#pull/67/head",
     "assemble-swig": "~0.1.0",
     "autoprefixer": "^6.3.4",
     "axios": "^0.18.1",
@@ -41,7 +41,7 @@
     "grunt-contrib-cssmin": "~1.0.0",
     "grunt-contrib-less": "^1.1.0",
     "grunt-contrib-uglify": "^1.0.0",
-    "grunt-contrib-watch": "~1.0.0",
+    "grunt-contrib-watch": "^1.1.0",
     "grunt-conventional-changelog": "^6.0.0",
     "grunt-dom-munger": "^3.4.0",
     "grunt-markdown": "~0.7.0",
