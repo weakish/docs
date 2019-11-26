@@ -193,7 +193,7 @@ curl -X POST \
   -H "X-LC-Key: {{appkey}}"        \
   -H "Content-Type: application/json" \
   -d '{
-        "where": {"channels" : ["public"]}
+        "where": {"channels" : ["public"]},
         "data": {"alert" : "Hello from LeanCloud"}
      }' \
   https://{{host}}/1.1/push
@@ -225,7 +225,7 @@ curl -X POST \
   -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
-        "where": {"channels" : ["public"]}
+        "where": {"channels" : ["public"]},
         "data": {"alert" : "Hello from LeanCloud"}
      }' \
   https://{{host}}/1.1/push
@@ -246,18 +246,18 @@ curl -X POST \
 ```
 {
   "alert":             字符串类型，表示消息内容。如果目标设备中只包含 iOS 设备则还可以是 JSON 类型，下面详述 JSON 类型时支持的属性,
-  "title":             字符串类型，表示推送内容标题，如果 alert 字段为字符串可以在此补充提供 title，如果 alert 是 JSON 类型则无需再提供本字段，
+  "title":             字符串类型，表示推送内容标题，如果 alert 字段为字符串可以在此补充提供 title，如果 alert 是 JSON 类型则无需再提供本字段,
   "category":          字符串类型，通知类型,
   "thread-id":         字符串类型，通知分类名称,
   "badge":             数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
-  "sound":             字符串或 JSON 类型，指定推送声音信息，下面详述 JSON 类型时支持的属性，
+  "sound":             字符串或 JSON 类型，指定推送声音信息，下面详述 JSON 类型时支持的属性,
   "content-available": 数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载,
   "mutable-content":   数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用,
-  "collapse-id":       字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅，
-  "apns-priority":     数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅，
-  "apns-push-type":    字符串类型，用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert"，
-  "url-args":          字符串列表类型，用于 Safari 推送，详情见 APNs 文档关于 url-args 参数的描述，
-  "target-content-id": 字符串类型，详情见 APNs 文档关于 target-content-id 参数的描述，
+  "collapse-id":       字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
+  "apns-priority":     数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
+  "apns-push-type":    字符串类型，用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert",
+  "url-args":          字符串列表类型，用于 Safari 推送，详情见 APNs 文档关于 url-args 参数的描述,
+  "target-content-id": 字符串类型，详情见 APNs 文档关于 target-content-id 参数的描述,
   "custom-key":        由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
@@ -267,18 +267,18 @@ curl -X POST \
 ```
 {
   "alert": {
-    "title":               字符串类型，表示推送内容标题，
-    "title-loc-key":       字符串列表，详情请参看 Apple 关于推送提醒本地化的说明，
-    "title-loc-args":      字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明， 
+    "title":               字符串类型，表示推送内容标题,
+    "title-loc-key":       字符串列表，详情请参看 Apple 关于推送提醒本地化的说明,
+    "title-loc-args":      字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
     "subtitle":            字符串类型，表示推送内容副标题,
     "subtitle-loc-key":    字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
-    "subtitle-loc-args":   字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
+    "subtitle-loc-args":   字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
     "body":                字符串类型，表示消息内容,
-    "action-loc-key":      字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
-    "loc-key":             字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
-    "loc-args":            字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
-    "launch-image":        字符串类型，设置点击推送后启动图片文件名， 
-    "summary-arg":         字符串类型，用于设置 Summary，
+    "action-loc-key":      字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
+    "loc-key":             字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
+    "loc-args":            字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
+    "launch-image":        字符串类型，设置点击推送后启动图片文件名,
+    "summary-arg":         字符串类型，用于设置 Summary,
     "summary-arg-count":   数字类型，用于设置 Summary 参数数量
    }
 }
@@ -290,9 +290,9 @@ iOS 支持通过 sound 参数设置推送声音，可以是字符串类型的声
 {
   "sound": {
     "name":         字符串类型的声音文件名，指向一个在应用内存在的声音文件,
-    "critical":     数字类型，只能为 0 或 1，1 表示使用 "Critical" 提示音，默认为 0，
+    "critical":     数字类型，只能为 0 或 1，1 表示使用 "Critical" 提示音，默认为 0,
     "volume":       指定声音大小，必须为 0 到 1 之间的小数
-  } 
+  }
 }
 ```
 
@@ -304,18 +304,18 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 {
   "aps": {
      "alert": {
-       "title":               字符串类型，表示推送内容标题，
-       "title-loc-key":       字符串列表，详情请参看 Apple 关于推送提醒本地化的说明，
-       "title-loc-args":      字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明， 
+       "title":               字符串类型，表示推送内容标题,
+       "title-loc-key":       字符串列表，详情请参看 Apple 关于推送提醒本地化的说明,
+       "title-loc-args":      字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
        "subtitle":            字符串类型，表示推送内容副标题,
        "subtitle-loc-key":    字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
-       "subtitle-loc-args":   字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
+       "subtitle-loc-args":   字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
        "body":                字符串类型，表示消息内容,
-       "action-loc-key":      字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
-       "loc-key":             字符串类型，详情请参看 Apple 关于推送提醒本地化的说明，
-       "loc-args":            字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明，
-       "launch-image":        字符串类型，设置点击推送后启动图片文件名， 
-       "summary-arg":         字符串类型，用于设置 Summary，
+       "action-loc-key":      字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
+       "loc-key":             字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
+       "loc-args":            字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
+       "launch-image":        字符串类型，设置点击推送后启动图片文件名,
+       "summary-arg":         字符串类型，用于设置 Summary,
        "summary-arg-count":   数字类型，用于设置 Summary 参数数量
      }
      "category":              字符串类型，通知类型,
@@ -325,9 +325,9 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
      "content-available":     数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载,
      "mutable-content":       数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用
    }
-   "collapse-id":             字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅，
-   "apns-priority":           数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅
-   "apns-push-type":          字符串类型，用于设置推送展示类型，只能为 "background"，"voip"，"complication"，"fileprovider"，"mdm"，"alert"，默认为 "alert"，
+   "collapse-id":             字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
+   "apns-priority":           数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅,
+   "apns-push-type":          字符串类型，用于设置推送展示类型，只能为 "background"，"voip"，"complication"，"fileprovider"，"mdm"，"alert"，默认为 "alert",
    "custom-key":              由用户添加的自定义属性，custom-key 仅是举例，可随意替换
 }
 ```
@@ -519,7 +519,6 @@ curl -X POST \
         }
       }' \
   https://{{host}}/1.1/push
-
 ```
 
 * 发送给某个 installation id 的用户
