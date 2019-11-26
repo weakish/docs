@@ -767,11 +767,12 @@ throw new EngineException(123, "自定义错误信息。");
 {# PHP 没有靠谱的异步处理方案 #}
 {% if platformName !== "PHP" %}
 #### 超时的处理方案
+
+我们建议将代码中的任务转化为异步队列处理，以优化运行时间，避免云函数或定时任务发生超时。
 {% endif %}
 
 {% if platformName === "Node.js" %}
-
-我们建议将代码中的任务转化为异步队列处理。可以：
+例如：
 
 1. 在存储服务中创建一个队列表，包含 `status` 列；
 2. 接到任务后，向队列表保存一条记录，`status` 值设置为 `处理中`，然后将请求结束掉，将队列对象的 `id` 发给客户端（旧版本的 SDK 使用 `response.success(id)`）：
@@ -783,9 +784,9 @@ throw new EngineException(123, "自定义错误信息。");
 3. 当业务处理完毕，根据处理结果更新刚才的队列对象状态，将 `status` 字段设置为 `完成` 或者 `失败`；
 4. 在任何时候，在控制台通过队列 `id` 可以获取某个任务的执行结果，判断任务状态。
 {% endif %}
-{% if platformName === "Python" %}
 
-我们建议将代码中的任务转化为异步队列处理，以优化运行时间，避免云函数或定时任务发生超时。Python 运行环境使用了 `gevent` 作为 event loop，所以你可以根据情况自己 `gevent.spawn` 一个 `greenlet` 来处理异步逻辑。例如：
+{% if platformName === "Python" %}
+Python 运行环境使用了 `gevent` 作为 event loop，所以你可以根据情况自己 `gevent.spawn` 一个 `greenlet` 来处理异步逻辑。例如：
 
 ```python
 def handle(req):
@@ -799,10 +800,8 @@ def handle(req):
     return # 上面的函数会异步地执行，这里会直接返回
 ```
 {% endif %}
+
 {% if platformName === "Java" %}
-
-我们建议将代码中的任务转化为异步队列处理，以优化运行时间，避免云函数或定时任务发生超时。例如：
-
 ```java
 @EngineFunction("hello")
 public static String hello(@EngineFunctionParam("name") String name) {
@@ -818,8 +817,6 @@ public static String hello(@EngineFunctionParam("name") String name) {
 {% endif %}
 
 {% if platformName === ".NET" %}
-我们建议将代码中的任务转化为异步队列处理，以优化运行时间，避免云函数或定时任务发生超时。例如：
-
 ```cs
 private async static void TimeConsumingTask()
 {
@@ -834,6 +831,7 @@ public static string Hello()
 }
 ```
 {% endif %}
+
 {% if platformName !== "PHP" %}
 注意，对于 before 类 hook 函数，改为异步处理通常没有意义。
 虽然改为异步后能保证 before 类函数能够运行完成，不会因超时而报错。
@@ -842,7 +840,6 @@ public static string Hello()
 例如，假设某个 beforeSave 函数需要调用耗时较久的第三方的自然语言处理接口判断用户提交的评论是否来自真实用户，导致超时，
 那么可以改为 afterSave 函数，在保存评论后再调用第三方接口，如果判断是水军评论，那么再行删除。
 {% endif %}
-
 
 {% if platformName === "Python" %}
 ### 分离云函数
