@@ -254,8 +254,8 @@ req_id | 可选 | 自定义请求 id，最长 16 个字符且只能由英文字�
 名称 | 约束 | 描述
 ---- | ---- | ----
 prod| 可选 | 用于设置将推送发至 APNs 的开发环境（***dev***）还是生产环境（***prod***）
-topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 APNs Topic 做鉴权。一次推送接口调用只能将推送发送至相同 Topic 的设备去。
-apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一次推送接口调用只能将推送发送至相同 Team ID 的设备去。
+topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 APNs Topic 做鉴权。一次推送接口调用只能将推送发送至相同 Topic 的设备。
+apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一次推送接口调用只能将推送发送至相同 Team ID 的设备。
 device_profile | 可选 | 用于指定使用的 iOS 自定义推送证书。如果使用 Token Authentication 鉴权方式，或者使用的推送证书为配置的「生产环境证书」或「开发环境证书」则无需提供本参数。我们会根据您填写的 `prod` 参数值来使用对应的证书。
 
 如果目标为 Android 设备，则在前述通用参数之外，还可以附带如下参数： 
@@ -263,7 +263,7 @@ device_profile | 可选 | 用于指定使用的 iOS 自定义推送证书。如�
 名称 | 约束 | 描述
 ---- | ---- | ----
 channel| 可选 | 指定推送频道。
-vendor | 可选 | ***仅对开启混合推送的设备有效*** 对应混合推送设备在 _Installation 表中的 vendor 字段。一次推送接口调用只能将推送发送给相同 vendor 的设备去。
+vendor | 可选 | ***仅对开启混合推送的设备有效*** 对应混合推送设备在 _Installation 表中的 vendor 字段。一次推送接口调用只能将推送发送给相同 vendor 的设备。
 device_profile | 可选 | ***仅对开启混合推送的设备有效*** 当目标混合推送平台下配置了多份配置时需要通过该参数指定配置名。默认值为 _default
 
 #### master key 校验
