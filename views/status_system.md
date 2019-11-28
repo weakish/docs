@@ -1,23 +1,66 @@
 {% set autoFollowFolloweeOptionLink = "如果在 [控制台 > 存储 > 设置 > 其他](/dashboard/storage.html?appid={{appid}}#/storage/conf) 勾选了 **应用内社交模块，关注用户时自动反向关注**" %}
-# 应用内社交模块
-应用内社交，又称「事件流」，在应用开发中出现的场景非常多，包括用户间关注（好友）、朋友圈（时间线）、状态、互动（点赞）、私信等常用功能。
+# 应用内社交组件
+应用内社交，包含「好友关系」和「信息流」两部分。好友关系指用户间通过「关注」或「加好友」形成的社交关系，信息流则是「好友」发布的状态信息汇集而成的「时间线」或者「朋友圈」内容。
+
+很多产品中都存在这种社交场景，例如用户间关注（好友）、朋友圈（时间线）、状态、互动（点赞）、私信等常用功能，LeanCloud 应用内社交组件对这些需求进行了提炼，给出了一套统一的方案，以帮助开发者快速实现社交需求。
 
 
-## 基本概念
+## 功能概述
 
-### Status
+### 基本概念
 
-Status 是指一条广义上的「状态」，它不仅可以表示某个用户更新了状态，还可以表示任意的一个事件，比如某人发布了一篇文章，某个图片被赞等等。在控制台中对应的表名称为 `_Status`。该表只有在开发者使用了相应的 API 成功发送了一条状态之后才会出现在 Class 列表中。
+首先说明几个基本概念。
 
-需要注意，**存入 `_Status` 表中的数据无法修改，任何对已存在记录的更新操作都会报错。**就像微博、微信朋友圈之类的系统不允许对已发布的内容进行修改一样，我们对 `_Status` 表中的记录也应用了同样的逻辑，即如需修改，只能删除老记录，添加新记录。
+#### 用户关系（Follower/Followee）
 
-如果业务的确要求状态的内容可以更改，请将可变的内容/字段放入自建的表中维护，并通过 `_Status` 表记录的 objectId 来建立关联。
+指社交应用中用户关注/加粉等行为构建成的群体关系，例如微博里面的「关注者」和微信中的「好友」关系，本文会统一按照关注关系来描述。假设一个用户 A 有 ta 关注的用户群体，也有关注 ta 的用户群体存在。
+在社交组件内，我们分为了 `Follower` 和 `Followee` 两种类型，分别表示用户的粉丝和用户的关注，在控制台中对应着两张表 `_Follower` 和 `_Followee`。
 
-### Follower/Followee
-分别表示用户的粉丝和用户的关注，在控制台中对应着两张表 `_Follower` 和 `_Followee`。
+#### 状态（Status）
 
-### 特别提示
-发了一条状态，并不代表会自动发送了一条推送消息，开发者可以自由控制是否使用推送。更多信息请参考 [消息推送开发指南](./push_guide.html)。
+指用户发出来的即时状态，例如微博中的一个帖子，微信朋友圈中的一段文字，就是这里所说的「状态」，我们用 `Status` 表示。
+
+社交组件中的 `Status` 是指一条广义上的「状态」，它不仅可以表示某个用户更新了状态，还可以表示任意的一个事件，比如某人发布了一篇文章，对某张图片点赞等等。在控制台中对应的表名称为 `_Status`。
+
+#### 时间线
+
+在社交类产品中，用户 A 关注了一些人之后，他就可以按照时间顺序查看到那些人发布的各种「状态」信息（这里我们暂且把这些信息称为「时间线」）；同样，A 发布了某一条「状态」之后，一般就会马上被关注 ta 的其他人看到，但是也有例外（就是接下来的「私信」）。
+
+#### 私信
+
+是状态中的一类特殊信息，只发给特定的用户，不会进入关注者的时间线来公开展示，例如微博里面的「私信」即是如此。
+
+### 功能概述
+
+#### 用户关系 API
+我们的用户关系 API 主要提供以下功能：
+
+- 用户 A 主动关注/取消关注用户 B；
+- 用户 A 查询自己的粉丝列表；
+- 用户 A 查询自己的关注列表；
+
+#### 信息流 API
+
+我们的信息流 API 主要提供以下功能：
+
+- 用户 A 给用户 B 发送私信（发私信）；
+- 用户 A 给关注 ta 的用户群体发送公开的状态信息（发推和转推，等）；
+- 用户 B 可以查看别人给他发送的私信（私信列表）；
+- 用户 B 可以查看 ta 关注的用户群体发出来的状态信息（查看时间线）；
+- 用户 C 可以公开查看用户 A 发出去的所有公开的状态信息（查看单个用户的公开状态）；
+- **用户 A 可以删除自己已经发布的状态，此时所有接收者的收件箱也会自动删除该状态数据**；
+- **用户 A 可以删除/屏蔽自己时间线上其他人发出来的状态（只在自己时间线上不显示，发布者和其他关注者依然可以看到）**；
+
+以下的功能我们无法在基础 API 层面提供支持：
+
+- 用户 B 根据用户关系中的分组设置来查看不同的人发出来的状态信息；
+- 状态发出之后无法修改（可以通过删除 + 发布来实现）；
+
+同时，信息流 API 是与用户账号系统绑定以及好友关系 API 绑定的，如果不使用这些内置组件，将无法正常使用信息流功能。接下来我们通过一些例子，看看如何使用信息流 API 来完成产品开发。
+
+> 特别提示：
+> 
+> 发了一条状态，并不代表会自动发送了一条推送消息，开发者可以自由控制是否使用推送。更多信息请参考 [消息推送开发指南](./push_guide.html)。
 
 ## JavaScript SDK
 
@@ -235,7 +278,7 @@ query.find().then(function(statuses){
 
 SDK 的安装参考 [Objective-C 安装指南](sdk_setup-objc.html)。
 
-### 好友关系
+### 用户关系
 
 #### 关注/取消关注
 
@@ -402,7 +445,7 @@ query.inboxType=kAVStatusTypeTimeline;
 
 SDK 的安装参考 [Android 安装指南](sdk_setup-android.html)。
 
-### 好友关系
+### 用户关系
 
 #### 关注和取消关注
 
@@ -533,148 +576,397 @@ followerNameQuery.include("followee");
     });
 ```
 
-### 状态
+### 信息流 API
+
+假设我们要开发一个类似微博的产品，其中有用户 A 已经关注了 2 个用户（B 和 C），同时他有 3 个关注者（D、E、F）。
+
+> 注意：以下示例代码基于 6.1.0 及以后版本开发。
 
 #### 发布状态
+第一步，我们来看看用户 A 如何发布一条公开的「状态」。
 
-发布一条时间线状态，即发一条我的粉丝可以看到的状态。
+##### 构造 Status
+开发者在 Status 中可以加入任意的数据，由应用层来对这些数据进行解析。信息流 API 提供了多种方式来构造一个 Status 实例：
 
-```java
-AVStatus status= new AVStatus();
-// 或者你也可以使用静态方法
-// AVStatus status = AVStatus.createStatus("my image", "my message");
-status.setImageUrl("myImageUrl");
-status.setMessage("myMessage");
-// 或者你也可以使用方法
-// setData(Map<String, Object> data)
-
-AVUser.logIn("myUserName", "myPassword");
-AVStatus.sendStatusToFollowersInBackgroud(status, new SaveCallback() {
-    @Override
-    public void done(AVException avException) {
-        Log.i(TAG, "Send status finished.");
-    }
-});
+```
+class AVStatus {
+  // 完全空的 Status
+  AVStatus()
+  // 默认的支持图文混合的 Status
+  AVStatus(String imageUrl, String message)
+  // 附带其他自定义属性的 Status
+  AVStatus(Map<String, Object> customData)
+  
+  // 设置与获取自定义属性
+  void put(String key, Object value)
+  Object get(String key)
+  // 删除某个自定义属性
+  void remove(String key)
+}
 ```
 
-其中 `status.setData` 可以任意指定 `Map<String, Object>` 数据（map 中的 source 字段为系统保留字段，不可使用）。
+使用方法在类的声明中应该可以一目了然。假如用户 A 想分享一下他中午吃的美食，那么可以按照如下方法来构造一条状态信息：
 
-
-#### 发私信
-
-给某个用户发私信也非常简单：
-
-```java
-AVStatus status = AVStatus.createStatus("test image", "test message");
-AVStatus.sendPrivateStatusInBackgroud(status, "user object id", new SaveCallback() {
-    @Override
-    public void done(AVException avException) {
-        Log.i(TAG, "Send private status finished.");
-    }
-});
+```
+AVStatus status = new AVStatus("https://ww4.sinaimg.cn/bmiddle/691c275bgy1g9cdxpw3f4j21hc1hc4qq.jpg", "北京烤鸭，贼拉好吃");
+status.put("location", "铁岭市赵大胡同");
 ```
 
-#### 自定义 Status
+这一条 Status 如果以公开的方式发送出去，所有关注 A 的用户都会看到这条信息。如果 A 只想发送给用户 D ，他可以选择私信的方式来发送，那就只有用户 D 可以查看到了（这两种方式下一节会说明）。
 
-除了上面常见两种场景，自定义 Status 可以通过设置**受众群体和发送者**来实现更加灵活的功能。
+AVStatus 类中有如下属性被系统保留了：
 
-```java
-Map<String, Object> data = new HashMap<String, Object>();
-data.put("text", "we have new website, take a look!");
-data.put("link", "http://leancloud.cn");
-AVStatus status = AVStatus.createStatusWithData(data);
-status.setInboxType("system");
+- inboxType，String，表示发布时指定的访问类型，目前有 `private` 和 `default` 两种类型。
+  - `private` 表示是私信，不会公开显示；
+  - `default` 表示是公开信息，会进入到关注者的时间线；
+  - 默认值为 `default`；
+  - 开发者可以在应用层面扩展这个 inboxType。例如，微博上就有「系统通知」这一类消息，我们可以增加一种「notification」的 inboxType，来实现这一类消息的收发展示。
+- source，Pointer，指向状态发布者（AVUser）的指针
+- messageId，Integer，LeanCloud 服务端在将状态插入目标用户的接收队列时，生成的一个序列号，主要用于状态流的分页遍历（这在后面会说明）。
+- updatedAt, createdAt, objectId，这些 AVObject 通用属性。
 
-    status.sendInBackgroundWithBlock(new SaveCallback() {
+这些属性都可以通过 getter/setter 方法进行访问。
+
+##### 发送 Status
+
+我们提供了三种方式来发送 Status：
+
+```
+class Status {
+  public Observable<AVStatus> sendToFollowersInBackground();
+  public Observable<AVStatus> sendToFollowersInBackground(String inboxType);
+  public Observable<AVStatus> sendToUsersInBackground(AVQuery query);
+  public Observable<AVStatus> sendToUsersInBackground(String inboxType, AVQuery query);
+  public Observable<AVStatus> sendPrivatelyInBackground(final String receiverObjectId);
+}
+```
+
+分别对应不同的使用场景：
+
+- 直接发布给用户自己的关注者（`sendToFollowersInBackground()`）。
+
+这是最常见的方式，用户 A 完成 Status 的构造之后，直接就公开发布出去。这条 Status 就会自动进入关注 ta 的用户的时间线。
+
+另外，考虑到应用层对 inboxType 扩展的需要，我们还提供了一个指定 inboxType 的公开发布 Status 的方法：`sendToFollowersInBackground(String inboxType)`，供开发者按需选择使用。
+
+- 选择性的发布给某些用户（`sendToUsersInBackground(AVQuery query)`）。
+
+用户 A 可能会有这样的需求，希望自己发布的 Status 只被一部分好友看到，这时候就可以在发布 Status 的时候，指定一个 AVQuery 实例来圈定目标用户。这是一种比较高阶的做法，具体细节后面会进行详细说明。
+
+- 以私信的形式单独发送给某个用户（`sendPrivatelyInBackground(final String receiverObjectId)`）。
+
+这也是比较常见的需求，某条 Status 只定向发送给某个好友，这时候默认就转变成了「私信」。
+
+我们还是回头来看用户 A 发送美食帖子的实现方法。假设 A 就是公开发布给所有的关注者，那么只需要一次调用就可以完成目的：
+
+```
+status.sendToFollowersInBackground()
+      .subscribe(new Observer<AVStatus>() {
         @Override
-        public void done(AVException e) {
-            Log.i(TAG, "Send finished");
-
+        public void onSubscribe(Disposable disposable) {
         }
+  
+        @Override
+        public void onNext(AVStatus avNull) {
+          // succeed
+        }
+  
+        @Override
+        public void onError(Throwable throwable) {
+          // failed
+          throwable.printStackTrace();
+        }
+  
+        @Override
+        public void onComplete() {
+        }
+      });
+```
+
+当然，这里有一个前提是用户 A 已经完成了登录，就是 `AVUser.currentUser` 必须存在且是登录状态，否则发送会失败。
+
+#### 查看 Status
+用户 A 发布了状态之后，关注 ta 的用户 D 该如何查看这些信息呢？我们提供了多种方法，可以来查询和展示 Status。
+
+##### 查看自己的时间线
+假设用户 D 要查看自己的时间线，他首先需要登录，然后可以调用如下方法来查询自己的时间线状态：
+
+```
+AVUser userD = AVUser.currentUser();
+String defaultInbox = AVStatus.INBOX_TYPE.TIMELINE.toString(); // "default"
+AVStatusQuery statusQuery = AVStatus.inboxQuery(userD, defaultInbox);
+statusQuery.findInBackground().subscribe(new Observer<List<AVStatus>>() {
+      @Override
+      public void onSubscribe(Disposable disposable) {
+      }
+
+      @Override
+      public void onNext(List<AVStatus> avStatuses) {
+        // succeed
+        // 这时候每一个 AVStatus 实例都会有 source，messageId，objectId，createdAt，inboxType 等预留属性，也会有开发者自定义设置的所有属性值。
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        // failed.
+        throwable.printStackTrace();
+      }
+
+      @Override
+      public void onComplete() {
+      }
     });
 ```
 
-上面是系统广播的基本实现。因为指定了一个无条件的 AVUser 查询，所以会发送给所有的用户，指定了 `inboxType` 是 system 或者任意字符串，则所有用户会在查询这个类型的状态中看到这一条。SDK 包含了两种预定类型：
+##### 查看私信
+用户 D 要查看自己的私信列表，其方法与查看时间线类似，只需要把 inboxType 变为 `AVStatus.INBOX_TYPE.PRIVATE` 即可，示例代码如下：
 
-- `AVStatus.INBOX_TYPE.TIMELINE`
-- `AVStatus.INBOX_TYPE.PRIVATE`
-
-#### 获取收件箱状态
-
-获取用户收件箱内时间线上的 50 条状态：
-
-```java
-AVStatusQuery<AVStatus> inboxQuery = AVStatus.inboxQuery(AVStatus.class, userB,AVStatus.INBOX_TYPE.TIMELINE.toString());
-inboxQuery.setLimit(50);  //设置最多返回 50 条状态
-inboxQuery.setSinceId(0);  //查询返回的 status 的 messageId 必须大于 sinceId，默认为 0
-inboxQuery.findInBackground(new InboxStatusFindCallback(){
-  @Override
-  public void done(final List<AVStatus> avObjects, final AVException avException) {
-
-  }
-});
+```
+AVUser userD = AVUser.currentUser();
+String inboxType = AVStatus.INBOX_TYPE.PRIVATE.toString(); // "private"
+AVStatusQuery statusQuery = AVStatus.inboxQuery(userD, inboxType);
+statusQuery.findInBackground().blockingLast();
 ```
 
-同理，可以获得用户收件箱的私信，只要把   `type` 参数改为 `AVStatus.INBOX_TYPE.PRIVATE.toString()` 即可。
+##### 查看单个用户的公开 Status
 
-AVStatus 有一个 messageId 属性，用于标示这条 status 在 inbox 里的唯一位置。使用这个 `messageId` 结合 `AVStatusQuery` 可以做分页查询，AVStatusQuery 可以设置 `sinceId` 和 `maxId`：
+查询时间线和私信都需要当前用户是登录状态，且只能查询当前登录用户能接收到状态流。有时候我们产品里还需要展示单个用户发布的所有公开状态，例如微博的个人主页上会展示 ta 发布的所有帖子。
 
-- **sinceId**：设定查询返回的 status 的 messageId 必须**大于**传入的 messageId。
-- **maxId**：限定查询返回的 status 的 messageId 必须小于等于传入的 messageId。
+要查看目标用户的公开 Status，并不要求该用户当前是登录状态，我们只需要知道目标用户的 objectId（AVUser 的基本属性之一） 就可以查看 ta 的公开状态了。
 
-使用这两个 Id 就可以做分页查询。AVStatusQuery 查询**不支持 skip**。
+示例代码如下：
 
-从 v2.6.7 版本开始，`InboxStatusFindCallback` 提供 `isEnd()` 方法，用来**在查询后**检查收件箱查询是否已经到了最早的一页数据。
+```
+AVUser targetUser = AVObject.createWithoutData(AVUser.class, targetUserObjectId);
+AVStatus.statusQuery(targetUser)
+        .findInBackground()
+        .subscribe(new Observer<List<AVStatus>>() {
+          @Override
+          public void onSubscribe(Disposable disposable) {
+          }
 
-#### 获取收件箱的计数
+          @Override
+          public void onNext(List<AVStatus> avStatuses) {
+            // succeed
+            // 这时候每一个 AVStatus 实例都会有 source，messageId，objectId，createdAt，inboxType 
+            // 等预留属性，也会有开发者自定义设置的所有属性值。
+          }
 
-使用 `AVStatus.getUnreadStatusesCountInBackground`方法可以查询收件箱的未读 status 数目和总 status 数目：
+          @Override
+          public void onError(Throwable throwable) {
+            // failed
+            throwable.printStackTrace();
+          }
 
-```java
-AVStatus.getUnreadStatusesCountInBackground(AVStatus.INBOX_TYPE.TIMELINE.toString(), new CountCallback() {
-        public void done(int count, AVException e) {
-            if (e == null) {
-                //count就是未读status数目
-            } else {
-                //有错误发生。
-            }
-        }
+          @Override
+          public void onComplete() {
+          }
+        });
+```
+
+##### Status 的分页展示
+
+从上面的示例代码可以看到，我们可以通过 StatusQuery 实例来完成多种 Status 数据查询，查询结果里所有 Status 实例按照发布时间从新到旧的顺序进行排列。不过如果 Status 数据量较大，无法一次查询（默认 100 条）获取全部数据，这时候就需要进行分页查询，我们该如何做呢？
+
+StatusQuery 还提供了分页获取结果的方法：`nextInBackground`，它可以在当前查询的基础上，继续往后获取结果数据。例如，用户 D 使用前述的接口获取了头 100 条结果之后，要继续拉取时间线数据，可以这样做：
+
+```
+// AVStatusQuery statusQuery = AVStatus.inboxQuery(userD, defaultInbox);
+statusQuery.nextInBackground().subscribe(new Observer<List<AVStatus>>() {
+      @Override
+      public void onSubscribe(Disposable disposable) {
+      }
+
+      @Override
+      public void onNext(List<AVStatus> avStatuses) {
+        // succeed
+        // 这时候每一个 AVStatus 实例都会有 source，messageId，objectId，createdAt，inboxType 等预留属性，也会有开发者自定义设置的所有属性值。
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        // failed.
+        throwable.printStackTrace();
+      }
+
+      @Override
+      public void onComplete() {
+      }
     });
 ```
 
-#### 重置收件箱未读消息数
+`nextInBackground()` 可以一直调用，直到没有新的结果返回为止。
 
-如果想将某个收件箱（比如 private）的未读消息数设置为 0，也就是通常看到的将全部消息设为「已读」的功能，可以调用如下函数：
+###### 分页查询的其他参数设置
 
-```java
-AVStatus.resetUnreadStatusesCount("private", new AVCallback() {
-  @Override
-  protected void internalDone0(Object o, AVException exception) {
-    if (exception == null) {
-      // 重置成功
-    } else {
-      // 重置失败，具体失败原因在 exception 中
-    }
-  }
-});
+StatusQuery 默认都是按照从新到旧的顺序来查询结果，并且每次查询默认的结果集大小为 100。实际上，StatusQuery 还允许开发者来设置多种查询参数，如：
+
+- 查询方向。可以通过 `setDirection(PaginationDirection direct)` 方法来设置是从新往旧查询（最近发布的 Status 会最先返回），还是从旧到新查询 Status 数据（最早发布的 Status 会最先返回）。
+- 分页大小。可以通过 `setPageSize(int pageSize)` 方法来设置分页的大小，允许的页面大小区间为 （0，1000）（不包含两个端点）。
+- 查询的起点和终点。在对时间线进行分页查询的时候，还允许开发者设置查询起点和终点 Status 的 MessageId（查询结果中不会包含两个端点的数据）。
+  - `setSinceId(long sinceId)` 用来设置结果集中最小的 messageId，返回的所有 Status 的 messageId 都会比 sinceId 大。
+  - `setMaxId(long maxId)` 用来设置结果集中最大的 messageId，返回的所有 Status 的 messageId 都会比 maxId 小。
+
+如果用户 D 需要按照从旧到新的顺序浏览时间线 Status，并且每次只希望看 20 条数据，那么可以这样实现：
+
+```
+AVUser userD = AVUser.currentUser();
+String defaultInbox = AVStatus.INBOX_TYPE.TIMELINE.toString(); // "default"
+AVStatusQuery statusQuery = AVStatus.inboxQuery(userD, defaultInbox);
+statusQuery.setPageSize(20);
+statusQuery.setDirection(PaginationDirection.OLD_TO_NEW);
+List<AVStatus> first20Statuses = statusQuery.findInBackground().blockingLast();
+List<AVStatus> second20Statuses = statusQuery.nextInBackground().blockingLast();
 ```
 
-#### 查询发件箱状态
+##### 状态流的计数信息
 
-查询当前用户发件箱内已经发送的 50 条状态：
+与 Query 类似，StatusQuery 提供以下方法：
 
-```java
-AVStatusQuery<AVStatus> query = AVStatus.statusQuery(AVStatus.class,AVUser.getCurrentUser());
-query.setLimit(50);    //设置最多返回 50 条状态
-query.setSinceId(0);   //查询返回的 status 的 messageId 必须大于 sinceId，默认为 0
-//query.setInboxType(AVStatus.INBOX_TYPE.TIMELINE.toString()); 此处可以通过这个方法来添加查询的状态条件，当然这里你也可以用你自己定义的状态类型，因为这里接受的其实是一个字符串类型。
-query.findInBackground(new FindCallback<AVStatus>(){
-  @Override
-  public void done(final List<AVStatus> avObjects,final AVException avException) {
-
-  }
-});
 ```
+Observable<Integer> countInBackground()
+```
+
+来查询符合条件的 Status 数量，这可以用来查询单个用户的公开 Status 总数。
+
+对于时间线的计数，就不能使用上面的方法了。对于时间线中 Status 的计数信息，因为后端的查询方式不一样，同时也由于产品层对查询结果的要求不一样（需要返回总数和未读数两个维度的统计信息），StatusQuery 提供了新的方法来查询计数信息：
+
+```
+Observable<JSONObject> unreadCountInBackground()
+```
+
+该函数的返回值是一个 JSONObject，包含 `total` 和 `unread` 两个计数值。
+
+例如，用户 D 要查看自己收到的私信的计数信息，可以按照如下办法来查询：
+
+```
+AVUser userD = AVUser.currentUser();
+AVStatus.inboxQuery(userD, AVStatus.INBOX_TYPE.PRIVATE.toString())
+        .unreadCountInBackground()
+        .subscribe(new Observer<JSONObject>() {
+          @Override
+          public void onSubscribe(Disposable disposable) {
+
+          }
+
+          @Override
+          public void onNext(JSONObject jsonObject) {
+            // succeed.
+          }
+
+          @Override
+          public void onError(Throwable throwable) {
+            // failed.
+          }
+
+          @Override
+          public void onComplete() {
+          }
+        });
+```
+
+要展示用户 A 发布的状态总数，可以按照如下办法来查询：
+
+```
+AVUser targetUser = AVObject.createWithoutData(AVUser.class, userAObjectId);
+AVStatus.statusQuery(targetUser)
+        .countInBackground()
+        .subscribe(new Observer<Integer>() {
+        @Override
+        public void onSubscribe(Disposable disposable) {
+        }
+  
+        @Override
+        public void onNext(Integer integer) {
+        }
+  
+        @Override
+        public void onError(Throwable throwable) {
+        }
+  
+        @Override
+        public void onComplete() {
+        }
+      });
+```
+
+#### 删除 Status
+
+我们提供删除 Status 的接口，但是只在以下条件满足的时候调用才会成功：
+
+- 当前用户必须是登录状态。
+- 当前登录用户可以删除自己发布的 Status，此时 Status 会从源头上被删除，当前用户的关注者时间线上就不会再出现这条 Status。
+- 当前登录用户可以删除自己时间线上他人发布的 Status，此时 Status 不会从源头上被删除，其他关注者在自己的时间线上依然可以看到这条 Status。
+
+Status 的删除接口如下：
+
+```
+Observable<AVNull> deleteInBackground();
+```
+
+##### 删除自己发布的 Status
+
+假设用户 A 发出那条美食的帖子之后，觉得图片不够精美，想删除它，那么在客户端可以这样执行删除：
+
+```
+// AVStatus target = ...;
+target.deleteInBackground()
+     .subscribe(new Observer<AVNull>() {
+        @Override
+        public void onSubscribe(Disposable disposable) {
+        }
+    
+        @Override
+        public void onNext(AVNull v) {
+          // succeed
+        }
+    
+        @Override
+        public void onError(Throwable throwable) {
+          // failed
+        }
+    
+        @Override
+        public void onComplete() {
+        }
+      })
+```
+
+
+##### 屏蔽别人发布的 Status
+
+假设用户 A 发出那条美食的帖子之后，ta 自己没有删除，但是 ta 的关注者 D 在时间线上看到之后，想屏蔽这一条 Status，那么在客户端可以这样执行删除：
+
+```
+// AVStatus target = ...;
+target.deleteInBackground()
+     .subscribe(new Observer<AVNull>() {
+        @Override
+        public void onSubscribe(Disposable disposable) {
+        }
+    
+        @Override
+        public void onNext(AVNull v) {
+          // succeed
+        }
+    
+        @Override
+        public void onError(Throwable throwable) {
+          // failed
+        }
+    
+        @Override
+        public void onComplete() {
+        }
+      })
+```
+
+可以看到，Status 的删除方式都是一样的，区别只在于当前登录用户是否拥有所有权：
+
+- 如果是当前用户自己发布的 Status，会从源头上进行删除；
+- 如果只是存在于当前用户的时间线上，则只会从当前用户的时间线上进行删除；
+- 其他情况下，当前用户无权进行删除操作，调用会报错；
+
 
 ## REST API
 
