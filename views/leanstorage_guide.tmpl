@@ -7280,6 +7280,7 @@ Apple 应用商店审核要求只提供第三方登录作为登录方式的应�
 [Sign in with Apple]: https://developer.apple.com/app-store/review/guidelines/#sign-in-with-apple
 
 {% if platform_name === "Objective-C" %}
+```objc
 [user loginWithAuthData:authData platformId:@"apple" options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
             NSLog(@"登录成功");
@@ -7287,9 +7288,11 @@ Apple 应用商店审核要求只提供第三方登录作为登录方式的应�
             NSLog(@"登录失败：%@",error.localizedFailureReason);
         }
 }];
+```
 {% endif %}
 
 {% if platform_name === "Swift" %}
+```swift
 user.logIn(authData: authData, platform: .custom("apple")) { (result) in
     switch result {
     case .success:
@@ -7298,6 +7301,7 @@ user.logIn(authData: authData, platform: .custom("apple")) { (result) in
         print(error)
     }
 }
+```
 {% endif %}
 
 目前开发者暂时需要自行校验 authData 的有效性，未来 SDK 会增加对 Sign in with Apple 的内置支持。
