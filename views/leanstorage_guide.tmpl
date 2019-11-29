@@ -7274,6 +7274,36 @@ user.logIn(authData: authData, platform: .weixin) { (result) in
 
 为确保每个 `{{ userObjectName }}` 只会关联每个平台一次，`_User` class 中每个用户的 `authData.<SERVICE_NAME>.openid` 需要保持独一无二。
 
+{% if platform_name in ["Objective-C", "Swift"] %}
+Apple 应用商店审核要求只提供第三方登录作为登录方式的应用必须支持 [Sign in with Apple]，例如：
+
+[Sign in with Apple]: https://developer.apple.com/app-store/review/guidelines/#sign-in-with-apple
+
+{% if platform_name === "Objective-C" %}
+[user loginWithAuthData:authData platformId:@"apple" options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+            NSLog(@"登录成功");
+        }else{
+            NSLog(@"登录失败：%@",error.localizedFailureReason);
+        }
+}];
+{% endif %}
+
+{% if platform_name === "Swift" %}
+user.logIn(authData: authData, platform: .custom("apple")) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+{% endif %}
+
+目前开发者暂时需要自行校验 authData 的有效性，未来 SDK 会增加对 Sign in with Apple 的内置支持。
+
+{% endif %}
+
 #### 配置平台账号
 
 开始使用前，需要在 [控制台 > 组件 > 社交](/dashboard/devcomponent.html?appid={{appid}}#/component/sns) 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。点击保存，自动生成 **回调 URL** 和 **登录 URL**。
