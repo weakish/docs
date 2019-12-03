@@ -73,10 +73,10 @@ fastify.listen(parseInt(process.env.LEANCLOUD_APP_PORT || '3000', 10), '0.0.0.0'
 [Nest.js]: https://nestjs.com/
 
 不过，这样修改的话，在每次部署项目（`lean deploy`）前都要记得先在本地构建项目（`nest build`），否则会部署过时的版本。
-如果希望在云引擎上完成构建，可以通过 `scripts.prepublish` 指定构建命令：
+如果希望在云引擎上完成构建，可以通过 `scripts.prepare` 指定构建命令：
 
 ```json
-"prepublish": "nest build",
+"prepare": "nest build",
 ```
 
 ### 健康监测
