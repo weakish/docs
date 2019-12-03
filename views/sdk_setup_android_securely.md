@@ -18,10 +18,9 @@ Android 开发者在使用 LeanCloud 服务前必须将签名证书的指纹配�
 - 当前开发机器已经安装 JDK。
 
 具体操作步骤如下：
-1. 打开命令行工具，执行命令
-```keytool -list -v -keystore <keystore-file>```
-	其中 <keystore-file> 为应用签名文件的完整路径，注意按命令行提示进行操作。
-2. 获取对应的 SHA256 指纹，例如。
+1. 打开命令行工具，执行命令 `keytool -list -v -keystore <keystore-file>`
+	其中 `<keystore-file>` 为应用签名文件的完整路径，注意按命令行提示进行操作。
+2. 获取对应的 SHA256 指纹，例如：
 ![images](images/security_android_sign_sha256.jpg)
 
 ### 1.2 在 LeanCloud 后台配置应用签名证书指纹
@@ -148,7 +147,7 @@ public class MyLeanCloudApp extends Application {
         super.onCreate();
 
         // 提供 this、App ID、Server Host 作为参数
-        AVOSCloud.initializeSecurely(this, "{{appId}}", "https://xxx.example.com");
+        AVOSCloud.initializeSecurely(this, "{{appid}}", "https://xxx.example.com");
     }
 }
 ```
@@ -160,7 +159,7 @@ public class MyLeanCloudApp extends Application {
 
 新的 Android SDK 会使用新的安全方式进行请求签名，与 LeanCloud 云端完成数据交互。
 如果开发者没有在客户端直接调用云引擎中的[云函数](https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html)，那么所有的集成都已经完成了，可以忽略本章内容。
-如果您有在 Android 客户端调用过云函数（例如代码里有 `AVCloud#callFunctionInBackground` 或 `AVCloud#callRPCInBackground` 请求），为了保证 SDK 发出的请求能被云引擎正确处理，您还需要升级云引擎的 runtime 库并重新部署云引擎实例。
+如果你有在 Android 客户端调用过云函数（例如代码里有 `AVCloud#callFunctionInBackground` 或 `AVCloud#callRPCInBackground` 请求），为了保证 SDK 发出的请求能被云引擎正确处理，您还需要升级云引擎的 runtime 库并重新部署云引擎实例。
 
 现在支持 Android SDK 新认证方式的云引擎 runtime SDK 版本如下：
 - Python SDK：2.3.0 and later
@@ -169,7 +168,7 @@ public class MyLeanCloudApp extends Application {
 
 大家更新云引擎代码依赖的版本，通过 `lean publish` 进行发布即可。
 
-如果您当前使用的 runtime SDK 版本满足要求，那么只需要对云引擎实例进行重新发布即可。
+如果你当前使用的 runtime SDK 版本满足要求，那么只需要对云引擎实例进行重新发布即可。
 
 ## 最后
 
