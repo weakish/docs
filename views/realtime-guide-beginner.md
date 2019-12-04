@@ -536,6 +536,7 @@ jerry.on(Event.MESSAGE, function(message, conversation) {
 });
 ```
 ```swift
+let delegator: Delegator = Delegator()
 jerry.delegate = delegator
 
 func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
@@ -554,6 +555,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
 ```
 ```objc
 // Objective-C SDK 通过实现 AVIMClientDelegate 代理来处理服务端通知
+// 不了解 Objective-C 代理（delegate）概念的读者可以参考：https://stackoverflow.com/a/2534583/
 jerry.delegate = delegator;
 
 /*!
