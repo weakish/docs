@@ -122,6 +122,13 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         mdPath: 'https://github.com/leancloud/unified_sdk_simple_demo',
         type: 'android',
         qcloudShow: false
+      },{
+        name: 'Funny Feed',
+        desc: 'Android 信息流 Demo 应用。',
+        downPath: '',
+        mdPath: 'https://github.com/leancloud/funny-feed/',
+        type: 'android',
+        qcloudShow: true
       }],
       'python': [{
         name: 'Flask Todo Demo',
