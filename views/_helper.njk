@@ -160,6 +160,7 @@ className-{{ name }}
   {{ useLangSpec('AVObject',[
     { lang: "js", value: "AV.Object" },
     { lang: "objc", value: "AVObject" },
+    { lang: "swift", value: "LCObject"},
     { lang: "java", value: "AVObject"},
     { lang: "cs", value: "AVObject"},
     { lang: "php", value: "LCObject"},
@@ -170,128 +171,148 @@ className-{{ name }}
   {{ useLangSpec('Conversation.id',[
     { lang: "js", value: "Conversation.id" },
     { lang: "objc", value: "AVIMConversation.conversationId" },
+    { lang: "swift", value: "IMConversation.conversationId"},
     { lang: "java", value: "AVIMConversation.conversationId"},
     { lang: "cs", value: "AVIMConversation.conversationId"}
   ])}}
   {{ useLangSpec('IMClient',[
     { lang: "js", value: "IMClient" },
     { lang: "objc", value: "AVIMClient" },
+    { lang: "swift", value: "IMClient" },
     { lang: "java", value: "AVIMClient"},
     { lang: "cs", value: "AVIMClient"}
   ])}}
   {{ useLangSpec('Conversation',[
     { lang: "js", value: "Conversation" },
     { lang: "objc", value: "AVIMConversation" },
+    { lang: "swift", value: "IMConversation" },
     { lang: "java", value: "AVIMConversation"},
     { lang: "cs", value: "AVIMConversation"}
   ])}}
   {{ useLangSpec('conversation.send',[
     { lang: "js", value: "conversation.send" },
     { lang: "objc", value: "[conversation sendMessage]" },
+    { lang: "swift", value: "conversation.send" },
     { lang: "java", value: "conversation.sendMessage"},
     { lang: "cs", value: "conversation.SendAsync"}
   ])}}
   {{ useLangSpec('INVITED',[
     { lang: "js", value: "INVITED" },
     { lang: "objc", value: "AVIMClientDelegate.invitedByClientId" },
+    { lang: "swift", value: "IMConversationEvent.joined" },
     { lang: "java", value: "AVIMConversationEventHandler.onInvited"},
     { lang: "cs", value: "AVIMClient.OnInvited"}
   ])}}
   {{ useLangSpec('KICKED',[
     { lang: "js", value: "KICKED" },
     { lang: "objc", value: "AVIMClientDelegate.kickedByClientId" },
+    { lang: "swift", value: "IMConversationEvent.left" },
     { lang: "java", value: "AVIMConversationEventHandler.onKicked"},
     { lang: "cs", value: "AVIMClient.OnKicked"}
   ])}}
   {{ useLangSpec('MESSAGE_RECALL',[
     { lang: "js", value: "MESSAGE_RECALL" },
     { lang: "objc", value: "conversation:messageHasBeenUpdated:" },
+    { lang: "swift", value: "IMConversationEvent.updated" },
     { lang: "java", value: "AVIMConversationEventHandler.onMessageRecalled"},
     { lang: "cs", value: "AVIMClient.OnMessageRecalled"}
   ])}}
   {{ useLangSpec('MESSAGE_UPDATE',[
     { lang: "js", value: "MESSAGE_UPDATE" },
     { lang: "objc", value: "conversation:messageHasBeenUpdated:" },
+    { lang: "swift", value: "IMConversationEvent.updated" },
     { lang: "java", value: "AVIMConversationEventHandler.onMessageUpdated"},
     { lang: "cs", value: "AVIMClient.OnMessageUpdated"}
   ])}}
   {{ useLangSpec('MESSAGE',[
     { lang: "js", value: "MESSAGE" },
     { lang: "objc", value: "AVIMClientDelegate.didReceiveTypedMessage" },
+    { lang: "swift", value: "IMConversationEvent.message" },
     { lang: "java", value: "AVIMMessageHandler.onMessage"},
     { lang: "cs", value: "AVIMClient.OnMessageReceived"}
   ])}}
   {{ useLangSpec('MEMBERS_JOINED',[
     { lang: "js", value: "MEMBERS_JOINED" },
     { lang: "objc", value: "AVIMClientDelegate.membersAdded" },
+    { lang: "swift", value: "IMConversationEvent.membersJoined" },
     { lang: "java", value: "AVIMMessageHandler.onMemberJoined"},
     { lang: "cs", value: "AVIMClient.OnMembersJoined"}
   ])}}
   {{ useLangSpec('MEMBERS_LEFT',[
     { lang: "js", value: "MEMBERS_LEFT" },
     { lang: "objc", value: "AVIMClientDelegate.membersRemoved" },
+    { lang: "swift", value: "IMConversationEvent.membersLeft" },
     { lang: "java", value: "AVIMMessageHandler.onMemberLeft"},
     { lang: "cs", value: "AVIMClient.OnMembersLeft"}
   ])}}
   {{ useLangSpec('ChatRoom',[
     { lang: "js", value: "ChatRoom" },
     { lang: "objc", value: "AVIMChatRoom" },
+    { lang: "swift", value: "IMChatRoom" },
     { lang: "java", value: "AVIMChatRoom"},
     { lang: "cs", value: "AVIMChatRoom"}
   ])}}
   {{ useLangSpec('ServiceConversation',[
     { lang: "js", value: "ServiceConversation" },
     { lang: "objc", value: "AVIMServiceConversation" },
+    { lang: "swift", value: "IMServiceConversation" },
     { lang: "java", value: "AVIMServiceConversation"},
     { lang: "cs", value: "AVIMServiceConversation"}
   ])}}
   {{ useLangSpec('TemporaryConversation',[
     { lang: "js", value: "TemporaryConversation" },
     { lang: "objc", value: "AVIMTemporaryConversation" },
+    { lang: "swift", value: "IMTemporaryConversation" },
     { lang: "java", value: "AVIMTemporaryConversation"},
     { lang: "cs", value: "AVIMTemporaryConversation"}
   ])}}
   {{ useLangSpec('TextMessage',[
     { lang: "js", value: "TextMessage" },
     { lang: "objc", value: "AVIMTextMessage" },
+    { lang: "swift", value: "IMTextMessage" },
     { lang: "java", value: "AVIMTextMessage"},
     { lang: "cs", value: "AVIMTextMessage"}
   ])}}
   {{ useLangSpec('ImageMessage',[
     { lang: "js", value: "ImageMessage" },
     { lang: "objc", value: "AVIMImageMessage" },
+    { lang: "swift", value: "IMImageMessage" },
     { lang: "java", value: "AVIMImageMessage"},
     { lang: "cs", value: "AVIMImageMessage"}
   ])}}
   {{ useLangSpec('AudioMessage',[
     { lang: "js", value: "AudioMessage" },
     { lang: "objc", value: "AVIMAudioMessage" },
+    { lang: "swift", value: "IMAudioMessage" },
     { lang: "java", value: "AVIMAudioMessage"},
     { lang: "cs", value: "AVIMAudioMessage"}
   ])}}
   {{ useLangSpec('VideoMessage',[
     { lang: "js", value: "VideoMessage" },
     { lang: "objc", value: "AVIMVideoMessage" },
+    { lang: "swift", value: "IMVideoMessage" },
     { lang: "java", value: "AVIMVideoMessage"},
     { lang: "cs", value: "AVIMVideoMessage"}
   ])}}
   {{ useLangSpec('FileMessage',[
     { lang: "js", value: "FileMessage" },
     { lang: "objc", value: "AVIMFileMessage" },
+    { lang: "swift", value: "IMFileMessage" },
     { lang: "java", value: "AVIMFileMessage"},
     { lang: "cs", value: "AVIMFileMessage"}
   ])}}
   {{ useLangSpec('LocationMessage',[
     { lang: "js", value: "LocationMessage" },
     { lang: "objc", value: "AVIMLocationMessage" },
+    { lang: "swift", value: "IMLocationMessage" },
     { lang: "java", value: "AVIMLocationMessage"},
     { lang: "cs", value: "AVIMLocationMessage"}
   ])}}
   {{ useLangSpec('AVIMMessageStatusFailed', [
     { lang: "js", value: "AVIMMessageStatusFailed" },
     { lang: "objc", value: "AVIMMessageStatusFailed" },
+    { lang: "swift", value: "failed" },
     { lang: "java", value: "AVIMMessageStatusFailed"},
-    { lang: "cs", value: "AVIMMessageStatusFailed"},
-    { lang: "swift", value: "failed" }
+    { lang: "cs", value: "AVIMMessageStatusFailed"}
   ])}}
 {% endmacro %}
