@@ -1,4 +1,4 @@
-{% from "views/_data.njk" import libVersion as version %}
+{% from "views/_data.njk" import android_groovy, android_key_init %}
 
 # Android SDK 更安全的接入和初始化方式
 
@@ -32,18 +32,10 @@ Android 开发者在使用 LeanCloud 服务前必须将签名证书的指纹配�
 
 ## 2 集成 Android SDK
 ### 2.1 获取 SDK
-推荐大家使用包依赖管理工具来安装 SDK，可以参考原文档：[SDK 安装指南](https://leancloud.cn/docs/start.html)。
+推荐大家使用包依赖管理工具来安装 SDK，可以参考原文档：[SDK 安装指南](start.html)。
 修改当前项目的 build.gradle 文件，加入如下依赖：
 
-```
-implementation ('cn.leancloud:storage-android:{{ version.unified }}'){
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-}
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-implementation 'com.alibaba:fastjson:1.1.71.android'
-implementation 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
-```
+{{ android_groovy() }}
 
 ### 2.2 加入 Native library
 
@@ -100,7 +92,7 @@ src/
 
 首先，需要修改一下 application 的 build.gradle 文件，以支持自动签名：
 
-```
+```groovy
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -138,19 +130,7 @@ android {
 
 然后向 Application 类的 onCreate 方法添加初始化代码：
 
-```
-import cn.leancloud.AVOSCloud;
-
-public class MyLeanCloudApp extends Application {
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        // 提供 this、App ID、Server Host 作为参数
-        AVOSCloud.initializeSecurely(this, "{{appid}}", "https://xxx.example.com");
-    }
-}
-```
+{{ android_key_init(appid) }}
 
 至此，客户端的所有改动已经完成，开发者可以如以往一样调用 LeanCloud 服务了。
 
@@ -158,38 +138,38 @@ public class MyLeanCloudApp extends Application {
 ## 3 升级、部署云引擎实例
 
 新的 Android SDK 会使用新的安全方式进行请求签名，与 LeanCloud 云端完成数据交互。
-如果开发者没有在客户端直接调用云引擎中的[云函数](https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html)，那么所有的集成都已经完成了，可以忽略本章内容。
+如果开发者没有在客户端直接调用云引擎中的[云函数](leanengine_cloudfunction_guide-node.html)，那么所有的集成都已经完成了，可以忽略本章内容。
 如果你有在 Android 客户端调用过云函数（例如代码里有 `AVCloud#callFunctionInBackground` 或 `AVCloud#callRPCInBackground` 请求），为了保证 SDK 发出的请求能被云引擎正确处理，您还需要升级云引擎的 runtime 库并重新部署云引擎实例。
 
 现在支持 Android SDK 新认证方式的云引擎 runtime SDK 版本如下：
 - Python SDK：2.3.0 and later
 - Node.js SDK：3.5.0 and later
-- Java SDK(engine-core)：6.1.0 and later
+- Java SDK (engine-core)：6.1.0 and later
 
 大家更新云引擎代码依赖的版本，通过 `lean publish` 进行发布即可。
 
 如果你当前使用的 runtime SDK 版本满足要求，那么只需要对云引擎实例进行重新发布即可。
 
-## 最后
+## 4. 最后
 
-新的使用方式只是去掉了 appKey 在客户端的使用，在一定程度上避免了暴露应用核心配置信息，它无法保证绝对的数据安全。我们还是推荐大家通过 ACL 机制来限制不同用户的数据访问权限，从源头降低安全风险，更多细节请参考[数据和安全指南](https://leancloud.cn/docs/data_security.html)。
+新的使用方式只是去掉了 appKey 在客户端的使用，在一定程度上避免了暴露应用核心配置信息，它无法保证绝对的数据安全。我们还是推荐大家通过 ACL 机制来限制不同用户的数据访问权限，从源头降低安全风险，更多细节请参考[数据和安全指南](data_security.html)。
 
 ## 附：常见问题
-#### 1. 6.1.0 版本 SDK 能否支持老的初始化方式？
+### 1. 6.1.0 版本 SDK 能否支持老的初始化方式？
 可以的。如果不使用新的初始化方式，还是可以按以前的方式来使用新版本 SDK 的，并且也不需要在工程中加入 native library。
 
-#### 2. 使用新的初始化方式，程序一运行就 crash，是怎么回事？
+### 2. 使用新的初始化方式，程序一运行就 crash，是怎么回事？
 
-多半是因为工程中没有加入 native library 导致的，请回看 2.2 一节。
+多半是因为工程中没有加入 native library 导致的，请回看 [2.2 节](#_2-2-加入-native-library)。
 
-#### 3. 加入 native library，使用新方式完成初始化之后，所有请求都返回 `{"code":401,"error":"Unauthorized."}` 的错误，是怎么回事？
+### 3. 加入 native library，使用新方式完成初始化之后，所有请求都返回 `{"code":401,"error":"Unauthorized."}` 的错误，是怎么回事？
 
-所有请求都出现 401 的错误，多半是因为打包的 apk （debug 运行也一样）没有正确配置签名证书导致的，请回看 2.3 节。
+所有请求都出现 401 的错误，多半是因为打包的 apk （debug 运行也一样）没有正确配置签名证书导致的，请回看 [2.3 节](#_2-3-初始化)。
 
-#### 4. 启用了新的初始化方式之后，android 平台上老版本的应用是否还能正常使用？
+### 4. 启用了新的初始化方式之后，android 平台上老版本的应用是否还能正常使用？
 
 可以的。设置了 package name 和证书指纹之后，只是为应用增加了一种新的认证方式，并不影响老的认证方式的继续使用。
 
-#### 5. 如果多个 android 应用使用了同样的 appid，该怎么处理？
+### 5. 如果多个 android 应用使用了同样的 appid，该怎么处理？
 
 目前我们只支持为一个平台的 app 配置一套包名和证书指纹，会对应到某一种 apk。如果开发者在多个客户端应用中共享同一个平台 app 数据，那么可以选择其中某一个客户端使用新的认证方式，而其他客户端还是使用老的方式，在 Android 平台上多种认证方式是可以共存的。
