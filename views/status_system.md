@@ -562,18 +562,31 @@ followerNameQuery.include("followee");
 
 ##### 一次性获取粉丝和关注列表
 
+下面的方法实现了一次获取粉丝和关注用户列表的功能，当然，你也可以用上面的方法通过两次调用来获取这些数据，特别是用户列表很长需要翻页的时候，下面的方法就失效了。
+
 ```java
-    AVFriendshipQuery query = AVUser.friendshipQuery(userId, SubUser.class);
-    query.include("followee");
-    query.include("follower");
-    query.getInBackground(new AVFriendshipCallback() {
-      @Override
-      public void done(AVFriendship friendship, AVException e) {
-        List<SubUser> followers = friendship.getFollowers(); //获取粉丝
-        List<SubUser> followees = friendship.getFollowees(); //获取关注列表
-        AVUser user = friendship.getUser(); //获取用户对象本身
-      }
-    });
+AVUser.currentUser().getFollowersAndFolloweesInBackground(new FollowersAndFolloweesCallback() {
+  @Override
+  public void done(Map avObjects, AVException avException) {
+    if (null == avObjects || null != avException) {
+      return;
+    }
+    try {
+      List<AVUser> followerArray = (List<AVUser>)avObjects.get("follower");
+      List<AVUser> followeeArray = (List<AVUser>)avObjects.get("followee");
+    
+      System.out.println("followers=" + followerArray);
+      System.out.println("followees=" + followeeArray);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  @Override
+  protected void internalDone0(Object o, AVException avException) {
+
+  }
+});
 ```
 
 ### 信息流 API
