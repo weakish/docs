@@ -593,7 +593,7 @@ AVUser.currentUser().getFollowersAndFolloweesInBackground(new FollowersAndFollow
 
 假设我们要开发一个类似微博的产品，其中有用户 A 已经关注了 2 个用户（B 和 C），同时他有 3 个关注者（D、E、F）。
 
-> 注意：以下示例代码基于 6.1.0 及以后版本开发。
+> 注意：以下示例代码基于 6.1.1 及以后版本开发。感兴趣的开发者可以参考我们的完整 demo: [funny feed](https://github.com/leancloud/funny-feed)。
 
 #### 发布状态
 第一步，我们来看看用户 A 如何发布一条公开的「状态」。
