@@ -1,4 +1,5 @@
 {% import "views/_helper.njk" as docs %}
+{% from "views/_data.njk" import android_groovy, android_key_init %}
 
 # {{platform_name}} SDK 安装指南
 
@@ -263,15 +264,8 @@ implementation 'cn.leancloud:storage-core:{{ version.unified }}'
 
 如果是 Android 项目，则换成以下这些包：
 
-```groovy
-implementation ('cn.leancloud:storage-android:{{ version.unified }}'){
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-}
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-implementation 'com.alibaba:fastjson:1.1.71.android'
-implementation 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
-```
+{{ android_groovy() }}
+
 #### 使用即时通讯 / 推送服务
 Example for Maven：
 
@@ -953,19 +947,8 @@ public class MyLeanCloudApp extends Application {
 
 从 6.1.0 版本开始，除了支持通过 appId + appKey 完成初始化，还提供一种更加安全的使用方式，支持仅仅通过 appId 来初始化应用，例如：
 
-```java
-import cn.leancloud.AVOSCloud;
+{{ android_key_init(appid) }}
 
-public class MyLeanCloudApp extends Application {
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        // 提供 this、App ID、Server Host 作为参数
-        AVOSCloud.initializeSecurely(this, "{{appid}}", "https://xxx.example.com");
-    }
-}
-```
 
 不再需要 appKey，避免核心配置信息在客户端泄漏可能带来的潜在风险。具体的集成方法可参看文档 [Android SDK 更安全的接入和初始化方式](sdk_setup_android_securely.html)。
 

@@ -104,3 +104,31 @@ LeanCloud 国际版不要求绑定自定义域名。除了使用自定义域名�
 appid前八位.{{service}}.lncldglobal.com
 ```
 {% endmacro %}
+
+{% macro android_groovy(version=libVersion.unified) %}
+```groovy
+implementation ('cn.leancloud:storage-android:{{ version }}'){
+    exclude group: 'com.alibaba', module: 'fastjson'
+    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+}
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+implementation 'com.alibaba:fastjson:1.1.71.android'
+implementation 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
+```
+{% endmacro %}
+
+{% macro android_key_init(appid="appid") %}
+```java
+import cn.leancloud.AVOSCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // 提供 this、App ID、Server Host 作为参数
+        AVOSCloud.initializeSecurely(this, "{{appid}}", "https://xxx.example.com");
+    }
+}
+```
+{% endmacro %}
