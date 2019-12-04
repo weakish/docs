@@ -1586,7 +1586,7 @@ messageWithCity["city"] = "北京";
 * 实现新的消息类型，继承自 `AVIMTypedMessage`。这里需要注意：
   * 在 class 上增加一个 `@AVIMMessageType(type=123)` 的 Annotation<br/>具体消息类型的值（这里是 `123`）由开发者自己决定。LeanCloud 内建的消息类型使用负数，所有正数都预留给开发者扩展使用。
   * 在消息内部声明字段属性时，要增加 `@AVIMMessageField(name="")` 的 Annotation<br/>`name` 为可选字段，同时自定义的字段要有对应的 getter/setter 方法。
-  * **请不要遗漏空的构造方法和 Creator 的代码**（参考下面的示例代码），否则会造成类型转换失败。
+  * **请不要遗漏空的构造方法**（参考下面的示例代码），否则会造成类型转换失败。
 * 调用 `AVIMMessageManager.registerAVIMMessageType()` 函数进行类型注册。
 * 调用 `AVIMMessageManager.registerMessageHandler()` 函数进行消息处理 handler 注册。
 
@@ -1710,8 +1710,6 @@ public class AVIMTextMessage extends AVIMTypedMessage {
   public void setAttrs(Map<String, Object> attr) {
     this.attrs = attr;
   }
-  // Creator 不可遗漏
-  public static final Creator<AVIMTextMessage> CREATOR = new AVIMMessageCreator<AVIMTextMessage>(AVIMTextMessage.class);
 }
 ```
 ```cs
