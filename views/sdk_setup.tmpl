@@ -314,7 +314,14 @@ implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 
 ### 手动安装
 
+{% if platform_name === "Python" %}
+<a class="btn btn-default" target="_blank" href="https://releases.leanapp.cn/#/leancloud/python-sdk/releases">下载 SDK</a>
+{% elif platform_name === "PHP" %}
+<a class="btn btn-default" target="_blank" href="https://releases.leanapp.cn/#/leancloud/php-sdk/releases">下载 SDK</a>
+{% else %}
 <a class="btn btn-default" target="_blank" href="sdk_down.html">下载 SDK</a>
+{% endif %}
+
 {% if platform_name === "Android / Java" %}
 #### 从源码编译
 
