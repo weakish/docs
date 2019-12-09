@@ -173,7 +173,7 @@ message_id | 必填 | 要删除的消息 id，字符串
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
-  https://{{host}}/1.2/rtm/broadcasts
+  https://{{host}}/1.2/rtm/broadcasts?conv_id={conv_id}
 ```
 
 参数 | 约束 | 说明
