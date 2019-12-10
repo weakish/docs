@@ -4465,6 +4465,15 @@ liveQuery.unsubscribeInBackground(new AVLiveQuerySubscribeCallback() {
 ### LiveQuery 的注意事项
 
 因为 LiveQuery 的实时性，很多用户会陷入一个误区，试着用 LiveQuery 来实现一个简单的聊天功能。我们不建议这样做，因为使用 LiveQuery 构建聊天服务会承担额外的存储成本，产生的费用会增加，后期维护的难度非常大（聊天记录、对话维护之类的代码会很混乱），并且 LeanCloud 已经提供了 [即时通讯](realtime_v2.html) 的服务。LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱离设计初衷容易造成前端的模块混乱。
+
+{% if platform_name === "Android / Java" %}
+如果你的应用只使用 LiveQuery （不使用即时通讯和其他推送服务），那么可以使用 `PushService` 的静态方法 `startIfRequired` 来创建 WebSocket 连接：
+
+```java
+PushService.startIfRequired(android.content.Context context);
+```
+{% endif %}
+
 {% endif %}
 
 ## 文件
