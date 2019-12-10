@@ -787,7 +787,7 @@ let _ = query.get("582570f38ac247004f39c24b") { (result) in
 
 对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt`和`createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `{{ baseObjectName }}` 不存在这些属性。
 
-如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `{% if platform_name in ["Objective-C", "Swift"] %}nil{% endif %}{% if platform_name === "JavaScript" %}undefined{% endif %}{% if platform_name === "Python" %}None{% endif %}{% if platform_name in ["Android / Java", "PHP"] %}null{% endif %}。
+如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `{% if platform_name in ["Objective-C", "Swift"] %}nil{% endif %}{% if platform_name === "JavaScript" %}undefined{% endif %}{% if platform_name === "Python" %}None{% endif %}{% if platform_name in ["Android / Java", "PHP"] %}null{% endif %}`。
 
 {% if platform_name === "JavaScript" %}
 如果需要一次性获取返回对象的所有属性（比如进行数据绑定）而非显式地调用 `get`，可以利用 `AV.Object` 实例的 `toJSON` 方法：
