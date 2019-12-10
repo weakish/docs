@@ -981,6 +981,16 @@ do {
 
 LeanCloud 会自动识别需要更新的属性并将对应的数据发往云端，未更新的属性会保持原样。
 
+{% if platform_name === "JavaScript" %}
+如果希望撤销尚未保存的修改，可以调用 `revert` 方法。
+直接调用 `revert()` 将撤销所有尚未保存的修改，
+还可以额外传入 `keys` 数组作为参数，指定需要撤销的属性，例如：
+
+```js
+todo.revert(['content'])
+```
+{% endif %}
+
 {% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "Android / Java" or platform_name === "Swift" %}
 #### 有条件更新对象
 
