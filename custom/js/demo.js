@@ -71,7 +71,7 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         downPath: '',
         mdPath: 'https://github.com/leancloud/leancloud-smsdemo-ios',
         type: 'ios',
-        qcloudShow: false
+        qcloudShow: true
       }],
       'android': [{
         name: '数据存储入门',
@@ -114,14 +114,21 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         downPath: '',
         mdPath: 'https://github.com/leancloud/LeanCloudSNSDemo-Android',
         type: 'android',
-        qcloudShow: false
+        qcloudShow: true
       },{
         name: '短信验证码',
         desc: '使用 LeanCloud 发送和验证短信验证码。',
         downPath: '',
         mdPath: 'https://github.com/leancloud/unified_sdk_simple_demo',
         type: 'android',
-        qcloudShow: false
+        qcloudShow: true
+      },{
+        name: 'Funny Feed',
+        desc: 'Android 信息流 Demo 应用。',
+        downPath: '',
+        mdPath: 'https://github.com/leancloud/funny-feed/',
+        type: 'android',
+        qcloudShow: true
       }],
       'python': [{
         name: 'Flask Todo Demo',
