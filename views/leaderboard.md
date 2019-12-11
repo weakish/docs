@@ -81,3 +81,7 @@ versionChangeInterval 代表数据重置周期，共有以下选项：
 ### 在线交流
 
 为了能及时解答大家的疑问，进一步了解游戏开发者的需求和使用场景，我们建立了游戏开发群，欢迎各位游戏开发者加入。[详情 >>>](https://forum.leancloud.cn/t/leancloud-qq/19389)
+
+
+<!-- This code is for Google Ads -->
+{% include 'templates/include/ga-config.html' %}
