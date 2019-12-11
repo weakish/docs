@@ -16,7 +16,7 @@ leancloud.init("{{appid}}", master_key="{{masterkey}}")
 `leancloud.Conversation` 对应即时通讯中的[对话概念](realtime_v2.html#对话（Conversation）)，同时也是 Python SDK 中 `leancloud.Object` 的子类，因此可以像正常的 `leancloud.Object` 那样来创建、查询对话。
 
 ```python
-conv = leancloud.Conversation()
+conv = leancloud.Conversation(is_unique=True)
 conv.save()
 
 same_conv = leancloud.Conversation.query.get(conv.id)
@@ -50,10 +50,12 @@ same_conv = leancloud.Conversation.query.get(conv.id)
 有些时候需要在服务端来进行对话创建，可以把 `leancloud.Conversation` 当作一个 `leancloud.Object` 来直接创建并保存就可以。
 
 ```python
-conv = leancloud.Conversation('testConversation')
+conv = leancloud.Conversation('testConversation', is_unique=True)
 conv.set('chatRoomNumber', 233)
 conv.save()
 ```
+
+指定 `is_unique=True` 时，云端会根据完整的成员列表先进行一次查询，如果已经有正好包含这些成员的对话存在，那么就返回已经存在的对话，否则才创建一个新的对话。
 
 创建对话时，指定 `is_system` 或 `is_transient` 参数为真，可以创建系统对话或暂态对话。
 
