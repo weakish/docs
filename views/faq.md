@@ -291,6 +291,8 @@ LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slice
 ### 对 AVObject 对象使用 getDate("createdAt") 方法读取创建时间为什么会返回 null
 
 请用 `AVObject` 的 `getCreatedAt` 方法；获取 `updatedAt` 用 `getUpdatedAt`。
+这两个方法会返回 Date 类型。
+如果希望返回字符串类型，可以使用 `getUpdatedAtString()` 和 `getCreatedAtString()`。
 
 ### client.open() 操作为什么没有被调用？
 
