@@ -78,7 +78,7 @@ AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<A
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -210,7 +210,7 @@ AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<A
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -290,7 +290,7 @@ AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<A
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -362,7 +362,7 @@ AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<A
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -426,7 +426,7 @@ AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<A
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -551,7 +551,7 @@ option.setSignatureName("sign_BuyBuyBuy");
 Map<String, Object> parameters = new HashMap<String, Object>();
 parameters.put("order_id", "7623432424540");      // 使用实际的值来替换模板中的变量
 option.setEnvMap(parameters);
-AVSMS.requestSMSCodeInBackground("18804208562", option).subscribe(new Observer<AVNull>() {
+AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
     @Override
     public void onSubscribe(Disposable disposable) {
     }
@@ -561,7 +561,7 @@ AVSMS.requestSMSCodeInBackground("18804208562", option).subscribe(new Observer<A
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -890,7 +890,7 @@ AVCaptcha.requestCaptchaInBackground(option).subscribe(new Observer<AVCaptchaDig
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request Captcha. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to request Captcha. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -953,7 +953,7 @@ AVCaptcha.verifyCaptchaCodeInBackground("123456",avCaptchaDigest).subscribe(new 
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify CaptchaCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to verify CaptchaCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -1027,7 +1027,7 @@ AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<A
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -1518,7 +1518,7 @@ AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<A
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -1585,7 +1585,7 @@ AVUser.requestMobilePhoneVerifyInBackground("186xxxxxxxx").subscribe(new Observe
     }
     @Override
     public void onError(Throwable e) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -1646,7 +1646,7 @@ AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<A
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage();
+        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage());
     }
     @Override
     public void onComplete() {

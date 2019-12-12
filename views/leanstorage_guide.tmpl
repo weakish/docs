@@ -5839,7 +5839,24 @@ SMS::requestSmsCode("+8618200008888");
 {% endif %}
 {% if platform_name === "Android / Java" %}
 ```java
-AVUser.requestLoginSmsCodeInBackground("+8618200008888").blockingSubscribe();
+AVSMSOption option = new AVSMSOption();
+option.setSignatureName("sign_name"); //设置短信签名名称
+AVSMS.requestSMSCodeInBackground("+8618200008888", option).subscribe(new Observer<AVNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
+    }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage()）;
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 {% endif %}
 {% if platform_name === "Swift" %}
@@ -6140,7 +6157,24 @@ SMS::requestSmsCode("+8618200008888");
 {% endif %}
 {% if platform_name === "Android / Java" %}
 ```java
-AVUser.requestLoginSmsCodeInBackground("+8618200008888").blockingSubscribe();
+AVSMSOption option = new AVSMSOption();
+option.setSignatureName("sign_name"); //设置短信签名名称
+AVSMS.requestSMSCodeInBackground("+8618200008888", option).subscribe(new Observer<AVNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
+    }
+    @Override
+    public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage()）;
+    }
+    @Override
+    public void onComplete() {
+    }
+});
 ```
 {% endif %}
 {% if platform_name === "Swift" %}
