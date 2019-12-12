@@ -912,13 +912,14 @@ roleQuery.findInBackground().subscribe(new Observer<List<AVRole>>() {
 ```
 ```js
   // 构建 AV.Role 的查询
+  var moderatorRole;
   var roleQuery = new AV.Query(AV.Role);
   roleQuery.equalTo('name', 'Moderator');
   roleQuery.find().then(function(results) {
 
     // 如果角色存在
     if (results.length > 0) {
-      var moderatorRole = results[0];
+      moderatorRole = results[0];
       roleQuery.equalTo('users', AV.User.current());
       return roleQuery.find();
     }
