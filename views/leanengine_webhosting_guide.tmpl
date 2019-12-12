@@ -186,7 +186,7 @@ LeanEngine PHP 不依赖第三方框架，你可以使用你最熟悉的框架�
 在 PHP 7.2 中官方从核心中移除了 `mcrypt` 这个拓展，云引擎以选装的方式继续提供支持，在 `composer.json` 的 `require` 中加入 `ext-mcrypt: *` 即可，使用 `mcrypt` 会增加部署耗时，如果没有用到请不要加。
 {% endif %}
 {% if platformName === "Java" %}
-云引擎目前只支持 Java 1.8 运行环境和 war 包运行，你的项目需要遵循一定格式才会被云引擎识别并运行。
+云引擎目前支持 Java 8、11、12、13、14 运行环境和 war 包运行，你的项目需要遵循一定格式才会被云引擎识别并运行。
 
 云引擎 Java 运行环境使用 Maven 进行构建，所以 LeanEngine Java 项目必须有 `$PROJECT_DIR/pom.xml` 文件，该文件为整个项目的配置文件。构建完成后云引擎会尝试到 `$PROJECT_DIR/target` 目录下寻找可以使用的包：
 
@@ -210,7 +210,11 @@ Java 运行环境对内存的使用较多，所以建议：
 如果云引擎 [实例规格](leanengine_plan.html#选择实例规格) **选择不当**，可能造成应用启动时因为内存溢出（OOM）导致部署失败，或运行期内存溢出导致应用频繁重启。
 {% endcall %}
 
-Java 云引擎支持 1.8 运行环境。
+Java 云引擎默认使用 Java 8 运行环境，如果希望使用其他版本的 Java，可以在项目根目录创建一个名为 `system.properties` 的文件，指定 `java.runtime.version`：
+
+```
+java.runtime.version=11
+```
 
 ### 打包成 WAR 文件的项目
 
