@@ -450,7 +450,7 @@ App({
 const realtime = getApp().realtime;
 ```
 
-即时通讯 SDK 的详细用法请参考 [即时通讯开发指南](realtime_guide-js.html)。
+即时通讯 SDK 的详细用法请参考 [即时通讯开发指南](realtime_v2.html)。
 
 ### 富媒体消息
 要在小程序中使用即时通讯 SDK 的富媒体消息插件，有一些额外的约束：
