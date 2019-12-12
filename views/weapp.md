@@ -47,6 +47,7 @@ const AV = require('./libs/av-weapp-min.js');
 AV.init({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
+  serverURLs: "https://xxx.example.com",
 });
 ```
 
@@ -426,6 +427,7 @@ const { Realtime } = require('./libs/realtime.weapp.min.js');
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
+  serverURLs: "https://xxx.example.com",
 });
 ```
 
@@ -437,6 +439,7 @@ const { Realtime } = require('./libs/realtime.weapp.min.js');
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
+  serverURLs: "https://xxx.example.com",
 });
 App({
   realtime: realtime,
@@ -468,12 +471,14 @@ const realtime = getApp().realtime;
   AV.init({
     appId: '{{appid}}',
     appKey: '{{appkey}}',
+    serverURLs: "https://xxx.example.com",
   });
   // 初始化即时通讯 SDK
   const realtime = new Realtime({
     appId: '{{appid}}',
     appKey: '{{appkey}}',
     plugins: [TypedMessagesPlugin], // 注册富媒体消息插件
+    serverURLs: "https://xxx.example.com",
   });
   ```
 
