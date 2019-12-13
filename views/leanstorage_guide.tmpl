@@ -5898,7 +5898,7 @@ AV.User.signUpOrlogInWithMobilePhone('+8618200008888', '123456').then(function (
 {% endif %}
 {% if platform_name === "Python" %}
 ```python
-leancloud.User.signup_or_login_with_mobile_phone('+8618200008888', '123456')
+user = leancloud.User.signup_or_login_with_mobile_phone('+8618200008888', '123456')
 ```
 {% endif %}
 {% if platform_name === "PHP" %}
@@ -5971,7 +5971,8 @@ AV.User.logIn('Tom', 'cat!@#123').then(function (user) {
 {% endif %}
 {% if platform_name === "Python" %}
 ```python
-leancloud.User.login(username='Tom', password='cat!@#123')
+user = leancloud.User()
+user.login(username='Tom', password='cat!@#123')
 ```
 {% endif %}
 {% if platform_name === "PHP" %}
@@ -6032,7 +6033,8 @@ AV.User.loginWithEmail('tom@leancloud.rocks', 'cat!@#123').then(function (user) 
 {% endif %}
 {% if platform_name === "Python" %}
 ```python
-leancloud.User.login(email='tom@leancloud.rocks', password='cat!@#123')
+user = leancloud.User()
+user.login(email='tom@leancloud.rocks', password='cat!@#123')
 ```
 {% endif %}
 {% if platform_name === "PHP" %}
@@ -6094,7 +6096,7 @@ AV.User.logInWithMobilePhone('+8618200008888', 'cat!@#123').then(function (user)
 {% endif %}
 {% if platform_name === "Python" %}
 ```python
-leancloud.User.login_with_mobile_phone('+8618200008888', 'cat!@#123')
+user = leancloud.User.login_with_mobile_phone('+8618200008888', 'cat!@#123')
 ```
 {% endif %}
 {% if platform_name === "PHP" %}
@@ -6197,7 +6199,7 @@ AV.User.logInWithMobilePhoneSmsCode('+8618200008888', '123456').then(function (u
 {% endif %}
 {% if platform_name === "Python" %}
 ```python
-leancloud.User.signup_or_login_with_mobile_phone('+8618200008888', '123456')
+user = leancloud.User.signup_or_login_with_mobile_phone('+8618200008888', '123456')
 ```
 {% endif %}
 {% if platform_name === "PHP" %}
@@ -6511,10 +6513,9 @@ var currentUser = AV.User.current();
 {% endif %}
 {% if platform_name === "Python" %}
 ```python
-leancloud.User.logout()
+user.logout()
 
-# current_user 变为 None
-current_user = leancloud.User.get_current()
+current_user = leancloud.User.get_current()  # None
 ```
 {% endif %}
 {% if platform_name === "PHP" %}
@@ -6582,7 +6583,7 @@ AV.User.become('anmlwi96s381m6ca7o7266pzf').then(function (user) {
 {% endif %}
 {% if platform_name === "Python" %}
 ```python
-leancloud.User.become('anmlwi96s381m6ca7o7266pzf')
+user = leancloud.User.become('anmlwi96s381m6ca7o7266pzf')
 ```
 {% endif %}
 {% if platform_name === "PHP" %}
