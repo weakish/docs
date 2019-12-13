@@ -911,30 +911,33 @@ roleQuery.findInBackground().subscribe(new Observer<List<AVRole>>() {
 });
 ```
 ```js
-  // 构建 AV.Role 的查询
-  var roleQuery = new AV.Query(AV.Role);
-  roleQuery.equalTo('name', 'Moderator');
-  roleQuery.find().then(function(results) {
-
+// 构建 AV.Role 的查询
+var moderatorRole;
+var roleQuery = new AV.Query(AV.Role);
+roleQuery.equalTo("name", "Moderator");
+roleQuery
+  .find()
+  .then(function(results) {
     // 如果角色存在
     if (results.length > 0) {
-      var moderatorRole = results[0];
-      roleQuery.equalTo('users', AV.User.current());
+      moderatorRole = results[0];
+      roleQuery.equalTo("users", AV.User.current());
       return roleQuery.find();
     }
-  }).then(function(userForRole) {
-
+  })
+  .then(function(userForRole) {
     //该角色存在，并且也拥有该角色
     if (userForRole.length > 0) {
-
       // 剥夺角色
-      var relation= moderatorRole.getUsers();
+      var relation = moderatorRole.getUsers();
       relation.remove(AV.User.current());
       return moderatorRole.save();
     }
-  }).then(function() {
+  })
+  .then(function() {
     // 保存成功
-  }).catch(function(error) {
+  })
+  .catch(function(error) {
     // 输出错误
     console.log(error);
   });
