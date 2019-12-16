@@ -1584,9 +1584,14 @@ Cloud::onVerifed("sms", function($user, $meta) {
 {% endif %}
 {% if platformName === "Java" %}
 ```java
-@EngineHook(className = "_User", type = EngineHookType.onVerified)
+@EngineHook(className = "_User", type = EngineHookType.onVerifiedSMS)
 public static void userOnVerifiedHook(AVUser user) throws Exception {
-  LOGGER.d("User " + user.getObjectId() + " is verified by SMS.");
+  LOGGER.d("用户 " + user.getObjectId() + " 已通过短信验证。");
+}
+
+@EngineHook(className = "_User", type = EngineHookType.onVerifiedEmail)
+public static void userOnVerifiedHook(AVUser user) throws Exception {
+  LOGGER.d("用户 " + user.getObjectId() + " 已通过邮箱验证。");
 }
 ```
 {% endif %}
@@ -1599,7 +1604,10 @@ cloud.OnVerifiedSMS((AVUser user) =>
 ```
 {% endif %}
 
-函数的第一个参数是验证类型。短信验证为 `sms`，邮箱验证为 `email`。另外，数据库中相关的验证字段，如 `emailVerified` 不需要修改，系统会自动更新。
+{% if platformName !== "Java" %}
+函数的第一个参数是验证类型。短信验证为 `sms`，邮箱验证为 `email`。
+{% endif %}
+数据库中相关的验证字段，如 `emailVerified` 不需要修改，系统会自动更新。
 
 ### `{% if platformName === "Node.js" %}onLogin{% endif %}{% if platformName === "Python" %}on_login{% endif %}{% if platformName === "PHP" %}onLogin{% endif %}{% if platformName === "Java" %}onLogin{% endif %}{% if platformName === ".NET" %}OnLogin{% endif %}`
 
