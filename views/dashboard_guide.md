@@ -117,7 +117,7 @@ JSON 格式要求是一个符合我们 REST 格式的 JSON 对象数组：
 
 【密码】导入用户密码需要使用一个特殊的字段 `bcryptPassword`，并且完全遵循 [Stackoverflow &middot; What column type/length should I use for storing a Bcrypt hashed password in a Database?](http://stackoverflow.com/a/5882472/1351961)  所描述的加密算法加密后，才可以作为合法的密码进行导入。
 
-顺便提下，数据导入页还有一个「导入 relation」标签。 relation 已经启用，推荐使用中间表。下面的内容仅供还在使用 relation 的开发者参考。
+顺便提下，数据导入页还有一个「导入 relation」标签。 relation 已经废弃，推荐使用中间表。下面的内容仅供还在使用 relation 的开发者参考。
 
 导入 relation 时，需要填写要导入的 Class 名称、导入后的字段名称、关联的 Class 名称等信息，才能完整导入，例如：
 
