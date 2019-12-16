@@ -1203,7 +1203,10 @@ LeanCloud 本就提供完善的消息推送服务，现在将推送与即时通�
   msg.setText("Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！");
 
   AVIMMessageOption messageOption = new AVIMMessageOption();
-  messageOption.setPushData("自定义离线消息推送内容");
+  String pushMessage = "{\"alert\":\"您有一条未读的消息\", \"category\":\"消息\","
+                     + "\"badge\":1,\"sound\":\"message.mp3\","
+                     + "\"custom-key\":\"由用户添加的自定义属性，custom-key 仅是举例，可随意替换\"}";
+  messageOption.setPushData(pushMessage);
   conv.sendMessage(msg, messageOption, new AVIMConversationCallback() {
       @Override
       public void done(AVIMException e) {
