@@ -128,7 +128,7 @@ func getOnOffStatus(peerIds: [String]) {
     }];
 }
 ```
-```csharp
+```cs
 async Task GetOnOffStatusWithPeerIds(List<string> peerIdList) {
     if (peerIdList == null || peerIdList.Count == 0) {
         return;
