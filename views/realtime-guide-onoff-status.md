@@ -128,5 +128,55 @@ func getOnOffStatus(peerIds: [String]) {
     }];
 }
 ```
+```csharp
+async Task GetOnOffStatusWithPeerIds(List<string> peerIdList) {
+    if (peerIdList == null || peerIdList.Count == 0) {
+        return;
+    }
+    try {
+        Dictionary<string, object> paramters = new Dictionary<string, object> {
+                    { "peerIds", peerIdList }
+                };
+        List<string> results = await AVCloud.CallFunctionAsync<List<string>>("getOnOffStatus", paramters);
+        foreach (string result in results) {
+            if (result == "1") {
+                // 在线
+            } else {
+                // 离线
+            }
+        }
+    } catch (Exception e) {
+        // TODO 处理错误
+    }
+}
+```
+```js
+const params = { peerIds : ['peerId1', 'peerId2', 'peerId3'] };
+AV.Cloud.run('getOnOffStatus', params).then(function (result) {
+  // result: ["0", "1", null]
+}).catch( function (err) {
+  // 处理异常
+});
+```
+```java
+String name = "getOnOffStatus";
+Map<String, Object> param = new HashMap<String, Object>();
+List<String> userIds = Arrays.asList("your_user_id_1", "your_user_id_2");
+param.put("peerIds", userIds);
+AVCloud.callFunctionInBackground(name, param).subscribe(results -> {
+    System.out.println("结果 = " + results);
+    for (String t: results) {
+        if (null == t) {
+            System.out.println("result: unknown");
+        } else if (1 == Integer.valueOf(t)) {
+            System.out.println("result: online");
+        } else {
+            System.out.println("result: offline");
+        }
+    }
+}, throwable -> {
+    System.out.println("error occurred! " + throwable);
+});
+```
 
 对于一些需要较为实时的更新上下线状态的场景，比如好友列表页面，群成员信息列表页面等等，可以通过轮询的方式来更新状态信息。
