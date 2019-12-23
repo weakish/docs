@@ -1105,6 +1105,25 @@ AVRealtime.WebSocketLog(Debug.Log);
 ```
 {% endif %}
 
+{% if platform_name === "Objective-C" or platform_name === "Swift" %}
+### 关闭调试日志
+
+{% if platform_name === "Objective-C" %}
+```objc
+// 在 Application 初始化代码执行之前执行
+[AVOSCloud setAllLogsEnabled:NO];
+[AVOSCloud setLogLevel:AVLogLevelNone];
+[AVOSCloud setVerbosePolicy:kAVVerboseNone];
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+// 在 Application 初始化代码执行之前执行
+LCApplication.logLevel = .off
+```
+{% endif %}
+{% endif %}
+
 {% call docs.alertWrap() %}
 在应用发布之前，请关闭调试日志，以免暴露敏感数据。
 {% endcall %}
