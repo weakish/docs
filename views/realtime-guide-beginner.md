@@ -3439,14 +3439,15 @@ do {
 }
 ```
 ```objc
-// 查询对话中最后 10 条消息，limit 取值范围 1~1000，默认 100
+// 查询对话中最后 10 条消息，limit 取值范围 1~1000
 [conversation queryMessagesWithLimit:10 callback:^(NSArray *objects, NSError *error) {
     NSLog(@"查询成功！");
 }];
 ```
 ```java
-// limit 取值范围 1~1000，默认 100
-conv.queryMessages(10, new AVIMMessagesQueryCallback() {
+// limit 取值范围 1~1000，如调用 queryMessages 时不带 limit 参数，默认获取 100 条消息记录
+int limit = 10
+conv.queryMessages(limit, new AVIMMessagesQueryCallback() {
   @Override
   public void done(List<AVIMMessage> messages, AVIMException e) {
     if (e == null) {
