@@ -227,28 +227,6 @@ AV.Cloud.define('querySomething', function(req, res) {
 * 在拷贝 Deploy Key 时，确保没有多余的换行符号。
 * Gitlab 目前不支持有注释的 Deploy Key。早期 LeanCloud 用户生成的 Deploy Key 末尾可能带有注释（类似于 `App dxzag3zdjuxbbfufuy58x1mvjq93udpblx7qoq0g27z51cx3's cloud code deploy key`），需要删除掉这部分再保存到 Gitlab。
 
-## Exceeded Limit 是什么意思？
-
-很多用户使用云引擎时会遇到 http 响应码为 `529` 的错误页面：
-
-```
-Exceeded Limit
-当前 IP [118.186.7.27] 超过并发限制。
-```
-
-这是因为云引擎的网站托管服务对每个广域网 IP 有 60 个连接的限制，来防止恶意用户使用较低的成本对云引擎应用发起较大的攻击。
-
-如果正常使用时遇到这个问题，一般是由以下场景所触发：
-
-* 一个办公室很多人都访问同一个云引擎应用：因为整个办公室出口 IP 是一样的，所以相对比较容易达到限制。
-* 自有服务器与云引擎通信：可能短时间产生大量请求，导致达到限制。
-* 应用响应很慢：导致请求不能迅速释放，请求堆积导致达到限制。
-
-解决办法：
-
-* 对于前两种情况，建议使用 [自定义域名](leanengine_webhosting_guide-node.html#备案和自定义域名) 绑定到云引擎，这样限制会扩大到每个 IP 允许 300 个连接。
-* 如果是最后一种情况，建议优化云引擎的业务降低响应时间，或者绑定 [自定义域名](leanengine_webhosting_guide-node.html#备案和自定义域名)。
-
 ## `npm ERR! peer dep missing` 错误怎么办？
 
 部署时出现类似错误：
