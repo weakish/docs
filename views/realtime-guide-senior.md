@@ -102,6 +102,8 @@ appid:client_id:convid:nonce:timestamp
 
 各参数的含义同上。
 
+注意，此签名仅用于通过 REST API 查询历史消息，客户端 SDK 不适用。
+
 #### 黑名单的签名
 
 由于黑名单有两种情况，所以签名的消息格式也有两种：
