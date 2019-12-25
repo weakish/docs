@@ -158,9 +158,6 @@ lean -p 3002
 - [手把手测试你的JS代码性能](https://cnodejs.org/topic/58b562f97872ea0864fee1a7)
 - [Speed Up JavaScript Execution](https://developers.google.com/web/tools/chrome-devtools/rendering-tools/js-execution)
 
-## 如何进行域名备案和域名绑定？
-
-只有网站类的才需要备案，并且在主域名已备案的情况下，二级子域名不需要备案。如果主站需要托管在我们这边，且还没有备案过，请进入 **应用控制台 > 账号设置 >** [域名备案](/dashboard/settings.html#/setting/domainrecord) 和 [域名绑定](/dashboard/settings.html#/setting/domainbind)，按照步骤提示操作即可。
 
 ## 调用云引擎方法如何收费？
 
