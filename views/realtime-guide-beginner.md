@@ -2341,7 +2341,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 | `lastMessage`                   | N/A                | 最新一条消息，可能会空 |
 | `isMuted`                       | N/A                | 当前用户是否静音该对话 |
 | `unreadMessageCount`            | N/A                | 未读消息数 |
-| `isUnreadMessageContainMention` | N/A                | 未读消是否 @ 了当前的 `Client` |
+| `isUnreadMessageContainMention` | N/A                | 未读消息是否 @ 了当前的 `Client` |
 | `client`                        | N/A                | 会话所属的 `Client` |
 | `clientID`                      | N/A                | 会话所属的 `Client` 的 `ID` |
 | `isOutdated`                    | N/A                | 会话的属性是否过期，可以根据该属性来决定是否更新会话的数据 |
