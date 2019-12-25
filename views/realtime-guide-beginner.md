@@ -3419,7 +3419,7 @@ SDK 提供了多种方式来拉取历史记录，iOS 和 Android SDK 还提供�
 
 ```js
 conversation.queryMessages({
-  limit: 10, // limit 取值范围 1~1000，默认 100
+  limit: 10, // limit 取值范围 1~100，默认 20
 }).then(function(messages) {
   // 最新的十条消息，按时间增序排列
 }).catch(console.error.bind(console));
@@ -3439,14 +3439,15 @@ do {
 }
 ```
 ```objc
-// 查询对话中最后 10 条消息，limit 取值范围 1~1000，默认 100
+// 查询对话中最后 10 条消息，limit 取值范围 1~100，值为 0 时获取 20 条消息记录（使用服务端默认值）
 [conversation queryMessagesWithLimit:10 callback:^(NSArray *objects, NSError *error) {
     NSLog(@"查询成功！");
 }];
 ```
 ```java
-// limit 取值范围 1~1000，默认 100
-conv.queryMessages(10, new AVIMMessagesQueryCallback() {
+// limit 取值范围 1~100，如调用 queryMessages 时不带 limit 参数，默认获取 20 条消息记录
+int limit = 10
+conv.queryMessages(limit, new AVIMMessagesQueryCallback() {
   @Override
   public void done(List<AVIMMessage> messages, AVIMException e) {
     if (e == null) {
@@ -3456,7 +3457,7 @@ conv.queryMessages(10, new AVIMMessagesQueryCallback() {
 });
 ```
 ```cs
-// limit 取值范围 1~1000，默认 100
+// limit 取值范围 1~100，默认 20
 var messages = await conversation.QueryMessageAsync(limit: 10);
 foreach (var message in messages)
 {
