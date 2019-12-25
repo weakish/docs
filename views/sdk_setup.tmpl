@@ -1018,17 +1018,15 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
 // 在 Application 初始化代码执行之前执行
 [AVOSCloud setAllLogsEnabled:YES];
 ```
+
+详细调试流程可以参考 [Objective-C SDK 调试指南][objc-debug-guide]。
+
+[objc-debug-guide]: https://forum.avoscloud.com/t/leancloud-sdk-objective-c-sdk/21851
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
 // 在 Application 初始化代码执行之前执行
 LCApplication.logLevel = .all
-```
-{% endif %}
-{% if platform_name === "Android" %}
-```java
-// 放在 SDK 初始化语句 AVOSCloud.initialize() 前面，只需要调用一次即可
-AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
@@ -1094,6 +1092,10 @@ Client::setDebug(true);
 // 在 AVOSCloud.initialize() 之前调用
 AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
 ```
+
+详细调试流程可以参考[Android SDK 调试指南][android-debug-guide]。
+
+[android-debug-guide]: https://forum.avoscloud.com/t/leancloud-sdk-android-sdk/21829/
 {% endif %}
 {% if platform_name === ".NET" %}
 ```cs
