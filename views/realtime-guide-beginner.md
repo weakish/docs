@@ -3446,7 +3446,7 @@ do {
 ```
 ```java
 // limit 取值范围 1~100，如调用 queryMessages 时不带 limit 参数，默认获取 20 条消息记录
-int limit = 10
+int limit = 10;
 conv.queryMessages(limit, new AVIMMessagesQueryCallback() {
   @Override
   public void done(List<AVIMMessage> messages, AVIMException e) {
