@@ -296,3 +296,8 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 ## 如何定制 Java 的堆内存大小？
 
 见 [网站托管开发指南 · Java](leanengine_webhosting_guide-java.html#项目骨架)。
+
+## 云引擎会重复提交请求吗？
+
+云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的。
+可以使用正确的谓词（例如 POST）避免此类重试。
