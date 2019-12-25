@@ -15,7 +15,7 @@
 
 ## 示例 Demo
 
-我们在 [leanengine-nodejs-demos](https://github.com/leancloud/leanengine-nodejs-demos) 这个项目里提供了[一份代码示例](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-onoff-status.js) 供参考。你可以直接把这里的代码部署到自己的应用中。
+我们在 [leanengine-nodejs-demos](https://github.com/leancloud/leanengine-nodejs-demos) 这个项目里提供了[一份代码示例](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-onoff-status.js)供参考。你可以直接把这里的代码部署到自己的应用中。
 
 
 ## 实现步骤
