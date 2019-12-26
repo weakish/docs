@@ -34,20 +34,7 @@ LeanCloud 开发者文档
 - 修改文中标题或文件名称
   - 确认要修改的标题 h1-h6 或文件名称有没有被 `/views` 和 `/templates` 目录下任何文件所引用，以免产生断链。
   - 系统自动生成的 h1-h6 标题的 id，将所有空格、中西文标点替换为由数字和减号组成的 hash 值。在编写 Markdown 需要引用这些标题时，要将原文中的连续空白替换成一个减号即可，例如引用标题 `## 使用 SSO 登录` 时，应写为 `请参考 [SSO 登录](#使用-SSO-登录)`，以数字开头的标题要先在前面加个下划线，比如标题 `### 601` 引用写为 `[错误码 601](#_601)`。
-- 提交修改并发起 `Pull Request`
-
-## 内部贡献
-
-为避免在所提交 PR 中出现与修改内容无关的 Merge pull request 的 commits，推荐使用以下流程提交 PR：
-
-1. 本地切换到 master 分支并同步至主 repo 的最新版本。
-1. 新建分支 new branch 进行修改
-1. 提交 PR，如有相关的 issue 在注释中增加 `close #???`。问号为 issue 的编号。
-
-合并 PR 时，如果 commits 历史不重要，可以选择 Squash and Merge 来合并，合并后删除相关的分支。
-
-PR 合并后，要让改动最终生效还需要通过 Jenkins 执行 `cn-avoscloud-docs-prod-ucloud` 任务进行发布。
-
+- 提交修改并发起 `Pull Request`，可以参考 [Git Commit 日志风格指南](https://open.leancloud.cn/git-commit-message/)。
 
 ## 目录结构
 
@@ -93,24 +80,22 @@ $ npm ci
 $ npm run preview
 ```
 
-## 版本更新
-
-- 请通过 `grunt release` 命令自动 bump `package.json` 来自动打标签，请不要手动更新。
-- 请按照 `CONVENTIONS.md` 的格式书写有意义的 commits，`CHANGELOG.md` 会被自动生成，请不要手动修改。
+注意保持网络畅通（如有必要请使用代理），因为部分 Native 依赖在网络不畅的情况下无法获取预编译文件，会触发本地编译，耗时较长，也有较大几率会编译失败。
 
 ## 特殊语法
 
 - [时序图](https://github.com/leancloud/docs/issues/2710)
 
-## 多语言多平台共享文案解决方案1 - 使用预编译宏
+## Nunjucks 模板
 
-LeanCloud 产品线较多，每一个产品都有多平台/多语言/多运行时的 SDK 的开发指南，而为了让文档的可维护性进一步增强和统一管理，致力于实现一下目标：
+Nunjucks 模板语法类似 Jinja，详见[官方文档](https://mozilla.github.io/nunjucks/templating.html)。
 
-> 单个产品线包含的单个子模块的文档只拥有一份文字描述文档，而多平台/多语言/多运行通过内置的拓展语法/前端展现来实现切换
+## 多语言多平台共享文案解决方案 1 - 使用预编译宏
 
-举个例子阐述如上目标：
+单个产品线包含的单个子模块的文档只拥有一份文字描述文档，而多平台/多语言/多运行通过内置的拓展语法/前端展现来实现切换。
 
-针对云存储产品线的 SDK（子模块）的文档只有一份叫做 `storage-sdk-guide.md` 的文档，而在它内部通过 Web 前端技术的来做不同语言(js/java/objc)的示例代码切换。
+即时通讯开发指南就采用了这种方案。
+比如即时通讯开发指南第一篇对应文档 `realtime-guide-beginner.md`，在它内部通过 Web 前端技术的来做不同语言的示例代码切换。
 
 切换按钮如下图：
 
@@ -171,107 +156,58 @@ AVObject|AVObject|AV.Object|LCObject|LeanCloud.Object|AVObject
 
 这样设置表示当前文档的默认首选语言是 js。
 
-## 多语言多平台共享文案解决方案2 - 一套模板多份渲染
+## 多语言多平台共享文案解决方案 2 - 内容集中到一份 tmpl 文件，每个语言 md 文件仅作骨架
 
-有些文档的相似度非常高，所以可以使用一份模板、多份变量渲染的方式一次性生成多份文档，比如《云函数开发指南》就是这样生成的。这份文档分为多个运行时：[Node.js](https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html)、[Python](https://leancloud.cn/docs/leanengine_cloudfunction_guide-python.html)、[Java](https://leancloud.cn/docs/leanengine_cloudfunction_guide-java.html)、[PHP](https://leancloud.cn/docs/leanengine_cloudfunction_guide-php.html)。这类文档编写方式如下：
+这种方案下，所有的内容都在 `topic.tmpl` 下，不同语言主要依靠模板的 `if else` 结构支持：
 
-* 在 `views` 目录先编写一份以 `tmpl` 作为扩展名的「模板」，将文档的主体部分完成，将文档之间不一样的部分（比如不同语言的代码片段）使用如下代码块：
-
-  ```
-  {% block <blockName> %}{% endblock %}
-  ```
-
-  可以参考 `[leanengine_cloudfunction_guide.tmpl](https://github.com/leancloud/docs/blob/master/views/leanengine_cloudfunction_guide.tmpl)`。
-* 在 `views` 目录里编写多份渲染变量（以 `md` 作为文件扩展名）。第一行表明自己继承哪个模板：
-
-  ```
-  {% extends "./<your-tmpl-file>" %}
-  ```
-
-  后续的内容就是用：
-
-  ```
-  {% block <blockName> %}<不同文档之间的差异>{% endblock%}
-  ```
-
-  来替换模板中存在的 block。可以参考 `[leanengine_cloudfunction_guide-node.md](https://github.com/leancloud/docs/blob/master/views/leanengine_cloudfunction_guide-node.md)`。
-* 生成文档：使用下列命令会在 `md` 文件夹中生成最终的 `.md` 文件：
-
-  ```
-  grunt nunjucks
-  ```
-
-  同样支持 `grunt server` 命令，该命令最终会执行 `watch` 插件，此时修改模板文件，或者变量文件都会自动重新生成最终的 md 文件（可能需要等待 2~4 秒）。
-
-**注意：如果在模板中需要渲染 `{{appid}}` 这样的 AngularJS 变量，则必须在模板文件的最上方先定义好一个新变量，如 `appid`，其值为 `'{{appid}}'`，例如：**
-
-```
-{% set appid = '{{appid}}' %}
-{% set appkey = '{{appkey}}' %}
-{% set masterkey = '{{masterkey}}' %}
+```nunjucks
+{% if platform_name === "JavaScript" %}
+// Code here
+{% endif %}
+{% if platform_name === "Swift" %}
+// Code here
+{% endif %}
 ```
 
-这样，在生成的 html 文档中，`{{appid}}` 才可以被正确渲染，否则，它会被替换为空值，原因是 nunjucks 在上下文中找不到该变量的定义。
+`topic-lang.md` 只有两行，一行是继承 `topic.tmpl`，一行是指定当前 `lang` （赋值 `platform_name` 变量），除此以外没有其他新增内容。
 
-其他常用的 [nunjucks 模板方法](https://mozilla.github.io/nunjucks/templating.html) 或者 [jinja](http://jinja.pocoo.org/docs/dev/templates/)，以下为快速参考：
-
-```
-{# 这是注释，用 <!-- --> 无效 #}
-
-{% if numUsers < 5 %}...{% endif %}
-{% if i != "String" %}...{% endif %}
-// boolean 的否定要用 not 而不是 !
-{% if not isNew %}...{% endif %}
-{% if users and showUsers %}...{% endif %}
-{% if i == 0 and not hideFirst %}...{% endif %}
-{% if (x < 5 or y < 5) and foo %}...{% endif %}
-
-// 复用文档片断
-{% macro ... %}
-{% include ... %}
+```nunjucks
+{% extends "./leanstorage_guide.tmpl" %}
+{% set platform_name = "JavaScript" %}
 ```
 
-### 辅助工具	
+新文档可以根据需求酌情选用方案 1、方案 2。
 
- 「一套模板多分渲染」的不同渲染文件编写起来比较困难，需要先从主模板上找到变量在对应到渲染文件，所以开发了一个简单的工具来简化这一步骤。使用方式如下：	
- 1. 安装需要的依赖，该步骤只需要执行一次：	
-    ```	
-    $ npm install	
-    ```	
- 2. 启动辅助工具的本地 webServer，使用以下命令：	
-    ```	
-    $ node server	
-    ```	
+### 多语言多平台共享文案解决方案 3 - 一套模板多份渲染
+
+目前还有部分旧文档采用这种方式编写。
+
+这个和上面一种方案类似，只不过不同语言特有内容并不通过 `if else` 结构包含在 `topic.tmpl` 内，而是采用如下方式「占位」：
+
+```nunjucks
+{% block <blockName> %}{% endblock %}
+```
+
+然后在 `topic-lang.md` 中写入具体内容：
+
+```nunjucks
+{% block <blockName> %}具体内容{% endblock%}
+```
+
+使用这种方案的情况下，可以通过 `node server` 命令运行一个简单的辅助工具，帮助编写文档。
+使用步骤如下：
+
 1. 使用浏览器打开 http://localhost:3001，将会看到一个「选择模板」的下拉列表框，该列表框里会显示 `views/<tmplName>.tmpl` 的所有模板文件，文件名的 `tmplName` 部分是下拉列表框选项的名称。选择你需要编写的模板（比如 `leanengine_guide`）。	
 2. 你会看到模板文件被读取，其中所有 `{% block <blockName> %}<content>{% endblock %}` 部分的下面都会有一些按钮。这些按钮表示该「模板」拥有的不同「渲染」，也就是对应的 `views/<tmplName>-<impl>.md` 文件，文件名的 `impl` 部分是按钮的名称。	
 3. 点击对应的按钮，即可看到「渲染」文件中对应 `block` 的内容已经读取到一个文本域中，如果为空，表明该「渲染」文件未渲染该 block，或者内容为空。	
 4. 在文本域中写入需要的内容，然后点击保存，编写的内容就会保存到对应的「渲染」文件的 block 中。	
-5. 最后建议打开「渲染」文件确认下内容，没问题即可通过 `grunt serve` 查看效果。当然整个过程打开 `grunt serve` 也是没问题的，它会发现「渲染」文件变动后重新加载。	有问题请与 <wchen@leancloud.rocks> 联系。
+5. 最后建议打开「渲染」文件确认下内容，没问题即可通过 `grunt serve` 查看效果。当然整个过程打开 `grunt serve` 也是没问题的，它会发现「渲染」文件变动后重新加载。有问题请与 <wchen@leancloud.rocks> 联系。
 
+## 文档上线
 
-## 新功能文档上线步骤
-
-前置条件：
-
-- 包含该功能的 SDK 确定已经经过单元测试和集成测试
-- 服务端已经上线
-- 所有包含该功能的语言 SDK （JavaScript/Objective-C/Java 等）都已经经过单元测试和集成测试
-
-### 功能提出者编写
-
-直接修改对应的文档，提交 PR，交由文档工程师审核，合并之后由功能提出者安排发布上线的时间。
-
-### 文档工程师编写
-
-步骤：
-
-1. 功能提出者提交 issue 描述该功能隶属于哪个子产品的哪个功能
-2. 功能提出者给出使用场景的描述文档
-3. 功能提出者给出对应所有的语言的 SDK 的示例代码/注释
-4. 文档工程师发出 PR，功能提出者来审阅
-
-然后文档工程师会在上述步骤都完成之后，合并之后由功能提出者安排发布上线的时间。
-
+请保证 master 分支处于随时可发布状态。
+如果相应功能或修复尚未上线，可以使用 draft pr，或者在 pr 标题注明「DO NOT MERGE」之类的字样。
+PR 合并后，要让改动最终生效还需要通过 Jenkins 执行 `cn-avoscloud-docs-prod-ucloud` 任务进行发布。
 
 ## License
 
