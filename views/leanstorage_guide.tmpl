@@ -5861,7 +5861,8 @@ AVSMS.requestSMSCodeInBackground("+8618200008888", option).subscribe(new Observe
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-_ = LCSMSClient.requestVerificationCode(mobilePhoneNumber: "+8618200008888") { (result) in
+//templateName 是短信模版名称，signatureName 是短信签名名称。可以在控制台 > 消息 > 短信 >设置中查看。
+_ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "+8618200008888", templateName: "template_name", signatureName: "sign_name") { (result) in
     switch result {
     case .success:
         break
@@ -5923,10 +5924,10 @@ AVUser.signUpOrLoginByMobilePhoneInBackground("+8618200008888", "123456").subscr
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-_ = LCSMSClient.verifyMobilePhoneNumber("+8618200008888", verificationCode: "123456", completion: { (result) in
+_ = LCUser.signUpOrLogIn(mobilePhoneNumber: "+8618200008888", verificationCode: "123456", completion: {(result) in
     switch result {
-    case .success:
-        break
+    case .success(object: let user):
+        print(user)
     case .failure(error: let error):
         print(error)
     }
