@@ -1,6 +1,10 @@
 {% import "views/_helper.njk" as docs %}
 {% from "views/_data.njk" import android_groovy, android_key_init %}
 
+{% macro requireServerURL() %}
+请将 `xxx.example.com` 替换为你的应用[绑定的 API 域名](custom-api-domain-guide.html#API_域名)。
+{% endmacro %}
+
 # {{platform_name}} SDK 安装指南
 
 {% if platform_name === "Android" %}
@@ -648,6 +652,8 @@ AV.init({
 });
 ```
 
+{{ requireServerURL() }}
+
 {{ docs.note("目前在 Egret 平台上，我们只提供存储服务的 SDK（不含 LiveQuery 功能）。") }} 
 
 ### React Native
@@ -765,6 +771,8 @@ PM> Install-Package LeanCloud.Realtime
             serverURLString:"https://xxx.example.com"];
 ```
 
+{{ requireServerURL() }}
+
 {{ docs.alert("在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Server URL 的初始化。") }}
 {% endif %}
 {% if platform_name === "Swift" %}
@@ -786,6 +794,8 @@ do {
     print(error)
 }
 ```
+
+{{ requireServerURL() }}
 
 {{ docs.alert("在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Server URL 的初始化。") }}
 {% endif %}
@@ -864,6 +874,8 @@ AV.init({
   serverURLs: "https://xxx.example.com"
 });
 ```
+
+{{ requireServerURL() }}
 {% endif %}
 {% if platform_name === "Python" %}
 然后导入 `leancloud`，并调用 `init` 方法进行初始化：
@@ -919,6 +931,8 @@ public class MyLeanCloudApp extends Application {
     }
 }
 ```
+
+{{ requireServerURL() }}
 
 然后指定 SDK 需要的权限并在 `AndroidManifest.xml` 里面声明 `MyLeanCloudApp` 类：
 
@@ -978,6 +992,8 @@ using LeanCloud.Realtime;
 AVClient.Initialize("{{appid}}", "{{appkey}}", "https://xxx.example.com");
 ```
 
+{{ requireServerURL() }}
+
 注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
 模板项目和[云引擎网站托管开发指南](leanengine_webhosting_guide-dotnet.html)中的示例代码均未配置 API 自定义域名，
 请勿多此一举设置 ApiServer，否则会变成公网访问，影响性能。
@@ -995,6 +1011,8 @@ var realtime = new AVRealtime(new AVRealtime.Configuration {
 AVLiveQuery.Channel = realtime;
 ```
 
+{{ requireServerURL() }}
+
 ### 即时通讯初始化
 
 在使用「即时通讯」服务前，调用如下代码：
@@ -1007,6 +1025,8 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
     RTMRouter = new Uri("https://xxx.example.com")
 });
 ```
+
+{{ requireServerURL() }}
 {% endif %}
 
 ## 开启调试日志
