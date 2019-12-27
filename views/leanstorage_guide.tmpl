@@ -5819,7 +5819,16 @@ do {
 
 {% if platform_name === "Objective-C" %}
 ```objc
-[AVOSCloud requestSmsCodeWithPhoneNumber:@"+8618200008888"];
+AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
+options.templateName = @"template_name";// 控制台预设的模板名称
+options.signatureName = @"sign_name";     // 控制台预设的短信签名
+[AVSMS requestShortMessageForPhoneNumber:@"186xxxxxxxx" options:options callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        /* 请求成功 */
+    } else {
+        /* 请求失败 */
+    }
+}];
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
@@ -5924,7 +5933,7 @@ AVUser.signUpOrLoginByMobilePhoneInBackground("+8618200008888", "123456").subscr
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-_ = LCUser.signUpOrLogIn(mobilePhoneNumber: "+8618200008888", verificationCode: "123456", completion: {(result) in
+_ = LCUser.signUpOrLogIn(mobilePhoneNumber: "+8618200008888", verificationCode: "123456", completion: { (result) in
     switch result {
     case .success(object: let user):
         print(user)
