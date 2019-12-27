@@ -4772,9 +4772,11 @@ _ = file.save { result in
 文件上传后，可以在 `_File` class 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
 {% endcall %}
 
-{% if platform_name === "JavaScript" %}
-如果希望在文件的 url 中保留文件名，可以在保存时传入 `keepFileName` 参数：
+{% if platform_name in ["JavaScript", "Android / Java"] %}
+如果希望在文件的 url 中保留文件名，可以在保存时传入 `keepFileName` 参数。
+{% endif %}
 
+{% if platform_name === "JavaScript" %}
 ```js
 var data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
 var file = new AV.File('resume.txt', data);
@@ -4782,6 +4784,20 @@ file.save({ keepFileName: true }).then(function (file) {
   console.log(file.url); // https://your-file-domain/5112b94e0536e995741c/resume.txt
 }, function (error) {
   // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
+});
+```
+{% endif %}
+{% if platform_name === "Android / Java" %}
+```java
+file.saveInBackground(true).subscribe(new Observer<AVFile>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(AVFile file) {
+        System.out.println("文件保存完成。objectId：" + file.getObjectId());
+    }
+    public void onError(Throwable throwable) {
+        // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
+    }
+    public void onComplete() {}
 });
 ```
 {% endif %}
