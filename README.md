@@ -74,7 +74,7 @@ $ sudo npm install -g grunt-cli
 $ npm ci
 ```
 
-本地启动一个 HTTP Server，然后打开浏览器访问 <http://localhost:3000> 即可
+本地启动一个 HTTP Server，然后打开浏览器访问 <http://localhost:9000> 即可
 
 ```bash
 $ npm run preview
