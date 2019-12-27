@@ -310,6 +310,16 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 implementation 'com.alibaba:fastjson:1.1.71.android'
 implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 ```
+
+#### 对 fastjson 的特别说明：
+从 fastjson 的[官网](https://github.com/alibaba/fastjson)我们可以看到，出于性能和安装包体积考虑，它针对纯的 Java 平台和 Android 平台分别推出了两个不同的版本（差异见[这里](https://github.com/alibaba/fastjson/wiki/Android%E7%89%88%E6%9C%AC)），所以我们的 SDK 也根据使用环境做了不同的依赖选择：
+
+- storage-core 依赖的是面向纯 Java 平台的 fastjson（版本为 `1.2.60`）;
+- storage-android 和 realtime-android 以及其他推送 sdk 依赖的是面向 Android 平台的 fastjson（版本为 `1.1.71.android`）。
+
+这一点请特别注意，如果版本不兼容可能导致程序在运行时会出现各种 json 解析的问题。
+
+
 {% endif %}
 
 ### 手动安装
