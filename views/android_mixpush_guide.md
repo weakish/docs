@@ -248,6 +248,7 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 ### 使用特定 activity 响应推送消息
 
 华为推送消息，在用户点击了通知栏信息之后，默认是打开应用，用户也可以指定特定的 activity 来响应推送启动事件，开发者需要在 manifest 文件的 application 中定义如下的 activity：
+
 ```
 <!-- (可选)开发者自定义的打开推送消息的目的 activity。-->
 <activity android:name="<please use your own activity name>">
@@ -258,14 +259,20 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
     </intent-filter>
 </activity>
 ```
+
 在目标 activity 的 `onCreate` 函数中可以从 intent extra data 中通过 `content` key 可以获得推送内容（JSON 格式，包含 push 消息中所有自定义属性）。
 
-这里 intent-filter 的内容不能修改。在 HMS 推送中，我们是通过自定义 `intent` 参数来指定响应 activity 的（具体可参考华为文档[服务端发送 push 消息](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_api_reference_agent_s2)）。对于开发者[自定义的属性](https://leancloud.cn/docs/push_guide.html#hash1053488444)，在调用 HMS 推送接口的时候，LeanCloud 云端会使用固定的 intentUri pattern 来封装自定义属性，intentUri 的固定格式为：
+一般情况下，这里 intent-filter 的内容都不需要修改。如果同一开发者有多个应用都使用了我们的 HMS 混合推送，或者终端用户安装了多个使用我们的 HMS 混合推送的应用，那么在同一个终端上，LeanCloud 推送消息在通知栏被点击之后，因为多个应用都响应同样的 intent-filter，所以会出现要选择应用来打开的情况。这可以通过在 intent-filter 中配置不一样的 `android:host` 解决。在 LeanCloud 控制台，增加华为 HMS 推送配置的时候，开发者可以指定自己的 Android Intent Hostname（不指定就使用默认值 `cn.leancloud.push`），然后在这里的 intent-filter 中填上***同样***的值，客户端就可以区分不同应用的通知栏消息了。
+
+在 HMS 推送中，我们是通过自定义 `intent` 参数来指定响应 activity 的（具体可参考华为文档[服务端发送 push 消息](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_api_reference_agent_s2)）。对于开发者[自定义的属性](https://leancloud.cn/docs/push_guide.html#hash1053488444)，在调用 HMS 推送接口的时候，LeanCloud 云端会使用固定的 intentUri pattern 来封装自定义属性，intentUri 的固定格式为：
+
 ```
-intent://cn.leancloud.push/notify_detail#Intent;scheme=lcpushscheme;S.content=XXXX;launchFlags=0x10000000;end
+intent://{host}/notify_detail#Intent;scheme=lcpushscheme;S.content=XXXX;launchFlags=0x10000000;end
 ```
-其中 XXX 就是开发者自定义参数的 JSON 字符串做了 URL Encode 之后的值，只有这部分内容是开发者可以指定的。
+
+其中 `{host}` 就是上面配置的 Android Intent Hostname，默认值为 `cn.leancloud.push`；`XXX` 就是开发者自定义参数的 JSON 字符串做了 URL Encode 之后的值，只有这部分内容是开发者可以指定的。
 在 LeanCloud 后端发送这种推送的例子如下：
+
 ```
 curl -X POST \
   -H "X-LC-Id: {your app id}"          \
@@ -282,6 +289,7 @@ curl -X POST \
 ```
 
 LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为：
+
 ```
 {"hps":
   {"msg":
@@ -299,6 +307,7 @@ LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为：
   }
 }
 ```
+
 ### 华为推送自定义 Receiver
 如果你想推送消息，但不显示在 Android 系统的通知栏中，而是执行应用程序预定义的逻辑，可以 [自定义 Receiver](android_push_guide.html#自定义_Receiver)。华为混合推送自定义 Receiver 需要继承 AVHMSPushMessageReceiver，在收到透传消息的回调方法 `onPushMsg` 获取推送消息数据。
 你的 Receiver 可以按照如下方式实现：
