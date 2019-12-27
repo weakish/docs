@@ -2982,7 +2982,7 @@ curl -X POST \
 
 `exportData` 要求使用 master key 来授权。
 
-你还可以指定导出数据的起始时间：
+你还可以指定导出数据的起始时间（`updatedAt`）：
 
 ```
 curl -X POST \
