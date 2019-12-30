@@ -397,8 +397,7 @@
 ## 529
 
 * 信息 - `Exceeded Limit`
-* 含义 -  当前 IP 超过并发限制。使用云引擎时遇到 http 响应码为 529 的错误页面，解决方案请参考 [Exceeded Limit](leanengine_faq.html#Exceeded_Limit_是什么意思_)。
-
+* 含义 -  当前 IP 超过并发限制。使用云引擎时遇到 http 响应码为 529 的错误页面。由于云引擎对 IP 连接数的限制非常宽松，因此正常情况下不会遇到这一报错。如果不是在压测之类的场景下遇到这一报错，请联系我们。
 ## 600
 
 * 信息 - `Invalid SMS signature.`
