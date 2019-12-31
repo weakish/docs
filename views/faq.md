@@ -14,8 +14,8 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 {% if node!='qcloud' %}
 ### 获取客服支持有哪些途径
 
-* 到免费的[用户社区](https://forum.leancloud.cn/) 进行提问。
-* 购买 [技术支持](/dashboard/bill.html#/bill/general)，进入 [工单系统](https://leanticket.cn/t/leancloud) 来提交问题。
+* 到免费的 [用户社区](https://forum.leancloud.cn/) 进行提问。
+* 商用版应用的所有者可以进入 [工单系统](https://leanticket.cn/t/leancloud) 来提交问题。
 * 账号相关事项，可发送邮件到 {{ include.supportEmail() }} 获取帮助。
 * 紧急故障拨打客服电话：+8618625038918。
 * 售前咨询请致电 +8613011098244。
