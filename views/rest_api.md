@@ -572,14 +572,12 @@ curl -X PUT \
 
 #### 指定 hook 函数调用环境
 
-请求可能触发[云引擎的 hook 函数][hooks]，可以通过设置 HTTP 头 `X-LC-Prod` 来区分调用的环境。
+请求可能触发[云引擎的 hook 函数](leanengine_cloudfunction_guide-node.html#Hook_函数)，可以通过设置 HTTP 头 `X-LC-Prod` 来区分调用的环境。
 
 * `X-LC-Prod: 0` 表示调用预备环境
 * `X-LC-Prod: 1` 表示调用生产环境
 
 默认（未指定 `X-LC-Prod` 头）调用生产环境的 hook 函数。
-
-[hooks]: https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html#hash1095356413
 
 ### 响应格式
 
