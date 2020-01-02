@@ -587,9 +587,8 @@ curl -X PUT \
 
 ```json
 {
-  "code": 105,
-  "error": "invalid field name: bl!ng"
-}
+  "code":105,
+  "error":"Invalid key name. Keys are case-sensitive and 'a-zA-Z0-9_' are the only valid characters. The column is: 'invalid?'."}
 ```
 
 错误代码请看 [错误代码详解](./error_code.html)。
