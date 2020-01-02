@@ -538,7 +538,7 @@ curl -X PUT \
     </tr>
     <tr>
       <td scope="row">请求时间</td>
-      <td>2016-01-17 15:15:43.466</td>
+      <td>2016-01-17 15:15:43.466 GMT+08:00</td>
     </tr>
     <tr>
       <td scope="row">timestamp</td>
