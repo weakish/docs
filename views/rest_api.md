@@ -340,7 +340,7 @@ Postman 还支持自动生成多种语言（库）调用 REST API 的代码。
     </tr>
     <tr>
       <td>/1.1/schemas/&lt;className&gt;</td>
-      <td>POST</td>
+      <td>GET</td>
       <td>获取应用指定的 Class 的 Schema</td>
     </tr>
   </tbody>
