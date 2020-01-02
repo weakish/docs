@@ -62,6 +62,8 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 * **_clientOffline**<br/>
   客户端下线，客户端登出成功或意外下线后调用。
 
+开发者可以利用这两个 Hook 函数，结合云缓存来完成一组客户端实时状态查询的 endpoint，具体可以参考文档[即时通讯中的在线状态查询](realtime-guide-onoff-status.html)。
+
 ### Hook 与云引擎的关系
 
 因为 Hook 发生在即时通讯的在线处理环节，而即时通讯服务端每秒钟需要处理的消息和对话事件数量远超大家的想象，出于性能考虑，我们要求开发者使用 [LeanCloud 云引擎](leanengine_overview.html) 来实现 Hook 函数，为此我们也提供了多种服务端 SDK 供大家选择：
