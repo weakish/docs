@@ -643,7 +643,7 @@ https://{{host}}/1.1/users
 针对于一个特定的对象的操作可以通过组织一个 URL 来做。例如，对 Post 中的一个 objectId 为 `558e20cbe4b060308e3eb36c` 的对象的操作应使用如下 URL：
 
 ```
-https://{{host}}/1.1/classes/Post/<objectId>
+https://{{host}}/1.1/classes/Post/558e20cbe4b060308e3eb36c
 ```
 
 ### 创建对象
