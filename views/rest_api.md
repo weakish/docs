@@ -686,8 +686,6 @@ curl -X POST \
   https://{{host}}/1.1/classes/Post?fetchWhenSave=true
 ```
 
-fetchWhenSave 选项对更新对象也同样有效，但是它仅返回已被更新的字段，而非全部字段。
-
 {{ docs.note("**每个应用最多可以创建 500 个 class**，但每个 class 中的记录数量没有限制。") }}
 
 ### 获取对象
@@ -782,6 +780,9 @@ curl -X PUT \
   "updatedAt": "2015-06-30T18:02:52.248Z"
 }
 ```
+
+fetchWhenSave 选项对更新对象也同样有效。
+但和创建对象不同，用于更新对象时仅返回更新的字段，而非全部字段。
 
 #### 计数器
 
