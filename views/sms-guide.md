@@ -36,10 +36,10 @@
 
 ```objc
 AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
-options.templateName = @"Register_Notice";// 控制台预设的模板名称
-options.signatureName = @"LeanCloud";     // 控制台预设的短信签名
-// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板和签名
-[AVSMS requestShortMessageForPhoneNumber:@"186xxxxxxxx"
+options.templateName = @"Register_Notice"; // 控制台预设的模板名称
+options.signatureName = @"LeanCloud";      // 控制台预设的短信签名
+// 往 18200008888 这个手机号码发送短信，使用预设的模板和签名
+[AVSMS requestShortMessageForPhoneNumber:@"18200008888"
                                 options:options
                                 callback:^(BOOL succeeded, NSError * _Nullable error) {
                                     if (succeeded) {
@@ -51,9 +51,9 @@ options.signatureName = @"LeanCloud";     // 控制台预设的短信签名
 ```
 ```swift
 _ = LCSMSClient.requestShortMessage(
-    mobilePhoneNumber: "186xxxxxxxx", 
+    mobilePhoneNumber: "18200008888",
     templateName: "Register_Notice", // 控制台预设的模板名称
-    signatureName: "LeanCloud") // 控制台预设的短信签名
+    signatureName: "LeanCloud")      // 控制台预设的短信签名
 { (result) in
     switch result {
     case .success:
@@ -64,21 +64,21 @@ _ = LCSMSClient.requestShortMessage(
 }
 ```
 ```java
-// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
 AVSMSOption option = new AVSMSOption();
-option.setTemplateName("Register_Notice");// 控制台预设的模板名称
-option.setSignatureName("LeanCloud");// 控制台预设的短信签名
-AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
+option.setTemplateName("Register_Notice"); // 控制台预设的模板名称
+option.setSignatureName("LeanCloud");      // 控制台预设的短信签名
+// 往 18200008888 这个手机号码发送短信，使用预设的模板和签名
+AVSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<AVNull>() {
     @Override
     public void onSubscribe(Disposable disposable) {
     }
     @Override
     public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to request SMSCode.");
+        Log.d("TAG","Result: Successfully sent text message.");
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
+        Log.d("TAG","Result: Failed to send text message. Reason: " + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -86,38 +86,37 @@ AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<A
 });
 ```
 ```javascript
-// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板和签名
+// 往 18200008888 这个手机号码发送短信，使用预设的模板和签名
 AV.Cloud.requestSmsCode({
-  mobilePhoneNumber: '186xxxxxxxx',  // 目标手机号
-  template: 'Register_Notice',       // 控制台预设的模板名称
-  sign:'LeanCloud'.                  // 控制台预设的短信签名
+  mobilePhoneNumber: '18200008888', // 目标手机号
+  template: 'Register_Notice',      // 控制台预设的模板名称
+  sign:'LeanCloud'                  // 控制台预设的短信签名
 }).then(function(){
-  //调用成功
+  // 调用成功
 }, function(err){
-  //调用失败
+  // 调用失败
 });
 ```
 ```cs
-// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）和签名（「LeanCloud」参数）
-AVCloud.RequestSMSCodeAsync("186xxxxxxxx","Register_Notice",null,"LeanCloud").ContinueWith(t =>
+// 往 18200008888 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）和签名（「LeanCloud」参数）
+AVCloud.RequestSMSCodeAsync("18200008888","Register_Notice",null,"LeanCloud").ContinueWith(t =>
 {
     var result = t.Result;
     // result 为 True 则表示调用成功
 });
 ```
 ```php
-// 往 186xxxxxxxx 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）
+// 往 18200008888 这个手机号码发送短信，使用预设的模板（「Register_Notice」参数）和签名（「LeanCloud」参数）
 $options = [
   "template" => "Register_Notice",
   "name" => "LeanCloud",
 ];
-SMS::requestSMSCode("186xxxxxxxx", $options);
+SMS::requestSMSCode("18200008888", $options);
 ```
 ```python
 from leancloud import cloud
-cloud.request_sms_code("186xxxxxxxx", template="Register_Notice", sign="LeanCloud")
+cloud.request_sms_code("18200008888", template="Register_Notice", sign="LeanCloud")
 ```
-
 
 用户收到的短信内容如下：
 
@@ -131,45 +130,47 @@ cloud.request_sms_code("186xxxxxxxx", template="Register_Notice", sign="LeanClou
 ## 开通短信服务
 
 ### 在安全中心开启短信服务
+
 要使用短信服务，首先需要在控制台创建一个应用，然后进入 [控制台 > 设置 > 安全中心](/dashboard/app.html?appid={{appid}}#/security)，确保 **短信服务** 开关是打开的：
 
-![sms_switch](images/sms_switch_setting.png)
+<img src="images/sms_switch_setting.png" width="600" class="img-responsive" alt="「服务开关」下面的「短信服务」是打开的。">
 
 ### 完成短信配置
-然后进入 [控制台 > 消息 > 短信 > 设置 > 短信选项](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf)，请确保以下选项处于勾选状态。
+
+然后进入 [控制台 > 消息 > 短信 > 设置 > 短信选项](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf)，请确保以下选项处于勾选状态：
 
 {{ include.checkbox(true) }}**启用通用的短信验证码服务（开放 `requestSmsCode` 和 `verifySmsCode` 接口）**
 - 开启：开发者可以使用短信进行验证功能的开发，比如，敏感的操作认证、异地登录、付款验证等业务相关的需求。
-- 关闭：请求验证发送短信以及验证短信验证码都会被服务端拒绝，但是请注意，跟用户相关的验证与该选项无关。
+- 关闭：请求发送验证短信以及验证短信验证码都会被服务端拒绝，但是请注意，跟用户相关的验证与该选项无关。
 
 ### 设置默认签名
-短信发送的时候需要有签名运营商才会放行，如前面示例中的「购物网」、「当当」即为短信签名。在开始发送短信之前，你需要进入[控制台 > 消息 > 短信 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf)，设置默认的短信签名（第一个签名即为「默认签名」）：
 
-![sms_switch](images/sms_create_signature.png)
+短信发送的时候需要有签名运营商才会放行，如前面示例中的「购物网」、「当当」即为短信签名。在开始发送短信之前，你需要进入 [控制台 > 消息 > 短信 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf)，设置默认的短信签名（第一个签名即为「默认签名」）：
+
+![「短信签名」中的「创建新短信签名」按钮。](images/sms_create_signature.png)
 
 创建签名只需要输入内部名称和签名字符串即可，如下图所示：
 
-![sms_switch](images/sms_signature_edit.png)
+<img src="images/sms_signature_edit.png" width="600" class="img-responsive" alt="在「短信签名」对话框中填入「名称」和「签名」。">
 
 等签名审核完成之后，你就可以调用 LeanCloud API 发送自己的短信了。我们看到最开始的示例代码里面还有「短信模板」，但是因为模板并不是必须的，所以留待 [后面详述](#短信模板)。
-
 
 ## 验证类短信
 
 通过短信进行注册、登录或重要操作的验证，是一种非常常见的需求。这里我们以一个购物应用为例，说明如何使用 LeanCloud 短信服务完成操作认证：
 
-1. **用户点击支付订单**  
-  发起敏感操作
+1. **用户点击支付订单**
+  发起敏感操作。
   
-2. **调用接口发送验证短信**  
+2. **调用接口发送验证短信**
   注意，在这一步之前，我们假设开发者已经完成了前面章节提及的所有短信服务设置。
 
 ```objc
 AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
-options.TTL = 10;                      // 验证码有效时间为 10 分钟
-options.applicationName = @"应用名称";  // 应用名称
-options.operation = @"某种操作";        // 操作名称
-[AVSMS requestShortMessageForPhoneNumber:@"186xxxxxxxx"
+options.TTL = 10;                     // 验证码有效时间为 10 分钟
+options.applicationName = @"应用名称"; // 应用名称
+options.operation = @"某种操作";       // 操作名称
+[AVSMS requestShortMessageForPhoneNumber:@"18200008888"
                                  options:options
                                 callback:^(BOOL succeeded, NSError * _Nullable error) {
                                     if (succeeded) {
@@ -181,12 +182,12 @@ options.operation = @"某种操作";        // 操作名称
 ```
 ```swift
 let variables: LCDictionary = [
-    "ttl": LCNumber(10), // 验证码有效时间为 10 分钟
+    "ttl": LCNumber(10),         // 验证码有效时间为 10 分钟
     "name": LCString("应用名称"), // 应用名称
-    "op": LCString("某种操作")  // 操作名称
+    "op": LCString("某种操作")    // 操作名称
 ]
 
-_ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "186xxxxxxxx", variables: variables) { (result) in
+_ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "18200008888", variables: variables) { (result) in
     switch result {
     case .success:
         break
@@ -200,17 +201,17 @@ AVSMSOption option = new AVSMSOption();
 option.setTtl(10);
 option.setApplicationName("应用名称");
 option.setOperation("某种操作");
-AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
+AVSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<AVNull>() {
     @Override
     public void onSubscribe(Disposable disposable) {
     }
     @Override
     public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to request SMSCode.");
+        Log.d("TAG","Result: Successfully sent verification code.");
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
+        Log.d("TAG","Result: Failed to send verification code. Reason: " + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -219,23 +220,23 @@ AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<A
 ```
 ```javascript
 AV.Cloud.requestSmsCode({
-    mobilePhoneNumber: '186xxxxxxxx',
+    mobilePhoneNumber: '18200008888',
     name: '应用名称',
     op: '某种操作',
-    ttl: 10                     // 验证码有效时间为 10 分钟
+    ttl: 10 // 验证码有效时间为 10 分钟
 }).then(function(){
-    //调用成功
+    // 调用成功
 }, function(err){
-    //调用失败
+    // 调用失败
 });
 ```
 ```cs
 // 下面参数中的 10 表示验证码有效时间为 10 分钟
-AVCloud.RequestSMSCodeAsync("186xxxxxxxx","应用名称","某种操作",10).ContinueWith(t =>
+AVCloud.RequestSMSCodeAsync("18200008888","应用名称","某种操作",10).ContinueWith(t =>
 {
     if(!t.Result)
     {
-        //调用成功
+        // 调用成功
     }
 });
 ```
@@ -245,7 +246,7 @@ $options = [
   "op" => "某种操作",
   "ttl" => 10, // 验证码有效时间为 10 分钟
 ];
-SMS::requestSMSCode("186xxxxxxxx", $options);
+SMS::requestSMSCode("18200008888", $options);
 ```
 ```python
 from leancloud import cloud
@@ -253,24 +254,24 @@ options = {
   "op": "某种操作",
   "ttl": 10  # 验证码有效时间为 10 分钟
 }
-cloud.request_sms_code("186xxxxxxxx", sign="应用名称", params=options) 
+cloud.request_sms_code("18200008888", sign="应用名称", params=options)
 ```
 
-3. **用户收到短信，并且输入了验证码。**  
+3. **用户收到短信，并且输入了验证码**  
   在进行下一步之前，我们建议先进行客户端验证（对有效性进行基本验证，例如长度、特殊字符等），这样就避免了错误的验证码被服务端驳回而产生的流量，以及与服务端沟通的时间，有助于提升用户体验。
   
-4. **调用接口验证用户输入的验证码是否有效。**  
-  注意，调用时需要确保验证码和手机号的参数顺序，我们假设验证码数字是「123456」。
+4. **调用接口验证用户输入的验证码是否有效**  
+  注意，调用时需要确保验证码和手机号的参数顺序，我们假设验证码数字是「123456」：
 
 ```objc
-[AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"186xxxxxxxx" callback:^(BOOL succeeded, NSError *error) {
+[AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"18200008888" callback:^(BOOL succeeded, NSError *error) {
     if(succeeded){
-        //验证成功
+        // 验证成功
     }
 }];
 ```
 ```swift
-_ = LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
+_ = LCSMSClient.verifyMobilePhoneNumber("18200008888", verificationCode: "123456") { (result) in
     switch result {
     case .success:
         break
@@ -280,17 +281,17 @@ _ = LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456
 }
 ```
 ```java 
-AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<AVNull>() {
+AVSMS.verifySMSCodeInBackground("123456","18200008888").subscribe(new Observer<AVNull>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
     public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to verify SMSCode.");
+        Log.d("TAG","Result: Successfully verified the number.");
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage());
+        Log.d("TAG","Result: Failed to verify the number. Reason: " + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -298,14 +299,14 @@ AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<A
 });
 ```
 ```javascript
-AV.Cloud.verifySmsCode('123456', '186xxxxxxxx').then(function(){
-    //验证成功
+AV.Cloud.verifySmsCode('123456', '18200008888').then(function(){
+    // 验证成功
 }, function(err){
-    //验证失败
+    // 验证失败
 });
 ```
 ```cs
-AVCloud.VerifySmsCodeAsync("123456","186xxxxxxxx").ContinueWith(t =>{
+AVCloud.VerifySmsCodeAsync("123456","18200008888").ContinueWith(t =>{
     if(t.Result) 
     {
         // 验证成功
@@ -314,33 +315,33 @@ AVCloud.VerifySmsCodeAsync("123456","186xxxxxxxx").ContinueWith(t =>{
 ```
 ```php
 // 注意，PHP SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
-SMS::verifySmsCode('186xxxxxxxx', '123456');
+SMS::verifySmsCode('18200008888', '123456');
 ```
 ```python
 from leancloud import cloud
 # 注意，Python SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
-cloud.verify_sms_code('186xxxxxxxx', '123456')
+cloud.verify_sms_code('18200008888', '123456')
 ```
 
 针对上述的需求，可以把场景换成异地登录验证、修改个人敏感信息验证等一些常见的场景，步骤是类似的，调用的接口也是一样的，仅仅是在做 UI 展现的时候需要开发者自己去优化验证过程。
 
 ### 语音短信验证码
 
-文本短信验证码在到达率上有一定的风险，尽管经过我们长期得到的用户反馈，到达率已接近 100%，但是有些应用的时效性和安全性要求极高，所以我们也推出了语音短信验证码的服务，调用的方式如下：
+文本短信验证码在到达率上有一定的风险。尽管根据我们长期得到的用户反馈，到达率已接近 100%，但是有些应用对时效性的要求极高，并且需要更好的安全性，所以我们也推出了语音短信验证码的服务，调用的方式如下：
 
 ```objc
 AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
 options.type = AVShortMessageTypeVoice;
-[AVSMS requestShortMessageForPhoneNumber:@"186xxxxxxxx"
+[AVSMS requestShortMessageForPhoneNumber:@"18200008888"
         options:options
         callback:^(BOOL succeeded, NSError * _Nullable error) {
             if (succeeded) {
-                NSLog(@"A voice short message has been sent.");
+                NSLog(@"A call containing verification code has been made.");
         }
 }];
 ```
 ```swift
-_ = LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "186xxxxxxxx") { (result) in
+_ = LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "18200008888") { (result) in
     switch result {
     case .success:
         break
@@ -352,17 +353,17 @@ _ = LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "186xxxxxxxx") {
 ```java
 AVSMSOption option = new AVSMSOption();
 option.setType(AVSMS.TYPE.VOICE_SMS);
-AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
+AVSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<AVNull>() {
     @Override
     public void onSubscribe(Disposable disposable) {
     }
     @Override
     public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to request SMSCode.");
+        Log.d("TAG","Result: Successfully made a call.");
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
+        Log.d("TAG","Result: Failed to make a call. Reason: " + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -371,7 +372,7 @@ AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<A
 ```
 ```js
 AV.Cloud.requestSmsCode({
-  mobilePhoneNumber: '186xxxxxxxx',
+  mobilePhoneNumber: '18200008888',
   smsType: 'voice'
 }).then(function() {
   // 发送成功
@@ -380,7 +381,7 @@ AV.Cloud.requestSmsCode({
 });
 ```
 ```cs
-AVCloud.RequestVoiceCodeAsync ("186xxxxxxxx").ContinueWith(t =>{
+AVCloud.RequestVoiceCodeAsync ("18200008888").ContinueWith(t =>{
     // 发送成功
 });
 ```
@@ -388,25 +389,24 @@ AVCloud.RequestVoiceCodeAsync ("186xxxxxxxx").ContinueWith(t =>{
 $options = [
   "smsType": "voice",
 ];
-SMS::requestSMSCode("186xxxxxxxx", $options);
+SMS::requestSMSCode("18200008888", $options);
 ```
 ```python
 from leancloud import cloud
-cloud.request_sms_code("186xxxxxxxx", sms_type="voice")
+cloud.request_sms_code("18200008888", sms_type="voice")
 ```
 
 发送成功之后，用户的手机就会收到一段语音通话，它会播报 6 位数的验证码，然后开发者需要再次调用：
 
-
 ```objc
-[AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"186xxxxxxxx" callback:^(BOOL succeeded, NSError *error) {
+[AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"18200008888" callback:^(BOOL succeeded, NSError *error) {
     if(succeeded){
-        //验证成功
+        // 验证成功
     }
 }];
 ```
 ```swift
-_ = LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
+_ = LCSMSClient.verifyMobilePhoneNumber("18200008888", verificationCode: "123456") { (result) in
     switch result {
     case .success:
         break
@@ -416,17 +416,17 @@ _ = LCSMSClient.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456
 }
 ```
 ```java
-AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<AVNull>() {
+AVSMS.verifySMSCodeInBackground("123456","18200008888").subscribe(new Observer<AVNull>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
     public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to verify SMSCode.");
+        Log.d("TAG","Result: Successfully verified the number.");
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage());
+        Log.d("TAG","Result: Failed to verify the number. Reason: " + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -434,14 +434,14 @@ AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<A
 });
 ```
 ```js
-AV.Cloud.verifySmsCode('123456', '186xxxxxxxx').then(function(){
-    //验证成功
+AV.Cloud.verifySmsCode('123456', '18200008888').then(function(){
+    // 验证成功
 }, function(err){
-    //验证失败
+    // 验证失败
 });
 ```
 ```cs
-AVCloud.VerifySmsCodeAsync("123456","186xxxxxxxx").ContinueWith(t =>{
+AVCloud.VerifySmsCodeAsync("123456","18200008888").ContinueWith(t =>{
     if(t.Result) 
     {
         // 验证成功
@@ -449,15 +449,14 @@ AVCloud.VerifySmsCodeAsync("123456","186xxxxxxxx").ContinueWith(t =>{
 });
 ```
 ```php
-SMS::verifySmsCode('186xxxxxxxx', '123456');
+SMS::verifySmsCode('18200008888', '123456');
 ```
 ```python
 from leancloud import cloud
-cloud.verify_sms_code('186xxxxxxxx', '123456')
+cloud.verify_sms_code('18200008888', '123456')
 ```
 
 再次验证用户输入的验证码是否正确。
-
 
 ## 营销、通知类短信
 
@@ -469,7 +468,7 @@ cloud.verify_sms_code('186xxxxxxxx', '123456')
 
 这是一个来自通信运营商的通知类短信的规范案例。
 
-在实际使用的过程中，通知类短信往往会因为**措辞不当**而被短信服务商拒绝发送；甚至还会出现 开发者发送过去的请求被服务商直接屏蔽的情况。因此，LeanCloud 在发送推广类的短信时**需要进行内容审核（也就是开发者需要事先创建[模板](#短信模板)，我们审核通过之后再按照模板进行内容发送）**。
+在实际使用的过程中，通知类短信往往会因为 **措辞不当** 而被短信服务商拒绝发送；甚至还会出现开发者发送过去的请求被服务商直接屏蔽的情况。因此，LeanCloud 在发送推广类的短信时 **需要进行内容审核（也就是开发者需要事先创建 [模板](#短信模板)，我们审核通过之后再按照模板进行内容发送）**。
 
 ### 营销短信
 
@@ -481,32 +480,31 @@ cloud.verify_sms_code('186xxxxxxxx', '123456')
 
 第一次提交营销模板，其使用的营销签名需要上报至运营商进行备案，审核过程将需要 2~5 个工作日。当营销签名完成了备案，此后再提交营销模板，审核将在工作日 4 小时内完成。
 
-{{ docs.namedAnchor("## 短信模板", "sms-template") }}
+## 短信模板
 
 开发者可以使用短信模板来自定义短信的内容。为了确保短信内容的合法性及投递成功率，短信模板需要经过 **人工审核** 通过后，开发者才能在接口中调用该模板。
 
-<!-- ### 短信签名 -->
 {{ sms.signature("### 短信签名") }}
 
 ### 创建模板
 
-要创建短信模板，先进入控制台，选择一个应用，再选择 [消息 > 短信 > 设置](http://leancloud.cn/messaging.html?appid={{appid}}#/message/sms/conf)。选择需要的模板类型：
+要创建短信模板，先进入控制台，选择一个应用，再选择 [消息 > 短信 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf)。选择需要的模板类型：
 
 - 通知类型
 - 验证码类型
 - 营销类型
 
-如果模板类型选择了**通知类**或者**验证类**，但短信内容涉及到营销内容，则无法通过审核。要发送营销类短信请阅读 [营销短信](#营销短信)。
+如果模板类型选择了 **通知类** 或者 **验证类**，但短信内容涉及到营销内容，则无法通过审核。要发送营销类短信请阅读 [营销短信](#营销短信)。
 
 ### 使用模板
 
 假设提交的短信模板的类型为「通知类」，内容如下：
 
 {% call docs.bubbleWrap() -%}
-尊敬的的用户，您的订单号：{{ docs.mustache("{order_id}") }} 正在派送，请保持手机畅通，我们的快递员随时可能与您联系，感谢您的订阅。 
+尊敬的的用户，您的订单号：{{ docs.mustache("{order_id}") }} 正在派送，请保持手机畅通，我们的快递员随时可能与您联系，感谢您的订阅。
 {% endcall %}
 
-并且模板名称为 `Order_Notice`，并且为已经拥有了一个审核通过的签名叫做「天天商城」，签名的名称叫做 `sign_BuyBuyBuy` ，当模板通过审批后就可以调用如下代码发送这条通知类的短信：
+并且模板名称为 `Order_Notice`，并且为已经拥有了一个审核通过的签名叫做「天天商城」，签名的名称叫做 `sign_BuyBuyBuy`，当模板通过审批后就可以调用如下代码发送这条通知类的短信：
 
 ```objc
 AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
@@ -515,7 +513,7 @@ options.templateName = @"Order_Notice";
 options.signatureName = @"sign_BuyBuyBuy";
 options.templateVariables = @{ @"order_id": @"7623432424540" }; // 使用实际的值来替换模板中的变量
 
-[AVSMS requestShortMessageForPhoneNumber:@"186xxxxxxxx"
+[AVSMS requestShortMessageForPhoneNumber:@"18200008888"
                                  options:options
                                 callback:^(BOOL succeeded, NSError * _Nullable error) {
                                     if (succeeded) {
@@ -531,7 +529,7 @@ let variables: LCDictionary = [
 ]
 
 _ = LCSMSClient.requestShortMessage(
-    mobilePhoneNumber: "186xxxxxxxx",
+    mobilePhoneNumber: "18200008888",
     templateName: "Order_Notice",
     signatureName: "sign_BuyBuyBuy",
     variables: variables)
@@ -549,19 +547,19 @@ AVSMSOption option = new AVSMSOption();
 option.setTemplateName("Order_Notice");
 option.setSignatureName("sign_BuyBuyBuy");
 Map<String, Object> parameters = new HashMap<String, Object>();
-parameters.put("order_id", "7623432424540");      // 使用实际的值来替换模板中的变量
+parameters.put("order_id", "7623432424540"); // 使用实际的值来替换模板中的变量
 option.setEnvMap(parameters);
-AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
+AVSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<AVNull>() {
     @Override
     public void onSubscribe(Disposable disposable) {
     }
     @Override
     public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to request SMSCode.");
+        Log.d("TAG","Result: Successfully sent text message.");
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
+        Log.d("TAG","Result: Failed to send text message. Reason: " + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -570,21 +568,21 @@ AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<A
 ```
 ```javascript
 AV.Cloud.requestSmsCode({
-mobilePhoneNumber: '186xxxxxxxx',
+mobilePhoneNumber: '18200008888',
 template: 'Order_Notice',
 sign:'sign_BuyBuyBuy',
 order_id: '7623432424540'}).then(function(){
-      //调用成功
+      // 调用成功
     }, function(err){
-      //调用失败
+      // 调用失败
 });
 ```
 ```cs
 var env = new Dictionary<string,object>()
 {
-    {"order_id","7623432424540"}    // 使用实际的值来替换模板中的变量
+    {"order_id","7623432424540"} // 使用实际的值来替换模板中的变量
 };
-AVCloud.RequestSMSCodeAsync("186xxxxxxxx","Order_Notice",env,"sign_BuyBuyBuy").ContinueWith(t =>
+AVCloud.RequestSMSCodeAsync("18200008888","Order_Notice",env,"sign_BuyBuyBuy").ContinueWith(t =>
 {
     var result = t.Result;
     // result 为 True 则表示调用成功
@@ -596,14 +594,14 @@ $options = [
   "name" => "sign_BuyBuyBuy",
   "order_id" => "7623432424540", // 使用实际的值来替换模板中的变量
 ];
-SMS::requestSmsCode("186xxxxxxxx", $options);
+SMS::requestSmsCode("18200008888", $options);
 ```
 ```python
 from leancloud import cloud
 options = {
   "order_id": "7623432424540" # 使用实际的值来替换模板中的变量
 }
-cloud.request_sms_code("186xxxxxxxx",
+cloud.request_sms_code("18200008888",
   template="Order_Notice", sign="sign_BuyBuyBuy", params=options)
 ```
 
@@ -615,11 +613,11 @@ cloud.request_sms_code("186xxxxxxxx",
 
 ### 模板变量
 
-模板可以使用<u>自定义变量</u>，在调用模板时以参数形式传入。模板语法遵循 [Handlebars](http://handlebarsjs.com) 规范。
+模板可以使用<u>自定义变量</u>，在调用模板时以参数形式传入。模板语法遵循 [Handlebars](https://handlebarsjs.com) 规范。
 
-{{ docs.alert("自定义变量的值不允许包含实心括号 `【】` 。") }}
+{{ docs.alert("自定义变量的值不允许包含实心括号 `【】`。") }}
 
-在模板中还可以使用<u>系统预留变量</u>，在短信发送时，它们会被自动填充，开发者**无法**对其重新赋值：
+在模板中还可以使用<u>系统预留变量</u>，在短信发送时，它们会被自动填充，开发者 **无法** 对其重新赋值：
 
 {% call docs.bubbleWrap() -%}
 欢迎注册{{ docs.mustache("{name}") }}应用！请使用验证码{{ docs.mustache("{code}") }}来完成注册。该验证码将在{{ docs.mustache("{ttl}") }}分钟后失效，请尽快使用。
@@ -633,7 +631,7 @@ cloud.request_sms_code("186xxxxxxxx",
 
 ### 内容规范
 
-开发者在设置短信内容的时候，文字表述上应该做到规范、正确、简洁。鉴于开发者的应用场景各异，我们整理了以下范例来说明如何撰写规范的短信内容。需要再次强调，一切跟营销推广相关的短信模板，请在创建模板时务必选择**营销类**，否则将无法通过审核。
+开发者在设置短信内容的时候，文字表述上应该做到规范、正确、简洁。鉴于开发者的应用场景各异，我们整理了以下范例来说明如何撰写规范的短信内容。需要再次强调，一切跟营销推广相关的短信模板，请在创建模板时务必选择 **营销类**，否则将无法通过审核。
 
 【正确范例】
 
@@ -643,13 +641,13 @@ XX房东您好，租客{{ docs.mustache("{guest_name}") }}（手机号码：{{ d
 
 #### 链接
 
-短信中的 URL 不允许**全部**设置为变量，这样是为了确保安全，防止病毒以及不良信息的传播。错误范例如下：
+短信中的 URL 不允许 **全部** 设置为变量，这样是为了确保安全，防止病毒以及不良信息的传播。错误范例如下：
 
 {% call docs.bubbleWrap() -%}
 尊敬的会员您好，您的订单（订单号{{ docs.mustache("{orderId}") }}）已确认支付。5周年庆新品降价！大牌奢品上演底价争霸，低至2折！BV低至888元！阿玛尼低至199元！都彭长款钱包仅售499元！杜嘉班纳休闲鞋仅售1399元！周年庆家居专场千元封顶现已开启！{{ docs.mustache("{download_link}") }} 客服电话400-881-6609 回复TD退订
 {% endcall %}
 
-{{ docs.alert("以上通知内容包含了象 <u>打折</u>、<u>降价</u>、<u>仅售</u> 这类营销推广的敏感词语，容易导致审批无法通过，因此请谨慎使用或改用 [营销类短信](#营销短信)。") }}
+{{ docs.alert("以上通知内容包含了像「打折」、「降价」、「仅售」这类营销推广的敏感词语，容易导致审批无法通过，因此请谨慎使用或改用 [营销类短信](#营销短信)。") }}
 
 但是 URL 中可以包含变量，比如：
 
@@ -671,13 +669,13 @@ XX房东您好，租客{{ docs.mustache("{guest_name}") }}（手机号码：{{ d
 您好，本条短信来自“XX旅游”~恭喜幸运的您，在本次“北海道机票”抽奖活动中，获得二等奖——定制星巴克杯! 请您关注我们的微信公众号（XX旅游：xx_app)，回复“中奖名单”即可查看详细中奖名单及领取须知！后续还会有更多活动惊喜，期待您的参与~官方网站：xxsite.cn
 {% endcall %}
 
-错误点在于不可以在 [通知类短信](#通知短信) 模板中发送带有抽奖中奖信息等营销信息的内容。解决方案是**在创建模板的时候选择 [营销类短信](#营销短信)**。
+错误点在于不可以在 [通知类短信](#通知短信) 模板中发送带有抽奖中奖信息等营销信息的内容。解决方案是 **在创建模板的时候选择 [营销类短信](#营销短信)**。
 
 另外，有一些行业相关的敏感词语是不允许发送的，错误范例如下：
 
 {{ docs.bubble("业主还在苦苦等待你的反馈，你认领的房源已超过1小时没有填写核实结果，请尽快登录XX客户端，在“业主--待处理”列表中进行填写。【XX网】") }}
 
-{{ docs.alert("无论是通知类还是营销类短信，凡包含<u>房源</u>、<u>借贷</u>这类敏感词都被禁止发送。") }}
+{{ docs.alert("无论是通知类还是营销类短信，凡包含「房源」、「借贷」这类敏感词的短信都被禁止发送。") }}
 
 #### 营销类模板
 
@@ -691,8 +689,6 @@ XX房东您好，租客{{ docs.mustache("{guest_name}") }}（手机号码：{{ d
 
 注意：应用的下载链接必须是明文，不可设置为参数。
 
-{% block sms_demo %}{% endblock %}
-
 ## 短信轰炸与图形验证码
 
 短信在提供便利性和实用性的同时，也会受到攻击而被滥用，产生经济损失，甚至影响到品牌形象。「短信轰炸」就是最常见的一种攻击手段——恶意攻击者使用软件来自动收集一些不需要认证就能发送短信验证码的网站，利用这些网站的漏洞，攻击者能以程序化方式批量地向手机号重复发送短信，这样造成的后果就是：
@@ -700,11 +696,11 @@ XX房东您好，租客{{ docs.mustache("{guest_name}") }}（手机号码：{{ d
 - 对于网站来说，它会不断收到发送短信验证码的请求，运营者会承担更多的短信费用；
 - 对手机号码的使用者来说，他会在短时间内频繁收到包含验证码的无关短信。
 
-因此开发者需要重视对此类攻击的防范。目前，图形验证码（又称 captcha）是防范短信轰炸最有力的手段。比如，我们在一些网站注册的时候，经常需要填写以下图片的信息：
+因此开发者需要重视对此类攻击的防范。目前，图形验证码（又称 CAPTCHA）是防范短信轰炸最有力的手段。比如，我们在一些网站注册的时候，经常需要填写以下图片的信息：
 
-<img src="images/captcha.png" width="400" height="50">
+<img src="images/captcha.png" width="400" alt="一个要求用户填写图片内文本的页面。">
 
-网站必须在用户进行「免费获取验证码」 操作前，要求用户先输入图形验证码来确认操作真实有效，服务器端再请求 LeanCloud 云端发送动态短信到用户手机上，这样才可以有效防范恶意攻击者。
+网站必须在用户进行「免费获取验证码」操作前，要求用户先输入图形验证码来确认操作真实有效，服务器端再请求 LeanCloud 云端发送动态短信到用户手机上，这样才可以有效防范恶意攻击者。
 
 图形验证码的基本工作流程如下：
 
@@ -723,130 +719,132 @@ LeanCloud->应用服务器: 11. 返回验证结果
 应用服务器->用户（浏览器）: 12. 返回操作结果
 ```
 
-- 用户在浏览器中打开产品的注册／登录页面，同时也会请求显示 LeanCloud 图形验证码。
-- 用户按照要求填写各项信息，并点击发送短信验证码的按钮，进行图形验证码的验证。
-- LeanCloud 图形验证码成功之后，发送短信验证码到目标手机号。
-- 用户提交表单，产品后台将用户表单的短信验证码相关数据发送到 LeanCloud 后台进行二次校验。
-- LeanCloud 后台返回校验通过／失败的结果，用户完成注册／登录流程。
+1. 用户在浏览器中打开产品的注册／登录页面，同时也会请求显示 LeanCloud 图形验证码。
+2. 用户按照要求填写各项信息，并点击发送短信验证码的按钮，进行图形验证码的验证。
+3. LeanCloud 图形验证码成功之后，发送短信验证码到目标手机号。
+4. 用户提交表单，产品后台将用户表单的短信验证码相关数据发送到 LeanCloud 后台进行二次校验。
+5. LeanCloud 后台返回校验通过／失败的结果，用户完成注册／登录流程。
 
 ### 开通图形验证码服务
 
-要使用图形验证码，开发者需要进入 [控制台 > 设置 > 安全中心](/dashboard/app.html?appid={{appid}}#/security)，打开 **图形验证码服务**。 
+要针对短信验证码启用图形验证码，开发者需要进入 [控制台 > 设置 > 安全中心](/dashboard/app.html?appid={{appid}}#/security)，打开 **图形验证码服务**。
 
-如果希望强制所有的短信接口都必须通过图形验证码验证才能发送，则进入 [控制台 > 消息 > 短信 > 设置 > 短信选项](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf)， 选中 **强制短信验证服务使用图形验证码**。注意：这样一来，所有主动调用发送短信的接口都会强制进行图形验证码验证，否则会直接返回调用错误。
+如果希望强制所有的短信接口都必须通过图形验证码验证才能发送，则进入 [控制台 > 消息 > 短信 > 设置 > 短信选项](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf)，选中 **强制短信验证服务使用图形验证码**。注意：这样一来，所有主动调用发送短信的接口都会强制进行图形验证码验证，否则会直接返回调用错误。
 
 LeanCloud 提供的图形验证码服务仅提供基本的防范，如有必要，可以自行接入功能更强大的第三方验证码服务。
 
 ### 前端接入示例
 
-我们以 JavaScript + HTML 实现一个很小的功能页面，演示图形验证码接入的流程。
+我们以 HTML + JavaScript 实现一个很小的功能页面，演示图形验证码接入的流程。
 
 #### 组件初始化
-引入 LeanCloud 图形验证码相关的 JavaScript：
-```
-  <script src="//cdn1.lncld.net/static/js/2.3.2/av-min.js"></script>
-```
 
 初始化图形验证码组件：
-```
-  AV.Captcha.request().then(function(captcha) {
-    captcha.bind({
-      textInput: 'captcha-code', // the id for textInput
-      image: 'captcha-image',    // the id for image element
-      verifyButton: 'verify',    // the id for verify button
-    }, {
-      success: function(validateCode) { 
-        console.log('验证成功，下一步')
-      },
-      error: function(error) {
-        console.error(error.message)
-      },
-    });
-  });
-```
 
+```js
+AV.Captcha.request().then(function (captcha) {
+  captcha.bind({
+    textInput: 'captcha-code', // The id for textInput
+    image: 'captcha-image',    // The id for image element
+    verifyButton: 'verify'     // The id for verify button
+  }, {
+    success: function (validateCode) {
+      console.log('验证成功，下一步');
+    },
+    error: function (error) {
+      console.error(error.message);
+    }
+  });
+});
+```
 
 #### 配置参数说明
 
-`AV.Captcha.request()` 在生成 AV.Captcha 实例的时候，可以指定如下参数：
+`AV.Captcha.request()` 在生成 `AV.Captcha` 实例的时候，可以指定如下参数：
 
 {{ sms.paramsRequestCaptcha() }}
 
-例如可以这样初始化一个展示高度为 30px、宽度为 80px 的 captcha 实例：
-<code>AV.Captcha.request({width: 80, height: 30})</code>
+例如可以这样初始化一个展示高度为 30px、宽度为 80px 的 `captcha` 实例：
 
-`captcha.bind()` 方法可以将 captcha 实例与界面元素绑定起来，它支持如下参数：
+```js
+AV.Captcha.request({ width: 80, height: 30 });
+```
 
-| 参数名          | 参数类型                     | 说明                       |
-| ------------ | ------------------------ | ------------------------ |
-| textInput    | <span style="white-space:nowrap;">string or HTMLInputElement</span> | 图形验证码的输入框控件，或者是该控件的 id   |
-| image        | <span style="white-space:nowrap;">string or HTMLImageElement</span> | 图形验证码对应的图像控件，或者是图像控件的 id |
-| <span style="white-space:nowrap;">verifyButton</span> | string or HTMLElement      | 验证图形验证码的按钮控件，或者是该按钮的 id  |
+`captcha.bind()` 方法可以将 `captcha` 实例与界面元素绑定起来，它支持如下参数：
 
+| 参数名 | 参数类型 | 说明 |
+| --- | --- | --- |
+| `textInput` | `string` 或 `HTMLInputElement` | 图形验证码的输入框控件，或者是该控件的 `id`。 |
+| `image` | `string` 或 `HTMLImageElement` | 图形验证码对应的图像控件，或者是该控件的 `id`。 |
+| `verifyButton` | `string` 或 `HTMLElement` | 验证图形验证码的按钮控件，或者是该控件的 `id`。 |
 
 #### 完整示例
+
 以下为上述 demo 的完整代码：
 
-```
+```html
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>JS Bin</title>
-  <!-- 引入 LeanCloud 图形验证码相关的 JavaScript -->
-  <script src="//cdn1.lncld.net/static/js/2.3.2/av-min.js"></script>
+  <title>测试图形验证码</title>
 </head>
-<body>
-  <span>手机号：</span>
-  <input type="text" id="phone"/>
-  <br/>
-  <span>校验码：</span>
-  <input type="text" id="captcha-code"/>
-  <img id="captcha-image"/>
-  <br/>
-  <button id="verify">发送验证码</button>
-</body>
-<script>
-  var appId = '{{appid}}';  // 你的应用 appid
-  var appKey = '{{appkey}}'; // 你的应用 appkey
-  AV.init({ appId: appId, appKey: appKey });
 
-  // AV.Captcha.request() 默认生成一个 85x30px 的 AV.Captcha 实例
-  AV.Captcha.request().then(function(captcha) {
-    //在浏览器中，可以直接使用 captcha.bind 方法将验证码与 DOM 元素绑定：
-    captcha.bind({
-      textInput:    'captcha-code',  // the id for textInput
-      image:        'captcha-image', // the id for image element
-      verifyButton: 'verify',        // the id for verify button
-    }, {
-      success: function(validateCode) { 
-        var phoneNumber = document.getElementById('phone').value;
-        console.log('验证成功，下一步 send sms to phone:' + phoneNumber)
-        AV.Cloud.requestSmsCode({
-          mobilePhoneNumber: phoneNumber,
-          name: '应用名称',
-          validate_token: validateCode,
-          op: '某种操作',
-          ttl: 10
-          }).then(function(){
-            //发送成功
-            console.log('发送成功')
-          }, function(err){
-            //发送失败
-            console.log('发送失败。' + err.message)
-        });
-      },
-      error: function(error) {
-        console.error(error.message)
-      },
+<body>
+  <label>手机号
+    <input type="text" id="phone" />
+  </label>
+  <br />
+  <label>校验码
+    <input type="text" id="captcha-code" />
+  </label>
+  <img id="captcha-image" />
+  <br />
+  <button id="verify">发送验证码</button>
+  <!-- 引入 LeanCloud SDK -->
+  <script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js"></script>
+  <script>
+    var appId = '{{appid}}';  // 你的 appId
+    var appKey = '{{appkey}}'; // 你的 appKey
+    AV.init({ appId, appKey });
+    // AV.Captcha.request() 默认生成一个 85px x 30px 的 AV.Captcha 实例
+    AV.Captcha.request().then(function (captcha) {
+      // 在浏览器中，可以直接使用 captcha.bind 方法将验证码与 DOM 元素绑定
+      captcha.bind({
+        textInput: 'captcha-code', // The id for textInput
+        image: 'captcha-image',    // The id for image element
+        verifyButton: 'verify'     // The id for verify button
+      }, {
+        success: function (validateCode) {
+          var phoneNumber = document.getElementById('phone').value;
+          console.log('验证成功，下一步发送验证码短信至：' + phoneNumber);
+          AV.Cloud.requestSmsCode({
+            mobilePhoneNumber: phoneNumber,
+            name: '应用名称',
+            validate_token: validateCode,
+            op: '某种操作',
+            ttl: 10
+          }).then(function () {
+            console.log('发送成功。');
+          }, function (err) {
+            console.error('发送失败。', err.message);
+          });
+        },
+        error: function (error) {
+          console.error(error.message);
+        }
+      });
     });
-  });
-</script>
+  </script>
+</body>
+
 </html>
 ```
 
 ### 图形验证码 API
+
 #### 获取图形验证码
 
 ```objc
@@ -886,11 +884,11 @@ AVCaptcha.requestCaptchaInBackground(option).subscribe(new Observer<AVCaptchaDig
     }
     @Override
     public void onNext(AVCaptchaDigest avCaptchaDigest) {
-        Log.d("TAG","图片的 url 是：" + avCaptchaDigest.getCaptchaUrl());
+        Log.d("TAG","图片的 URL 是：" + avCaptchaDigest.getCaptchaUrl());
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request Captcha. cause:" + throwable.getMessage());
+        Log.d("TAG","Result: Failed to request CAPTCHA. Reason: " + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -902,14 +900,14 @@ AV.Captcha.request({
   width:100, // 图片的宽度
   height:50, // 图片的高度
 }).then(function(captcha) {
-  console.log(captcha.url); // 图片的 url，客户端用来展现
+  console.log(captcha.url); // 图片的 URL，客户端用来展现
 });
 ```
 ```cs
 AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
   var captchaData = t.Result;
-  var url = captchaData.Url;// 图片的 url，客户端用来展现
-  var captchaToken = captchaData.captchaToken;// 用来对应后面的验证接口，服务端用这个参数来匹配具体是哪一个图形验证码
+  var url = captchaData.Url; // 图片的 URL，客户端用来展现
+  var captchaToken = captchaData.captchaToken; // 用来对应后面的验证接口，服务端用这个参数来匹配具体是哪一个图形验证码
 });
 ```
 ```php
@@ -919,6 +917,7 @@ AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
 from leancloud import cloud
 captcha = cloud.request_captcha(width=100, height=50)
 ```
+
 #### 校验图形验证码
 
 获取图形验证码之后，将图形验证码的图像显示在客户端（iOS 和 Android 或者其他平台可以调用基础的图像控件展示该图片），等到用户输入完成之后，继续调用下一步的接口校验用户输入的是否合法。
@@ -949,11 +948,11 @@ AVCaptcha.verifyCaptchaCodeInBackground("123456",avCaptchaDigest).subscribe(new 
     }
     @Override
     public void onNext(AVCaptchaValidateResult avCaptchaValidateResult) {
-        Log.d("TAG","Result: succeed to verify CaptchaCode.");
+        Log.d("TAG","Result: Verification completed.");
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify CaptchaCode. cause:" + throwable.getMessage());
+        Log.d("TAG","Result: Verification failed. Reason: " + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -977,7 +976,7 @@ AVCloud.VerifyCaptchaAsync("这里填写用户输入的图形验证码，例如 
 validate_token = captcha.verify("这里填写用户输入的图形验证码，例如 AM8N")
 ```
 
-#### 使用 validate_token 发送短信
+#### 使用 `validate_token` 发送短信
 
 如果校验成功，拿到返回的 `validate_token`，继续调用发送短信的接口：
 
@@ -987,7 +986,7 @@ options.templateName = @"New_Series";
 options.signatureName = @"sign_BuyBuyBuy";
 options.validationToken = <#validationToken#>;
 
-[AVSMS requestShortMessageForPhoneNumber:@"186xxxxxxxx"
+[AVSMS requestShortMessageForPhoneNumber:@"18200008888"
                                  options:options
                                 callback:^(BOOL succeeded, NSError * _Nullable error) {
                                     if (succeeded) {
@@ -999,7 +998,7 @@ options.validationToken = <#validationToken#>;
 ```
 ```swift
 _ = LCSMSClient.requestShortMessage(
-    mobilePhoneNumber: "186xxxxxxxx",
+    mobilePhoneNumber: "18200008888",
     templateName: "New_Series",
     signatureName: "sign_BuyBuyBuy",
     captchaVerificationToken: "captcha_verification_token")
@@ -1017,17 +1016,17 @@ AVSMSOption option = new AVSMSOption();
 option.setTemplateName("Order_Notice");
 option.setSignatureName("sign_BuyBuyBuy");
 option.setCaptchaValidateToken("validateToken");
-AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<AVNull>() {
+AVSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<AVNull>() {
     @Override
     public void onSubscribe(Disposable disposable) {
     }
     @Override
     public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to request SMSCode.");
+        Log.d("TAG","Result: Successfully sent verification code.");
     }
     @Override
     public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
+        Log.d("TAG","Result: Failed to send verification code. Reason: " + throwable.getMessage());
     }
     @Override
     public void onComplete() {
@@ -1035,26 +1034,26 @@ AVSMS.requestSMSCodeInBackground("186xxxxxxxx", option).subscribe(new Observer<A
 });
 ```
 ```javascript
-// mobilePhoneNumber ：手机号
-// template ：模板名称
-// sign ：签名 
+// mobilePhoneNumber：手机号
+// template：模板名称
+// sign：签名 
 AV.Cloud.requestSmsCode({
-    mobilePhoneNumber: '186xxxxxxxx',
+    mobilePhoneNumber: '18200008888',
     template: 'New_Series',
     sign:'sign_BuyBuyBuy'
 }，{
     validateToken:'上一步返回的 validate_token'
 }).then(function(){
-    //调用成功
+    // 调用成功
 }, function(err){
-    //调用失败
+    // 调用失败
 });
 ```
 ```cs
-// 186xxxxxxxx ：手机号
-// New_Series ：模板名称
-// sign_BuyBuyBuy ：签名 
-AVCloud.RequestSMSCodeAsync("186xxxxxxxx","New_Series",null,"sign_BuyBuyBuy","上一步返回的 validate_token").ContinueWith(t =>
+// 18200008888：手机号
+// New_Series：模板名称
+// sign_BuyBuyBuy：签名 
+AVCloud.RequestSMSCodeAsync("18200008888","New_Series",null,"sign_BuyBuyBuy","上一步返回的 validate_token").ContinueWith(t =>
 {
     var result = t.Result;
     // result 为 True 则表示调用成功
@@ -1066,426 +1065,25 @@ AVCloud.RequestSMSCodeAsync("186xxxxxxxx","New_Series",null,"sign_BuyBuyBuy","�
 ```python
 from leancloud import cloud
 options = { "validate_token": validate_token }
-cloud.request_sms_code("186xxxxxxxx",
+cloud.request_sms_code("18200008888",
   template="New_Series", sign="sign_BuyBuyBuy", params=options)
 ```
 
 ## 国际短信
 
-向国外用户发送短信，只需要在手机号码前加上正确的国际区号即可，如美国和加拿大为 `+1`，当然前提是已在 [短信设置](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf) 中选中了 **开启国际短信服务**。中国区号为 `+86`，但可以省略，无区号的手机号码会默认使用中国区号。
+向国外用户发送短信，只需要在手机号码前加上正确的国际区号即可，如美国和加拿大为 `+1`，当然前提是已在 [短信设置](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf) 中选中了 **开启国际短信服务**。中国区号为 `+86`，但可以省略。无区号的手机号码会默认使用中国区号。
 
-### 服务覆盖区域和价格
-
-<a id="pricing"></a>以下金额为每条短信的价格，国际版以美元计费，国内版以人民币计费。列表中未包含的国家或区域，请在论坛或工单中提问确认。
-
-<script src="custom/js/lib/jquery.dataTables.min.js"></script>
-
-<script type="text/javascript">
-var rawSMSPrice = {
-  "us": {
-    "currency": "USD",
-    "pricing": {
-      "+34": 0.11,
-      "+852": 0.1,
-      "+58": 0.06,
-      "+60": 0.05,
-      "+977": 0.13,
-      "+351": 0.06,
-      "+57": 0.06,
-      "+886": 0.07,
-      "+66": 0.04,
-      "+95": 0.13,
-      "+86": 0.04,
-      "+856": 0.1,
-      "+960": 0.03,
-      "+855": 0.14,
-      "+33": 0.1,
-      "+7": 0.14,
-      "+81": 0.1,
-      "+39": 0.11,
-      "+974": 0.08,
-      "+853": 0.04,
-      "+64": 0.13,
-      "+30": 0.08,
-      "+63": 0.06,
-      "+40": 0.09,
-      "+998": 0.14,
-      "+1": 0.15,
-      "+91": 0.02,
-      "+27": 0.04,
-      "+61": 0.07,
-      "+971": 0.04,
-      "+44": 0.05,
-      "+966": 0.1,
-      "+49": 0.11,
-      "+54": 0.09,
-      "+82": 0.06,
-      "+92": 0.07,
-      "+65": 0.06,
-      "+90": 0.04,
-      "+52": 0.06,
-      "+62": 0.1,
-      "+55": 0.07
-    }
-  },
-  "cn": {
-    "currency": "CNY",
-    "pricing": {
-      "+34": 0.77,
-      "+852": 0.7,
-      "+58": 0.42,
-      "+60": 0.35,
-      "+977": 0.91,
-      "+351": 0.42,
-      "+57": 0.42,
-      "+886": 0.49,
-      "+66": 0.28,
-      "+95": 0.91,
-      "+86": 0.05,
-      "+856": 0.7,
-      "+960": 0.21,
-      "+855": 0.98,
-      "+33": 0.7,
-      "+7": 0.98,
-      "+81": 0.7,
-      "+39": 0.77,
-      "+974": 0.56,
-      "+853": 0.28,
-      "+64": 0.91,
-      "+30": 0.56,
-      "+63": 0.42,
-      "+40": 0.63,
-      "+998": 0.98,
-      "+1": 1.05,
-      "+91": 0.14,
-      "+27": 0.28,
-      "+61": 0.49,
-      "+971": 0.28,
-      "+44": 0.35,
-      "+966": 0.7,
-      "+49": 0.77,
-      "+54": 0.63,
-      "+82": 0.42,
-      "+92": 0.49,
-      "+65": 0.42,
-      "+90": 0.28,
-      "+52": 0.42,
-      "+62": 0.7,
-      "+55": 0.49
-    }
-  }
-};
-
-var smsPrices = [ { CountryNumber: 1,
-    CountryOrRegion: '美国',
-    CountryCode: 'US',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 1,
-    CountryOrRegion: '加拿大',
-    CountryCode: 'CA',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 7,
-    CountryOrRegion: '哈萨克斯坦',
-    CountryCode: 'KZ',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 7,
-    CountryOrRegion: '俄罗斯',
-    CountryCode: 'RU',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 27,
-    CountryOrRegion: '南非',
-    CountryCode: 'ZA',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 30,
-    CountryOrRegion: '希腊',
-    CountryCode: 'GR',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 33,
-    CountryOrRegion: '法国',
-    CountryCode: 'FR',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 34,
-    CountryOrRegion: '西班牙',
-    CountryCode: 'ES',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 39,
-    CountryOrRegion: '意大利',
-    CountryCode: 'IT',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 40,
-    CountryOrRegion: '罗马尼亚',
-    CountryCode: 'RO',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 44,
-    CountryOrRegion: '英国',
-    CountryCode: 'GB',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 49,
-    CountryOrRegion: '德国',
-    CountryCode: 'DE',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 52,
-    CountryOrRegion: '墨西哥',
-    CountryCode: 'MX',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 54,
-    CountryOrRegion: '阿根廷',
-    CountryCode: 'AR',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 55,
-    CountryOrRegion: '巴西',
-    CountryCode: 'BR',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 57,
-    CountryOrRegion: '哥伦比亚',
-    CountryCode: 'CO',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 58,
-    CountryOrRegion: '委内瑞拉',
-    CountryCode: 'VE',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 60,
-    CountryOrRegion: '马来西亚',
-    CountryCode: 'MY',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 61,
-    CountryOrRegion: '澳大利亚',
-    CountryCode: 'AU',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 62,
-    CountryOrRegion: '印度尼西亚',
-    CountryCode: 'ID',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 63,
-    CountryOrRegion: '菲律宾',
-    CountryCode: 'PH',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 64,
-    CountryOrRegion: '新西兰',
-    CountryCode: 'NZ',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 65,
-    CountryOrRegion: '新加坡',
-    CountryCode: 'SG',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 66,
-    CountryOrRegion: '泰国',
-    CountryCode: 'TH',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 81,
-    CountryOrRegion: '日本',
-    CountryCode: 'JP',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 82,
-    CountryOrRegion: '韩国',
-    CountryCode: 'KR',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 86,
-    CountryOrRegion: '中国',
-    CountryCode: 'CN',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 90,
-    CountryOrRegion: '土耳其',
-    CountryCode: 'TR',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 92,
-    CountryOrRegion: '巴基斯坦',
-    CountryCode: 'PK',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 95,
-    CountryOrRegion: '缅甸',
-    CountryCode: 'MM',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 351,
-    CountryOrRegion: '葡萄牙',
-    CountryCode: 'PT',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 852,
-    CountryOrRegion: '香港',
-    CountryCode: 'HK',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 853,
-    CountryOrRegion: '澳门',
-    CountryCode: 'MO',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 855,
-    CountryOrRegion: '柬埔寨',
-    CountryCode: 'KH',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 856,
-    CountryOrRegion: '老挝',
-    CountryCode: 'LA',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 886,
-    CountryOrRegion: '台湾',
-    CountryCode: 'TW',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 960,
-    CountryOrRegion: '马尔代夫',
-    CountryCode: 'MV',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 966,
-    CountryOrRegion: '沙特阿拉伯',
-    CountryCode: 'SA',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 971,
-    CountryOrRegion: '阿拉伯联合酋长国',
-    CountryCode: 'AE',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 974,
-    CountryOrRegion: '卡塔尔',
-    CountryCode: 'QA',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 977,
-    CountryOrRegion: '尼泊尔',
-    CountryCode: 'NP',
-    UnitPrice: 0,
-    USUnitPrice: 0 },
-  { CountryNumber: 998,
-    CountryOrRegion: '乌兹别克斯坦',
-    CountryCode: 'UZ',
-    UnitPrice: 0,
-    USUnitPrice: 0 } ];
-
-for (var i = 0; i < smsPrices.length; i++) {
-  smsPrices[i].UnitPrice = rawSMSPrice.cn.pricing["+" + smsPrices[i].CountryNumber];
-  smsPrices[i].USUnitPrice = rawSMSPrice.us.pricing["+" + smsPrices[i].CountryNumber];
-}
-
-var nodes = [{ code: "cn", name: "华北节点"},{ code: "tab", name: "华东节点"  },{ code: "us", name: "国际版"  }];
-
-for (var j = 0; j < smsPrices.length; j++){
-    smsPrices[j].nodes = {};
-    for (var i = 0; i < nodes.length - 1; i++){ // assuming us node is in the last 
-        smsPrices[j]['nodes'][nodes[i]['code']] = smsPrices[j]['UnitPrice'];
-    }
-    smsPrices[j]['nodes'][nodes[nodes.length - 1]['code']] = smsPrices[j]['USUnitPrice'];
-}
-</script>
-
-<table class="datatable" cellspacing="0" cellpadding="0" width="100%" style="margin-top: 12px;">
-    <thead>
-        <tr>
-            <th>国号</th>
-            <th>国家或地区</th>
-            <th>国家代号</th>
-            <th>华北节点</th>
-            <th>华东节点</th>
-            <th>国际版</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-
-<script type="text/javascript">
-$(document).ready(function() {
-    var smsPriceTable = $('.datatable').DataTable({
-        data: smsPrices,
-        // disable pagination
-        paging: false,
-        info: false,
-        ordering: false,
-        language: {
-            zeroRecords: '没有找到匹配数据。',
-            search: '过滤：'
-        },
-        columns: [
-            { "data": "CountryNumber" },
-            { "data": "CountryOrRegion" },
-            { "data": "CountryCode" },
-            { "data": "nodes.cn" },
-            { "data": "nodes.tab" },
-            { "data": "nodes.us" }
-        ],
-        columnDefs: [
-            {
-                targets: [3, 4],
-                className: 'text-right', 
-                render: function(data, type, row, meta){
-                    return '<span class="text-muted" style="opacity: 0.5; padding-right: 4px;">¥</span> ' + data.toFixed(2)
-                }
-            },
-            {
-                targets: 5,
-                className: 'text-right', 
-                render: function(data, type, row, meta){
-                    return '<span class="text-muted" style="opacity: 0.5; padding-right: 4px;">$</span> ' + data.toFixed(2)
-                }
-            }
-        ]
-    });
-    // style global filter
-    $('.dataTables_filter')
-        .find('label')
-            .css({
-                "display": "flex",
-                "white-space":  "nowrap",
-                "align-items":  "center"
-            })
-        .find('input')
-            .addClass('form-control input-sm')
-            .css({
-                "flex-basis": '200px'
-            });
-} );
-</script>
-
-### 开通国际短信服务
-国际短信服务是需要额外开启的，你需要在 [控制台 > 消息 > 短信 > 设置 > 短信选项](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf) 进行选择。
-
-{{ include.checkbox() }}**开启国际短信服务**
-- 开启：可以向中国大陆以外的手机号发送短信，详见 [覆盖国家和地区](#短信服务覆盖区域)。
-- 关闭：无法向中国大陆 +86 之外的手机号发送短信。
+请参阅官网的 [价格](/pricing) 页面以了解 LeanCloud 支持的国家和地区。
 
 ## 与 LeanCloud 账户系统集成
-LeanCloud 提供了内建的 [账户系统](leanstorage_guide-js.html#用户) 来帮助开发者快速完成用户系统的注册、登录、重置密码等功能，同时为了方便使用，我们也集成了账户系统手机号码相关的短信功能，譬如账户注册时自动验证手机号、手机号码登录和重置密码等等。
+
+LeanCloud 提供了内建的 [账户系统](leanstorage_guide-js.html#用户) 来帮助开发者快速完成用户的注册、登录、重置密码等功能，同时为了方便使用，我们也集成了账户系统手机号码相关的短信功能，譬如账户注册时自动验证手机号、手机号码登录和重置密码等等。
 
 我们可以在 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf) 查看相关选项：
 
-{{ include.checkbox(true) }}**用户注册时，向注册手机号码发送验证短信**
-- 开启：调用 AVUser 注册相关的接口时，如果传入了手机号，系统则会自动发送验证短信，然后开发者需要手动调用一下验证接口，这样 `_User` 表中的 `mobilePhoneVerified` 值才会被置为 `true`。
-- 关闭：调用 AVUser 注册相关的接口不会发送短信。
+{{ include.checkbox(true) }}**从客户端注册或更新手机号时，向注册手机号码发送验证短信**
+- 开启：调用 `AVUser` 注册相关的接口时，如果传入了手机号，系统则会自动发送验证短信，然后开发者需要手动调用一下验证接口，这样 `_User` 表中的 `mobilePhoneVerified` 值才会被置为 `true`。
+- 关闭：调用 `AVUser` 注册相关的接口不会发送短信。
 
 {{ include.checkbox() }}**未验证手机号码的用户，禁止登录**
 - 开启：未验证手机号的 `AVUser` 不能使用「手机号 + 密码」以及「手机号 + 短信验证码」的方式登录，但是<u>用户名搭配密码的登录方式不会失败</u>。
@@ -1497,299 +1095,21 @@ LeanCloud 提供了内建的 [账户系统](leanstorage_guide-js.html#用户) �
 
 {{ include.checkbox() }}**已验证手机号码的用户，允许以短信验证码登录**
 - 开启：`AVUser` 可以使用手机号搭配短信验证码的方式登录。
-- 关闭：`AVUser` 不能直接使用。
+- 关闭：`AVUser` 不能使用手机号搭配短信验证码的方式登录。
 
-下面以「注册验证」为例，详细说明一下如何在注册过程中自动使用短信服务。
-
-### 注册验证
-
-现在越来越多的应用支持使用手机号码来快速注册账户，并且同时会通过短信验证码来核实用户手机号码的有效性。下面我们来看看如何便捷地使用 LeanCloud 的「注册验证」功能。其使用步骤如下：
-
-1. **用户输入手机号以及密码**  
-  引导用户正确的输入，建议在调用 SDK 接口之前，验证一下手机号的格式。
-
-2. **调用 AVUser 的注册接口，传入手机号以及密码。**  
-
-```objc
-AVUser *user = [AVUser user];
-user.username = @"hjiang";
-user.password =  @"f32@ds*@&dsa";
-user.email = @"hang@leancloud.rocks";
-user.mobilePhoneNumber = @"186xxxxxxxx";
-[user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-    if (succeeded) {
-        // 注册成功
-    } else {
-        // 注册失败
-    }
-}];
-```
-```swift
-let user = LCUser()
-user.username = LCString("hjiang")
-user.password = LCString("f32@ds*@&dsa")
-user.email = LCString("hang@leancloud.rocks")
-user.mobilePhoneNumber = LCString("186xxxxxxxx")
-user.signUp()
-```
-```java
-AVUser user = new AVUser();
-user.setUsername("hjiang");
-user.setPassword("f32@ds*@&dsa");
-user.setEmail("hang@leancloud.rocks");
-// 其他属性可以像其他AVObject对象一样使用put方法添加
-user.put("mobilePhoneNumber", "186-1234-0000");
-user.signUpInBackground().subscribe(new Observer<AVUser>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(AVUser avUser) {
-        Log.d("TAG","注册成功");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG", "注册失败。cause：" + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-```
-```javascript
-var user = new AV.User();
-user.set("username", "hjiang");
-user.set("password", "123456");
-user.setMobilePhoneNumber('186xxxxxxxx');
-user.signUp(null, ……)
-```
-```cs
-var user = new AVUser();
-user.Username = "hjiang";
-user.Password = "123456ZXCV";
-user.MobilePhoneNumber = "186xxxxxxxx";
-user.SignUpAsync().ContinueWith(t =>
-{
-    // 注册成功之后云端会自动发送验证短信
-});
-```
-```php
-$user = new User();
-$user->setUsername("hjiang");
-$user->setPassword("f32@ds*@&dsa");
-$user->setMobilePhoneNumber("186xxxxxxxx");
-$user->signUp();
-```
-```python
-import leancloud
-
-user = leancloud.User()
-user.set_username("hjiang")
-user.set_password("f32@ds*@&dsa")
-user.set_mobile_phone_number("186xxxxxxxx")
-user.sign_up()
-```
-
-3. **云端发送手机验证码，并且返回注册成功**。但是此时用户的 `mobilePhoneVerified` 依然是 `false`，客户端需要引导用户去输入验证码。   
-  
-4. **用户再一次输入验证码**  
-  最好本地先验证一下有效性（例如长度、特殊字符等）。
-  
-5. **调用验证接口，检查用户输入的纯数字验证码是否合法。**
-
-```objc
-[AVUser verifyMobilePhone:@"123456" withBlock:^(BOOL succeeded, NSError *error) {
-    //验证结果
-}];
-```
-```swift
-LCUser.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
-   //验证结果
-}
-```
-```java
-AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<AVNull>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to verify SMSCode.");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-```
-```javascript
-AV.User.verifyMobilePhone('6位数字验证码').then(function(){
-//验证成功
-}, function(err){
-//验证失败
-});
-```
-```cs
-AVUser.VerifyMobilePhoneAsync("6位数字验证码", "186xxxxxxxx").ContinueWith(t =>
-    {
-        if (t.Result)
-        {
-            // 验证成功
-        }
-    });
-```
-```php
-User::verifyMobilePhone("6位数字验证码");
-```
-```python
-from leancloud import user
-user.verify_mobile_phone_number("6位数字验证码")
-```
-
-以上是一个通用的带有手机号验证的注册过程。开发者可以根据需求增加或减少步骤，但是推荐开发者在使用该功能时，首先明确是否需要勾选「验证注册用户手机号码」。因为一旦勾选，只要调用了 AVUser 相关的注册账号，并传入手机号，云端就会自动发送短信验证码。
-
-{{ docs.note("注意：只有使用了 LeanCloud 内建账户系统的应用才能使用这一功能。") }}
-
-另外，假如注册的时候并没有强制用户验证手机号，而是在用户使用某一个功能的时候，要求用户验证手机号，也可以调用接口进行「延迟验证」，验证之后 `mobilePhoneVerified` 就会被置为 `true`。
-
-1. **请求发送验证码**    
-
-```objc
-[AVUser requestMobilePhoneVerify:@"186xxxxxxxx" withBlock:^(BOOL succeeded, NSError *error) {
-if(succeeded){
-    //调用成功
-}
-}];
-```
-```swift
-LCUser.requestVerificationCode(mobilePhoneNumber: "186xxxxxxxx") { (result) in
-	switch result {
-    case .success:
-        print("调用成功")
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-```java
-AVUser.requestMobilePhoneVerifyInBackground("186xxxxxxxx").subscribe(new Observer<AVNull>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to request SMSCode.");
-    }
-    @Override
-    public void onError(Throwable e) {
-        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-```
-```javascript
-AV.User.requestMobilePhoneVerify('186xxxxxxxx').then(function(){
-    //调用成功
-}, function(err){
-    //调用失败
-});
-```
-```cs
-AVUser.RequestMobilePhoneVerifyAsync("186xxxxxxxx").ContinueWith(t =>
-{
-    if(t.Result)
-    {
-        // 调用成功
-    }
-});
-```
-```php
-User::requestMobilePhoneVerify("186xxxxxxxx");
-```
-```python
-from leancloud import cloud
-cloud.request_mobile_phone_verify("186xxxxxxxx")
-```
-
-2. **调用验证接口，验证用户输入的纯数字的验证码。** 
-
-```objc
-[AVUser verifyMobilePhone:@"123456" withBlock:^(BOOL succeeded, NSError *error) {
-    if(succeeded){
-        //验证成功
-    }
-}];
-```
-```swift
-LCUser.verifyMobilePhoneNumber("186xxxxxxxx", verificationCode: "123456") { (result) in
-    switch result {
-    case .success:
-        print("验证成功")
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-```java
-AVSMS.verifySMSCodeInBackground("123456","186xxxxxxxx").subscribe(new Observer<AVNull>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: succeed to verify SMSCode.");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: failed to verify SMSCode. cause:" + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-```
-```javascript
-AV.User.verifyMobilePhone('6位数字验证码').then(function(){
-    //验证成功
-}, function(err){
-    //验证失败
-});
-```
-```cs
-AVUser.VerifyMobilePhoneAsync("6位数字验证码").ContinueWith(t =>
-    {
-        if (t.Result)
-        {
-            // 验证成功
-        }
-    });
-```
-```php
-User::verifyMobilePhone("6位数字验证码");
-```
-```python
-from leancloud import cloud
-cloud.verify_mobile_phone_number("6位数字验证码")
-```
+《数据存储开发指南》中详细介绍了如何通过手机号 [注册](leanstorage_guide-js.html#手机号注册) 和 [登录](leanstorage_guide-js.html#手机号登录)，以及如何 [验证已有用户的手机号](leanstorage_guide-js.html#验证手机号)。
 
 #### 未收到注册验证短信
 
 一般来说，用户收到的注册验证短信内容为：
 
-{{ docs.bubble("【Signature】欢迎使用“应用名称”服务，您的验证码是 123456，请输入完成验证。") }}
+{{ docs.bubble("【Signature】欢迎使用「应用名称」服务，您的验证码是 123456，请输入完成验证。") }}
 
-其中【Signature】为短信签名，必须遵循 [短信签名规范](#短信签名) 中的长度及其他要求，否则会被短信供应商拒绝发送。
-
+其中「Signature」为短信签名，必须遵循 [短信签名规范](#短信签名) 中的长度及其他要求，否则会被短信供应商拒绝发送。
 
 ## 常见问题
 
 详情请参照 [短信收发常见问题一览](rest_sms_api.html#常见问题_FAQ)。
-
 
 ### 短信计费
 
@@ -1798,7 +1118,7 @@ cloud.verify_mobile_phone_number("6位数字验证码")
 - 小于或等于 70 个字，按一条计费。
 - 中英文标点算作一个字符。
 - 超过 70 个字符则按照 67 个字符来计算条数，最长可发 400 字。
-- 最长的 400 字符的短信收费计算公式为：400/67 = 5.9， 也就是要扣 6 条短信费用。
+- 最长的 400 字符的短信收费计算公式为：400/67 = 5.9，也就是要扣 6 条短信的费用。
 
 只有「调用失败」不收费，「投递失败」也要收费。每条短信的收费标准请参考 [官网价格方案](/pricing)。
 

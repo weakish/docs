@@ -5968,7 +5968,7 @@ _ = LCUser.signUpOrLogIn(mobilePhoneNumber: "+8618200008888", verificationCode: 
 
 `{{ userObjectName }}` 接受的手机号以 `+` 和国家代码开头，后面紧跟着剩余的部分。手机号中不应含有任何划线、空格等非数字字符。例如，`+19490008888` 是一个合法的美国或加拿大手机号（`1` 是国家代码），`+8618200008888` 是一个合法的中国手机号（`86` 是国家代码）。
 
-请参阅短信 SMS 服务使用指南中的 [服务覆盖区域和价格](sms-guide.html#服务覆盖区域和价格) 以了解 LeanCloud 支持的国家和地区。
+请参阅官网的 [价格](/pricing) 页面以了解 LeanCloud 支持的国家和地区。
 {% endif %}
 
 ### 登录
@@ -6541,7 +6541,7 @@ var currentUser = AV.User.current();
 ```python
 user.logout()
 
-current_user = leancloud.User.get_current() # None
+current_user = leancloud.User.get_current()  # None
 ```
 {% endif %}
 {% if platform_name === "PHP" %}
