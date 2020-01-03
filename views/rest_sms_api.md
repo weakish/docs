@@ -91,7 +91,11 @@ curl -X POST \
 | name              |      | 应用名字（默认为 LeanCloud 控制台填写的应用名。） |
 | op                |      | 操作类型                           |
 
-{{ sms.successfulResponse() }}
+如果成功，将返回：
+
+```json
+{}
+```
 
 假设有如下调用：
 
@@ -145,15 +149,17 @@ curl -X POST \
 
 其中 `verifySmsCode` 后面是手机收到的 6 位数字验证码。`mobilePhoneNumber` 是收到短信的手机号码。
 
-{{ sms.successfulResponse() }}
+如果成功，将返回：
+
+```json
+{}
+```
 
 {% call docs.noteWrap() %}
 由于运营商和渠道的限制，短信验证码（也包括语音验证码）向同一手机号码发送要求间隔至少一分钟，并且 24 小时内向同一手机号码发送次数不能超过 10 次，**因此建议采用 [图形验证码](#图形验证码)、倒数计时等措施来控制频率** 提示用户，防止短信轰炸等恶劣情况发生。
 
-另外，请了解有关短信的 [其他限制](#短信有什么限制吗_)。
+另外，请了解有关短信的 [其他限制](#短信有什么限制吗_)，以及如何设置 [测试手机号和固定验证码](leanstorage_guide-js.html#测试手机号和固定验证码)。
 {% endcall %}
-
-{{ sms.fixedVerificationCode() }}
 
 ### 国际短信
 
@@ -170,7 +176,7 @@ curl -X POST \
 
 除了修改手机号码格式，发送国际短信和国内短信的请求参数完全一样。
 
-{{ sms.worldwideSms() }}
+要了解短信可送达的所有国家或地区以及费率，请参考 [官网价格方案](/pricing)。
 
 ## 自定义短信模板
 
@@ -325,7 +331,11 @@ curl -X POST \
   https://{{host}}/1.1/requestChangePhoneNumber
 ```
 
-{{ sms.successfulResponse() }}
+如果成功，将返回：
+
+```json
+{}
+```
 
 验证后绑定或更新手机号：
 
@@ -355,7 +365,11 @@ curl -X POST \
   https://{{host}}/1.1/requestMobilePhoneVerify
 ```
 
-{{ sms.successfulResponse() }}
+如果成功，将返回：
+
+```json
+{}
+```
 
 ### 手机号码＋验证码登录
 
@@ -370,7 +384,11 @@ curl -X POST \
   https://{{host}}/1.1/requestLoginSmsCode
 ```
 
-{{ sms.successfulResponse() }}
+如果成功，将返回：
+
+```json
+{}
+```
 
 用户收到验证码短信后，输入手机号码和该验证码来登录应用：
 
@@ -411,7 +429,11 @@ curl -X POST \
 
 发送一条重置密码的短信验证码到注册用户的手机上，需要传入注册时候的 `mobilePhoneNumber`。
 
-{{ sms.successfulResponse() }}
+如果成功，将返回：
+
+```json
+{}
+```
 
 用户收到验证码后，调用 `PUT /1.1/resetPasswordBySmsCode/<code>` 来设置新的密码（其中 URL 中的 `<code>` 就是 6 位验证数字）：
 
