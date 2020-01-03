@@ -159,103 +159,103 @@ cloud.request_sms_code("18200008888", template="Register_Notice", sign="LeanClou
 
 通过短信进行注册、登录或重要操作的验证，是一种非常常见的需求。这里我们以一个购物应用为例，说明如何使用 LeanCloud 短信服务完成操作认证：
 
-1. **用户点击支付订单**
+1. **用户点击支付订单**  
   发起敏感操作。
   
-2. **调用接口发送验证短信**
+2. **调用接口发送验证短信**  
   注意，在这一步之前，我们假设开发者已经完成了前面章节提及的所有短信服务设置。
 
-```objc
-AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
-options.TTL = 10;                     // 验证码有效时间为 10 分钟
-options.applicationName = @"应用名称"; // 应用名称
-options.operation = @"某种操作";       // 操作名称
-[AVSMS requestShortMessageForPhoneNumber:@"18200008888"
-                                 options:options
-                                callback:^(BOOL succeeded, NSError * _Nullable error) {
-                                    if (succeeded) {
-                                        /* 请求成功 */
-                                    } else {
-                                        /* 请求失败 */
-                                    }
-                                }];
-```
-```swift
-let variables: LCDictionary = [
-    "ttl": LCNumber(10),         // 验证码有效时间为 10 分钟
-    "name": LCString("应用名称"), // 应用名称
-    "op": LCString("某种操作")    // 操作名称
-]
+  ```objc
+  AVShortMessageRequestOptions *options = [[AVShortMessageRequestOptions alloc] init];
+  options.TTL = 10;                     // 验证码有效时间为 10 分钟
+  options.applicationName = @"应用名称"; // 应用名称
+  options.operation = @"某种操作";       // 操作名称
+  [AVSMS requestShortMessageForPhoneNumber:@"18200008888"
+                                  options:options
+                                  callback:^(BOOL succeeded, NSError * _Nullable error) {
+                                      if (succeeded) {
+                                          /* 请求成功 */
+                                      } else {
+                                          /* 请求失败 */
+                                      }
+                                  }];
+  ```
+  ```swift
+  let variables: LCDictionary = [
+      "ttl": LCNumber(10),         // 验证码有效时间为 10 分钟
+      "name": LCString("应用名称"), // 应用名称
+      "op": LCString("某种操作")    // 操作名称
+  ]
 
-_ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "18200008888", variables: variables) { (result) in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-```java
-AVSMSOption option = new AVSMSOption();
-option.setTtl(10);
-option.setApplicationName("应用名称");
-option.setOperation("某种操作");
-AVSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<AVNull>() {
-    @Override
-    public void onSubscribe(Disposable disposable) {
-    }
-    @Override
-    public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: Successfully sent verification code.");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: Failed to send verification code. Reason: " + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-```
-```javascript
-AV.Cloud.requestSmsCode({
-    mobilePhoneNumber: '18200008888',
-    name: '应用名称',
-    op: '某种操作',
-    ttl: 10 // 验证码有效时间为 10 分钟
-}).then(function(){
-    // 调用成功
-}, function(err){
-    // 调用失败
-});
-```
-```cs
-// 下面参数中的 10 表示验证码有效时间为 10 分钟
-AVCloud.RequestSMSCodeAsync("18200008888","应用名称","某种操作",10).ContinueWith(t =>
-{
-    if(!t.Result)
-    {
-        // 调用成功
-    }
-});
-```
-```php
-$options = [
-  "name" => "应用名称",
-  "op" => "某种操作",
-  "ttl" => 10, // 验证码有效时间为 10 分钟
-];
-SMS::requestSMSCode("18200008888", $options);
-```
-```python
-from leancloud import cloud
-options = {
-  "op": "某种操作",
-  "ttl": 10  # 验证码有效时间为 10 分钟
-}
-cloud.request_sms_code("18200008888", sign="应用名称", params=options)
-```
+  _ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "18200008888", variables: variables) { (result) in
+      switch result {
+      case .success:
+          break
+      case .failure(error: let error):
+          print(error)
+      }
+  }
+  ```
+  ```java
+  AVSMSOption option = new AVSMSOption();
+  option.setTtl(10);
+  option.setApplicationName("应用名称");
+  option.setOperation("某种操作");
+  AVSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<AVNull>() {
+      @Override
+      public void onSubscribe(Disposable disposable) {
+      }
+      @Override
+      public void onNext(AVNull avNull) {
+          Log.d("TAG","Result: Successfully sent verification code.");
+      }
+      @Override
+      public void onError(Throwable throwable) {
+          Log.d("TAG","Result: Failed to send verification code. Reason: " + throwable.getMessage());
+      }
+      @Override
+      public void onComplete() {
+      }
+  });
+  ```
+  ```javascript
+  AV.Cloud.requestSmsCode({
+      mobilePhoneNumber: '18200008888',
+      name: '应用名称',
+      op: '某种操作',
+      ttl: 10 // 验证码有效时间为 10 分钟
+  }).then(function(){
+      // 调用成功
+  }, function(err){
+      // 调用失败
+  });
+  ```
+  ```cs
+  // 下面参数中的 10 表示验证码有效时间为 10 分钟
+  AVCloud.RequestSMSCodeAsync("18200008888","应用名称","某种操作",10).ContinueWith(t =>
+  {
+      if(!t.Result)
+      {
+          // 调用成功
+      }
+  });
+  ```
+  ```php
+  $options = [
+    "name" => "应用名称",
+    "op" => "某种操作",
+    "ttl" => 10, // 验证码有效时间为 10 分钟
+  ];
+  SMS::requestSMSCode("18200008888", $options);
+  ```
+  ```python
+  from leancloud import cloud
+  options = {
+    "op": "某种操作",
+    "ttl": 10  # 验证码有效时间为 10 分钟
+  }
+  cloud.request_sms_code("18200008888", sign="应用名称", params=options)
+  ```
 
 3. **用户收到短信，并且输入了验证码**  
   在进行下一步之前，我们建议先进行客户端验证（对有效性进行基本验证，例如长度、特殊字符等），这样就避免了错误的验证码被服务端驳回而产生的流量，以及与服务端沟通的时间，有助于提升用户体验。
@@ -263,65 +263,65 @@ cloud.request_sms_code("18200008888", sign="应用名称", params=options)
 4. **调用接口验证用户输入的验证码是否有效**  
   注意，调用时需要确保验证码和手机号的参数顺序，我们假设验证码数字是「123456」：
 
-```objc
-[AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"18200008888" callback:^(BOOL succeeded, NSError *error) {
-    if(succeeded){
-        // 验证成功
-    }
-}];
-```
-```swift
-_ = LCSMSClient.verifyMobilePhoneNumber("18200008888", verificationCode: "123456") { (result) in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-```java 
-AVSMS.verifySMSCodeInBackground("123456","18200008888").subscribe(new Observer<AVNull>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(AVNull avNull) {
-        Log.d("TAG","Result: Successfully verified the number.");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: Failed to verify the number. Reason: " + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-```
-```javascript
-AV.Cloud.verifySmsCode('123456', '18200008888').then(function(){
-    // 验证成功
-}, function(err){
-    // 验证失败
-});
-```
-```cs
-AVCloud.VerifySmsCodeAsync("123456","18200008888").ContinueWith(t =>{
-    if(t.Result) 
-    {
-        // 验证成功
-    }
-});
-```
-```php
-// 注意，PHP SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
-SMS::verifySmsCode('18200008888', '123456');
-```
-```python
-from leancloud import cloud
-# 注意，Python SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
-cloud.verify_sms_code('18200008888', '123456')
-```
+  ```objc
+  [AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"18200008888" callback:^(BOOL succeeded, NSError *error) {
+      if(succeeded){
+          // 验证成功
+      }
+  }];
+  ```
+  ```swift
+  _ = LCSMSClient.verifyMobilePhoneNumber("18200008888", verificationCode: "123456") { (result) in
+      switch result {
+      case .success:
+          break
+      case .failure(error: let error):
+          print(error)
+      }
+  }
+  ```
+  ```java 
+  AVSMS.verifySMSCodeInBackground("123456","18200008888").subscribe(new Observer<AVNull>() {
+      @Override
+      public void onSubscribe(Disposable d) {
+      }
+      @Override
+      public void onNext(AVNull avNull) {
+          Log.d("TAG","Result: Successfully verified the number.");
+      }
+      @Override
+      public void onError(Throwable throwable) {
+          Log.d("TAG","Result: Failed to verify the number. Reason: " + throwable.getMessage());
+      }
+      @Override
+      public void onComplete() {
+      }
+  });
+  ```
+  ```javascript
+  AV.Cloud.verifySmsCode('123456', '18200008888').then(function(){
+      // 验证成功
+  }, function(err){
+      // 验证失败
+  });
+  ```
+  ```cs
+  AVCloud.VerifySmsCodeAsync("123456","18200008888").ContinueWith(t =>{
+      if(t.Result) 
+      {
+          // 验证成功
+      }
+  });
+  ```
+  ```php
+  // 注意，PHP SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
+  SMS::verifySmsCode('18200008888', '123456');
+  ```
+  ```python
+  from leancloud import cloud
+  # 注意，Python SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
+  cloud.verify_sms_code('18200008888', '123456')
+  ```
 
 针对上述的需求，可以把场景换成异地登录验证、修改个人敏感信息验证等一些常见的场景，步骤是类似的，调用的接口也是一样的，仅仅是在做 UI 展现的时候需要开发者自己去优化验证过程。
 
