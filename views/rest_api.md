@@ -5,12 +5,11 @@
 
 REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 进行交互，你可以使用 REST API 做很多事情，比如：
 
-* 一个移动网站可以通过 JavaScript 来获取 LeanCloud 上的数据.
-* 一个网站可以展示来自 LeanCloud 的数据。
-* 你可以上传大量的数据，之后可以被一个移动 App 读取。
-* 你可以下载最近的数据来进行你自定义的分析统计。
-* 使用任何语言写的程序都可以操作 LeanCloud 上的数据。
+* 使用任何编程语言操作 LeanCloud 上的数据。
 * 如果你不再需要使用 LeanCloud，你可以导出你所有的数据。
+* 一个追求最少化依赖库的移动网站可以通过 JavaScript 直接获取 LeanCloud 上的数据。
+* 你可以批量新增大量数据，供移动 App 之后读取。
+* 你可以下载最近的数据用于离线分析和归档备份。
 
 ## API 版本
 
@@ -341,7 +340,7 @@ Postman 还支持自动生成多种语言（库）调用 REST API 的代码。
     </tr>
     <tr>
       <td>/1.1/schemas/&lt;className&gt;</td>
-      <td>POST</td>
+      <td>GET</td>
       <td>获取应用指定的 Class 的 Schema</td>
     </tr>
   </tbody>
@@ -539,7 +538,7 @@ curl -X PUT \
     </tr>
     <tr>
       <td scope="row">请求时间</td>
-      <td>2016-01-17 15:15:43.466</td>
+      <td>2016-01-17 15:15:43.466 GMT+08:00</td>
     </tr>
     <tr>
       <td scope="row">timestamp</td>
@@ -573,14 +572,12 @@ curl -X PUT \
 
 #### 指定 hook 函数调用环境
 
-POST 和 PUT 请求可能触发[云引擎的 hook 函数][hooks]，可以通过设置 HTTP 头 `X-LC-Prod` 来区分调用的环境。
+请求可能触发[云引擎的 hook 函数](leanengine_cloudfunction_guide-node.html#Hook_函数)，可以通过设置 HTTP 头 `X-LC-Prod` 来区分调用的环境。
 
 * `X-LC-Prod: 0` 表示调用预备环境
 * `X-LC-Prod: 1` 表示调用生产环境
 
 默认（未指定 `X-LC-Prod` 头）调用生产环境的 hook 函数。
-
-[hooks]: https://leancloud.cn/docs/leanengine_cloudfunction_guide-node.html#hash1095356413
 
 ### 响应格式
 
@@ -590,9 +587,8 @@ POST 和 PUT 请求可能触发[云引擎的 hook 函数][hooks]，可以通过�
 
 ```json
 {
-  "code": 105,
-  "error": "invalid field name: bl!ng"
-}
+  "code":105,
+  "error":"Invalid key name. Keys are case-sensitive and 'a-zA-Z0-9_' are the only valid characters. The column is: 'invalid?'."}
 ```
 
 错误代码请看 [错误代码详解](./error_code.html)。
@@ -647,7 +643,7 @@ https://{{host}}/1.1/users
 针对于一个特定的对象的操作可以通过组织一个 URL 来做。例如，对 Post 中的一个 objectId 为 `558e20cbe4b060308e3eb36c` 的对象的操作应使用如下 URL：
 
 ```
-https://{{host}}/1.1/classes/Post/<objectId>
+https://{{host}}/1.1/classes/Post/558e20cbe4b060308e3eb36c
 ```
 
 ### 创建对象
@@ -689,8 +685,6 @@ curl -X POST \
   -d '{"content": "每个 Java 程序员必备的 8 个开发工具","pubUser": "LeanCloud官方客服","pubTimestamp": 1435541999}' \
   https://{{host}}/1.1/classes/Post?fetchWhenSave=true
 ```
-
-fetchWhenSave 选项对更新对象也同样有效，但是它仅返回已被更新的字段，而非全部字段。
 
 {{ docs.note("**每个应用最多可以创建 500 个 class**，但每个 class 中的记录数量没有限制。") }}
 
@@ -786,6 +780,9 @@ curl -X PUT \
   "updatedAt": "2015-06-30T18:02:52.248Z"
 }
 ```
+
+fetchWhenSave 选项对更新对象也同样有效。
+但和创建对象不同，用于更新对象时仅返回更新的字段，而非全部字段。
 
 #### 计数器
 
@@ -3120,7 +3117,7 @@ curl -X POST \
 }
 ```
 
-* 设置依赖 job，也就是当前的查询可以使用前趋查询结果：
+* 设置依赖 job，也就是当前的查询可以使用前去查询结果：
 
 ```
 {
