@@ -366,6 +366,8 @@ AndroidManifest.xml 中把 AVHMSPushMessageReceiver 替换为你自定义的 MyH
 2. **创建小米推送服务应用**（[详细流程](http://dev.xiaomi.com/doc/?p=1621)）。
 3. **设置小米的 AppId 及 AppSecret**：在 [小米开放平台][xiaomi] > **管理控制台** > **消息推送** > **相关应用** 可以查到具体的小米推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
 
+[xiaomi]: http://dev.xiaomi.com/index
+
 ### 接入 SDK
 
 首先导入 `mixpush-android` 包。修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
