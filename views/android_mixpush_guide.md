@@ -366,6 +366,8 @@ AndroidManifest.xml 中把 AVHMSPushMessageReceiver 替换为你自定义的 MyH
 2. **创建小米推送服务应用**（[详细流程](http://dev.xiaomi.com/doc/?p=1621)）。
 3. **设置小米的 AppId 及 AppSecret**：在 [小米开放平台][xiaomi] > **管理控制台** > **消息推送** > **相关应用** 可以查到具体的小米推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
 
+[xiaomi]: http://dev.xiaomi.com/index
+
 ### 接入 SDK
 
 首先导入 `mixpush-android` 包。修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
@@ -1235,73 +1237,3 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 ### 提升透传消息到达率
 
 当使用华为推送发透传消息时，如果目标设备上 App 进程被杀，会出现推送消息无法接收的情况。这个是华为 ROM 对透传消息广播的限制导致的，需要引导用户在华为 「权限设置」中对 App 开启自启动权限来避免。
-
-## GCM 推送（deprecated）
-
-{{ docs.alert("Google 已停止支持，请升级使用上面的 FCM 推送。") }}
-
-GCM（Google Cloud Messaging）是 Google 提供的一项将推送通知消息发送到手机的服务。接入时后台不需要任何设置，GCM 相关的 token 由 LeanCloud SDK 来申请。
-
-### 环境要求
-
-GCM 需要系统为 Android 2.2 及以上并且安装有 Google Play 商店的设备，或者使用了 GppgleAPIs 且系统为 Android 2.2 及以上的模拟器。具体要求详见 [Google Developers &middot; Set up a GCM Client App on Android](https://developers.google.com/cloud-messaging/android/client)。
-
-### 接入 SDK
-
-首先导入 avoscloud-gcm 包。修改 build.gradle 文件，在 dependencies 中添加依赖：
-
-```xml
-dependencies {
-    compile ('cn.leancloud.android:avoscloud-gcm:{{ version.leancloud }}@aar')
-}
-```
-
-然后补充 `AndroidManifest`，添加 Permission，开发者要将其中的 `<包名>` 替换为自己的应用对应的 package：
-
-```xml
-<permission android:name="<包名>.permission.C2D_MESSAGE"
-                    android:protectionLevel="signature" />
-<uses-permission android:name="<包名>.permission.C2D_MESSAGE" />
-```
-
-添加 service 与 receiver：
-
-```xml
-<receiver android:name="com.avos.avoscloud.AVBroadcastReceiver">
-  <intent-filter>
-      <action android:name="android.intent.action.BOOT_COMPLETED"/>
-      <action android:name="android.intent.action.USER_PRESENT"/>
-      <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-  </intent-filter>
-</receiver>
-<service android:name="com.avos.avoscloud.PushService" />
-<service android:name="com.avos.avoscloud.AVGCMService">
-  <intent-filter>
-      <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-  </intent-filter>
-</service>
-<receiver
-  android:name="com.google.android.gms.gcm.GcmReceiver"
-  android:exported="true"
-  android:permission="com.google.android.c2dm.permission.SEND" >
-  <intent-filter>
-      <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-      <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-      <category android:name="<包名>" />
-  </intent-filter>
-</receiver>
-```
-
-接下来设置 GCM 开关。在 `AVOSCloud.initialize` 初始化时设置开关 `AVOSCloud.setGcmOpen(true)`。
-
-注意，LeanCloud 云端只有在以下三个条件都满足的情况下，才会默认走 GCM 通道。
-
-- LeanCloud 国际版
-- 调用 `AVOSCloud.setGcmOpen(true)`
-- manifest 正确填写
-
-如果注册成功，`_Installation` 表中的相关记录应该具有 **vendor** 这个字段并且不为空值。
-
-
-[xiaomi]: http://dev.xiaomi.com/index
-
