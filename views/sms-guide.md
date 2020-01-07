@@ -153,7 +153,7 @@ cloud.request_sms_code("18200008888", template="Register_Notice", sign="LeanClou
 
 <img src="images/sms_signature_edit.png" width="600" class="img-responsive" alt="在「短信签名」对话框中填入「名称」和「签名」。">
 
-等签名审核完成之后，你就可以调用 LeanCloud API 发送自己的短信了。我们看到最开始的示例代码里面还有「短信模板」，但是因为模板并不是必须的，所以留待 [后面详述](#短信模板)。
+等签名审核完成之后，你就可以调用 LeanCloud API 发送自己的短信了。我们看到最开始的示例代码里面还有「短信模板」，但是因为并非所有类型的短信都需要用到模板，所以留待 [后面详述](#短信模板)。
 
 ## 验证类短信
 
