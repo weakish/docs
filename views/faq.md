@@ -442,7 +442,7 @@ LeanCloud 云引擎提供了托管 Python 和 Node.js 运行的方式，开发�
 
 但是同一个设备的 deviceToken 只能成功发送一个环境。要么是正式环境，要么是测试环境。现象是给一个 deviceToken 推送，如果 dev 成功了，prod 就会报 invalid Tokens，不会在两个环境同时发送成功。
 
-### 有一些 iOS 设备收不到推送，到控制台查看推送记录，发现 invalidTokens的数量大于 0，是怎么回事？
+### 有一些 iOS 设备收不到推送，到控制台查看推送记录，发现 invalidTokens 的数量大于 0，是怎么回事？
 
 invalidTokens 的数量由以下两部分组成：
 * 选择的设备与选择的证书不匹配时，会增加 invalidTokens 的数量，例如使用开发证书给生产证书的设备推送。
