@@ -593,3 +593,16 @@ AV.Cloud.run('order').then((data) => {
 
 ## 反馈
 如果在微信小程序中使用 LeanCloud 时遇到问题，欢迎通过我们的 [论坛](https://forum.leancloud.cn/c/jing-xuan-faq/weapp) 进行反馈。
+
+## QQ 小程序
+
+LeanCloud SDK 同样兼容 QQ 小程序，QQ 小程序用户登录相关方法为：
+
+- `AV.User.loginWithQQApp`
+- `AV.User.loginWithQQAppWithUnionId`
+- `AV.User#loginWithQQApp`
+- `AV.User#loginWithQQAppWithUnionId`
+- `AV.User#associateWithQQApp`
+- `AV.User#associateWithQQAppWithUnionId`
+
+用法可以参考[微信小程序的相应方法](#用户系统)。
