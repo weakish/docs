@@ -1149,19 +1149,26 @@ curl -X GET \
 ```
 
 指向用户对象的 Pointer 的 className 为 `_User`，前面加一个下划线表示开发者不能定义的类名，而且所指的类是 LeanCloud 平台内置的。
+类似地，指向角色和 Installation 的 Pointer 的 className 为 `_Role` 和 `_Installation`。
 
-**Relation** 类型被用在多对多的类型上，移动端使用 AVRelation 作为值，它有一个 className 字段表示目标对象的类名。
-
-{{ data.relationDeprecated() }}
+然而，关联文件（可以看成指向文件的 Pointer）采用不同于 Pointer 的编码形式：
 
 ```json
 {
-  "__type": "Relation",
-  "className": "Post"
+  "id": "543cbaede4b07db196f50f3c",
+  "__type": "File"
 }
 ```
 
-在进行查询时，Relation 对象的行为很像是 Pointer 的数组，任何针对于 pointer 数组的操作（`include` 除外）都可以对 Relation 起作用。
+**GeoPoint** 包含地理位置的经纬度：
+
+```json
+{
+  "__type": "GeoPoint",
+  "latitude": 39.9,
+  "longitude": 116.4
+}
+```
 
 当更多的数据类型被加入的时候，它们都会采用 hashmap 加上一个 `__type` 字段的形式，所以你不应该使用 `__type` 作为你自己的 JSON 对象的 key。
 
