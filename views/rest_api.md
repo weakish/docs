@@ -1825,7 +1825,7 @@ curl -X POST \
   https://{{host}}/1.1/requestPasswordReset
 ```
 
-如果成功的话，返回的值是一个 JSON 对象。
+如果成功的话，返回的值是一个空 JSON 对象（`{}`）。
 
 关于自定义邮件模板和验证链接请看这篇博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
 
