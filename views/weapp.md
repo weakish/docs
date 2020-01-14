@@ -423,7 +423,7 @@ AV.User.logIn('username', 'password').then(user => {
 
 ```javascript
 // Realtime 类获取的方式根据不同的安装方式而异，这里假设是通过手动导入文件的方式安装的 SDK
-const { Realtime } = require('./libs/realtime.weapp.min.js');
+const { Realtime } = require('./libs/realtime-weapp.min.js');
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
@@ -435,7 +435,7 @@ const realtime = new Realtime({
 
 ```js
 // app.js
-const { Realtime } = require('./libs/realtime.weapp.min.js');
+const { Realtime } = require('./libs/realtime-weapp.min.js');
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
