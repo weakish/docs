@@ -5,7 +5,7 @@
 
 # 常见问题一览
 
-## 账户和平台常见问题
+## 账户和控制台常见问题
 
 ### LeanCloud 部署在哪个云平台上
 
@@ -19,10 +19,6 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 * 账号相关事项，可发送邮件到 {{ include.supportEmail() }} 获取帮助。
 * 紧急故障拨打客服电话：+8618625038918。
 * 售前咨询请致电 +8613011098244。
-
-### 计费是基于账号还是应用
-
-计费都基于用户账号，详细信息请参考 [价格](/pricing) 页面。
 
 ### 如果没有缴费会怎么样
 
@@ -76,45 +72,41 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 * 每月初，我们会将每月的更新摘要发送到您的注册邮箱。
 * 在控制台页面的右上方有 [消息中心](/dashboard/info-center.html#/index)，请注意查看新通知。
 {% endif %}
+### 如何重命名 Class？
 
-### API 开放吗
+LeanCloud 不支持重命名 Class。
+你可以新建一个 Class，利用 [数据导入导出](rest_api.html#数据导出_API) 功能从旧 Class 导出数据，然后导入到新 Class。
+导出导入期间不要往旧 Class 写数据，或者在旧 Class 和新 Class 双写数据，以避免数据不一致。
 
-我们的 API 完全开放。我们提供的 SDK 也都是基于开放 API 实现的。详情请阅读 [REST API 详解](/docs/rest_api.html)。
+### 如何导入或者导出数据？
 
-### 提供哪些平台的 SDK
+请参考《数据与安全》文档的 [导入数据](./dashboard_guide.html#本地数据导入_LeanCloud) 和 [导出数据](./dashboard_guide.html#云端数据导出到本地) 部分。
 
-目前官方提供的 SDK 种类包括：
 
-* Objective-C
-* Swift
-* Android
-* Java
-* JavaScript
-* Python
-* PHP
-* Unity
+### 如何在 App 邮件内完全使用自己的品牌
 
-部分 SDK 已开源，详情请访问 [SDK 下载](/docs/sdk_down.html) 页面。
+请参考博文 [《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
+  
+### 创建唯一索引失败
 
-### iOS 和 Android 是否可以使用同一个 App
+请确认想要创建索引的列没有已经存在的重复值。
 
-当然可以。使用我们的 SDK，可以为同一个应用开发多个平台的版本，共享后端数据。
+### 如何上传文件
 
-### 支持 Unity 3D 吗
+任何一个 Class 如果有 File 类型的列，就可以直接在 **数据** 管理平台中将文件上传到该列。如果没有，请自行创建列，类型指定为 File。
 
-支持。请到 [SDK 下载](sdk_down.html) 页面下载 Unity SDK。
+### 如何在应用之间共享数据
 
-### 开发文档有提供搜索功能吗
+请参考 [控制台指南](dashboard_guide.html#应用之间共享部分数据) 绑定 Class。
 
- **官网文档** 首页右上角就有搜索框。
-
-## API 相关
+## 数据存储常见问题
 
 ### API 调用次数有什么限制吗
 
-开发版提供每天三万次的免费额度。推送服务和统计服务免费使用，并不占用免费额度。
+开发版提供每天三万次的免费额度。
+推送服务免费使用，并不占用免费额度，推送消息接口的调用受频率限制，具体参考：[推送消息接口的限制](push_guide.html#推送消息接口) 文档。
 
-默认情况下，商用版应用同一时刻最多可使用的工作线程数为 60，即同一时刻最多可以同时处理 60 个数据请求。**我们会根据应用运行状况以及运维需要调整改值**。如果需要提高这一上限，请写信至 {{ include.supportEmail() }} 进行申请。
+默认情况下，商用版应用同一时刻最多可使用的工作线程数为 60，即同一时刻最多可以同时处理 60 个数据请求。**我们会根据应用运行状况以及运维需要调整改值**。如果需要提高这一上限，请 [提交工单](https://leanticket.cn/t/leancloud) 进行申请。
 
 ### API 调用次数的计算
 
@@ -144,26 +136,7 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 
 ### 如何获取 API 的访问日志
 
-进入 [控制台 > 存储 > 统计 > API 访问日志](/dashboard/storage.html?appid={{appid}}#/storage/stat/accesslog)，开启日志服务，稍后刷新页面，就可以看到从开启到当前时间产生的日志了。查看
-
-### 可以在线测试 API 吗
-
-请访问 [API 在线测试工具](/dashboard/apionline/index.html)。
-
-### Unauthorized 错误
-
-应用 API 授权失败，请检查是否初始化了 App Id 和 App Key。
-
-* 如何进行初始化，请查看 [SDK 安装指南](start.html)。
-* App Id 和 App Key 在应用的 **设置** 菜单里可以找到。
-
-### 错误信息代码和详细解释在哪里
-
-* [错误代码详解](./error_code.html)
-* iOS SDK：[AVConstants](/api-docs/iOS/docs/AVConstants.html)
-* Android SDK：[AVException](/api-docs/android/index.html)
-
-REST API 返回的错误信息跟 SDK 保持一致。
+进入 [控制台 > 存储 > 统计 > API 访问日志](/dashboard/storage.html?appid={{appid}}#/storage/stat/accesslog)，开启日志服务，稍后刷新页面，就可以看到从开启到当前时间产生的日志了。
 
 ### 其他语言调用 REST API 如何对参数进行编码
 
@@ -231,12 +204,6 @@ LeanCloud 数据存储的查询接口不支持这些函数，可以查询到客�
 1. 对老的数据做一次更新，查询出 key 不存在（whereDoesNotExist）的记录，再更新回去。
 2. 查询条件加上 or 查询，or key 不存在（whereDoesNotExist）。
 
-### 如何重命名 Class？
-
-LeanCloud 不支持重命名 Class。
-你可以新建一个 Class，利用[数据导入导出](rest_api.html#数据导出_API)功能从旧 Class 导出数据，然后导入到新 Class。
-导出导入期间不要往旧 Class 写数据，或者在旧 Class 和新 Class 双写数据，以避免数据不一致。
-
 ### 如何解决数据一致性或事务需求？
 
 LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数据一致性的特性，可以解决大部分的一致性需求：
@@ -248,31 +215,20 @@ LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数�
 - 在云引擎上还可以借助 [LeanCache](leancache_guide.html) 来实现自定义的 [排他锁](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/redlock.js)。
 
 关于这个话题我们还录制了一期公开课视频：[在 LeanCloud 上解决数据一致性问题](https://www.bilibili.com/video/av12823801/)，其中有对上面这些特性的详细介绍，和解决常见场景的实例教程（包括实现两阶段提交）。
+### 文件存储有 CDN 加速吗？
 
-## 控制台相关
+{{ data.cdn() }}
 
-### 如何导入或者导出数据？
+### 文件存储有大小限制吗？
 
-请参考《数据与安全》文档的 [导入数据](./dashboard_guide.html#本地数据导入_LeanCloud) 和 [导出数据](./dashboard_guide.html#云端数据导出到本地) 部分。
+没有。除了在浏览器里通过 JavaScript SDK 上传文件，或者通过我们网站直接上传文件，有 10 MB 的大小限制之外，其他 SDK 都没有限制。 JavaScript SDK 在 Node.js 环境中也没有大小限制。
 
+### 存储图片可以做缩略图等处理吗？
 
-### 如何在 App 邮件内完全使用自己的品牌
-
-请参考博文 [《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
-  
-### 创建唯一索引失败
-
-请确认想要创建索引的列没有已经存在的重复值。
-
-### 如何上传文件
-
-任何一个 Class 如果有 File 类型的列，就可以直接在 **数据** 管理平台中将文件上传到该列。如果没有，请自行创建列，类型指定为 File。
-
-### 如何在应用之间共享数据
-
-请参考[控制台指南](dashboard_guide.html#应用之间共享部分数据)绑定 Class。
-
-## iOS/macOS SDK
+可以。默认我们的 `AVFile` 类提供了缩略图获取方法，可以参见各个 SDK 的开发指南。如果要自己处理，可以通过获取 `AVFile` 的 `URL` 属性。
+{% if node!='qcloud' %}
+使用 [七牛图片处理 API](https://developer.qiniu.com/dora/manual/1279/basic-processing-images-imageview2) 执行处理，例如添加水印、裁剪等。
+{% endif %}
 
 ### iOS 项目打包后的大小
 
@@ -280,35 +236,24 @@ LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数�
 
 LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slices。发布过程中，non-ARM 的符号和没有参与连接的符号会被 strip 掉。因此，最终应用体积不会增加超过 10 MB，请放心使用。
 
-### 请求报错
-
-请参考请求返回的错误码 [详细说明](error_code.html)。
-
 ### 地理位置查询错误
 
 如果错误信息类似于 `can't find any special indices: 2d (needs index), 2dsphere (needs index), for 字段名`，就代表用于查询的字段没有建立 2D 索引，可以在 Class 管理的 **其他** 菜单里找到 **索引** 管理，点击进入，找到字段名称，选择并创建「2dsphere」索引类型。
 
 ![image](images/geopoint_faq.png)
 
-
-## Java SDK
-
-### 对 AVObject 对象使用 getDate("createdAt") 方法读取创建时间为什么会返回 null
+### Java SDK 对 AVObject 对象使用 getDate("createdAt") 方法读取创建时间为什么会返回 null
 
 请用 `AVObject` 的 `getCreatedAt` 方法；获取 `updatedAt` 用 `getUpdatedAt`。
 这两个方法会返回 Date 类型。
 如果希望返回字符串类型，可以使用 `getUpdatedAtString()` 和 `getCreatedAtString()`。
-
-### client.open() 操作为什么没有被调用？
-
-请检查 AndroidManifest.xml 配置，确认 receiver 和 service 写在了 application 标签里，并且与 activity 平级。它们与 activity 同为四大组件之一，需要写在一起。
 
 ### Android 设备每次启动时，installationId 为什么总会改变？如何才能不改变？
 可能有以下两种原因导致这种情况：
 * SDK 版本过旧，installationId 的生成逻辑在版本更迭中有修改。请更新至最新版本。
 * 代码混淆引起的，注意在 proguard 文件中添加 [LeanCloud SDK 的混淆排除](faq.html#代码混淆怎么做)。
 
-### 代码混淆怎么做
+### Android 代码混淆怎么做
 为了保证 SDK 在代码混淆后能正常运作，需要保证部分类和第三方库不被混淆，参考下列配置：
 
 ```
@@ -373,19 +318,17 @@ LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slice
 
 ```
 
-### 出现 already has one request sending 错误是什么原因
+### Java SDK 出现 already has one request sending 错误是什么原因
 
 日志中出现了 `com.avos.avoscloud.AVException: already has one request sending` 的错误信息，这说明存在对同一个 `AVObject` 实例对象同时进行了 2 次异步的 `save` 操作。为防止数据错乱，LeanCloud SDK 对于这种同一数据的并发写入做了限制，所以抛出了这个异常。
 
 需要检查代码，通过打印 log 和断点的方式来定位究竟是由哪一行 `save` 所引发的。
 
-## JavaScript SDK
-
-### 有没有同步 API
+### JavaScript SDK 有没有同步 API
 
 JavaScript SDK 由于平台的特殊性（运行在单线程运行的浏览器或者 Node.js 环境中），不提供同步 API，所有需要网络交互的 API 都需要以 callback 的形式调用。我们提供了 [Promise 模式](leanstorage_guide-js.html#Promise) 来减少 callback 嵌套过多的问题。
 
-### 在 AV.init 中用了 Master Key，但发出去的 AJAX 请求返回 206
+### JavaScript SDK 在 AV.init 中用了 Master Key，但发出去的 AJAX 请求返回 206
 目前 JavaScript SDK 在浏览器（而不是 Node）中工作时，是不会发送 Master Key 的，因为我们不鼓励在浏览器中使用 Master Key，Master Key 代表着对数据的最高权限，只应当在后端程序中使用。
 
 如果你的应用的确是内部应用（做好了相关的安全措施，外部访问不到），可以在 `AV.init`之后增加下面的代码来让 JavaScript SDK 发送 Master Key：
@@ -393,7 +336,7 @@ JavaScript SDK 由于平台的特殊性（运行在单线程运行的浏览器�
 AV.Cloud.useMasterKey(true);
 ```
 
-### Web 端会暴露 App Key 和 App Id，怎么保证安全性？
+### JavaScript SDK 会暴露 App Key 和 App Id，怎么保证安全性？
 首先请阅读「[安全总览](data_security.html)」来了解 LeanCloud 完整的安全体系。其中提到，可以使用「[安全域名](data_security.html#Web_应用安全设置) 」，在没有域名的情况下，可以使用「[ACL](acl-guide.html)」。
 理论上所有客户端都是不可信任的，所以需要在服务端对安全性进行设计。如果需要高级安全，可以使用 ACL 方式来管理，如果需要更高级的自定义方式，可以使用 [LeanEngine（云引擎）](leanengine_overview.html)。
 
@@ -407,8 +350,7 @@ AV.Cloud.useMasterKey(true);
 
 ### 要让单个群组消息进入「免打扰模式」，该如何做
 
-对于普通对话的新消息，LeanCloud 即时通讯服务有选项支持将消息以 Push Notification 的方式通知当前不在线的成员，但是有时候，这种推送会非常频繁对用户造成干扰。LeanCloud 提供选项，支持让单个用户关闭特定对话的离线消息推送。具体可以看相应平台的开发指南文档。
-
+对于普通对话的新消息，LeanCloud 即时通讯服务有选项支持将消息以 Push Notification 的方式通知当前不在线的成员，但是有时候，这种推送会非常频繁对用户造成干扰。LeanCloud 提供选项，支持让单个用户关闭特定对话的离线消息推送。具体可以参考 [消息免打扰](realtime-guide-senior.html#消息免打扰) 文档。
 
 ### 聊天好友关系如何实现
 
@@ -500,7 +442,7 @@ LeanCloud 云引擎提供了托管 Python 和 Node.js 运行的方式，开发�
 
 但是同一个设备的 deviceToken 只能成功发送一个环境。要么是正式环境，要么是测试环境。现象是给一个 deviceToken 推送，如果 dev 成功了，prod 就会报 invalid Tokens，不会在两个环境同时发送成功。
 
-### 有一些 iOS 设备收不到推送，到控制台查看推送记录，发现 invalidTokens的 数量大于0，是怎么回事？
+### 有一些 iOS 设备收不到推送，到控制台查看推送记录，发现 invalidTokens 的数量大于 0，是怎么回事？
 
 invalidTokens 的数量由以下两部分组成：
 * 选择的设备与选择的证书不匹配时，会增加 invalidTokens 的数量，例如使用开发证书给生产证书的设备推送。
@@ -517,24 +459,7 @@ invalidTokens 的数量由以下两部分组成：
 ### Android 应用进程被杀掉后无法收到推送消息
 iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系统之间还会存在连接，这条连接跟应用无关，所以无论应用是否被杀掉，消息都能发送到 APNs 再通过这条连接发送到设备。但对 Android 来说，如果是国内用户，因为众所周知的原因，Google 和设备之间的这条连接是无法使用的，所以应用只能自己去保持连接并在后台持续运行，一旦后台进程被杀掉，就无法收到推送消息了。虽然 LeanCloud SDK 已经采取了各种办法保持应用在后台运行，但随着 Android 系统版本的升级，权限控制越来越严，第三方推送通道的生命周期受到较大限制。因此 LeanCloud SDK 推出了混合推送的方案，对接国内主流厂商，保障了主流 Android 系统上的推送到达率。详见 [Android 混合推送开发指南](android_mixpush_guide.html)。
 
-## 文件
-
-### 文件存储有 CDN 加速吗？
-
-{{ data.cdn() }}
-
-### 文件存储有大小限制吗？
-
-没有。除了在浏览器里通过 JavaScript SDK 上传文件，或者通过我们网站直接上传文件，有 10 MB 的大小限制之外，其他 SDK 都没有限制。 JavaScript SDK 在 Node.js 环境中也没有大小限制。
-
-### 存储图片可以做缩略图等处理吗？
-
-可以。默认我们的 `AVFile` 类提供了缩略图获取方法，可以参见各个 SDK 的开发指南。如果要自己处理，可以通过获取 `AVFile` 的 `URL` 属性。
-{% if node!='qcloud' %}
-使用 [七牛图片处理 API](https://developer.qiniu.com/dora/manual/1279/basic-processing-images-imageview2) 执行处理，例如添加水印、裁剪等。
-{% endif %}
-
 {% if node != 'qcloud' and node != 'us' %}
-## 短信
+## 短信常见问题
 请参见 [短信收发常见问题一览](/docs/rest_sms_api.html#常见问题_FAQ)。
 {% endif %}

@@ -276,3 +276,23 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的。
 可以使用正确的谓词（例如 POST）避免此类重试。
+
+## 如何在本地调试依赖 LeanCache 的应用？
+
+见 [LeanCache 使用指南](leancache_guide.html#在本地调试依赖_LeanCache_的应用)。
+
+## 云引擎是否可以使用本地磁盘存储文件？
+
+见 [网站托管开发指南 · Node.js](leanengine_webhosting_guide-node.html#文件系统)。
+
+## 云引擎如何上传文件？
+
+见 [网站托管开发指南 · Node.js](leanengine_webhosting_guide-node.html#文件上传)。
+
+## 云引擎中如何处理用户登录和 Cookie？
+
+见 [网站托管开发指南 · Node.js](leanengine_webhosting_guide-node.html#用户状态管理)。
+
+## 定时器 crontab 表达式
+
+见 [云函数开发指南 · Node.js](leanengine_cloudfunction_guide-node.html#Cron_表达式)。
