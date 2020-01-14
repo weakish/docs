@@ -1781,11 +1781,9 @@ curl -X PUT \
 
 锁定将在最后一次错误登录的 15 分钟之后由云端自动解除，开发者无法通过 SDK 或 REST API 进行干预。在锁定期间，即使用户输入了正确的验证信息也不允许登录。这个限制在 SDK 和云引擎中都有效。
 
-{% if node != 'qcloud' and node != 'us' %}
 ### 使用手机号码注册或登录
 
 请参考 [短信服务 REST API 详解 &middot; 使用手机号码注册或登录](rest_sms_api.html#使用手机号码注册或登录)。
-{% endif %}
 
 ### 验证 Email
 
@@ -1825,15 +1823,13 @@ curl -X POST \
   https://{{host}}/1.1/requestPasswordReset
 ```
 
-如果成功的话，返回的值是一个 JSON 对象。
+如果成功的话，返回的值是一个空 JSON 对象（`{}`）。
 
 关于自定义邮件模板和验证链接请看这篇博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
 
-{% if node!='qcloud' %}
 ### 手机号码验证
 
 请参考 [短信服务 REST API 详解 - 用户账户与手机号码验证](rest_sms_api.html#用户账户与手机号码验证)。
-{% endif %}
 
 ### 获取用户
 
