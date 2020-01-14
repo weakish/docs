@@ -958,39 +958,3 @@ curl -X DELETE \
 每当用户打开应用，我们都会更新该设备的 `_Installation` 表中的 `updatedAt` 时间戳。如果用户长期没有更新 `_Installation` 表的 `updatedAt` 时间戳，也就意味着该用户长期没有打开过应用。当超过 90 天没有打开过应用时，我们会将这个用户在 `_Installation` 表中的记录删除。不过请不要担心，当用户再次打开应用的时候，仍然会自动创建一个新的 Installation 用于推送。
 
 对于 iOS 设备，除了上述过期机制外还多拥有一套过期机制。当我们根据 Apple 推送服务的反馈获取到某设备的 deviceToken 已过期时，我们也会将这个设备在 `_Installation` 表中的信息删除，并标记这个已过期的 deviceToken 为无效，丢弃后续所有发送到该 deviceToken 的消息。
-
-## 推送问题排查
-
-推送因为环节较多，跟设备和网络都相关，并且调用都是异步化，因此问题比较难以查找，这里提供一些有用助于排查消息推送问题的技巧。
-
-### 推送结果查询
-
-所有经过 `/push` 接口发出的消息的都可以在控制台的消息菜单里的推送记录看到。每次调用 `/push` 都将产生一条新的 推送记录表示一次推送。该表的各属性含义请参考 [Notification 表详解](#Notification) 。
-
-`/push` 接口会返回新建的推送记录的 `objectId`，你就可以在推送记录里根据 ID 查询消息推送的结果。
-
-### iOS 推送排查建议
-
-iOS 推送问题的一些排查建议：
-
-* 请确保在项目 Info.plist 文件中使用了正确的 **Bundle Identifier**。
-* 请确保在 **Project** > **Build Settings** 设置了正确的 **provisioning profile**。
-* 尝试 clean 项目并重启 Xcode
-* 尝试到 [Apple Developer](https://developer.apple.com/account/overview.action) 重新生成 **provisioning profile**，修改 Apple ID，再改回来，然后重新生成。你需要重新安装 provisioning profile，并在 **Project** > **Build Settings** 里重新设置。
-* 打开 XCode Organizer，从电脑和 iOS 设备里删除所有过期和不用的 provisioning profile。
-* 如果编译和运行都没有问题，但是你仍然收不到推送，请确保你的应用打开了接收推送权限，在 iOS 设备的 **设置** > **通知** > **你的应用** 里确认。
-* 如果权限也没有问题，请确保使用了正确的 **provisioning profile**。 打包你的应用。如果你上传了开发证书并使用开发证书推送，那么必须使用 **Development Provisioning Profile** 构建你的应用。如果你上传了生产证书，并且使用生产证书推送，请确保你的应用使用 **Distribution Provisioning Profile** 签名打包。**Ad Hoc** 和 **App Store Distribution Provisioning Profile** 都可以接收使用生产证书发送的消息。
-* 当在一个已经存在的 Apple ID 上启用推送，请记得重新生成 **provisioning profile**，并到 XCode Organizer 更新。
-* 生产环境的推送证书必须在提交到 App Store 之前启用推送并生成，否则你需要重新提交 App Store。
-* 请在提交 App Store 之前，使用 Ad Hoc Profile 测试生产环境推送，这种情况下的配置最接近于 App Store。
-* 检查消息菜单里的推送记录中的 `devices` 和 `status`，确认推送状态和接收设备数目正常。
-* 检查消息菜单里的推送记录中的 `invalidTokens` 字段，如果该数字异常大，可能证书选择错误，跟设备 build 的 provisioning profile 不匹配。
-
-### Android 排查建议
-
-Android 推送问题的一些建议和提示：
-
-* 请确保设备正确调用了 `AVInstallation` 保存了设备信息到 _Installation 表。
-* 可以在控制台的 **消息** > **推送** > **帮助** 根据 `installationId` 查询设备是否在线。
-* 请确保 `com.avos.avoscloud.PushService` 添加到 AndroidManifest.xml 文件中。
-* 如果使用自定义 Receiver，请确保在 AndroidManifest.xml 中声明你的 Receiver，并且保证 data 里的 action 一致。

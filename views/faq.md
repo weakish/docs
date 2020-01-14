@@ -75,7 +75,7 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 ### 如何重命名 Class？
 
 LeanCloud 不支持重命名 Class。
-你可以新建一个 Class，利用[数据导入导出](rest_api.html#数据导出_API)功能从旧 Class 导出数据，然后导入到新 Class。
+你可以新建一个 Class，利用 [数据导入导出](rest_api.html#数据导出_API) 功能从旧 Class 导出数据，然后导入到新 Class。
 导出导入期间不要往旧 Class 写数据，或者在旧 Class 和新 Class 双写数据，以避免数据不一致。
 
 ### 如何导入或者导出数据？
@@ -97,7 +97,7 @@ LeanCloud 不支持重命名 Class。
 
 ### 如何在应用之间共享数据
 
-请参考[控制台指南](dashboard_guide.html#应用之间共享部分数据)绑定 Class。
+请参考 [控制台指南](dashboard_guide.html#应用之间共享部分数据) 绑定 Class。
 
 ## 数据存储常见问题
 
