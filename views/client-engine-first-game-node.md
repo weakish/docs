@@ -240,7 +240,11 @@ return play.joinRoom(roomName);
 
 ```js
 import { AutomaticGameEvent, Game, watchRoomFull } from "@leancloud/client-engine";
-import { Event, Play, Room } from "@leancloud/play";
+import { Play, Room } from "@leancloud/play";
+
+enum Event {
+  Start = 10,
+};
 
 @watchRoomFull()
 export default class RPSGame extends Game {
@@ -255,12 +259,12 @@ export default class RPSGame extends Game {
     // 标记房间不再可加入
     this.masterClient.setRoomOpened(false);
     // 向客户端广播游戏开始事件
-    this.broadcast("game-start");
+    this.broadcast(Event.Start);
   }
 }
 ```
 
-在这段代码中，`watchRoomFull` 装饰器在人满时会使 `Game` 抛出 `AutomaticGameEvent.ROOM_FULL` 事件，在这个事件中我们选择调用自定义的 `start` 方法。在 `start` 方法中我们将房间关闭，然后向所有客户端广播游戏开始。
+在这段代码中，`watchRoomFull` 装饰器在人满时会使 `Game` 抛出 `AutomaticGameEvent.ROOM_FULL` 事件，在这个事件中我们选择调用自定义的 `start` 方法。在 `start` 方法中我们将房间打开，然后向所有客户端广播游戏开始。
 
 到了这一步，您可以启动当前 Client Engine 项目，启动客户端并开启两个客户端 Web 页面，在界面上点击「快速开始」，可以观察到第一个点击「快速开始」的界面显示出了日志：`xxxx 加入了房间`。
 
@@ -287,11 +291,14 @@ export default class RPSGame extends Game {
 这一部分代码是客户端的，**不需要您写在 Client Engine 中**，您可以在客户端项目中 `./src/components/Game.vue` 找到相关代码。
 
 ```js
+enum Event {
+  Start = 10,
+  Play = 11,
+};
 choices = ["✊", "✌️", "✋"];
 
 // 当用户选择时，我们把对应选项的 index 发送给服务端
-const PLAY_EVENT_ID = 1;
-play.sendEvent(PLAY_EVENT_ID, {index}, {receiverGroup: ReceiverGroup.MasterClient});
+play.sendEvent(Event.Play, {index}, {receiverGroup: ReceiverGroup.MasterClient});
 ```
 
 #### MasterClient 收到事件，转发事件给玩家 B
@@ -302,8 +309,8 @@ play.sendEvent(PLAY_EVENT_ID, {index}, {receiverGroup: ReceiverGroup.MasterClien
 protected start = async () => {
   ......
   // 接收自定义事件
-  this.masterClient.on(Event.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
-    if (eventId === "play") {
+  this.masterClient.on(PlayEvent.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
+    if (eventId === Event.Play) {
       // 收到其他玩家的事件，转发事件
       this.forwardToTheRests({ eventId, eventData, senderId }, (eventData) => {
         return {}
@@ -320,11 +327,11 @@ protected start = async () => {
 这部分代码是客户端的，**不需要您写在 Client Engine 中**，您可以在客户端项目中 `./src/components/Game.vue` 找到相关代码。
 
 ```js
-play.on(Event.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
+play.on(PlayEvent.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
   ......
   switch (eventId) {
     ......
-    case "play":
+    case Event.Play:
       this.log(`对手已选择`);
       break;
     .....
@@ -353,8 +360,8 @@ protected start = async () => {
   // [this.player[0] 的选择, this.player[1] 的选择]。当两个玩家都没有选择时，假定双方的选择都为 -1
   const choices = [-1, -1];
 
-  this.masterClient.on(Event.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
-    if (eventId === "play") {
+  this.masterClient.on(PlayEvent.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
+    if (eventId === Event.Play) {
       // 收到其他玩家的事件，转发事件
       ......
       // 存储当前玩家的选择
@@ -373,13 +380,19 @@ protected start = async () => {
 在上面这段代码中，我们构造了一个 Array 类型的 choice 来存储玩家的选择，当收到出拳事件时会将用户的选择存储起来，接下来我们判断两个玩家是不是都做出选择了，如果做出选择了则广播游戏结果，并广播游戏结束：
 
 ```js
+enum Event {
+  Start = 10,
+  Play = 11,
+  Over = 20,
+};
+......
 protected start = async () => {
   ......
   // [this.player[0] 的选择, this.player[1] 的选择]。当两个玩家都没有选择时，假定双方的选择都为 -1
   const choices = [-1, -1];
 
-  this.masterClient.on(Event.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
-    if (eventId === "play") {
+  this.masterClient.on(PlayEvent.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
+    if (eventId === Event.Play) {
       // 收到其他玩家的事件，转发事件
       ......
       // 存储当前玩家的选择
@@ -388,7 +401,7 @@ protected start = async () => {
       if (choices.every((choice) => choice > 0)) {
         // 两个玩家都已经做出选择，游戏结束,向客户端广播游戏结果
         const winner = this.getWinner(choices);
-        this.broadcast("game-over", {
+        this.broadcast(Event.Over, {
           choices,
           winnerId: winner ? winner.userId : null,
         });
