@@ -446,9 +446,9 @@ Eclipse 的导入与一般的 jar 导入无本质区别，因此不再赘述。
 {% if platform_name === "JavaScript" %}
 本指南按照应用的适用平台来介绍各自的安装与集成方式。
 
-|[<img src="images/platforms/html5.svg" width="120"/>](#Web)|[<img src="images/platforms/node-js.svg" width="120"/>](#Node.js)|[<img src="images/platforms/weapp.svg" width="120"/>](#微信小程序)|[<img src="images/platforms/weapp-game.svg" width="120"/>](#微信小游戏)|[<img src="images/platforms/cocos.png" width="120"/>](#CocosCreator)|[<img src="images/platforms/laya.png" width="120"/>](#LayaAir)|[<img src="images/platforms/egret.png" width="120"/>](#Egret（白鹭引擎）)|[<img src="images/platforms/react-native.svg" width="120"/>](#React-Native)|[<img src="images/platforms/electron.svg" width="120"/>](#Electron)|
+|[<img src="images/platforms/html5.svg" width="120"/>](#Web)|[<img src="images/platforms/node-js.svg" width="120"/>](#Node.js)|[<img src="images/platforms/weapp.svg" width="120"/>](#微信 / QQ 小程序)|[<img src="images/platforms/qq-app.svg" width="120"/>](#微信 / QQ 小程序)|[<img src="images/platforms/weapp-game.svg" width="120"/>](#微信 / QQ 小游戏)|[<img src="images/platforms/cocos.png" width="120"/>](#CocosCreator)|[<img src="images/platforms/laya.png" width="120"/>](#LayaAir)|[<img src="images/platforms/egret.png" width="120"/>](#Egret（白鹭引擎）)|[<img src="images/platforms/react-native.svg" width="120"/>](#React-Native)|[<img src="images/platforms/electron.svg" width="120"/>](#Electron)|
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|Web|Node.js|微信小程序|微信小游戏|CocosCreator|LayaAir|Egret|React Native|Electron|
+|Web|Node.js|微信小程序|QQ 小程序|微信 / QQ 小游戏|CocosCreator|LayaAir|Egret|React Native|Electron|
 
 ### Web
 
@@ -533,21 +533,23 @@ var { Realtime, TextMessage } = AV;
 
 Node.js 中 SDK 的安装与引用也是通过包管理工具 npm，请参考 [npm](#npm)。
 
-### 微信小程序
+### 微信 / QQ 小程序
+
+{{ docs.note('QQ 小程序兼容微信小程序的 API，因此两者使用同一个 SDK，安装与使用方法也是一样的。')}}
 
 #### 手动导入文件
 
 ##### 存储服务
 
-<a id="weapp" name="weapp"></a>前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-weapp-min.js`，移动到 `libs` 目录。如果需要使用 [LiveQuery](leanstorage_guide-js.html#livequery) 功能，需要下载 `av-live-query-weapp-min.js`。
+<a id="weapp" name="weapp"></a><a id="qq-app" name="qq-app"></a>前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-weapp-min.js`，移动到 `libs` 目录。如果需要使用 [LiveQuery](leanstorage_guide-js.html#livequery) 功能，需要下载 `av-live-query-weapp-min.js`。
 
 在 `app.js` 中使用 `const AV = require('./libs/av-weapp-min.js');` 获得 `AV` 的引用。在其他文件中使用时请将路径替换成对应的相对路径。 
 
 ##### 即时通讯服务
 
-前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `realtime.weapp.min.js`，移动到 `libs` 目录。
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `realtime-weapp.min.js`，移动到 `libs` 目录。
 
-在 `app.js` 中使用 `const { Realtime, TextMessage } = require('./libs/realtime.weapp.min.js');` 获得 `Realtime` 等 SDK 暴露成员的引用。在其他文件中使用时请将路径替换成对应的相对路径。
+在 `app.js` 中使用 `const { Realtime, TextMessage } = require('./libs/realtime-weapp.min.js');` 获得 `Realtime` 等 SDK 暴露成员的引用。在其他文件中使用时请将路径替换成对应的相对路径。
 
 #### WePY
 
@@ -571,11 +573,11 @@ import AV from 'leancloud-storage/dist/av-weapp.js';
 
 小程序插件引入 SDK 的方法与微信小程序一致。
 
-### 微信小游戏
+### 微信 / QQ 小游戏
 
-<a id="weapp-game" name="weapp-game"></a>微信小游戏手动导入 SDK 的步骤与微信小程序一致，请参考 [微信小程序 · 手动导入文件](#手动导入文件)。
+<a id="weapp-game" name="weapp-game"></a>小游戏手动导入 SDK 的步骤与小程序一致，请参考 [微信 / QQ 小程序 · 手动导入文件](#手动导入文件)。
 
-如果使用游戏引擎提供的开发工具开发微信小游戏，请参照对应的游戏引擎章节。
+如果使用游戏引擎提供的开发工具开发小游戏，请参照对应的游戏引擎章节。
 
 ### CocosCreator
 
@@ -583,7 +585,7 @@ import AV from 'leancloud-storage/dist/av-weapp.js';
 
 {{ docs.note("CocosCreator 项目默认没有 `package.json` 文件，可以在安装 SDK 前通过 `npm init -y` 命令创建。") }}
 
-如果你的 CocosCreator 项目需要发布为微信小游戏，需要在构建发布到小游戏之前修改 SDK 的引用路径：
+如果你的 CocosCreator 项目需要发布为微信或 QQ 小游戏，需要在构建发布到小游戏之前修改 SDK 的引用路径：
 
 ```diff
   // 存储服务 SDK 路径变更为
@@ -596,7 +598,7 @@ import AV from 'leancloud-storage/dist/av-weapp.js';
 
   // 即时通讯服务 SDK 路径变更为
 - var { Realtime } = require('leancloud-realtime');
-+ var { Realtime } = require('leancloud-realtime/dist/realtime.weapp.js');
++ var { Realtime } = require('leancloud-realtime/dist/realtime-weapp.js');
 ```
 
 请注意，此改动会导致其他平台的产出（包括浏览器与模拟器的预览功能）不能正常工作，因此应该只在构建发布到小游戏之前临时修改，并在发布之后修改回来。
@@ -609,7 +611,7 @@ import AV from 'leancloud-storage/dist/av-weapp.js';
 
 {{ docs.note("LayaAir 项目默认没有 `package.json` 文件，可以在安装 SDK 前通过 `npm init -y` 命令创建。") }}
 
-如果你的 LayaAir 项目需要发布为微信小游戏，需要在构建发布到小游戏之前修改 SDK 的引用路径：
+如果你的 LayaAir 项目需要发布为微信或 QQ 小游戏，需要在构建发布到小游戏之前修改 SDK 的引用路径：
 
 ```diff
   // 存储服务 SDK  路径变更为
@@ -622,7 +624,7 @@ import AV from 'leancloud-storage/dist/av-weapp.js';
 
   // 即时通讯服务 SDK 路径变更为
 - import { Realtime } from 'leancloud-realtime';
-+ import { Realtime } from 'leancloud-realtime/dist/realtime.weapp.js';
++ import { Realtime } from 'leancloud-realtime/dist/realtime-weapp.js';
 ```
 
 请注意，此改动会导致其他平台的产出（包括浏览器与模拟器的预览功能）不能正常工作，因此应该只在构建发布到小游戏之前临时修改，并在发布之后修改回来。
