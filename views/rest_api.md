@@ -1734,19 +1734,6 @@ https://{{host}}/1.1/login
 
 在 sessionToken 变化后，已有的登录如果调用到用户相关权限受限的 API，将返回 403 权限错误。
 
-### 已登录的用户信息
-
-用户成功注册或登录后，服务器会返回 sessionToken 并保存在本地，后续请求可以通过传递 sessionToken 来获取该用户信息（如访问权限等）。更多说明请参考 [存储 &middot; 设置当前用户](leanstorage_guide-js.html#设置当前用户)。
-
-```
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
-  https://{{host}}/1.1/users/me
-```
-返回的 JSON 数据与 [`/login`](#登录) 登录请求所返回的相同。
-
 ### 重置登录 sessionToken
 
 可以主动重置用户的 sessionToken：
@@ -1833,7 +1820,7 @@ curl -X POST \
 
 ### 获取用户
 
-你可以发送一个 GET 请求到 URL 以获取用户的账户信息，返回的内容就是当创建用户时返回的内容。比如，为了获取上面创建的用户:
+和[获取对象](#获取对象)类似，你可以发送一个 GET 请求到 URL 以获取用户的账户信息。比如，为了获取上面创建的用户:
 
 ```sh
 curl -X GET \
@@ -1842,19 +1829,18 @@ curl -X GET \
   https://{{host}}/1.1/users/55a47496e4b05001a7732c5f
 ```
 
-返回的 body 是一个 JSON 对象，包含所有用户提供的字段，除了密码以外，也包括了 createdAt、 updatedAt 和 objectId 字段.
+你还可以通过 sessionToken 获取用户信息。
+这种方法最常见的使用场景是用户成功注册或登录后，本地保存服务器返回的 sessionToken，后续使用 sessionToken 获取当前用户信息：
 
-```json
-{
-  "updatedAt":"2015-07-14T02:31:50.100Z",
-  "phone":"18612340000",
-  "objectId":"55a47496e4b05001a7732c5f",
-  "username":"hjiang",
-  "createdAt":"2015-07-14T02:31:50.100Z",
-  "emailVerified":false,
-  "mobilePhoneVerified":false
-}
 ```
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  https://{{host}}/1.1/users/me
+```
+
+返回的 JSON 数据与 [`/login`](#登录) 登录请求所返回的相同。
 
 用户不存在时返回 400 Bad Request 错误：
 
@@ -1869,7 +1855,7 @@ curl -X GET \
 
 在通常的情况下，没有人会允许别人来改动他们自己的数据。为了做好权限认证，确保只有用户自己可以修改个人数据，在更新用户信息的时候，必须在 HTTP 头部加入一个 `X-LC-Session` 项来请求更新，这个 session token 在注册和登录时会返回。
 
-为了改动一个用户已经有的数据，需要对这个用户的 URL 发送一个 PUT 请求。任何你没有指定的 key 都会保持不动，所以你可以只改动用户数据中的一部分。username 和 password 也是可以改动的，但是新的 username 不能和既有数据重复。
+为了改动一个用户已经有的数据，需要对这个用户的 URL 发送一个 PUT 请求。任何你没有指定的 key 都会保持不动，所以你可以只改动用户数据中的一部分。
 
 比如，如果我们想对 「hjiang」 的手机号码做出一些改动:
 
@@ -1891,9 +1877,9 @@ curl -X PUT \
 }
 ```
 
-### 安全地修改用户密码
+username 也可以改动，但是新的 username 不能和既有数据重复。
 
-修改密码，可以直接使用上面的`PUT /1.1/users/:objectId`的 API，但是很多开发者会希望让用户输入一次旧密码做一次认证，旧密码正确才可以修改为新密码，因此我们提供了一个单独的 API `PUT /1.1/users/:objectId/updatePassword` 来安全地更新密码：
+很多开发者会希望让用户输入一次旧密码做一次认证，旧密码正确才可以修改为新密码，因此我们提供了一个单独的 API `PUT /1.1/users/:objectId/updatePassword` 来安全地更新密码：
 
 ```sh
 curl -X PUT \
@@ -1909,7 +1895,6 @@ curl -X PUT \
 * **new_password**：用户的新密码
 
 注意：仍然需要传入 X-LC-Session，也就是登录用户才可以修改自己的密码。
-
 
 ### 查询
 
@@ -1958,7 +1943,7 @@ curl -X DELETE \
 
 ### 连接用户账户和第三方平台
 
-LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾讯微博，这样就允许你的用户直接用他们现有的账号 id 来注册或登录你的应用。在进行注册和登录时，需要附带上 `authData` 字段来提供你希望连接的服务的授权信息。一旦关联了某个服务，`authData` 将被存储到你的用户信息里。如需重新获取该内容，请参考 [获取 authData](#获取_authData)。
+LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾讯微博，这样就允许你的用户直接用他们现有的账号 id 来注册或登录你的应用。在进行注册和登录时，需要附带上 `authData` 字段来提供你希望连接的服务的授权信息。一旦关联了某个服务，`authData` 将被存储到你的用户信息里。
 
 `authData` 是一个普通的 JSON 对象，它所要求的 key 根据 service 不同而不同，具体要求见下面。每种情况下，你都需要自己负责完成整个授权过程(一般是通过 OAuth 协议，1.0 或者 2.0) 来获取授权信息，提供给连接 API。
 
@@ -2022,7 +2007,7 @@ LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾�
      {
        "uid": "在第三方平台上的唯一用户id字符串",
        "access_token": "在第三方平台的 access token",
-        ……其他可选属性
+       // ……其他可选属性
      }
   }
 ```
@@ -2036,7 +2021,7 @@ LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾�
 
 #### 注册和登录
 
-使用一个连接服务来注册用户并登录，同样使用 POST 请求 users，只是需要提供 `authData` 字段。例如，使用新浪微博账户注册或者登录用户：
+使用一个连接服务来注册用户并登录，同样使用 POST 请求 users，只是需要提供 `authData` 字段。例如，使用 QQ 账户注册或者登录用户：
 
 
 ```sh
@@ -2364,7 +2349,7 @@ Location: https://{{host}}/1.1/roles/55a483f0e4b05001a774b837
 
 ### 获取角色
 
-你可以同样通过发送一个 GET 请求到 Location header 中返回的 URL 来获取这个对象，比如我们想要获取上面创建的对象：
+类似获取对象，你可以通过发送一个 GET 请求到 Location header 中返回的 URL 来获取这个对象，比如我们想要获取上面创建的对象：
 
 ```sh
 curl -X GET \
