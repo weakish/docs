@@ -900,6 +900,10 @@ todo.fetchInBackground(keys).subscribe(new Observable<AVObject>() {
     public void onComplete() {}
 });
 ```
+
+如果想要确保只刷新已经保存到云端的对象，那么可以用 `fetchIfNeededInBackground` 替换 `fetchInBackground`。
+调用 `fetchIfNeededInBackground` 方法时，如果是本地构造尚未保存的对象，那么不会访问云端，onNext 方法中传入的是本地对象。
+
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
@@ -5197,6 +5201,59 @@ AVFile 也提供了清除缓存的方法：
 // 类方法, 清除所有缓存
 + (BOOL)clearAllPersistentCache;
 ```
+{% endif %}
+
+{% if platform_name === "Andorid / Java" %}
+### 下载文件
+
+可以调用 AVFile 的 `getDataInBackground` 或 `getDataStreamInBackground` 方法下载文件：
+
+```java
+avFile.getDataInBackground().subscribe(new Observer<byte[]>() {
+    @Override
+    public void onSubscribe(Disposable d) {}
+
+    @Override
+    public void onNext(byte[] bytes) {
+        Log.d("file data length: " + bytes.length);
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        Log.d("failed to get data. cause: " + e.getMessage());
+    }
+
+    @Override
+    public void onComplete() {}
+});
+
+avFile.getDataStreamInBackground().subscribe(new Observer<InputStream>() {
+    @Override
+    public void onSubscribe(Disposable d) {}
+
+    @Override
+    public void onNext(InputStream inputStream) {
+        try {
+            byte[] buffer = new byte[102400];
+            int read = inputStream.read(buffer);
+            Log.d("file data length: " + read);
+            inputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        Log.d("failed to get data. cause: " + e.getMessage());
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+除了使用 SDK 提供的方法外，也可以获取 AVFile 的 url 后调用标准库和第三方库下载文件。
 {% endif %}
 
 ### 删除文件
