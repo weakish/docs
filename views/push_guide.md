@@ -191,6 +191,8 @@ curl -X PUT \
 
 本接口用于根据提供的查询条件，给在 _Installation 表内所有符合查询条件的有效设备记录发推送消息。例如下面是给所有在 _Installation 表中 "channels" 字段包含 "public" 值的有效设备推送一条内容为 "Hello from LeanCloud" 的消息。
 
+请注意，本接口限制请求的 HTTP Body 大小必须小于 4096 个字符，即您调用本接口传递的所有参数做 JSON 序列化后得到的结果不能超过此限制。
+
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
@@ -207,7 +209,7 @@ curl -X POST \
 
 名称| 约束 | 描述
 ---|--- | ---
-data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容_Data)。请注意，整个 JSON 字符串不能超过 4096 个字符。
+data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容_Data)。
 where| 可选 | 检索 `_Installation` 表使用的查询条件，JSON 对象。如果查询条件内包含日期或二进制等需要做编码的特殊类型数据，查询条件内需要包含编码后的数据。如查询 `createdAt` 字段大于某个时间的设备，where 条件需要为 `{"createdAt":{"$gte":{"__type":"Date","iso":"2015-06-21T18:02:52.249Z"}}}`。更多信息请参看：[数据编码说明](./rest_api.html#数据类型)
 channels| 可选 | 推送给哪些频道，将作为条件加入 where 对象。
 expiration_interval| 可选 | 消息过期的相对时间，从调用 API 的时间开始算起，单位是秒。
@@ -245,7 +247,7 @@ curl -X POST \
 ---|--- | ---
 data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容_Data)。请注意，整个 JSON 字符串不能超过 4096 个字符。
 device_type | **必填** | 目标设备类型，目前只能为 android，ios，wp 三种。一次推送只能给一种类型的设备发推送。
-device_ids | **必填** | 目标设备 ID 列表。对于 iOS 设备来说，设备 ID 是 _Installation 表中的 deviceToken 字段；对于使用混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 registrationId 字段；对于非混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 installationId 字段；对于 Windows Phone 设备来说，设备 ID 是 _Installation 表中的 subscriptionUri 字段。
+device_ids | **必填** | 目标设备 ID 列表，最多包含 500 个 ID 。对于 iOS 设备来说，设备 ID 是 _Installation 表中的 deviceToken 字段；对于使用混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 registrationId 字段；对于非混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 installationId 字段；对于 Windows Phone 设备来说，设备 ID 是 _Installation 表中的 subscriptionUri 字段。
 expiration_interval| 可选 | 消息过期的相对时间，从调用 API 的时间开始算起，单位是秒。
 expiration_time| 可选 | 消息过期的绝对日期时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"
 notification_id | 可选 | 自定义推送 id，最长 16 个字符且只能由英文字母和数字组成，不提供该参数时我们会为每个推送请求随机分配一个唯一的推送 id，用于区分不同推送。我们会根据推送 id 来统计推送的目标设备数和最终消息到达数，并展示在 [推送记录](#Notification) 当中。用户自定义推送 id 可以将多个不同的请求并入同一个推送 id 下从而整体统计出这一批推送请求的目标设备数和最终消息到达数。
