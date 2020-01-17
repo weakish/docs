@@ -59,6 +59,11 @@
 lean -p 3002
 ```
 
+## 命令行工具初始化项目时报错 `please login first`，可是之前明明已经通过 `lean login` 成功登录了？
+
+如果通过 `lean login` 登录的账号名下没有 LeanCloud 应用，会碰到这一问题。
+需要创建一个应用再重新运行一下 `lean login`，之后就可以正常使用了。
+
 ## Application not found 错误
 
 访问云引擎服务时，服务端返回错误「Application not found」或在云引擎日志中出现同一错误。
