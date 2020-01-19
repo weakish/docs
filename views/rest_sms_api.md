@@ -286,7 +286,7 @@ curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
-  -d '{}' \
+  -d '{"mobilePhoneNumber":"186xxxxxxxx"}' \
   https://{{host}}/1.1/verifyMobilePhone/<code>
 ```
 
@@ -442,7 +442,7 @@ curl -X PUT \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
-  -d '{"password": "<新密码>"}' \
+  -d '{"password": "<新密码>", "mobilePhoneNumber": "186xxxxxxxx"}' \
   https://{{host}}/1.1/resetPasswordBySmsCode/收到的6位验证码
 ```
 
