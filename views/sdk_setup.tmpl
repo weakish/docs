@@ -234,9 +234,13 @@ composer require leancloud/leancloud-sdk
 
 - `leancloud-sdk` 依赖 PHP 的 curl 扩展（常见 Linux 系统下一般需要安装 `php-curl` 这个包）。
 - 如果 composer 访问 packagist 仓库有问题，需要 [设置镜像](https://mirrors.aliyun.com/composer/) 或者通过代理（设置 `http_proxy` 环境变量）访问。
+
 {% endif %}
+
 {% if platform_name === "Android / Java" %}
-可以用以下任意包管理工具来安装 SDK。
+
+我们已经将所有的 library 发布到了 maven 中心仓库，开发者可以用以下任意包管理工具来安装 SDK。
+
 #### 使用存储功能
 Maven：
 
@@ -347,6 +351,47 @@ implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
     implementation("org.ligboy.retrofit2:converter-fastjson-android:2.1.0") {
         exclude group: 'com.alibaba', module: 'fastjson' // 注意增加这一行
     }
+```
+
+#### 对 maven 源的特别说明
+
+我们发现有时候 Maven 源的 CDN 缓存同步策略出现问题，可能会导致我们某个版本或者该版本下某种格式的 library 文件无法下载，这时候你可以在配置文件中显式增加一个 Sonatype 的源，就可以解决找不到文件的问题。
+
+Maven pom.xml 的修改示例如下：
+```
+<repositories>
+    <repository>
+        <id>oss-sonatype</id>
+        <name>oss-sonatype</name>
+        <url>https://oss.sonatype.org/content/groups/public/</url>
+    </repository>
+</repositories>
+```
+
+Gradle build.gradle 的修改示例如下：
+```
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        // 增加下面的配置
+        maven {
+            url "https://oss.sonatype.org/content/groups/public/"
+        }
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        // 增加下面的配置
+        maven {
+            url "https://oss.sonatype.org/content/groups/public/"
+        }
+    }
+}
+
 ```
 
 {% endif %}
