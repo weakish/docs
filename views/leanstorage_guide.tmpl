@@ -7441,7 +7441,7 @@ user.logIn(authData: authData, platform: .weixin) { (result) in
 }
 ```
 
-云端会自动验证部分服务的 access token 的有效性以防止伪造请求。如果验证失败，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，你需要自己去验证 access token 的有效性。如果不希望云端自动验证 access token，可以在 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
+云端会自动验证部分服务的 access token 的有效性以防止伪造请求。如果验证失败，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，你需要自己去验证 access token 的有效性（通过 [onLogin hook 函数](leanengine_cloudfunction_guide-node.html#onLogin)）。如果不希望云端自动验证 access token，可以在 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
 
 {% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Swift" or platform_name === "Android / Java" %}
 #### 扩展需求
