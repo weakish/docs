@@ -5,11 +5,9 @@
 
 ## 自定义邮件验证页面
 
-### 基于云引擎托管的纯静态站点
+0. 从「控制台 > 设置 > 邮件模板 > 自定义邮件验证页面」下载 HTML 模板文件 `verify-template.html`。 
 
-1. 在使用命令行工具 [lean-cli](leanengine_cli.html) [初始化项目](leanengine_quickstart.html) 时选择 `Others > Static Site`，创建一个纯静态站点。
-
-2. 修改项目中的 `verify-template.html` 文件，将
+1. 修改项目中的 `verify-template.html` 文件，将
 
     ```js
     var url = "https://api.example.com/1.1/verifyEmail/";
@@ -17,18 +15,13 @@
 
     中的 `api.example.com` 替换为你的应用绑定的[自定义 API 域名](custom-api-domain-guide.html#API_域名)。
 
-3. （可选）可以视情况在页面加上应用名称、联系方式之类的 HTML 代码。
+2. （可选）可以视情况在页面加上应用名称、联系方式之类的 HTML 代码。
 
-4. 将 `verify-template.html` 重命名为 `verify.html` （可以根据需要使用其他的文件名称）。
+3. 将 `verify-template.html` 重命名为 `verify.html` （可以根据需要使用其他的文件名称）。
 
-5. 部署到云引擎生产环境（`lean deploy --prod 1`）。
+4. 使用命令行工具 [lean-cli](leanengine_cli.html) [初始化项目](leanengine_quickstart.html) 时选择 `Others > Static Site`，创建一个纯静态站点。在项目中加入 `verify.html` 文件，然后部署到云引擎生产环境（`lean deploy --prod 1`）。你也可以将 `verify.html` 部署到自己的服务器上，并配置相应的路由。
 
-6. 在「控制台 > 设置 > 邮件模板 > 自定义邮件验证页面」填写 url：`https://www.example.com/verify`，其中 `www.example.com` 是你的应用绑定的[自定义云引擎域名](custom-api-domain-guide.html#云引擎域名)。
-
-### 在其他服务器上托管
-
-如果您在云引擎上托管了动态站点，或者打算在托管于别处的网站上部署自定义邮件验证页面，那么可以从「控制台 > 设置 > 邮件模板 > 自定义邮件验证页面」下载 HTML  模板文件，并参照上一节第 2-4 步的说明修改模板文件中的代码。
-然后部署文件并配置站点的路由，最后参照上一节第 6 步的说明在控制台填写 url 即可。
+5. 在「控制台 > 设置 > 邮件模板 > 自定义邮件验证页面」填写 url：`https://www.example.com/verify`，其中 `www.example.com` 是你的应用绑定的[自定义云引擎域名](custom-api-domain-guide.html#云引擎域名)或者你自己的服务器使用的域名。
 
 ## 自定义重设密码页面
 
