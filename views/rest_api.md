@@ -2446,8 +2446,7 @@ curl -X PUT \
   https://{{host}}/1.1/roles/55a48351e4b05001a774a89f
 ```
 
-
-### 删除对象
+### 删除角色
 
 为了从 LeanCloud 上删除一个角色，只需要发送 DELETE 请求到它的 URL 就可以了。
 
@@ -2491,7 +2490,7 @@ curl -X DELETE \
 
 这样的关系类型通常在用户管理的内容类的 app 上比较常见，比如论坛。有一些少数的用户是「管理员」，有最高级的权限来调整程序的设置、创建新的论坛、设定全局的消息等等。
 
-另一类用户是「版主」，他们有责任保证用户生成的内容是合适的。任何有管理员权限的人都应该有版主的权利。为了建立这个关系，你应该把「Administartors」的角色设置为「Moderators」 的子角色，具体来说就是把 Administrators 这个角色加入 Moderators 对象的 roles 关系之中：
+另一类用户是「版主」，他们有责任保证用户生成的内容是合适的。任何有管理员权限的人都应该有版主的权利。为了建立这个关系，你应该把「Administrators」的角色设置为「Moderators」 的子角色，具体来说就是把 Administrators 这个角色加入 Moderators 对象的 roles 关系之中：
 
 ```sh
 curl -X PUT \
