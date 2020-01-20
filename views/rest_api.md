@@ -1471,6 +1471,17 @@ curl -X GET \
   https://{{host}}/1.1/classes/TestObject
 ```
 
+使用 `$size` 操作符来查找 key 值数组长度为 3 的对象：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'where={"arrayKey":{"$size": 3}}' \
+  https://{{host}}/1.1/classes/TestObject
+```
+
 ### 关系查询
 
 有几种方式来查询对象之间的关系数据。如果你想获取对象，而这个对象的一个字段对应了另一个对象，你可以用一个 `where` 查询，自己构造一个 Pointer，和其他数据类型一样。例如，每条微博都会有很多人评论，我们可以让每一个 Comment 将它对应的 Post 对象保存到 post 字段上，这样你可以取得一条微博下所有 Comment：

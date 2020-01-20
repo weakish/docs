@@ -2876,6 +2876,39 @@ query.whereKey("tags", .equalTo("工作"))
 ```
 {% endif %}
 
+下面的代码查询数组属性长度为 3 （正好包含 3 个标签）的对象：
+
+{% if platform_name === "Objective-C" %}
+```objc
+[query whereKey:@"tags" sizeEqualTo:3];
+```
+{% endif %}
+{% if platform_name === "JavaScript" %}
+```js
+query.sizeEqualTo('tags', 3);
+```
+{% endif %}
+{% if platform_name === "Python" %}
+```python
+query.size_equal_to('tags', 3)
+```
+{% endif %}
+{% if platform_name === "PHP" %}
+```php
+$query->sizeEqualTo("tags", 3);
+```
+{% endif %}
+{% if platform_name === "Android / Java" %}
+```java
+query.whereSizeEqual("tags", 3);
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+query.whereKey("tags", .equalToSize(3))
+```
+{% endif %}
+
 下面的代码查找所有数组属性 `tags` **同时包含** `工作`、`销售` 和 `会议` 的对象：
 
 {% if platform_name === "Objective-C" %}
