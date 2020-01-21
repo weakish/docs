@@ -2380,7 +2380,14 @@ curl -X POST \
   https://{{host}}/1.1/roles
 ```
 
-其返回值类似于：
+和创建对象类似，创建成功时，HTTP 返回 `201 Created`，`Location` header 包含了新的对象的 URL：
+
+```sh
+Status: 201 Created
+Location: https://{{host}}/1.1/roles/55a483f0e4b05001a774b837
+```
+
+返回值是一个 JSON 对象：
 
 ```json
 {
@@ -2427,12 +2434,12 @@ curl -X POST \
   https://{{host}}/1.1/roles
 ```
 
-当创建成功时，HTTP 返回是 **201 Created** 而 Location header 包含了新的对象的 URL：
-
-```sh
-Status: 201 Created
-Location: https://{{host}}/1.1/roles/55a483f0e4b05001a774b837
-```
+你也许注意到了，上面的代码里出现了一个新操作符 `AddRelation`。
+因为一些性能上的考量，Relation 的实现比较复杂。
+不过我们可以简单地把它看成 Pointer 数组。
+如果你是 LeanCloud 老用户，可能还记得曾经 Relation 是 LeanCloud 提供的重要的多对多抽象。
+后来因为考虑到 Relation 的用法比较复杂（特别是在考虑性能的情况下），我们废弃了 Relation，推荐大家改用中间表。
+但是在角色中还是用到了 Relation 这一概念。
 
 ### 获取角色
 
@@ -2465,6 +2472,18 @@ curl -X GET \
 ```
 
 注意 users 和 roles 关系无法在 JSON 中见到，你需要相应地用 `$relatedTo` 操作符来查询角色中的子角色和用户。
+
+```
+where={
+  "$relatedTo":{
+    "object":{
+      "__type":"Pointer",
+      "className":"_Role",
+      "objectId":"objectId of a role"
+  },
+  "key":"users"}
+}
+```
 
 ### 更新角色
 
@@ -2514,8 +2533,7 @@ curl -X PUT \
   https://{{host}}/1.1/roles/55a48351e4b05001a774a89f
 ```
 
-
-### 删除对象
+### 删除角色
 
 为了从 LeanCloud 上删除一个角色，只需要发送 DELETE 请求到它的 URL 就可以了。
 
@@ -2529,9 +2547,9 @@ curl -X DELETE \
   https://{{host}}/1.1/roles/55a483f0e4b05001a774b837
 ```
 
-### 安全性
+### 角色和 ACL
 
-当你通过 REST API key 访问 LeanCloud 的时候，访问同样可能被 ACL 所限制，就像 iOS 和 Android SDK 上一样。你仍然可以通过 REST API 来读和修改 ACL，只用通过访问「ACL」键就可以了。
+当你通过 REST API 访问 LeanCloud 的时候，访问和 SDK 一样可能被 ACL 所限制。你仍然可以通过 REST API 来读和修改 ACL，只用通过访问「ACL」键就可以了。
 
 除了用户级的权限设置以外，你可以通过设置角色级的权限来限制对 LeanCloud 对象的访问。取代了指定一个 objectId 带一个权限的方式，你可以设定一个角色的权限为它的名字在前面加上 `role:` 前缀作为 key。你可以同时使用用户级的权限和角色级的权限来提供精细的用户访问控制。
 
@@ -2551,15 +2569,15 @@ curl -X DELETE \
 }
 ```
 
-你不必为创建的用户和 Manager 指定读的权限，如果这个用户和 Manager 本身就是 Staff 的子角色和用户，因为它们都会继承授予 Staff 的权限。
+如果创建的用户和 Manager 本身就是 Staff 的子角色和用户，那么它们都会继承授予 Staff 的权限。
+所以我们上面没有显式地为创建者和 Manager 授予「读」权限。
 
-### 角色继承
-
-就像上面所说的一样，一个角色可以包含另一个，可以为 2 个角色建立一个「父子」关系。这个关系的结果就是任何被授予父角色的权限隐含地被授予子角色。
+就像我们之前提到的一样，一个角色可以包含另一个，可以为 2 个角色建立一个「父子」关系。
+这个关系的结果就是任何被授予父角色的权限隐含地被授予子角色。
 
 这样的关系类型通常在用户管理的内容类的 app 上比较常见，比如论坛。有一些少数的用户是「管理员」，有最高级的权限来调整程序的设置、创建新的论坛、设定全局的消息等等。
 
-另一类用户是「版主」，他们有责任保证用户生成的内容是合适的。任何有管理员权限的人都应该有版主的权利。为了建立这个关系，你应该把「Administartors」的角色设置为「Moderators」 的子角色，具体来说就是把 Administrators 这个角色加入 Moderators 对象的 roles 关系之中：
+另一类用户是「版主」，他们有责任保证用户生成的内容是合适的。任何有管理员权限的人都应该有版主的权利。为了建立这个关系，你应该把「Administrators」的角色设置为「Moderators」 的子角色，具体来说就是把 Administrators 这个角色加入 Moderators 对象的 roles 关系之中：
 
 ```sh
 curl -X PUT \
