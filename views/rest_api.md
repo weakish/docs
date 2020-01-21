@@ -1563,6 +1563,82 @@ curl -X GET \
 
 如果你要构建一个查询，这个查询要 include 多个类，此时用逗号分隔列表即可。
 
+### 地理查询
+
+之前我们简要介绍过 GeoPoint。
+目前 GeoPoint 有一个限制：每一个 AVObject 类只能包含一个 AVGeoPoint 对象的键值。
+另外，Points 不应该等于或者超出它的界. 纬度不应该是 -90.0 或者 90.0，经度不应该是 -180.0 或者 180.0。试图在 GeoPoint 上使用超出范围内的经度和纬度会导致问题。
+
+假如在发布微博的时候，我们也支持用户加上当时的位置信息（新增一个 `location` 字段），如果想看看指定的地点附近发生的事情，可以通过 GeoPoint 数据类型加上在查询中使用 `$nearSphere` 做到。获取离当前用户最近的 10 条微博应该看起来像下面这个样子:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'limit=10' \
+  --data-urlencode 'where={
+        "location": {
+          "$nearSphere": {
+            "__type": "GeoPoint",
+            "latitude": 39.9,
+            "longitude": 116.4
+          }
+        }
+      }' \
+  https://{{host}}/1.1/classes/Post
+```
+
+这会按照距离纬度 39.9、经度 116.4（当前用户所在位置）的远近排序返回一系列结果，第一个就是最近的对象。(注意：**如果指定了 order 参数的话，它会覆盖按距离排序。**）
+
+为了限定搜索的最大距离，需要加入 `$maxDistanceInMiles` 和 `$maxDistanceInKilometers`或者 `$maxDistanceInRadians` 参数来限定。比如要找的半径在 10 英里内的话：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'where={
+        "location": {
+          "$nearSphere": {
+            "__type": "GeoPoint",
+            "latitude": 39.9,
+            "longitude": 116.4
+          },
+          "$maxDistanceInMiles": 10.0
+        }
+      }' \
+  https://{{host}}/1.1/classes/Post
+```
+
+同样做查询寻找在一个特定的范围里面的对象也是可以的，为了找到在一个矩形的区域里的对象，按下面的格式加入一个约束 `{"$within": {"$box": [southwestGeoPoint, northeastGeoPoint]}}`。
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'where={
+        "location": {
+          "$within": {
+            "$box": [
+              {
+                "__type": "GeoPoint",
+                "latitude": 39.97,
+                "longitude": 116.33
+              },
+              {
+                "__type": "GeoPoint",
+                "latitude": 39.99,
+                "longitude": 116.37
+              }
+            ]
+          }
+        }
+      }' \
+  https://{{host}}/1.1/classes/Post
+```
+
 ### 对象计数
 
 如果你在使用 `limit`，或者如果返回的结果很多，你可能想要知道到底有多少对象应该返回，而不用把它们全部获得以后再计数，此时你可以使用 `count` 参数。举个例子，如果你仅仅是关心一个某个用户发布了多少条微博：
@@ -2780,84 +2856,7 @@ curl -X GET \
 
 请查看我们的 [云引擎 REST API 使用指南](leanengine-rest-api.html)。
 
-## 地理查询
 
-假如在发布微博的时候，我们也支持用户加上当时的位置信息（新增一个 `location` 字段），如果想看看指定的地点附近发生的事情，可以通过 GeoPoint 数据类型加上在查询中使用 `$nearSphere` 做到。获取离当前用户最近的 10 条微博应该看起来像下面这个样子:
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -G \
-  --data-urlencode 'limit=10' \
-  --data-urlencode 'where={
-        "location": {
-          "$nearSphere": {
-            "__type": "GeoPoint",
-            "latitude": 39.9,
-            "longitude": 116.4
-          }
-        }
-      }' \
-  https://{{host}}/1.1/classes/Post
-```
-
-这会按照距离纬度 39.9、经度 116.4（当前用户所在位置）的远近排序返回一系列结果，第一个就是最近的对象。(注意：**如果指定了 order 参数的话，它会覆盖按距离排序。**）
-
-为了限定搜索的最大距离，需要加入 `$maxDistanceInMiles` 和 `$maxDistanceInKilometers`或者 `$maxDistanceInRadians` 参数来限定。比如要找的半径在 10 英里内的话：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -G \
-  --data-urlencode 'where={
-        "location": {
-          "$nearSphere": {
-            "__type": "GeoPoint",
-            "latitude": 39.9,
-            "longitude": 116.4
-          },
-          "$maxDistanceInMiles": 10.0
-        }
-      }' \
-  https://{{host}}/1.1/classes/Post
-```
-
-同样做查询寻找在一个特定的范围里面的对象也是可以的，为了找到在一个矩形的区域里的对象，按下面的格式加入一个约束 `{"$within": {"$box": [southwestGeoPoint, northeastGeoPoint]}}`。
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -G \
-  --data-urlencode 'where={
-        "location": {
-          "$within": {
-            "$box": [
-              {
-                "__type": "GeoPoint",
-                "latitude": 39.97,
-                "longitude": 116.33
-              },
-              {
-                "__type": "GeoPoint",
-                "latitude": 39.99,
-                "longitude": 116.37
-              }
-            ]
-          }
-        }
-      }' \
-  https://{{host}}/1.1/classes/Post
-```
-
-### 警告
-
-这是有一些问题是值得留心的:
-
-1. 每一个 AVObject 类只能包含一个 AVGeoPoint 对象的键值。
-2. Points 不应该等于或者超出它的界. 纬度不应该是 -90.0 或者 90.0，经度不应该是 -180.0 或者 180.0。试图在 GeoPoint 上使用超出范围内的经度和纬度会导致问题.
 
 ## 用户反馈组件 API
 
