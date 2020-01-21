@@ -6856,7 +6856,7 @@ _ = LCUser.requestPasswordReset(email: "tom@leancloud.rocks") { (result) in
 上面的代码会查询 `_User` 表中是否有对象的 `email` 属性与前面提供的邮箱匹配。如果有的话，则向该邮箱发送一封密码重置邮件。之前提到过，应用可以让 `username` 与 `email` 保持一致，也可以单独收集用户的邮箱并将其存为 `email`。
 
 {% call docs.noteWrap() %}
-密码重置邮件的内容可在应用的 [控制台 > 设置 > 邮件模版](/dashboard/app.html?appid={{appid}}#/email) 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考 [自定义应用内用户重设密码和邮箱验证页面](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
+密码重置邮件的内容可在应用的 [控制台 > 设置 > 邮件模版](/dashboard/app.html?appid={{appid}}#/email) 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考 [自定义邮件验证和重设密码页面](custom-reset-verify-page.html)。
 {% endcall %}
 
 {% if node !== "qcloud" %}

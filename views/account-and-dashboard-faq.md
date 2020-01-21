@@ -83,7 +83,7 @@ LeanCloud 不支持重命名 Class。
 
 ### 如何在 App 邮件内完全使用自己的品牌
 
-请参考博文 [《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
+请参考 [自定义邮件验证和重设密码页面](custom-reset-verify-page.html)。
   
 ### 创建唯一索引失败
 

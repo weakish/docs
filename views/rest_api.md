@@ -1869,7 +1869,7 @@ emailVerified 字段有 3 种状态可以参考：
 2. **false**：User 对象最后一次被更新的时候，用户并没有确认过他的 email 地址。如果你看到 emailVerified 为 false 的话，你可以考虑刷新 User 对象或者再次请求验证用户邮箱。
 3. **null**：User对象在 email 验证没有打开的时候就已经创建了，或者 User 没有 email。
 
-关于自定义邮件模板和验证链接请看博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
+关于自定义邮件模板和验证链接请看[自定义邮件验证和重设密码页面](custom-reset-verify-page.html)。
 
 ### 请求验证 Email
 
@@ -1899,7 +1899,7 @@ curl -X POST \
 
 如果成功的话，返回的值是一个空 JSON 对象（`{}`）。
 
-关于自定义邮件模板和验证链接请看这篇博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
+关于自定义邮件模板和验证链接请看[自定义邮件验证和重设密码页面](custom-reset-verify-page.html)。
 
 ### 手机号码验证
 

@@ -1309,7 +1309,7 @@ await AVUser.RequestPasswordResetAsync("myemail@example.com");
 3. 用户点击重置密码链接后，一个特殊的页面会打开，让他们输入新密码；
 4. 用户的密码已被重置为新输入的密码。
 
-关于自定义邮件模板和验证链接，请参考《[自定义应用内用户重设密码和邮箱验证页面](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)》。
+关于自定义邮件模板和验证链接，请参考[自定义邮件验证和重设密码页面](custom-reset-verify-page.html)。
 
 #### 手机号码重置密码
 用户需要先绑定手机号码才能使用这个功能。首先获取短信验证码：
