@@ -56,7 +56,7 @@
 
 ## 推送
 
-* 我们提供 iOS、Android 和 Windows Phone 平台的消息推送服务，请参考各 SDK 开发指南和 [消息推送开发指南](push_guide.html)。
+* 我们提供 iOS、Android 平台的消息推送服务，请参考各 SDK 开发指南和 [消息推送开发指南](push_guide.html)。
 * 你可以为 AVInstallation 添加自定义的业务属性，也可以使用频道订阅功能，来实现各种复杂推送。
 * iOS 推送必须在应用设置的 **推送设置** 里上传推送证书，证书生成参考 [iOS 推送证书设置指南](ios_push_cert.html)。
 * 可以通过 AVAnalytics 的 `trackAppOpened` 方法跟踪推送消息的应用打开情况。
