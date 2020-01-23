@@ -1245,7 +1245,7 @@ tom.open(new AVIMClientCallback(){
 // 暂不支持
 ```
 
-设置静音之后，iOS、Windows Phone 及启用混合推送的 Android 用户就不会收到推送消息了。与之对应的就是取消静音的操作（`Conversation#unmute` 方法），即取消免打扰模式。
+设置静音之后，iOS 及启用混合推送的 Android 用户就不会收到推送消息了。与之对应的就是取消静音的操作（`Conversation#unmute` 方法），即取消免打扰模式。
 
 > 使用建议：
 >
