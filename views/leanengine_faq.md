@@ -59,6 +59,11 @@
 lean -p 3002
 ```
 
+## 命令行工具初始化项目时报错 `please login first`，可是之前明明已经通过 `lean login` 成功登录了？
+
+如果通过 `lean login` 登录的账号名下没有 LeanCloud 应用，会碰到这一问题。
+需要创建一个应用再重新运行一下 `lean login`，之后就可以正常使用了。
+
 ## Application not found 错误
 
 访问云引擎服务时，服务端返回错误「Application not found」或在云引擎日志中出现同一错误。
@@ -250,6 +255,10 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 同一环境（预备/生产）下有多个实例时，云引擎会同时在所有实例上部署项目。如因偶然因素部分实例部署不成功，会在几分钟后自动尝试再次部署，无需手动重新部署。
 
+## 云引擎实例部署后控制台多次显示「部署中」是怎么回事？
+
+控制台显示的「部署中」状态泛指所有运维操作，例如唤醒休眠实例、服务器偶发故障引起的重新部署，不只是用户主动进行的部署。
+
 ## 云引擎的健康检查是什么？
 
 云引擎的管理系统会每隔几分钟检查所有实例的工作状态（通过 HTTP 检查，详见 [网站托管开发指南：健康监测](leanengine_webhosting_guide-node.html#健康监测)），如果实例无法正确响应的话，管理系统会触发一次重新部署，并在控制台上打印类似下面的日志：
@@ -276,3 +285,23 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的。
 可以使用正确的谓词（例如 POST）避免此类重试。
+
+## 如何在本地调试依赖 LeanCache 的应用？
+
+见 [LeanCache 使用指南](leancache_guide.html#在本地调试依赖_LeanCache_的应用)。
+
+## 云引擎是否可以使用本地磁盘存储文件？
+
+见 [网站托管开发指南 · Node.js](leanengine_webhosting_guide-node.html#文件系统)。
+
+## 云引擎如何上传文件？
+
+见 [网站托管开发指南 · Node.js](leanengine_webhosting_guide-node.html#文件上传)。
+
+## 云引擎中如何处理用户登录和 Cookie？
+
+见 [网站托管开发指南 · Node.js](leanengine_webhosting_guide-node.html#用户状态管理)。
+
+## 定时器 crontab 表达式
+
+见 [云函数开发指南 · Node.js](leanengine_cloudfunction_guide-node.html#Cron_表达式)。

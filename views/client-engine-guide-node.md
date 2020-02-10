@@ -58,9 +58,6 @@ const gameManager = new SampleGameManager(
   APP_KEY,
   {
     concurrency: 2,
-    // 如果要使用其他节点，暂时需要手动指定，该参数会在今后移除。
-    // 需要先 import { Region } from "@leancloud/play";
-    // region: Region.NorthChina,
   },
 );
 ```
@@ -263,8 +260,11 @@ export default class SampleGame extends Game {
 当房间的人数满足[设置房间内玩家数量](#设置房间内玩家数量)的人满逻辑时，`watchRoomFull` 装饰器会让您收到 Game 抛出的 `AutomaticGameEvent.ROOM_FULL` 事件，您可以在这个事件中撰写相应的游戏逻辑，例如关闭房间，向客户端广播游戏开始：
 
 ```js
-
 import { AutomaticGameEvent, Game, watchRoomFull } from "@leancloud/client-engine";
+
+enum Event {
+  GameStart = 15,
+};
 
 @watchRoomFull()
 export default class SampleGame extends Game {
@@ -279,7 +279,7 @@ export default class SampleGame extends Game {
     // 标记房间不再可加入
     this.masterClient.setRoomOpened(false);
     // 向客户端广播游戏开始事件
-    this.broadcast("game-start");
+    this.broadcast(Event.GameStart);
   }
 }
 ```
@@ -288,15 +288,20 @@ export default class SampleGame extends Game {
 在[房间人满事件](#房间人满事件)中，`Game` 向房间内所有成员广播了游戏开始：
 
 ```js
-this.broadcast("game-start");
+enum Event {
+  GameStart = 15,
+};
+this.broadcast(Event.GameStart);
 ```
 
 在广播事件时您还可以带有一些数据：
 
 ```js
+enum Event {
+  GameStart = 15,
+};
 const gameData = {someGameData};
-//  'gameStart' 是自定义事件的名称
-this.broadcast('game-start', gameData);
+this.broadcast(Event.GameStart, gameData);
 ```
 
 此时客户端的[接收自定义事件](multiplayer-guide-js.html#接收自定义事件)方法会被触发，如果发现是 `game-start` 事件，客户端可以在 UI 上展示对战开始。
@@ -305,13 +310,16 @@ this.broadcast('game-start', gameData);
 MasterClient 可以转发某个客户端发来的事件给其他客户端，在转发时还可以处理数据：
 
 ```js
+enum Event {
+  SomeEvent = 15,
+};
 this.forwardToTheRests(event, (eventData) => {
   // 准备要转发的数据
   const actUserId = event.senderId;
   const result = {actUserId};
   return result;
-  // `someOneAct` 是自定义事件的名称
-}, 'someOneAct')
+  // Event.SomeEvent 是自定义事件的 ID，如果省略则使用原 event 事件的 ID
+}, Event.SomeEvent)
 ```
 在这个代码中，`event` 参数是某个客户端发来的原始事件，`eventData` 是原始事件的数据，您可以在转发事件给其他客户端时处理该数据，例如抹去或增加一些信息。MasterClient 发送该事件后，客户端的[接收自定义事件](multiplayer-guide-js.html#接收自定义事件)会被触发。
 

@@ -1149,19 +1149,26 @@ curl -X GET \
 ```
 
 指向用户对象的 Pointer 的 className 为 `_User`，前面加一个下划线表示开发者不能定义的类名，而且所指的类是 LeanCloud 平台内置的。
+类似地，指向角色和 Installation 的 Pointer 的 className 为 `_Role` 和 `_Installation`。
 
-**Relation** 类型被用在多对多的类型上，移动端使用 AVRelation 作为值，它有一个 className 字段表示目标对象的类名。
-
-{{ data.relationDeprecated() }}
+然而，关联文件（可以看成指向文件的 Pointer）采用不同于 Pointer 的编码形式：
 
 ```json
 {
-  "__type": "Relation",
-  "className": "Post"
+  "id": "543cbaede4b07db196f50f3c",
+  "__type": "File"
 }
 ```
 
-在进行查询时，Relation 对象的行为很像是 Pointer 的数组，任何针对于 pointer 数组的操作（`include` 除外）都可以对 Relation 起作用。
+**GeoPoint** 包含地理位置的经纬度：
+
+```json
+{
+  "__type": "GeoPoint",
+  "latitude": 39.9,
+  "longitude": 116.4
+}
+```
 
 当更多的数据类型被加入的时候，它们都会采用 hashmap 加上一个 `__type` 字段的形式，所以你不应该使用 `__type` 作为你自己的 JSON 对象的 key。
 
@@ -1464,6 +1471,17 @@ curl -X GET \
   https://{{host}}/1.1/classes/TestObject
 ```
 
+使用 `$size` 操作符来查找 key 值数组长度为 3 的对象：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'where={"arrayKey":{"$size": 3}}' \
+  https://{{host}}/1.1/classes/TestObject
+```
+
 ### 关系查询
 
 有几种方式来查询对象之间的关系数据。如果你想获取对象，而这个对象的一个字段对应了另一个对象，你可以用一个 `where` 查询，自己构造一个 Pointer，和其他数据类型一样。例如，每条微博都会有很多人评论，我们可以让每一个 Comment 将它对应的 Post 对象保存到 post 字段上，这样你可以取得一条微博下所有 Comment：
@@ -1555,6 +1573,82 @@ curl -X GET \
 ```
 
 如果你要构建一个查询，这个查询要 include 多个类，此时用逗号分隔列表即可。
+
+### 地理查询
+
+之前我们简要介绍过 GeoPoint。
+目前 GeoPoint 有一个限制：每一个 AVObject 类只能包含一个 AVGeoPoint 对象的键值。
+另外，Points 不应该等于或者超出它的界. 纬度不应该是 -90.0 或者 90.0，经度不应该是 -180.0 或者 180.0。试图在 GeoPoint 上使用超出范围内的经度和纬度会导致问题。
+
+假如在发布微博的时候，我们也支持用户加上当时的位置信息（新增一个 `location` 字段），如果想看看指定的地点附近发生的事情，可以通过 GeoPoint 数据类型加上在查询中使用 `$nearSphere` 做到。获取离当前用户最近的 10 条微博应该看起来像下面这个样子:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'limit=10' \
+  --data-urlencode 'where={
+        "location": {
+          "$nearSphere": {
+            "__type": "GeoPoint",
+            "latitude": 39.9,
+            "longitude": 116.4
+          }
+        }
+      }' \
+  https://{{host}}/1.1/classes/Post
+```
+
+这会按照距离纬度 39.9、经度 116.4（当前用户所在位置）的远近排序返回一系列结果，第一个就是最近的对象。(注意：**如果指定了 order 参数的话，它会覆盖按距离排序。**）
+
+为了限定搜索的最大距离，需要加入 `$maxDistanceInMiles` 和 `$maxDistanceInKilometers`或者 `$maxDistanceInRadians` 参数来限定。比如要找的半径在 10 英里内的话：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'where={
+        "location": {
+          "$nearSphere": {
+            "__type": "GeoPoint",
+            "latitude": 39.9,
+            "longitude": 116.4
+          },
+          "$maxDistanceInMiles": 10.0
+        }
+      }' \
+  https://{{host}}/1.1/classes/Post
+```
+
+同样做查询寻找在一个特定的范围里面的对象也是可以的，为了找到在一个矩形的区域里的对象，按下面的格式加入一个约束 `{"$within": {"$box": [southwestGeoPoint, northeastGeoPoint]}}`。
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'where={
+        "location": {
+          "$within": {
+            "$box": [
+              {
+                "__type": "GeoPoint",
+                "latitude": 39.97,
+                "longitude": 116.33
+              },
+              {
+                "__type": "GeoPoint",
+                "latitude": 39.99,
+                "longitude": 116.37
+              }
+            ]
+          }
+        }
+      }' \
+  https://{{host}}/1.1/classes/Post
+```
 
 ### 对象计数
 
@@ -1727,19 +1821,6 @@ https://{{host}}/1.1/login
 
 在 sessionToken 变化后，已有的登录如果调用到用户相关权限受限的 API，将返回 403 权限错误。
 
-### 已登录的用户信息
-
-用户成功注册或登录后，服务器会返回 sessionToken 并保存在本地，后续请求可以通过传递 sessionToken 来获取该用户信息（如访问权限等）。更多说明请参考 [存储 &middot; 设置当前用户](leanstorage_guide-js.html#设置当前用户)。
-
-```
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
-  https://{{host}}/1.1/users/me
-```
-返回的 JSON 数据与 [`/login`](#登录) 登录请求所返回的相同。
-
 ### 重置登录 sessionToken
 
 可以主动重置用户的 sessionToken：
@@ -1774,11 +1855,9 @@ curl -X PUT \
 
 锁定将在最后一次错误登录的 15 分钟之后由云端自动解除，开发者无法通过 SDK 或 REST API 进行干预。在锁定期间，即使用户输入了正确的验证信息也不允许登录。这个限制在 SDK 和云引擎中都有效。
 
-{% if node != 'qcloud' and node != 'us' %}
 ### 使用手机号码注册或登录
 
 请参考 [短信服务 REST API 详解 &middot; 使用手机号码注册或登录](rest_sms_api.html#使用手机号码注册或登录)。
-{% endif %}
 
 ### 验证 Email
 
@@ -1790,7 +1869,7 @@ emailVerified 字段有 3 种状态可以参考：
 2. **false**：User 对象最后一次被更新的时候，用户并没有确认过他的 email 地址。如果你看到 emailVerified 为 false 的话，你可以考虑刷新 User 对象或者再次请求验证用户邮箱。
 3. **null**：User对象在 email 验证没有打开的时候就已经创建了，或者 User 没有 email。
 
-关于自定义邮件模板和验证链接请看博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
+关于自定义邮件模板和验证链接请看[自定义邮件验证和重设密码页面](custom-reset-verify-page.html)。
 
 ### 请求验证 Email
 
@@ -1818,19 +1897,17 @@ curl -X POST \
   https://{{host}}/1.1/requestPasswordReset
 ```
 
-如果成功的话，返回的值是一个 JSON 对象。
+如果成功的话，返回的值是一个空 JSON 对象（`{}`）。
 
-关于自定义邮件模板和验证链接请看这篇博客文章[《自定义应用内用户重设密码和邮箱验证页面》](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
+关于自定义邮件模板和验证链接请看[自定义邮件验证和重设密码页面](custom-reset-verify-page.html)。
 
-{% if node!='qcloud' %}
 ### 手机号码验证
 
 请参考 [短信服务 REST API 详解 - 用户账户与手机号码验证](rest_sms_api.html#用户账户与手机号码验证)。
-{% endif %}
 
 ### 获取用户
 
-你可以发送一个 GET 请求到 URL 以获取用户的账户信息，返回的内容就是当创建用户时返回的内容。比如，为了获取上面创建的用户:
+和[获取对象](#获取对象)类似，你可以发送一个 GET 请求到 URL 以获取用户的账户信息。比如，为了获取上面创建的用户:
 
 ```sh
 curl -X GET \
@@ -1839,19 +1916,18 @@ curl -X GET \
   https://{{host}}/1.1/users/55a47496e4b05001a7732c5f
 ```
 
-返回的 body 是一个 JSON 对象，包含所有用户提供的字段，除了密码以外，也包括了 createdAt、 updatedAt 和 objectId 字段.
+你还可以通过 sessionToken 获取用户信息。
+这种方法最常见的使用场景是用户成功注册或登录后，本地保存服务器返回的 sessionToken，后续使用 sessionToken 获取当前用户信息：
 
-```json
-{
-  "updatedAt":"2015-07-14T02:31:50.100Z",
-  "phone":"18612340000",
-  "objectId":"55a47496e4b05001a7732c5f",
-  "username":"hjiang",
-  "createdAt":"2015-07-14T02:31:50.100Z",
-  "emailVerified":false,
-  "mobilePhoneVerified":false
-}
 ```
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  https://{{host}}/1.1/users/me
+```
+
+返回的 JSON 数据与 [`/login`](#登录) 登录请求所返回的相同。
 
 用户不存在时返回 400 Bad Request 错误：
 
@@ -1866,7 +1942,7 @@ curl -X GET \
 
 在通常的情况下，没有人会允许别人来改动他们自己的数据。为了做好权限认证，确保只有用户自己可以修改个人数据，在更新用户信息的时候，必须在 HTTP 头部加入一个 `X-LC-Session` 项来请求更新，这个 session token 在注册和登录时会返回。
 
-为了改动一个用户已经有的数据，需要对这个用户的 URL 发送一个 PUT 请求。任何你没有指定的 key 都会保持不动，所以你可以只改动用户数据中的一部分。username 和 password 也是可以改动的，但是新的 username 不能和既有数据重复。
+为了改动一个用户已经有的数据，需要对这个用户的 URL 发送一个 PUT 请求。任何你没有指定的 key 都会保持不动，所以你可以只改动用户数据中的一部分。
 
 比如，如果我们想对 「hjiang」 的手机号码做出一些改动:
 
@@ -1888,9 +1964,9 @@ curl -X PUT \
 }
 ```
 
-### 安全地修改用户密码
+username 也可以改动，但是新的 username 不能和既有数据重复。
 
-修改密码，可以直接使用上面的`PUT /1.1/users/:objectId`的 API，但是很多开发者会希望让用户输入一次旧密码做一次认证，旧密码正确才可以修改为新密码，因此我们提供了一个单独的 API `PUT /1.1/users/:objectId/updatePassword` 来安全地更新密码：
+很多开发者会希望让用户输入一次旧密码做一次认证，旧密码正确才可以修改为新密码，因此我们提供了一个单独的 API `PUT /1.1/users/:objectId/updatePassword` 来安全地更新密码：
 
 ```sh
 curl -X PUT \
@@ -1906,7 +1982,6 @@ curl -X PUT \
 * **new_password**：用户的新密码
 
 注意：仍然需要传入 X-LC-Session，也就是登录用户才可以修改自己的密码。
-
 
 ### 查询
 
@@ -1955,7 +2030,7 @@ curl -X DELETE \
 
 ### 连接用户账户和第三方平台
 
-LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾讯微博，这样就允许你的用户直接用他们现有的账号 id 来注册或登录你的应用。在进行注册和登录时，需要附带上 `authData` 字段来提供你希望连接的服务的授权信息。一旦关联了某个服务，`authData` 将被存储到你的用户信息里。如需重新获取该内容，请参考 [获取 authData](#获取_authData)。
+LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾讯微博，这样就允许你的用户直接用他们现有的账号 id 来注册或登录你的应用。在进行注册和登录时，需要附带上 `authData` 字段来提供你希望连接的服务的授权信息。一旦关联了某个服务，`authData` 将被存储到你的用户信息里。
 
 `authData` 是一个普通的 JSON 对象，它所要求的 key 根据 service 不同而不同，具体要求见下面。每种情况下，你都需要自己负责完成整个授权过程(一般是通过 OAuth 协议，1.0 或者 2.0) 来获取授权信息，提供给连接 API。
 
@@ -2019,7 +2094,7 @@ LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾�
      {
        "uid": "在第三方平台上的唯一用户id字符串",
        "access_token": "在第三方平台的 access token",
-        ……其他可选属性
+       // ……其他可选属性
      }
   }
 ```
@@ -2033,7 +2108,7 @@ LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾�
 
 #### 注册和登录
 
-使用一个连接服务来注册用户并登录，同样使用 POST 请求 users，只是需要提供 `authData` 字段。例如，使用新浪微博账户注册或者登录用户：
+使用一个连接服务来注册用户并登录，同样使用 POST 请求 users，只是需要提供 `authData` 字段。例如，使用 QQ 账户注册或者登录用户：
 
 
 ```sh
@@ -2305,7 +2380,14 @@ curl -X POST \
   https://{{host}}/1.1/roles
 ```
 
-其返回值类似于：
+和创建对象类似，创建成功时，HTTP 返回 `201 Created`，`Location` header 包含了新的对象的 URL：
+
+```sh
+Status: 201 Created
+Location: https://{{host}}/1.1/roles/55a483f0e4b05001a774b837
+```
+
+返回值是一个 JSON 对象：
 
 ```json
 {
@@ -2352,16 +2434,16 @@ curl -X POST \
   https://{{host}}/1.1/roles
 ```
 
-当创建成功时，HTTP 返回是 **201 Created** 而 Location header 包含了新的对象的 URL：
-
-```sh
-Status: 201 Created
-Location: https://{{host}}/1.1/roles/55a483f0e4b05001a774b837
-```
+你也许注意到了，上面的代码里出现了一个新操作符 `AddRelation`。
+因为一些性能上的考量，Relation 的实现比较复杂。
+不过我们可以简单地把它看成 Pointer 数组。
+如果你是 LeanCloud 老用户，可能还记得曾经 Relation 是 LeanCloud 提供的重要的多对多抽象。
+后来因为考虑到 Relation 的用法比较复杂（特别是在考虑性能的情况下），我们废弃了 Relation，推荐大家改用中间表。
+但是在角色中还是用到了 Relation 这一概念。
 
 ### 获取角色
 
-你可以同样通过发送一个 GET 请求到 Location header 中返回的 URL 来获取这个对象，比如我们想要获取上面创建的对象：
+类似获取对象，你可以通过发送一个 GET 请求到 Location header 中返回的 URL 来获取这个对象，比如我们想要获取上面创建的对象：
 
 ```sh
 curl -X GET \
@@ -2390,6 +2472,18 @@ curl -X GET \
 ```
 
 注意 users 和 roles 关系无法在 JSON 中见到，你需要相应地用 `$relatedTo` 操作符来查询角色中的子角色和用户。
+
+```
+where={
+  "$relatedTo":{
+    "object":{
+      "__type":"Pointer",
+      "className":"_Role",
+      "objectId":"objectId of a role"
+  },
+  "key":"users"}
+}
+```
 
 ### 更新角色
 
@@ -2439,8 +2533,7 @@ curl -X PUT \
   https://{{host}}/1.1/roles/55a48351e4b05001a774a89f
 ```
 
-
-### 删除对象
+### 删除角色
 
 为了从 LeanCloud 上删除一个角色，只需要发送 DELETE 请求到它的 URL 就可以了。
 
@@ -2454,9 +2547,9 @@ curl -X DELETE \
   https://{{host}}/1.1/roles/55a483f0e4b05001a774b837
 ```
 
-### 安全性
+### 角色和 ACL
 
-当你通过 REST API key 访问 LeanCloud 的时候，访问同样可能被 ACL 所限制，就像 iOS 和 Android SDK 上一样。你仍然可以通过 REST API 来读和修改 ACL，只用通过访问「ACL」键就可以了。
+当你通过 REST API 访问 LeanCloud 的时候，访问和 SDK 一样可能被 ACL 所限制。你仍然可以通过 REST API 来读和修改 ACL，只用通过访问「ACL」键就可以了。
 
 除了用户级的权限设置以外，你可以通过设置角色级的权限来限制对 LeanCloud 对象的访问。取代了指定一个 objectId 带一个权限的方式，你可以设定一个角色的权限为它的名字在前面加上 `role:` 前缀作为 key。你可以同时使用用户级的权限和角色级的权限来提供精细的用户访问控制。
 
@@ -2476,15 +2569,15 @@ curl -X DELETE \
 }
 ```
 
-你不必为创建的用户和 Manager 指定读的权限，如果这个用户和 Manager 本身就是 Staff 的子角色和用户，因为它们都会继承授予 Staff 的权限。
+如果创建的用户和 Manager 本身就是 Staff 的子角色和用户，那么它们都会继承授予 Staff 的权限。
+所以我们上面没有显式地为创建者和 Manager 授予「读」权限。
 
-### 角色继承
-
-就像上面所说的一样，一个角色可以包含另一个，可以为 2 个角色建立一个「父子」关系。这个关系的结果就是任何被授予父角色的权限隐含地被授予子角色。
+就像我们之前提到的一样，一个角色可以包含另一个，可以为 2 个角色建立一个「父子」关系。
+这个关系的结果就是任何被授予父角色的权限隐含地被授予子角色。
 
 这样的关系类型通常在用户管理的内容类的 app 上比较常见，比如论坛。有一些少数的用户是「管理员」，有最高级的权限来调整程序的设置、创建新的论坛、设定全局的消息等等。
 
-另一类用户是「版主」，他们有责任保证用户生成的内容是合适的。任何有管理员权限的人都应该有版主的权利。为了建立这个关系，你应该把「Administartors」的角色设置为「Moderators」 的子角色，具体来说就是把 Administrators 这个角色加入 Moderators 对象的 roles 关系之中：
+另一类用户是「版主」，他们有责任保证用户生成的内容是合适的。任何有管理员权限的人都应该有版主的权利。为了建立这个关系，你应该把「Administrators」的角色设置为「Moderators」 的子角色，具体来说就是把 Administrators 这个角色加入 Moderators 对象的 roles 关系之中：
 
 ```sh
 curl -X PUT \
@@ -2508,6 +2601,10 @@ curl -X PUT \
 
 ## 文件
 
+### 上传文件
+
+{{ docs.alert("北美和华东节点不支持通过 REST API 上传文件，请使用 SDK 提供的文件相关接口上传文件。") }}
+
 对于文件上传，我们推荐使用各个客户端的 SDK 进行操作，或者使用[命令行工具](./leanengine_cli.html)。
 
 **通过 REST API 上传文件受到三个限制**：
@@ -2517,10 +2614,6 @@ curl -X PUT \
 * 每个应用每分钟最多上传 30 个文件
 
 **而使用 SDK 或者命令行上传没有这些限制**。
-
-### 上传文件
-
-{{ docs.alert("北美和华东节点不支持通过 REST API 上传文件，请使用 SDK 提供的文件相关接口上传文件。") }}
 
 上传文件到  LeanCloud  通过 POST 请求，注意必须指定文件的 content-type，例如上传一个文本文件 hello.txt 包含一行字符串：
 
@@ -2792,84 +2885,7 @@ curl -X GET \
 
 请查看我们的 [云引擎 REST API 使用指南](leanengine-rest-api.html)。
 
-## 地理查询
 
-假如在发布微博的时候，我们也支持用户加上当时的位置信息（新增一个 `location` 字段），如果想看看指定的地点附近发生的事情，可以通过 GeoPoint 数据类型加上在查询中使用 `$nearSphere` 做到。获取离当前用户最近的 10 条微博应该看起来像下面这个样子:
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -G \
-  --data-urlencode 'limit=10' \
-  --data-urlencode 'where={
-        "location": {
-          "$nearSphere": {
-            "__type": "GeoPoint",
-            "latitude": 39.9,
-            "longitude": 116.4
-          }
-        }
-      }' \
-  https://{{host}}/1.1/classes/Post
-```
-
-这会按照距离纬度 39.9、经度 116.4（当前用户所在位置）的远近排序返回一系列结果，第一个就是最近的对象。(注意：**如果指定了 order 参数的话，它会覆盖按距离排序。**）
-
-为了限定搜索的最大距离，需要加入 `$maxDistanceInMiles` 和 `$maxDistanceInKilometers`或者 `$maxDistanceInRadians` 参数来限定。比如要找的半径在 10 英里内的话：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -G \
-  --data-urlencode 'where={
-        "location": {
-          "$nearSphere": {
-            "__type": "GeoPoint",
-            "latitude": 39.9,
-            "longitude": 116.4
-          },
-          "$maxDistanceInMiles": 10.0
-        }
-      }' \
-  https://{{host}}/1.1/classes/Post
-```
-
-同样做查询寻找在一个特定的范围里面的对象也是可以的，为了找到在一个矩形的区域里的对象，按下面的格式加入一个约束 `{"$within": {"$box": [southwestGeoPoint, northeastGeoPoint]}}`。
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -G \
-  --data-urlencode 'where={
-        "location": {
-          "$within": {
-            "$box": [
-              {
-                "__type": "GeoPoint",
-                "latitude": 39.97,
-                "longitude": 116.33
-              },
-              {
-                "__type": "GeoPoint",
-                "latitude": 39.99,
-                "longitude": 116.37
-              }
-            ]
-          }
-        }
-      }' \
-  https://{{host}}/1.1/classes/Post
-```
-
-### 警告
-
-这是有一些问题是值得留心的:
-
-1. 每一个 AVObject 类只能包含一个 AVGeoPoint 对象的键值。
-2. Points 不应该等于或者超出它的界. 纬度不应该是 -90.0 或者 90.0，经度不应该是 -180.0 或者 180.0。试图在 GeoPoint 上使用超出范围内的经度和纬度会导致问题.
 
 ## 用户反馈组件 API
 

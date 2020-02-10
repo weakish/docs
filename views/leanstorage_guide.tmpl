@@ -900,6 +900,10 @@ todo.fetchInBackground(keys).subscribe(new Observable<AVObject>() {
     public void onComplete() {}
 });
 ```
+
+如果想要确保只刷新已经保存到云端的对象，那么可以用 `fetchIfNeededInBackground` 替换 `fetchInBackground`。
+调用 `fetchIfNeededInBackground` 方法时，如果是本地构造尚未保存的对象，那么不会访问云端，onNext 方法中传入的是本地对象。
+
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
@@ -2869,6 +2873,39 @@ query.whereEqualTo("tags", "工作");
 {% if platform_name === "Swift" %}
 ```swift
 query.whereKey("tags", .equalTo("工作"))
+```
+{% endif %}
+
+下面的代码查询数组属性长度为 3 （正好包含 3 个标签）的对象：
+
+{% if platform_name === "Objective-C" %}
+```objc
+[query whereKey:@"tags" sizeEqualTo:3];
+```
+{% endif %}
+{% if platform_name === "JavaScript" %}
+```js
+query.sizeEqualTo('tags', 3);
+```
+{% endif %}
+{% if platform_name === "Python" %}
+```python
+query.size_equal_to('tags', 3)
+```
+{% endif %}
+{% if platform_name === "PHP" %}
+```php
+$query->sizeEqualTo("tags", 3);
+```
+{% endif %}
+{% if platform_name === "Android / Java" %}
+```java
+query.whereSizeEqual("tags", 3);
+```
+{% endif %}
+{% if platform_name === "Swift" %}
+```swift
+query.whereKey("tags", .equalToSize(3))
 ```
 {% endif %}
 
@@ -5199,6 +5236,59 @@ AVFile 也提供了清除缓存的方法：
 ```
 {% endif %}
 
+{% if platform_name === "Andorid / Java" %}
+### 下载文件
+
+可以调用 AVFile 的 `getDataInBackground` 或 `getDataStreamInBackground` 方法下载文件：
+
+```java
+avFile.getDataInBackground().subscribe(new Observer<byte[]>() {
+    @Override
+    public void onSubscribe(Disposable d) {}
+
+    @Override
+    public void onNext(byte[] bytes) {
+        Log.d("file data length: " + bytes.length);
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        Log.d("failed to get data. cause: " + e.getMessage());
+    }
+
+    @Override
+    public void onComplete() {}
+});
+
+avFile.getDataStreamInBackground().subscribe(new Observer<InputStream>() {
+    @Override
+    public void onSubscribe(Disposable d) {}
+
+    @Override
+    public void onNext(InputStream inputStream) {
+        try {
+            byte[] buffer = new byte[102400];
+            int read = inputStream.read(buffer);
+            Log.d("file data length: " + read);
+            inputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        Log.d("failed to get data. cause: " + e.getMessage());
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+除了使用 SDK 提供的方法外，也可以获取 AVFile 的 url 后调用标准库和第三方库下载文件。
+{% endif %}
+
 ### 删除文件
 
 下面的代码从云端删除一个文件：
@@ -6766,7 +6856,7 @@ _ = LCUser.requestPasswordReset(email: "tom@leancloud.rocks") { (result) in
 上面的代码会查询 `_User` 表中是否有对象的 `email` 属性与前面提供的邮箱匹配。如果有的话，则向该邮箱发送一封密码重置邮件。之前提到过，应用可以让 `username` 与 `email` 保持一致，也可以单独收集用户的邮箱并将其存为 `email`。
 
 {% call docs.noteWrap() %}
-密码重置邮件的内容可在应用的 [控制台 > 设置 > 邮件模版](/dashboard/app.html?appid={{appid}}#/email) 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考 [自定义应用内用户重设密码和邮箱验证页面](https://leancloudblog.com/zi-ding-yi-ying-yong-nei-yong-hu-chong-she-mi-ma-he-you-xiang-yan-zheng-ye-mian/)。
+密码重置邮件的内容可在应用的 [控制台 > 设置 > 邮件模版](/dashboard/app.html?appid={{appid}}#/email) 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考 [自定义邮件验证和重设密码页面](custom-reset-verify-page.html)。
 {% endcall %}
 
 {% if node !== "qcloud" %}
@@ -7384,7 +7474,7 @@ user.logIn(authData: authData, platform: .weixin) { (result) in
 }
 ```
 
-云端会自动验证部分服务的 access token 的有效性以防止伪造请求。如果验证失败，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，你需要自己去验证 access token 的有效性。如果不希望云端自动验证 access token，可以在 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
+云端会自动验证部分服务的 access token 的有效性以防止伪造请求。如果验证失败，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，你需要自己去验证 access token 的有效性（通过 [onLogin hook 函数](leanengine_cloudfunction_guide-node.html#onLogin)）。如果不希望云端自动验证 access token，可以在 [控制台 > 存储 > 设置](/dashboard/storage.html?appid={{appid}}#/storage/conf) 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
 
 {% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Swift" or platform_name === "Android / Java" %}
 #### 扩展需求

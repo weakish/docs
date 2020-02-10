@@ -380,6 +380,11 @@
 * 信息 - `The app is temporarily disabled/readonly.`
 * 含义 - 应用被临时禁用或者进入只读状态，通常是进行运维或者故障处理操作，我们会提前告知开发者。如果是调用云引擎报错，可能是预备环境或者体验实例已进入强制休眠阶段，可以稍等几秒后重试。
 
+## 504
+
+* 信息 - `The app is archived, please restore in console before use.`
+* 含义 - 应用结构化数据存储长时期无访问被归档，请访问 LeanCloud 控制台自助激活。如果激活遇到问题，请通过工单、论坛联系我们处理。
+
 ## 511
 
 * 信息 - `Temporarily Unavailable.`

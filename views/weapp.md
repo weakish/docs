@@ -1,8 +1,10 @@
 {% import "views/_data.njk" as data %}
 {% import "views/_helper.njk" as docs %}
-# 在微信小程序与小游戏中使用 {% if node == 'qcloud' %}TAB{% else %}LeanCloud{% endif %}
+# 在微信小程序（游戏）与 QQ 小程序（游戏）中使用 LeanCloud
 
-微信小程序是一个全新的跨平台移动应用平台，小游戏是小程序的一个类目，在小程序的基础上开放了游戏相关的 API。LeanCloud 为小程序提供一站式后端云服务，为你免去服务器维护、证书配置等繁琐的工作，大幅降低你的开发和运维成本。本文说明了如何在微信小程序与小游戏中使用 LeanCloud 提供的各项服务。
+小程序是一个全新的跨平台移动应用平台，小游戏是小程序的一个类目，在小程序的基础上开放了游戏相关的 API。LeanCloud 为小程序提供一站式后端云服务，为你免去服务器维护、证书配置等繁琐的工作，大幅降低你的开发和运维成本。本文说明了如何在小程序与小游戏中使用 LeanCloud 提供的各项服务。
+
+{{ docs.note('QQ 小程序兼容微信小程序的 API，概念与用法也相似。如果没有特殊说明，本文将不再区分微信小程序与 QQ 小程序。')}}
 
 ## Demo
 我们在小程序上实现了 LeanTodo 应用。在这个 Demo 中你可以看到：
@@ -11,27 +13,28 @@
 - 如何对云端数据进行查询、增加、修改与删除
 - 如何将查询结果数组绑定到视图层进行展示，以及如何在点击事件中得到对应的数组项
 - 如何使用 [LiveQuery](leanstorage_guide-js.html#livequery) 实现对查询结果的实时更新和多端同步
-- 如何集成微信支付
+- 如何集成微信支付（仅支持微信小程序）
 
-你可以通过微信扫描以下二维码进入 Demo。 Demo 的源码与运行说明请参考 [https://github.com/leancloud/leantodo-weapp](https://github.com/leancloud/leantodo-weapp)。
+你可以通过微信或 QQ 扫描以下二维码进入 Demo。 Demo 的源码与运行说明请参考 [https://github.com/leancloud/leantodo-weapp](https://github.com/leancloud/leantodo-weapp)。
 
-<img src="images/leantodo-weapp-qr.png" alt="LeanTodo Weapp QR" width="250">
+<img src="images/leantodo-weapp-qr.jpg" alt="LeanTodo Weapp QR" width="250"> <img src="images/leantodo-qqapp-qr.png" alt="LeanTodo Weapp QR" width="250">
+
 
 ## 准备工作
 ### 创建应用
-- 如果你还没有创建过 LeanCloud 应用，请登录 LeanCloud 控制台 [创建一个新应用](/dashboard/applist.html#/newapp)。
-- 如果你还没有小程序帐号，请访问 [微信公众平台] 注册一个小程序帐号。如果你不需要进行真机调试可以跳过这一步。
-- 下载 [小程序开发工具](https://mp.weixin.qq.com/debug/wxadoc/dev/devtools/download.html)，按照 [小程序开发教程](https://mp.weixin.qq.com/debug/wxadoc/dev/) 创建一个项目。
+- 如果你还没有创建过 LeanCloud 应用，请登录 LeanCloud 控制台创建一个新应用。
+- 如果你还没有小程序帐号，请访问 [微信公众平台] 或 [QQ 小程序开放平台] 注册一个小程序帐号。如果你不需要进行真机调试可以跳过这一步。
+- 下载对应平台的小程序开发工具，按照指引创建一个新项目。
 
 [微信公众平台]: https://mp.weixin.qq.com
+[QQ 小程序开放平台]: https://q.qq.com
 
 ### 配置域名白名单
 
-前往 [LeanCloud 控制台 > 设置 > 应用 Keys > 域名白名单][weapp-domains]，获取域名白名单（不同应用对应不同的域名）。
+- 前往 [LeanCloud 控制台 > 设置 > 应用 Keys > 域名白名单][weapp-domains]，获取域名白名单（不同应用对应不同的域名）。
+- 登录 [微信公众平台] 或 [QQ 小程序开放平台]，前往 **设置 > 开发设置 > 服务器配置 > 「修改」** 链接，**增加**上述域名白名单中的域名。
 
 [weapp-domains]: https://leancloud.cn/dashboard/app.html?appid={{appid}}#/key
-
-登录[微信公众平台]，前往 **设置 > 开发设置 > 服务器配置 > 「修改」** 链接，**增加**上述域名白名单中的域名。
 
 如果你不需要进行真机调试可以暂时跳过这一步（可在开发者工具的 **详情** > **项目设置** 中勾选**不校验安全域名、TLS 版本以及 HTTPS 证书**）。
 
@@ -191,6 +194,17 @@ wx.chooseImage({
 ## 用户系统
 
 小程序中提供了登录 API 来获取微信的用户登录状态，应用可以访问到用户的昵称、性别等基本信息。但是如果想要保存额外的用户信息，如用户的手机号码、收货地址等，或者需要在其他平台使用该用户登录，则需要使用 LeanCloud 的用户系统。
+
+SDK 提供了一系列小程序特有的用户相关的 API，适用于不同的使用场景：
+
+|微信|QQ|作用|
+|--|--|--|
+|`AV.User.loginWithWeapp`<br/>`AV.User#loginWithWeapp`|`AV.User.loginWithQQApp`<br/>`AV.User#loginWithQQApp`|一键使用当前平台用户身份登录
+|`AV.User.loginWithWeappWithUnionId`<br/>`AV.User#loginWithWeappWithUnionId`|`AV.User.loginWithQQAppWithUnionId`<br/>`AV.User#loginWithQQAppWithUnionId`|使用 unionid 并使用当前平台用户身份登录
+|`AV.User#associateWithWeapp`|`AV.User#associateWithQQApp`|当前登录用户关联当前平台用户
+|`AV.User#associateWithWeappWithUnionId`|`AV.User#associateWithQQAppWithUnionId`|当前登录用户关联当前平台用户与 unionid
+
+下面我们以微信平台为例讨论不同场景下的使用方式。
 
 ### 一键登录
 LeanCloud 的用户系统支持一键使用微信用户身份登录。要使用一键登录功能，需要先设置小程序的 AppID 与 AppSecret：
@@ -423,7 +437,7 @@ AV.User.logIn('username', 'password').then(user => {
 
 ```javascript
 // Realtime 类获取的方式根据不同的安装方式而异，这里假设是通过手动导入文件的方式安装的 SDK
-const { Realtime } = require('./libs/realtime.weapp.min.js');
+const { Realtime } = require('./libs/realtime-weapp.min.js');
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
@@ -435,7 +449,7 @@ const realtime = new Realtime({
 
 ```js
 // app.js
-const { Realtime } = require('./libs/realtime.weapp.min.js');
+const { Realtime } = require('./libs/realtime-weapp.min.js');
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
@@ -489,6 +503,8 @@ const realtime = getApp().realtime;
 使用即时通讯 SDK，一个常见的需求是将 `Conversation` 与 `Message` 类型的数据绑定到视图层进行渲染。这里会遇到一些与结构化数据存储 SDK 一样的问题，其解决方案与最佳实践请参考结构化数据存储的 [数据绑定](#数据绑定) 章节（`Conversation` 与 `Message` 都实现了 `#toJSON` 方法，上文中介绍的 `jsonify` 方法同样适用于`Conversation` 与 `Message` 实例）。
 
 ## 支付
+
+{{ docs.note('利用云引擎服务，我们能轻松的接入各类平台的支付功能。在这里我们以微信小程序中使用微信支付作为示例。')}}
 
 ### 配置
 
@@ -592,4 +608,4 @@ AV.Cloud.run('order').then((data) => {
 例如新建一个名为「Todo」的表，上传数据成功后进入控制台查看，其表名称显示为像 i、u 这样的单个字母。这是因为真机上代码会被压缩，解决办法是在创建 Class 后向 SDK 注册该 Class 的名字：`AV.Object.register(Todo, 'Todo');`。
 
 ## 反馈
-如果在微信小程序中使用 LeanCloud 时遇到问题，欢迎通过我们的 [论坛](https://forum.leancloud.cn/c/jing-xuan-faq/weapp) 进行反馈。
+如果在微信 / QQ 小程序中使用 LeanCloud 时遇到问题，欢迎通过我们的 [论坛](https://forum.leancloud.cn/c/jing-xuan-faq/weapp) 进行反馈。
