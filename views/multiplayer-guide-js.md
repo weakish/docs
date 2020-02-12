@@ -189,7 +189,7 @@ client.joinRoom('LiLeiRoom').then(() => {
 	// 加入房间成功
 }).catch((error) => {
 	// 加入房间失败
-	console.error(errod.code, error.detail);
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
@@ -206,7 +206,7 @@ client.joinRoom('game', {
 	// 加入房间成功
 }).catch((error) => {
 	// 加入房间失败
-	console.error(errod.code, error.detail);
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
@@ -225,7 +225,7 @@ client.joinRandomRoom().then(() => {
 	// 加入房间成功
 }).catch((error) => {
 	// 加入房间失败
-	console.error(errod.code, error.detail);
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
@@ -244,7 +244,7 @@ client.joinRandomRoom({
 	// 加入房间成功
 }).catch((error) => {
 	// 加入房间失败
-	console.error(errod.code, error.detail);
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
@@ -258,7 +258,7 @@ client.joinOrCreateRoom('room1').then(() => {
 	// 加入或创建房间成功
 }).catch((error) => {
 	// 加入房间失败，也没有成功创建房间
-	console.error(errod.code, error.detail);
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
@@ -299,7 +299,7 @@ const isLocal = player.isLocal;
 client.leaveRoom().then(() => {
 	// 离开房间成功，可以执行跳转场景等逻辑
 }).catch((error) => {
-	console.error(errod.code, error.detail);
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
@@ -333,7 +333,7 @@ client.on(Event.PLAYER_ROOM_LEFT, ({ leftPlayer }) => {
 client.setRoomOpen(false).then(() => {
 	console.log(client.room.open);
 }).catch((error) => {
-	console.error(errod.code, error.detail);
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
@@ -346,7 +346,7 @@ client.setRoomOpen(false).then(() => {
 client.setRoomVisible(false).then(() => {
 	console.log(client.room.visible);
 }).catch((error) => {
-	console.error(errod.code, error.detail);
+	console.error(error.code, error.detail);
 });
 ```
 {% endblock %}
