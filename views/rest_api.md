@@ -2772,6 +2772,29 @@ curl -X GET \
 https://{{feedback_host}}/1.1/feedback
 ```
 
+返回的结果是反馈主帖数组：
+
+```json
+{
+  "results": [
+    {
+      "updatedAt": "2019-07-19T08:53:10.972Z",
+      "content": "经常闪退",
+      "uid": "fd99b400eaa357006ce54238",
+      "iid": "5wChmGL9G6qRoeBwt4J89ceGhp9nMOWe",
+      "objectId": "5dec3eba8a84ab00581e61f1",
+      "createdAt": "2019-07-17T07:41:43.027Z",
+      "status": "open",
+      "deviceType": "android",
+      "contact": "email@example.com"
+    },
+    // 更多结果……
+  ]
+}
+```
+
+其中，`uid` 是反馈用户（`_User`）的 objectId，`iid` 是反馈设备（`_Installation`） 的 objectId，`status` 表示反馈意见的状态（`open` 为打开，`close` 为关闭），`contact` 是反馈用户的联系方式，可以是邮箱、手机等。
+
 获取一条反馈里面的信息：
 
 ```
@@ -2785,6 +2808,42 @@ https://{{feedback_host}}/1.1/feedback/<:feedback_objectId>/threads
 将 `<:feedback_objectId>` 替换为 feedback 的 objectId（可以从上述的「获取所有的反馈」这个查询中得到 objectId）。
 和其他查询类 API 一样，你可以用 `skip` 和 `limit` 分页。
 不过 `limit` 的默认值是 1000，这是针对用户反馈这一使用场景做的调整，确保绝大多数情况下一次请求即可获取整个会话。
+
+返回的结果是一个包含反馈回复的数组：
+
+```json
+{
+  "results": [
+    {
+      "type": "user",
+      "content": "有一次出现了如下图所示的报错信息",
+      "attachment": "https://file.example.com/just-an-example.png",
+      "feedback": {
+        "__type": "Pointer",
+        "className": "UserFeedback",
+        "objectId": "deb777b111460d0068b90f16"
+      },
+      "createdAt": "2019-07-07T09:58:11.057Z",
+      "updatedAt": "2019-07-07T09:58:11.057Z",
+      "objectId": "deb777b343c25700783cd635"
+    },
+    {
+      "type": "dev",
+      "content": "感谢反馈问题，我会转给研发小伙伴，有进展会回复您。",
+      "feedback": {
+        "__type": "Pointer",
+        "className": "UserFeedback",
+        "objectId": "deb777b111460d0068b90f16"
+      },
+      "createdAt": "2019-07-07T09:58:29.921Z",
+      "updatedAt": "2019-07-07T09:58:29.921Z",
+      "objectId": "deb777c543c25700683cd717"
+    }
+  ]
+}
+```
+
+其中，`feedback` 是一个指向反馈主帖（`UserFeedback`）的 Pointer，`type` 的值为 `user` （用户回复）或 `dev` （客服回复）。 
 
 客服为一条已经存在的反馈增加一条回复：
 
