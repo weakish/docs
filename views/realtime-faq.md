@@ -69,3 +69,56 @@ LeanCloud 即时通讯服务是完全独立的即时通讯业务抽象，专注�
 ### 我自己没有云端，如何实现签名的功能？
 
 LeanCloud 云引擎提供了托管 Python 和 Node.js 运行的方式，开发者可以所以用这两种语言按照签名的算法实现签名，完全可以支持开发者的自定义权限控制。
+
+### JavaScript SDK 即时通信使用 `leancloud-storage/live-query` SDK，创建图片消息报类型错误:「`TypeError：file must be an AV.File`」。
+ 
+
+这个问题是因为 typed-messages plugin 会从 'leancloud-storage' 中 import File，而用 webpack 打包时 'leancloud-storage' 与 'leancloud-storage/live-query' 对应的是两个不同的 bundle，所以拿到的 File 不是同一个 File。
+
+推荐的用法是直接使用 `leancloud-storage` 然后单独加载 LiveQuery 部分，需要在初始化 SDK 的时候进行如下配置： 
+
+```
+import { Realtime } from 'leancloud-realtime';
+import { LiveQueryPlugin } from 'leancloud-realtime-plugin-live-query';
+import { TypedMessagesPlugin } from 'leancloud-realtime-plugin-typed-messages';
+import AV from 'leancloud-storage';
+
+const realtime = new Realtime({
+  // appId, appKey,
+  plugins: [TypedMessagesPlugin, LiveQueryPlugin],
+});
+AV.init({
+  // appId, appKey,
+  realtime,
+});
+```
+对于同时使用 RTM 与 LiveQuery 的场景，这样处理还有一些好处：  
+
+* 减少重复的代码（因为 leancloud-storage/live-query 是可以独立运行的，这个 bundle 里包含了 RTM 的核心部分代码），大大减少最终 bundle 的体积。 
+
+* RTM 与 LiveQuery 共享一个长链接，减少用户的客户端开销。
+
+
+### 即时通信服务中，有些消息类型及时性要求特别高，有些消息及时性要求不高。一个房间内的消息有没有优先级？
+
+LeanCloud 有消息优先级的概念，当某个用户连接因为消息过多出现阻塞写入缓慢的情况下，用户可以考虑指定消息优先级，低优先级消息在堵塞时我们会丢弃，高优先级消息则永久排队等待下发。默认情况下消息都是高优先级。
+此功能仅针对聊天室消息有效。使用指南参考：[消息等级](realtime-guide-senior.html#消息等级)。
+
+
+### 对话查询如何区分单聊还是群聊？
+
+SDK 层面不区分单聊和群聊。可以使用会话的成员数量做区分。「会话成员数量为 2」即是单聊，大于 2 即可看作群聊。
+
+
+### 怎么删除或者退出一个会话聊天？
+
+在即时通信服务中，SDK 没有提供删除会话的方法。理论上使用存储 SDK 或 REST API 能够做到删除会话记录，也就是删除 _Conversation 表数据。但是如果用户删除了某条 conversation 记录，这个会话中的其他成员也会受到影响，所以不建议直接删除会话。
+
+在即时通信中，可以使用 [用户主动退出对话](realtime-guide-beginner.html#用户主动退出对话) 或者 [将他人踢出对话](realtime-guide-beginner.html#将他人踢出对话) 来实现类似删除会话的需求。
+
+
+### 使用系统会话给用户发的消息支持撤回吗？
+
+单独发送的消息只能一个一个的撤回。如果是使用订阅消息方式发送的消息可以一次撤回所有人的消息。
+
+订阅消息发送方式接口参考文档：[给所有订阅者发消息](realtime_rest_api_v2.html#给所有订阅者发消息)。

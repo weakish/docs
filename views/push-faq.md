@@ -55,6 +55,51 @@ invalidTokens 的数量由以下两部分组成：
 ### Android 应用进程被杀掉后无法收到推送消息
 iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系统之间还会存在连接，这条连接跟应用无关，所以无论应用是否被杀掉，消息都能发送到 APNs 再通过这条连接发送到设备。但对 Android 来说，如果是国内用户，因为众所周知的原因，Google 和设备之间的这条连接是无法使用的，所以应用只能自己去保持连接并在后台持续运行，一旦后台进程被杀掉，就无法收到推送消息了。虽然 LeanCloud SDK 已经采取了各种办法保持应用在后台运行，但随着 Android 系统版本的升级，权限控制越来越严，第三方推送通道的生命周期受到较大限制。因此 LeanCloud SDK 推出了混合推送的方案，对接国内主流厂商，保障了主流 Android 系统上的推送到达率。详见 [Android 混合推送开发指南](android_mixpush_guide.html)。
 
+### 推送记录会保留多久？
+
+推送记录会保留 7 天，7 天之前的推送记录无法查询。
+
+### 同一个账号在两个设备登录过，两个设备都会收到推送信息吗？
+
+推送的时候是根据推送查询条件，在 _installation 表中查找符合条件的目标设备来推送。只要查询条件能包含这两个设备，则两个设备都能收到推送。
+
+如果是登录即时通讯系统，如果没有开启单点登录，用户在登录两个设备后，如果用户不在线会尝试给这两个设备都发离线消息推送。
+
+### Android 非混合推送，控制台推送记录中显示推送成功，但 Android 设备实际没有收到推送，是什么原因？
+
+对于 Android 非混合推送设备，当返回的记录成功数为 1 时，表示一定收到了 SDK 确认收到该消息的回应。即此条推送消息一定是到达了设备。
+建议检查推送是否使用了自定义 Receiver 功能（消息中是否有 action 字段），消息到达后 SDK 会直接将消息转交给自定义 Receiver，由自定义 Receiver 完成推送提醒。这种情况需要检查自定义 Receiver 实现逻辑排查消息到达后为什么没有弹出提醒。
+
+### 旧版本 Objective-C SDK 在 iOS 13 环境下，无法接收推送的解决办法。
+
+在 iOS 13 环境下，由于苹果更改了基础框架的 API，导致旧版本的 Objc SDK（<= 11.6.6）无法上传有效的 device token。
+
+解决办法是升级 SDK 版本到 v11.6.7 及以上，保存 deviceToken 的方法参见  [保存 Token](ios_push_guide.html#保存_Token)。
+
+旧版本的 Objective-C SDK（<= 11.6.6）的解决办法是按如下方式上传 device token：
+
+```
+NSUInteger dataLength = deviceToken.length;
+if (dataLength > 0) {
+    const unsigned char *dataBuffer = deviceToken.bytes;
+    NSMutableString *hexString = [NSMutableString stringWithCapacity:(dataLength * 2)];
+    for (int i = 0; i < dataLength; ++i) {
+        [hexString appendFormat:@"%02.2hhx", dataBuffer[i]];
+    }
+    [installation setDeviceToken:[hexString copy]];
+    [installation saveInBackground];
+}
+```
+或者使用 Swift SDK 替换 Objective-C SDK。
+
+
+### iOS 推送如何选择推送证书？
+推送消息接口有一个参数：**prod**。
+**这个参数仅对 iOS 推送有效。**
+
+* 当使用 Token Authentication 鉴权方式发 iOS 推送时，该参数用于设置将推送发至 APNs 的开发环境（dev）还是生产环境（prod）。
+* 当使用证书鉴权方式发 iOS 推送时，该参数用于设置使用开发证书（dev）还是生产证书（prod）。在使用证书鉴权方式下，当设备在 Installation 记录中设置了 deviceProfile 时我们优先按照 deviceProfile 指定的证书推送。
+
 ## 推送问题排查
 
 推送因为环节较多，跟设备和网络都相关，并且调用都是异步化，因此问题比较难以查找，这里提供一些有用助于排查消息推送问题的技巧。
