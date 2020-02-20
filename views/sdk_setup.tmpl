@@ -313,6 +313,8 @@ Example for Gradle：
 implementation('cn.leancloud:mixpush-android:{{ version.unified }}') {
     exclude group: 'com.alibaba', module: 'fastjson'
     exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
+    // 如果接入的是华为推送，还需要加上：
+    // exclude group:'cn.leancloud', module:'huawei-hmsagent' 
 }
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 implementation 'com.alibaba:fastjson:1.1.71.android'
