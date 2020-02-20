@@ -172,21 +172,22 @@ _ = LCUser.logIn(username: "username", password: "password") { (result) in
 ```
 ```java
 // 以 AVUser 的用户名和密码登录到 LeanCloud 存储服务
-AVUser.logInInBackground("username", "password", new LogInCallback<AVUser>() {
-    @Override
-    public void done(AVUser user, AVException e) {
-        if (null != e) {
-          return;
-        }
-        // 与服务器连接
+AVUser.logIn("Tom", "cat!@#123").subscribe(new Observer<AVUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(AVUser user) {
+        // 登录成功，与服务器连接
         AVIMClient client = AVIMClient.getInstance(user);
         client.open(new AVIMClientCallback() {
-          @Override
-          public void done(final AVIMClient avimClient, AVIMException e) {
-            // 执行其他逻辑
-          }
-       });
+            @Override
+            public void done(final AVIMClient avimClient, AVIMException e) {
+                // 执行其他逻辑
+            }
+        });
     }
+    public void onError(Throwable throwable) {
+        // 登录失败（可能是密码错误）
+    }
+    public void onComplete() {}
 });
 ```
 ```cs
