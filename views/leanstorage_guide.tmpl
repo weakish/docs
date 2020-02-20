@@ -2688,6 +2688,9 @@ _ = query.getFirst { result in
 ```
 {% endif %}
 
+`{% if platform_name === "Objective-C" %}selectKeys{% endif %}{% if platform_name === "JavaScript" %}select{% endif %}{% if platform_name === "Python" %}select{% endif %}{% if platform_name === "PHP" %}select{% endif %}{% if platform_name === "Android / Java" %}selectKeys{% endif %}{% if platform_name === "Swift" %}.selected{% endif %}`
+支持点号（`author.firstName`），详见 [点号使用指南](dot-notation.html#在查询对象时使用点号)。
+
 {% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "Java" or platform_name === "Swift" %}
 对于未获取的属性，可以通过对结果中的对象进行 `{% if platform_name === "Objective-C" %}fetchInBackgroundWithBlock{% endif %}{% if platform_name === "JavaScript" %}fetch{% endif %}{% if platform_name === "Python" %}fetch{% endif %}{% if platform_name === "Android / Java" %}fetchInBackground{% endif %}{% if platform_name === "Swift" %}fetch{% endif %}` 操作来获取。参见 [同步对象](#同步对象)。
 {% endif %}
@@ -3354,77 +3357,13 @@ _ = query.find { result in
 ```
 {% endif %}
 
-可以用 dot 符号（`.`）来获取多级关系。比如说，在获取评论对应文章的同时获取文章作者：
-
-{% if platform_name === "Objective-C" %}
-```objc
-[query includeKey:@"post.author"];
-```
-{% endif %}
-{% if platform_name === "JavaScript" %}
-```js
-query.include('post.author');
-```
-{% endif %}
-{% if platform_name === "Python" %}
-```python
-query.include('post.author')
-```
-{% endif %}
-{% if platform_name === "PHP" %}
-```php
-$query->_include("post.author");
-```
-{% endif %}
-{% if platform_name === "Android / Java" %}
-```java
-query.include("post.author");
-```
-{% endif %}
-{% if platform_name === "Swift" %}
-```swift
-query.whereKey("post.author", .included)
-```
-{% endif %}
+可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见 [点号使用指南](dot-notation.html#在查询对象时使用点号)。
 
 可以在同一查询上应用多次 `{% if platform_name === "Objective-C" %}includeKey{% endif %}{% if platform_name === "JavaScript" %}include{% endif %}{% if platform_name === "Python" %}include{% endif %}{% if platform_name === "PHP" %}_include{% endif %}{% if platform_name === "Android / Java" %}include{% endif %}{% if platform_name === "Swift" %}.included{% endif %}` 以包含多个属性。通过这种方法获取到的对象同样接受 `{% if platform_name === "Objective-C" %}getFirstObject{% endif %}{% if platform_name === "JavaScript" %}first{% endif %}{% if platform_name === "Python" %}first{% endif %}{% if platform_name === "PHP" %}{% endif %}{% if platform_name === "Android / Java" %}getFirst{% endif %}{% if platform_name === "Swift" %}getFirst{% endif %}`{% if platform_name === "JavaScript" or platform_name === "Python" or platform_name === "Swift" %}、`get`{% endif %} 等 `{{ baseQueryClassName }}` 辅助方法。
 
 {% call docs.noteWrap() %}
 通过 `{% if platform_name === "Objective-C" %}includeKey{% endif %}{% if platform_name === "JavaScript" %}include{% endif %}{% if platform_name === "Python" %}include{% endif %}{% if platform_name === "PHP" %}_include{% endif %}{% if platform_name === "Android / Java" %}include{% endif %}{% if platform_name === "Swift" %}.included{% endif %}` 进行多级查询的方式不适用于数组属性内部的 `{{ baseObjectName }}`，只能包含到数组本身。
 {% endcall %}
-
-dot 符号（`.`）还可用于 `{% if platform_name === "Objective-C" %}selectKeys{% endif %}{% if platform_name === "JavaScript" %}select{% endif %}{% if platform_name === "Python" %}select{% endif %}{% if platform_name === "PHP" %}select{% endif %}{% if platform_name === "Android / Java" %}selectKeys{% endif %}{% if platform_name === "Swift" %}.selected{% endif %}` 以限制返回的关联对象的属性：
-
-{% if platform_name === "Objective-C" %}
-```objc
-[query selectKeys:@[@"post.author.firstName"]];
-```
-{% endif %}
-{% if platform_name === "JavaScript" %}
-```js
-query.select('post.author.firstName');
-```
-{% endif %}
-{% if platform_name === "Python" %}
-```python
-query.select('post.author.firstName')
-```
-{% endif %}
-{% if platform_name === "PHP" %}
-```php
-$query->select("post.author.firstName");
-```
-{% endif %}
-{% if platform_name === "Android / Java" %}
-```java
-query.selectKeys(Arrays.asList("post.author.firstName"));
-```
-{% endif %}
-{% if platform_name === "Swift" %}
-```swift
-query.whereKey("post.author.firstName", .selected)
-```
-{% endif %}
 
 #### 关系查询的注意事项
 

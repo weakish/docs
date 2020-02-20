@@ -723,6 +723,8 @@ curl -X GET \
   https://{{host}}/1.1/classes/Post/<objectId>
 ```
 
+`include` 支持[点号](dot-notation.html#在查询对象时使用点号)，例如，假定发布者有一个字段 `department` 指向发布者所属的部门，那么可以使用 `include=author.department` 一并获取部门信息。
+
 类不存在时，返回 404 Not Found 错误：
 
 ```json
@@ -1388,6 +1390,8 @@ curl -X GET \
   --data-urlencode 'keys=pubUser,content' \
   https://{{host}}/1.1/classes/Post
 ```
+
+`keys` 的参数中可以使用 [点号](dot-notation.html#在查询对象时使用点号) 进一步限定只返回字段的部分属性，例如，只返回发布者的姓氏：`keys=pubUser.familyName`。
 
 `keys` 还支持反向选择，也就是不返回某些字段，字段名前面加个减号即可，比如我不想查询返回 `author`：
 
