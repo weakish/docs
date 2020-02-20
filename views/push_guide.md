@@ -9,6 +9,8 @@
 
 除了 iOS、Android SDK 做推送服务之外，你还可以通过 [REST API](#使用_REST_API_推送消息) 来发送推送请求。
 
+使用推送服务前，需在相应应用 [控制台 > 设置 > 安全中心 > 服务开关] 开启推送服务，此开关有三分钟的延迟。
+
 ## 基本概念
 
 ### Installation
@@ -32,7 +34,7 @@ timeZone| |字符串，设备设定的时区
 
 ### 增加 Installation
 
-通过使用REST API，你可以实现在云端增加安装对象，仅仅是增加几个特殊的字段。使用REST API 还可以达成很多Leancloud SDK 无法完成的操作，比如查询所有的installations来找到一个channel的订阅者的集合。
+通过使用 REST API，你可以实现在云端增加安装对象，仅仅是增加几个特殊的字段。使用 REST API 还可以达成很多 Leancloud SDK 无法完成的操作，比如查询所有的 installations 来找到一个 channel 的订阅者的集合。
 
 创建一个安装对象和普通的对象差不多，但是特殊的几个安装字段必须通过认证。举个例子，如果你有一个由 Apple Push Notification 提供的 device token，而且想订阅一个广播频道，你可以如下发送请求：
 
@@ -51,7 +53,7 @@ curl -X POST \
   https://{{host}}/1.1/installations
 ```
 
-当创建成功后，HTTP的返回值为 **201 Created**，Location header 包括了新的安装的 URL：
+当创建成功后，HTTP 的返回值为 **201 Created**，Location header 包括了新的安装的 URL：
 
 ```sh
 Status: 201 Created
