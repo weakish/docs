@@ -40,6 +40,7 @@ using LeanCloud.Play;
 接着我们需要实例化一个在线对战 SDK 的客户端对象。
 ```cs
 var client = new Client({{appid}}, {{appkey}}, userId, playServer: "https://xxx.example.com", gameVersion: "0.0.1");
+// 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
 ```
 {% endblock %}
 

@@ -57,7 +57,7 @@ const client = new Client({
 	appId: {{appid}},
 	// 设置 APP Key
 	appKey: {{appkey}},
-    // 设置 Server
+    // 设置 Server （将 xxx.example.com 替换为你的应用绑定的自定义 API 域名）
     playServer: 'https://xxx.example.com',
 	// 设置用户 id
 	userId: 'leancloud',

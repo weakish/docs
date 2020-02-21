@@ -252,6 +252,7 @@ const client = new Client({
 ```
 
 ```cs
+// 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
 var client = new Client({{appid}}, {{appkey}}, userId, playServer: "https://xxx.example.com");
 await client.Connect();
 ```

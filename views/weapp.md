@@ -50,6 +50,7 @@ const AV = require('./libs/av-weapp-min.js');
 AV.init({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
+  // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
   serverURLs: "https://xxx.example.com",
 });
 ```
@@ -441,6 +442,7 @@ const { Realtime } = require('./libs/realtime-weapp.min.js');
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
+  // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
   serverURLs: "https://xxx.example.com",
 });
 ```
@@ -453,6 +455,7 @@ const { Realtime } = require('./libs/realtime-weapp.min.js');
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
+  // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
   serverURLs: "https://xxx.example.com",
 });
 App({
@@ -494,6 +497,7 @@ const realtime = getApp().realtime;
     plugins: [TypedMessagesPlugin], // 注册富媒体消息插件
     serverURLs: "https://xxx.example.com",
   });
+  // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
   ```
 
 富媒体消息的用法请参考 [即时通讯开发指南 - 富媒体消息](realtime-guide-beginner.html#文本之外的聊天消息)。

@@ -177,6 +177,7 @@ AVClient.Initialize(new AVClient.Configuration
     ApplicationId = {{appid}},
     ApplicationKey = {{appkey}},
     MasterKey = {{masterkey}},
+    // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
     ApiServer = new Uri("https://xxx.example.com"),
     EngineServer = new Uri("https://xxx.example.com"),
     PushServer = new Uri("https://xxx.example.com")

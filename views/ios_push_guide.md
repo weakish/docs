@@ -65,11 +65,12 @@ import UserNotifications
 
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-    // should setup application firstly.
+    // 首先需要初始化应用
     do {
         try LCApplication.default.set(
             id: {{appid}},
             key: {{appkey}},
+            // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
             serverURL: "https://xxx.example.com")
     } catch {
         print(error)
@@ -104,9 +105,10 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    // should setup application firstly.
+    // 首先需要初始化应用
     [AVOSCloud setApplicationId:{{appid}}
                       clientKey:{{appkey}}
+                // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名      
                 serverURLString:@"https://xxx.example.com"];
     
     [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
@@ -199,6 +201,7 @@ do {
     try LCApplication.default.set(
         id: {{appid}},
         key: {{appkey}},
+        // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
         serverURL: "https://xxx.example.com",
         configuration: configuration)
 } catch {

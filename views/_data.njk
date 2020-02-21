@@ -126,7 +126,7 @@ public class MyLeanCloudApp extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // 提供 this、App ID、Server Host 作为参数
+        // 提供 this、App ID、绑定的自定义 API 域名作为参数
         AVOSCloud.initializeSecurely(this, "{{appid}}", "https://xxx.example.com");
     }
 }
