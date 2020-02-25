@@ -499,6 +499,8 @@ X-LC-Key: {{masterkey}},master
 
 对于 JavaScript 使用，LeanCloud 支持跨域资源共享，所以你可以将这些 header 同 XMLHttpRequest 一同使用。
 
+REST API 通讯支持 `gzip` 和 `brotli` 压缩，客户端可以通过指定相应的 `Accept-Encoding` HTTP 头开启压缩。
+
 #### 更安全的鉴权方式
 
 我们还支持一种新的 API 鉴权方式，即在 HTTP header 中使用 **X-LC-Sign** 来代替 **X-LC-Key**，以降低 App Key 的泄露风险。例如：
