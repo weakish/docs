@@ -9,7 +9,7 @@ LeanCloud 的 SDK 和 REST API 也支持类似的功能。
 AVObject 字段允许的类型包括对象（`Object`），如果我们想要根据对象的属性发起查询，那么可以使用 `字段名.属性名` 的格式进行查询。
 例如，假设有一个 `Member` 类，其 `occupation` 字段的结构如下：
 
-```js
+```ts
 {
     "profession": string;
     "remark": string;
