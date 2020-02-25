@@ -11,8 +11,8 @@ AVObject 字段允许的类型包括对象（`Object`），如果我们想要根
 
 ```js
 {
-    "profession": string
-    "remark": string
+    "profession": string;
+    "remark": string;
     // ... 其他属性
 }
 ```
