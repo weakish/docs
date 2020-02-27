@@ -31,8 +31,8 @@ CDN 能有效防止 DDoS 攻击，同时也有一定的加速效果（尤其对�
 
 在配置完成之后，可以通过下面的请求验证配置的正确性：
 
-如果是 API 服务： `https://example.yourdomain.com/1.1/date`（应该每次都返回当前的时间）
-如果是云引擎服务： `https://example.yourdomain.com/__engine/1/ping`
+- 如果是 API 服务： `https://example.yourdomain.com/1.1/date`（应该每次都返回当前的时间）
+- 如果是云引擎服务： `https://example.yourdomain.com/__engine/1/ping`
 
 ## 常见问题
 
