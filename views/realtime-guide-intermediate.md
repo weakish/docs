@@ -1520,6 +1520,21 @@ realtime.createIMClient('Tom', { tag: 'Mobile', isReconnect: true }).then(functi
   console.log('冲突时登录失败，不会踢掉较早登录的设备');
 });
 ```
+```swift
+do {
+    let client = try IMClient(ID: "CLIENT_ID", tag: "Mobile")
+    client.open([.reconnect]) { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
 ```objc
 AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile"];
 [currentClient openWithOption:AVIMClientOpenOptionReopen callback:^(BOOL succeeded, NSError *error) {
