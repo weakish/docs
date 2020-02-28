@@ -1513,13 +1513,20 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 已登录用户在应用启动、网络中断等场景下，SDK 会自动重新登录。
 这种情况下，如果触发登录冲突，云端并不会踢掉较早登录的设备，自动重新登录的设备则会收到登录冲突的报错，登录失败。
 
-
-相应地，应用开发者如果希望在用户主动登录触发冲突时，不踢掉较早登录的设备，而提示用户登录失败，可以在登录时设置 `isReconnect` 参数：
+相应地，应用开发者如果希望在用户主动登录触发冲突时，不踢掉较早登录的设备，而提示用户登录失败，可以在登录时传入参数指明这一点：
 
 ```js
 realtime.createIMClient('Tom', { tag: 'Mobile', isReconnect: true }).then(function(tom) {
   console.log('冲突时登录失败，不会踢掉较早登录的设备');
 });
+```
+```objc
+AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile"];
+[currentClient openWithOption:AVIMClientOpenOptionReopen callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // 与云端建立连接成功
+    }
+}];
 ```
 ```java
 AVIMClientOpenOption openOption = new AVIMClientOpenOption();
