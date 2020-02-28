@@ -3780,7 +3780,7 @@ query.maxCacheAge = 24*3600;
   BOOL isInCache = [query hasCachedResult];
   ```
 
-- 删除某一查询的任何缓存结果：
+- 删除某一查询的任何缓存结果：（删除缓存只影响持久化缓存（磁盘缓存），不影响内存缓存，下同）
 
   ```objc
   [query clearCachedResult];
