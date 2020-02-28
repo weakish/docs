@@ -1556,6 +1556,9 @@ currentClient.open(openOption, new AVIMClientCallback() {
   }
 });
 ```
+```cs
+// 暂不支持
+```
 
 
 ## 扩展自己的消息类型
