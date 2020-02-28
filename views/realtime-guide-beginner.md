@@ -3293,7 +3293,7 @@ do {
     print(error)
 }
 
-// Preparetion for Local Storage of IM Client
+// Preparation for Local Storage of IM Client
 do {
     try client.prepareLocalStorage { (result) in
         switch result {
@@ -3335,6 +3335,11 @@ do {
     print(error)
 }
 ```
+
+注意：
+
+1. 聊天室和临时会话没有本地缓存机制。
+2. 会话有内存缓存和持久化（磁盘）缓存。消息只有持久化缓存，且只支持消息查询的结果（查询结果小于 3 时不缓存）。
 
 {{ docs.langSpecEnd('swift') }}
 
