@@ -171,6 +171,10 @@ func application(_ application: UIApplication, didRegisterForRemoteNotifications
 }
 ```
 
+iOS 应用重装或系统审计会导致 device token 变化，因此 Apple 推荐在应用每次启动时都去请求 APNs 的 device token，获取 token 后进行设置并保存 token。
+除此以外，LeanCloud 后端会统计 installation 的更新时间（`updatedAt`），据此清理长期未更新的 installation 数据。
+所以我们建议开发者遵循 Apple 的推荐方式开发应用，以免有效 installation 数据被意外清理，以及因为 device token 过期无效而推送失败。
+
 ## 多证书场景
 
 对于一些应用，他们在发布和上架时分为不同的版本（司机版、乘客版），但数据和消息是互通的，这种场景下我们允许应用上传多个自定义证书并对不同的设备设置 `deviceProfile`，从而可以用合适的证书给不同版本的应用推送。
