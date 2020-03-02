@@ -344,7 +344,10 @@ AndroidManifest.xml 中把 AVHMSPushMessageReceiver 替换为你自定义的 MyH
     </intent-filter>
 </receiver>
 ```
-推送的内容如下
+
+修改 HMS 推送注册函数。特别注意一点，使用自定义 Receiver 的时候，需要调用 `AVMixPushManager.registerHMSPush(context, profile, receiverClazz)` 或者 `AVMixPushManager.registerHMSPush(context, receiverClazz)` 来完成 HMS 推送的初始化，否则会导致 `AVMixPushManager.registerHMSPush` 调用失败。
+
+推送的内容示例如下：
 
 ```json
 {
