@@ -1395,7 +1395,7 @@ onUnreadMessagesCountUpdated(AVIMClient client, AVIMConversation conversation) {
 
 一个用户可以使用相同的账号在不同的客户端上登录（例如 QQ 网页版和手机客户端可以同时接收到消息和回复消息，实现多端消息同步），而有一些场景下，需要禁止一个用户同时在不同客户端登录，例如我们不能用同一个微信账号在两个手机上同时登录。LeanCloud 即时通讯服务提供了灵活的机制，来满足 ***多端登录*** 和 ***单设备登录*** 这两种完全相反的需求。
 
-即时通讯 SDK 在生成 `IMClient` 实例的时候，允许开发者在 `clientId` 之外，增加一个额外的 `tag` 标记。云端在用户登录的时候，会检查 `<ClientId, Tag>` 组合的唯一性。如果当前用户已经在其他设备上使用同样的 `tag` 登录了，那么云端会强制让之前登录的设备下线。如果多个 `tag` 不发生冲突，那么云端会把他们当成独立的设备进行处理，应该下发给该用户的消息会分别下发给所有设备，不同设备上的未读消息计数则是合并在一起的（各端之间消息状态是同步的）；该用户在单个设备上发出来的上行消息，云端也会默认同步到其他设备。
+即时通讯 SDK 在生成 `IMClient` 实例的时候，允许开发者在 `clientId` 之外，增加一个额外的 `tag` 标记。云端在用户主动登录的时候，会检查 `<ClientId, Tag>` 组合的唯一性。如果当前用户已经在其他设备上使用同样的 `tag` 登录了，那么云端会强制让之前登录的设备下线。如果多个 `tag` 不发生冲突，那么云端会把他们当成独立的设备进行处理，应该下发给该用户的消息会分别下发给所有设备，不同设备上的未读消息计数则是合并在一起的（各端之间消息状态是同步的）；该用户在单个设备上发出来的上行消息，云端也会默认同步到其他设备。
 
 以 QQ 那样的多端登录需求为例，我们可以设计三种 `tag`：`Mobile`、`Pad`、`Web`，分别对应三种类型的设备：手机、平板和电脑，那么用户分别在三种设备上登录就都是允许的，但是却不能同时在两台电脑上登录。
 
@@ -1508,6 +1508,58 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 ```
 
 如上述代码中，被动下线的时候，云端会告知原因，因此客户端在做展现的时候也可以做出类似于 QQ 一样友好的通知。
+
+以上提到的登录均指用户主动进行登录操作。
+已登录用户在应用启动、网络中断等场景下，SDK 会自动重新登录。
+这种情况下，如果触发登录冲突，云端并不会踢掉较早登录的设备，自动重新登录的设备则会收到登录冲突的报错，登录失败。
+
+相应地，应用开发者如果希望在用户主动登录触发冲突时，不踢掉较早登录的设备，而提示用户登录失败，可以在登录时传入参数指明这一点：
+
+```js
+realtime.createIMClient('Tom', { tag: 'Mobile', isReconnect: true }).then(function(tom) {
+  console.log('冲突时登录失败，不会踢掉较早登录的设备');
+});
+```
+```swift
+do {
+    let client = try IMClient(ID: "CLIENT_ID", tag: "Mobile")
+    client.open([.reconnect]) { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+```objc
+AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile"];
+[currentClient openWithOption:AVIMClientOpenOptionReopen callback:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // 与云端建立连接成功
+    }
+}];
+```
+```java
+AVIMClientOpenOption openOption = new AVIMClientOpenOption();
+openOption.setReconnect(true);
+AVIMClient currentClient = AVIMClient.getInstance(clientId, "Mobile");
+currentClient.open(openOption, new AVIMClientCallback() {
+  @Override
+  public void done(AVIMClient avimClient, AVIMException e) {
+    if(e == null){
+      // 与云端建立连接成功
+    }
+  }
+});
+```
+```cs
+// 暂不支持
+```
+
 
 ## 扩展自己的消息类型
 
