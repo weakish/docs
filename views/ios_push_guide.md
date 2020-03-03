@@ -171,9 +171,11 @@ func application(_ application: UIApplication, didRegisterForRemoteNotifications
 }
 ```
 
-iOS 应用重装或系统审计会导致 device token 变化，因此 Apple 推荐在应用每次启动时都去请求 APNs 的 device token，获取 token 后进行设置并保存 token。
+iOS 系统重装、从备份恢复应用、在新设备上安装应用都会导致 device token 变化，因此 [Apple 推荐][apple-apns]在应用每次启动时都去请求 APNs 的 device token，获取 token 后进行设置并保存 token。
 除此以外，LeanCloud 后端会统计 installation 的更新时间（`updatedAt`），据此清理长期未更新的 installation 数据。
 所以我们建议开发者遵循 Apple 的推荐方式开发应用，以免有效 installation 数据被意外清理，以及因为 device token 过期无效而推送失败。
+
+[apple-apns]: https://developer.apple.com/documentation/usernotifications/registering_your_app_with_apns
 
 ## 多证书场景
 

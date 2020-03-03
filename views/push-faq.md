@@ -126,9 +126,9 @@ iOS 推送问题的一些排查建议：
 * 请在提交 App Store 之前，使用 Ad Hoc Profile 测试生产环境推送，这种情况下的配置最接近于 App Store。
 * 检查消息菜单里的推送记录中的 `devices` 和 `status`，确认推送状态和接收设备数目正常。
 * 检查消息菜单里的推送记录中的 `invalidTokens` 字段，如果该数字异常大，可能证书选择错误，跟设备 build 的 provisioning profile 不匹配。
-* 建议[使用串行队列操作 installation][swift-demo]，以免保存 installation 时因为多线程写入而崩溃。
+* 建议使用串行队列操作 installation，以免保存 installation 时因为多线程写入而崩溃。可以参考 [Swift Demo 中 VoIP 项目的做法][swift-voip-demo]。
 
-[swift-demo]: https://github.com/leancloud/swift-sdk-demo/blob/839c78f473f4fcd9a149b88d552d7a5c2beab955/swift-sdk-demo/Chat/AppDelegate.swift#L42
+[swift-voip-demo]: https://github.com/leancloud/swift-sdk-demo#voip
 
 ### Android 排查建议
 
