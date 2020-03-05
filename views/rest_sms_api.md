@@ -226,6 +226,7 @@ curl -X POST \
   "updatedAt":    "2014-11-07T20:58:34.448Z",
   "objectId":     "51c3ba66e4b0f0e851c1621b",
   "sessionToken": "pnktnjyb996sj4p156gjtp4im",
+  "mobilePhoneVerified": true,
   // ... 其他属性
 }
 ```
@@ -249,7 +250,7 @@ curl -X POST \
 ### 手机号码验证
 
 如上所述，通过手机号码注册新用户时，LeanCloud 会将用户的 `mobilePhoneNumberVerified` 属性设置为 `true`。
-如果用户是通过其他途径注册的，开发者可以主动要求发送短信验y用户手机：
+如果用户是通过其他途径注册的，开发者可以主动要求发送短信验证用户手机：
 
 ```sh
 curl -X POST \
