@@ -18,6 +18,15 @@ brew install lean-cli
 
 如果之前使用 `npm` 安装过旧版本的命令行工具，为了避免与新版本产生冲突，建议使用 `npm uninstall -g leancloud-cli` 卸载旧版本命令行工具。或者直接按照 `homebrew` 的提示，执行 `brew link --overwrite lean-cli` 覆盖掉之前的 `lean` 命令来解决。
 
+有些地区 Homebrew 访问网络可能很慢，可以通过设置环境变量 `http_proxy`、`https_proxy`、`all_proxy` 加速访问（详见 [man brew]）。
+
+[man brew]: https://docs.brew.sh/Manpage
+
+或者也可以在 {{release}} 下载适用于 macOS 的二进制文件，重命名为 `lean`　后移动到 `$PATH` 下的路径，并添加可执行权限（`chmod a+x /path/to/lean`）。
+如果运行 `lean` 时 macOS 报错「来自身份不明的开发者」，那么需要在 macOS 系统设置「隐私与安全」下配置一下，详见 [Apple 官方文档][HT202491]。
+
+[HT202491]: https://support.apple.com/en-us/HT202491
+
 ### Windows
 
 Windows 用户可以在 {{release}} 根据操作系统版本下载最新的 32 位 或 64 位 **msi** 安装包进行安装，安装成功之后在 Windows 命令提示符（或 PowerShell）下直接输入 `lean` 命令即可使用。
