@@ -23,9 +23,9 @@
   - 内建账户系统（AVUser）
   - 查询（AVQuery）
   - 文件存储（AVFile）
-  - 社交关系（AVFriendship，当前版本暂不提供）
-  - 朋友圈（AVStatus，当前版本暂不提供）
+  - 朋友圈（AVStatus）
   - 短信（AVSMS）
+  - 社交关系（用户 follow 关系）
   - 等等
 - realtime-core：部分依赖 storage-core library，实现了 LiveQuery 以及即时通讯功能，如：
   - LiveQuery
@@ -37,8 +37,8 @@
 #### Android 特有的包
 - storage-android：是 storage-core 在 Android 平台的定制化实现，接口与 storage-core 完全相同。
 - realtime-android：是 realtime-core 在 Android 平台的定制化实现，并且增加 Android 推送相关接口。
-- mixpush-android：是 LeanCloud 混合推送的 library，支持华为、小米、魅族、vivo 以及 oppo 的官方推送。
-- leancloud-fcm：是 Firebase Cloud Messaging 的封装 library，供美国节点的 app 使用推送服务。
+- mixpush-android：是 LeanCloud 混合推送的 library，支持华为、小米（包括国际版）、魅族、vivo 以及 oppo 的官方推送。
+- leancloud-fcm：是 Firebase Cloud Messaging 的封装 library，供国际版 app 使用推送服务。
 
 
 #### 模块依赖关系
