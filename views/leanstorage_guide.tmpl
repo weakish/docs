@@ -155,71 +155,9 @@ do {
 
 {% if platform_name === "Android / Java" %}
 
-## Android SDK 老版本迁移
-
-如果你已经在使用我们 [老版本 Android SDK](https://github.com/leancloud/android-sdk-all)，要迁移到当前新版本，函数接口方面新版 SDK 尽可能沿用老版 SDK 的命名方式，所以要做的改动主要是Callback 回调机制的修改。
-
-### Observable 接口
-例如老的方式保存一个 AVObject 的代码如下(Callback 方式)：
-```java
-final AVObject todo = new AVObject("Todo");
-todo.put("title", "工程师周会");
-todo.put("content", "每周工程师会议，周一下午2点");
-todo.put("location", "会议室");// 只要添加这一行代码，服务端就会自动添加这个字段
-todo.saveInBackground(new SaveCallback() {
-  @Override
-  public void done(AVException e) {
-    if (e == null) {
-      // 存储成功
-      Log.d(TAG, todo.getObjectId());// 保存成功之后，objectId 会自动从服务端加载到本地
-    } else {
-      // 失败的话，请检查网络环境以及 SDK 配置是否正确
-    }
-  }
-});
-```
-而新版本 SDK 里 `AVObject#saveInBackground` 方法，返回的是一个 `Observable<? extends AVObject>` 实例，我们需要 subscribe 才能得到结果通知，新版本的实现方式如下：
-```java
-final AVObject todo = new AVObject("Todo");
-todo.put("title", "工程师周会");
-todo.put("content", "每周工程师会议，周一下午2点");
-todo.put("location", "会议室");// 只要添加这一行代码，服务端就会自动添加这个字段
-todo.saveInBackground().subscribe(new Observer<AVObject>() {
-  public void onSubscribe(Disposable disposable) {
-  }
-  public void onNext(AVObject avObject) {
-    System.out.println("remove field finished.");
-  }
-  public void onError(Throwable throwable) {
-  }
-  public void onComplete() {
-  }
-});
-```
-
-### ObserverBuilder 工具类
-这个改动比较大，考虑到尽量降低迁移成本，我们准备了一个工具类 `cn.leancloud.convertor.ObserverBuilder`，该类有一系列的 `buildSingleObserver` 方法，来帮我们由原来的 Callback 回调函数生成 `Observable` 实例，上面的例子按照这种方法可以变为：
-
-```java
-final AVObject todo = new AVObject("Todo");
-todo.put("title", "工程师周会");
-todo.put("content", "每周工程师会议，周一下午2点");
-todo.put("location", "会议室");// 只要添加这一行代码，服务端就会自动添加这个字段
-todo.saveInBackground().subscribe(ObserverBuilder.buildSingleObserver(new SaveCallback() {
-  @Override
-  public void done(AVException e) {
-    if (e == null) {
-      // 存储成功
-      Log.d(TAG, todo.getObjectId());// 保存成功之后，objectId 会自动从服务端加载到本地
-    } else {
-      // 失败的话，请检查网络环境以及 SDK 配置是否正确
-    }
-  }
-}));
-```
-处理异步调用结果的两种方式，可供大家自由选择。
-
-** 另外，在新版 SDK 中我们统一将包名的 root 目录由 `com.avos.avoscloud` 改成了 `cn.leancloud`，也需要大家做一个全局替换。** 
+> Android SDK 老版本迁移
+> 
+> 如果你还在在使用我们老版本 Android SDK（所有版本号低于 `5.0.0`，`groupId` 为 `cn.leancloud.android` 的 libraries），要迁移到新版的 Unified SDK，具体迁移方法详见 [Java Unified SDK 迁移指南](java_unified_sdk_migration.html)。
 
 {% endif %}
 
