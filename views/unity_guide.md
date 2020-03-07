@@ -1,7 +1,7 @@
 {% import "views/_data.njk" as data %}
 {% import "views/_helper.njk" as docs %}
 {% set segment_code ="dotnet" %}
-{% set app_permission_link = "[控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)" %}
+{% set app_permission_link = "「控制台 > 存储 > 用户 > 设置」" %}
 
 # 数据存储开发指南 · Unity
 

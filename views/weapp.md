@@ -414,7 +414,7 @@ AV.User.loginWithWeapp().then(user => {
 }).catch(console.error);
 ```
 
-{{ docs.note("验证手机号码功能要求在 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf) 启用「用户注册时，向注册手机号码发送验证短信」。") }}
+{{ docs.note("验证手机号码功能要求在「控制台 > 存储 > 用户 > 设置」中启用「用户注册时，向注册手机号码发送验证短信」。") }}
 
 ### 绑定现有用户
 如果你的应用已经在使用 LeanCloud 的用户系统，或者用户已经通过其他方式注册了你的应用（比如在 Web 端通过用户名密码注册），可以通过在小程序中调用 `AV.User#associateWithWeapp()` 来关联已有的账户：

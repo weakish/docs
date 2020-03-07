@@ -1801,6 +1801,12 @@ https://{{host}}/1.1/login
 {"email":"hjiang@example.com","password":"f32@ds*@&dsa"}
 ```
 
+类似地，将 `username` 换成 `mobilePhoneNumber` 可以通过手机号和密码登录：
+
+```json
+{"mobilePhoneNumber":"+86186xxxxxxxx","password":"f32@ds*@&dsa"}
+```
+
 返回的主体是一个 JSON 对象包括所有除了 password 以外的自定义字段。它同样包含了 createdAt、updateAt、objectId 和 sessionToken 字段。
 
 ```json

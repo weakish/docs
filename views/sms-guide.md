@@ -1079,7 +1079,7 @@ cloud.request_sms_code("18200008888",
 
 LeanCloud 提供了内建的 [账户系统](leanstorage_guide-js.html#用户) 来帮助开发者快速完成用户的注册、登录、重置密码等功能，同时为了方便使用，我们也集成了账户系统手机号码相关的短信功能，譬如账户注册时自动验证手机号、手机号码登录和重置密码等等。
 
-我们可以在 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf) 查看相关选项：
+我们可以在「控制台 > 存储 > 用户 > 设置」查看相关选项：
 
 {{ include.checkbox(true) }}**从客户端注册或更新手机号时，向注册手机号码发送验证短信**
 - 开启：调用 `AVUser` 注册相关的接口时，如果传入了手机号，系统则会自动发送验证短信，然后开发者需要手动调用一下验证接口，这样 `_User` 表中的 `mobilePhoneVerified` 值才会被置为 `true`。
