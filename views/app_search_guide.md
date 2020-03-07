@@ -69,8 +69,8 @@ https://{{host}}/1.1/go/com.leancloud.todo
 
 其中包括三个设定项目：
 
-- **启用**：你可以启用或者关闭这个 Class 的应用内搜索功能，默认是关闭的。每个应用最多允许 5 个 Class 启用应用内搜索。
-- **选择开放的列**：你可以选择哪些字段将加入索引引擎用于搜索，每个 Class 最多允许索引 5 个字段（除内置字段外）。请仔细挑选要索引的字段。默认情况下，`objectId`、`createdAt`、`updatedAt` 三个字段将无条件加入开放字段列表。
+- **启用**：你可以启用或者关闭这个 Class 的应用内搜索功能，默认是关闭的。开发版应用最多允许 5 个 Class 启用应用内搜索，商用版应用最多允许 10 个 Class 启用应用内搜索。
+- **选择开放的列**：你可以选择哪些字段将加入索引引擎用于搜索。默认情况下，`objectId`、`createdAt`、`updatedAt` 三个字段将无条件加入开放字段列表。除了这三个字段外，开发版应用每个 Class 最多允许索引 5 个字段，商用版应用每个 Class 最多允许索引 10 个字段。请仔细挑选要索引的字段。
 - **数据模板**：设置这个 Class 的数据展现模板，当外部调用无法打开应用（通常是用户没有安装应用）的时候，将渲染这个模板并展现给用户，默认的模板的只是渲染一些下载链接，你可以自定义这个模板的样式，比如加入你的应用 Logo， 添加 CSS 等。
 
 **如果一个 Class 启用了应用内搜索，但是超过两周没有任何搜索调用，我们将自动禁用该 Class 的搜索功能。**
@@ -333,7 +333,7 @@ searchQuery.setSortBuilder(builder);
 
   /**
    * 设置返回的高亮语法，默认为"*"
-   * 语法规则可以参考 http://www.elasticsearch.org/guide/en/elasticsearch/reference/current
+   * 语法规则可以参考 https://www.elasticsearch.org/guide/en/elasticsearch/reference/6.5
    * /search-request-highlighting.html#highlighting-settings
    *
    * @param hightlights
@@ -420,7 +420,7 @@ searchQuery.fields = @[@"field1", @"field2"];
 /*!
  *  当前页面的scroll id，用于分页，可选。
  #  @warning 如非特殊需求，请不要手动设置 sid。每次 findObjects 之后，SDK 会自动更新 sid。如果手动设置了错误的sid，将无法获取到搜索结果。
- *  有关scroll id，可以参考 http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/scan-scroll.html
+ *  有关scroll id，可以参考 https://www.elastic.co/guide/en/elasticsearch/reference/6.5/search-request-scroll.html
  */
 @property (nonatomic, retain) NSString *sid;
 
@@ -478,20 +478,21 @@ curl -X GET \
 
 ``` json
 {
-results: [
+"hits": 1,  
+"results": [
   {
-    _app_url: "http://stg.pass.com//1/go/com.leancloud/classes/GameScore/51e3a334e4b0b3eb44adbe1a",
-    _deeplink: "com.leancloud.appSearchTest://leancloud/classes/GameScore/51e3a334e4b0b3eb44adbe1a"
-    updatedAt: "2011-08-20T02:06:57.931Z",
-    playerName: "Sean Plott",
-    objectId: "51e3a334e4b0b3eb44adbe1a",
-    createdAt: "2011-08-20T02:06:57.931Z",
-    cheatMode: false,
-    score: 1337
-  },
-  ……
+    "_app_url": "http://stg.pass.com//1/go/com.leancloud/classes/GameScore/51e3a334e4b0b3eb44adbe1a",
+    "_deeplink": "com.leancloud.appSearchTest://leancloud/classes/GameScore/51e3a334e4b0b3eb44adbe1a",
+    "_highlight": null,
+    "updatedAt": "2011-08-20T02:06:57.931Z",
+    "playerName": "Sean Plott",
+    "objectId": "51e3a334e4b0b3eb44adbe1a",
+    "createdAt": "2011-08-20T02:06:57.931Z",
+    "cheatMode": false,
+    "score": 1337
+  }
 ],
-sid: "cXVlcnlUaGVuRmV0Y2g7Mzs0NDpWX0NFUmFjY1JtMnpaRDFrNUlBcTNnOzQzOlZfQ0VSYWNjUm0yelpEMWs1SUFxM2c7NDU6Vl9DRVJhY2NSbTJ6WkQxazVJQXEzZzswOw=="
+"sid": "cXVlcnlUaGVuRmV0Y2g7Mzs0NDpWX0NFUmFjY1JtMnpaRDFrNUlBcTNnOzQzOlZfQ0VSYWNjUm0yelpEMWs1SUFxM2c7NDU6Vl9DRVJhY2NSbTJ6WkQxazVJQXEzZzswOw=="
 }
 ```
 
@@ -501,14 +502,16 @@ sid: "cXVlcnlUaGVuRmV0Y2g7Mzs0NDpWX0NFUmFjY1JtMnpaRDFrNUlBcTNnOzQzOlZfQ0VSYWNjUm
 ---|---|---
 `skip`||跳过的文档数目，默认为 0
 `limit`||返回集合大小，默认 100，最大 1000
-`sid`|可选|第一次查询结果中返回的 sid 值，用于分页，对应于 elasticsearch 中的 scoll id。
-`q`|必须|查询文本，支持类似 google 的搜索语法。
+`sid`|可选|第一次查询结果中返回的 sid 值，用于分页，对应于 elasticsearch 中的 [scroll id]。
+`q`|必须|查询文本，支持 elasticsearch 的 query string 语法。
 `fields`|可选|逗号隔开的字段列表，查询的字段列表
-<code class="text-nowrap">highlights</code>|可选|高亮字段，可以是通配符 `*`，也可以是字段列表逗号隔开的字符串。如果加入，返回结果会多出 `_highlight` 属性，表示高亮的搜索结果内容，关键字用 `em` 标签括起来。
+<code class="text-nowrap">highlights</code>|可选|高亮字段，可以是通配符 `*`，也可以是字段列表逗号隔开的字符串。如果加入，返回结果的 `_highlight` 属性将包含高亮的搜索结果内容，关键字用 `em` 标签括起来。
 `clazz`|可选|类名，如果没有指定或者为空字符串，则搜索所有启用了应用内搜索的 class。
 `order`|可选|排序字段，形如 `-score,createdAt` 逗号隔开的字段，负号表示倒序，可以多个字段组合排序。
 `include`||关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
 `sort`||复杂排序字段，例如地理位置信息排序，见下文描述。
+
+[scroll id]: https://www.elastic.co/guide/en/elasticsearch/reference/6.5/search-request-scroll.html
 
 返回结果属性介绍：
 
@@ -516,10 +519,11 @@ sid: "cXVlcnlUaGVuRmV0Y2g7Mzs0NDpWX0NFUmFjY1JtMnpaRDFrNUlBcTNnOzQzOlZfQ0VSYWNjUm
 - `hits`：符合查询条件的文档总数
 - `sid`：标记本次查询结果，下次查询继续传入这个 sid 用于查找后续的数据，用来支持翻页查询。
 
-返回结果 results 列表里是一个一个的对象，字段是你在应用内搜索设置里启用的字段列表，并且有两个特殊字段：
+返回结果 results 列表里是一个一个的对象，字段是你在应用内搜索设置里启用的字段列表，并且有三个特殊字段：
 
 - `_app_url`：应用内搜索结果在网站上的链接。
 - `_deeplink`：应用内搜索的程序调用 URL，也就是 deeplink。
+- `_highlight`: 高亮的搜索结果内容
 
 最外层的 `sid` 用来标记本次查询结果，下次查询继续传入这个 sid 将翻页查找后 200 条数据：
 
@@ -573,7 +577,7 @@ curl -X GET \
 
 ### q 查询语法举例
 
-q 的查询走的是 elasticsearch 的 [query string 语法](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
+q 的查询走的是 elasticsearch 的 [query string 语法](https://www.elasticsearch.org/guide/en/elasticsearch/reference/6.5/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
 
 查询的关键字保留字符包括： `+ - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /`，当出现这些字符的时候，请对这些保留字符做 URL Escape 转义。
 
@@ -601,7 +605,7 @@ q 的查询走的是 elasticsearch 的 [query string 语法](http://www.elastics
 name:/joh?n(ath[oa]n)/
 ```
 
-正则的语法参考 [正则语法](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html#regexp-syntax)。
+正则的语法参考 [正则语法](https://www.elastic.co/guide/en/elasticsearch/reference/6.5/query-dsl-regexp-query.html#regexp-syntax)。
 
 #### 模糊查询
 
@@ -763,4 +767,4 @@ curl -X GET \
 `min_doc_freq`|可选|**词语至少出现的文档个数，少于这个值的词将被忽略，默认值为 5**，同样，如果返回文档数目过少，可以尝试调低此值。
 `max_doc_freq`|可选|词语最多出现的文档个数，超过这个值的词将被忽略，防止一些无意义的热频词干扰结果，默认无限制。
 
-更多内容参考 [ElasticSearch 文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-mlt-query.html)。
+更多内容参考 [ElasticSearch 文档](https://www.elastic.co/guide/en/elasticsearch/reference/6.5/query-dsl-mlt-query.html)。
