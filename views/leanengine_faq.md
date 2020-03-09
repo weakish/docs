@@ -80,6 +80,11 @@ lean -p 3002
 
 请参考 [网站托管开发指南 · 预备环境和生产环境](leanengine_webhosting_guide-node.html#预备环境和生产环境) 。
 
+## 定时任务应该在预备环境还是生产环境执行？
+
+系统赠送的预备环境体验实例会[自动休眠](leanengine_plan.html#休眠策略)，可能干扰定时任务的执行，因此一般建议在预备环境测试定时任务，在生产环境正式执行定时任务。
+如果定时任务 CPU、内存占用非常高，担心影响生产环境的网站托管功能或其他云函数访问，那么可以在预备环境购买标准实例，并在预备环境执行定时任务。
+
 ## 怎么添加第三方模块
 
 只需要像普通的 Node.js 项目那样，在项目根目录的 `package.json` 中添加依赖即可：
@@ -303,6 +308,6 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 见 [网站托管开发指南 · Node.js](leanengine_webhosting_guide-node.html#用户状态管理)。
 
-## 定时器 crontab 表达式
+## 定时任务 crontab 表达式
 
 见 [云函数开发指南 · Node.js](leanengine_cloudfunction_guide-node.html#Cron_表达式)。
