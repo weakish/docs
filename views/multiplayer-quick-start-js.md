@@ -178,7 +178,7 @@ client.joinOrCreateRoom('room1').then(() => {
     // 加入或创建房间成功
 }).catch((error) => {
     // 加入房间失败，也没有成功创建房间
-    console.error(errod.code, error.detail);
+    console.error(error.code, error.detail);
 });
 ```
 
