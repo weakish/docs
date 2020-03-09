@@ -159,7 +159,7 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         mdPath: 'https://github.com/hjiang/react-hook-demo',
         type: 'web',
         qcloudShow: true
-        
+
       }, {
         name: 'LeanMessage',
         desc: '使用 JavaScript 即时通讯 SDK 与 Angular 实现的完整功能的聊天 WebApp',
@@ -214,17 +214,10 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         type: 'node',
         qcloudShow: true
       },{
-        name: 'Node.js 小 Demo 合集',
+        name: '云引擎 Node.js Demo 汇总',
         desc: '该项目包括了推荐的最佳实践和常用的代码片段，每个文件中都有较为详细的注释，适合云引擎的开发者来阅读和参考，所涉及的代码片段也可以直接复制到项目中使用。',
         downPath: '',
         mdPath: 'https://github.com/leancloud/leanengine-nodejs-demos',
-        type: 'node',
-        qcloudShow: true
-      },{
-        name: 'Redis 缓存',
-        desc: '使用 LeanCache 来实现抢红包、排行榜缓存、关联数据缓存、图形验证码、节点选举和锁、任务队列、热点只读数据缓存等实用功能，展示出 Redis 缓存的实际应用效果。',
-        downPath: '',
-        mdPath: 'https://github.com/leancloud/lean-cache-demos',
         type: 'node',
         qcloudShow: true
       },{

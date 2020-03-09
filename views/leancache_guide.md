@@ -15,7 +15,13 @@ LeanCache 使用 [Redis](http://redis.io/) （3.0.x）来提供高性能、高�
 
 <div style="max-width:620px"><img src="images/leancache_arch.png" class="img-responsive" alt=""></div>
 
-恰当使用 LeanCache 不仅可以极大地提高应用的服务性能，还能**降低成本**，因为某些高频率的查询不需要走存储服务（存储服务按调用次数收费）。我们在 [LeanCache Node.js Demos](https://github.com/leancloud/lean-cache-demos) 这个仓库中包含了一些常见的使用场景的示例，可供大家参考。
+恰当使用 LeanCache 不仅可以极大地提高应用的服务性能，还能**降低成本**，因为某些高频率的查询不需要走存储服务（存储服务按调用次数收费）。你可以在 [leanengine-nodejs-demos](https://github.com/leancloud/leanengine-nodejs-demos) 中找到一些有关 LeanCache 的示例：
+
+- [associated-data](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/associated-data.js) 缓存关联数据
+- [leaderboard](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/leaderboard.js) 实现排行榜
+- [limited-stock-rush](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/limited-stock-rush.js) 实现秒杀抢购
+- [redlock](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/redlock.js) 实现分布式锁
+
 
 ## 主要特性
 
