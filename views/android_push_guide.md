@@ -399,3 +399,40 @@ curl -X POST \
 ## 混合推送
 
 自 Android 8.0 之后，系统权限控制越来越严，第三方推送通道的生命周期受到较大限制，同时国内主流厂商也开始推出自己独立的推送服务。因此我们提供「混合推送」的方案来提升推送到达率，具体请参考 [混合推送开发指南](android_mixpush_guide.html)。
+
+### 让 PushService 前台运行
+
+对于高版本的 Android OS 系统来说，后台 Service 受到越来越严格的限制，为了尽量保证 PushService 的生命周期，让 PushSevice 成为前台 Service（foreground Service）来运行也是一个可以考虑的选择。
+
+为了支持这一选项，从 6.4.0 版本开始，我们在 `realtime-android` library 中，给 PushService 增加了一个新的配置项，以便开发者自己选择是否让 PushService 在前台运行：
+```
+  /**
+   * 设置 PushService 以前台进程的方式运行（默认是 background service）。
+   * Android 前台 Service 必须要显示一个 Notification 在通知栏，详见说明：
+   * https://developer.android.com/guide/components/services
+   *
+   * @param enableForeground enable PushService run on foreground or not.
+   * @param identifier The identifier for this notification as per
+   * {@link NotificationManager#notify(int, Notification)
+   * NotificationManager.notify(int, Notification)}; must not be 0.
+   * @param notification The Notification to be displayed.
+   */
+  public static void setForegroundMode(boolean enableForeground, int identifier, Notification notification);
+```
+
+PushService 默认是始终在后台运行的，如果切换到前台运行，从我们测试的结果来看，PushService 可以保持长时间不被系统杀死。设置前台运行的示例代码如下：
+```
+String channelId = "cn.leancloud.simpleapp";
+PushService.setDefaultChannelId(this, channelId);
+
+NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId);
+Notification notification = notificationBuilder.setOngoing(true)
+    .setSmallIcon(R.mipmap.ic_launcher)
+    .setContentTitle("App is running in background")
+    .setPriority(NotificationManager.IMPORTANCE_MIN)
+    .setCategory(Notification.CATEGORY_SERVICE)
+    .build();
+PushService.setForegroundMode(true, 101, notification);
+```
+
+
