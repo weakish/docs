@@ -3,6 +3,10 @@
 
 {% macro requireServerURL() %}
 请将 `xxx.example.com` 替换为你的应用[绑定的 API 域名](custom-api-domain-guide.html#API_域名)。
+
+国际版应用不要求绑定自定义域名。
+如果你的国际版应用（App ID 后缀为 `-MdYXbMMI`）没有绑定自定义域名，初始化 SDK 时不用传入服务器地址参数。
+极个别　App ID　后缀不为 `-MdYXbMMI` 的国际版应用，请参见[这里的说明](custom-api-domain-guide.html#App_ID_后缀不为_-MdYXbMMI_的国际版应用如何初始化_SDK)。
 {% endmacro %}
 
 # {{platform_name}} SDK 安装指南

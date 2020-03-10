@@ -330,6 +330,123 @@ AVClient.Initialize(new AVClient.Configuration {
 
 在云引擎以外的服务端使用 PHP 或 Python SDK，可以不配置 API 自定义域名。
 
+#### App ID 后缀不为 `-MdYXbMMI` 的国际版应用如何初始化 SDK
+
+国际版应用不要求绑定自定义域名。
+相应地，如果你的国际版应用没有绑定自定义域名，初始化 SDK 时也就不用配置自定义域名。
+但是，有极个别国际版应用的 App ID 后缀不为 `-MdYXbMMI`（包括个别老应用以及进行过特殊配置迁移到国际版的应用），初始化 SDK 时不配置自定义域名可能会报错
+（因为较新版本的 SDK 增加了自定义域名配置参数的检查，检查时会根据 App ID 后缀判断是否为国际版应用）。
+如果你的国际版应用 App ID 后缀不为 `-MdYXbMMI`，那么我们建议你绑定一个自定义域名，然后在初始化 SDK 时配置自定义域名，这样可以避免这个问题。
+
+如果你的国际版应用 App ID 后缀不为 `-MdYXbMMI`，但就是不想绑定自定义域名，那么需要这样初始化 SDK：
+
+<details>
+
+<p>注意，请使用你的应用 App ID 的前 8 位替换以下 url 地址中的 <code>aaaaaaaa</code>。<p>
+
+<p><strong>JavaScript 存储</strong></p>
+
+<pre><code>
+AV.init({
+  // appId, appKey,
+  serverURLs: {
+    push: 'https://aaaaaaaa.push.lncldglobal.com',
+    stats: 'https://aaaaaaaa.stats.lncldglobal.com',
+    engine: 'https://aaaaaaaa.engine.lncldglobal.com',
+    api: 'https://aaaaaaaa.api.lncldglobal.com',
+  },
+});
+</code></pre>
+
+<p><strong>JavaScript 即时通讯</strong></p>
+
+<p>请参考 <a href="realtime-guide-beginner.html#创建_IMClient">即时通讯开发指南</a> 配置。
+其中 <code>server</code> 参数的值为 <code>aaaaaaaa.rtm.lncldglobal.com</code>。</p>
+
+<p><strong>JavaScript 多人在线对战</strong></p>
+
+<p>请参考 <a href="multiplayer-quick-start-js.html#初始化">入门指南</a> 或 <a href="multiplayer-guide-js.html#初始化">开发指南</a> 进行配置。
+其中 <code>playServer</code> 参数的值为 <code>aaaaaaaa.play.lncldglobal.com</code>。</p>
+
+<p><strong>Objective-C</strong></p>
+
+<pre><code>
+// 配置 SDK 储存
+[AVOSCloud setServerURLString:@"https://aaaaaaaa.api.lncldglobal.com" forServiceModule:AVServiceModuleAPI];
+// 配置 SDK 推送
+[AVOSCloud setServerURLString:@"https://aaaaaaaa.push.lncldglobal.com" forServiceModule:AVServiceModulePush];
+// 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
+[AVOSCloud setServerURLString:@"https://aaaaaaaa.engine.lncldglobal.com" forServiceModule:AVServiceModuleEngine];
+// 配置 SDK 即时通讯
+[AVOSCloud setServerURLString:@"https://aaaaaaaa.rtm.lncldglobal.com" forServiceModule:AVServiceModuleRTM];
+// 配置 SDK 统计
+[AVOSCloud setServerURLString:@"https://aaaaaaaa.stats.lncldglobal.com" forServiceModule:AVServiceModuleStatistics];
+// 初始化应用
+[AVOSCloud setApplicationId:@"{{appid}}" clientKey:@"{{appkey}}"];
+</code></pre>
+
+<p><strong>Swift</strong></p>
+
+<pre><code>
+let configuration = LCApplication.Configuration(
+    customizedServers: [
+        .api("https://aaaaaaaa.api.lncldglobal.com"),
+        .engine("https://aaaaaaaa.engine.lncldglobal.com"),
+        .push("https://aaaaaaaa.push.lncldglobal.com"),
+        .rtm("https://aaaaaaaa.rtm.lncldglobal.com")
+    ]
+)
+do {
+    try LCApplication.default.set(
+        id: "{{appid}}",
+        key: "{{appkey}}",
+        configuration: configuration
+    )
+} catch {
+    fatalError("\(error)")
+}
+</code></pre>
+
+<p><strong>Java</strong></p>
+
+<pre><code>
+import cn.leancloud.AVOSCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // 配置 SDK 储存
+        AVOSCloud.setServer(AVOSService.API, "https://aaaaaaaa.api.lncldglobal.com");
+        // 配置 SDK 云引擎（用于访问云函数，使用 API 自定义域名，而非云引擎自定义域名）
+        AVOSCloud.setServer(AVOSService.ENGINE, "https://aaaaaaaa.engine.lncldglobal.com");
+        // 配置 SDK 推送
+        AVOSCloud.setServer(AVOSService.PUSH, "https://aaaaaaaa.push.lncldglobal.com");
+        // 配置 SDK 即时通讯
+        AVOSCloud.setServer(AVOSService.RTM, "https://aaaaaaaa.rtm.lncldglobal.com"); 
+
+        // 提供 this、App ID 和 App Key 作为参数
+        // 注意这里千万不要调用 cn.leancloud.core.AVOSCloud 的 initialize 方法，否则会出现 NetworkOnMainThread 等错误。
+        AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}");
+    }
+}
+</code></pre>
+
+<p><strong>.NET</strong></p>
+
+<pre><code>
+AVClient.Initialize(new AVClient.Configuration {
+                ApplicationId = "{{appid}}",
+                ApplicationKey = "{{appkey}}",
+                ApiServer = new Uri("https://aaaaaaaa.api.lncldglobal.com"),
+                EngineServer = new Uri("https://aaaaaaaa.engine.lncldglobal.com"),
+                PushServer = new Uri("https://aaaaaaaa.push.lncldglobal.com")
+});
+<code></pre>
+
+
+</details>
+
 ## CNAME 设置
 
 绝大部分情况下，绑定域名均需要设置 CNAME，因此这里我们简单解释下如何设置 CNAME。
