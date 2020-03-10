@@ -2585,10 +2585,10 @@ v3|3.x|3.x|8|需要使用 Promise 写法|async, bluebird, crypto, debug, ejs, ja
 定时任务是普通的云函数，也会遇到 [超时问题](#云函数超时)，具体请参考 [超时处理方案](#超时的处理方案)。
 
 {% call docs.noteWrap() %}
-一个定时器如果在 24 小时内收到了超过 30 次的 `400`（Bad Request）或 `502`（Bad Gateway）的应答，它将会被云引擎禁用，同时系统会向开发者发出相关的禁用通知邮件。在控制台的日志中，对应的错误信息为 [`timerAction short-circuited and no fallback available`](#错误信息)。
+一个定时任务如果在 24 小时内收到了超过 30 次的 `400`（Bad Request）或 `502`（Bad Gateway）的应答，它将会被云引擎禁用，同时系统会向开发者发出相关的禁用通知邮件。在控制台的日志中，对应的错误信息为 [`timerAction short-circuited and no fallback available`](#错误信息)。
 {% endcall %}
 
-部署云引擎之后，进入 [控制台 > 云引擎 > 定时任务](/dashboard/cloud.html?appid={{appid}}#/task)，点击 **创建定时器**，然后设定执行的函数名称、执行环境等等。例如定义一个打印循环打印日志的任务 `logTimer`：
+部署云引擎之后，进入 [控制台 > 云引擎 > 定时任务](/dashboard/cloud.html?appid={{appid}}#/task)，点击 **创建定时任务**，然后设定执行的函数名称、执行环境等等。例如定义一个打印循环打印日志的任务 `logTimer`：
 
 {% if platformName === "Node.js" %}
 ```js
@@ -2620,65 +2620,48 @@ public static float logTimer throws Exception {
 ```
 {% endif %}
 {% if platformName === ".NET" %}
-{# TODO #}
+[EngineFunction("logTimer")]
+public static void LogTimer()
+{
+  Console.WriteLine("This log is printed by logTimer.");
+}
 {% endif %}
-
-定时器创建后，其状态为 **未运行**，需要点击 <span class="label label-default">启用</span> 来激活。之后其执行日志可以在 **日志** 页面中查看。
 
 定时任务分为两类：
 
 - 使用 Cron 表达式安排调度
 - 以秒为单位的简单循环调度
 
-以 Cron 表达式为例，比如每周一早上 8 点准时发送推送消息给用户：
-
-{% if platformName === "Node.js" %}
-```js
-AV.Cloud.define('pushTimer', function(request){
-  return AV.Push.send({
-    channels: ['Public'],
-    data: {
-      alert: 'Public message'
-    }
-  });
-});
-```
-{% endif %}
-{% if platformName === "Python" %}
-{# TODO #}
-{% endif %}
-{% if platformName === "PHP" %}
-```php
-use \LeanCloud\Push;
-
-Cloud::define("pushTimer", function($params, $user) {
-    $push = new Push(array("alert" => "Public message"));
-    $push->setChannels(array("Public"));
-    $push->send();
-});
-```
-{% endif %}
-{% if platformName === "Java" %}
-{# TODO #}
-{% endif %}
-{% if platformName === ".NET" %}
-{# TODO #}
-{% endif %}
-
-创建定时器的时候，选择 **Cron 表达式** 并填入 `0 0 8 ? * MON`。
+以 Cron 表达式为例，比如每周一早上 8 点打印日志（运行之前定义的 `logTimer` 函数），创建定时任务的时候，选择 **Cron 表达式** 并填入 `0 0 8 ? * MON`。
 
 Cron 表达式的语法可以参考 [云队列使用指南的 Cron 表达式一节](leanengine_cloudqueue.html#CRON_表达式)。
 
-### 定时器数量
+点击「非必填」会展开更多选项：
 
-生产环境和预备环境的定时器数量都限制在 6 个以内，也就是说你总共最多可以创建 12 个定时器。
+- 运行参数：传递给云函数的参数（JSON 对象）。
+- 异常策略：任务因云函数超时失败后重试执行还是放弃执行。
 
-### 错误信息
+定时任务创建后，会显示「最近一次执行时间」和「下次执行时间」。
+「最近一次执行时间」除了显示时间外，还会显示执行结果，点击「查看详情」还可以查看细节：
 
-定时器执行后的日志会记录在 [控制台 > 云引擎 > 日志](/dashboard/cloud.html?appid={{appid}}#/log) 中，以下为常见的错误信息及原因：
+- `status` 任务的状态，包括 `success`（成功）、`failed`（失败）
+- `uniqueId` 任务的唯一 ID
+- `finishedAt` 执行完成的精确时间（仅限成功任务）
+- `statusCode` 云函数响应的 HTTP 状态码（仅限成功任务）
+- `result` 来自云函数的响应（仅限成功任务）
+- `error` 错误提示（仅限失败任务）
+- `retryAt` 下次重试时间（仅限失败任务）
 
-- **timerAction timed-out and no fallback available**<br>某个定时器触发的云函数，因 15 秒内没有响应而超时（可参考 [对云函数调用超时的处理](#超时的处理方案)）。
-- **timerAction short-circuited and no fallback available**<br>某个定时器触发的云函数因为太多次超时而停止触发。
+具体的执行日志可以在[控制台 > 云引擎 > 日志](/dashboard/cloud.html?appid={{appid}}#/log) 查看。
+例如：
+
+```
+CloudQueue 运行失败 24e1b480-aeb5-4222-ab7d-7d4b8ee170b9: hello !! {"error":"Error: ESOCKETTIMEDOUT"}
+```
+
+如果希望暂停定时任务（比如遇到报错需要排查），可以点击状态栏的「暂停」按钮。
+相应地，点击「启用」按钮可以重新启用暂停的任务。
+点击操作栏的「编辑」、「删除」按钮则可以修改、删除定时任务。
 
 ## Master Key 和超级权限
 
