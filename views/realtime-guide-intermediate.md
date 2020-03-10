@@ -1345,7 +1345,7 @@ AVIMOptions.getGlobalOptions().setUnreadNotificationEnabled(true);
 > 包括客户端在线时收到的消息，也会导致未读消息数增加。
 > 因此开发者需要在合适时机通过将对话标记为已读主动清除未读消息数。
 
-客户端 SDK 在 `<Conversation, UnreadMessageCount>` 数字变化的时候，会通过 `IMClient` 派发「未读消息数量更新（`UNREAD_MESSAGES_COUNT_UPDATE`）」事件到应用层。开发者可以监听 `UNREAD_MESSAGES_COUNT_UPDATE` 事件，在对话列表界面上更新这些对话的未读消息数量，不过考虑到这个通知回调会非常频繁，并且未读消息数量变化的通知一般也都是伴随其他事件产生的，所以建议开发者 ***对于此通知不做特殊处理*** 即可。
+客户端 SDK 在 `<Conversation, UnreadMessageCount>` 数字变化的时候，会通过 `IMClient` 派发「未读消息数量更新（`UNREAD_MESSAGES_COUNT_UPDATE`）」事件到应用层。开发者可以监听 `UNREAD_MESSAGES_COUNT_UPDATE` 事件，在对话列表界面上更新这些对话的未读消息数量。建议开发者在应用层面对未读计数的结果进行持久化缓存，如果同一个对话有两个不同的未读数，则使用新数据直接覆盖老数据，这样对话列表里面展示的未读数会比较准确。
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -1390,6 +1390,13 @@ onUnreadMessagesCountUpdated(AVIMClient client, AVIMConversation conversation) {
 
 - 在对话列表点击某对话进入到对话页面时
 - 用户正在某个对话页面聊天，并在这个对话中收到了消息时
+
+> iOS 和 Android 应用层需要持久化缓存未读计数的细节说明
+> 
+> 对于未读通知的下发时机和数量，iOS 和 Java/Android 两个平台的 SDK 在内部处理上稍有差异：iOS SDK（Objective-C 和 Swift 都包括）在每次登录即时通讯云端的时候，都会获得云端下发的**大量**未读通知；而 Java/Android SDK 由于内部持久化缓存了通知的时间戳（能减轻服务端压力），所以登录即时通讯云端之后客户端只会收到上次通知时间戳之后发生了变化的**部分**未读数通知。
+> 
+> 因此 Java SDK 的开发者需要在应用层缓存收到的未读数通知（同一个对话的未读数采用覆盖的方式来更新），而 iOS SDK 这里收到的**大量未读通知并不等于全量数据（云端追踪的有未读消息的对话数不超过 50 个）**，所以也是一样需要在应用层面缓存收到的未读计数结果，这样才能保证对话列表超过 50 个之后未读计数值的准确性。
+
 
 ## 多端登录与单设备登录
 
