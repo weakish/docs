@@ -500,16 +500,16 @@ curl -X GET \
 
 参数|约束|说明
 ---|---|---
-`skip`||跳过的文档数目，默认为 0
-`limit`||返回集合大小，默认 100，最大 1000
-`sid`|可选|第一次查询结果中返回的 sid 值，用于分页，对应于 elasticsearch 中的 [scroll id]。
 `q`|必须|查询文本，支持 elasticsearch 的 query string 语法。
+`skip`|可选|跳过的文档数目，默认为 0
+`limit`|可选|返回集合大小，默认 100，最大 1000
+`sid`|可选|之前查询结果中返回的 sid 值，用于分页，对应于 elasticsearch 中的 [scroll id]。
 `fields`|可选|逗号隔开的字段列表，查询的字段列表
-<code class="text-nowrap">highlights</code>|可选|高亮字段，可以是通配符 `*`，也可以是字段列表逗号隔开的字符串。如果加入，返回结果的 `_highlight` 属性将包含高亮的搜索结果内容，关键字用 `em` 标签括起来。
+<code class="text-nowrap">highlights</code>|可选|高亮字段，可以是通配符 `*`，也可以是字段列表逗号隔开的字符串。
 `clazz`|可选|类名，如果没有指定或者为空字符串，则搜索所有启用了应用内搜索的 class。
+`include`|可选|关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
 `order`|可选|排序字段，形如 `-score,createdAt` 逗号隔开的字段，负号表示倒序，可以多个字段组合排序。
-`include`||关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
-`sort`||复杂排序字段，例如地理位置信息排序，见下文描述。
+`sort`|可选|复杂排序字段，例如地理位置信息排序，见下文描述。
 
 [scroll id]: https://www.elastic.co/guide/en/elasticsearch/reference/6.5/search-request-scroll.html
 
@@ -523,7 +523,7 @@ curl -X GET \
 
 - `_app_url`：应用内搜索结果在网站上的链接。
 - `_deeplink`：应用内搜索的程序调用 URL，也就是 deeplink。
-- `_highlight`: 高亮的搜索结果内容
+- `_highlight`: 高亮的搜索结果内容，关键字用 `em` 标签括起来。如果搜索时未传入 `highlights`　参数，则该字段为 null。 
 
 最外层的 `sid` 用来标记本次查询结果，下次查询继续传入这个 sid 将翻页查找后 200 条数据：
 
