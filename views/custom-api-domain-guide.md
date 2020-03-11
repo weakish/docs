@@ -338,7 +338,7 @@ AVClient.Initialize(new AVClient.Configuration {
 （因为较新版本的 SDK 增加了自定义域名配置参数的检查，检查时会根据 App ID 后缀判断是否为国际版应用）。
 如果你的国际版应用 App ID 后缀不为 `-MdYXbMMI`，那么我们建议你绑定一个自定义域名，然后在初始化 SDK 时配置自定义域名，这样可以避免这个问题。
 
-如果你的国际版应用 App ID 后缀不为 `-MdYXbMMI`，但就是不想绑定自定义域名，那么需要这样初始化 SDK：
+如果你的国际版应用 App ID 后缀不为 `-MdYXbMMI`，但因为某些原因无法绑定域名，那么需要这样初始化 SDK：
 
 <details>
 
