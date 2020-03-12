@@ -329,7 +329,7 @@ searchQuery.setSortBuilder(builder);
 
   /**
    * 设置返回的高亮语法，默认为"*"
-   * 语法规则可以参考 https://www.elasticsearch.org/guide/en/elasticsearch/reference/6.5
+   * 语法规则可以参考 https://www.elastic.co/guide/en/elasticsearch/reference/6.5
    * /search-request-highlighting.html#highlighting-settings
    *
    * @param hightlights
@@ -534,7 +534,7 @@ curl -X GET \
 
 ### q 查询语法举例
 
-q 的查询走的是 elasticsearch 的 [query string 语法](https://www.elasticsearch.org/guide/en/elasticsearch/reference/6.5/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
+q 的查询走的是 elasticsearch 的 [query string 语法](https://www.elastic.co/guide/en/elasticsearch/reference/6.5/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
 
 查询的关键字保留字符包括： `+ - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /`，当出现这些字符的时候，请对这些保留字符做 URL Escape 转义。
 
