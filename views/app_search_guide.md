@@ -63,14 +63,10 @@ https://{{host}}/1.1/go/com.leancloud.todo
 
 **请注意，启用了搜索的 Class 数据，仍然只能被该应用的认证过的 API 搜索到。其次，搜索结果仍然遵循我们提供的 ACL 机制，如果你为 Class 里的 Object 设定了合理的 ACL，那么搜索结果也将遵循这些 ACL 值，保护你的数据安全。**
 
-在 Class 的 **其他** 菜单里新增了应用内搜索菜单，打开的截图如下：
+你可以在「控制台 > 存储 > 应用内搜索」为 Class 启用搜索，点击「添加 Class」，其中包括三个设定项目：
 
-![image](images/app_search_setting.png)
-
-其中包括三个设定项目：
-
-- **启用**：你可以启用或者关闭这个 Class 的应用内搜索功能，默认是关闭的。开发版应用最多允许 5 个 Class 启用应用内搜索，商用版应用最多允许 10 个 Class 启用应用内搜索。
-- **选择开放的列**：你可以选择哪些字段将加入索引引擎用于搜索。默认情况下，`objectId`、`createdAt`、`updatedAt` 三个字段将无条件加入开放字段列表。除了这三个字段外，开发版应用每个 Class 最多允许索引 5 个字段，商用版应用每个 Class 最多允许索引 10 个字段。请仔细挑选要索引的字段。
+- **Class**：选择需要启用搜索的 Class。开发版应用最多允许 5 个 Class 启用应用内搜索，商用版应用最多允许 10 个 Class 启用应用内搜索。
+- **开放的列**：你可以选择哪些字段将加入索引引擎用于搜索。默认情况下，`objectId`、`createdAt`、`updatedAt` 三个字段将无条件加入开放字段列表。除了这三个字段外，开发版应用每个 Class 最多允许索引 5 个字段，商用版应用每个 Class 最多允许索引 10 个字段。请仔细挑选要索引的字段。
 - **数据模板**：设置这个 Class 的数据展现模板，当外部调用无法打开应用（通常是用户没有安装应用）的时候，将渲染这个模板并展现给用户，默认的模板的只是渲染一些下载链接，你可以自定义这个模板的样式，比如加入你的应用 Logo， 添加 CSS 等。
 
 **如果一个 Class 启用了应用内搜索，但是超过两周没有任何搜索调用，我们将自动禁用该 Class 的搜索功能。**
@@ -536,45 +532,6 @@ curl -X GET \
 
 直到返回结果为空。
 
-### 自定义分词
-
-默认情况下， String 类型的字段都将被自动执行分词处理，我们使用的分词组件是 [mmseg](https://github.com/medcl/elasticsearch-analysis-mmseg)，词库来自搜狗。但是很多用户由于行业或者专业的特殊性，一般都有自定义词库的需求，因此我们提供了自定义词库的功能。应用创建者可以通过 [LeanCloud 控制台 > 组件 > 应用内搜索 > 自定义词库](/dashboard/devcomponent.html?appid={{appid}}#/component/custom_param) 上传词库文件。
-
-词库文件要求为 UTF-8 编码，每个词单独一行，文件大小不能超过 512 K，例如：
-
-```
-面向对象编程
-函数式编程
-高阶函数
-响应式设计
-```
-
-将其保存为文本文件，如 `words.txt`，上传即可。上传后，分词将于 3 分钟后生效。开发者可以通过 `analyze` API（要求使用 master key）来测试：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{masterkey}},master" \
-  "https://{{host}}/1.1/search/analyze?clazz=GameScore&text=反应式设计"
-```
-
-参数包括 `clazz` 和 `text`。`text` 就是测试的文本段，返回结果：
-
-```json
-{
-  "tokens" [
-             { "token":"反应式设计",
-               "start_offset":0,
-               "end_offset":5,
-               "type":"word",
-               "position":0 }
-           ]
-}
-```
-
-自定义词库生效后，**仅对新添加或者更新的文档/记录才有效**，如果需要对原有的文档也生效的话，需要在 **存储** > 选择对应的 Class > **其他** > **应用内搜索** 菜单中点击「强制重建索引」按钮，重建原有索引。
-同样，如果更新了自定义词库（包括删除自定义词库），也需要重建索引。
-
 ### q 查询语法举例
 
 q 的查询走的是 elasticsearch 的 [query string 语法](https://www.elasticsearch.org/guide/en/elasticsearch/reference/6.5/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
@@ -710,7 +667,7 @@ age:<=10
 
 假设我们有一个 Class 叫 `Post` 是用来保存博客文章的，我们想基于它的标签字段 `tags` 做相关性推荐，可以通过：
 
-``` sh
+```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
@@ -736,14 +693,15 @@ curl -X GET \
      "className":"Article",
      "title":"clojure persistent vector"
   },
-  ……
+  // ……
 ],
-"sid": null}
+"sid": null
+}
 ```
 
 除了可以通过指定 `like` 这样的相关性文本来指定查询相似的文档之外，还可以通过 likeObjectIds 指定一个对象的 objectId 列表，来查询相似的对象：
 
-```
+```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
@@ -756,15 +714,54 @@ curl -X GET \
 
 参数|约束|说明
 ---|---|---
-`skip`|可选|跳过的文档数目，默认为 0
-`limit`|可选|返回集合大小，默认 100，最大 1000
-`fields`|可选|相似搜索匹配的字段列表，用逗号隔开，默认为所有索引字段 `_all`
+`clazz`|必须|类名
 `like`|可选|**和 `likeObjectIds` 参数二者必须提供其中之一**。代表相似的文本关键字。
 `likeObjectIds`|可选|**和 `like` 参数二者必须提供其中之一**。代表相似的对象 objectId 列表，用逗号隔开。
-`clazz`|必须|类名
-`include`|可选|关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
 `min_term_freq`|可选|**文档中一个词语至少出现次数，小于这个值的词将被忽略，默认是 2**，如果返回文档数目过少，可以尝试调低此值。
 `min_doc_freq`|可选|**词语至少出现的文档个数，少于这个值的词将被忽略，默认值为 5**，同样，如果返回文档数目过少，可以尝试调低此值。
 `max_doc_freq`|可选|词语最多出现的文档个数，超过这个值的词将被忽略，防止一些无意义的热频词干扰结果，默认无限制。
+`skip`|可选|跳过的文档数目，默认为 0
+`limit`|可选|返回集合大小，默认 100，最大 1000
+`fields`|可选|相似搜索匹配的字段列表，用逗号隔开，默认为所有索引字段 `_all`
+`include`|可选|关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
 
 更多内容参考 [ElasticSearch 文档](https://www.elastic.co/guide/en/elasticsearch/reference/6.5/query-dsl-mlt-query.html)。
+
+## 自定义分词
+
+默认情况下， String 类型的字段都将被自动执行分词处理，我们使用的分词组件是 [mmseg](https://github.com/medcl/elasticsearch-analysis-mmseg)，词库来自搜狗。但是很多用户由于行业或者专业的特殊性，一般都有自定义词库的需求，因此我们提供了自定义词库的功能。应用创建者可以通过 [LeanCloud 控制台 > 组件 > 应用内搜索 > 自定义词库](/dashboard/devcomponent.html?appid={{appid}}#/component/custom_param) 上传词库文件。
+
+词库文件要求为 UTF-8 编码，每个词单独一行，文件大小不能超过 512 K，例如：
+
+```
+面向对象编程
+函数式编程
+高阶函数
+响应式设计
+```
+
+将其保存为文本文件，如 `words.txt`，上传即可。上传后，分词将于 3 分钟后生效。开发者可以通过 `analyze` API（要求使用 master key）来测试：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  "https://{{host}}/1.1/search/analyze?clazz=GameScore&text=反应式设计"
+```
+
+参数包括 `clazz` 和 `text`。`text` 就是测试的文本段，返回结果：
+
+```json
+{
+  "tokens" [
+             { "token":"反应式设计",
+               "start_offset":0,
+               "end_offset":5,
+               "type":"word",
+               "position":0 }
+           ]
+}
+```
+
+自定义词库生效后，**仅对新添加或者更新的文档/记录才有效**，如果需要对原有的文档也生效的话，需要在 **存储** > 选择对应的 Class > **其他** > **应用内搜索** 菜单中点击「强制重建索引」按钮，重建原有索引。
+同样，如果更新了自定义词库（包括删除自定义词库），也需要重建索引。
