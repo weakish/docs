@@ -1406,45 +1406,6 @@ LeanEngine.setHttpsRedirectEnabled(true);
 
 部署并发布到生产环境之后，访问你的 LeanEngine 网站都会强制通过 HTTPS 访问。
 
-{% if platformName === "Node.js" %}
-### 多进程运行
-
-因为 Node.js 本身的单线程模型，无法充分利用多个 CPU 核心，所以如果你使用了 2 CPU 或以上的实例，需要自行使用 Node.js 的 [`cluster`](https://nodejs.org/api/cluster.html) 配置多进程运行。
-
-创建一个 `server-cluster.js`：
-
-```js
-var cluster = require('cluster');
-
-var workers = process.env.LEANCLOUD_AVAILABLE_CPUS || 1;
-
-if (cluster.isMaster) {
-  for (var i = 0; i < workers; i++) {
-    cluster.fork();
-  }
-
-  cluster.on('exit', (worker, code, signal) => {
-    console.log('Worker %s died, restarting…', worker.process.pid);
-    cluster.fork();
-  });
-} else {
-  require('./server.js');
-}
-```
-
-然后在 `package.json` 中将 `scripts.start` 改为 `node server-cluster.js` 即可：
-
-```json
-"scripts": {
-  "start": "node server-cluster.js"
-}
-```
-
-{% call docs.noteWrap() %}
-多进程运行要求你的程序中没有在内存中维护全局状态（例如锁），建议在首次切换到多进程或多实例运行时进行充分的测试。
-{% endcall %}
-{% endif %}
-
 ## 部署与发布
 
 ### 命令行部署
