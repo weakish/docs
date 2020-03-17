@@ -753,6 +753,15 @@ app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 
 - **name**：Cookie 的名字，默认为 `avos.sess`。
 - **maxAge**：Cookie 的过期时间。单位为毫秒。
 
+`AV.Cloud.CookieSession` 会将所有参数都传递给浏览器的 `cookies.set()`，因此如果你有其他选项需要设置，也可以传入。
+例如，Chrome 80 起 `SameSite` 的默认值为 `Lax`，如果你的应用的前端没部署在云引擎上，又需要向云引擎发送带登录状态信息的 POST 请求，那么 `sameSite` 应当设置为 `none`：
+
+```js
+AV.Cloud.CookieSession({sameSite: 'none'})
+```
+
+注意，请仅在有必要的时候设置 `sameSite` 为 `none`，以免平白增加 CSRF 风险。
+
 在 Node SDK 1.x 之后我们不再允许通过 `AV.User.current()` 获取登录用户的信息（详见 [升级到云引擎 Node.js SDK 1.0](leanengine-node-sdk-upgrade-1.html#废弃_currentUser)），而是需要你：
 
 - 在云引擎方法中，通过 `request.currentUser` 获取用户信息。
