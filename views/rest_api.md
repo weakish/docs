@@ -18,8 +18,6 @@ REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 
 | 1.1  | 2014 年 8 月 13 号发布，修复 Date 类型和 createdAt、updatedAt 的时区问题，返回标准 UTC 时间。 |
 | 1.0  | 存在时间不准确的 Bug，实际返回的 Date 类型和 createdAt、updatedAt 都是北京时间。**不推荐再使用**。 |
 
-
-
 ### 在线测试
 
 [API 在线测试工具](/dashboard/apionline/index.html)，目前仅支持调试**中国节点**下的应用。
@@ -804,6 +802,8 @@ curl -X PUT \
 这样就将对象的 **upvotes** 属性值（被用户点赞的次数）加上 1，其中 **amount** 为递增的数字大小，如果为负数，则为递减。
 
 除了 Increment，我们也提供了 Decrement 用于递减，等价于 Increment 一个负数。
+
+{% data.inc_float_warn() %}
 
 #### 位运算
 
