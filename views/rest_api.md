@@ -803,7 +803,7 @@ curl -X PUT \
 
 除了 Increment，我们也提供了 Decrement 用于递减，等价于 Increment 一个负数。
 
-{% data.inc_float_warn() %}
+{{ data.inc_float_warn() }}
 
 #### 位运算
 
