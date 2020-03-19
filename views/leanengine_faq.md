@@ -311,3 +311,17 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 ## 定时任务 crontab 表达式
 
 见 [云函数开发指南 · Node.js](leanengine_cloudfunction_guide-node.html#Cron_表达式)。
+
+## 跨域 POST 请求未携带 Cookie 怎么办？
+
+Chrome 80 起 `SameSite` 的默认值为 `Lax`，如果你的应用的前端没部署在云引擎上，又需要向云引擎发送携带 Cookie 的 POST 请求，那么需要设置 `SameSite` 为 `none`。
+`AV.Cloud.CookieSession` 会将所有参数都传递给浏览器的 `cookies.set()`，所以你可以将 `sameSite` 传入：
+
+```js
+AV.Cloud.CookieSession({sameSite: 'none'})
+```
+
+注意：
+
+0. `SameSite` 要求与 `Secure` 标记一同发送，因此请确保你的客户端是通过 HTTPS 协议访问云引擎的。
+1. 请仅在有必要的时候设置 `SameSite` 为 `none`，以免平白增加 CSRF 风险。
