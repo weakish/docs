@@ -211,7 +211,7 @@ SDK 提供了一系列小程序特有的用户相关的 API，适用于不同的
 LeanCloud 的用户系统支持一键使用微信用户身份登录。要使用一键登录功能，需要先设置小程序的 AppID 与 AppSecret：
 
 1. 登录 [微信公众平台](https://mp.weixin.qq.com)，在 **设置** > **开发设置** 中获得 AppID 与 AppSecret。
-2. 前往 LeanCloud 控制台 > **组件** > **社交**，保存「微信小程序」的 AppID 与 AppSecret。
+2. 前往 LeanCloud 控制台 > 存储 > 用户 > 设置 > 第三方集成，启用「微信小程序」后填写 AppID 与 AppSecret。
 
 这样你就可以在应用中使用 `AV.User.loginWithWeapp()` 方法来使用当前用户身份登录了。
 

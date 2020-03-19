@@ -1360,11 +1360,11 @@ await query.FindAsync();
 
 #### 配置平台账号
 
-在 [LeanCloud 应用控制台 > 组件 > 社交](/dashboard/devcomponent.html?appid={{appid}}#/component/sns) 配置相应平台的 **应用 ID** 和 **应用 Secret Key** 。点击保存，自动生成 **回调 URL** 和 **登录 URL**。
+在 LeanCloud 应用控制台 > 存储 > 用户 > 设置 > 第三方集成，配置相应平台的 **应用 ID** 和 **应用 Secret Key** 。点击保存，自动生成 **回调 URL** 和 **登录 URL**。
 
 以微博开放平台举例，它需要单独配置 **回调 URL**。 在微博开放平台的 **应用信息** > **高级信息** > **OAuth2.0 授权设置** 里的「授权回调页」中绑定生成的 **回调 URL**。测试阶段，在微博开放平台的 **应用信息** > **测试信息** 添加微博账号，在腾讯开放平台的 **QQ 登录** > **应用调试者** 里添加 QQ 账号即可。在应用通过审核后，可以获取公开的第三方登录能力。
 
-配置平台账号的目的在于创建 AVUser 时，LeanCloud 云端会使用相关信息去校验 authData 的合法性，确保 AVUser 实际对应着一个合法真实的用户，确保平台安全性。如果想关闭自动校验 authData 的功能，需要在 [应用控制台 > 组件 > 社交](/dashboard/devcomponent.html?appid={{appid}}#/component/sns)中**取消勾选**「第三方登录时，验证用户 AccessToken 合法性」。
+配置平台账号的目的在于创建 AVUser 时，LeanCloud 云端会使用相关信息去校验 authData 的合法性，确保 AVUser 实际对应着一个合法真实的用户，确保平台安全性。如果想关闭自动校验 authData 的功能，需要在应用控制台「存储 > 用户 > 设置」中**取消勾选**「第三方登录时，验证用户 AccessToken 合法性」。
 
 #### 获取 authData 并创建 AVUser
 
