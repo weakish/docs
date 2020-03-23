@@ -4439,6 +4439,15 @@ var file = new AV.File('resume.txt', data);
 var data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
 var file = new AV.File('resume.txt', data);
 ```
+
+此外，浏览器环境下还可以通过 Blob 构建文件，Node.js 环境下还可以通过 Buffer、Stream 构建文件。
+
+React Native 环境下，可以通过本地路径构建文件：
+
+```js
+var data = { blob: { uri: localFileUri } }
+var file = new AV.File('resume.txt', data)
+```
 {% endif %}
 {% if platform_name === "Python" %}
 可以通过字符串构建文件：
