@@ -6319,7 +6319,13 @@ _ = LCUser.requestVerificationMail(email: "tom@leancloud.rocks") { result in
 
 {% if platform_name === "Objective-C" %}
 ```objc
-[AVUser requestMobilePhoneVerify:@"+8618200008888"];
+[AVUser requestMobilePhoneVerify:@"18804208562" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if(succeeded){
+        //请求成功
+    }else{
+        //请求失败
+    }
+}];
 ```
 {% endif %}
 {% if platform_name === "JavaScript" %}
@@ -6359,10 +6365,10 @@ _ = LCUser.requestVerificationCode(mobilePhoneNumber: "+8618200008888") { result
 
 {% if platform_name === "Objective-C" %}
 ```objc
-[AVUser verifyMobilePhone:@"123456" block:^(BOOL succeeded, NSError *error) {
-    if (succeeded) {
-        // mobilePhoneVerified 将变为 true
-    } else {
+[AVUser verifyMobilePhone:@"154250" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if(succeeded){
+         // mobilePhoneVerified 将变为 true
+    }else{
         // 验证码不正确
     }
 }];
