@@ -15,11 +15,7 @@
 
 ### Installation
 
-{% if node=='qcloud' %}
-Installation 表示一个允许推送的设备的唯一标示，对应 `数据管理` 平台中的 `_Installation` 表。它就是一个普通的对象，主要属性包括:
-{% else %}
 Installation 表示一个允许推送的设备的唯一标示，对应 [数据管理](/dashboard/data.html?appid={{appid}}) 平台中的 `_Installation` 表。它就是一个普通的对象，主要属性包括:
-{% endif %}
 
 名称|适用平台|描述
 ---|---|---
@@ -31,144 +27,6 @@ apnsTopic|iOS|基于 Token Authentication 的推送需要设置该字段。iOS S
 deviceType| |设备类型，目前支持 "ios"、"android"、"wp"。
 installationId|Android|LeanCloud SDK 为每个 Android 设备产生的唯一标识符
 timeZone| |字符串，设备设定的时区
-
-### 增加 Installation
-
-通过使用 REST API，你可以实现在云端增加安装对象，仅仅是增加几个特殊的字段。使用 REST API 还可以达成很多 Leancloud SDK 无法完成的操作，比如查询所有的 installations 来找到一个 channel 的订阅者的集合。
-
-创建一个安装对象和普通的对象差不多，但是特殊的几个安装字段必须通过认证。举个例子，如果你有一个由 Apple Push Notification 提供的 device token，而且想订阅一个广播频道，你可以如下发送请求：
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -H "Content-Type: application/json" \
-  -d '{
-        "deviceType": "ios",
-        "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
-        "channels": [
-          ""
-        ]
-      }' \
-  https://{{host}}/1.1/installations
-```
-
-当创建成功后，HTTP 的返回值为 **201 Created**，Location header 包括了新的安装的 URL：
-
-```sh
-Status: 201 Created
-Location: https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
-```
-
-返回的 body 是一个 JSON 对象，包括了 objectId 和 createdAt 这个创建对象的时间戳。
-
-```json
-{
-  "createdAt": "2012-04-28T17:41:09.106Z",
-  "objectId": "51ff1808e4b074ac5c34d7fd"
-}
-```
-
-### 获取 Installation
-
-你可以通过 GET 方法请求创建的时候 Location 表示的 URL 来获取 Installation 对象。比如，获取上面的被创建的对象：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
-```
-
-返回的 JSON 对象所有用户提供的字段，加上 createdAt、updatedAt 和 objectId 字段：
-
-```json
-{
-  "deviceType": "ios",
-  "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
-  "channels": [
-    ""
-  ],
-  "createdAt": "2012-04-28T17:41:09.106Z",
-  "updatedAt": "2012-04-28T17:41:09.106Z",
-  "objectId": "51ff1808e4b074ac5c34d7fd"
-}
-```
-
-### 更新 Installation 
-
-安装对象可以向相应的 URL 发送 PUT 请求来更新。例如，为了让设备订阅一个名字为「foo」的推送频道：
-
-```sh
-curl -X PUT \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -H "Content-Type: application/json" \
-  -d '{
-        "deviceType": "ios",
-        "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
-        "channels": [
-          "",
-          "foo"
-        ]
-      }' \
-  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
-```
-
-### 查询 Installation
-
-你可以一次通过 GET 请求到 installations 的根 URL 来获取多个安装对象。这项功能在 SDK 中不可用。
-
-没有任何 URL 参数的话，一个 GET 请求会列出所有安装：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  https://{{host}}/1.1/installations
-```
-
-返回的 JSON 对象的 results 字段包含了所有的结果：
-
-```json
-{
-  "results": [
-    {
-      "deviceType": "ios",
-      "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
-      "channels": [
-        ""
-      ],
-      "createdAt": "2012-04-28T17:41:09.106Z",
-      "updatedAt": "2012-04-28T17:41:09.106Z",
-      "objectId": "51ff1808e4b074ac5c34d7fd"
-    },
-    {
-      "deviceType": "ios",
-      "deviceToken": "876543210fedcba9876543210fedcba9876543210fedcba9876543210fedcba9",
-      "channels": [
-        ""
-      ],
-      "createdAt": "2012-04-30T01:52:57.975Z",
-      "updatedAt": "2012-04-30T01:52:57.975Z",
-      "objectId": "51fcb74ee4b074ac5c34cf85"
-    }
-  ]
-}
-```
-
-所有对普通的对象的查询都对 installatin 对象起作用，所以可以查看之前的查询部分以获取详细信息。通过做 channels 的数组查询，你可以查找一个订阅了给定的推送频道的所有设备.
-
-### 删除 Installaion
-
-为了从 AVOSCloud 中删除一个安装对象，可以发送 DELETE 请求到相应的 URL。这个功能在客户端 SDK 也不可用。举例：
-
-```sh
-curl -X DELETE \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  https://{{host}}/1.1/installations/51fcb74ee4b074ac5c34cf85
-```
 
 ### Notification
 
@@ -228,7 +86,27 @@ errors| | 本次推送过程中的错误信息。
 
 当 App 安装到用户设备后，如果要使用消息推送功能，LeanCloud SDK 会自动生成一个 Installation 对象。Installation 对象包含了推送所需要的所有信息。你可以使用 REST API，通过 Installation 对象进行消息推送。
 
-#### 保存 Installation
+#### 增加 Installation
+
+通过使用 REST API，你可以实现在云端增加安装对象，仅仅是增加几个特殊的字段。使用 REST API 还可以达成很多 Leancloud SDK 无法完成的操作，比如查询所有的 installations 来找到一个 channel 的订阅者的集合。
+
+创建一个安装对象和普通的对象差不多，只是不同平台有不同的字段。
+
+创建成功后，HTTP 的返回值为 **201 Created**，Location header 包括了新的安装的 URL：
+
+```sh
+Status: 201 Created
+Location: https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+返回的 body 是一个 JSON 对象，包括了 objectId 和 createdAt 这个创建对象的时间戳。
+
+```json
+{
+  "createdAt": "2012-04-28T17:41:09.106Z",
+  "objectId": "51ff1808e4b074ac5c34d7fd"
+}
+```
 
 ##### DeviceToken
 
@@ -251,7 +129,7 @@ curl -X POST \
 
 ##### installationId
 
-对于 Android 设备，LeanCloud SDK 会自动生成 uuid 作为 installationId 保存到云端。使用 REST API 来保存  installationId 的方法如下：
+对于 Android 设备，LeanCloud SDK 会自动生成 uuid 作为 installationId 保存到云端。
 
 ```sh
 curl -X POST \
@@ -270,26 +148,55 @@ curl -X POST \
 
 `installationId` 必须在应用内唯一。
 
-##### 订阅和退订频道
+#### 获取 Installation
 
-通过设置 `channels` 属性来订阅某个推送频道，下面假设 `mrmBZvsErB` 是待操作 Installation 对象的 objectId：
+你可以通过 GET 方法请求创建的时候 Location 表示的 URL 来获取 Installation 对象。比如，获取上面的被创建的对象：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+返回的 JSON 对象所有用户提供的字段，加上 createdAt、updatedAt 和 objectId 字段：
+
+```json
+{
+  "deviceType": "ios",
+  "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
+  "channels": [
+    ""
+  ],
+  "createdAt": "2012-04-28T17:41:09.106Z",
+  "updatedAt": "2012-04-28T17:41:09.106Z",
+  "objectId": "51ff1808e4b074ac5c34d7fd"
+}
+```
+
+#### 更新 Installation 
+
+安装对象可以向相应的 URL 发送 PUT 请求来更新。例如，通过设置 `channels` 属性来订阅某个推送频道：
 
 ```sh
 curl -X PUT \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -d '{
+        "deviceType": "ios",
+        "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
         "channels": [
-          "customer"
+          "",
+          "foo"
         ]
       }' \
-  https://{{host}}/1.1/installations/mrmBZvsErB
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 ```
 
-退订一个频道：
+再比如退订一个频道：
 
-```
+```sh
 curl -X PUT \
   -H "X-LC-Id: {{appid}}"          \
   -H "X-LC-Key: {{appkey}}"        \
@@ -300,14 +207,12 @@ curl -X PUT \
            "objects":["customer"]
         }
        }' \
-  https://{{host}}/1.1/installations/mrmBZvsErB
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 ```
 
 `channels` 本质上是数组属性，因此可以使用标准 [REST API](./rest_api.html#数组) 操作。
 
-#### 添加自定义属性
-
-假设 `mrmBZvsErB` 是待操作 Installation 对象的 objectId，待添加的自定义属性是 **userObjectId**，值为 `<用户的 objectId>`：
+又比如添加自定义属性：
 
 ```sh
 curl -X PUT \
@@ -317,7 +222,62 @@ curl -X PUT \
   -d '{
         "userObjectId": "<用户的 objectId>"
       }' \
-  https://{{host}}/1.1/installations/mrmBZvsErB
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd 
+```
+
+#### 查询 Installation
+
+你可以一次通过 GET 请求到 installations 的根 URL 来获取多个安装对象。这项功能在 SDK 中不可用。
+
+没有任何 URL 参数的话，一个 GET 请求会列出所有安装：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://{{host}}/1.1/installations
+```
+
+返回的 JSON 对象的 results 字段包含了所有的结果：
+
+```json
+{
+  "results": [
+    {
+      "deviceType": "ios",
+      "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
+      "channels": [
+        ""
+      ],
+      "createdAt": "2012-04-28T17:41:09.106Z",
+      "updatedAt": "2012-04-28T17:41:09.106Z",
+      "objectId": "51ff1808e4b074ac5c34d7fd"
+    },
+    {
+      "deviceType": "ios",
+      "deviceToken": "876543210fedcba9876543210fedcba9876543210fedcba9876543210fedcba9",
+      "channels": [
+        ""
+      ],
+      "createdAt": "2012-04-30T01:52:57.975Z",
+      "updatedAt": "2012-04-30T01:52:57.975Z",
+      "objectId": "51fcb74ee4b074ac5c34cf85"
+    }
+  ]
+}
+```
+
+所有对普通的对象的查询都对 installatin 对象起作用，所以可以查看之前的查询部分以获取详细信息。通过做 channels 的数组查询，你可以查找一个订阅了给定的推送频道的所有设备.
+
+#### 删除 Installaion
+
+为了从 AVOSCloud 中删除一个安装对象，可以发送 DELETE 请求到相应的 URL。这个功能在客户端 SDK 也不可用。举例：
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://{{host}}/1.1/installations/51fcb74ee4b074ac5c34cf85
 ```
 
 ### 推送消息
