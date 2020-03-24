@@ -21,21 +21,16 @@ Installation 表示一个允许推送的设备的唯一标示，对应 [数据�
 ---|---|---
 badge|iOS|呈现在应用图标右上角的红色圆形数字提示，例如待更新的应用数、未读信息数目等。
 channels| |设备订阅的频道 **每个 channel 名称只能包含 26 个英文字母和数字。**
-deviceProfile||在应用有多个 iOS 推送证书或多个 Android 混合推送配置的场景下，deviceProfile 用于指定当前设备使用的证书名或配置名。其值需要与 [控制台 > 消息 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 内配置的证书名或配置名对应，否则将无法完成推送。使用方法请参考 [iOS 测试和生产证书区分](#iOS_测试和生产证书区分) 和 [Android 混合推送多配置区分](#Android_混合推送多配置区分)。<br/><br/>{{deviceprofile_format}}
+deviceProfile||在应用有多个 iOS 推送证书或多个 Android 混合推送配置的场景下，deviceProfile 用于指定当前设备使用的证书名或配置名。其值需要与 [控制台 > 消息 >  推送 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 内配置的证书名或配置名对应，否则将无法完成推送。使用方法请参考 [iOS 测试和生产证书区分](#iOS_测试和生产证书区分) 和 [Android 混合推送多配置区分](#Android_混合推送多配置区分)。<br/><br/>{{deviceprofile_format}}
 deviceToken|iOS|APNS 推送的唯一标识符
 apnsTopic|iOS|基于 Token Authentication 的推送需要设置该字段。iOS SDK 会自动读取 iOS 应用的 bundle ID 作为 apnsTopic。但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK 版本; 2. 不使用 iOS SDK （如 React Native）；3. 使用不同于 bundle ID 的 topic。
-deviceType| |设备类型，目前支持 "ios"、"android"、"wp"。
+deviceType| |设备类型，目前支持 `ios`、`android`。
 installationId|Android|LeanCloud SDK 为每个 Android 设备产生的唯一标识符
 timeZone| |字符串，设备设定的时区
 
 ### Notification
 
-{% if node=='qcloud' %}
-对应 **控制台 > 消息 > 推送记录** 里的一条记录，表示一条推送消息，它包括下列属性：
-{% else %}
-对应 [控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 里的一条记录，表示一条推送消息，它包括下列属性：
-{% endif %}
-
+对应 [控制台 > 消息 > 推送 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 里的一条记录，表示一条推送消息，它包括下列属性：
 
 名称|适用平台|描述
 ---|---|---
