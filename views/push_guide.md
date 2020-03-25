@@ -278,6 +278,13 @@ curl -X DELETE \
 
 ### 推送消息
 
+#### master key 校验
+
+当在 [控制台 > 消息 > 推送 > 设置 > 推送选项](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 中点选了 **禁止从客户端进行消息推送** 后，
+必须通过 **master key** （`X-LC-Key: {{masterkey}},master`）才能发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。
+这一限制默认为启用状态。
+我们建议用户都将此限制启用。
+
 #### 通过查询条件发推送
 
 本接口用于根据提供的查询条件，给在 _Installation 表内所有符合查询条件的有效设备记录发推送消息。例如下面是给所有在 _Installation 表中 "channels" 字段包含 "public" 值的有效设备推送一条内容为 "Hello from LeanCloud" 的消息。
@@ -287,7 +294,7 @@ curl -X DELETE \
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
+  -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
         "where": {"channels" : ["public"]},
@@ -320,7 +327,7 @@ flow_control | 可选 | 是否开启平缓发送，默认不开启。其值代�
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
+  -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
         "data": {"alert" : "Hello from LeanCloud"},
@@ -363,21 +370,7 @@ device_profile | 可选 | ***仅对开启混合推送的设备有效*** 当目�
 
 [android-channel]: https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels
 
-#### master key 校验
 
-当在 [控制台 > 消息 > 推送 > 设置 > 推送选项](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 中点选了 **禁止从客户端进行消息推送** 后，推送消息接口必须增加 **master key** 校验才能成功发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。我们建议用户都将此限制启用。
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{masterkey}},master"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "where": {"channels" : ["public"]},
-        "data": {"alert" : "Hello from LeanCloud"}
-     }' \
-  https://{{host}}/1.1/push
-```
 
 #### 过期时间
 
