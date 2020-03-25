@@ -405,7 +405,7 @@ curl -X POST \
           "preOrder": true
         },
         "data": {
-          "alert": "您关注的商品已经到货，请尽快购买。"
+          "alert": "抢购开始！"
         }
       }' \
   https://{{host}}/1.1/push
