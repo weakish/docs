@@ -1655,6 +1655,8 @@ messageWithCity["city"] = "北京";
 * 调用 `AVIMMessageManager.registerAVIMMessageType()` 函数进行类型注册。
 * 调用 `AVIMMessageManager.registerMessageHandler()` 函数进行消息处理 handler 注册。
 
+> 注意：如果你是使用 Kotlin 来开发，由于 Kotlin 对反射的处理方式与 Java 有细微差异，导致 `AVIMMessageField` 注释不能产生作用，所以 SDK 实际发送的自定义消息数据不全。我们已经在 `6.4.4` 版本的 SDK 中对这一问题进行了优化，请 Kotlin 开发者升级到 6.4.4 及其后续版本来定制子类化消息。
+
 `AVIMTextMessage` 的源码如下，可供参考：
 
 {{ docs.langSpecEnd('java') }}
