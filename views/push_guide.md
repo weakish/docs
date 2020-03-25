@@ -320,6 +320,130 @@ topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送
 apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一般情况下如果您配置的所有 Team ID 下的 APNs Topic 均不重复，或在存储 Installation 时主动设置过 apnsTeamId 值，则无需提供本参数，我们会为每个设备匹配对应的 Team ID 来发推送。否则必须提供本参数且需要通过 where 查询条件保证单次推送请求的目标设备均属于本参数指定的 Team ID，以保证推送正常进行。
 flow_control | 可选 | 是否开启平缓发送，默认不开启。其值代表推送的速度，即每秒推送的目标终端用户数。最低值 1000，低于最低值按最低值计算。
 
+`_Installation` 表中的所有属性，无论是内置的还是自定义的，都可以作为查询条件通过 where 来指定，并且支持 [REST API](./rest_api.html#查询) 定义的各种复杂查询。
+
+下面会举一些例子，更多例子请参考 [REST API](./rest_api.html#查询) 查询文档。
+
+##### 推送给所有的设备
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "data": {
+          "alert": "LeanCloud 向您问好！"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+##### 推送给 android 设备
+
+```sh
+curl -X POST \
+-H "X-LC-Id: {{appid}}"          \
+-H "X-LC-Key: {{masterkey}},master"        \
+-H "Content-Type: application/json" \
+-d '{
+      "where":{
+        "deviceType": "android"
+      },
+      "data": {
+        "alert": "LeanCloud 向您问好！"
+      }
+    }' \
+https://{{host}}/1.1/push
+```
+
+##### 推送给 public 频道的设备
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "channels":["public"],
+        "data": {
+          "alert": "LeanCloud 向您问好！"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+##### 推送给不活跃的设备
+
+```sh
+curl -X POST \
+-H "X-LC-Id: {{appid}}"          \
+-H "X-LC-Key: {{masterkey}},master"        \
+-H "Content-Type: application/json" \
+-d '{
+      "where":{
+          "updatedAt":{
+              "$lt":{"__type":"Date","iso":"2015-06-29T11:33:53.323Z"}
+            }
+      },
+      "data": {
+          "alert": "LeanCloud 向您问好！"
+      }
+    }' \
+https://{{host}}/1.1/push
+```
+
+##### 推送给自定义属性符合条件的设备
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {
+          "preOrder": true
+        },
+        "data": {
+          "alert": "您关注的商品已经到货，请尽快购买。"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+用 `where` 查询的都是 `_Installations` 表中的属性。这里假设该表存储了 `preOrder` 的布尔属性。
+
+##### 根据地理信息位置做推送
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {
+          "owner": {
+            "$inQuery": {
+              "location": {
+                "$nearSphere": {
+                  "__type": "GeoPoint",
+                  "latitude": 30.0,
+                  "longitude": -20.0
+                },
+                "$maxDistanceInMiles": 10.0
+              }
+            }
+          }
+        },
+        "data": {
+          "alert": "北京明日最高气温 40 摄氏度。"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+上面的例子假设 installation 有个 owner 属性指向 `_User` 表的记录，并且用户有个 `location` 属性是 GeoPoint 类型，我们就可以根据地理信息位置做推送。
+
 #### 通过设备 ID 列表发推送
 
 本接口用于给一批指定的设备 ID 发推送，推送过程因为不用查询目标设备的 Installation 记录，推送速度相对查询方式来说会更快，延迟相对更低。例如下面是给 device token 为 "device_token1", "device_token2", "device_token3" 的 iOS 设备推送一条内容为 "Hello from LeanCloud" 的消息。
@@ -369,8 +493,6 @@ vendor | 可选 | ***仅对开启混合推送的设备有效*** 对应混合推�
 device_profile | 可选 | ***仅对开启混合推送的设备有效*** 当目标混合推送平台下配置了多份配置时需要通过该参数指定配置名。默认值为 _default
 
 [android-channel]: https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels
-
-
 
 #### 过期时间
 
@@ -586,170 +708,6 @@ LeanCloud 推送服务通过推送请求中 `data` 参数内的 `silent` 字段�
 如果 `deviceProfile` 字段为空，系统会默认使用名为 `_default` 的混合推送配置来进行推送，所以一定要保证在控制台的混合推送设置中，存在以 `_default` 命名的 Profile 并且已被正确配置，否则系统会**拒绝推送。**
 
 {{deviceprofile_format}}
-
-#### 推送查询条件
-
-`_Installation` 表中的所有属性，无论是内置的还是自定义的，都可以作为查询条件通过 where 来指定，并且支持 [REST API](./rest_api.html#查询) 定义的各种复杂查询。
-
-下面会举一些例子，更多例子请参考 [REST API](./rest_api.html#查询) 查询文档。
-
-#### 推送给所有的设备
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "data": {
-          "alert": "LeanCloud 向您问好！"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
-
-#### 发送给特定的用户
-
-* 发送给 android 设备的用户
-
-```sh
-curl -X POST \
--H "X-LC-Id: {{appid}}"          \
--H "X-LC-Key: {{appkey}}"        \
--H "Content-Type: application/json" \
--d '{
-      "where":{
-        "deviceType": "android"
-      },
-      "data": {
-        "alert": "LeanCloud 向您问好！"
-      }
-    }' \
-https://{{host}}/1.1/push
-```
-
-* 发送给 public 频道的用户
-
-```sh
-curl -X POST \
--H "X-LC-Id: {{appid}}"          \
--H "X-LC-Key: {{appkey}}"        \
--H "Content-Type: application/json" \
--d '{
-      "where":{
-        "channels":
-          {"$regex":"\\Qpublic\\E"}
-      },
-      "data": {
-        "alert": "LeanCloud 向您问好！"
-      }
-    }' \
-https://{{host}}/1.1/push
-```
-
-或者更简便的方式
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "channels":[ "public"],
-        "data": {
-          "alert": "LeanCloud 向您问好！"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
-
-* 发送给某个 installation id 的用户
-
-```sh
-curl -X POST \
--H "X-LC-Id: {{appid}}"          \
--H "X-LC-Key: {{appkey}}"        \
--H "Content-Type: application/json" \
--d '{
-      "where":{
-          "installationId":"57234d4c-752f-4e78-81ad-a6d14048020d"
-          },
-      "data": {
-        "alert": "LeanCloud 向您问好！"
-      }
-    }' \
-https://{{host}}/1.1/push
-```
-
-* 推送给不活跃的用户
-
-```sh
-curl -X POST \
--H "X-LC-Id: {{appid}}"          \
--H "X-LC-Key: {{appkey}}"        \
--H "Content-Type: application/json" \
--d '{
-      "where":{
-          "updatedAt":{
-              "$lt":{"__type":"Date","iso":"2015-06-29T11:33:53.323Z"}
-            }
-      },
-      "data": {
-          "alert": "LeanCloud 向您问好！"
-      }
-    }' \
-https://{{host}}/1.1/push
-```
-
-* 根据查询条件做推送：
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "where": {
-          "inStock": true
-        },
-        "data": {
-          "alert": "您关注的商品已经到货，请尽快购买。"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
-
-用 `where` 查询的都是 `_Installations` 表中的属性。这里假设该表存储了 `inStock` 的布尔属性。
-
-* 根据地理信息位置做推送：
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "where": {
-          "owner": {
-            "$inQuery": {
-              "location": {
-                "$nearSphere": {
-                  "__type": "GeoPoint",
-                  "latitude": 30.0,
-                  "longitude": -20.0
-                },
-                "$maxDistanceInMiles": 10.0
-              }
-            }
-          }
-        },
-        "data": {
-          "alert": "北京明日最高气温 40 摄氏度。"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
-
-上面的例子假设 installation 有个 owner 属性指向 `_User` 表的记录，并且用户有个 `location` 属性是 GeoPoint 类型，我们就可以根据地理信息位置做推送。
 
 #### 过期时间和定时推送
 
