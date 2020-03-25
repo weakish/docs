@@ -77,13 +77,14 @@ errors| | 本次推送过程中的错误信息。
 
 ## 使用 REST API 推送消息
 
-### Installation
-
 当 App 安装到用户设备后，如果要使用消息推送功能，LeanCloud SDK 会自动生成一个 Installation 对象。Installation 对象包含了推送所需要的所有信息。你可以使用 REST API，通过 Installation 对象进行消息推送。
 
-#### 增加 Installation
+### Installation
 
-通过使用 REST API，你可以实现在云端增加安装对象，仅仅是增加几个特殊的字段。使用 REST API 还可以达成很多 Leancloud SDK 无法完成的操作，比如查询所有的 installations 来找到一个 channel 的订阅者的集合。
+你可以通过 REST API 在云端增加安装对象。
+使用 REST API 还可以达成一些 LeanCloud 客户端 SDK 无法完成的操作，比如查询所有的 installation 来找到一个 channel 的订阅者的集合。
+
+#### 增加 Installation
 
 创建一个安装对象和普通的对象差不多，只是不同平台有不同的字段。
 
@@ -266,7 +267,7 @@ curl -X GET \
 
 #### 删除 Installaion
 
-为了从 AVOSCloud 中删除一个安装对象，可以发送 DELETE 请求到相应的 URL。这个功能在客户端 SDK 也不可用。举例：
+为了从 LeanCloud 中删除一个安装对象，可以发送 DELETE 请求到相应的 URL。这个功能在客户端 SDK 也不可用。举例：
 
 ```sh
 curl -X DELETE \

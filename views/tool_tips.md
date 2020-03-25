@@ -106,5 +106,5 @@
 * 使用 [fir.im](http://fir.im/) 分发测试你的应用。
 * 不知道怎么使用 LeanCloud？各种 [Demo](demo.html) 等你来拿。
 * 所有 SDK 都提供 [API 文档](index.html)，开发指南没有覆盖的 API 介绍都可以在里面找到解释。
-* 关注我们的 [博客](https://leancloudblog.com/) 和 [微博](http://weibo.com/avoscloud)，获取 LeanCloud 最新消息。
+* 关注我们的 [博客](https://leancloudblog.com/) 和 [微博](https://weibo.com/avoscloud)，获取 LeanCloud 最新消息。
 * 在应用设置的基本设置菜单里，可以更改应用名称，提交应用图标，申请发布到 [应用墙](https://leancloud.cn/customers.html)。
