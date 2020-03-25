@@ -65,7 +65,7 @@ LeanCloud 部署在国内多个云计算平台上，并采用在双线机房内�
 通常情况下，我们新版本的更新周期为一到两周。获取更新信息可以通过：
 
 * [官方博客](https://leancloudblog.com/)（每次更新的详细信息都会发布在那里）
-* [官方微博](http://weibo.com/avoscloud)
+* [官方微博](https://weibo.com/avoscloud)
 * 官方微信公众号：LeanCloud通讯
 * 每月初，我们会将每月的更新摘要发送到您的注册邮箱。
 * 在控制台页面的右上方有 [消息中心](/dashboard/info-center.html#/index)，请注意查看新通知。
