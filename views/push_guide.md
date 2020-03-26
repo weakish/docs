@@ -559,7 +559,7 @@ iOS 支持通过 sound 参数设置推送声音，可以是字符串类型的声
 }
 ```
 
-data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html)，[Apple 关于推送提醒本地化的文档](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html#//apple_ref/doc/uid/TP40008194-CH10-SW9)，以及 [Apple 官方关于 Request Header 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)。
+data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification)，[Apple 官方关于 Request Header 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)，以及 [Apple 官方关于 UserNotifications 的文档](https://developer.apple.com/documentation/usernotifications)。
 
 另外，我们也支持按照上述 Apple 官方文档的方式构造推送参数，如：
 
@@ -601,38 +601,15 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 
 ```
 {
-  "alert":      字符串类型，表示消息内容,
-  "title":      字符串类型，表示显示在通知栏的标题,
-  "silent":     布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒,
-  "custom-key": 由用户添加的自定义属性，custom-key 仅是举例，可随意替换
-}
-```
-
-如果自定义 Receiver，需要设置 `action`：
-
-```
-{
-  "alert":      字符串类型，表示消息内容,
-  "title":      字符串类型，表示显示在通知栏的标题,
-  "action":     字符串类型，注册 Receiver 时提供的 action name,
-  "silent":     布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒,
-  "custom-key": 由用户添加的自定义属性，custom-key 仅是举例，可随意替换
+  "alert":      "字符串类型，表示消息内容",
+  "title":      "字符串类型，表示显示在通知栏的标题",
+  "silent":     "布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒",
+  "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
+  "action":     "字符串类型，注册 Receiver 时提供的 action name，仅当需要自定义 Receiver 时设置",
 }
 ```
 
 关于自定义 Receiver 请参看[自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
-
-##### Windows Phone 设备推送消息内容
-
-Windows Phone 设备类似，也支持 `title` 和 `alert`，同时支持 `wp-param` 用于定义打开通知的时候打开的是哪个 Page：
-
-```
-{
-  "alert":      字符串类型，表示消息内容,
-  "title":      字符串类型，表示显示在通知栏的标题,
-  "wp-param":   "/chat.xaml?NavigatedFrom=Toast Notification"
-}
-```
 
 ##### 为多种类型设备设置不同推送内容
 
