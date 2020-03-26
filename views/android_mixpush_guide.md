@@ -44,9 +44,9 @@ vendor | 厂商
 ### 环境配置
 
 1. **注册华为账号**：在 [华为开发者联盟](http://developer.huawei.com/cn/consumer/) 注册华为开发者账号（[详细流程](https://developer.huawei.com/consumer/cn/devservice/doc/20300)）。
-2. **开发前准备**：接入华为 PUSH 之前，需要 [配置应用签名](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#2%20配置应用签名)。
-3. 登录 [华为开发者联盟](http://developer.huawei.com/cn/consumer/)，点击右上角「管理中心」，在管理中心 > 应用服务 > 开发服务 > 配置中 [开通推送服务](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#3%20开通推送服务)。
-4. **设置华为的 AppId 及 AppKey**：在华为开发者联盟 > 管理中心 > 开发服务 > Push 产品列表中选择目标产品。点进目标产品获取应用的服务信息 AppId 及 AppSecret，将此 AppId 及 AppSecret 通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
+2. **开发前准备**：接入华为 PUSH 之前，需要创建应用并配置应用签名，具体可参考华为官方文档：[开发准备](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_v3.html?page=hmssdk_huaweipush_devprepare_v3)。
+3. **打开推送服务开关**：登录 [华为开发者联盟](http://developer.huawei.com/cn/consumer/)，按照华为官方文档提示[开通推送服务](https://developer.huawei.com/consumer/cn/service/hms/catalog/AGCHelp.html?page=AGC_appGalleryConnect_associated_service)。
+4. **将华为 App 信息保存到 LeanCloud 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
 
 ### 接入 SDK
 
