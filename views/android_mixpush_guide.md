@@ -44,34 +44,69 @@ vendor | 厂商
 ### 环境配置
 
 1. **注册华为账号**：在 [华为开发者联盟](http://developer.huawei.com/cn/consumer/) 注册华为开发者账号（[详细流程](https://developer.huawei.com/consumer/cn/devservice/doc/20300)）。
-2. **开发前准备**：接入华为 PUSH 之前，需要 [配置应用签名](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#2%20配置应用签名)。
-3. 登录 [华为开发者联盟](http://developer.huawei.com/cn/consumer/)，点击右上角「管理中心」，在管理中心 > 应用服务 > 开发服务 > 配置中 [开通推送服务](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#3%20开通推送服务)。
-4. **设置华为的 AppId 及 AppKey**：在华为开发者联盟 > 管理中心 > 开发服务 > Push 产品列表中选择目标产品。点进目标产品获取应用的服务信息 AppId 及 AppSecret，将此 AppId 及 AppSecret 通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
+2. **开发前准备**：接入华为 PUSH 之前，需要创建应用并配置应用签名，具体可参考华为官方文档：[开发准备](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_v3.html?page=hmssdk_huaweipush_devprepare_v3)。
+3. **打开推送服务开关**：登录 [华为开发者联盟](http://developer.huawei.com/cn/consumer/)，按照华为官方文档提示[开通推送服务](https://developer.huawei.com/consumer/cn/service/hms/catalog/AGCHelp.html?page=AGC_appGalleryConnect_associated_service)。
+4. **将华为 App 信息保存到 LeanCloud 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
 
 ### 接入 SDK
 
-#### 获取 HMS SDK 和 HMS Agent SDK
-华为 HMS 推送 SDK 分为两部分，一个是 HMS SDK，一个是 HMS Agent SDK，两个 SDK 都要正确接入，且两者需要主版本号一致才能正常使用（当前 LeanCloud 混合推送基于 v2.6.3.306 这一版本）。可参考：[华为官方文档：消息推送服务开发准备](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent)。
+#### 获取 HMS SDK
+从 6.4.4 版本开始，LeanCloud 混合推送已经升级到华为 PushKit V3 版本，开发者可以参考[华为官方文档](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_v3.html?page=hmssdk_huaweipush_devprepare_v3)完成 HMS SDK 的接入。其主要步骤有：
 
-HMS SDK 可以直接通过 jar 包加入，解压 HMS SDK 目录如下表所示，需要将下面三个目录的文件拷贝到应用工程根目录，华为要求将 HMS 资源文件和证书文件打包到 apk 中。（[SDK 下载地址](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#4%20%E4%B8%8B%E8%BD%BDSDK)）
+- 在 AndroidStudio 开发环境中添加当前应用的 AppGallery Connect 配置文件，如下图所示：
+![image](https://obs.cn-north-2.myhwclouds.com/hms-ds-wf/b/3d9b4319cc364362ab910dfd20957fe38198369731757579184.PNG)
+- 配置 HMS SDK 的 maven 仓库地址。
+  - 在项目级 build.gradle 文件的 `allprojects/repositories` 和 `buildscript/repositories` 中增加仓库地址：
+`maven {url 'http://developer.huawei.com/repo/'}`
+  - 在项目级 build.gradle 的 buildscript/dependencies 里面增加配置：
+```
+dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.huawei.agconnect:agcp:1.2.1.301'
+    }
+```
+- 添加编译依赖。
+  - 在应用级的 build.gradle 头部增加如下配置：
+```
+apply plugin: 'com.huawei.agconnect'
+```
+如下图所示：
+![applyImage](https://obs.cn-north-2.myhwclouds.com/hms-ds-wf/b/b757df517a3a49ca8254d551957902ca7924390658280237088.PNG)
 
-目录 | 说明 | 使用方式
-----|----|----
-libs/ | 包含 HMS 所有功能的 jar 包。通用包不再按照业务功能分成多个 jar 包，包含帐号、支付、消息、推送、游戏服务。 |请直接将 libs 目录下的文件拷贝到应用工程 libs 目录
-res/ | HMS SDK 需要使用的资源目录，包含多国语言。应用如果不需要集成多种语言的，可以适当裁剪。但是必须保留默认语言和简体中文。 | 请直接将 res 目录下的文件拷贝到应用工程 res 目录
-assets/ | HMS SDK 请求华为服务器需要使用的证书文件 | 请直接将 assets 目录拷贝到应用工程根目录
+  - 在应用级的 build.gradle 中增加如下编译依赖：
+```
+dependencies {
+  //其它已存在的依赖不要删除
+  implementation 'com.huawei.hms:push:4.0.2.300'
+}
+```
+- 在 android 中配置签名
+将生成签名证书指纹步骤中生成的签名文件拷贝到工程的 app 目录下，在 build.gradle 文件中配置签名：
+```
+android {
+    signingConfigs {
+        config {
+            keyAlias 'pushdemo'
+            keyPassword '123456789'
+            storeFile file('demo.keystore')
+            storePassword '123456789'
+        }
+    }
+ 
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.config
+        }
+        release {
+            signingConfig signingConfigs.config
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+```
 
-HMS Agent SDK 需要下载解压之后把源码完全拷贝进入工程。HMS Agent SDK 包含帐号、支付、消息、推送、游戏等功能，如果只打算使用其中的推送功能，可以使用 HMS Agent SDK 压缩包中自带的 GetHMSAgent 脚本删除不需要的文件，具体步骤如下：
-
-1. 执行 `GetHMSAgent_cn.bat` 生成 copysrc 的文件夹，copysrc 里面是根据您选择需要集成 HMS 服务，抽取后的 HMSAgent 代码（java 文件夹）和manifest文件（AndroidManifest.xml）。注意此步骤中会用到当前应用签名对应的 SHA256 指纹与应用的 App ID 与 App Secret 等信息。
-2. 拷贝 copysrc/java 里面的代码到您现有的工程。请保持 HMSAgent 代码的包的路径和结构不变。AndroidManifest.xml仅供配置参考。
-
-这样既可以减少应用大小，也可以避免要求不必要的权限。
-详见 [华为开发者文档 > 集成 HMS SDK Agent](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#5.1%20%E9%9B%86%E6%88%90SDK)。
-注意，华为的文档里只提到了 `GetHMSAgent_cn.bat`，但实际上HMS Agent SDK 压缩包中还提供了 `GetHMSAgent_cn.sh`，如果您的开发环境是 macOS 或 Linux，可以用这个脚本。
-
-
-> 注意：华为 HMS 推送不能与老的 HwPush 共存，如果切换到 HMS 推送，则需要将原来的 HwPush SDK 全部删除干净才行。
+做完这些修改后，Android Studio 右上方出现「Sync Now」链接。点击「Sync Now」等待同步完成。
 
 #### 修改应用 manifest 配置
 
@@ -93,10 +128,12 @@ dependencies {
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
   implementation 'com.alibaba:fastjson:1.1.70.android'
   implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
+
+  implementation 'com.huawei.hms:push:4.0.2.300'
 }
 ```
 
-然后配置相关 AndroidManifest，添加 Permission：
+然后配置相关 AndroidManifest，添加 Permission(开发者要将其中的 `<包名>` 替换为自己的应用的 package)：
 
 ```xml
 <!-- HMS-SDK引导升级HMS功能，访问OTA服务器需要网络权限 -->
@@ -121,117 +158,34 @@ dependencies {
 <uses-permission android:name="${PACKAGE_NAME}.permission.PROCESS_PUSH_MSG" />
 ```
 
-再在 application 节点下添加 service 与 receiver。开发者要将其中的 `<包名>` 替换为自己的应用的 package：
+集成最新的 HMS Core Push SDK 版本后要在 AndroidManifest.xml 文件的 application 节点下参照以下步骤注册 Service，用于接收华为推送的消息与令牌。
 
 ```xml
-<application
-   android:name="xxx.xxx.xxx.YourApplication">
-  <!-- 华为推送要求的设置（appId） -->
-  <meta-data
-    android:name="com.huawei.hms.client.appid"
-    android:value="<please use your HMS appId>">
-  </meta-data>
-  <!-- 配置华为移动服务版本 -->
-  <meta-data  
-    android:name="com.huawei.hms.version"  
-    android:value="2.6.3">
-  </meta-data>
-
-  <!-- 华为推送要求的 updateProvider，用于HMS SDK引导升级HMS APK，提供给系统安装器读取升级文件 -->
-  <!-- <包名> 用实际的应用包名替换 -->
-  <provider
-      android:name="com.huawei.hms.update.provider.UpdateProvider"
-      android:authorities="<包名>.hms.update.provider"
-      android:exported="false"
-      android:grantUriPermissions="true">
-  </provider>
-
-  <!-- 华为推送要求的 activity -->
-  <!-- BridgeActivity定义了HMS SDK中一些跳转所需要的透明页面 -->
-  <activity
-      android:name="com.huawei.hms.activity.BridgeActivity"
-      android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
-      android:excludeFromRecents="true"
-      android:exported="false"
-      android:hardwareAccelerated="true"
-      android:theme="@android:style/Theme.Translucent">
-      <meta-data
-          android:name="hwc-theme"
-          android:value="androidhwext:style/Theme.Emui.Translucent"/>
-  </activity>
-
-  <!-- AppUpdateActivity和PackageInstallActivity是 HMS SDK自升级接口所需要使用的页面 -->
-  <activity
-      android:name="com.huawei.updatesdk.service.otaupdate.AppUpdateActivity"
-      android:configChanges="orientation|screenSize"
-      android:exported="false"
-      android:theme="@style/upsdkDlDialog" >
-  
-      <meta-data
-          android:name="hwc-theme"
-          android:value="androidhwext:style/Theme.Emui.Translucent.NoTitleBar" />
-  </activity>
-        
-  <activity
-      android:name="com.huawei.updatesdk.support.pm.PackageInstallerActivity"
-      android:configChanges="orientation|keyboardHidden|screenSize"
-      android:exported="false"
-      android:theme="@style/upsdkDlDialog" >
-      <meta-data
-          android:name="hwc-theme"
-          android:value="androidhwext:style/Theme.Emui.Translucent" />
-  </activity>
-        
-  <!-- 解决华为移动服务升级问题的透明界面 -->
-  <activity
-    android:name="com.huawei.android.hms.agent.common.HMSAgentActivity"
-    android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
-    android:excludeFromRecents="true"
-    android:exported="false"
-    android:hardwareAccelerated="true"
-    android:theme="@android:style/Theme.Translucent" >
-    <meta-data
-        android:name="hwc-theme"
-        android:value="androidhwext:style/Theme.Emui.Translucent" />
-  </activity>
-
-  <!-- HMS-SDK 下载服务 -->
-  <service android:name="com.huawei.updatesdk.service.deamon.download.DownloadService"
-      android:exported="false"/>
-
-  <!-- LeanCloud 自定义 receiver -->
-  <!-- ${PACKAGE_NAME} 要替换上您应用的包名 -->
-  <receiver android:name="cn.leancloud.AVHMSPushMessageReceiver"
-  android:permission="${PACKAGE_NAME}.permission.PROCESS_PUSH_MSG">
+<service
+      android:name="cn.leancloud.AVHMSMessageService"
+      android:exported="false">
       <intent-filter>
-         <!-- 必须,用于接收token -->
-         <action android:name="com.huawei.android.push.intent.REGISTRATION" />
-         <!-- 必须, 用于接收透传消息 -->
-         <action android:name="com.huawei.android.push.intent.RECEIVE" />
-         <!-- 必须, 用于接收通知栏消息点击事件 此事件不需要开发者处理，只需注册就可以 -->
-         <action android:name="com.huawei.intent.action.PUSH_DELAY_NOTIFY"/>
+            <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
       </intent-filter>
-  </receiver>
-
-  <!-- 开发者自定义的打开推送消息的目的 activity，如果不指定则默认是打开应用。-->
-  <activity android:name="<please use your own activity name>">
-      <intent-filter>
-          <action android:name="android.intent.action.VIEW" />
-          <category android:name="android.intent.category.DEFAULT" />
-          <data android:scheme="lcpushscheme" android:host="cn.leancloud.push" android:path="/notify_detail"/>
-      </intent-filter>
-  </activity>
-
-</application>
+</service>
+<service
+    android:name="com.huawei.hms.support.api.push.service.HmsMsgService"
+    android:enabled="true"
+    android:exported="true"
+    android:process=":pushservice">
+    <intent-filter>
+        <action android:name="com.huawei.push.msg.NOTIFY_MSG" />
+        <action android:name="com.huawei.push.msg.PASSBY_MSG" />
+    </intent-filter>
+</service>
 ```
-
-如果开发者还使用了华为的其他服务（例如支付等），请参考华为[官方文档](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_devprepare_agent#4%20%E4%B8%8B%E8%BD%BDSDK)来调整 manifest 文件内容。
 
 ### 具体使用
 
 1. 在 application 的 onCreate 方法中调用 `AVOSCloud.initialize` 完成初始化之后，增加 `AVMixPushManager.registerHMSPush(context, profile)` 完成 HMS 推送的初始化。参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
 
-2. 务必在应用启动的首个 activity 的 `onCreate` 方法中调用 `AVMixPushManager.connectHMS(activity)` ，确保 HMS SDK 和 HMS APK 的连接。
+2. 务必在应用启动的首个 activity 的 `onCreate` 方法中调用 `AVMixPushManager.connectHMS(activity)` ，确保 HMS SDK 连接成功。
+如果开发者不通过 AppGallery Connect 配置文件来集成，我们也提供了 `AVMixPushManager.connectHMS(activity, huaweiAppId)` 来显式指定华为应用 id 完成连接。
 
 LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华为推送：
 
@@ -309,15 +263,16 @@ LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为：
 ```
 
 ### 华为推送自定义 Receiver
-如果你想推送消息，但不显示在 Android 系统的通知栏中，而是执行应用程序预定义的逻辑，可以 [自定义 Receiver](android_push_guide.html#自定义_Receiver)。华为混合推送自定义 Receiver 需要继承 AVHMSPushMessageReceiver，在收到透传消息的回调方法 `onPushMsg` 获取推送消息数据。
+如果你想推送消息，但不显示在 Android 系统的通知栏中，而是执行应用程序预定义的逻辑，可以 [自定义 Receiver](android_push_guide.html#自定义_Receiver)。华为混合推送自定义 Receiver 需要继承 AVHMSMessageService，在收到透传消息的回调方法 `onMessageReceived` 获取推送消息数据。
 你的 Receiver 可以按照如下方式实现：
 
 ```java
-public class MyHuaweiReceiver extends AVHMSPushMessageReceiver {
+public class MyHuaweiReceiver extends AVHMSMessageService {
     @Override
-    public boolean onPushMsg(Context context, byte[] msg, Bundle bundle) {
+    public boolean onMessageReceived(RemoteMessage remoteMessage) {
         try {
-            String content = "--- 收到推送消息：--- " + new String(msg, "UTF-8");
+            String message = remoteMessage.getData();
+            String content = "--- 收到推送消息：--- " + new String(message, "UTF-8");
             System.out.println("TAG:" + content);
         } catch (Exception e) {
             e.printStackTrace();
@@ -327,22 +282,16 @@ public class MyHuaweiReceiver extends AVHMSPushMessageReceiver {
 }
 ```
 
-AndroidManifest.xml 中把 AVHMSPushMessageReceiver 替换为你自定义的 MyHuaweiReceiver。
+AndroidManifest.xml 中把 AVHMSMessageService 替换为你自定义的 MyHuaweiReceiver。
  		
 ```xml
-<!-- LeanCloud 自定义 receiver -->
-<!-- ${PACKAGE_NAME} 要替换上您应用的包名 -->
-<receiver android:name="${PACKAGE_NAME}.MyHuaweiReceiver"
-    android:permission="${PACKAGE_NAME}.permission.PROCESS_PUSH_MSG">
+<service
+    android:name=".MyHuaweiReceiver"
+    android:exported="false">
     <intent-filter>
-        <!-- 必须,用于接收token -->
-        <action android:name="com.huawei.android.push.intent.REGISTRATION" />
-        <!-- 必须, 用于接收透传消息 -->
-        <action android:name="com.huawei.android.push.intent.RECEIVE" />
-        <!-- 必须, 用于接收通知栏消息点击事件 此事件不需要开发者处理，只需注册就可以 -->
-        <action android:name="com.huawei.intent.action.PUSH_DELAY_NOTIFY"/>
+        <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
     </intent-filter>
-</receiver>
+</service>
 ```
 
 修改 HMS 推送注册函数。特别注意一点，使用自定义 Receiver 的时候，需要调用 `AVMixPushManager.registerHMSPush(context, profile, receiverClazz)` 或者 `AVMixPushManager.registerHMSPush(context, receiverClazz)` 来完成 HMS 推送的初始化，否则会导致 `AVMixPushManager.registerHMSPush` 调用失败。
@@ -373,7 +322,7 @@ AndroidManifest.xml 中把 AVHMSPushMessageReceiver 替换为你自定义的 MyH
 
 ### 接入 SDK
 
-首先导入 `mixpush-android` 包。修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
+我们混合推送基于小米 3.7.5 版本 SDK 进行开发。开发者需要首先导入 `mixpush-android` 包：修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
 
 ```
 dependencies {
@@ -579,9 +528,9 @@ dependencies {
 
 当魅族通知栏消息被点击后，如果已经设置了 [自定义 Receiver](android_push_guide.html#自定义_Receiver)，则 SDK 会发送一个 action 为 `com.avos.avoscloud.flyme_notification_action` 的 broadcast。如有需要，开发者可以通过订阅此消息获取点击事件，否则 SDK 会默认打开 [启动推送服务](android_push_guide.html#启动推送服务) 对应设置的 Activity。
 
-## vivo 推送（beta）
+## vivo 推送
 
-我们新推出了支持 vivo 手机的混合推送，当前该功能还处于 beta 阶段，可能存有缺陷，欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
+我们新推出了支持 vivo 手机的混合推送（基于 vivo 2.9.0.0 版本），欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
 
 - vivo 混合推送 SDK 源代码：可参照 [这里](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush)。
 - vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush-demos/tree/master/vivo)。
@@ -591,7 +540,7 @@ dependencies {
 这里假设大家已经完成上述操作，创建好了应用，并获取了 `appId` 、 `appKey`和`appSecret`（请保存好这几个值，下一步接入的时候会用到。）
 
 ### 接入 SDK
-当前版本的 SDK 是基于 vivo 官方文档 [push SDK 接入文档](https://dev.vivo.com.cn/documentCenter/doc/158) 封装而来，使用的 vivo push SDK 基线版本是 `2.3.4`。我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
+当前版本的 SDK 是基于 vivo 官方文档 [push SDK 接入文档](https://dev.vivo.com.cn/documentCenter/doc/158) 封装而来，使用的 vivo push SDK 基线版本是 `2.9.0.0`。我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
 
 首先将 demo 工程 app/libs 目录下的所有 jar 包（如有）拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
@@ -761,9 +710,9 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 
 
 
-## Oppo 推送（beta）
+## Oppo 推送
 
-我们新推出了支持 Oppo 手机的混合推送，当前该功能还处于 beta 阶段，可能存有缺陷，欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
+我们新推出了支持 Oppo 手机的混合推送（基于 Oppo 2.0.2 版本SDK），欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
 
 - oppo 混合推送 SDK 源代码：可参照 [这里](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush)。
 - oppo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush-demos/tree/master/oppo)。
@@ -774,7 +723,7 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 ### 环境配置
 在开始接入之前，有两项准备工作：
 - 在 [oppo 开放平台](https://open.oppomobile.com/)注册一个账号，并创建好应用。
-- 从 Oppo 官网下载 推送 SDK(地址如下：[Oppo Push 客户端 SDK](https://open.oppomobile.com/wiki/doc#id=10201))。LeanCloud 混合推送目前是基于 1.0.1 版本进行开发的，大家也可以从[混合推送源码](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush/libs)里得到这一版本的 jar 包。
+- 从 Oppo 官网下载 推送 SDK(地址如下：[Oppo Push 客户端 SDK](https://open.oppomobile.com/wiki/doc#id=10201))。LeanCloud 混合推送目前是基于 2.0.2 版本进行开发的，大家也可以从[混合推送源码](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush/libs)里得到这一版本的 jar 包。
 
 这里假设大家已经完成上述操作，创建好了应用，并获取了 `appKey` 、 `appSecret`和 `masterSecret`，请保存好这三个值，下一步接入的时候会用到：
 

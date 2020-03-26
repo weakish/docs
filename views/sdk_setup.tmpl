@@ -1006,19 +1006,6 @@ Client::initialize("{{appid}}", "{{appkey}}", "{{masterkey}}");
 
 {% endif %}
 {% if platform_name === "Android / Java" %}
-### Java 平台初始化代码
-
-如果是一个普通 Java 项目，则在代码开头添加：
-
-```java
-import cn.leancloud.core.AVOSService;
-
-AVOSCloud.initialize("{{appid}}", "{{appkey}}");
-```
-
-注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
-模板项目和[云引擎网站托管开发指南](leanengine_webhosting_guide-java.html)中的示例代码均未配置 API 自定义域名，
-请勿多此一举 setServer，否则会变成公网访问，影响性能。
 
 ### Android 平台初始化
 
@@ -1071,14 +1058,34 @@ public class MyLeanCloudApp extends Application {
 
 ```
 
-#### 更安全的客户端初始化方法
+#### 更安全的 Android 客户端初始化方法
 
-从 6.1.0 版本开始，除了支持通过 appId + appKey 完成初始化，还提供一种更加安全的使用方式，支持仅仅通过 appId 来初始化应用，例如：
+对 Android 开发者来说，从 6.1.0 版本开始，除了支持通过 appId + appKey 完成初始化，我们还提供一种更加安全的使用方式，支持仅仅通过 appId 来初始化应用，例如：
 
 {{ android_key_init(appid) }}
 
+这时候程序初始化不再需要 appKey，避免了核心配置信息在客户端泄漏可能带来的潜在风险。具体的集成方法可参看文档 [Android SDK 更安全的接入和初始化方式](sdk_setup_android_securely.html)。
 
-不再需要 appKey，避免核心配置信息在客户端泄漏可能带来的潜在风险。具体的集成方法可参看文档 [Android SDK 更安全的接入和初始化方式](sdk_setup_android_securely.html)。
+
+### Java 平台初始化代码
+
+如果是一个普通 Java 项目，则在代码开头添加：
+
+```java
+import cn.leancloud.core.AVOSService;
+
+AVOSCloud.initialize("{{appid}}", "{{appkey}}");
+```
+
+注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
+模板项目和[云引擎网站托管开发指南](leanengine_webhosting_guide-java.html)中的示例代码均未配置 API 自定义域名，
+请勿调用 `setServer`，否则会变成公网访问，影响性能。
+
+LeanCloud realtime-core library 也支持在纯 Java Application 中使用，但是与 Android 的调用方式有细微差异，Java Application 中需要开发者显式建立与 LeanCloud 即时通讯云端的长链接（Android 平台是通过 PushService 自动建立的）。建立长链接的方法如下：
+```
+AVConnectionManager.getInstance().startConnection(callback);
+```
+只有长链接成功建立之后，后续的聊天请求才能开始。
 
 {% endif %}
 {% if platform_name === ".NET" %}
