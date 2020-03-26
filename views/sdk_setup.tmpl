@@ -4,12 +4,6 @@
 {% macro requireServerURL() %}
 请将 `xxx.example.com` 替换为你的应用[绑定的 API 域名](custom-api-domain-guide.html#API_域名)。
 
-> 注意：对于**只使用 LeanCloud 即时通讯服务**，而**不使用推送服务**的应用来说，在初始化的时候设置 AVIMOptions#disableAutoLogin4Push 选项，可以加快即时通讯用户登录的过程。设置方法如下：
-```
-// 在 AVOSCloud#initialize 之后调用，禁止自动发送推送服务的 login 请求。
-AVIMOptions.getGlobalOptions().setDisableAutoLogin4Push(true);
-```
-
 国际版应用不要求绑定自定义域名。
 如果你的国际版应用（App ID 后缀为 `-MdYXbMMI`）没有绑定自定义域名，**初始化 SDK 时不用传入服务器地址参数**。
 极个别　App ID　后缀不为 `-MdYXbMMI` 的国际版应用，请参见[这里的说明](custom-api-domain-guide.html#App_ID_后缀不为_-MdYXbMMI_的国际版应用如何初始化_SDK)。
@@ -1058,7 +1052,13 @@ public class MyLeanCloudApp extends Application {
 
 ```
 
-#### 更安全的 Android 客户端初始化方法
+> 注意：对于**只使用 LeanCloud 即时通讯服务**，而**不使用推送服务**的应用来说，在初始化的时候设置 AVIMOptions#disableAutoLogin4Push 选项，可以加快即时通讯用户登录的过程。设置方法如下：
+```
+// 在 AVOSCloud#initialize 之后调用，禁止自动发送推送服务的 login 请求。
+AVIMOptions.getGlobalOptions().setDisableAutoLogin4Push(true);
+```
+
+#### 更安全的客户端初始化方法
 
 对 Android 开发者来说，从 6.1.0 版本开始，除了支持通过 appId + appKey 完成初始化，我们还提供一种更加安全的使用方式，支持仅仅通过 appId 来初始化应用，例如：
 
