@@ -817,7 +817,6 @@ $ npm install leancloud-realtime --save
 支持以下运行时：
 
 - .NET Framework 4.5+
-- .NET Core 2.0+
 
 在 Visual Studio 执行安装 nuget 依赖：
 
@@ -833,12 +832,7 @@ PM> Install-Package LeanCloud.Realtime
 
 ## 初始化
 
-{% if node == 'us'}
-首先进入 [控制台 > 设置 > 应用 Key](/app.html?appid={{appid}}#/key) 来获取 **App ID**，**App Key** 以及**服务器地址**。
-
-{% eles %}
 首先进入 [控制台 > 设置 > 应用 Key](/dashboard/app.html?appid={{appid}}#/key) 来获取 **App ID**，**App Key** 以及**服务器地址**。
-{% endif %}
 
 {% if platform_name === "Objective-C" %}
 打开 `AppDelegate` 文件，导入基础模块头文件：
