@@ -603,7 +603,7 @@ AV.Cloud.run('order').then((data) => {
 ## FAQ
 
 ### 配置 download 合法域名时显示「该域名因违规被禁止设置。」
-请前往 [控制台 > 存储 > 设置 > 文件](/dashboard/storage.html?appid={{appid}}#/storage/conf) 配置你自己的文件域名。
+请前往 **控制台 > 存储 > 设置 > 文件** 配置你自己的文件域名。
 
 ### Access denied by api domain white list
 如果你的应用启用并配置了 [Web 安全域名](data_security.html#Web_应用安全设置)，你可能会 catch 到 `Access denied by api domain white list` 异常，请将提示的域名添加至应用的 Web 安全域名列表。

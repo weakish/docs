@@ -250,7 +250,7 @@ var tom = await realtime.CreateClientAsync('Tom');
 var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry", isUnique:true);
 ```
 
-`createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开 [控制台 > 存储 > 数据](/dashboard/data.html?appid={{appid}}#/) 查看数据。不同 SDK 提供的创建对话接口如下：
+`createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开 **控制台 > 存储 > 数据** 查看数据。不同 SDK 提供的创建对话接口如下：
 
 ```js
 /**

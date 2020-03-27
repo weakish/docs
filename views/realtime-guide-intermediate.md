@@ -257,7 +257,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 
 ### 修改消息
 
-在 [控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 启用 「允许通过 SDK 编辑消息」后，终端用户可以对自己已经发送的消息进行修改（`Conversation#updateMessage` 方法）。目前即时通讯服务端并没有在时效性上进行限制，不过只允许用户修改自己发出去的消息，不允许修改别人的消息。
+在 **控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项** 启用 「允许通过 SDK 编辑消息」后，终端用户可以对自己已经发送的消息进行修改（`Conversation#updateMessage` 方法）。目前即时通讯服务端并没有在时效性上进行限制，不过只允许用户修改自己发出去的消息，不允许修改别人的消息。
 
 修改已经发送的消息，并不是直接在老的消息对象上修改，而是像发新消息一样创建一个消息实例，然后调用 `Conversation#updateMessage(oldMessage, newMessage)` 方法来向云端提交请求，示例代码如下：
 
@@ -378,7 +378,7 @@ tom.OnMessageUpdated += (sender, e) => {
 ### 撤回消息
 
 除了修改消息，终端用户还可以撤回一条自己之前发送过的消息。
-和修改消息类似，这一功能需要在控制台启用（[控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 启用「允许通过 SDK 撤回消息」）。
+和修改消息类似，这一功能需要在控制台启用（**控制台 > 消息 > 即时通讯 > 设置 > 即时通讯选项** 启用「允许通过 SDK 撤回消息」）。
 同样，即时通讯服务端并没有在时效性上进行限制，不过只允许用户撤回自己发出去的消息，不允许撤回别人的消息。
 
 撤回消息调用 `Conversation#recallMessage` 方法，示例代码如下：
@@ -1141,7 +1141,7 @@ LeanCloud 本就提供完善的消息推送服务，现在将推送与即时通�
 
 1. 静态配置提醒消息
 
-  用户可以在控制台中为应用设置一个全局的静态 JSON 字符串，指定固定内容来发送通知。例如，我们进入 [控制台 > 消息 > 即时通讯 > 设置 > 离线推送设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf)，填入：
+  用户可以在控制台中为应用设置一个全局的静态 JSON 字符串，指定固定内容来发送通知。例如，我们进入 **控制台 > 消息 > 即时通讯 > 设置 > 离线推送设置**，填入：
 
   ```json
   { "alert": "您有新的消息", "badge": "Increment" }
@@ -1281,7 +1281,7 @@ Apple 不允许在一次推送请求中向多个从属于不同 Team ID 的设�
 
 `_profile` 和 `_apns_team_id` 属性均不会实际推送。
 
-目前，[控制台 > 消息 > 即时通讯 > 设置 > 离线推送设置](/dashboard/messaging.html?appid={{appid}}#/message/realtime/conf) 这里的推送内容也支持一些内置变量，你可以将上下文信息直接设置到推送内容中：
+目前，**控制台 > 消息 > 即时通讯 > 设置 > 离线推送设置** 这里的推送内容也支持一些内置变量，你可以将上下文信息直接设置到推送内容中：
 
 * `${convId}` 推送相关的对话 ID
 * `${timestamp}` 触发推送的时间戳（Unix 时间戳）

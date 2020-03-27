@@ -5,7 +5,7 @@
 
 * iOS Objective C SDK 的 [AVConstants](https://github.com/leancloud/objc-sdk/blob/master/AVOS/AVOSCloud/AVConstants.h)。
 * PHP SDK 中与网络请求操作相关的错误码，比如 `28` 表示请求超时、`7` 表示连接服务器失败，请参考 [libcurl error codes](http://curl.haxx.se/libcurl/c/libcurl-errors.html)。
-* Android 的 [AVException](/api-docs/android/com/avos/avoscloud/AVException.html)。
+* Android 的 AVException。
 * JavaScript SDK 的 [AV.Error](https://leancloud.github.io/javascript-sdk/docs/AV.Error.html)。
 
 ## 0
@@ -98,7 +98,7 @@
 ## 119
 
 * 信息 - `That operation isn't allowed for clients.`
-* 含义 - 该操作无法从客户端发起。请检查该错误由哪个操作引起，然后在应用控制台中找到对应的服务设置来启用相应的选项，例如 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)、[控制台 > 消息 > 短信 > 设置 > 短信选项](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf) 等等。
+* 含义 - 该操作无法从客户端发起。请检查该错误由哪个操作引起，然后在应用控制台中找到对应的服务设置来启用相应的选项，例如 **控制台 > 存储 > 设置 > 用户账号**、**控制台 > 消息 > 短信 > 设置 > 短信选项** 等等。
 
 ## 120
 
@@ -437,7 +437,7 @@
 * 含义 - 短信模板未审核。
 ----
 * 信息 - `SMS sign not verified`
-* 含义 - 没有设置默认签名。请进入 [控制台 > 消息 > 短信 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/sms/conf) 中设置一个默认短信签名。
+* 含义 - 没有设置默认签名。请进入 **控制台 > 消息 > 短信 > 设置** 中设置一个默认短信签名。
 
 ## 606
 

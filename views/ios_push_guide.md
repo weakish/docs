@@ -53,7 +53,7 @@ deviceType|String|设备类型，SDK 会自动设置该属性，一般情况下�
 apnsTopic|String|应用的 Bundle Identifier，SDK 会自动设置该属性，一般情况下不要随意更改
 timeZone|String|设备所处时区，SDK 会自动设置该属性，一般情况下不要随意更改
 
-可以在 {% if node=='qcloud' %}**控制台 > 存储 > 数据 > `_Installation`**{% else %}[控制台 > 存储 > 数据 > `_Installation`](/dashboard/data.html?appid={{appid}}#/_Installation){% endif %} 查看所有保存成功的 Installation 对象的数据。
+可以在 **控制台 > 存储 > 数据 > `_Installation`** 查看所有保存成功的 Installation 对象的数据。
 
 ### 注册 APNs 获取 Token
 
@@ -218,7 +218,7 @@ do {
 [AVPush setProductionMode:false];
 ```
 
-<div class="callout callout-info">为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，并在 **[控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list)** 页面中体现。因此，在使用开发证书推送时，请合理设置推送条件。</div>
+<div class="callout callout-info">为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，并在 **控制台 > 消息 > 推送记录** 页面中体现。因此，在使用开发证书推送时，请合理设置推送条件。</div>
 
 ## 使用频道
 
@@ -252,7 +252,7 @@ AVInstallation *currentInstallation = [AVInstallation defaultInstallation];
 [currentInstallation saveInBackground];
 ```
 
-订阅后要记得保存，即可在 **[控制台 > 存储 > 数据 > `_Installation`](/dashboard/data.html?appid={{appid}}#/_Installation)** 中看到该 installation 的 channels 字段多了一个「Giants」。
+订阅后要记得保存，即可在 **控制台 > 存储 > 数据 > `_Installation`** 中看到该 installation 的 channels 字段多了一个「Giants」。
 
 退订：
 

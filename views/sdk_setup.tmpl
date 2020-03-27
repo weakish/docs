@@ -840,7 +840,7 @@ PM> Install-Package LeanCloud.Realtime
 
 ## 初始化
 
-首先进入 [控制台 > 设置 > 应用 Key](/dashboard/app.html?appid={{appid}}#/key) 来获取 **App ID**，**App Key** 以及**服务器地址**。
+首先进入 **控制台 > 设置 > 应用 Key** 来获取 **App ID**，**App Key** 以及**服务器地址**。
 
 {% if platform_name === "Objective-C" %}
 打开 `AppDelegate` 文件，导入基础模块头文件：
@@ -1146,7 +1146,7 @@ var realtime = new AVRealtime(new AVRealtime.Configuration
 
 ## 开启调试日志
 
-在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口，或是浏览器 Console 或是 LeanCloud 控制台的 [云引擎日志](/dashboard/cloud.html?appid={{appid}}#/log) 中。
+在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口，或是浏览器 Console 或是 LeanCloud 控制台的云引擎日志中。
 
 {% if platform_name === "Objective-C" %}
 ```objc
@@ -1174,7 +1174,7 @@ DEBUG=leancloud* npm start
 DEBUG=LC* npm start
 ```
 
-若是在 [云引擎](leanengine_overview.html) 中使用 Node.js，可以到 [控制台 > 云引擎 > 设置 > 自定义环境变量](/dashboard/cloud.html?appid={{appid}}#/conf) 里面添加一个新的变量，在第一栏填入 `DEBUG`，第二栏填入 `leancloud:*`（不要丢掉 `leancloud` 和 `*` 之间的冒号）。保存成功后，在本地通过 [命令行工具](leanengine_cli.html) 调试时，可以通过设置环境变量 `DEBUG=leancloud:*` 来让日志信息输出到 [LeanCloud 控制台 > 云引擎 > 应用日志](/dashboard/cloud.html?appid={{appid}}#/log)：
+若是在 [云引擎](leanengine_overview.html) 中使用 Node.js，可以到 **控制台 > 云引擎 > 设置 > 自定义环境变量** 里面添加一个新的变量，在第一栏填入 `DEBUG`，第二栏填入 `leancloud:*`（不要丢掉 `leancloud` 和 `*` 之间的冒号）。保存成功后，在本地通过 [命令行工具](leanengine_cli.html) 调试时，可以通过设置环境变量 `DEBUG=leancloud:*` 来让日志信息输出到 **LeanCloud 控制台 > 云引擎 > 应用日志**：
 
 ```sh
 DEBUG=leancloud:* lean up
@@ -1409,7 +1409,7 @@ await saveTask;
 保存后运行程序。
 {% endif %}
 
-然后打开 [控制台 > 存储 > 数据 > `TestObject`](/dashboard/data.html?appid={{appid}}#/TestObject)，如果看到如下内容，说明 SDK 已经正确地执行了上述代码，安装完毕。
+然后打开 **控制台 > 存储 > 数据 > `TestObject`**，如果看到如下内容，说明 SDK 已经正确地执行了上述代码，安装完毕。
 
 ![数据表中出现一行「words」值为「Hello world!」的数据。](images/testobject_saved.png)
 
