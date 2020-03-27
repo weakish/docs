@@ -47,6 +47,19 @@
 
 相关文档：[云引擎指南：Hook 函数](leanengine_cloudfunction_guide-node.html#Hook_函数)
 
+## 使用 Homebrew 安装命令行工具失败
+
+有些地区 Homebrew 访问网络可能很慢，可以通过设置环境变量 `http_proxy`、`https_proxy`、`all_proxy` 加速访问（详见 [man brew]），或者也可以配置 Homebrew [索引][tuna]和[二进制预编译包][tuna-bottles]的镜像。
+
+[man brew]: https://docs.brew.sh/Manpage
+[tuna]: https://mirror.tuna.tsinghua.edu.cn/help/homebrew/
+[tuna-bottles]: https://mirrors.tuna.tsinghua.edu.cn/help/homebrew-bottles/
+
+或者也可以在 {{release}} 下载适用于 macOS 的二进制文件，重命名为 `lean`　后移动到 `$PATH` 下的路径，并添加可执行权限（`chmod a+x /path/to/lean`）。
+如果运行 `lean` 时 macOS 报错「来自身份不明的开发者」，那么需要在 macOS 系统设置「隐私与安全」下配置一下，详见 [Apple 官方文档][HT202491]。
+
+[HT202491]: https://support.apple.com/en-us/HT202491
+
 ## 命令行工具在本地调试时提示 `Error: listen EADDRINUSE :::3000`，无法访问应用
 
 `listen EADDRINUSE :::3000` 表示你的程序默认使用的 3000 端口被其他应用占用了，可以按照下面的方法找到并关闭占用 3000 端口的程序：
