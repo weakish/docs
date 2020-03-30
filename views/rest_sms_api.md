@@ -87,6 +87,7 @@ curl -X POST \
 | template          |      | 短信模板名称，参见下面的[自定义短信模板一节](#自定义短信模板) |
 | sign              |      | 短信签名，参见下面的[自定义短信模板一节](#自定义短信模板) |
 | validate_token    |      | 参见下面的[图形验证码 captcha 一节](#图形验证码-captcha)
+| other_variable    |      | [短信模板中的变量](#自定义短信模板)，`other_variable` 仅为举例 |
 
 如果成功，将返回：
 
