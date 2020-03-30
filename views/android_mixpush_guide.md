@@ -770,11 +770,11 @@ dependencies {
 
 ```xml
 <service
-android:name="com.coloros.mcssdk.PushService"
-android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
-  <intent-filter>
-  	<action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE"/>
-  </intent-filter>
+    android:name="com.heytap.mcssdk.PushService"
+    android:permission="com.heytap.mcs.permission.SEND_MCS_MESSAGE">
+    <intent-filter>
+        <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE"/>
+    </intent-filter>
 </service>
 ```
 
