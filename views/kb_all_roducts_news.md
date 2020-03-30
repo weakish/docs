@@ -29,16 +29,16 @@
 
 对于开发者担心的 android app 在客户端暴露 appId 和 appKey 可能带来的潜在风险，我们在新版本 SDK 中进行了优化，增加了一种更「安全」的使用方式：允许应用程序只通过 appId 来完成 LeanCloud 服务初始化，从而避免了暴露应用核心配置信息的风险。
 
-具体的使用方式请参考开发指南：[Android SDK 更安全的接入和初始化方式](https://leancloud.cn/docs/sdk_setup_android_securely.html?utm_source=newsletter&utm_medium=email&utm_campaign=202001)，欢迎大家升级到新版本 SDK，并给我们更多建议和反馈。
+具体的使用方式请参考开发指南：[Android SDK 更安全的接入和初始化方式](sdk_setup_android_securely.html)，欢迎大家升级到新版本 SDK，并给我们更多建议和反馈。
 
 ### 最佳实践：即时通讯客户端在线状态查询的解决方案
 
 在即时通讯产品中展示用户在线状态是一个常见需求，例如聊天好友是否在线、公司办公交流时同事是否在线、以及群成员是否在线等等，其应用场景十分广泛。
 
-LeanCloud 即时通讯服务支持 [客户端上下线 Hook ](https://leancloud.cn/docs/realtime-guide-systemconv.html?utm_source=newsletter&utm_medium=email&utm_campaign=202001#hash-2017196884)通知，开发者可以结合此 Hook 函数与云缓存机制，在云引擎中非常快速地完成客户端实时状态的记录与查询，详细方案可参考文档：[即时通讯中的在线状态查询](https://leancloud.cn/docs/realtime-guide-onoff-status.html?utm_source=newsletter&utm_medium=email&utm_campaign=202001)。
+LeanCloud 即时通讯服务支持 [客户端上下线 Hook ](realtime-guide-systemconv.html)通知，开发者可以结合此 Hook 函数与云缓存机制，在云引擎中非常快速地完成客户端实时状态的记录与查询，详细方案可参考文档：[即时通讯中的在线状态查询](realtime-guide-onoff-status.html)。
 
 
 
 ### 国际短信价格调整
 
-由于短信通道成本的变动，年前 12 月份我们调整了国际短信价格。您可以访问 [如下页面](https://leancloud.cn/docs/sms-guide.html?utm_source=newsletter&utm_medium=email&utm_campaign=202001#hash-228064280) 查看最新列表，这一调整无需开发者进行任何操作，发送国际短信时我们后端会自动应用新价格，请您留意近期的账单变化，如有疑惑可随时联系我们，感谢您的使用。
+由于短信通道成本的变动，年前 12 月份我们调整了国际短信价格。您可以访问 [如下页面](sms-guide.html) 查看最新列表，这一调整无需开发者进行任何操作，发送国际短信时我们后端会自动应用新价格，请您留意近期的账单变化，如有疑惑可随时联系我们，感谢您的使用。
