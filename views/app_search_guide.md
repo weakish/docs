@@ -29,7 +29,7 @@
 ```
 {URL Scheme}://{ URL Host }/{ Resource Path }
 ```
-进入 [控制台 > 组件 > 应用内搜索 > 基础设置](/dashboard/devcomponent.html?appid={{appid}}#/component/appsearch)，注意一下几个关键的属性：
+进入 **控制台 > 组件 > 应用内搜索 > 基础设置**，注意一下几个关键的属性：
 
 - **应用名称**：你的应用名称（必须）
 - **应用 URL Scheme**：支持外部调用的 URL scheme，我们强制要求采用**域名反转**的方式，类似 Java 语言的 package 命名机制。假设你的应用的域名为 `myapp.company.com`，那么我们要求的 scheme 就是形如 `com.company.myapp` 的字符串。例如我们的 Todo Demo 设置的 scheme 为 `com.leancloud.todo`。如果你没有域名，那么我们推荐你使用 `com.leancloud.{appId的前8位}` 来作为 Scheme。我们会在保存的时候检测 scheme 是否冲突。
@@ -729,7 +729,7 @@ curl -X GET \
 
 ## 自定义分词
 
-默认情况下， String 类型的字段都将被自动执行分词处理，我们使用的分词组件是 [mmseg](https://github.com/medcl/elasticsearch-analysis-mmseg)，词库来自搜狗。但是很多用户由于行业或者专业的特殊性，一般都有自定义词库的需求，因此我们提供了自定义词库的功能。应用创建者可以通过 [LeanCloud 控制台 > 组件 > 应用内搜索 > 自定义词库](/dashboard/devcomponent.html?appid={{appid}}#/component/custom_param) 上传词库文件。
+默认情况下， String 类型的字段都将被自动执行分词处理，我们使用的分词组件是 [mmseg](https://github.com/medcl/elasticsearch-analysis-mmseg)，词库来自搜狗。但是很多用户由于行业或者专业的特殊性，一般都有自定义词库的需求，因此我们提供了自定义词库的功能。应用创建者可以通过 **LeanCloud 控制台 > 组件 > 应用内搜索 > 自定义词库** 上传词库文件。
 
 词库文件要求为 UTF-8 编码，每个词单独一行，文件大小不能超过 512 K，例如：
 
