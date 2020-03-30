@@ -10,7 +10,7 @@
 * 查询的时候如果想将关联 Pointer 类型带入查询结果，请使用 AV.Query 的 `includeKey` 方法指定字段名称。
 * 查询可以指定 skip 和 limit 做分页查询。
 * 你可以在 [错误码详解](error_code.html) 文档里找到所有的错误代码和信息解释。
-* 你可以使用API 在线测试工具在线测试我们提供的开放 [REST API](rest_api.html)。
+* 你可以使用 [API 在线测试工具](rest_api.md#在线测试) 在线测试我们提供的开放 [REST API](rest_api.html)。
 * 我们的用户账户系统都自动做了密码加密存储，基于 SHA-512 加密算法，使用随机生成的 salt 加密。
 {% if node != 'qcloud' and node != 'us' %}
 * 我们提供短信服务，你可以使用短息服务发送手机验证码、手机登录验证码等。具体参考各 SDK 开发指南。
