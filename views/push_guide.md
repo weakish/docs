@@ -603,11 +603,18 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 {
   "alert":      "字符串类型，表示消息内容",
   "title":      "字符串类型，表示显示在通知栏的标题",
-  "silent":     "布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒",
+  "silent":     "布尔类型，指定透传消息或通知栏消息，默认为 false（通知栏消息）",
   "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
   "action":     "字符串类型，注册 Receiver 时提供的 action name，仅当需要自定义 Receiver 时设置",
 }
 ```
+
+其中，`silent` 为 `true` 表示这个消息是透传消息，为 `false` 表示消息是通知栏消息。
+透传消息和通知栏消息是 Android 推送（包括 Android 混合推送）支持的两种消息类型。
+透传消息是指消息到达设备后会先交给 LeanCloud Android SDK，再由 SDK 将消息通过 [自定义 Receiver](./android_push_guide.html#自定义_Receiver) 传递给开发者，收到消息后的行为由开发者定义的 Receiver 来决定，SDK 不会自动弹出通知栏提醒。
+而通知栏消息是指消息到达设备后会立即自动弹出通知栏提醒。
+
+另外请注意，如果希望接收透传消息请不要忘记自行实现 [自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
 
 关于自定义 Receiver 请参看[自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
 
@@ -669,14 +676,6 @@ wp  | Windows Phone
 ```
 
 如果是 `dev` 值就表示使用开发证书，`prod` 值表示使用生产证书。如果未设置 `prod` 属性，且使用的不是 [JavaScript 数据存储 SDK](https://leancloud.github.io/javascript-sdk/docs/AV.Push.html)，我们默认使用**生产证书**来发推送。如果未设置 `prod` 属性，且使用的是 [JavaScript 数据存储 SDK](https://leancloud.github.io/javascript-sdk/docs/AV.Push.html) ，则需要在发推送之前执行 [AV.setProduction](https://leancloud.github.io/javascript-sdk/docs/AV.html#.setProduction) 函数才会使用生产证书发推送，否则会以开发证书发推送。注意，当设备设置了 `deviceProfile` 时我们优先按照 `deviceProfile` 指定的证书推送。
-
-#### Android 推送区分透传和通知栏消息
-
-Android 推送（包括 Android 混合推送）支持透传和通知栏两种消息类型。透传消息是指消息到达设备后会先交给 LeanCloud Android SDK，再由 SDK 将消息通过 [自定义 Receiver](./android_push_guide.html#自定义_Receiver) 传递给开发者，收到消息后的行为由开发者定义的 Receiver 来决定，SDK 不会自动弹出通知栏提醒。而通知栏消息是指消息到达设备后会立即自动弹出通知栏提醒。
-
-LeanCloud 推送服务通过推送请求中 `data` 参数内的 `silent` 字段区分透传和通知栏消息。如果 `silent` 是 `true` 则表示这个消息是透传消息，为 `false` 表示消息是通知栏消息。如果不传递 `silent` 则默认其值为 `false`。另外请注意，如果希望接收透传消息请不要忘记自行实现 [自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
-
-推送请求中的 `data` 参数请参考 [消息内容 Data](#消息内容_Data)。
 
 #### Android 混合推送多配置区分
 
