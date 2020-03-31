@@ -42,13 +42,6 @@
 假设我们产品中有一个叫「Tom」的用户，首先我们在 SDK 中创建出一个与之对应的 `IMClient` 实例：
 
 ```js
-var realtime = new Realtime({
-  appId: '{{appid}}',
-  appKey: '{{appkey}}',
-  // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
-  server: 'https://xxx.example.com',
-  plugins: [TypedMessagesPlugin], // 注册富媒体消息插件
-});
 // Tom 用自己的名字作为 clientId 来登录即时通讯服务
 realtime.createIMClient('Tom').then(function(tom) {
   // 成功登录
@@ -1461,8 +1454,8 @@ Cloud->Jerry: 5. 收到图像消息，在对话框里面做 UI 展现
 对应的代码并没有时序图那样复杂，因为调用 `send` 接口的时候，SDK 会自动上传图像，不需要开发者再去关心这一步：
 
 ```js
-var AV = require('leancloud-storage');
-var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+// 图像消息等富媒体消息依赖存储 SDK 和富媒体消息插件，
+// 具体的引用和初始化步骤请参考《SDK 安装指南》
 
 var fileUploadControl = $('#photoFileUpload')[0];
 var file = new AV.File('avatar.jpg', fileUploadControl.files[0]);
