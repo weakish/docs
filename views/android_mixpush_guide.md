@@ -764,17 +764,26 @@ dependencies {
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <!-- 基础模块 END -->
     <uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE"/>
+    <uses-permission android:name="com.heytap.mcs.permission.RECIEVE_MCS_MESSAGE"/>
 ```
 
 最后在 AndroidManifest 中添加 oppo PushService ：
 
 ```xml
 <service
-    android:name="com.heytap.mcssdk.PushService"
-    android:permission="com.heytap.mcs.permission.SEND_MCS_MESSAGE">
+  android:name="com.heytap.mcssdk.PushService"
+  android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
     <intent-filter>
-        <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE"/>
+      <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE"/>
     </intent-filter>
+</service>
+
+<service
+   android:name="com.heytap.mcssdk.AppPushService"
+   android:permission="com.heytap.mcs.permission.SEND_MCS_MESSAGE">
+   <intent-filter>
+     <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE"/>
+   </intent-filter>
 </service>
 ```
 
