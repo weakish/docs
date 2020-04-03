@@ -310,10 +310,10 @@ curl -X POST \
 data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容_Data)。
 where| 可选 | 检索 `_Installation` 表使用的查询条件，JSON 对象。如果查询条件内包含日期或二进制等需要做编码的特殊类型数据，查询条件内需要包含编码后的数据。如查询 `createdAt` 字段大于某个时间的设备，where 条件需要为 `{"createdAt":{"$gte":{"__type":"Date","iso":"2015-06-21T18:02:52.249Z"}}}`。更多信息请参看：[数据编码说明](./rest_api.html#数据类型)
 channels| 可选 | 推送给哪些频道，将作为条件加入 where 对象。
-expiration_interval| 可选 | 消息过期的相对时间，从调用 API 的时间开始算起，单位是秒。
-expiration_time| 可选 | 消息过期的绝对日期时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"
-notification_id | 可选 | 自定义推送 id，最长 16 个字符且只能由英文字母和数字组成，不提供该参数时我们会为每个推送请求随机分配一个唯一的推送 id，用于区分不同推送。我们会根据推送 id 来统计推送的目标设备数和最终消息到达数，并展示在 [推送记录](#Notification) 当中。用户自定义推送 id 可以将多个不同的请求并入同一个推送 id 下从而整体统计出这一批推送请求的目标设备数和最终消息到达数。
 push_time| 可选 | 设置定时推送的发送时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"。请注意发送时间与当前时间如果小于 1 分钟则推送会立即发出，不会遵循 push_time 参数要求。如果需要实现周期推送，可以参照 [使用云引擎实现周期推送](#使用云引擎实现周期推送) 实现。
+expiration_time| 可选 | 消息过期的绝对日期时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"。如果客户端收到消息的时间超过消息过期的时间，那么消息将不显示给用户。
+expiration_interval| 可选 | 消息过期的相对时间，单位是秒。从 `push_time` 开始算起，未指定 `push_time` 时从调用 API 的时间开始算起。建议推送都设置 `expiration_time` 或 `expiration_interval`，避免用户长时间断网并重新联网后收到一大堆已失效的推送信息。
+notification_id | 可选 | 自定义推送 id，最长 16 个字符且只能由英文字母和数字组成，不提供该参数时我们会为每个推送请求随机分配一个唯一的推送 id，用于区分不同推送。我们会根据推送 id 来统计推送的目标设备数和最终消息到达数，并展示在 [推送记录](#Notification) 当中。用户自定义推送 id 可以将多个不同的请求并入同一个推送 id 下从而整体统计出这一批推送请求的目标设备数和最终消息到达数。
 req_id | 可选 | 自定义请求 id，最长 16 个字符且只能由英文字母和数字组成。5 分钟内带有相同 req_id 的不同推送请求我们认为是重复请求，只会发一次推送。用户可以在请求中带着唯一的 req_id 从而在接口出现超时等异常时将请求重发一次，以避免漏掉失败的推送请求。并且由于前后两次请求中 req_id 相同，我们会自动过滤重复的推送请求以保证每个目标终端用户最多只会收到一次推送消息。**重发过频或次数过多会影响正常的消息推送**，请注意控制。
 prod| 可选 | ***仅对 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS  推送时，该参数用于设置将推送发至 APNs 的开发环境（***dev***）还是生产环境（***prod***）。当使用证书鉴权方式发 iOS 推送时，该参数用于设置使用开发证书（***dev***）还是生产证书（***prod***）。未传入 `prod` 时，如果传入了 `X-LC-Prod` HTTP 头，且其值不为 1，那么视同 `"prod": "dev"`，否则默认 `"prod": "prod"`。那么推送 在使用证书鉴权方式下，当设备在 Installation 记录中设置了 deviceProfile 时我们优先按照 deviceProfile 指定的证书推送。
 topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 APNs Topic 做鉴权。一般情况下，iOS SDK 会自动读取 iOS app 的 bundle ID 作为 topic 存入 Installation 记录的 apnsTopic 字段，所以推送请求中无需带有该参数。但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK; 2. 不使用 iOS SDK （如 React Native）；3. 推送目标设备使用的 topic 与 iOS Bundle ID 不同。
@@ -494,12 +494,6 @@ device_profile | 可选 | ***仅对开启混合推送的设备有效*** 当目�
 
 [android-channel]: https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels
 
-#### 过期时间
-
-我们建议给 iOS 设备的推送都设置过期时间，这样才能保证在推送的当时，如果用户与 APNs 之间的连接恰好断开（如关闭了手机网络、设置了飞行模式等)，在连接恢复之后消息过期之前，用户仍然可以收到推送消息。可以参考 [Stackoverflow &middot; Push notification is not being delivered when iPhone comes back online](http://stackoverflow.com/questions/24026544/push-notification-is-not-being-delivered-when-iphone-comes-back-online)。
-
-过期时间的用法请参考 [过期时间和定时推送](#过期时间和定时推送)。
-
 #### 消息内容 Data
 
 ##### iOS 设备推送消息内容
@@ -667,49 +661,12 @@ oppo | oppo 推送
 
 #### 过期时间和定时推送
 
-`expiration_time` 属性用于指定消息的过期时间，如果客户端收到消息的时间超过这个绝对时间，那么消息将不显示给用户。`expiration_time` 是一个 UTC 时间的字符串，格式为 `YYYY-MM-DDTHH:MM:SS.MMMZ`。
+如上所述，可以用 `expiration_time` 参数指定消息的过期时间：
 
-```
-{
-      "expiration_time": "2016-01-28T00:07:29.773Z",
-      "data": {
-        "alert": "过期时间为北京时间 1 月 28 日 8:07。"
-      }
-}
-```
-
-`expiration_interval` 也可以用于指定过期时间，不过这是一个相对时间，以**秒**为单位，从 API 调用时间点开始计算起：
-
-```
-{
-      "expiration_interval": "86400",
-      "data": {
-        "alert": "收到 Push API 调用的 24 小时后过期。"
-      }
-}
-```
-
-`push_time` 是定时推送的时间，格式为 `YYYY-MM-DDTHH:MM:SS.MMMZ` 的 UTC 时间，也可以结合 `expiration_interval` 设定过期时间：
-
-```
-{
-      "push_time":           "2016-01-28T00:07:29.773Z",
-      "expiration_interval": "86400",
-      "data": {
-        "alert": "北京时间 1 月 28 日 8:07 发送这条推送，24 小时后过期"
-      }
-}
-```
-
-#### 推送消息属性
-
-##### 消息过期
-
- 过期时间，可以是绝对时间：
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
+  -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
         "expiration_time": "2015-10-07T00:51:13Z",
@@ -720,75 +677,26 @@ curl -X POST \
   https://{{host}}/1.1/push
 ```
 
-也可以是相对时间（从推送 API 调用开始算起，结合 push_time 做定期推送）:
+`expiration_interval` 也可以用于指定过期时间，一般结合定时推送使用：
+
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
+  -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
-        "push_time": "2015-06-28T00:51:13.931Z",
-        "expiration_interval": 518400,
+        "push_time": "2016-01-28T00:07:29.773Z",
+        "expiration_interval": 86400,
         "data": {
-          "alert": "您未使用的代金券将于 2015 年 7 月 4 日过期。"
+          "alert": "北京时间 1 月 28 日 8:07 发送这条推送，24 小时（86400 秒）后过期"
         }
       }' \
   https://{{host}}/1.1/push
 ```
 
-##### 定制消息属性：
+##### 定时推送任务查询和取消
 
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "channels": [
-          "employee"
-        ],
-        "data": {
-          "alert": "本周五下午三点组织大家看电影《大圣归来》。",
-          "badge": "Increment",
-          "sound": "cheering.caf",
-          "title": "员工福利"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
-
-
-### 推送记录查询
-
-`/push` 接口在推送后会返回代表该条推送消息的 `objectId`，你可以使用这个 ID 调用下列 API 查询推送记录：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  https://{{host}}/1.1/tables/Notifications/:objectId
-```
-
-其中 URL 里的 `:objectId` 替换成 `/push` 接口返回的 objectId 。
-
-将返回推送记录对象，推送记录各字段含义参考 [Notification 说明](#Notification)。
-
-### 推送状态查看和取消
-
-{% if node=='qcloud' %}
-在发推送的过程中，我们会随着推送任务的执行更新推送状态到 **控制台 > 消息 > 推送记录** 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看 [Notification 表详解](#Notification)。
-{% else %}
-在发推送的过程中，我们会随着推送任务的执行更新推送状态到 [控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看 [Notification 表详解](#Notification)。
-{% endif %}
-
-在一条推送记录状态到达 **done** 即完成推送之前，其状态信息旁边会显示 “取消推送” 按钮，点击后就能将本次推送取消。并且取消了的推送会从推送记录中删除。
-
-请注意取消推送的意思是取消还排在队列中未发出的推送，已经发出或已存入离线缓存的推送是无法取消的。同理，推送状态显示已经完成的推送也无法取消。请尽力在发推送前做好测试，确认好发送内容和目标设备查询条件。
-
-### 定时推送任务查询和取消
-
-可以使用 **master key** 查询当前正在等待推送的定时推送任务：
+调用 `POST /scheduledPushMessages` 接口可以查询当前正在等待推送的定时推送任务，调用这个接口需要使用 **master key**：
 
 ```sh
 curl -X GET \
@@ -796,7 +704,7 @@ curl -X GET \
   -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   https://{{host}}/1.1/scheduledPushMessages
- ```
+```
 
 查询出来的结果类似：
 
@@ -834,27 +742,46 @@ curl -X GET \
 
 其中 `push_msg` 就是该推送消息的详情，`expire_time` 是消息设定推送时间的 unix 时间戳。
 
-取消一个定时推送任务，要使用返回结果中最外层的 id。以上面的结果为例，即为 `results[0].id`，而不是 `results[0].push_msg.id`:
+根据查询的结果，就可以取消一个定时推送任务。
+注意需要使用返回结果中最外层的 id。
+比如取消第一个定时推送，需要使用 `results[0].id`，而不是 `results[0].push_msg.id`。
+就上面的例子而言，应该使用 `1` 而不是 `XRs9jmWnLd0GH2EH`：
 
 ```sh
 curl -X DELETE \
   -H "X-LC-Id: {{appid}}"          \
   -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
-  https://{{host}}/1.1/scheduledPushMessages/:id
+  https://{{host}}/1.1/scheduledPushMessages/1
 ```
 
-### 使用云引擎实现周期推送
+##### 使用云引擎实现周期推送
 
 可以配合 `云引擎` 的 `定时任务` 功能实现周期推送，非常方便。请阅读 [在云引擎中使用推送服务](./push-guide-leanengine.html)。
 
-以从控制台操作举例，可以有以下几个步骤：
-1. 定义函数：在 `云引擎` -> `web 组` -> `部署` -> `在线编辑` 里创建函数并部署，
-函数体为 `require('leancloud-storage').Push.send(request.params)`，可以根据实际需要创建自定义函数。
-2. 创建定时任务：在 `云引擎` -> `web 组` -> `定时任务` 里创建定时任务，
-在运行参数里填入推送消息 `{"data": {"alert": "轻松实现周期推送！"}}`，可以根据实际需要填写消息体和查询条件。
+### 推送记录查询
 
-定时任务创建完成后，当推送发生时会产生一条常规推送，可以去 `消息` -> `推送` -> `推送记录` 里面查看结果。
+`/push` 接口在推送后会返回代表该条推送消息的 `objectId`，你可以使用这个 ID 调用下列 API 查询推送记录：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.1/tables/Notifications/:objectId
+```
+
+其中 URL 里的 `:objectId` 替换成 `/push` 接口返回的 objectId 。
+
+将返回推送记录对象，推送记录各字段含义参考 [Notification 说明](#Notification)。
+
+### 推送状态查看和取消
+
+在发推送的过程中，我们会随着推送任务的执行更新推送状态到 **控制台 > 消息 > 推送记录** 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看 [Notification 表详解](#Notification)。
+
+在一条推送记录状态到达 **done** 即完成推送之前，其状态信息旁边会显示 “取消推送” 按钮，点击后就能将本次推送取消。并且取消了的推送会从推送记录中删除。
+
+请注意取消推送的意思是取消还排在队列中未发出的推送，已经发出或已存入离线缓存的推送是无法取消的。同理，推送状态显示已经完成的推送也无法取消。请尽力在发推送前做好测试，确认好发送内容和目标设备查询条件。
 
 ## 限制与费用
 
