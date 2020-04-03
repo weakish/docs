@@ -1,99 +1,352 @@
 --- layout: download.swig ---
 <div id="backbone">
-<div class="section">
-          <h2 class="section-title"><span>常见问题</span></h2>
-  <div class="row">
-    <div class="section-content col-xs-12 col-sm-6 col-md-6">
-      <div class="link-block">
-      <h2>数据存储</h2>
-        <ul>
-          <li><a href="leanstorage-faq.html#API_调用次数有什么限制吗">API 调用次数有什么限制吗</a></li>
-          <li><a href="leanstorage-faq.html#API_调用次数的计算">API 调用次数的计算</a></li>
-          <li><a href="leanstorage-faq.html#当数据量越来越来大时_怎么加快查询速度_" target="_blank">当数据量越来越来大时，怎么加快查询速度</a></li>
-          <li><a href="leanstorage-faq.html#默认值的查询结果为什么不对">默认值的查询结果为什么不对</a></li>
-          <li><a href="leanstorage-faq.html">【点击查看更多】</a></li>
-        </ul>
+  {# section1 #}
+  <div class="section">
+    <h2 class="section-title">
+      <span>最新产品动态</span></h2>
+    <!-- .row1 -->
+    <div class="news-months-row">
+      <h3>2020-02</h3>
+      <div class="news-questions-wrapper">
+        <div class="news-question">
+          <details>
+            <summary>云引擎改版基本完成</summary>
+            <p>在过去的这个春节里，我们对云引擎的控制台做了一个改版，希望可以给开发者带来更好的使用体验。新版本的主要变化有：</p>
+            <ul class="ak-ul">
+              <li>
+                <p>简化了对计算资源的管理，开发者可以按组设置所有实例的规格和数量，而不必对每个实例去修改和设置，这也会对水平扩容的操作变得更加友好。</p>
+              </li>
+              <li>
+                <p>调整了云引擎实例的规格列表，取消了用处不大的 256MB 内存规格，新增了部分用户需要的 4096MB 内存规格，还将所有标准版实例的 CPU 资源改为了「单核心」，可以让 Node.js 程序运行更简单。</p>
+              </li>
+              <li>
+                <p>我们还调整了国际版的价格，将新规格的价格下调了 20%。</p>
+              </li>
+            </ul>
+            <p>这些改动都只对新近调整之后的实例有效，也就是说老的实例如果不手动调整的话，还是按照老的方式来运行和计费。详细信息可以参考博客说明：<a class="sc-cpmKsF duwzxL" href="https://leancloudblog.com/2020-leanengine-new-resources-view/" title="https://leancloudblog.com/2020-leanengine-new-resources-view/">云引擎资源管理页面更新以及价格调整</a>。</p>
+          </details>
+        </div>
+        <div class="news-question">
+          <details>
+            <summary>存储服务 Flutter SDK 发布</summary>
+            <p>春节前不少开发者向我们提出了支持 Flutter 的需求，经过讨论后我们将 Flutter SDK 的开发排上了日程，目前存储服务的 SDK 第一版已经完成，<a class="sc-cpmKsF duwzxL" href="https://github.com/leancloud/Storage-SDK-Flutter" title="https://github.com/leancloud/Storage-SDK-Flutter">代码</a>全部开源且已经发布到了官方仓库（版本 0.1.4 ），欢迎大家试用并给我们更多反馈（可参看 <a class="sc-cpmKsF duwzxL" href="https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/leancloud_storage-library.html" title="https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/leancloud_storage-library.html">API 文档</a>）；即时通讯服务的 SDK 也基本就绪，在准备好文档和 Demo 之后就会公开发布，敬请期待。</p>
+          </details>
+        </div>
       </div>
-    </div>
-    <!-- .col-md-4 -->
 
-    <div class="section-content col-xs-12 col-sm-6 col-md-6">
-      <div class="link-block">
-      <h2>云引擎</h2>
-        <ul>
-          <li><a href="leanengine_faq.html#云引擎都支持哪些语言">云引擎都支持哪些语言</a></li>
-          <li><a href="leanengine_faq.html#云引擎的开发域名多久生效">云引擎的开发域名多久生效</a></li>
-          <li><a href="leanengine_faq.html#云引擎支持_HTTPS_吗">云引擎支持 HTTPS 吗</a></li>
-          <li><a href="leanengine_faq.html#如何判断当前是预备环境还是生产环境_">如何判断当前是预备环境还是生产环境？</a></li>
-          <li><a href="leanengine_faq.html">【点击查看更多】</a></li>
-        </ul>
-      </div>
     </div>
-    <!-- .col-md-4 -->
-  </div>
-  <!-- .row -->
-  <hr>
-  <div class="row">
-  <div class="section-content col-xs-12 col-sm-6 col-md-6">
-      <div class="link-block">
-      <h2>即时通信</h2>
-        <ul>
-          <li><a href="realtime-faq.html#为什么我收不到离线消息推送">为什么我收不到离线消息推送</a></li>
-          <li><a href="realtime-faq.html#聊天消息没有收到_该如何排查">聊天消息没有收到，该如何排查</a></li>
-          <li><a href="realtime-faq.html#我只想实现两个用户的私聊_是不是每次都得重复创建对话_">我只想实现两个用户的私聊_是不是每次都得重复创建对话</a></li>
-          <li><a href="realtime-faq.html#我自己没有云端_如何实现签名的功能_">如何实现签名的功能</a></li>
-          <li><a href="realtime-faq.html">【点击查看更多】</a></li>
-        </ul>
-      </div>
-    </div>
-    <!-- .col-md-4 -->
-  <div class="section-content col-xs-12 col-sm-6 col-md-6">
-      <div class="link-block">
-        <h2>消息推送</h2>
-        <ul>
-          <li><a href="push-faq.html#为什么成功设备数小于目标设备数_">为什么成功设备数小于目标设备数？</a></li>
-          <li><a href="push-faq.html#为什么只能给三个月内活跃过的设备发消息_能否发全量设备_">为什么只能给三个月内活跃过的设备发消息？能否发全量设备？</a></li>
-          <li><a href="push-faq.html#Android_消息接收能不能自定义_Receiver_不弹出通知">Android 消息接收能不能自定义 Receiver 不弹出通知</a></li>
-          <li><a href="push-faq.html#Android_应用进程被杀掉后无法收到推送消息">Android 应用进程被杀掉后无法收到推送消息</a></li>
-          <li><a href="push-faq.html">【点击查看更多】</a></li>
-        </ul>
-      </div>
-    </div>
-    <!-- .col-md-4 -->
-   </div>
-  <!-- .row -->
-  <hr>
-  <div class="row">
-    <div class="section-content col-xs-12 col-sm-6 col-md-6">
-      <div class="link-block">
-         <h2>短信</h2>
-        <ul>
-          <li><a href="sms-faq.html#短信有什么限制吗_">短信有什么限制吗</a></li>
-          <li><a href="sms-faq.html#有些手机收不到短信是什么情况_">有些手机收不到短信是什么情况</a></li>
-          <li><a href="sms-faq.html#短信支持港澳台和国外吗_" target="_blank">短信支持港澳台和国外吗</a></li>
-          <li><a href="sms-faq.html#短信模板审核的原则有哪些_" target="_blank">短信模板审核的原则有哪些</a></li>
-          <li><a href="sms-faq.html#手机号被列入了黑名单怎么办？为什么会被列入黑名单？" target="_blank">手机号被列入了黑名单怎么办，为什么会被列入黑名单</a></li>
-          <li><a href="sms-faq.html" target="_blank">【点击查看更多】</a></li>
-        </ul>
-      </div>
-    </div>
-    <!-- .col-md-4 -->
+    <!-- .row1 -->
+    <hr>
 
-    <div class="section-content col-xs-12 col-sm-6 col-md-6">
-      <div class="link-block">
-         <h2>账户和控制台</h2>
-        <ul>
-          <li><a href="account-and-dashboard-faq.html#如何申请开具发票">如何申请开具发票</a></li>
-          <li><a href="account-and-dashboard-faq.html#获取客服支持有哪些途径">获取客服支持有哪些途径</a></li>
-          <li><a href="account-and-dashboard-faq.html#如何导入或者导出数据_">如何导入或者导出数据</a></li>
-          <li><a href="account-and-dashboard-faq.html">更多账户与控制台问题</a></li>
-          <li><a href="account-and-dashboard-faq.html" target="_blank">【点击查看更多】</a></li>
-        </ul>
+    <!-- .row1 -->
+    <div class="news-months-row">
+      <h3>2020-01</h3>
+      <div class="news-questions-wrapper">
+        <div class="news-question">
+          <details>
+            <summary>Android SDK 支持不使用 appKey 的初始化方式，避免安全风险</summary>
+            <p>这些改动都只对新近调整之后的实例有效，也就是说老的实例如果不手动调整的话，还是按照老的方式来运行和计费。详细信息可以参考博客说明：<a class="sc-cpmKsF duwzxL" href="https://leancloudblog.com/2020-leanengine-new-resources-view/" title="https://leancloudblog.com/2020-leanengine-new-resources-view/">云引擎资源管理页面更新以及价格调整</a>。</p>
+            <p>具体的使用方式请参考开发指南：<a href="https://leancloud.cn/docs/sdk_setup_android_securely.html?utm_source=newsletter&amp;utm_medium=email&amp;utm_campaign=202001" class="external-link" rel="nofollow">Android SDK 更安全的接入和初始化方式</a>，欢迎大家升级到新版本 SDK，并给我们更多建议和反馈。</p>
+          </details>
+        </div>
+        <div class="news-question">
+          <details>
+            <summary>最佳实践：即时通讯客户端在线状态查询的解决方案</summary>
+            <p>春节前不少开发者向我们提出了支持 Flutter 的需求，经过讨论后我们将 Flutter SDK 的开发排上了日程，目前存储服务的 SDK 第一版已经完成，<a class="sc-cpmKsF duwzxL" href="https://github.com/leancloud/Storage-SDK-Flutter" title="https://github.com/leancloud/Storage-SDK-Flutter">代码</a>全部开源且已经发布到了官方仓库（版本 0.1.4 ），欢迎大家试用并给我们更多反馈（可参看 <a class="sc-cpmKsF duwzxL" href="https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/leancloud_storage-library.html" title="https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/leancloud_storage-library.html">API 文档</a>）；即时通讯服务的 SDK 也基本就绪，在准备好文档和 Demo 之后就会公开发布，敬请期待。</p>
+            <p>LeanCloud 即时通讯服务支持&nbsp;<a href="https://leancloud.cn/docs/realtime-guide-systemconv.html?utm_source=newsletter&amp;utm_medium=email&amp;utm_campaign=202001#hash-2017196884" class="external-link" rel="nofollow">客户端上下线 Hook </a>通知，开发者可以结合此 Hook 函数与云缓存机制，在云引擎中非常快速地完成客户端实时状态的记录与查询，详细方案可参考文档：<a href="https://leancloud.cn/docs/realtime-guide-onoff-status.html?utm_source=newsletter&amp;utm_medium=email&amp;utm_campaign=202001" class="external-link" rel="nofollow">即时通讯中的在线状态查询</a>。</p>
+          </details>
+        </div>
+        <div class="news-question">
+          <details>
+            <summary>国际短信价格调整</summary>
+            <p>LeanCloud 即时通讯服务支持&nbsp;<a href="https://leancloud.cn/docs/realtime-guide-systemconv.html?utm_source=newsletter&amp;utm_medium=email&amp;utm_campaign=202001#hash-2017196884" class="external-link" rel="nofollow">客户端上下线 Hook </a>通知，开发者可以结合此 Hook 函数与云缓存机制，在云引擎中非常快速地完成客户端实时状态的记录与查询，详细方案可参考文档：<a href="https://leancloud.cn/docs/realtime-guide-onoff-status.html?utm_source=newsletter&amp;utm_medium=email&amp;utm_campaign=202001" class="external-link" rel="nofollow">即时通讯中的在线状态查询</a>。</p>
+          </details>
+        </div>
       </div>
+
     </div>
-    <!-- .col-md-4 -->
+
+    <a class="more-news-a" href="kb_all_roducts_news.html">
+      <div class="more-news">查看更多产品动态</div>
+    </a>
   </div>
-  <!-- .row -->
-</div>
-<hr>
+
+  {# section2 #}
+  <div class="section">
+    <h2 class="section-title">
+      <span>常见问题</span></h2>
+    <div class="row">
+      <div class="section-content col-xs-12 col-sm-6 col-md-6">
+        <div class="link-block">
+          <h2>数据存储</h2>
+          <ul>
+            <li>
+              <a href="leanstorage-faq.html#API_调用次数有什么限制吗">API 调用次数有什么限制吗</a>
+            </li>
+            <li>
+              <a href="leanstorage-faq.html#API_调用次数的计算">API 调用次数的计算</a>
+            </li>
+            <li>
+              <a href="leanstorage-faq.html#当数据量越来越来大时_怎么加快查询速度_" target="_blank">当数据量越来越来大时，怎么加快查询速度</a>
+            </li>
+            <li>
+              <a href="leanstorage-faq.html#默认值的查询结果为什么不对">默认值的查询结果为什么不对</a>
+            </li>
+            <li>
+              <a href="leanstorage-faq.html">【点击查看更多】</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+
+      <div class="section-content col-xs-12 col-sm-6 col-md-6">
+        <div class="link-block">
+          <h2>云引擎</h2>
+          <ul>
+            <li>
+              <a href="leanengine_faq.html#云引擎都支持哪些语言">云引擎都支持哪些语言</a>
+            </li>
+            <li>
+              <a href="leanengine_faq.html#云引擎的开发域名多久生效">云引擎的开发域名多久生效</a>
+            </li>
+            <li>
+              <a href="leanengine_faq.html#云引擎支持_HTTPS_吗">云引擎支持 HTTPS 吗</a>
+            </li>
+            <li>
+              <a href="leanengine_faq.html#如何判断当前是预备环境还是生产环境_">如何判断当前是预备环境还是生产环境？</a>
+            </li>
+            <li>
+              <a href="leanengine_faq.html">【点击查看更多】</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+    </div>
+    <!-- .row -->
+    <hr>
+    <div class="row">
+      <div class="section-content col-xs-12 col-sm-6 col-md-6">
+        <div class="link-block">
+          <h2>即时通信</h2>
+          <ul>
+            <li>
+              <a href="realtime-faq.html#为什么我收不到离线消息推送">为什么我收不到离线消息推送</a>
+            </li>
+            <li>
+              <a href="realtime-faq.html#聊天消息没有收到_该如何排查">聊天消息没有收到，该如何排查</a>
+            </li>
+            <li>
+              <a href="realtime-faq.html#我只想实现两个用户的私聊_是不是每次都得重复创建对话_">我只想实现两个用户的私聊_是不是每次都得重复创建对话</a>
+            </li>
+            <li>
+              <a href="realtime-faq.html#我自己没有云端_如何实现签名的功能_">如何实现签名的功能</a>
+            </li>
+            <li>
+              <a href="realtime-faq.html">【点击查看更多】</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+      <div class="section-content col-xs-12 col-sm-6 col-md-6">
+        <div class="link-block">
+          <h2>消息推送</h2>
+          <ul>
+            <li>
+              <a href="push-faq.html#为什么成功设备数小于目标设备数_">为什么成功设备数小于目标设备数？</a>
+            </li>
+            <li>
+              <a href="push-faq.html#为什么只能给三个月内活跃过的设备发消息_能否发全量设备_">为什么只能给三个月内活跃过的设备发消息？能否发全量设备？</a>
+            </li>
+            <li>
+              <a href="push-faq.html#Android_消息接收能不能自定义_Receiver_不弹出通知">Android 消息接收能不能自定义 Receiver 不弹出通知</a>
+            </li>
+            <li>
+              <a href="push-faq.html#Android_应用进程被杀掉后无法收到推送消息">Android 应用进程被杀掉后无法收到推送消息</a>
+            </li>
+            <li>
+              <a href="push-faq.html">【点击查看更多】</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+    </div>
+    <!-- .row -->
+    <hr>
+    <div class="row">
+      <div class="section-content col-xs-12 col-sm-6 col-md-6">
+        <div class="link-block">
+          <h2>短信</h2>
+          <ul>
+            <li>
+              <a href="sms-faq.html#短信有什么限制吗_">短信有什么限制吗</a>
+            </li>
+            <li>
+              <a href="sms-faq.html#有些手机收不到短信是什么情况_">有些手机收不到短信是什么情况</a>
+            </li>
+            <li>
+              <a href="sms-faq.html#短信支持港澳台和国外吗_" target="_blank">短信支持港澳台和国外吗</a>
+            </li>
+            <li>
+              <a href="sms-faq.html#短信模板审核的原则有哪些_" target="_blank">短信模板审核的原则有哪些</a>
+            </li>
+            <li>
+              <a href="sms-faq.html#手机号被列入了黑名单怎么办？为什么会被列入黑名单？" target="_blank">手机号被列入了黑名单怎么办，为什么会被列入黑名单</a>
+            </li>
+            <li>
+              <a href="sms-faq.html" target="_blank">【点击查看更多】</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+
+      <div class="section-content col-xs-12 col-sm-6 col-md-6">
+        <div class="link-block">
+          <h2>账户和控制台</h2>
+          <ul>
+            <li>
+              <a href="account-and-dashboard-faq.html#如何申请开具发票">如何申请开具发票</a>
+            </li>
+            <li>
+              <a href="account-and-dashboard-faq.html#获取客服支持有哪些途径">获取客服支持有哪些途径</a>
+            </li>
+            <li>
+              <a href="account-and-dashboard-faq.html#如何导入或者导出数据_">如何导入或者导出数据</a>
+            </li>
+            <li>
+              <a href="account-and-dashboard-faq.html">更多账户与控制台问题</a>
+            </li>
+            <li>
+              <a href="account-and-dashboard-faq.html" target="_blank">【点击查看更多】</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+    </div>
+    <!-- .row -->
+  </div>
+
+  {# section3 #}
+  <div class="section">
+    <h2 class="section-title">
+      <span>最佳实践</span></h2>
+    <div class="row">
+      <div class="section-content col-xs-6 col-md-4">
+        <div class="link-block">
+          <h2>聊天与消息</h2>
+          <ul>
+            <li>
+              <a href="realtime-guide-onoff-status.html" target="_blank">即时通讯中的在线状态查询</a>
+            </li>
+            <li>
+              <a href="https://zhuanlan.zhihu.com/p/21399155" target="_blank">快速开发聊天机器人</a>
+            </li>
+            <li>
+              <a href="https://leancloud.cn/docs/webhosting_weixin.html" target="_blank">打造我的微信客服</a>
+            </li>
+            <li>
+              <a href="https://leancloud.cn/docs/tutorials.html#hash1432079419" target="_blank">为聊天接入表情云</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+
+      <div class="section-content col-xs-6 col-md-4">
+        <div class="link-block">
+          <h2>账号安全</h2>
+          <ul>
+            <li>
+              <a href="https://leancloud.cn/docs/data_security.html" target="_blank">数据安全详解</a>
+            </li>
+            <li>
+              <a href="https://leancloud.cn/docs/acl-guide.html" target="_blank">ACL 权限管理指南</a>
+            </li>
+            <li>
+              <a href="https://leancloud.cn/docs/acl_guide_leanengine.html" target="_blank">在云引擎中使用 ACL</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+
+      <div class="section-content col-xs-6 col-md-4">
+        <div class="link-block">
+          <h2>控制台</h2>
+          <ul>
+            <li>
+              <a href="https://leancloud.cn/docs/app_data_share.html" target="_blank">应用间数据共享</a>
+            </li>
+            <li>
+              <a href="https://leancloud.cn/docs/dashboard_guide.html" target="_blank">管理控制台使用指南</a>
+            </li>
+            <li>
+              <a href="https://leancloud.cn/docs/custom-reset-verify-page.html" target="_blank">自定义邮件验证和重设密码页面</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+    </div>
+    <!-- .row -->
+    <hr>
+    <div class="row">
+      <div class="section-content col-xs-6 col-md-4">
+        <div class="link-block">
+          <h2>数据处理</h2>
+          <ul>
+            <li>
+              <a href="https://leancloud.cn/docs/app_search_guide.html" target="_blank">应用内搜索和 DeepLink 开发</a>
+            </li>
+            <li>
+              <a href="https://leancloud.cn/docs/leaninsight_guide.html" target="_blank">离线数据分析</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+      <div class="section-content col-xs-6 col-md-4">
+        <div class="link-block">
+          <h2>域名与备案</h2>
+          <ul>
+            <li>
+              <a href="https://leancloud.cn/docs/custom-api-domain-guide.html" target="_blank">域名绑定指南</a>
+            </li>
+            <li>
+              <a href="https://leancloud.cn/docs/cdn-guide.html" target="_blank">CDN 配置指南</a>
+            </li>
+            <li>
+              <a href="https://leancloudblog.com/Domain-Name-Story-confirm/" target="_blank">域名背后那些事</a>
+            </li>
+            <li>
+              <a href="https://leancloudblog.com/DNS-knowledge/" target="_blank">域名之殇</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+      <div class="section-content col-xs-6 col-md-4">
+        <div class="link-block">
+          <h2>技术分享</h2>
+          <ul>
+            <li>
+              <a href="https://leancloud.cn/docs/game-demos.html#hash-1253694070" target="_blank">LeanCloud 周年游戏实现</a>
+            </li>
+            <li>
+              <a href="https://forum.leancloud.cn/t/postman-rest-api/8638" target="_blank">使用 Postman 调试 REST API</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- .col-md-4 -->
+    </div>
+    <!-- .row -->
+
+  </div>
+  <hr>
 </div>

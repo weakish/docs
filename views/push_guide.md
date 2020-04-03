@@ -9,19 +9,19 @@
 
 除了 iOS、Android SDK 做推送服务之外，你还可以通过 [REST API](#使用_REST_API_推送消息) 来发送推送请求。
 
-使用推送服务前，需在相应应用 [控制台 > 设置 > 安全中心 > 服务开关](/dashboard/app.html?appid={{appid}}#/security) 开启推送服务，此开关有三分钟的延迟。
+使用推送服务前，需在相应应用 **控制台 > 设置 > 安全中心 > 服务开关** 开启推送服务，此开关有三分钟的延迟。
 
 ## 基本概念
 
 ### Installation
 
-Installation 表示一个允许推送的设备的唯一标示，对应 [数据管理](/dashboard/data.html?appid={{appid}}) 平台中的 `_Installation` 表。它就是一个普通的对象，主要属性包括:
+Installation 表示一个允许推送的设备的唯一标示，对应数据管理平台中的 `_Installation` 表。它就是一个普通的对象，主要属性包括:
 
 名称|适用平台|描述
 ---|---|---
 badge|iOS|呈现在应用图标右上角的红色圆形数字提示，例如待更新的应用数、未读信息数目等。
 channels| |设备订阅的频道 **每个 channel 名称只能包含 26 个英文字母和数字。**
-deviceProfile||在应用有多个 iOS 推送证书或多个 Android 混合推送配置的场景下，deviceProfile 用于指定当前设备使用的证书名或配置名。其值需要与 [控制台 > 消息 >  推送 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 内配置的证书名或配置名对应，否则将无法完成推送。使用方法请参考 [iOS 测试和生产证书区分](#iOS_测试和生产证书区分) 和 [Android 混合推送多配置区分](#Android_混合推送多配置区分)。<br/><br/>{{deviceprofile_format}}
+deviceProfile||在应用有多个 iOS 推送证书或多个 Android 混合推送配置的场景下，deviceProfile 用于指定当前设备使用的证书名或配置名。其值需要与 **控制台 > 消息 >  推送 > 设置** 内配置的证书名或配置名对应，否则将无法完成推送。使用方法请参考 [iOS 测试和生产证书区分](#iOS_测试和生产证书区分) 和 [Android 混合推送多配置区分](#Android_混合推送多配置区分)。<br/><br/>{{deviceprofile_format}}
 deviceToken|iOS|APNS 推送的唯一标识符
 apnsTopic|iOS|基于 Token Authentication 的推送需要设置该字段。iOS SDK 会自动读取 iOS 应用的 bundle ID 作为 apnsTopic。但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK 版本; 2. 不使用 iOS SDK （如 React Native）；3. 使用不同于 bundle ID 的 topic。
 deviceType| |设备类型，目前支持 `ios`、`android`。
@@ -30,7 +30,7 @@ timeZone| |字符串，设备设定的时区
 
 ### Notification
 
-对应 [控制台 > 消息 > 推送 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 里的一条记录，表示一条推送消息，它包括下列属性：
+对应 **控制台 > 消息 > 推送 > 推送记录** 里的一条记录，表示一条推送消息，它包括下列属性：
 
 名称|适用平台|描述
 ---|---|---
@@ -65,7 +65,7 @@ errors| | 本次推送过程中的错误信息。
 
 在部分 Android ROM 上，由于系统对后台进程控制较严，Android 推送的到达率会受到影响。为此我们专门设计了一套称为「混合推送」的高级推送机制，用以提高在这部分 Android ROM 上推送的到达率。
 
-目前 Android 混合推送功能仅对商用版应用开放，如果希望使用该功能，请进入 [控制台 > 消息 > 推送 > 设置 > 混合推送](/dashboard/messaging.html?appid={{appid}}#/message/push/conf)，打开混合推送的开关。
+目前 Android 混合推送功能仅对商用版应用开放，如果希望使用该功能，请进入 **控制台 > 消息 > 推送 > 设置 > 混合推送**，打开混合推送的开关。
 
 请注意，**开启混合推送** 选项可以根据需要随时进行切换，这样做并不会产生不良影响。当该选项关闭后，下一次 Android 推送会与普通推送一样自动选择 LeanCloud 自有通道送达客户端，除了会再次遇到上面提到的自有通道在部分 ROM 上会受到限制的问题之外，不会有别的影响。而当该选项再次开启后，Android 推送又会去选择第三方推送渠道。
 
@@ -494,6 +494,7 @@ device_profile | 可选 | ***仅对开启混合推送的设备有效*** 当目�
 
 [android-channel]: https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels
 
+
 #### 消息内容 Data
 
 ##### iOS 设备推送消息内容
@@ -653,7 +654,7 @@ oppo | oppo 推送
 
 #### Android 混合推送多配置区分
 
-如果使用了混合推送功能，并且在 [控制台 > 消息 > 推送 > 设置 > 混合推送](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 增加了多个混合推送配置，那么在向 `_Installation` 表保存设备信息时就需要将当前设备所对应的混合推送配置名存入 `deviceProfile` 字段。系统会按照该字段指定的唯一配置名为每个目标设备进行混合推送。
+如果使用了混合推送功能，并且在 **控制台 > 消息 > 推送 > 设置 > 混合推送** 增加了多个混合推送配置，那么在向 `_Installation` 表保存设备信息时就需要将当前设备所对应的混合推送配置名存入 `deviceProfile` 字段。系统会按照该字段指定的唯一配置名为每个目标设备进行混合推送。
 
 如果 `deviceProfile` 字段为空，系统会默认使用名为 `_default` 的混合推送配置来进行推送，所以一定要保证在控制台的混合推送设置中，存在以 `_default` 命名的 Profile 并且已被正确配置，否则系统会**拒绝推送。**
 
@@ -697,6 +698,7 @@ curl -X POST \
 ##### 定时推送任务查询和取消
 
 调用 `POST /scheduledPushMessages` 接口可以查询当前正在等待推送的定时推送任务，调用这个接口需要使用 **master key**：
+
 
 ```sh
 curl -X GET \

@@ -20,7 +20,7 @@ REST API 可以让你用任何支持发送 HTTP 请求的设备来与 LeanCloud 
 
 ### 在线测试
 
-[API 在线测试工具](/dashboard/apionline/index.html)，目前仅支持调试**中国节点**下的应用。
+你可以使用 **控制台 > 帮助 > API 在线测试工具** 进行在线测试。该工具目前仅支持调试**中国节点**下的应用。
 
 为了方便测试 REST API，文档给出了 curl 命令示例，示例针对类 unix 平台（macOS、Linux 等）编写，直接粘贴至 Windows 平台 cmd.exe 很可能无法工作。
 例如，curl 命令示例中的 shell 换行符（`\`）在 cmd.exe 中是目录分隔符。
@@ -1406,7 +1406,10 @@ curl -X GET \
   https://{{host}}/1.1/classes/Post
 ```
 
-所有以上这些参数都可以和其他的组合进行使用。
+反向选择同样使用于内置字段，比如 `keys=-createdAt,-updatedAt,-objectId`。
+另外反向选择同样可以和点号组合使用，例如 `keys=-pubUser.createdAt,-pubUser.updatedAt`。
+
+所有以上这些参数都可以组合使用。
 
 ### 正则查询
 
@@ -1748,11 +1751,11 @@ curl -X GET \
 
 注册一个新用户与创建一个新的普通对象之间的不同点在于 username 和 password 字段都是必需的。password 字段会以和其他的字段不一样的方式处理，它在储存时会被加密而且永远不会被返回给任何来自客户端的请求。
 
-你可以让 LeanCloud 自动验证邮件地址，做法是进入 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)，勾选 **用户注册时，发送验证邮件**。
+你可以让 LeanCloud 自动验证邮件地址，做法是进入 **控制台 > 存储 > 设置 > 用户账号**，勾选 **用户注册时，发送验证邮件**。
 
 这项设置启用了的话，所有填写了 email 的用户在注册时都会产生一个 email 验证地址，并发回到用户邮箱，用户打开邮箱点击了验证链接之后，用户表里 `emailVerified` 属性值会被设为 true。你可以在 `emailVerified` 字段上查看用户的 email 是否已经通过验证。
 
-你还可以在 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)，勾选**未验证邮箱的用户，禁止登录**。
+你还可以在 **控制台 > 存储 > 设置 > 用户账号**，勾选**未验证邮箱的用户，禁止登录**。
 
 为了注册一个新的用户，需要向 user 路径发送一个 POST 请求，你可以加入一个新的字段，例如，创建一个新的用户有一个电话号码:
 
@@ -1827,7 +1830,7 @@ https://{{host}}/1.1/login
 正常情况下，用户的 sessionToken 是固定不变的，但在以下情况下会发生改变：
 
 * 客户端调用了忘记密码功能，重设了密码。
-* 开发者在 [控制台 > 存储 > 设置 > 用户账号](/dashboard/storage.html?appid={{appid}}#/storage/conf)
+* 开发者在 **控制台 > 存储 > 设置 > 用户账号**
  中勾选了 **密码修改后，强制客户端重新登录**，那么在修改密码后 sessionToken 也将强制更换。
 * 调用 [`refreshSessionToken`](#重置登录_sessionToken) 主动重置。
 
@@ -2772,7 +2775,7 @@ curl -X POST \
   https://{{feedback_host}}/1.1/feedback
 ```
 
-提交后的用户反馈在可以在 [控制台 >（选择应用）> 组件 > 用户反馈](/dashboard/devcomponent.html?appid={{appid}}#/component/feedback) 里看到。
+提交后的用户反馈在可以在 **控制台 >（选择应用）> 组件 > 用户反馈** 里看到。
 
 获取所有的反馈：
 

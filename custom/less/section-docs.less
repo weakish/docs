@@ -119,6 +119,66 @@ body {
     }
   }
 
+  .more-news-a {
+    text-decoration:none;
+  }
+
+  .more-news {
+    cursor: pointer;
+    width: 180px;
+    height: 35px;
+    margin: 0 auto;
+    line-height:35px;
+    text-align: center;
+    border: 1px solid #3090e4;
+    color: #3090e4;
+    margin-top: 30px;
+    opacity: .75;
+  }
+
+  .news-months-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    h3 {
+      width: 100px;
+      margin: 14px 40px;
+      padding: 0;
+    }
+
+    .news-questions-wrapper {
+      flex: 1;
+      margin-left: 34px;
+    }
+
+
+    .news-question {
+      margin-bottom: 20px;
+
+      summary {
+        margin: 14px 0;
+        border: none;
+        padding: 0;
+        font-size: 15px;
+        margin-bottom: 8px;
+        color: #3090e4;
+        outline: none;
+        // &::-webkit-details-marker {
+          //  display:none; 
+        // }
+      }
+
+      p {
+        border: none;
+        font-size: 16px;
+        color: #999;
+      }
+    }
+
+
+  }
+
   .section-title {
     overflow: hidden;
     text-align: center;
@@ -1560,8 +1620,8 @@ blockquote{
 
 .code-lang-toggles {
   overflow: auto;
-  margin-top: -10px;
-  margin-bottom: 18px;
+  margin-top: 18px;
+  margin-bottom: 8px;
 
   .toggle-item, .toggle-select {
     float: left;
