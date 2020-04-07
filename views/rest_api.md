@@ -1406,7 +1406,7 @@ curl -X GET \
   https://{{host}}/1.1/classes/Post
 ```
 
-反向选择同样使用于内置字段，比如 `keys=-createdAt,-updatedAt,-objectId`。
+反向选择同样适用于内置字段，比如 `keys=-createdAt,-updatedAt,-objectId`。
 另外反向选择同样可以和点号组合使用，例如 `keys=-pubUser.createdAt,-pubUser.updatedAt`。
 
 所有以上这些参数都可以组合使用。
