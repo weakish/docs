@@ -21,7 +21,7 @@
 ## 100
 
 * 信息 - `The connection to the AVOS servers failed.`
-* 含义 - 无法建立 TCP 连接到 LeanCloud 服务器，通常是因为网络故障，或者我们服务器故障引起的，我们的服务器状态可以查看 [健康状态检查](https://status.leancloud.cn/)。
+* 含义 - 无法建立 TCP 连接到 LeanCloud 服务器，通常是因为网络故障，或者我们服务器故障引起的，我们的服务器状态可以查看 [健康状态检查](https://leancloudstatus.com/)。
 
 ## 101
 
