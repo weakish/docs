@@ -227,10 +227,8 @@ curl -X GET \
 
 所有接口共享额度。超过额度限制后一分钟内 LeanCloud 会拒绝请求持续返回 429 错误码，一分钟后会重新处理请求。
 
-商用版应用的上限可以在 [控制台 > 消息 > 即时通讯 > 设置 > 服务阈值 > 普通消息 API 调用频率上限][dashboard-rtm-limit] 修改。
+商用版应用的上限可以在 **控制台 > 消息 > 即时通讯 > 设置 > 服务阈值 > 普通消息 API 调用频率上限** 修改。
 按照每日调用频率峰值实行阶梯收费，如下表所示：
-
-[dashboard-rtm-limit]: /dashboard/messaging.html?appid={{appid}}#/message/realtime/conf
 
 | 每分钟调用频率 | 费用 |
 | - | - |
@@ -250,9 +248,7 @@ curl -X GET \
 | 5401 ~ 7200 | $12 USD / 天 |
 | 7201 ~ 9000 | $15 USD / 天 |
 
-每日调用频率峰值可以在 [控制台 > 消息 > 即时通讯 > 统计 > API 请求频率峰值][dashboard-rtm-stats] 中查看。
-
-[dashboard-rtm-stats]: /dashboard/messaging.html?appid={{appid}}#/message/realtime/stat
+每日调用频率峰值可以在 **控制台 > 消息 > 即时通讯 > 统计 > API 请求频率峰值** 中查看。
 
 ### 订阅消息
 
