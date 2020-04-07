@@ -604,14 +604,7 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 }
 ```
 
-其中，`silent` 为 `true` 表示这个消息是透传消息，为 `false` 表示消息是通知栏消息。
-透传消息和通知栏消息是 Android 推送（包括 Android 混合推送）支持的两种消息类型。
-透传消息是指消息到达设备后会先交给 LeanCloud Android SDK，再由 SDK 将消息通过 [自定义 Receiver](./android_push_guide.html#自定义_Receiver) 传递给开发者，收到消息后的行为由开发者定义的 Receiver 来决定，SDK 不会自动弹出通知栏提醒。
-而通知栏消息是指消息到达设备后会立即自动弹出通知栏提醒。
-
-另外请注意，如果希望接收透传消息请不要忘记自行实现 [自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
-
-关于自定义 Receiver 请参看[自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
+关于 `silent` 参数请参看 [Android 推送区分透传和通知栏消息](#Android_推送区分透传和通知栏消息)，关于自定义 Receiver 请参看[自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
 
 ##### 为多种类型设备设置不同推送内容
 
@@ -659,6 +652,15 @@ oppo | oppo 推送
 如果 `deviceProfile` 字段为空，系统会默认使用名为 `_default` 的混合推送配置来进行推送，所以一定要保证在控制台的混合推送设置中，存在以 `_default` 命名的 Profile 并且已被正确配置，否则系统会**拒绝推送。**
 
 {{deviceprofile_format}}
+
+#### Android 推送区分透传和通知栏消息
+
+Android 推送（包括 Android 混合推送）支持透传和通知栏两种消息类型。透传消息是指消息到达设备后会先交给 LeanCloud Android SDK，再由 SDK 将消息通过 [自定义 Receiver](./android_push_guide.html#自定义_Receiver) 传递给开发者，收到消息后的行为由开发者定义的 Receiver 来决定，SDK 不会自动弹出通知栏提醒。而通知栏消息是指消息到达设备后会立即自动弹出通知栏提醒。
+
+LeanCloud 推送服务通过推送请求中 `data` 参数内的 `silent` 字段区分透传和通知栏消息。
+`silent` 为 `true` 表示这个消息是透传消息，为 `false` 表示消息是通知栏消息。
+如果不传递 `silent` 则默认其值为 `false`。
+另外请注意，如果希望接收透传消息请不要忘记自行实现 [自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
 
 #### 过期时间和定时推送
 
