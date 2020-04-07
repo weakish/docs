@@ -177,5 +177,4 @@ chatRoom.quit().then(function(success){
 ## FAQ
 
 Q: 如何确保聊天室的消息全量送达？
-A: 这一点请参考我们的[消息分级](/realtime_guide-objc.html#消息等级)
-
+A: 这一点请参考我们的[消息分级](realtime_guide-objc.html#消息等级)

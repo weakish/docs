@@ -1,4 +1,4 @@
-{% set autoFollowFolloweeOptionLink = "如果在 [控制台 > 存储 > 设置 > 其他](/dashboard/storage.html?appid={{appid}}#/storage/conf) 勾选了 **应用内社交模块，关注用户时自动反向关注**" %}
+{% set autoFollowFolloweeOptionLink = "如果在 **控制台 > 存储 > 设置 > 其他** 勾选了 **应用内社交模块，关注用户时自动反向关注**" %}
 # 应用内社交组件
 应用内社交，包含「好友关系」和「信息流」两部分。好友关系指用户间通过「关注」或「加好友」形成的社交关系，信息流则是「好友」发布的状态信息汇集而成的「时间线」或者「朋友圈」内容。
 

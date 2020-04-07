@@ -257,6 +257,7 @@ angular.module('app').controller('StartCtrl', [
                                 $(ele).after("<div class='doc-example-action'><button class='copybtn'><span class='icon icon-clipboard'></span></button></div>");
                             });
                             glueCopy();
+                            codeBlockTabber.start();
                         }, 0);
                     }, 0);
                     dom.css("visibility", 'visible').prev().addClass('loaded');

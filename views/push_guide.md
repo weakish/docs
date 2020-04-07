@@ -9,19 +9,19 @@
 
 除了 iOS、Android SDK 做推送服务之外，你还可以通过 [REST API](#使用_REST_API_推送消息) 来发送推送请求。
 
-使用推送服务前，需在相应应用 [控制台 > 设置 > 安全中心 > 服务开关](/dashboard/app.html?appid={{appid}}#/security) 开启推送服务，此开关有三分钟的延迟。
+使用推送服务前，需在相应应用 **控制台 > 设置 > 安全中心 > 服务开关** 开启推送服务，此开关有三分钟的延迟。
 
 ## 基本概念
 
 ### Installation
 
-Installation 表示一个允许推送的设备的唯一标示，对应 [数据管理](/dashboard/data.html?appid={{appid}}) 平台中的 `_Installation` 表。它就是一个普通的对象，主要属性包括:
+Installation 表示一个允许推送的设备的唯一标示，对应数据管理平台中的 `_Installation` 表。它就是一个普通的对象，主要属性包括:
 
 名称|适用平台|描述
 ---|---|---
 badge|iOS|呈现在应用图标右上角的红色圆形数字提示，例如待更新的应用数、未读信息数目等。
 channels| |设备订阅的频道 **每个 channel 名称只能包含 26 个英文字母和数字。**
-deviceProfile||在应用有多个 iOS 推送证书或多个 Android 混合推送配置的场景下，deviceProfile 用于指定当前设备使用的证书名或配置名。其值需要与 [控制台 > 消息 >  推送 > 设置](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 内配置的证书名或配置名对应，否则将无法完成推送。使用方法请参考 [iOS 测试和生产证书区分](#iOS_测试和生产证书区分) 和 [Android 混合推送多配置区分](#Android_混合推送多配置区分)。<br/><br/>{{deviceprofile_format}}
+deviceProfile||在应用有多个 iOS 推送证书或多个 Android 混合推送配置的场景下，deviceProfile 用于指定当前设备使用的证书名或配置名。其值需要与 **控制台 > 消息 >  推送 > 设置** 内配置的证书名或配置名对应，否则将无法完成推送。使用方法请参考 [iOS 测试和生产证书区分](#iOS_测试和生产证书区分) 和 [Android 混合推送多配置区分](#Android_混合推送多配置区分)。<br/><br/>{{deviceprofile_format}}
 deviceToken|iOS|APNS 推送的唯一标识符
 apnsTopic|iOS|基于 Token Authentication 的推送需要设置该字段。iOS SDK 会自动读取 iOS 应用的 bundle ID 作为 apnsTopic。但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK 版本; 2. 不使用 iOS SDK （如 React Native）；3. 使用不同于 bundle ID 的 topic。
 deviceType| |设备类型，目前支持 `ios`、`android`。
@@ -30,7 +30,7 @@ timeZone| |字符串，设备设定的时区
 
 ### Notification
 
-对应 [控制台 > 消息 > 推送 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 里的一条记录，表示一条推送消息，它包括下列属性：
+对应 **控制台 > 消息 > 推送 > 推送记录** 里的一条记录，表示一条推送消息，它包括下列属性：
 
 名称|适用平台|描述
 ---|---|---
@@ -65,7 +65,7 @@ errors| | 本次推送过程中的错误信息。
 
 在部分 Android ROM 上，由于系统对后台进程控制较严，Android 推送的到达率会受到影响。为此我们专门设计了一套称为「混合推送」的高级推送机制，用以提高在这部分 Android ROM 上推送的到达率。
 
-目前 Android 混合推送功能仅对商用版应用开放，如果希望使用该功能，请进入 [控制台 > 消息 > 推送 > 设置 > 混合推送](/dashboard/messaging.html?appid={{appid}}#/message/push/conf)，打开混合推送的开关。
+目前 Android 混合推送功能仅对商用版应用开放，如果希望使用该功能，请进入 **控制台 > 消息 > 推送 > 设置 > 混合推送**，打开混合推送的开关。
 
 请注意，**开启混合推送** 选项可以根据需要随时进行切换，这样做并不会产生不良影响。当该选项关闭后，下一次 Android 推送会与普通推送一样自动选择 LeanCloud 自有通道送达客户端，除了会再次遇到上面提到的自有通道在部分 ROM 上会受到限制的问题之外，不会有别的影响。而当该选项再次开启后，Android 推送又会去选择第三方推送渠道。
 
@@ -278,16 +278,23 @@ curl -X DELETE \
 
 ### 推送消息
 
+#### master key 校验
+
+当在 [控制台 > 消息 > 推送 > 设置 > 推送选项](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 中点选了 **禁止从客户端进行消息推送** 后，
+必须通过 **master key** （`X-LC-Key: {{masterkey}},master`）才能发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。
+这一限制默认为启用状态。
+我们建议用户都将此限制启用。
+
 #### 通过查询条件发推送
 
 本接口用于根据提供的查询条件，给在 _Installation 表内所有符合查询条件的有效设备记录发推送消息。例如下面是给所有在 _Installation 表中 "channels" 字段包含 "public" 值的有效设备推送一条内容为 "Hello from LeanCloud" 的消息。
 
-请注意，本接口限制请求的 HTTP Body 大小必须小于 4096 个字符，即您调用本接口传递的所有参数做 JSON 序列化后得到的结果不能超过此限制。
+请注意，本接口限制请求的 HTTP Body 大小必须小于 4096 个字节，即您调用本接口传递的所有参数做 JSON 序列化后得到的结果不能超过此限制。
 
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
+  -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
         "where": {"channels" : ["public"]},
@@ -303,15 +310,139 @@ curl -X POST \
 data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容_Data)。
 where| 可选 | 检索 `_Installation` 表使用的查询条件，JSON 对象。如果查询条件内包含日期或二进制等需要做编码的特殊类型数据，查询条件内需要包含编码后的数据。如查询 `createdAt` 字段大于某个时间的设备，where 条件需要为 `{"createdAt":{"$gte":{"__type":"Date","iso":"2015-06-21T18:02:52.249Z"}}}`。更多信息请参看：[数据编码说明](./rest_api.html#数据类型)
 channels| 可选 | 推送给哪些频道，将作为条件加入 where 对象。
-expiration_interval| 可选 | 消息过期的相对时间，从调用 API 的时间开始算起，单位是秒。
-expiration_time| 可选 | 消息过期的绝对日期时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"
-notification_id | 可选 | 自定义推送 id，最长 16 个字符且只能由英文字母和数字组成，不提供该参数时我们会为每个推送请求随机分配一个唯一的推送 id，用于区分不同推送。我们会根据推送 id 来统计推送的目标设备数和最终消息到达数，并展示在 [推送记录](#Notification) 当中。用户自定义推送 id 可以将多个不同的请求并入同一个推送 id 下从而整体统计出这一批推送请求的目标设备数和最终消息到达数。
 push_time| 可选 | 设置定时推送的发送时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"。请注意发送时间与当前时间如果小于 1 分钟则推送会立即发出，不会遵循 push_time 参数要求。如果需要实现周期推送，可以参照 [使用云引擎实现周期推送](#使用云引擎实现周期推送) 实现。
+expiration_time| 可选 | 消息过期的绝对日期时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"。如果客户端收到消息的时间超过消息过期的时间，那么消息将不显示给用户。
+expiration_interval| 可选 | 消息过期的相对时间，单位是秒。从 `push_time` 开始算起，未指定 `push_time` 时从调用 API 的时间开始算起。建议推送都设置 `expiration_time` 或 `expiration_interval`，避免用户长时间断网并重新联网后收到一大堆已失效的推送信息。
+notification_id | 可选 | 自定义推送 id，最长 16 个字符且只能由英文字母和数字组成，不提供该参数时我们会为每个推送请求随机分配一个唯一的推送 id，用于区分不同推送。我们会根据推送 id 来统计推送的目标设备数和最终消息到达数，并展示在 [推送记录](#Notification) 当中。用户自定义推送 id 可以将多个不同的请求并入同一个推送 id 下从而整体统计出这一批推送请求的目标设备数和最终消息到达数。
 req_id | 可选 | 自定义请求 id，最长 16 个字符且只能由英文字母和数字组成。5 分钟内带有相同 req_id 的不同推送请求我们认为是重复请求，只会发一次推送。用户可以在请求中带着唯一的 req_id 从而在接口出现超时等异常时将请求重发一次，以避免漏掉失败的推送请求。并且由于前后两次请求中 req_id 相同，我们会自动过滤重复的推送请求以保证每个目标终端用户最多只会收到一次推送消息。**重发过频或次数过多会影响正常的消息推送**，请注意控制。
-prod| 可选 | ***仅对 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS  推送时，该参数用于设置将推送发至 APNs 的开发环境（***dev***）还是生产环境（***prod***）。当使用证书鉴权方式发 iOS 推送时，该参数用于设置使用开发证书（***dev***）还是生产证书（***prod***）。在使用证书鉴权方式下，当设备在 Installation 记录中设置了 deviceProfile 时我们优先按照 deviceProfile 指定的证书推送。
-topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 APNs  Topic 做鉴权。一般情况下，iOS SDK 会自动读取 iOS app 的 bundle ID 作为 topic 存入 Installation 记录的 apnsTopic 字段，所以推送请求中无需带有该参数。但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK; 2. 不使用 iOS SDK （如 React Native）；3. 推送目标设备使用的 topic 与 iOS Bundle ID 不同。
-apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一般情况下如果您配置的所有 Team ID 下的 APNs Topic 均不重复，或在存储 Installation 时主动设置过 apnsTeamId 值，则无需提供本参数，我们会为每个设备匹配对应的 Team ID 来发推送。否则必须提供本参数且需要通过 where 查询条件保证单次推送请求的目标设备均属于本参数指定的 Team Id，以保证推送正常进行。
+prod| 可选 | ***仅对 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时，该参数用于设置将推送发至 APNs 的开发环境（***dev***）还是生产环境（***prod***）。当使用证书鉴权方式发 iOS 推送时，该参数用于设置使用开发证书（***dev***）还是生产证书（***prod***）。未传入 `prod` 时，如果传入了 `X-LC-Prod` HTTP 头，且其值不为 1，那么视同 `"prod": "dev"`，否则默认 `"prod": "prod"`。在使用证书鉴权方式下，当设备在 Installation 记录中设置了 deviceProfile 时我们优先按照 deviceProfile 指定的证书推送。
+topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 APNs Topic 做鉴权。一般情况下，iOS SDK 会自动读取 iOS app 的 bundle ID 作为 topic 存入 Installation 记录的 apnsTopic 字段，所以推送请求中无需带有该参数。但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK; 2. 不使用 iOS SDK （如 React Native）；3. 推送目标设备使用的 topic 与 iOS Bundle ID 不同。
+apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一般情况下如果您配置的所有 Team ID 下的 APNs Topic 均不重复，或在存储 Installation 时主动设置过 apnsTeamId 值，则无需提供本参数，我们会为每个设备匹配对应的 Team ID 来发推送。否则必须提供本参数且需要通过 where 查询条件保证单次推送请求的目标设备均属于本参数指定的 Team ID，以保证推送正常进行。
 flow_control | 可选 | 是否开启平缓发送，默认不开启。其值代表推送的速度，即每秒推送的目标终端用户数。最低值 1000，低于最低值按最低值计算。
+
+`_Installation` 表中的所有属性，无论是内置的还是自定义的，都可以作为查询条件通过 where 来指定，并且支持 [REST API](./rest_api.html#查询) 定义的各种复杂查询。
+
+下面会举一些例子，更多例子请参考 [REST API](./rest_api.html#查询) 查询文档。
+
+##### 推送给所有的设备
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "data": {
+          "alert": "LeanCloud 向您问好！"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+##### 推送给 android 设备
+
+```sh
+curl -X POST \
+-H "X-LC-Id: {{appid}}"          \
+-H "X-LC-Key: {{masterkey}},master"        \
+-H "Content-Type: application/json" \
+-d '{
+      "where":{
+        "deviceType": "android"
+      },
+      "data": {
+        "alert": "LeanCloud 向您问好！"
+      }
+    }' \
+https://{{host}}/1.1/push
+```
+
+##### 推送给 public 频道的设备
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "channels":["public"],
+        "data": {
+          "alert": "LeanCloud 向您问好！"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+##### 推送给不活跃的设备
+
+```sh
+curl -X POST \
+-H "X-LC-Id: {{appid}}"          \
+-H "X-LC-Key: {{masterkey}},master"        \
+-H "Content-Type: application/json" \
+-d '{
+      "where":{
+          "updatedAt":{
+              "$lt":{"__type":"Date","iso":"2015-06-29T11:33:53.323Z"}
+            }
+      },
+      "data": {
+          "alert": "LeanCloud 向您问好！"
+      }
+    }' \
+https://{{host}}/1.1/push
+```
+
+##### 推送给自定义属性符合条件的设备
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {
+          "preOrder": true
+        },
+        "data": {
+          "alert": "抢购开始！"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+用 `where` 查询的都是 `_Installations` 表中的属性。这里假设该表存储了 `preOrder` 的布尔属性。
+
+##### 根据地理信息位置做推送
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {
+          "owner": {
+            "$inQuery": {
+              "location": {
+                "$nearSphere": {
+                  "__type": "GeoPoint",
+                  "latitude": 30.0,
+                  "longitude": -20.0
+                },
+                "$maxDistanceInMiles": 10.0
+              }
+            }
+          }
+        },
+        "data": {
+          "alert": "北京明日最高气温 40 摄氏度。"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+上面的例子假设 installation 有个 owner 属性指向 `_User` 表的记录，并且用户有个 `location` 属性是 GeoPoint 类型，我们就可以根据地理信息位置做推送。
 
 #### 通过设备 ID 列表发推送
 
@@ -320,7 +451,7 @@ flow_control | 可选 | 是否开启平缓发送，默认不开启。其值代�
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
+  -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
         "data": {"alert" : "Hello from LeanCloud"},
@@ -336,52 +467,33 @@ curl -X POST \
 
 名称| 约束 | 描述
 ---|--- | ---
-data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容_Data)。请注意，整个 JSON 字符串不能超过 4096 个字符。
 device_type | **必填** | 目标设备类型，目前只能为 android，ios，wp 三种。一次推送只能给一种类型的设备发推送。
-device_ids | **必填** | 目标设备 ID 列表，最多包含 500 个 ID 。对于 iOS 设备来说，设备 ID 是 _Installation 表中的 deviceToken 字段；对于使用混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 registrationId 字段；对于非混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 installationId 字段；对于 Windows Phone 设备来说，设备 ID 是 _Installation 表中的 subscriptionUri 字段。
-expiration_interval| 可选 | 消息过期的相对时间，从调用 API 的时间开始算起，单位是秒。
-expiration_time| 可选 | 消息过期的绝对日期时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"
-notification_id | 可选 | 自定义推送 id，最长 16 个字符且只能由英文字母和数字组成，不提供该参数时我们会为每个推送请求随机分配一个唯一的推送 id，用于区分不同推送。我们会根据推送 id 来统计推送的目标设备数和最终消息到达数，并展示在 [推送记录](#Notification) 当中。用户自定义推送 id 可以将多个不同的请求并入同一个推送 id 下从而整体统计出这一批推送请求的目标设备数和最终消息到达数。
-req_id | 可选 | 自定义请求 id，最长 16 个字符且只能由英文字母和数字组成。5 分钟内带有相同 req_id 的不同推送请求我们认为是重复请求，只会发一次推送。用户可以在请求中带着唯一的 req_id 从而在接口出现超时等异常时将请求重发一次，以避免漏掉失败的推送请求。并且由于前后两次请求中 req_id 相同，我们会自动过滤重复的推送请求以保证每个目标终端用户最多只会收到一次推送消息。**重发过频或次数过多会影响正常的消息推送**，请注意控制。
+device_ids | **必填** | 目标设备 ID 列表，最多包含 500 个 ID 。对于 iOS 设备来说，设备 ID 是 _Installation 表中的 deviceToken 字段；对于使用混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 registrationId 字段；对于非混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 installationId 字段。
+data| **必填**| 见[通过查询条件发推送](#通过查询条件发推送)。
+expiration_interval| 可选 | 同上。
+expiration_time| 可选 | 同上。 
+notification_id | 可选 | 同上。 
+req_id | 可选 | 同上。
 
 如果目标设备为 iOS 设备，则在上述通用参数之外，还可以附带如下参数：
 
 名称 | 约束 | 描述
 ---- | ---- | ----
-prod| 可选 | 用于设置将推送发至 APNs 的开发环境（***dev***）还是生产环境（***prod***）
-topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 APNs Topic 做鉴权。一次推送接口调用只能将推送发送至相同 Topic 的设备。
-apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一次推送接口调用只能将推送发送至相同 Team ID 的设备。
+prod| 可选 | 见[通过查询条件发推送](#通过查询条件发推送)。
+topic | 可选 | 同上。 
+apns_team_id | 可选 | 同上。
 device_profile | 可选 | 用于指定使用的 iOS 自定义推送证书。如果使用 Token Authentication 鉴权方式，或者使用的推送证书为配置的「生产环境证书」或「开发环境证书」则无需提供本参数。我们会根据您填写的 `prod` 参数值来使用对应的证书。
 
 如果目标为 Android 设备，则在前述通用参数之外，还可以附带如下参数： 
 
 名称 | 约束 | 描述
 ---- | ---- | ----
-channel| 可选 | 指定推送频道。
+channel| 可选 | 指定[Android 通知渠道][android-channel]。
 vendor | 可选 | ***仅对开启混合推送的设备有效*** 对应混合推送设备在 _Installation 表中的 vendor 字段。一次推送接口调用只能将推送发送给相同 vendor 的设备。
 device_profile | 可选 | ***仅对开启混合推送的设备有效*** 当目标混合推送平台下配置了多份配置时需要通过该参数指定配置名。默认值为 _default
 
-#### master key 校验
+[android-channel]: https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels
 
-当在 [控制台 > 消息 > 推送 > 设置 > 推送选项](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 中点选了 **禁止从客户端进行消息推送** 后，推送消息接口必须增加 **master key** 校验才能成功发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。我们建议用户都将此限制启用。
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{masterkey}},master"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "where": {"channels" : ["public"]},
-        "data": {"alert" : "Hello from LeanCloud"}
-     }' \
-  https://{{host}}/1.1/push
-```
-
-#### 过期时间
-
-我们建议给 iOS 设备的推送都设置过期时间，这样才能保证在推送的当时，如果用户与 APNs 之间的连接恰好断开（如关闭了手机网络、设置了飞行模式等)，在连接恢复之后消息过期之前，用户仍然可以收到推送消息。可以参考 [Stackoverflow &middot; Push notification is not being delivered when iPhone comes back online](http://stackoverflow.com/questions/24026544/push-notification-is-not-being-delivered-when-iphone-comes-back-online)。
-
-过期时间的用法请参考 [过期时间和定时推送](#过期时间和定时推送)。
 
 #### 消息内容 Data
 
@@ -442,7 +554,7 @@ iOS 支持通过 sound 参数设置推送声音，可以是字符串类型的声
 }
 ```
 
-data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html)，[Apple 关于推送提醒本地化的文档](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html#//apple_ref/doc/uid/TP40008194-CH10-SW9)，以及 [Apple 官方关于 Request Header 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)。
+data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification)，[Apple 官方关于 Request Header 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)，以及 [Apple 官方关于 UserNotifications 的文档](https://developer.apple.com/documentation/usernotifications)。
 
 另外，我们也支持按照上述 Apple 官方文档的方式构造推送参数，如：
 
@@ -484,44 +596,21 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 
 ```
 {
-  "alert":      字符串类型，表示消息内容,
-  "title":      字符串类型，表示显示在通知栏的标题,
-  "silent":     布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒,
-  "custom-key": 由用户添加的自定义属性，custom-key 仅是举例，可随意替换
+  "alert":      "字符串类型，表示消息内容",
+  "title":      "字符串类型，表示显示在通知栏的标题",
+  "silent":     "布尔类型，指定透传消息或通知栏消息，默认为 false（通知栏消息）",
+  "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
+  "action":     "字符串类型，注册 Receiver 时提供的 action name，仅当需要自定义 Receiver 时设置",
 }
 ```
 
-如果自定义 Receiver，需要设置 `action`：
-
-```
-{
-  "alert":      字符串类型，表示消息内容,
-  "title":      字符串类型，表示显示在通知栏的标题,
-  "action":     字符串类型，注册 Receiver 时提供的 action name,
-  "silent":     布尔类型，用于控制是否关闭推送通知栏提醒，默认为 false，即不关闭通知栏提醒,
-  "custom-key": 由用户添加的自定义属性，custom-key 仅是举例，可随意替换
-}
-```
-
-关于自定义 Receiver 请参看[自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
-
-##### Windows Phone 设备推送消息内容
-
-Windows Phone 设备类似，也支持 `title` 和 `alert`，同时支持 `wp-param` 用于定义打开通知的时候打开的是哪个 Page：
-
-```
-{
-  "alert":      字符串类型，表示消息内容,
-  "title":      字符串类型，表示显示在通知栏的标题,
-  "wp-param":   "/chat.xaml?NavigatedFrom=Toast Notification"
-}
-```
+关于 `silent` 参数请参看 [Android 推送区分透传和通知栏消息](#Android_推送区分透传和通知栏消息)，关于自定义 Receiver 请参看[自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
 
 ##### 为多种类型设备设置不同推送内容
 
 单次推送中，如果查询条件覆盖的目标推送设备包含多种类型，如既包含 iOS 设备，又包含 LeanCloud 自有渠道的 Android 设备，又有混合推送的小米华为设备等，可以为不同推送设备单独填写推送内容参数，我们会按照设备类型取出对应设备类型的推送内容来发推送，例如：
 
-```
+```json
 {
   "ios": {
     "alert":             "Hello iOS",
@@ -540,10 +629,6 @@ Windows Phone 设备类似，也支持 `title` 和 `alert`，同时支持 `wp-pa
   "hms": {
     "alert":             "Hello Huawei",
     "custom-key":        "custom-value"
-  },
-  "wp":{
-    "alert":             "Hello Windows Phone",
-    "wp-param":          "/chat.xaml?NavigatedFrom=Toast Notification"
   }
 }
 ```
@@ -559,248 +644,32 @@ hms | 华为 HMS 推送
 mz | 魅族推送
 vivo | vivo 推送
 oppo | oppo 推送
-wp  | Windows Phone
-
-#### iOS 测试和生产证书区分
-
-我们现在支持上传两个环境的 iOS 推送证书：测试和生产环境，你可以通过设定 `prod` 属性来指定使用哪个环境证书。
-
-```
-{
-  "prod": "dev",
-  "data": {
-    "alert": "test"
-  }
-}
-```
-
-如果是 `dev` 值就表示使用开发证书，`prod` 值表示使用生产证书。如果未设置 `prod` 属性，且使用的不是 [JavaScript 数据存储 SDK](https://leancloud.github.io/javascript-sdk/docs/AV.Push.html)，我们默认使用**生产证书**来发推送。如果未设置 `prod` 属性，且使用的是 [JavaScript 数据存储 SDK](https://leancloud.github.io/javascript-sdk/docs/AV.Push.html) ，则需要在发推送之前执行 [AV.setProduction](https://leancloud.github.io/javascript-sdk/docs/AV.html#.setProduction) 函数才会使用生产证书发推送，否则会以开发证书发推送。注意，当设备设置了 `deviceProfile` 时我们优先按照 `deviceProfile` 指定的证书推送。
-
-#### Android 推送区分透传和通知栏消息
-
-Android 推送（包括 Android 混合推送）支持透传和通知栏两种消息类型。透传消息是指消息到达设备后会先交给 LeanCloud Android SDK，再由 SDK 将消息通过 [自定义 Receiver](./android_push_guide.html#自定义_Receiver) 传递给开发者，收到消息后的行为由开发者定义的 Receiver 来决定，SDK 不会自动弹出通知栏提醒。而通知栏消息是指消息到达设备后会立即自动弹出通知栏提醒。
-
-LeanCloud 推送服务通过推送请求中 `data` 参数内的 `silent` 字段区分透传和通知栏消息。如果 `silent` 是 `true` 则表示这个消息是透传消息，为 `false` 表示消息是通知栏消息。如果不传递 `silent` 则默认其值为 `false`。另外请注意，如果希望接收透传消息请不要忘记自行实现 [自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
-
-推送请求中的 `data` 参数请参考 [消息内容 Data](#消息内容_Data)。
 
 #### Android 混合推送多配置区分
 
-如果使用了混合推送功能，并且在 [控制台 > 消息 > 推送 > 设置 > 混合推送](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 增加了多个混合推送配置，那么在向 `_Installation` 表保存设备信息时就需要将当前设备所对应的混合推送配置名存入 `deviceProfile` 字段。系统会按照该字段指定的唯一配置名为每个目标设备进行混合推送。
+如果使用了混合推送功能，并且在 **控制台 > 消息 > 推送 > 设置 > 混合推送** 增加了多个混合推送配置，那么在向 `_Installation` 表保存设备信息时就需要将当前设备所对应的混合推送配置名存入 `deviceProfile` 字段。系统会按照该字段指定的唯一配置名为每个目标设备进行混合推送。
 
 如果 `deviceProfile` 字段为空，系统会默认使用名为 `_default` 的混合推送配置来进行推送，所以一定要保证在控制台的混合推送设置中，存在以 `_default` 命名的 Profile 并且已被正确配置，否则系统会**拒绝推送。**
 
 {{deviceprofile_format}}
 
-#### 推送查询条件
+#### Android 推送区分透传和通知栏消息
 
-`_Installation` 表中的所有属性，无论是内置的还是自定义的，都可以作为查询条件通过 where 来指定，并且支持 [REST API](./rest_api.html#查询) 定义的各种复杂查询。
+Android 推送（包括 Android 混合推送）支持透传和通知栏两种消息类型。透传消息是指消息到达设备后会先交给 LeanCloud Android SDK，再由 SDK 将消息通过 [自定义 Receiver](./android_push_guide.html#自定义_Receiver) 传递给开发者，收到消息后的行为由开发者定义的 Receiver 来决定，SDK 不会自动弹出通知栏提醒。而通知栏消息是指消息到达设备后会立即自动弹出通知栏提醒。
 
-下面会举一些例子，更多例子请参考 [REST API](./rest_api.html#查询) 查询文档。
-
-#### 推送给所有的设备
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "data": {
-          "alert": "LeanCloud 向您问好！"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
-
-#### 发送给特定的用户
-
-* 发送给 android 设备的用户
-
-```sh
-curl -X POST \
--H "X-LC-Id: {{appid}}"          \
--H "X-LC-Key: {{appkey}}"        \
--H "Content-Type: application/json" \
--d '{
-      "where":{
-        "deviceType": "android"
-      },
-      "data": {
-        "alert": "LeanCloud 向您问好！"
-      }
-    }' \
-https://{{host}}/1.1/push
-```
-
-* 发送给 public 频道的用户
-
-```sh
-curl -X POST \
--H "X-LC-Id: {{appid}}"          \
--H "X-LC-Key: {{appkey}}"        \
--H "Content-Type: application/json" \
--d '{
-      "where":{
-        "channels":
-          {"$regex":"\\Qpublic\\E"}
-      },
-      "data": {
-        "alert": "LeanCloud 向您问好！"
-      }
-    }' \
-https://{{host}}/1.1/push
-```
-
-或者更简便的方式
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "channels":[ "public"],
-        "data": {
-          "alert": "LeanCloud 向您问好！"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
-
-* 发送给某个 installation id 的用户
-
-```sh
-curl -X POST \
--H "X-LC-Id: {{appid}}"          \
--H "X-LC-Key: {{appkey}}"        \
--H "Content-Type: application/json" \
--d '{
-      "where":{
-          "installationId":"57234d4c-752f-4e78-81ad-a6d14048020d"
-          },
-      "data": {
-        "alert": "LeanCloud 向您问好！"
-      }
-    }' \
-https://{{host}}/1.1/push
-```
-
-* 推送给不活跃的用户
-
-```sh
-curl -X POST \
--H "X-LC-Id: {{appid}}"          \
--H "X-LC-Key: {{appkey}}"        \
--H "Content-Type: application/json" \
--d '{
-      "where":{
-          "updatedAt":{
-              "$lt":{"__type":"Date","iso":"2015-06-29T11:33:53.323Z"}
-            }
-      },
-      "data": {
-          "alert": "LeanCloud 向您问好！"
-      }
-    }' \
-https://{{host}}/1.1/push
-```
-
-* 根据查询条件做推送：
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "where": {
-          "inStock": true
-        },
-        "data": {
-          "alert": "您关注的商品已经到货，请尽快购买。"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
-
-用 `where` 查询的都是 `_Installations` 表中的属性。这里假设该表存储了 `inStock` 的布尔属性。
-
-* 根据地理信息位置做推送：
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "where": {
-          "owner": {
-            "$inQuery": {
-              "location": {
-                "$nearSphere": {
-                  "__type": "GeoPoint",
-                  "latitude": 30.0,
-                  "longitude": -20.0
-                },
-                "$maxDistanceInMiles": 10.0
-              }
-            }
-          }
-        },
-        "data": {
-          "alert": "北京明日最高气温 40 摄氏度。"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
-
-上面的例子假设 installation 有个 owner 属性指向 `_User` 表的记录，并且用户有个 `location` 属性是 GeoPoint 类型，我们就可以根据地理信息位置做推送。
+LeanCloud 推送服务通过推送请求中 `data` 参数内的 `silent` 字段区分透传和通知栏消息。
+`silent` 为 `true` 表示这个消息是透传消息，为 `false` 表示消息是通知栏消息。
+如果不传递 `silent` 则默认其值为 `false`。
+另外请注意，如果希望接收透传消息请不要忘记自行实现 [自定义 Receiver](./android_push_guide.html#自定义_Receiver)。
 
 #### 过期时间和定时推送
 
-`expiration_time` 属性用于指定消息的过期时间，如果客户端收到消息的时间超过这个绝对时间，那么消息将不显示给用户。`expiration_time` 是一个 UTC 时间的字符串，格式为 `YYYY-MM-DDTHH:MM:SS.MMMZ`。
+如上所述，可以用 `expiration_time` 参数指定消息的过期时间：
 
-```
-{
-      "expiration_time": "2016-01-28T00:07:29.773Z",
-      "data": {
-        "alert": "过期时间为北京时间 1 月 28 日 8:07。"
-      }
-}
-```
-
-`expiration_interval` 也可以用于指定过期时间，不过这是一个相对时间，以**秒**为单位，从 API 调用时间点开始计算起：
-
-```
-{
-      "expiration_interval": "86400",
-      "data": {
-        "alert": "收到 Push API 调用的 24 小时后过期。"
-      }
-}
-```
-
-`push_time` 是定时推送的时间，格式为 `YYYY-MM-DDTHH:MM:SS.MMMZ` 的 UTC 时间，也可以结合 `expiration_interval` 设定过期时间：
-
-```
-{
-      "push_time":           "2016-01-28T00:07:29.773Z",
-      "expiration_interval": "86400",
-      "data": {
-        "alert": "北京时间 1 月 28 日 8:07 发送这条推送，24 小时后过期"
-      }
-}
-```
-
-#### 推送消息属性
-
-##### 消息过期
-
- 过期时间，可以是绝对时间：
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
+  -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
         "expiration_time": "2015-10-07T00:51:13Z",
@@ -811,75 +680,27 @@ curl -X POST \
   https://{{host}}/1.1/push
 ```
 
-也可以是相对时间（从推送 API 调用开始算起，结合 push_time 做定期推送）:
+`expiration_interval` 也可以用于指定过期时间，一般结合定时推送使用：
+
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
+  -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
-        "push_time": "2015-06-28T00:51:13.931Z",
-        "expiration_interval": 518400,
+        "push_time": "2016-01-28T00:07:29.773Z",
+        "expiration_interval": 86400,
         "data": {
-          "alert": "您未使用的代金券将于 2015 年 7 月 4 日过期。"
+          "alert": "北京时间 1 月 28 日 8:07 发送这条推送，24 小时（86400 秒）后过期"
         }
       }' \
   https://{{host}}/1.1/push
 ```
 
-##### 定制消息属性：
+##### 定时推送任务查询和取消
 
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  -d '{
-        "channels": [
-          "employee"
-        ],
-        "data": {
-          "alert": "本周五下午三点组织大家看电影《大圣归来》。",
-          "badge": "Increment",
-          "sound": "cheering.caf",
-          "title": "员工福利"
-        }
-      }' \
-  https://{{host}}/1.1/push
-```
+调用 `POST /scheduledPushMessages` 接口可以查询当前正在等待推送的定时推送任务，调用这个接口需要使用 **master key**：
 
-
-### 推送记录查询
-
-`/push` 接口在推送后会返回代表该条推送消息的 `objectId`，你可以使用这个 ID 调用下列 API 查询推送记录：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}"          \
-  -H "X-LC-Key: {{appkey}}"        \
-  -H "Content-Type: application/json" \
-  https://{{host}}/1.1/tables/Notifications/:objectId
-```
-
-其中 URL 里的 `:objectId` 替换成 `/push` 接口返回的 objectId 。
-
-将返回推送记录对象，推送记录各字段含义参考 [Notification 说明](#Notification)。
-
-### 推送状态查看和取消
-
-{% if node=='qcloud' %}
-在发推送的过程中，我们会随着推送任务的执行更新推送状态到 **控制台 > 消息 > 推送记录** 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看 [Notification 表详解](#Notification)。
-{% else %}
-在发推送的过程中，我们会随着推送任务的执行更新推送状态到 [控制台 > 消息 > 推送记录](/dashboard/messaging.html?appid={{appid}}#/message/push/list) 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看 [Notification 表详解](#Notification)。
-{% endif %}
-
-在一条推送记录状态到达 **done** 即完成推送之前，其状态信息旁边会显示 “取消推送” 按钮，点击后就能将本次推送取消。并且取消了的推送会从推送记录中删除。
-
-请注意取消推送的意思是取消还排在队列中未发出的推送，已经发出或已存入离线缓存的推送是无法取消的。同理，推送状态显示已经完成的推送也无法取消。请尽力在发推送前做好测试，确认好发送内容和目标设备查询条件。
-
-### 定时推送任务查询和取消
-
-可以使用 **master key** 查询当前正在等待推送的定时推送任务：
 
 ```sh
 curl -X GET \
@@ -887,7 +708,7 @@ curl -X GET \
   -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   https://{{host}}/1.1/scheduledPushMessages
- ```
+```
 
 查询出来的结果类似：
 
@@ -925,27 +746,46 @@ curl -X GET \
 
 其中 `push_msg` 就是该推送消息的详情，`expire_time` 是消息设定推送时间的 unix 时间戳。
 
-取消一个定时推送任务，要使用返回结果中最外层的 id。以上面的结果为例，即为 `results[0].id`，而不是 `results[0].push_msg.id`:
+根据查询的结果，就可以取消一个定时推送任务。
+注意需要使用返回结果中最外层的 id。
+比如取消第一个定时推送，需要使用 `results[0].id`，而不是 `results[0].push_msg.id`。
+就上面的例子而言，应该使用 `1` 而不是 `XRs9jmWnLd0GH2EH`：
 
 ```sh
 curl -X DELETE \
   -H "X-LC-Id: {{appid}}"          \
   -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
-  https://{{host}}/1.1/scheduledPushMessages/:id
+  https://{{host}}/1.1/scheduledPushMessages/1
 ```
 
-### 使用云引擎实现周期推送
+##### 使用云引擎实现周期推送
 
 可以配合 `云引擎` 的 `定时任务` 功能实现周期推送，非常方便。请阅读 [在云引擎中使用推送服务](./push-guide-leanengine.html)。
 
-以从控制台操作举例，可以有以下几个步骤：
-1. 定义函数：在 `云引擎` -> `web 组` -> `部署` -> `在线编辑` 里创建函数并部署，
-函数体为 `require('leancloud-storage').Push.send(request.params)`，可以根据实际需要创建自定义函数。
-2. 创建定时任务：在 `云引擎` -> `web 组` -> `定时任务` 里创建定时任务，
-在运行参数里填入推送消息 `{"data": {"alert": "轻松实现周期推送！"}}`，可以根据实际需要填写消息体和查询条件。
+### 推送记录查询
 
-定时任务创建完成后，当推送发生时会产生一条常规推送，可以去 `消息` -> `推送` -> `推送记录` 里面查看结果。
+`/push` 接口在推送后会返回代表该条推送消息的 `objectId`，你可以使用这个 ID 调用下列 API 查询推送记录：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.1/tables/Notifications/:objectId
+```
+
+其中 URL 里的 `:objectId` 替换成 `/push` 接口返回的 objectId 。
+
+将返回推送记录对象，推送记录各字段含义参考 [Notification 说明](#Notification)。
+
+### 推送状态查看和取消
+
+在发推送的过程中，我们会随着推送任务的执行更新推送状态到 **控制台 > 消息 > 推送记录** 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看 [Notification 表详解](#Notification)。
+
+在一条推送记录状态到达 **done** 即完成推送之前，其状态信息旁边会显示 “取消推送” 按钮，点击后就能将本次推送取消。并且取消了的推送会从推送记录中删除。
+
+请注意取消推送的意思是取消还排在队列中未发出的推送，已经发出或已存入离线缓存的推送是无法取消的。同理，推送状态显示已经完成的推送也无法取消。请尽力在发推送前做好测试，确认好发送内容和目标设备查询条件。
 
 ## 限制与费用
 

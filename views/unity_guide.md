@@ -91,7 +91,7 @@ await equipBag.SaveAsync();
 Debug.Log(equipBag.ObjectId);
 ```
 
-运行以上代码后，要想确认保存动作是否已经生效，可以到 LeanCloud 应用管理平台的 [数据管理](/dashboard/data.html?appid={{appid}})  页面来查看数据的存储情况。
+运行以上代码后，要想确认保存动作是否已经生效，可以到 LeanCloud 应用管理平台的数据管理页面来查看数据的存储情况。
 
 除了 scale、name 之外，其他字段都是数据表的内置属性。
 
@@ -505,7 +505,7 @@ equipments.ForEach((equip) =>
 
 **删除文件就意味着，执行之后在数据库中立刻删除记录，并且原始文件也会从存储仓库中删除（所有涉及到物理级别删除的操作请谨慎使用）**
 
-<div class="callout callout-danger">默认情况下，文件的删除权限是关闭的，需要进入 {% if node == 'qcloud' %}**控制台** > **存储** > `_File`{% else %}[控制台 > 存储 > **`_File`**](/dashboard/data.html?appid={{appid}}#/_File){% endif %}，选择菜单 **其他** > **权限设置** > **delete** 来开启。</div>
+<div class="callout callout-danger">默认情况下，文件的删除权限是关闭的，需要进入 **控制台 > 存储 > `_File`**，选择菜单 **其他** > **权限设置** > **delete** 来开启。</div>
 
 ```cs
 AVFile file = await AVFile.GetFileWithObjectIdAsync("538ed669e4b0e335f6102809");
@@ -514,7 +514,7 @@ await file.DeleteAsync();
 
 ### 启用 HTTPS 域名
 
-如果希望使用 HTTPS 域名来访问文件，需要进入 [控制台 > 存储 > 设置 > 文件](/dashboard/storage.html?appid={{appid}}#/storage/conf)，勾选 **启用 https 域名**。HTTPS 文件流量无免费的使用额度，收费标准将在该选项开启时显示。
+如果希望使用 HTTPS 域名来访问文件，需要进入 **控制台 > 存储 > 设置 > 文件**，勾选 **启用 https 域名**。HTTPS 文件流量无免费的使用额度，收费标准将在该选项开启时显示。
 
 {{ docs.alert("「启用 https 域名」会影响到 API 返回的文件地址是 HTTPS 还是 HTTP 类型的 URL。需要注意的是，即使没有启用这一选项，终端仍然可以选择使用 HTTPS URL 来访问文件，但由此会产生 HTTPS 流量扣费。") }}
 
@@ -526,7 +526,7 @@ await file.DeleteAsync();
 
 ### 设置自定义文件域名
 
-LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地访问到存储在云端的文件。但由于受网络法规的管控与限制，我们无法 100% 保证该公用域名随时可用。因此，强烈建议开发者**使用自定义域名来访问自己的文件**，以避免公用域名不可用之时应用的体验会受到影响。请前往 [存储 > 设置 > 文件](/dashboard/storage.html?appid={{appid}}#/storage/conf) 设置自定义域名。
+LeanCloud 提供公用的二级域名来让开发者及其用户能够便捷地访问到存储在云端的文件。但由于受网络法规的管控与限制，我们无法 100% 保证该公用域名随时可用。因此，强烈建议开发者**使用自定义域名来访问自己的文件**，以避免公用域名不可用之时应用的体验会受到影响。请前往 **存储 > 设置 > 文件** 设置自定义域名。
 
 ### CDN 加速
 {{ data.cdn(true, "AVFile") }}

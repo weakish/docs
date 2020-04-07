@@ -27,6 +27,7 @@ vendor | 厂商
 `mz`  | 魅族推送
 `oppo`| Oppo 推送
 `vivo`| VIVO 推送
+`fcm` | FCM 推送（仅限国际版）
 
 注意，混合推送对接的是厂商各自的推送服务，需要单独配置，不支持混用。
 通常情况下，需要提交不同的版本（分别对接厂商的推送服务）到相应厂商的应用商店。
@@ -46,7 +47,7 @@ vendor | 厂商
 1. **注册华为账号**：在 [华为开发者联盟](http://developer.huawei.com/cn/consumer/) 注册华为开发者账号（[详细流程](https://developer.huawei.com/consumer/cn/devservice/doc/20300)）。
 2. **开发前准备**：接入华为 PUSH 之前，需要创建应用并配置应用签名，具体可参考华为官方文档：[开发准备](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_v3.html?page=hmssdk_huaweipush_devprepare_v3)。
 3. **打开推送服务开关**：登录 [华为开发者联盟](http://developer.huawei.com/cn/consumer/)，按照华为官方文档提示[开通推送服务](https://developer.huawei.com/consumer/cn/service/hms/catalog/AGCHelp.html?page=AGC_appGalleryConnect_associated_service)。
-4. **将华为 App 信息保存到 LeanCloud 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
+4. **将华为 App 信息保存到 LeanCloud 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过  **LeanCloud 控制台 > 消息 > 推送 > 设置 > 混合推送** 与 LeanCloud 应用关联。
 
 ### 接入 SDK
 
@@ -316,7 +317,7 @@ AndroidManifest.xml 中把 AVHMSMessageService 替换为你自定义的 MyHuawei
 
 1. **注册小米账号**：在 [小米开放平台][xiaomi] 上注册小米开发者账号并完成实名认证（[详细流程](http://dev.xiaomi.com/doc/?p=90)）。
 2. **创建小米推送服务应用**（[详细流程](http://dev.xiaomi.com/doc/?p=1621)）。
-3. **设置小米的 AppId 及 AppSecret**：在 [小米开放平台][xiaomi] > **管理控制台** > **消息推送** > **相关应用** 可以查到具体的小米推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
+3. **设置小米的 AppId 及 AppSecret**：在 [小米开放平台][xiaomi] > **管理控制台** > **消息推送** > **相关应用** 可以查到具体的小米推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 **LeanCloud 控制台 > 消息 > 推送 > 设置 > 混合推送** 与 LeanCloud 应用关联。
 
 [xiaomi]: http://dev.xiaomi.com/index
 
@@ -453,6 +454,8 @@ AVMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
 1. **注册魅族账号**：在 [Flyme开放平台](https://open.flyme.cn) 上注册魅族开发者账号并完成开发者认证 ([详细流程](http://open-wiki.flyme.cn/index.php?title=%E6%96%B0%E6%89%8B%E6%8C%87%E5%8D%97))。
 2. **创建魅族推送服务应用** ([详细流程](http://open-wiki.flyme.cn/index.php?title=%E9%AD%85%E6%97%8F%E6%8E%A8%E9%80%81%E5%B9%B3%E5%8F%B0%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C))。
 3. **设置魅族的 AppId 及 AppSecret**：在 [魅族推送平台](http://push.meizu.com/) > **应用列表** > **打开应用** > **配置管理** 可以查到具体的魅族推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 [LeanCloud 控制台][leancloud-console] > **消息** > **推送** > **设置** > **混合推送**，与 LeanCloud 应用关联。
+
+[leancloud-console]: /dashboard/data.html?appid={{appid}}#/
 
 ### 接入 SDK
 
@@ -764,17 +767,26 @@ dependencies {
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <!-- 基础模块 END -->
     <uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE"/>
+    <uses-permission android:name="com.heytap.mcs.permission.RECIEVE_MCS_MESSAGE"/>
 ```
 
 最后在 AndroidManifest 中添加 oppo PushService ：
 
 ```xml
 <service
-android:name="com.coloros.mcssdk.PushService"
-android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
-  <intent-filter>
-  	<action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE"/>
-  </intent-filter>
+  android:name="com.heytap.mcssdk.PushService"
+  android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
+    <intent-filter>
+      <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE"/>
+    </intent-filter>
+</service>
+
+<service
+   android:name="com.heytap.mcssdk.AppPushService"
+   android:permission="com.heytap.mcs.permission.SEND_MCS_MESSAGE">
+   <intent-filter>
+     <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE"/>
+   </intent-filter>
 </service>
 ```
 
@@ -1101,7 +1113,7 @@ AVMixPushManager.unRegisterMixPush();
 
 1. **注册华为账号**：在 [华为开发者联盟](http://developer.huawei.com/cn/consumer/)注册华为开发者账号（[详细流程](http://developer.huawei.com/cn/consumer/wiki/index.php?title=%E6%B3%A8%E5%86%8C%E7%99%BB%E5%BD%95)）。
 2. **创建华为应用**：实名认证通过后，需要创建华为移动应用并配置 Push 权益（[详细流程](http://developer.huawei.com/cn/consumer/wiki/index.php?title=%E6%8E%A5%E5%85%A5%E8%AF%B4%E6%98%8E#2.1_.E6.B3.A8.E5.86.8C)）。
-3. **设置华为的 AppId 及 AppKey**：在 [华为开发者联盟控制中心](http://developer.huawei.com/cn/consumer/devunion/openPlatform/html/memberCenter.html#appManage#) > **应用管理** > **移动应用详情**  可以查到具体的华为推送服务应用的 AppId 及 AppSecret，将此 AppId 及 AppSecret 通过  [LeanCloud 控制台 > **消息** > **推送** > **设置** > **混合推送**](/dashboard/messaging.html?appid={{appid}}#/message/push/conf) 与 LeanCloud 应用关联。
+3. **设置华为的 AppId 及 AppKey**：在 [华为开发者联盟控制中心](http://developer.huawei.com/cn/consumer/devunion/openPlatform/html/memberCenter.html#appManage#) > **应用管理** > **移动应用详情**  可以查到具体的华为推送服务应用的 AppId 及 AppSecret，将此 AppId 及 AppSecret 通过  **LeanCloud 控制台 > 消息 > 推送 > 设置 > 混合推送** 与 LeanCloud 应用关联。
 
 ### 接入 SDK
 
