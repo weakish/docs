@@ -276,6 +276,12 @@ curl -X DELETE \
   https://{{host}}/1.1/installations/51fcb74ee4b074ac5c34cf85
 ```
 
+#### Installation 自动过期和清理
+
+每当用户打开应用，我们都会更新该设备的 `_Installation` 表中的 `updatedAt` 时间戳。如果用户长期没有更新 `_Installation` 表的 `updatedAt` 时间戳，也就意味着该用户长期没有打开过应用。当超过 90 天没有打开过应用时，我们会将这个用户在 `_Installation` 表中的记录删除。不过请不要担心，当用户再次打开应用的时候，仍然会自动创建一个新的 Installation 用于推送。
+
+对于 iOS 设备，除了上述过期机制外还多拥有一套过期机制。当我们根据 Apple 推送服务的反馈获取到某设备的 deviceToken 已过期时，我们也会将这个设备在 `_Installation` 表中的信息删除，并标记这个已过期的 deviceToken 为无效，丢弃后续所有发送到该 deviceToken 的消息。
+
 ### 推送消息
 
 #### master key 校验
@@ -799,7 +805,7 @@ curl -X GET \
 
 超过频率限制后 1 分钟内 LeanCloud 会拒绝请求持续返回 429 错误码，一分钟后会重新处理请求。
 
-商用版应用默认上限可以在 [控制台 > 消息 > 推送 > 设置 > 推送选项 > 消息推送 API 调用频率上限][dashboard-push-config] 修改。
+商用版应用默认上限可以在 **控制台 > 消息 > 推送 > 设置 > 推送选项 > 消息推送 API 调用频率上限** 修改。
 按照每日调用频率峰值实行阶梯收费，费用如下：
 
 | 每分钟调用频率 | 费用 |
@@ -842,7 +848,7 @@ curl -X GET \
 | 8401 ~ 9000 | $150 USD / 天 |
 | 9001 ~ 9600 | $160 USD / 天 |
 
-每日调用频率峰值可在 [控制台 > 消息 > 推送 > 统计 > API 请求频率峰值][dashboard-push-statistics] 中查看。
+每日调用频率峰值可在 **控制台 > 消息 > 推送 > 统计 > API 请求频率峰值** 中查看。
 
 ### 每日推送人次
 
@@ -854,7 +860,7 @@ curl -X GET \
 
 达到限制后，当天将无法再推送消息。
 
-商用版应用默认上限可以在 [控制台 > 消息 > 推送 > 设置 > 推送选项 > 每日推送上限][dashboard-push-config] 修改。
+商用版应用默认上限可以在 **控制台 > 消息 > 推送 > 设置 > 推送选项 > 每日推送上限** 修改。
 费用如下（其中不足一万人次的部分，按一万人次计算）：
 
 | 每日推送人次 | 费用 |
@@ -869,25 +875,15 @@ curl -X GET \
 | 小于等于 10 万的部分 | 免费 |
 | 大于 10 万的部分 | $0.02 USD / 万人次 |
 
-每日推送人次可在 [控制台 > 消息 > 推送 > 统计 > 推送人次][dashboard-push-statistics] 中查看。
-
-[dashboard-push-config]: /dashboard/messaging.html?appid={{appid}}#/message/push/conf
-[dashboard-push-statistics]: /dashboard/messaging.html?appid={{appid}}#/message/push/stat
+每日推送人次可在 **控制台 > 消息 > 推送 > 统计 > 推送人次** 中查看。
 
 ### 其它
 
-* 为避免给大量早已不再活跃的用户发消息，我们限制只能给 `_Installation` 表内 `updatedAt` 时间在最近三个月以内的设备推送消息。我们会在根据推送查询条件查出目标设备后自动将不符合条件的设备从目标设备中剔除，并且被剔除的设备不会计入 [控制台 > 消息 > 推送记录][dashboard-push-list] 内的目标设备数中。商用版用户如有特别需求，可提交工单联系我们付费延长有效期（最长可延长至一年）。
-* 为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，在 [控制台 > 消息 > 推送记录][dashboard-push-list] 中的 **状态** 一栏显示「错误」，提示信息为「dev profile disabled for massive push」。因此，在使用开发证书推送时，请合理设置推送条件。
+* 为避免给大量早已不再活跃的用户发消息，我们限制只能给 `_Installation` 表内 `updatedAt` 时间在最近三个月以内的设备推送消息。我们会在根据推送查询条件查出目标设备后自动将不符合条件的设备从目标设备中剔除，并且被剔除的设备不会计入 **控制台 > 消息 > 推送 > 推送记录** 内的目标设备数中。商用版用户如有特别需求，可提交工单联系我们付费延长有效期（最长可延长至一年）。
+* 为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，在 **控制台 > 消息 > 推送 > 推送记录** 中的 **状态** 一栏显示「错误」，提示信息为「dev profile disabled for massive push」。因此，在使用开发证书推送时，请合理设置推送条件。
 * Apple 对推送消息大小有限制，对 iOS 推送请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html)。
 * 如果使用了 Android 的混合推送，请注意华为推送对消息大小有限制。为保证推送消息能被正常发送，我们要求 data + channels 参数须小于 4096 字节，超过限制会导致推送无法正常发送，请尽量减小发送数据大小。
 * 每个开发版应用处在待发队列中的定时推送数量最多 10 条，每个商用版应用处在待发队列中的定时推送数量最多 1000 条。
 
-如果推送失败，在 [控制台 > 消息 > 推送记录 > 状态][dashboard-push-list] 一栏中会看到错误提示。
+如果推送失败，在 **控制台 > 消息 > 推送 > 推送记录 > 状态** 一栏中会看到错误提示。
 
-[dashboard-push-list]: /dashboard/messaging.html?appid={{appid}}#/message/push/list
-
-## Installation 自动过期和清理
-
-每当用户打开应用，我们都会更新该设备的 `_Installation` 表中的 `updatedAt` 时间戳。如果用户长期没有更新 `_Installation` 表的 `updatedAt` 时间戳，也就意味着该用户长期没有打开过应用。当超过 90 天没有打开过应用时，我们会将这个用户在 `_Installation` 表中的记录删除。不过请不要担心，当用户再次打开应用的时候，仍然会自动创建一个新的 Installation 用于推送。
-
-对于 iOS 设备，除了上述过期机制外还多拥有一套过期机制。当我们根据 Apple 推送服务的反馈获取到某设备的 deviceToken 已过期时，我们也会将这个设备在 `_Installation` 表中的信息删除，并标记这个已过期的 deviceToken 为无效，丢弃后续所有发送到该 deviceToken 的消息。
