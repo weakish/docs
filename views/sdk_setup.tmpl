@@ -580,7 +580,7 @@ const { Realtime } = require('leancloud-realtime/es-latest');
 ```即时通讯（含富媒体消息）
 <script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/leancloud-realtime@{{jsimsdkversion}}/dist/im-browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leancloud-realtime-plugin-typed-messages@3.1.0/dist/typed-messages.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-realtime-plugin-typed-messages@3.1.0/dist/typed-messages.min.js"></script>
 ```
 
 通过这种方式引入的 SDK 可以通过全局变量 `AV` 获得引用：
@@ -824,9 +824,9 @@ const reactNativeAdapters = require('@leancloud/platform-adapters-react-native')
 setAdapters(reactNativeAdapters);
 ```
 ```即时通讯（含富媒体消息）
-var AV = require('leancloud-storage/core');
+const AV = require('leancloud-storage/core');
 const { Realtime, setAdapters } = require('leancloud-realtime/im');
-var { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+const { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
 const reactNativeAdapters = require('@leancloud/platform-adapters-react-native');
 AV.setAdapters(reactNativeAdapters);
 setAdapters(reactNativeAdapters);
@@ -864,11 +864,11 @@ $ npm install leancloud-realtime leancloud-realtime-plugin-typed-message leanclo
 <script src="./node_modules/leancloud-storage/dist/av-live-query-min.js"></script>
 ```
 ```即时通讯
-<script src="./node_modules/leancloud-realtime/dist/dist/im-browser.min.js"></script>
+<script src="./node_modules/leancloud-realtime/dist/im-browser.min.js"></script>
 ```
 ```即时通讯（含富媒体消息）
 <script src="./node_modules/leancloud-storage/dist/av-min.js"></script>
-<script src="./node_modules/leancloud-realtime/dist/dist/im-browser.min.js"></script>
+<script src="./node_modules/leancloud-realtime/dist/im-browser.min.js"></script>
 <script src="./node_modules/leancloud-realtime-plugin-typed-messages/dist/typed-messages.js"></script>
 ```
 
@@ -901,9 +901,9 @@ const adapters = require('platform-adapters-xyz');
 setAdapters(adapters);
 ```
 ```即时通讯（含富媒体消息）
-var AV = require('leancloud-storage/core');
+const AV = require('leancloud-storage/core');
 const { Realtime, setAdapters } = require('leancloud-realtime/im');
-var { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+const { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
 const adapters = require('platform-adapters-xyz');
 AV.setAdapters(adapters);
 setAdapters(adapters);
