@@ -249,7 +249,7 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 ## `node --max-http-header-size` 无效？
 
-云引擎负载均衡限制 HTTP Header 大小为 8 KB（和[node.js 的默认值][cli_max_http_header_size_size]保持一致）。
+云引擎负载均衡限制 HTTP Header 大小为 8 KB（和[Node.js 的默认值][cli_max_http_header_size_size]保持一致）。
 因此无法通过 `--max-http-header-size` 指定大于 8 KB 的值。
 
 [cli_max_http_header_size_size]: https://nodejs.org/api/cli.html#cli_max_http_header_size_size
