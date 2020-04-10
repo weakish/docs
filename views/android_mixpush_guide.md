@@ -116,19 +116,10 @@ android {
 ```
 dependencies {
   //混合推送需要的包
-  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-      exclude group:'cn.leancloud', module:'huawei-hmsagent'
-  }
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
   //即时通信与推送需要的包
-  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-  implementation 'com.alibaba:fastjson:1.1.70.android'
-  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 
   implementation 'com.huawei.hms:push:4.0.2.300'
 }
@@ -328,18 +319,10 @@ AndroidManifest.xml 中把 AVHMSMessageService 替换为你自定义的 MyHuawei
 ```
 dependencies {
   //混合推送需要的包
-  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
   //即时通信与推送需要的包
-  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-  implementation 'com.alibaba:fastjson:1.1.71.android'
-  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
 
@@ -464,18 +447,10 @@ dependencies {
   //魅族推送需要的包
   implementation 'com.meizu.flyme.internet:push-internal:3.6.+@aar'
   //混合推送需要的包
-  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
   //即时通信与推送需要的包
-  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-  implementation 'com.alibaba:fastjson:1.1.70.android'
-  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
 
@@ -548,18 +523,10 @@ dependencies {
 ```
 dependencies {
   //混合推送需要的包
-  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
   //即时通信与推送需要的包
-  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-  implementation 'com.alibaba:fastjson:1.1.70.android'
-  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
 
@@ -739,18 +706,10 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 ```
 dependencies {
   //混合推送需要的包
-  implementation('cn.leancloud:mixpush-android:{{ version.unified }}@aar') {
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
   //即时通信与推送需要的包
-  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-  implementation 'com.alibaba:fastjson:1.1.70.android'
-  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 }
 ```
 
@@ -1014,18 +973,10 @@ FCM 客户端需要在运行 Android 4.0 或更高版本且安装了 Google Play
 
 ```xml
 dependencies {
-  implementation('cn.leancloud:leancloud-fcm:{{ version.unified }}@aar') {
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:leancloud-fcm:{{ version.unified }}@aar'
   //即时通信与推送需要的包
-  implementation ('cn.leancloud:realtime-android:{{ version.unified }}'){
-      exclude group: 'com.alibaba', module: 'fastjson'
-      exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-  }
+  implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-  implementation 'com.alibaba:fastjson:1.1.70.android'
-  implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 
   implementation 'com.google.firebase:firebase-core:15.0.2'
   implementation 'com.google.firebase:firebase-iid:15.0.2'

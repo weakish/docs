@@ -23,13 +23,8 @@ Android 的消息推送主要依赖客户端的 PushService 服务。PushService
 ```
 dependencies {
 
-implementation('cn.leancloud:realtime-android:{{ version.unified }}') {
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-}
+implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-implementation 'com.alibaba:fastjson:1.1.70.android'
-implementation 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
 
 }
 ```

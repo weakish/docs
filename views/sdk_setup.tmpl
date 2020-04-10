@@ -299,42 +299,27 @@ libraryDependencies += "cn.leancloud" %% "realtime-core" % "{{ version.unified }
 
 and for Gradle:
 ```
-    implementation('cn.leancloud:realtime-android:{{ version.unified }}') {
-        exclude group: 'com.alibaba', module: 'fastjson'
-        exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-    }
+    implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'com.alibaba:fastjson:1.1.71.android'
-    implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 ```
 
 #### 使用混合推送服务
 
 Example for Gradle：
 ```
-implementation('cn.leancloud:mixpush-android:{{ version.unified }}') {
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-    // 如果接入的是华为推送，还需要加上：
-    // exclude group:'cn.leancloud', module:'huawei-hmsagent' 
-}
+implementation 'cn.leancloud:mixpush-android:{{ version.unified }}'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-implementation 'com.alibaba:fastjson:1.1.71.android'
-implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 ```
 
 #### 对 fastjson 的特别说明
 
-从 fastjson 的[官网](https://github.com/alibaba/fastjson)我们可以看到，出于性能和安装包体积考虑，它针对纯的 Java 平台和 Android 平台分别推出了两个不同的版本（差异见[这里](https://github.com/alibaba/fastjson/wiki/Android%E7%89%88%E6%9C%AC)），所以我们的 SDK 也根据使用环境做了不同的依赖选择：
+从 `6.5.0` 版本开始，我们 Java 平台和 Android 平台的 SDK 都统一依赖 fastjson 最新的 JVM 版本（`1.2.68`），开发者在使用的时候不需要做特殊的处理。
 
+> 对 `6.5.0` 之前的 SDK 版本，我们根据使用环境做了不同的依赖选择：
 - storage-core 依赖的是面向纯 Java 平台的 fastjson（版本为 `1.2.60`）;
 - storage-android 和 realtime-android 以及其他推送 sdk 依赖的是面向 Android 平台的 fastjson（版本为 `1.1.71.android`）。
-
-这一点请特别注意，如果版本不兼容可能导致程序在运行时会出现各种 json 解析的问题。
-
-另外，我们发现 Android 版本的 fastjson 库在反序列化的时候，对 double 和 float 类型的处理存在漏洞。如果属性值中存在 `3.1415F` 或 `3.1415D` 这样的数字，JSON#parse 方法会抛出异常，异常信息类似于`com.alibaba.fastjson.JSONException: syntax error, pos 123, json : xxx `。
-
-为此我们提供了一个临时的 bugfix 版本供开发者下载使用，下载地址见[这里](https://github.com/leancloud/java-unified-sdk/tree/master/3rd-parties)。开发者可以通过引用本地文件的方式来依赖这个版本，build.gradle 中的依赖部分可按照如下示例进行更改：
+>
+> 同时，我们发现 Android 版本的 fastjson 库在反序列化的时候，对 double 和 float 类型的处理存在漏洞。如果属性值中存在 `3.1415F` 或 `3.1415D` 这样的数字，JSON#parse 方法会抛出异常，异常信息类似于 `com.alibaba.fastjson.JSONException: syntax error, pos 123, json : xxx `。为此我们提供了一个临时的 bugfix 版本供开发者下载使用，下载地址见[这里](https://github.com/leancloud/java-unified-sdk/tree/master/3rd-parties)。开发者可以通过引用本地文件的方式来依赖这个版本，build.gradle 中的依赖部分可按照如下示例进行更改：
 
 ```
     implementation fileTree(include: ['*.jar'], dir: 'libs') // 注意把上面的 lib 拷贝到该目录下
