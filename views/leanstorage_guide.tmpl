@@ -1985,7 +1985,7 @@ comment['post'] = post;
 我们知道设计数据模型并不容易，所以我们专门写了一篇 [数据模型设计指南](relation-guide.html) 来详细介绍这部分内容，推荐你去看一下。
 {% endcall %}
 
-{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Android / Java" or platform_name === "Swift" or platform_name === "Flutter"% }
+{% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Android / Java" or platform_name === "Swift" or platform_name === "Flutter" %}
 ### 序列化和反序列化
 
 在实际的开发中，把 `{{ baseObjectName }}` 当作参数传递的时候，会涉及到复杂对象的拷贝的问题，因此 `{{ baseObjectName }}` 也提供了序列化和反序列化的方法。
@@ -3097,10 +3097,7 @@ query.whereKey("title", .matchedPattern("{{ regex() | safe }}, option: nil))
 </code></pre>
 {% endif %}
 {% if platform_name === "Flutter" %}
-<pre><code class="lang-swift">
 {# TODO Flutter 正则查询 #}
-("{{ regex() | safe }}, option: nil))
-</code></pre>
 {% endif %}
 
 {# 2016-12-29 DO NOT USE markdown to rewrite the previous block #}
