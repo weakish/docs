@@ -286,6 +286,37 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 如果一周内发生一两次属正常现象（有可能是我们的服务器出现偶发的故障，因为会立刻重新部署，对服务影响很小），如果频繁发生可能是你的程序资源不足，或存在其他问题（运行一段时间后不再响应 HTTP 请求），需结合具体情况来分析。
 
+## 不使用云函数，但是加载了 HTTPS 重定向中间件，部署失败？
+
+项目不使用云函数和 hook，加载了 [HTTPS 重定向中间件后](leanengine_webhosting_guide-node.html#重定向到_HTTPS)，部署失败：
+
+```
+Deploy failed: 获取云函数信息失败：: 
+Error: write EPROTO 140033368790848:error:140770FC:SSL
+routines:SSL23_GET_SERVER_HELLO:unknown 
+protocol:../deps/openssl/openssl/ssl/s23_clnt.c:827:
+```
+
+这个报错是因为云函数健康检查失败。
+即使项目不使用云函数和 hook，加载 HTTPS 重定向中间件后，也需要将 `/1.1/functions/_ops/metadatas` 这个交给 SDK 处理，避免健康检查失败。
+如果不想将 `/1.1/functions/_ops/metadatas` 交给 SDK 处理，需要自行定义并添加一个在相应 URL  返回 404 的中间件。
+下面是一个 Express 中间件的例子：
+
+```js
+const IgnoreCloudFunction = (req, res, next) => {
+  if (req.path === "/1.1/functions/_ops/metadatas") {
+    res.status(404).end()
+  } else {
+    next()
+  }
+}
+const app = express();
+app.enable('trust proxy');
+// 注意中间件加载的顺序，IgnoreCloudFunction 在 HttpsRedirect 之前加载 
+app.use(IgnoreCloudFunction);
+app.use(AV.Cloud.HttpsRedirect());
+```
+
 ## 如何使用云引擎批量更新数据？
 
 可以参考我们的 [Demo: batch-update](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/routes/batch-update.js)。

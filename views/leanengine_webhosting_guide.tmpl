@@ -1406,6 +1406,10 @@ LeanEngine.setHttpsRedirectEnabled(true);
 
 部署并发布到生产环境之后，访问你的 LeanEngine 网站都会强制通过 HTTPS 访问。
 
+注意，启用 HTTPS 重定向，需要将 `/1.1/functions/_ops/metadatas` 这个 URL 交给 SDK 处理，
+[或者自行添加一个在相应 URL 返回 404 的中间件](leanengine_faq.html#不使用云函数，但是加载了_HTTPS_重定向中间件，部署失败)，
+否则健康检测无法通过，部署会失败。
+
 ## 部署与发布
 
 ### 命令行部署
