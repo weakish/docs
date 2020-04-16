@@ -31,10 +31,10 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo"];
 {% if platform_name === "JavaScript" %}
 ```js
 // 声明 class
-var Todo = AV.Object.extend('Todo');
+const Todo = AV.Object.extend('Todo');
 
 // 构建对象
-var todo = new Todo();
+const todo = new Todo();
 
 // 为属性赋值
 todo.set('title',   '工程师周会');
@@ -225,23 +225,23 @@ AVObject *testObject = [AVObject objectWithClassName:@"TestObject"];
 {% if platform_name === "JavaScript" %}
 ```js
 // 声明 class
-var TestObject = AV.Object.extend('TestObject');
+const TestObject = AV.Object.extend('TestObject');
 
 // 基本类型
-var number = 2018;
-var string = number + ' 流行音乐榜单';
-var date   = new Date();
-var array  = [string, number];
-var object = {
+const number = 2018;
+const string = number + ' 流行音乐榜单';
+const date   = new Date();
+const array  = [string, number];
+const object = {
   number: number,
   string: string
 };
 
 // 指向另一个 class 的 AV.Object
-var pointer = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+const pointer = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
 
 // 构建对象
-var testObject = new TestObject();
+const testObject = new TestObject();
 testObject.set('testNumber',  number);
 testObject.set('testString',  string);
 testObject.set('testDate',    date);
@@ -400,13 +400,13 @@ AVObject *todo = [[AVObject alloc] initWithClassName:@"Todo"];
 {% if platform_name === "JavaScript" %}
 ```js
 // 为 AV.Object 创建子类
-var Todo = AV.Object.extend('Todo');
+const Todo = AV.Object.extend('Todo');
 
 // 为该类创建一个新实例
-var todo = new Todo();
+const todo = new Todo();
 
 // 你还可以直接使用 AV.Object 的构造器
-var todo = new AV.Object('Todo');
+const todo = new AV.Object('Todo');
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -485,10 +485,10 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo"];
 {% if platform_name === "JavaScript" %}
 ```js
 // 声明 class
-var Todo = AV.Object.extend('Todo');
+const Todo = AV.Object.extend('Todo');
 
 // 构建对象
-var todo = new Todo();
+const todo = new Todo();
 
 // 为属性赋值
 todo.set('title', '马拉松报名');
@@ -642,16 +642,16 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.get('582570f38ac247004f39c24b').then(function (todo) {
   // todo 就是 objectId 为 582570f38ac247004f39c24b 的 Todo 实例
-  var title     = todo.get('title');
-  var priority  = todo.get('priority');
+  const title     = todo.get('title');
+  const priority  = todo.get('priority');
 
   // 获取内置属性
-  var objectId  = todo.id;
-  var updatedAt = todo.updatedAt;
-  var createdAt = todo.createdAt;
+  const objectId  = todo.id;
+  const updatedAt = todo.updatedAt;
+  const createdAt = todo.createdAt;
 });
 ```
 {% endif %}
@@ -731,7 +731,7 @@ let _ = query.get("582570f38ac247004f39c24b") { (result) in
 如果需要一次性获取返回对象的所有属性（比如进行数据绑定）而非显式地调用 `get`，可以利用 `AV.Object` 实例的 `toJSON` 方法：
 
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.get('582570f38ac247004f39c24b').then(function (todo) {
   console.log(todo.toJSON());
   // {
@@ -761,7 +761,7 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo" objectId:@"582570f38ac247
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
 todo.fetch().then(function (todo) {
   // todo 已刷新
 });
@@ -817,7 +817,7 @@ NSArray *keys = [NSArray arrayWithObjects:@"priority", @"location", nil];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
 todo.fetch({
   keys: 'priority, location'
 }).then(function (todo) {
@@ -875,7 +875,7 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo" objectId:@"582570f38ac247
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
 todo.set('content', '这周周会改到周三下午三点。');
 todo.save();
 ```
@@ -973,9 +973,9 @@ option.fetchWhenSave = YES;
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var account = AV.Object.createWithoutData('Account', '5745557f71cfe40068c6abe0');
+const account = AV.Object.createWithoutData('Account', '5745557f71cfe40068c6abe0');
 // 对 balance 原子减少 100
-var amount = -100;
+const amount = -100;
 account.increment('balance', amount);
 account.save(null, {
   // 设置条件
@@ -1186,13 +1186,13 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var alarm1 = new Date('2018-04-30T07:10:00');
-var alarm2 = new Date('2018-04-30T07:20:00');
-var alarm3 = new Date('2018-04-30T07:30:00');
+const alarm1 = new Date('2018-04-30T07:10:00');
+const alarm2 = new Date('2018-04-30T07:20:00');
+const alarm3 = new Date('2018-04-30T07:30:00');
 
-var alarms = [alarm1, alarm2, alarm3];
+const alarms = [alarm1, alarm2, alarm3];
 
-var todo = new AV.Object('Todo');
+const todo = new AV.Object('Todo');
 todo.addUnique('alarms', alarms);
 todo.save();
 ```
@@ -1301,7 +1301,7 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo" objectId:@"582570f38ac247
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
 todo.destroy();
 ```
 {% endif %}
@@ -1342,7 +1342,7 @@ _ = todo.delete { result in
 如果只需删除对象的一个属性，可以用 `unset`：
 
 ```js
-var todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
 
 // priority 属性会被删除
 todo.unset('priority');
@@ -1383,7 +1383,7 @@ todo.save();
 {% if platform_name === "JavaScript" %}
 ```js
 // 创建一个保存所有 AV.Object 的数组
-var objects = [];
+const objects = [];
 
 // 批量构建和更新
 AV.Object.saveAll(objects);
@@ -1486,7 +1486,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.find().then(function (todos) {
   // 获取需要更新的 todo
   todos.forEach(function (todo) {
@@ -1640,12 +1640,12 @@ AVObject *comment = [[AVObject alloc] initWithClassName:@"Comment"];
 {% if platform_name === "JavaScript" %}
 ```js
 // 创建 post
-var post = new AV.Object('Post');
+const post = new AV.Object('Post');
 post.set('title', '饿了……');
 post.set('content', '中午去哪吃呢？');
 
 // 创建 comment
-var comment = new AV.Object('Comment');
+const comment = new AV.Object('Comment');
 comment.set('content', '当然是肯德基啦！');
 
 // 将 post 设为 comment 的一个属性值
@@ -1744,7 +1744,7 @@ AVObject *post = [AVObject objectWithClassName:@"Post" objectId:@"57328ca079bc44
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
+const post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
 comment.set('post', post);
 ```
 {% endif %}
@@ -1809,15 +1809,15 @@ NSString *serializedString = [[NSString alloc] initWithData:jsonData encoding:NS
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var todo = new AV.Object('Todo'); // 构建对象
+const todo = new AV.Object('Todo'); // 构建对象
 todo.set('title', '马拉松报名'); // 设置名称
 todo.set('priority', 2); // 设置优先级
 todo.set('owner', AV.User.current()); // 这里就是一个 Pointer 类型，指向当前登录的用户
 
 // 将 AV.Object 对象反序列化成 JSON 对象
-var json = todo.toFullJSON();
+const json = todo.toFullJSON();
 // 将 JSON 对象序列化为字符串
-var serializedString = JSON.stringify(json);
+const serializedString = JSON.stringify(json);
 ```
 
 {% call docs.noteWrap() %}
@@ -1871,9 +1871,9 @@ AVObject *todo = [AVObject objectWithDictionary:objectDictionary]; // 由 NSMuta
 {% if platform_name === "JavaScript" %}
 ```js
 // 将字符串反序列化为 JSON 对象
-var json = JSON.parse(serializedString);
+const json = JSON.parse(serializedString);
 // 将 JSON 对象反序列化成 AV.Object 对象
-var todo = AV.parseJSON(json);
+const todo = AV.parseJSON(json);
 ```
 {% endif %}
 {% if platform_name === "Android / Java" %}
@@ -1939,7 +1939,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Student"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Student');
+const query = new AV.Query('Student');
 query.equalTo('lastName', 'Smith');
 query.find().then(function (students) {
   // students 是包含满足条件的 Student 对象的数组
@@ -2216,7 +2216,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.equalTo('priority', 2);
 query.first().then(function (todo) {
   // todo 是第一个满足条件的 Todo 对象
@@ -2318,7 +2318,7 @@ query.skip = 20;
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.equalTo('priority', 2);
 query.limit(10);
 query.skip(20);
@@ -2535,8 +2535,8 @@ Ming Li | China
 下面的代码可以找到所有来自英语国家的学生：
 
 ```js
-var studentQuery = new AV.Query('Student');
-var countryQuery = new AV.Query('Country');
+const studentQuery = new AV.Query('Student');
+const countryQuery = new AV.Query('Country');
 // 获取所有的英语国家
 countryQuery.equalTo('language', 'English');
 // 把 Student 的 nationality 和 Country 的 name 关联起来
@@ -2562,12 +2562,12 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.select(['title', 'content']);
 query.first().then(function (todo) {
-  var title = todo.get('title'); // √
-  var content = todo.get('content'); // √
-  var notes = todo.get('notes'); // undefined
+  const title = todo.get('title'); // √
+  const content = todo.get('content'); // √
+  const notes = todo.get('notes'); // undefined
 });
 ```
 {% endif %}
@@ -2651,7 +2651,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 // 相当于 SQL 中的 title LIKE 'lunch%'
 query.startsWith('title', 'lunch');
 ```
@@ -2697,7 +2697,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 // 相当于 SQL 中的 title LIKE '%lunch%'
 query.contains('title', 'lunch');
 ```
@@ -2747,9 +2747,9 @@ query.whereKey("title", .matchedSubstring("lunch"))
 </code></pre>
 {% endif %}
 {% if platform_name === "JavaScript" %}
-<pre><code class="lang-js">var query = new AV.Query('Todo');
+<pre><code class="lang-js">const query = new AV.Query('Todo');
 // 'title' 不包含 'ticket'（区分大小写）
-var regExp = new RegExp('{{ regex(true) | safe }}, 'i');
+const regExp = new RegExp('{{ regex(true) | safe }}, 'i');
 query.matches('title', regExp);
 </code></pre>
 {% endif %}
@@ -2915,7 +2915,7 @@ AVQuery *priorityOneOrTwo = [AVQuery orQueryWithSubqueries:[NSArray arrayWithObj
 {% if platform_name === "JavaScript" %}
 ```js
 // 单个查询
-var priorityOneOrTwo = new AV.Query('Todo');
+const priorityOneOrTwo = new AV.Query('Todo');
 priorityOneOrTwo.containedIn('priority', [1, 2]);
 // 这样就可以了 :)
 
@@ -2924,13 +2924,13 @@ priorityOneOrTwo.containedIn('priority', [1, 2]);
 // ---------------
 
 // 多个查询
-var priorityOne = new AV.Query('Todo');
+const priorityOne = new AV.Query('Todo');
 priorityOne.equalTo('priority', 1);
 
-var priorityTwo = new AV.Query('Todo');
+const priorityTwo = new AV.Query('Todo');
 priorityTwo.equalTo('priority', 2);
 
-var priorityOneOrTwo = AV.Query.or(priorityOne, priorityTwo);
+const priorityOneOrTwo = AV.Query.or(priorityOne, priorityTwo);
 // 好像有些繁琐 :(
 ```
 {% endif %}
@@ -3044,8 +3044,8 @@ AVQuery *query = [AVQuery queryWithClassName:@"Comment"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
-var query = new AV.Query('Comment');
+const post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
+const query = new AV.Query('Comment');
 query.equalTo('post', post);
 query.find().then(function (comments) {
   // comments 包含与 post 相关联的评论
@@ -3114,10 +3114,10 @@ AVQuery *query = [AVQuery queryWithClassName:@"Comment"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var innerQuery = new AV.Query('Post');
+const innerQuery = new AV.Query('Post');
 innerQuery.exists('image');
 
-var query = new AV.Query('Comment');
+const query = new AV.Query('Comment');
 query.matchesQuery('post', innerQuery);
 ```
 {% endif %}
@@ -3186,7 +3186,7 @@ query.limit = 10;
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Comment');
+const query = new AV.Query('Comment');
 
 // 获取最新发布的
 query.descending('createdAt');
@@ -3201,7 +3201,7 @@ query.find().then(function (comments) {
   // comments 包含最新发布的 10 条评论，包含各自对应的博客文章
   comments.forEach(function (comment) {
     // 该操作无需网络连接
-    var post = comment.get('post');
+    const post = comment.get('post');
   });
 });
 ```
@@ -3333,7 +3333,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.equalTo('isComplete', true);
 query.count().then(function (count) {
   console.log(count + " 个 todo 已完成。");
@@ -3402,13 +3402,13 @@ AVQuery *query = [AVQuery orQueryWithSubqueries:[NSArray arrayWithObjects:priori
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var priorityQuery = new AV.Query('Todo');
+const priorityQuery = new AV.Query('Todo');
 priorityQuery.greaterThanOrEqualTo('priority', 3);
 
-var isCompleteQuery = new AV.Query('Todo');
+const isCompleteQuery = new AV.Query('Todo');
 isCompleteQuery.equalTo('isComplete', true);
 
-var query = AV.Query.or(priorityQuery, isCompleteQuery);
+const query = AV.Query.or(priorityQuery, isCompleteQuery);
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -3485,13 +3485,13 @@ AVQuery *query = [AVQuery andQueryWithSubqueries:[NSArray arrayWithObjects:start
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var startDateQuery = new AV.Query('Todo');
+const startDateQuery = new AV.Query('Todo');
 startDateQuery.greaterThanOrEqualTo('createdAt', new Date('2016-11-13 00:00:00'));
 
-var endDateQuery = new AV.Query('Todo');
+const endDateQuery = new AV.Query('Todo');
 endDateQuery.lessThan('createdAt', new Date('2016-12-03 00:00:00'));
 
-var query = AV.Query.and(startDateQuery, endDateQuery);
+const query = AV.Query.and(startDateQuery, endDateQuery);
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -3587,22 +3587,22 @@ AVQuery *query = [AVQuery andQueryWithSubqueries:[NSArray arrayWithObjects:prior
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var createdAtQuery = new AV.Query('Todo');
+const createdAtQuery = new AV.Query('Todo');
 createdAtQuery.greaterThanOrEqualTo('createdAt', new Date('2018-04-30'));
 createdAtQuery.lessThan('createdAt', new Date('2018-05-01'));
 
-var locationQuery = new AV.Query('Todo');
+const locationQuery = new AV.Query('Todo');
 locationQuery.doesNotExist('location');
 
-var priority2Query = new AV.Query('Todo');
+const priority2Query = new AV.Query('Todo');
 priority2Query.equalTo('priority', 2);
 
-var priority3Query = new AV.Query('Todo');
+const priority3Query = new AV.Query('Todo');
 priority3Query.equalTo('priority', 3);
 
-var priorityQuery = AV.Query.or(priority2Query, priority3Query); 
-var timeLocationQuery = AV.Query.or(locationQuery, createdAtQuery);
-var query = AV.Query.and(priorityQuery, timeLocationQuery);
+const priorityQuery = AV.Query.or(priority2Query, priority3Query); 
+const timeLocationQuery = AV.Query.or(locationQuery, createdAtQuery);
+const query = AV.Query.and(priorityQuery, timeLocationQuery);
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -3776,7 +3776,7 @@ query.maxCacheAge = 24*3600;
 
 ```swift
 do {
-    var configuration = LCApplication.Configuration.default
+    const configuration = LCApplication.Configuration.default
     configuration.HTTPURLCache = URLCache(
         // 内存缓存容量，100 MB
         memoryCapacity: 100 * 1024 * 1024,
@@ -3870,7 +3870,7 @@ import LeanCloud
 {% if platform_name === "JavaScript" %}
 ```js
 // 无需加载 leancloud-storage
-var AV = require('leancloud-storage/live-query');
+const AV = require('leancloud-storage/live-query');
 ```
 
 或者使用 `<script>` 标签：
@@ -3955,7 +3955,7 @@ do {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.subscribe().then(function (liveQuery) {
   // 订阅成功
 });
@@ -4016,7 +4016,7 @@ do {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.subscribe().then(function (liveQuery) {
   liveQuery.on('create', function (newTodo) {
     console.log(newTodo.get('title')); // 更新作品集
@@ -4455,16 +4455,16 @@ AVFile *file = [AVFile fileWithData:data name:@"resume.txt"];
 可以通过 base64 编码的字符串构建文件：
 
 ```js
-var data = { base64: 'TGVhbkNsb3Vk' };
+const data = { base64: 'TGVhbkNsb3Vk' };
 // resume.txt 是文件名
-var file = new AV.File('resume.txt', data);
+const file = new AV.File('resume.txt', data);
 ```
 
 还可以通过字节数组构建文件：
 
 ```js
-var data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
-var file = new AV.File('resume.txt', data);
+const data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
+const file = new AV.File('resume.txt', data);
 ```
 
 此外，浏览器环境下还可以通过 Blob 构建文件，Node.js 环境下还可以通过 Buffer、Stream 构建文件。
@@ -4472,8 +4472,8 @@ var file = new AV.File('resume.txt', data);
 React Native 环境下，可以通过本地路径构建文件：
 
 ```js
-var data = { blob: { uri: localFileUri } }
-var file = new AV.File('resume.txt', data)
+const data = { blob: { uri: localFileUri } }
+const file = new AV.File('resume.txt', data)
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -4529,7 +4529,7 @@ AVFile *file = [AVFile fileWithRemoteURL:[NSURL URLWithString:@"https://leanclou
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var file = AV.File.withURL(
+const file = AV.File.withURL(
   'logo.png',
   'https://leancloud.cn/assets/imgs/press/Logo%20-%20Blue%20Padding.a60eb2fa.png'
 );
@@ -4572,7 +4572,7 @@ LeanCloud 会根据文件扩展名自动检测文件类型。如果需要的话�
 
 {% if platform_name === "JavaScript" %}
 ```js
-var file = new AV.File('resume.txt', data, 'application/json');
+const file = new AV.File('resume.txt', data, 'application/json');
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -4620,10 +4620,10 @@ AVFile *file = [AVFile fileWithLocalPath:imagePath error:&error];
 然后在一个点击事件处理函数中获取这个文件：
 
 ```js
-var avatarUpload = document.getElementById('avatar-upload');
+const avatarUpload = document.getElementById('avatar-upload');
 if (avatarUpload.files.length) {
-  var localFile = avatarUpload.files[0];
-  var file = new AV.File('avatar.jpg', localFile);
+  const localFile = avatarUpload.files[0];
+  const file = new AV.File('avatar.jpg', localFile);
 }
 ```
 {% endif %}
@@ -4731,8 +4731,8 @@ _ = file.save { result in
 
 {% if platform_name === "JavaScript" %}
 ```js
-var data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
-var file = new AV.File('resume.txt', data);
+const data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
+const file = new AV.File('resume.txt', data);
 file.save({ keepFileName: true }).then(function (file) {
   console.log(file.url); // https://your-file-domain/5112b94e0536e995741c/resume.txt
 }, function (error) {
@@ -4769,8 +4769,8 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var Todo = AV.Object.extend('Todo');
-var todo = new Todo();
+const Todo = AV.Object.extend('Todo');
+const todo = new Todo();
 todo.set('title', '买蛋糕');
 // attachments 是一个 Array 属性
 todo.add('attachments', file);
@@ -4851,7 +4851,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% if platform_name === "JavaScript" %}
 ```js
 // 获取同一标题且包含附件的 todo
-var query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.equalTo('title', '买蛋糕');
 query.exists('attachments');
 
@@ -4861,7 +4861,7 @@ query.include('attachments');
 query.find().then(function (todos) {
   todos.forEach(function (todo) {
     // 获取每个 todo 的 attachments 数组
-    var attachments = todo.get('attachments');
+    const attachments = todo.get('attachments');
     attachments.forEach(function (attachment) {
       // 每个附件都是一个 AV.File 实例
       console.log('附件 URL：', attachment.get('url'));
@@ -4977,13 +4977,13 @@ _ = file.save(progress: { (progress) in
 file.metaData('author', 'LeanCloud');
 file.save().then(function (file) {
   // 获取全部元数据
-  var metadata = file.metaData();
+  const metadata = file.metaData();
   // 获取 author 属性
-  var author = file.metaData('author');
+  const author = file.metaData('author');
   // 获取文件名
-  var fileName = file.get('name');
+  const fileName = file.get('name');
   // 获取大小（不适用于通过 base64 编码的字符串或者 URL 保存的文件）
-  var size = file.size();
+  const size = file.size();
 });
 ```
 {% endif %}
@@ -5103,7 +5103,7 @@ let sizedURL = file.thumbnailURL(.size(width: 100, height: 200))
 {% if platform_name === "JavaScript" %}
 ```js
 // 获得宽度为 100 像素，高度 200 像素的缩略图
-var url = file.thumbnailURL(100, 200);
+const url = file.thumbnailURL(100, 200);
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -5217,7 +5217,7 @@ AVFile *file = [AVFile getFileWithObjectId:@"552e0a27e4b0643b709e891e"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var file = AV.File.createWithoutData('552e0a27e4b0643b709e891e');
+const file = AV.File.createWithoutData('552e0a27e4b0643b709e891e');
 file.destroy();
 ```
 {% endif %}
@@ -5302,12 +5302,12 @@ LeanCloud 即时通讯组件也使用 `{{ fileObjectName }}` 来保存消息的�
 每一个在 LeanCloud JavaScript SDK 中的异步方法都会返回一个 `Promise`，可以用于处理该异步方法的完成与异常。下面的示例代码在查询到一个 `AV.Object` 后对其进行更新：
 
 ```js
-let query = new AV.Query('Todo');
+const query = new AV.Query('Todo');
 query.equalTo('priority', 1);
 // find 方法是一个异步方法，会返回一个 Promise，之后可以使用 then 方法
 query.find().then(function (todos) {
   // 返回符合条件的对象组成的数组
-  let todo = todos[0];
+  const todo = todos[0];
   todo.set('notes', '今天需要完成。');
   // save 方法也是一个异步方法，会返回一个 Promise，所以在此处，你可以直接 return 出去，后续操作就可以支持链式 Promise 调用
   return todo.save();
@@ -5350,7 +5350,7 @@ Promise 比较神奇，可以代替多层嵌套方式来解决发送异步请求
 
 ```js
 // 将内容按章节顺序添加到页面上
-let chapterIds = [
+const chapterIds = [
   '584e1c408e450a006c676162', // 第一章
   '584e1c43128fe10058b01cf5', // 第二章
   '581aff915bbb500059ca8d0b'  // 第三章
@@ -5404,10 +5404,10 @@ new AV.Query('Chapter').get(chapterIds[0]).then(function (chapterOne) {
 ```js
 async function example() {
   try {
-    let query = new AV.Query('Todo');
+    const query = new AV.Query('Todo');
     query.equalTo('priority', 1);
-    let todos = await query.find();
-    let todo = todos[0];
+    const todos = await query.find();
+    const todo = todos[0];
     todo.set('notes', '今天需要完成。');
     return await todo.save();
   } catch (error) {
@@ -5432,11 +5432,11 @@ AVGeoPoint *point = [AVGeoPoint geoPointWithLatitude:39.9 longitude:116.4];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var point = new AV.GeoPoint(39.9, 116.4);
+const point = new AV.GeoPoint(39.9, 116.4);
 
 // 其他构建 AV.GeoPoint 的方式
-var point = new AV.GeoPoint([39.9, 116.4]);
-var point = new AV.GeoPoint({ latitude: 39.9, longitude: 116.4 });
+const point = new AV.GeoPoint([39.9, 116.4]);
+const point = new AV.GeoPoint({ latitude: 39.9, longitude: 116.4 });
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -5512,8 +5512,8 @@ query.limit = 10;
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
-var point = new AV.GeoPoint(39.9, 116.4);
+const query = new AV.Query('Todo');
+const point = new AV.GeoPoint(39.9, 116.4);
 query.near('location', point);
 
 // 限制为 10 条结果
@@ -5603,9 +5603,9 @@ AVGeoPoint *northeast = [AVGeoPoint geoPointWithLatitude:40 longitude:118];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var query = new AV.Query('Todo');
-var southwest = new AV.GeoPoint(30, 115);
-var northeast = new AV.GeoPoint(40, 118);
+const query = new AV.Query('Todo');
+const southwest = new AV.GeoPoint(30, 115);
+const northeast = new AV.GeoPoint(40, 118);
 query.withinGeoBox('location', southwest, northeast);
 ```
 {% endif %}
@@ -5705,7 +5705,7 @@ user.mobilePhoneNumber = @"+8618200008888";
 {% if platform_name === "JavaScript" %}
 ```js
 // 创建实例
-var user = new AV.User();
+const user = new AV.User();
 
 // 等同于 user.set('username', 'Tom')
 user.setUsername('Tom');
@@ -6483,7 +6483,7 @@ if let user = LCApplication.default.currentUser {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var currentUser = AV.User.current();
+const currentUser = AV.User.current();
 if (currentUser) {
   // 跳到首页
 } else {
@@ -6546,7 +6546,7 @@ let currentUser = LCApplication.default.currentUser
 AV.User.logOut();
 
 // currentUser 变为 null
-var currentUser = AV.User.current();
+const currentUser = AV.User.current();
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -6682,7 +6682,7 @@ if let sessionToken = LCApplication.default.currentUser?.sessionToken?.value {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var currentUser = AV.User.current();
+const currentUser = AV.User.current();
 currentUser.isAuthenticated().then(function (authenticated) {
   if (authenticated) {
     // session token 有效
@@ -6909,7 +6909,7 @@ AVQuery *userQuery = [AVUser query];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var userQuery = new AV.Query('_User');
+const userQuery = new AV.Query('_User');
 ```
 {% endif %}
 {% if platform_name === "Python" %}
@@ -6959,14 +6959,14 @@ AVUser *author = [AVUser currentUser];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var Book = AV.Object.extend('Book');
-var book = new Book();
-var author = AV.User.current();
+const Book = AV.Object.extend('Book');
+const book = new Book();
+const author = AV.User.current();
 book.set('title', '我的第五本书');
 book.set('author', author);
 book.save().then(function (book) {
   // 获取所有该作者写的书
-  var query = new AV.Query('Book');
+  const query = new AV.Query('Book');
   query.equalTo('author', author);
   query.find().then(function (books) {
     // books 是包含同一作者所有 Book 对象的数组
@@ -7108,17 +7108,17 @@ do {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var user = AV.User.logIn('Tom', 'cat!@#123').then(function (user) {
+const user = AV.User.logIn('Tom', 'cat!@#123').then(function (user) {
   // 试图修改用户名
   user.set('username', 'Jerry');
   // 密码已被加密，这样做会获取到空字符串
-  var password = user.get('password');
+  const password = user.get('password');
   // 保存更改
   user.save().then(function (user) {
     // 可以执行，因为用户已鉴权
 
     // 绕过鉴权直接获取用户
-    var query = new AV.Query('_User');
+    const query = new AV.Query('_User');
     query.get(user.objectId).then(function (unauthenticatedUser) {
       unauthenticatedUser.set('username', 'Toodle');
       unauthenticatedUser.save().then(function (unauthenticatedUser) { }, function (error) {
@@ -7277,7 +7277,7 @@ option.platform = LeanCloudSocialPlatformWeiXin;
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var authData = {
+const authData = {
   // 必须
   openid:        'OPENID',
   access_token:  'ACCESS_TOKEN',
@@ -7445,7 +7445,7 @@ option.platform = LeanCloudSocialPlatformWeiXin;
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var authData = {
+const authData = {
   access_token: 'ACCESS_TOKEN',
   expires_in: 7200,
   refresh_token: 'REFRESH_TOKEN',
@@ -7459,7 +7459,7 @@ AV.User.loginWithAuthData(authData, 'weixin', { failOnNotExist: true }).then(fun
   // 检查 error.code == 211，跳转到用户名、手机号等资料的输入页面
 });
 
-var user = new AV.User();
+const user = new AV.User();
 // 设置用户名
 user.setUsername('Tom');
 // 设置密码
@@ -7613,7 +7613,7 @@ option.isMainAccount = true;
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var authData = {
+const authData = {
   access_token: 'ACCESS_TOKEN',
   expires_in: 7200,
   refresh_token: 'REFRESH_TOKEN',
@@ -7856,7 +7856,7 @@ user.password = @"cat!@#123";
 {% if platform_name === "JavaScript" %}
 ```js
 // currentUser 是个匿名用户
-var currentUser = AV.User.current();
+const currentUser = AV.User.current();
 
 user.setUsername('Tom');
 user.setPassword('cat!@#123');
@@ -7903,7 +7903,7 @@ if (currentUser.isAnonymous) {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-var currentUser = AV.User.current();
+const currentUser = AV.User.current();
 if (currentUser.isAnonymous()) {
   // currentUser 是匿名用户
 } else {
@@ -8362,7 +8362,7 @@ $query->find();
 ```swift
 class Student: LCObject {
 
-    @objc dynamic var name: LCString?
+    @objc dynamic const name: LCString?
 
     override static func objectClassName() -> String {
         return "Student"
@@ -8433,7 +8433,7 @@ AV.Push.send({
 如果希望按照某个 `_Installation` 表的查询条件来推送，例如推送给某个 `installationId` 的 Android 设备，可以传入一个 `AV.Query` 对象作为 `where` 条件：
 
 ```js
-var query = new AV.Query('_Installation');
+const query = new AV.Query('_Installation');
 query.equalTo('installationId', installationId);
 AV.Push.send({
   where: query,
