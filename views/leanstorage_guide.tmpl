@@ -43,7 +43,7 @@ todo.set('content', '周二两点，全体成员');
 // 将对象保存到云端
 todo.save().then((todo) => {
   // 成功保存之后，执行其他逻辑
-  console.log('保存成功。objectId：' + todo.id);
+  console.log(`保存成功。objectId：${todo.id}`);
 }, (error) => {
   // 异常处理
 });
@@ -229,7 +229,7 @@ const TestObject = AV.Object.extend('TestObject');
 
 // 基本类型
 const number = 2018;
-const string = number + ' 流行音乐榜单';
+const string = `${number} 流行音乐榜单`;
 const date   = new Date();
 const array  = [string, number];
 const object = {
@@ -497,7 +497,7 @@ todo.set('priority', 2);
 // 将对象保存到云端
 todo.save().then((todo) => {
   // 成功保存之后，执行其他逻辑
-  console.log('保存成功。objectId：' + todo.id);
+  console.log(`保存成功。objectId：${todo.id}`);
 }, (error) => {
   // 异常处理
 });
@@ -985,7 +985,7 @@ account.save(null, {
   // 否则只有更新的属性会被返回。
   fetchWhenSave: true
 }).then((account) => {
-  console.log('当前余额为：', account.get('balance'));
+  console.log(`当前余额为：${account.get('balance')}`);
 }, (error) => {
   if (error.code === 305) {
     console.error('余额不足，操作失败！');
@@ -3336,7 +3336,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 const query = new AV.Query('Todo');
 query.equalTo('isComplete', true);
 query.count().then((count) => {
-  console.log(count + " 个 todo 已完成。");
+  console.log(`${count} 个 todo 已完成。`);
 });
 ```
 {% endif %}
@@ -4675,7 +4675,7 @@ if let url = Bundle.main.url(forResource: "avatar", withExtension: "jpg") {
 {% if platform_name === "JavaScript" %}
 ```js
 file.save().then((file) => {
-  console.log('文件保存完成。objectId：' + file.id);
+  console.log(`文件保存完成。objectId：${file.id}`);
 }, (error) => {
   // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
 });
@@ -4864,7 +4864,7 @@ query.find().then((todos) => {
     const attachments = todo.get('attachments');
     attachments.forEach((attachment) => {
       // 每个附件都是一个 AV.File 实例
-      console.log('附件 URL：', attachment.get('url'));
+      console.log(`附件 URL：${attachment.get('url')}`);
     });
   });
 });
@@ -5720,7 +5720,7 @@ user.set('gender', 'secret');
 
 user.signUp().then((user) => {
   // 注册成功
-  console.log('注册成功。objectId：' + user.id);
+  console.log(`注册成功。objectId：${user.id}`);
 }, (error) => {
   // 注册失败（通常是因为用户名已被使用）
 });
@@ -5922,7 +5922,7 @@ _ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "+8618200008888", templat
 ```js
 AV.User.signUpOrlogInWithMobilePhone('+8618200008888', '123456').then((user) => {
   // 注册成功
-  console.log('注册成功。objectId：' + user.id);
+  console.log(`注册成功。objectId：${user.id}`);
 }, (error) => {
   // 验证码不正确
 });
