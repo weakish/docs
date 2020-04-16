@@ -41,10 +41,10 @@ todo.set('title',   '工程师周会');
 todo.set('content', '周二两点，全体成员');
 
 // 将对象保存到云端
-todo.save().then(function (todo) {
+todo.save().then((todo) => {
   // 成功保存之后，执行其他逻辑
   console.log('保存成功。objectId：' + todo.id);
-}, function (error) {
+}, (error) => {
   // 异常处理
 });
 ```
@@ -495,10 +495,10 @@ todo.set('title', '马拉松报名');
 todo.set('priority', 2);
 
 // 将对象保存到云端
-todo.save().then(function (todo) {
+todo.save().then((todo) => {
   // 成功保存之后，执行其他逻辑
   console.log('保存成功。objectId：' + todo.id);
-}, function (error) {
+}, (error) => {
   // 异常处理
 });
 ```
@@ -643,7 +643,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% if platform_name === "JavaScript" %}
 ```js
 const query = new AV.Query('Todo');
-query.get('582570f38ac247004f39c24b').then(function (todo) {
+query.get('582570f38ac247004f39c24b').then((todo) => {
   // todo 就是 objectId 为 582570f38ac247004f39c24b 的 Todo 实例
   const title     = todo.get('title');
   const priority  = todo.get('priority');
@@ -732,7 +732,7 @@ let _ = query.get("582570f38ac247004f39c24b") { (result) in
 
 ```js
 const query = new AV.Query('Todo');
-query.get('582570f38ac247004f39c24b').then(function (todo) {
+query.get('582570f38ac247004f39c24b').then((todo) => {
   console.log(todo.toJSON());
   // {
   //   createdAt: "2017-03-08T11:25:07.804Z",
@@ -762,7 +762,7 @@ AVObject *todo = [AVObject objectWithClassName:@"Todo" objectId:@"582570f38ac247
 {% if platform_name === "JavaScript" %}
 ```js
 const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
-todo.fetch().then(function (todo) {
+todo.fetch().then((todo) => {
   // todo 已刷新
 });
 ```
@@ -820,7 +820,7 @@ NSArray *keys = [NSArray arrayWithObjects:@"priority", @"location", nil];
 const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
 todo.fetch({
   keys: 'priority, location'
-}).then(function (todo) {
+}).then((todo) => {
   // 只有 priority 和 location 会被获取和刷新
 });
 ```
@@ -984,9 +984,9 @@ account.save(null, {
   // 如果是新对象，则所有属性都会被返回，
   // 否则只有更新的属性会被返回。
   fetchWhenSave: true
-}).then(function (account) {
+}).then((account) => {
   console.log('当前余额为：', account.get('balance'));
-}, function (error) {
+}, (error) => {
   if (error.code === 305) {
     console.error('余额不足，操作失败！');
   }
@@ -1487,9 +1487,9 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 {% if platform_name === "JavaScript" %}
 ```js
 const query = new AV.Query('Todo');
-query.find().then(function (todos) {
+query.find().then((todos) => {
   // 获取需要更新的 todo
-  todos.forEach(function (todo) {
+  todos.forEach((todo) => {
     // 更新属性值
     todo.set('isComplete', true);
   });
@@ -1941,7 +1941,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Student"];
 ```js
 const query = new AV.Query('Student');
 query.equalTo('lastName', 'Smith');
-query.find().then(function (students) {
+query.find().then((students) => {
   // students 是包含满足条件的 Student 对象的数组
 });
 ```
@@ -2218,7 +2218,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 ```js
 const query = new AV.Query('Todo');
 query.equalTo('priority', 2);
-query.first().then(function (todo) {
+query.first().then((todo) => {
   // todo 是第一个满足条件的 Todo 对象
 });
 ```
@@ -2541,7 +2541,7 @@ const countryQuery = new AV.Query('Country');
 countryQuery.equalTo('language', 'English');
 // 把 Student 的 nationality 和 Country 的 name 关联起来
 studentQuery.matchesKeyInQuery('nationality', 'name', countryQuery);
-studentQuery.find().then(function (students) {
+studentQuery.find().then((students) => {
   // students 包含 John Doe 和 Tom Sawyer
 });
 ```
@@ -2564,7 +2564,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 ```js
 const query = new AV.Query('Todo');
 query.select(['title', 'content']);
-query.first().then(function (todo) {
+query.first().then((todo) => {
   const title = todo.get('title'); // √
   const content = todo.get('content'); // √
   const notes = todo.get('notes'); // undefined
@@ -3047,7 +3047,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Comment"];
 const post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
 const query = new AV.Query('Comment');
 query.equalTo('post', post);
-query.find().then(function (comments) {
+query.find().then((comments) => {
   // comments 包含与 post 相关联的评论
 });
 ```
@@ -3197,9 +3197,9 @@ query.limit(10);
 // 同时包含博客文章
 query.include('post');
 
-query.find().then(function (comments) {
+query.find().then((comments) => {
   // comments 包含最新发布的 10 条评论，包含各自对应的博客文章
-  comments.forEach(function (comment) {
+  comments.forEach((comment) => {
     // 该操作无需网络连接
     const post = comment.get('post');
   });
@@ -3335,7 +3335,7 @@ AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 ```js
 const query = new AV.Query('Todo');
 query.equalTo('isComplete', true);
-query.count().then(function (count) {
+query.count().then((count) => {
   console.log(count + " 个 todo 已完成。");
 });
 ```
@@ -3956,7 +3956,7 @@ do {
 {% if platform_name === "JavaScript" %}
 ```js
 const query = new AV.Query('Todo');
-query.subscribe().then(function (liveQuery) {
+query.subscribe().then((liveQuery) => {
   // 订阅成功
 });
 ```
@@ -4017,8 +4017,8 @@ do {
 {% if platform_name === "JavaScript" %}
 ```js
 const query = new AV.Query('Todo');
-query.subscribe().then(function (liveQuery) {
-  liveQuery.on('create', function (newTodo) {
+query.subscribe().then((liveQuery) => {
+  liveQuery.on('create', (newTodo) => {
     console.log(newTodo.get('title')); // 更新作品集
   });
 });
@@ -4075,7 +4075,7 @@ do {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-liveQuery.on('update', function (updatedTodo, updatedKeys) {
+liveQuery.on('update', (updatedTodo, updatedKeys) => {
   console.log(updatedTodo.get('content')); // 把我最近画的插画放上去
 });
 ```
@@ -4129,7 +4129,7 @@ self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) 
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-liveQuery.on('create', function (object) {
+liveQuery.on('create', (object) => {
   console.log('对象被创建。');
 });
 ```
@@ -4172,7 +4172,7 @@ self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) 
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-liveQuery.on('update', function (object, updatedKeys) {
+liveQuery.on('update', (object, updatedKeys) => {
   console.log('对象被更新。');
 });
 ```
@@ -4215,7 +4215,7 @@ self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) 
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-liveQuery.on('enter', function (object, updatedKeys) {
+liveQuery.on('enter', (object, updatedKeys) => {
   console.log('对象进入。');
 });
 ```
@@ -4262,7 +4262,7 @@ self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) 
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-liveQuery.on('leave', function (object, updatedKeys) {
+liveQuery.on('leave', (object, updatedKeys) => {
   console.log('对象离开。');
 });
 ```
@@ -4305,7 +4305,7 @@ self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) 
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-liveQuery.on('delete', function (object) {
+liveQuery.on('delete', (object) => {
   console.log('对象被删除。');
 });
 ```
@@ -4348,7 +4348,7 @@ self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) 
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-liveQuery.on('login', function (user) {
+liveQuery.on('login', (user) => {
   console.log('用户登录。');
 });
 ```
@@ -4393,7 +4393,7 @@ self.liveQuery.unsubscribe { (result) in
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-liveQuery.unsubscribe().then(function () {
+liveQuery.unsubscribe().then(() => {
   // 成功取消订阅
 });
 ```
@@ -4674,9 +4674,9 @@ if let url = Bundle.main.url(forResource: "avatar", withExtension: "jpg") {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-file.save().then(function (file) {
+file.save().then((file) => {
   console.log('文件保存完成。objectId：' + file.id);
-}, function (error) {
+}, (error) => {
   // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
 });
 ```
@@ -4733,9 +4733,9 @@ _ = file.save { result in
 ```js
 const data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
 const file = new AV.File('resume.txt', data);
-file.save({ keepFileName: true }).then(function (file) {
+file.save({ keepFileName: true }).then((file) => {
   console.log(file.url); // https://your-file-domain/5112b94e0536e995741c/resume.txt
-}, function (error) {
+}, (error) => {
   // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
 });
 ```
@@ -4858,11 +4858,11 @@ query.exists('attachments');
 // 同时获取附件中的文件
 query.include('attachments');
 
-query.find().then(function (todos) {
-  todos.forEach(function (todo) {
+query.find().then((todos) => {
+  todos.forEach((todo) => {
     // 获取每个 todo 的 attachments 数组
     const attachments = todo.get('attachments');
-    attachments.forEach(function (attachment) {
+    attachments.forEach((attachment) => {
       // 每个附件都是一个 AV.File 实例
       console.log('附件 URL：', attachment.get('url'));
     });
@@ -4912,7 +4912,7 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
 {% if platform_name === "JavaScript" %}
 ```js
 file.save({
-  onprogress: function (progress) {
+  onprogress: (progress) => {
     console.log(progress);
     // {
     //   loaded:  1024,
@@ -4920,7 +4920,7 @@ file.save({
     //   percent: 50
     // }
   }
-}).then(function (file) {
+}).then((file) => {
   // 保存后的操作
 });
 ```
@@ -4975,7 +4975,7 @@ _ = file.save(progress: { (progress) in
 ```js
 // 设置元数据
 file.metaData('author', 'LeanCloud');
-file.save().then(function (file) {
+file.save().then((file) => {
   // 获取全部元数据
   const metadata = file.metaData();
   // 获取 author 属性
@@ -5305,16 +5305,16 @@ LeanCloud 即时通讯组件也使用 `{{ fileObjectName }}` 来保存消息的�
 const query = new AV.Query('Todo');
 query.equalTo('priority', 1);
 // find 方法是一个异步方法，会返回一个 Promise，之后可以使用 then 方法
-query.find().then(function (todos) {
+query.find().then((todos) => {
   // 返回符合条件的对象组成的数组
   const todo = todos[0];
   todo.set('notes', '今天需要完成。');
   // save 方法也是一个异步方法，会返回一个 Promise，所以在此处，你可以直接 return 出去，后续操作就可以支持链式 Promise 调用
   return todo.save();
-}).then(function () {
+}).then(() => {
   // 这里是 save 方法返回的 Promise
   console.log('成功更新 todo。');
-}).catch(function (error) {
+}).catch((error) => {
   // catch 方法写在 Promise 链式的最后，可以捕捉到全部 error
   console.error(error);
 });
@@ -5325,9 +5325,9 @@ query.find().then(function (todos) {
 每一个 `Promise` 都有一个叫 `then` 的方法，这个方法接受一对 callback。第一个 callback 在 `Promise` 被解决（`resolved`，也就是正常运行）的时候调用，第二个会在 `Promise` 被拒绝（`rejected`，也就是遇到错误）的时候调用：
 
 ```js
-todo.save().then(function (todo) {
+todo.save().then((todo) => {
   console.log('成功更新 todo。');
-}, function (error) {
+}, (error) => {
   console.error(error);
 });
 ```
@@ -5337,9 +5337,9 @@ todo.save().then(function (todo) {
 你还可以使用 `catch` 方法，将逻辑写成：
 
 ```js
-todo.save().then(function (todo) {
+todo.save().then((todo) => {
   console.log('成功更新 todo。');
-}).catch(function (error) {
+}).catch((error) => {
   console.error(error);
 });
 ```
@@ -5356,15 +5356,15 @@ const chapterIds = [
   '581aff915bbb500059ca8d0b'  // 第三章
 ];
 
-new AV.Query('Chapter').get(chapterIds[0]).then(function (chapterOne) {
+new AV.Query('Chapter').get(chapterIds[0]).then((chapterOne) => {
   // 向页面添加内容
   addHtmlToPage(chapterOne.get('content'));
   // 返回新的 Promise
   return new AV.Query('Chapter').get(chapterIds[1]);
-}).then(function (chapterTwo) {
+}).then((chapterTwo) => {
   addHtmlToPage(chapterTwo.get('content'));
   return new AV.Query('Chapter').get(chapterIds[2]);
-}).then(function (chapterThree) {
+}).then((chapterThree) => {
   addHtmlToPage(chapterThree.get('content'));
   // 完成
 });
@@ -5379,19 +5379,19 @@ new AV.Query('Chapter').get(chapterIds[0]).then(function (chapterOne) {
 利用 `catch` 方法可以将上述代码改写为：
 
 ```js
-new AV.Query('Chapter').get(chapterIds[0]).then(function (chapterOne) {
+new AV.Query('Chapter').get(chapterIds[0]).then((chapterOne) => {
   addHtmlToPage(chapterOne.get('content'));
   // 强制失败
   throw new Error('出错啦');
   return new AV.Query('Chapter').get(chapterIds[1]);
-}).then(function (chapterTwo) {
+}).then((chapterTwo) => {
   // 这里的代码将被忽略
   addHtmlToPage(chapterTwo.get('content'));
   return new AV.Query('Chapter').get(chapterIds[2]);
-}).then(function (chapterThree) {
+}).then((chapterThree) => {
   // 这里的代码将被忽略
   addHtmlToPage(chapterThree.get('content'));
-}).catch(function (error) {
+}).catch((error) => {
   // 这个错误处理函数将被调用，错误信息是 '出错啦'
   console.error(error.message);
 });
@@ -5518,7 +5518,7 @@ query.near('location', point);
 
 // 限制为 10 条结果
 query.limit(10);
-query.find().then(function (todos) {
+query.find().then((todos) => {
   // todos 是包含满足条件的 Todo 对象的数组
 });
 ```
@@ -5718,10 +5718,10 @@ user.setMobilePhoneNumber('+8618200008888');
 // 设置其他属性的方法跟 AV.Object 一样
 user.set('gender', 'secret');
 
-user.signUp().then(function (user) {
+user.signUp().then((user) => {
   // 注册成功
   console.log('注册成功。objectId：' + user.id);
-}, function (error) {
+}, (error) => {
   // 注册失败（通常是因为用户名已被使用）
 });
 ```
@@ -5920,10 +5920,10 @@ _ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "+8618200008888", templat
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.signUpOrlogInWithMobilePhone('+8618200008888', '123456').then(function (user) {
+AV.User.signUpOrlogInWithMobilePhone('+8618200008888', '123456').then((user) => {
   // 注册成功
   console.log('注册成功。objectId：' + user.id);
-}, function (error) {
+}, (error) => {
   // 验证码不正确
 });
 ```
@@ -5994,9 +5994,9 @@ _ = LCUser.signUpOrLogIn(mobilePhoneNumber: "+8618200008888", verificationCode: 
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.logIn('Tom', 'cat!@#123').then(function (user) {
+AV.User.logIn('Tom', 'cat!@#123').then((user) => {
   // 登录成功
-}, function (error) {
+}, (error) => {
   // 登录失败（可能是密码错误）
 });
 ```
@@ -6056,9 +6056,9 @@ _ = LCUser.logIn(username: "Tom", password: "cat!@#123") { result in
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.loginWithEmail('tom@leancloud.rocks', 'cat!@#123').then(function (user) {
+AV.User.loginWithEmail('tom@leancloud.rocks', 'cat!@#123').then((user) => {
   // 登录成功
-}, function (error) {
+}, (error) => {
   // 登录失败（可能是密码错误）
 });
 ```
@@ -6119,9 +6119,9 @@ _ = LCUser.logIn(email: "tom@leancloud.rocks", password: "cat!@#123") { result i
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.logInWithMobilePhone('+8618200008888', 'cat!@#123').then(function (user) {
+AV.User.logInWithMobilePhone('+8618200008888', 'cat!@#123').then((user) => {
   // 登录成功
-}, function (error) {
+}, (error) => {
   // 登录失败（可能是密码错误）
 });
 ```
@@ -6222,9 +6222,9 @@ _ = LCUser.requestLoginVerificationCode(mobilePhoneNumber: "+8618200008888") { r
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.logInWithMobilePhoneSmsCode('+8618200008888', '123456').then(function (user) {
+AV.User.logInWithMobilePhoneSmsCode('+8618200008888', '123456').then((user) => {
   // 登录成功
-}, function (error) {
+}, (error) => {
   // 验证码不正确
 });
 ```
@@ -6403,9 +6403,9 @@ _ = LCUser.requestVerificationCode(mobilePhoneNumber: "+8618200008888") { result
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.verifyMobilePhone('123456').then(function () {
+AV.User.verifyMobilePhone('123456').then(() => {
   // mobilePhoneVerified 将变为 true
-}, function (error) {
+}, (error) => {
   // 验证码不正确
 });
 ```
@@ -6612,9 +6612,9 @@ _ = LCUser.logIn(sessionToken: "anmlwi96s381m6ca7o7266pzf") { (result) in
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.become('anmlwi96s381m6ca7o7266pzf').then(function (user) {
+AV.User.become('anmlwi96s381m6ca7o7266pzf').then((user) => {
   // 登录成功
-}, function (error) {
+}, (error) => {
   // session token 无效
 });
 ```
@@ -6683,7 +6683,7 @@ if let sessionToken = LCApplication.default.currentUser?.sessionToken?.value {
 {% if platform_name === "JavaScript" %}
 ```js
 const currentUser = AV.User.current();
-currentUser.isAuthenticated().then(function (authenticated) {
+currentUser.isAuthenticated().then((authenticated) => {
   if (authenticated) {
     // session token 有效
   } else {
@@ -6849,9 +6849,9 @@ _ = LCUser.requestPasswordReset(mobilePhoneNumber: "+8618200008888") { (result) 
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.resetPasswordBySmsCode('123456', 'cat!@#123').then(function () {
+AV.User.resetPasswordBySmsCode('123456', 'cat!@#123').then(() => {
   // 密码重置成功
-}, function (error) {
+}, (error) => {
   // 验证码不正确
 });
 ```
@@ -6964,11 +6964,11 @@ const book = new Book();
 const author = AV.User.current();
 book.set('title', '我的第五本书');
 book.set('author', author);
-book.save().then(function (book) {
+book.save().then((book) => {
   // 获取所有该作者写的书
   const query = new AV.Query('Book');
   query.equalTo('author', author);
-  query.find().then(function (books) {
+  query.find().then((books) => {
     // books 是包含同一作者所有 Book 对象的数组
   });
 });
@@ -7108,20 +7108,20 @@ do {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-const user = AV.User.logIn('Tom', 'cat!@#123').then(function (user) {
+const user = AV.User.logIn('Tom', 'cat!@#123').then((user) => {
   // 试图修改用户名
   user.set('username', 'Jerry');
   // 密码已被加密，这样做会获取到空字符串
   const password = user.get('password');
   // 保存更改
-  user.save().then(function (user) {
+  user.save().then((user) => {
     // 可以执行，因为用户已鉴权
 
     // 绕过鉴权直接获取用户
     const query = new AV.Query('_User');
-    query.get(user.objectId).then(function (unauthenticatedUser) {
+    query.get(user.objectId).then((unauthenticatedUser) => {
       unauthenticatedUser.set('username', 'Toodle');
-      unauthenticatedUser.save().then(function (unauthenticatedUser) { }, function (error) {
+      unauthenticatedUser.save().then((unauthenticatedUser) => { }, (error) => {
         // 会出错，因为用户未鉴权
       });
     });
@@ -7287,9 +7287,9 @@ const authData = {
   refresh_token: 'REFRESH_TOKEN',
   scope:         'SCOPE'
 };
-AV.User.loginWithAuthData(authData, 'weixin').then(function (user) {
+AV.User.loginWithAuthData(authData, 'weixin').then((user) => {
   // 登录成功
-}, function (error) {
+}, (error) => {
   // 登录失败
 });
 ```
@@ -7452,9 +7452,9 @@ const authData = {
   openid: 'OPENID',
   scope: 'SCOPE',
 };
-AV.User.loginWithAuthData(authData, 'weixin', { failOnNotExist: true }).then(function (s) {
+AV.User.loginWithAuthData(authData, 'weixin', { failOnNotExist: true }).then((s) => {
   // 登录成功
-}, function (error) {
+}, (error) => {
   // 登录失败
   // 检查 error.code == 211，跳转到用户名、手机号等资料的输入页面
 });
@@ -7467,9 +7467,9 @@ user.setMobilePhoneNumber('+8618200008888');
 user.setPassword('cat!@#123');
 // 设置邮箱
 user.setEmail('tom@leancloud.rocks');
-user.loginWithAuthData(authData, 'weixin').then(function (loggedInUser) {
+user.loginWithAuthData(authData, 'weixin').then((loggedInUser) => {
   console.log(loggedInUser);
-}, function (error) {
+}, (error) => {
 });
 ```
 {% endif %}
@@ -7628,9 +7628,9 @@ AV.User.loginWithAuthDataAndUnionId(
     unionIdPlatform: 'weixin',
     asMainAccount: true,
   }
-).then(function (user) {
+).then((user) => {
   // 绑定成功
-}, function (error) {
+}, (error) => {
   // 绑定失败 
 });
 ```
@@ -7758,9 +7758,9 @@ AVUser.loginWithAuthData(authData, "weixinapp1","UnionId","weixin",true).subscri
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.loginWithAuthData(null, 'weixin').then(function (s) {
+AV.User.loginWithAuthData(null, 'weixin').then((s) => {
   // 解除关联成功
-}, function (error) {
+}, (error) => {
   // 解除关联失败
 });
 ```
@@ -7811,7 +7811,7 @@ avUser.dissociateWithAuthData("weixinapp1").subscribe(new Observer<AVUser>() {
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-AV.User.loginAnonymously().then(function (user) {
+AV.User.loginAnonymously().then((user) => {
   // user 是新的匿名用户
 });
 ```
@@ -7861,9 +7861,9 @@ const currentUser = AV.User.current();
 user.setUsername('Tom');
 user.setPassword('cat!@#123');
 
-user.signUp().then(function (user) {
+user.signUp().then((user) => {
   // currentUser 已经转化为普通用户
-}, function (error) {
+}, (error) => {
   // 注册失败（通常是因为用户名已被使用）
 });
 ```
