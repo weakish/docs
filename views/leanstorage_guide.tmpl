@@ -131,7 +131,7 @@ do {
 {% if platform_name === "Flutter" %}
 ```dart
 // 构建对象
-LCObject todo = new LCObject("Todo");
+LCObject todo = LCObject("Todo");
 // 为属性赋值
 todo["title"] = "工程师周会";
 todo["content"] = "周二两点，全体成员";
@@ -268,17 +268,17 @@ testObject.save();
 {% if platform_name === "Flutter" %}
 ```dart
 // 基本类型
-var intValue = 2018;
-var doubleValue = 10.1;
-var boolValue = true;
-var stringValue = 'hello, world';
-var now = DateTime.now();
+int intValue = 2018;
+double doubleValue = 10.1;
+bool boolValue = true;
+String stringValue = 'hello, world';
+DateTime now = DateTime.now();
 Uint8List data = utf8.encode(stringValue);
-var intList = [1, 2, 3];
-var stringMap = {
-    'first': 'partridge',
-    'second': 'turtledoves',
-    'fifth': 'golden rings'
+List intList = [1, 2, 3];
+Map<String, dynamic> stringMap = {
+  'first': 'partridge',
+  'second': 'turtledoves',
+  'fifth': 'golden rings'
 };
 
 // 构建对象
@@ -289,7 +289,7 @@ object['stringValue'] = 'hello, world';
 object['time'] = DateTime.now();
 object['intList'] = [1, 1, 2, 3, 5, 8];
 object['stringMap'] = {'k1': 111, 'k2': true, 'k3': 'Hi'};
-LCObject nestedObj = new LCObject('World');
+LCObject nestedObj = LCObject('World');
 nestedObj['content'] = '7788';
 object['objectValue'] = nestedObj;
 object['pointerList'] = [new LCObject('World'), nestedObj];
@@ -481,7 +481,7 @@ let todo = LCObject(className: "Todo")
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCObject object = new LCObject('Todo');
+LCObject object = LCObject('Todo');
 ```
 {% endif %}
 在构建对象时，为了使云端知道对象属于哪个 class，需要将 class 的名字作为参数传入。你可以将 LeanCloud 里面的 class 比作关系型数据库里面的表。一个 class 的名字必须以字母开头，且只能包含数字、字母和下划线。
@@ -631,7 +631,7 @@ do {
 {% if platform_name === "Flutter" %}
 ```
 // 构建对象
-LCObject todo = new LCObject("Todo");
+LCObject todo = LCObject("Todo");
 // 为属性赋值
 todo['title'] = '马拉松报名';
 todo['priority'] = 2;
@@ -782,7 +782,7 @@ let _ = query.get("582570f38ac247004f39c24b") { (result) in
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query =  new LCQuery('Todo');
+LCQuery<LCObject> query = LCQuery('Todo');
 LCObject todo = await query.get('582570f38ac247004f39c24b');
 // todo 就是 objectId 为 582570f38ac247004f39c24b 的 Todo 实例
 String title = todo['title'];
@@ -790,8 +790,8 @@ int priority = todo['priority'];
 
 // 获取内置属性
 String objectId = todo.objectId;
-DateTime updatedAt  = todo.updatedAt;
-DateTime createdAt  = todo.createdAt;
+DateTime updatedAt = todo.updatedAt;
+DateTime createdAt = todo.createdAt;
 ```
 {% endif %}
 
@@ -1176,7 +1176,7 @@ try {
   int amount = -100;
   account.increment('balance', amount);
 // 设置条件
-  LCQuery<LCObject> query = new LCQuery('Account');
+  LCQuery<LCObject> query = LCQuery('Account');
   query.whereGreaterThanOrEqualTo('balance', -amount);
   // 操作结束后，返回最新数据。
   // 如果是新对象，则所有属性都会被返回，
@@ -1184,9 +1184,10 @@ try {
   await account.save(fetchWhenSave: true, query: query);
   print('当前余额为：${account['balance']}');
 } on LCException catch (e) {
-  if(e.code == 305){
+  if (e.code == 305) {
     print("余额不足，操作失败！");
-}}
+  }
+}
 ```
 {% endif %}
 {% if platform_name === "Objective-C" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "Android / Java" or platform_name === "Swift" %}
@@ -1413,12 +1414,12 @@ func testSetArray() {
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-var alarm1 = DateTime.parse('2018-04-30 07:40:00Z');
-var alarm2 = DateTime.parse('2018-04-30 07:50:00Z');
-var alarm3 = DateTime.parse('2018-04-30 07:60:00Z');
+DateTime alarm1 = DateTime.parse('2018-04-30 07:40:00Z');
+DateTime alarm2 = DateTime.parse('2018-04-30 07:50:00Z');
+DateTime alarm3 = DateTime.parse('2018-04-30 07:60:00Z');
 
-LCObject todo = new LCObject("Todo");
-todo.addAllUnique('alarms',[alarm1,alarm2,alarm3]);
+LCObject todo = LCObject("Todo");
+todo.addAllUnique('alarms', [alarm1, alarm2, alarm3]);
 await todo.save();
 ```
 {% endif %}
@@ -1579,7 +1580,7 @@ deleteAll()
 deleteAllInBackground()
 
 // 批量同步
-fetchall()
+fetchAll()
 fetchAllInBackground()
 ```
 {% endif %}
@@ -1622,13 +1623,13 @@ _ = LCObject.fetch(objects, completion: { (result) in
 {% if platform_name === "Flutter" %}
 ```dart
 // 批量构建和更新
-saveAll()
+LCObject.saveAll();
 
 // 批量删除
-deleteAll()
+LCObject.deleteAll();
 
 // 批量同步
-fetchall()
+LCObject.fetchAll();
 ```
 {% endif %}
 下面的代码将所有 `Todo` 的 `isComplete` 设为 `true`：
@@ -1740,7 +1741,7 @@ _ = query.find { (result) in
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query =  new LCQuery('Todo');
+LCQuery<LCObject> query = LCQuery('Todo');
 List<LCObject> results = await query.find();
 // 获取需要更新的 todo
 results.forEach((todo) {
@@ -1911,13 +1912,13 @@ do {
 {% if platform_name === "Flutter" %}
 ```dart
 // 创建 post
-LCObject post = new LCObject("Post");
-post['title'] ='饿了……';
-post['content'] ='中午去哪吃呢?';
+LCObject post = LCObject("Post");
+post['title'] = '饿了……';
+post['content'] = '中午去哪吃呢?';
 
 // 创建 comment
-LCObject comment = new LCObject("Comment");
-comment['content'] ='当然是肯德基啦!';
+LCObject comment = LCObject("Comment");
+comment['content'] = '当然是肯德基啦!';
 
 // 将 post 设为 comment 的一个属性值
 comment['parent'] = post;
@@ -2201,7 +2202,7 @@ _ = query.find { result in
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query =  new LCQuery('Student');
+LCQuery<LCObject> query = LCQuery('Student');
 query.whereEqualTo('lastName', 'Smith');
 // students 是包含满足条件的 Student 对象的数组
 List<LCObject> students = await query.find();
@@ -2516,7 +2517,7 @@ _ = query.getFirst { result in
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query =  new LCQuery('Todo');
+LCQuery<LCObject> query = LCQuery('Todo');
 query.whereEqualTo('priority', 2);
 // todo 是第一个满足条件的 Todo 对象
 LCObject todo = await query.first();
@@ -2620,7 +2621,7 @@ query.skip = 20
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query =  new LCQuery('Todo');
+LCQuery<LCObject> query = LCQuery('Todo');
 query.whereEqualTo('priority', 2);
 query.limit(10);
 query.skip(20);
@@ -2921,7 +2922,7 @@ _ = query.getFirst { result in
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query = new LCQuery('Todo');
+LCQuery<LCObject> query = LCQuery('Todo');
 query.select('title');
 query.select('content');
 LCObject todo = await query.first();
@@ -3044,7 +3045,7 @@ query.whereKey("title", .matchedSubstring("lunch"))
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query = new LCQuery('Todo');
+LCQuery<LCObject> query = LCQuery('Todo');
 // 相当于 SQL 中的 title LIKE '%lunch%'
 query.whereContains('title', 'lunch');
 ```
@@ -3364,8 +3365,8 @@ let priorityOneOrTwo = priorityOne.or(priorityTwo)
 {% if platform_name === "Flutter" %}
 ```dart
 // 单个查询
-LCQuery<LCObject> priorityOneOrTwo = new LCQuery('Todo');
-priorityOneOrTwo.whereContainedIn('priority', [1,2]);
+LCQuery<LCObject> priorityOneOrTwo = LCQuery('Todo');
+priorityOneOrTwo.whereContainedIn('priority', [1, 2]);
 // 这样就可以了 :)
 
 // ---------------
@@ -3373,10 +3374,10 @@ priorityOneOrTwo.whereContainedIn('priority', [1,2]);
 // ---------------
 
 // 多个查询
-LCQuery<LCObject> priorityOne = new LCQuery('Todo');
+LCQuery<LCObject> priorityOne = LCQuery('Todo');
 priorityOne.whereEqualTo('priority', 1);
 
-LCQuery<LCObject> priorityTwo = new LCQuery('Todo');
+LCQuery<LCObject> priorityTwo = LCQuery('Todo');
 priorityTwo.whereEqualTo('priority', 2);
 
 LCQuery<LCObject> priorityOneOrTwo = LCQuery.or([priorityOne, priorityTwo]);
@@ -3462,7 +3463,7 @@ _ = query.find { result in
 {% if platform_name === "Flutter" %}
 ```dart
 LCObject post = LCObject.createWithoutData('Post', '57328ca079bc44005c2472d0');
-LCQuery<LCObject> query = new LCQuery('Comment');
+LCQuery<LCObject> query = LCQuery('Comment');
 query.whereEqualTo('post', post);
 // comments 包含与 post 相关联的评论
 List<LCObject> comments = await query.find();
@@ -3675,7 +3676,7 @@ _ = query.find { result in
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query = new LCQuery('Comment');
+LCQuery<LCObject> query = LCQuery('Comment');
 
 // 获取最新发布的
 query.orderByDescending('createdAt');
@@ -3773,7 +3774,7 @@ let count = query.count()
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query = new LCQuery('Todo');
+LCQuery<LCObject> query = LCQuery('Todo');
 query.whereEqualTo('isComplete', true);
 int count = await query.count();
 print('$count 个 todo 已完成');
@@ -3862,10 +3863,10 @@ let query = priorityQuery.or(isCompleteQuery)
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> priorityQuery = new LCQuery('Todo');
+LCQuery<LCObject> priorityQuery = LCQuery('Todo');
 priorityQuery.whereGreaterThanOrEqualTo('priority', 3);
 
-LCQuery<LCObject> isCompleteQuery = new LCQuery('Todo');
+LCQuery<LCObject> isCompleteQuery = LCQuery('Todo');
 isCompleteQuery.whereEqualTo('isComplete', true);
 
 LCQuery<LCObject> priorityOneOrTwo = LCQuery.or([priorityQuery, isCompleteQuery]);
@@ -4108,14 +4109,14 @@ let query = createdAtQuery.and(orQuery)
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> createdAtQuery = new LCQuery('Todo');
+LCQuery<LCObject> createdAtQuery = LCQuery('Todo');
 createdAtQuery.whereGreaterThanOrEqualTo('createdAt',DateTime.parse('2018-04-30 00:00:00Z'));
 createdAtQuery.whereLessThan('createdAt', DateTime.parse('2018-05-01 00:00:00Z'));
 
-LCQuery<LCObject> locationQuery = new LCQuery('Todo');
+LCQuery<LCObject> locationQuery = LCQuery('Todo');
 locationQuery.whereDoesNotExist('location');
 
-LCQuery<LCObject> priorityQuery = new LCQuery('Todo');
+LCQuery<LCObject> priorityQuery = LCQuery('Todo');
 priorityQuery.whereEqualTo('priority', 3);
 
 LCQuery<LCObject> orQuery = LCQuery.or([locationQuery, priorityQuery]);
@@ -5275,7 +5276,7 @@ do {
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCObject todo = new LCObject('Todo');
+LCObject todo = LCObject('Todo');
 todo['title'] = '买蛋糕';
 // attachments 是一个 File 类型
 todo.add('attachments', file);
@@ -5353,7 +5354,7 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
 {% if platform_name === "Flutter" %}
 ```dart
 // 获取同一标题且包含附件的 todo
-LCQuery<LCObject> query = new LCQuery('Todo');
+LCQuery<LCObject> query = LCQuery('Todo');
 query.whereEqualTo('title', '买蛋糕');
 query.whereExists('attachments');
 
@@ -5622,7 +5623,7 @@ file.getThumbnailUrl(true, 100, 100);
 {% if platform_name === "Flutter" %}
 ```dart
  // 获得宽度为 100 像素，100 像素的缩略图 url
- var url = file.getThumbnailUrl(100, 100);
+ String url = file.getThumbnailUrl(100, 100);
 ```
 {% endif %}
 
@@ -5965,7 +5966,7 @@ let point = LCGeoPoint(latitude: 39.9, longitude: 116.4)
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCGeoPoint point = new LCGeoPoint(39.9, 116.4);
+LCGeoPoint point = LCGeoPoint(39.9, 116.4);
 ```
 {% endif %}
 
@@ -6003,7 +6004,7 @@ try todo.set("location", value: point)
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-todo['location']= point;
+todo['location'] = point;
 ```
 {% endif %}
 
@@ -6098,8 +6099,8 @@ _ = query.find { result in
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query = new LCQuery('Todo');
-LCGeoPoint point = new LCGeoPoint(39.9, 116.4);
+LCQuery<LCObject> query = LCQuery('Todo');
+LCGeoPoint point = LCGeoPoint(39.9, 116.4);
 query.whereNear('location', point);
 
 // 限制为 10 条结果
@@ -6169,9 +6170,9 @@ query.whereKey("location", .locatedWithin(southwest: southwest, northeast: north
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCQuery<LCObject> query = new LCQuery('Todo');
-LCGeoPoint southwest = new LCGeoPoint(30, 115);
-LCGeoPoint northeast = new LCGeoPoint(40, 118);
+LCQuery<LCObject> query = LCQuery('Todo');
+LCGeoPoint southwest = LCGeoPoint(30, 115);
+LCGeoPoint northeast = LCGeoPoint(40, 118);
 query.whereWithinGeoBox('location', southwest, northeast);
 ```
 {% endif %}
@@ -6359,8 +6360,8 @@ do {
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
- // 创建实例
-LCUser user = new LCUser();
+// 创建实例
+LCUser user = LCUser();
 
 // 等同于 user['username'] = 'Tom';
 user.username = 'Tom';
@@ -7374,7 +7375,7 @@ if (authenticated) {
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCUser currentUser = await  LCUser.getCurrent();
+LCUser currentUser = await LCUser.getCurrent();
 bool isAuthenticated = await currentUser.isAuthenticated();
 if (isAuthenticated) {
   // session token 有效
@@ -7744,13 +7745,13 @@ do {
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-LCObject todo = new LCObject('Book');
+LCObject todo = LCObject('Book');
 LCUser author = await LCUser.getCurrent();
 todo['title'] = '我的第五本书';
 todo['author'] = author;
 await todo.save();
 
-LCQuery<LCObject> query = new LCQuery('Book');
+LCQuery<LCObject> query = LCQuery('Book');
 query.whereEqualTo('author', author);
 // books 是包含同一作者所有 Book 对象的数组
 List<LCObject> books = await query.find();
@@ -7941,7 +7942,7 @@ try {
   await user.save();
 
   // 绕过鉴权直接获取用户
-  LCQuery<LCUser> userQuery = new LCQuery('_User');
+  LCQuery<LCUser> userQuery = LCQuery('_User');
   LCUser unauthenticatedUser = await userQuery.get(user.objectId);
   unauthenticatedUser['username'] = 'Toodle';
 
@@ -8297,30 +8298,42 @@ avUser.loginWithAuthData(authData, "weixin").subscribe(new Observer<AVUser>() {
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-  try {
-    var authData = {
-      // 必须
-      'openid': 'OPENID',
-      'access_token': 'ACCESS_TOKEN',
-      'expires_in': 7200,
+try {
+  Map<String, dynamic> authData = {
+    // 必须
+    'openid': 'OPENID',
+    'access_token': 'ACCESS_TOKEN',
+    'expires_in': 7200,
 
-      // 可选
-      'refresh_token': 'REFRESH_TOKEN',
-      'scope': 'SCOPE'
-    };
-    LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
-    option.failOnNotExist = true;
-    LCUser currentUser =
-        await LCUser.loginWithAuthData(authData, 'weixin', option: option);
-  } on LCException catch (e) {
-    if (e.code == 211) {
-      // 不存在 authData 的 AVUser 的实例，跳转到输入用户名、密码、手机号等业务页面
-    }
+    // 可选
+    'refresh_token': 'REFRESH_TOKEN',
+    'scope': 'SCOPE'
+  };
+  LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
+  option.failOnNotExist = true;
+  LCUser currentUser = await LCUser.loginWithAuthData(authData, 'weixin', option: option);
+} on LCException catch (e) {
+  if (e.code == 211) {
+    // 不存在 authData 的 AVUser 的实例，跳转到输入用户名、密码、手机号等业务页面
   }
+}
 
 // 跳转到输入用户名、密码、手机号等业务页面之后
-{# Todo #}
-  
+Map<String, dynamic> authData = {
+  'expires_in': 7200,
+  'openid': 'OPENID',
+  'access_token': 'ACCESS_TOKEN'
+};
+try {
+  LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
+  option.failOnNotExist = true;
+  LCUser user = await LCUser.loginWithAuthData(authData, 'weixin', option: option);
+  user.username = 'Tome';
+  user.mobile = '+8618200008888';
+  await user.save();
+} on LCException catch (e) {
+    //其他报错信息
+}
 ```
 {% endif %}
 
@@ -8450,7 +8463,7 @@ AVUser.loginWithAuthData(authData, "weixinapp1","UnionId","weixin",true).subscri
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-var authData = {
+Map<String, dynamic> authData = {
   // 必须
   'openid': 'OPENID',
   'access_token': 'ACCESS_TOKEN',
@@ -8461,7 +8474,7 @@ var authData = {
   'refresh_token': 'REFRESH_TOKEN',
   'scope': 'SCOPE'
 };
-LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
+LCUserAuthDataLoginOption option = LCUserAuthDataLoginOption();
 option.asMainAccount = true;
 option.unionIdPlatform = 'weixin';
 LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
