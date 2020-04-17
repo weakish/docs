@@ -3,6 +3,9 @@
 {% macro regex(useSingleQuotes = false) -%}
 ^((?!ticket).)*&dollar;{% if useSingleQuotes == true %}&apos;{% else %}&quot;{% endif %}
 {%- endmacro %}
+{% macro regexFlutter() -%}
+^((?!ticket).)*\&dollar;
+{%- endmacro %}
 
 # 数据存储开发指南 · {{platform_name}}
 
@@ -2055,7 +2058,11 @@ do {
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-{# todo：序列化 #}
+LCObject object = LCObject('Hello');
+object['title'] = '马拉松报名';
+object['priority'] = 2;
+object['owner'] = LCUser.getCurrent();
+String serializedString = object.toString();
 ```
 {% endif %}
 
@@ -2111,7 +2118,8 @@ do {
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-{# todo：反序列化 #}
+LCObject newObject = LCObject.parseObject(json);
+await newObject.save();
 ```
 {% endif %}
 {% endif %}
@@ -3057,7 +3065,7 @@ query.whereContains('title', 'lunch');
 注意 `{% if platform_name === "Objective-C" %}hasPrefix{% endif %}{% if platform_name === "JavaScript" %}startsWith{% endif %}{% if platform_name === "Python" %}startswith{% endif %}{% if platform_name === "PHP" %}startsWith{% endif %}{% if platform_name === "Android / Java" %}whereStartsWith{% endif %}{% if platform_name === "Swift" %}.prefixedBy{% endif %}{% if platform_name === "Flutter" %}whereStartsWith{% endif %}` 和 `{% if platform_name === "Objective-C" %}containsString{% endif %}{% if platform_name === "JavaScript" %}contains{% endif %}{% if platform_name === "Python" %}contains{% endif %}{% if platform_name === "PHP" %}contains{% endif %}{% if platform_name === "Android / Java" %}whereContains{% endif %}{% if platform_name === "Swift" %}.matchedSubstring{% endif %}{% if platform_name === "Flutter" %}whereContains{% endif %}` 都是 **区分大小写** 的，所以上述查询会忽略 `Lunch`、`LUNCH` 等字符串。
 {% endcall %}
 
-如果想查找某一属性值不包含特定字符串的对象，可以使用 `{% if platform_name === "Objective-C" %}matchesRegex{% endif %}{% if platform_name === "JavaScript" %}matches{% endif %}{% if platform_name === "Python" %}matched{% endif %}{% if platform_name === "PHP" %}matches{% endif %}{% if platform_name === "Android / Java" %}whereMatches{% endif %}{% if platform_name === "Swift" %}.matchedPattern{% endif %}` 进行基于正则表达式的查询：
+如果想查找某一属性值不包含特定字符串的对象，可以使用 `{% if platform_name === "Objective-C" %}matchesRegex{% endif %}{% if platform_name === "JavaScript" %}matches{% endif %}{% if platform_name === "Python" %}matched{% endif %}{% if platform_name === "PHP" %}matches{% endif %}{% if platform_name === "Android / Java" %}whereMatches{% endif %}{% if platform_name === "Swift" %}.matchedPattern{% endif %}{% if platform_name === "Flutter" %}whereMatches{% endif %}` 进行基于正则表达式的查询：
 
 {% if platform_name === "Objective-C" %}
 <pre><code class="lang-objc">AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
@@ -3098,7 +3106,10 @@ query.whereKey("title", .matchedPattern("{{ regex() | safe }}, option: nil))
 </code></pre>
 {% endif %}
 {% if platform_name === "Flutter" %}
-{# TODO Flutter 正则查询 #}
+<pre><code class="lang-java">LCQuery query = LCQuery('Todo');
+// 'title' 不包含 "ticket"（区分大小写）
+query.whereMatches('title','{{ regexFlutter() | safe }}', modifiers: 'i');
+</code></pre>
 {% endif %}
 
 {# 2016-12-29 DO NOT USE markdown to rewrite the previous block #}
@@ -3528,11 +3539,14 @@ query.whereKey("post", .matchedQuery(innerQuery))
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-{# Todo 内嵌查询 #}
+LCQuery innerQuery = LCQuery('Post');
+innerQuery.whereExists('image');
+
+LCQuery query = LCQuery('Comment');
+query.whereMatchesQuery('post', innerQuery);
 ```
 {% endif %}
 
-{# Todo 下面这行 Flutter 后续需要补充 doesNotMatchQuery #}
 如需获取某一属性值不是另一查询结果中任一 `{{ baseObjectName }}` 的对象，则使用 `{% if platform_name === "Objective-C" %}doesNotMatchQuery{% endif %}{% if platform_name === "JavaScript" %}doesNotMatchQuery{% endif %}{% if platform_name === "Python" %}does_not_match_query{% endif %}{% if platform_name === "PHP" %}notMatchInQuery{% endif %}{% if platform_name === "Android / Java" %}whereDoesNotMatchQuery{% endif %}{% if platform_name === "Swift" %}.notMatchedQuery{% endif %}{% if platform_name === "Flutter" %}whereDoesNotMatchQuery{% endif %}`。
 
 有时候可能需要获取来自另一个 class 的数据而不想进行额外的查询，此时可以在同一个查询上使用 `{% if platform_name === "Objective-C" %}includeKey{% endif %}{% if platform_name === "JavaScript" %}include{% endif %}{% if platform_name === "Python" %}include{% endif %}{% if platform_name === "PHP" %}_include{% endif %}{% if platform_name === "Android / Java" %}include{% endif %}{% if platform_name === "Swift" %}.included{% endif %}{% if platform_name === "Flutter" %}include{% endif %}`。下面的代码查找最新发布的 10 条评论，并包含各自对应的博客文章：
@@ -6804,7 +6818,7 @@ _ = LCUser.requestLoginVerificationCode(mobilePhoneNumber: "+8618200008888") { r
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-await LCUser.requestLogionSMSCode('+8618200008888');
+await LCUser.requestLoginSMSCode('+8618200008888');
 ```
 {% endif %}
 
@@ -8731,7 +8745,12 @@ if (currentUser.isAnonymous()) {
 ```
 {% if platform_name === "Flutter" %}
 ```dart
-{# Todo #}
+LCUser currentUser = await LCUser.getCurrent();
+if (currentUser.isAnonymous) {
+  // currentUser 是匿名用户
+} else {
+  // currentUser 不是匿名用户
+}
 ```
 {% endif %}
 {% endif %}
