@@ -1,6 +1,6 @@
 {% import "views/_helper.njk" as docs %}
 {% from "views/_data.njk" import libVersion as version %}
-# 应用内搜索和 DeepLink 开发指南
+# 应用内搜索开发指南
 
 在应用内使用全文搜索是一个很常见的需求。例如一个阅读类的应用，里面有很多有价值的文章，开发者会提供一个搜索框，让用户键入关键字后就能查找到应用内相关的文章，并按照相关度排序，就好像我们打开浏览器用 Google 搜索关键字一样。
 虽然使用[正则查询](rest_api.html#正则查询)也可以实现全文搜索功能，但数据量较大的时候正则查询会有性能问题，因此 LeanCloud 提供了专门的应用内搜索功能。
