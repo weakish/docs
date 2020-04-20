@@ -70,7 +70,7 @@ curl -X GET \
 `order`|可选|排序字段，形如 `-score,createdAt` 逗号隔开的字段，负号表示倒序，可以多个字段组合排序。
 `sort`|可选|复杂排序字段，例如地理位置信息排序，见下文描述。
 
-[scroll id]: https://www.elastic.co/guide/en/elasticsearch/reference/6.5/search-request-scroll.html
+[scroll id]: https://www.elastic.co/guide/en/elasticsearch/reference/7.4/search-request-body.html#request-body-search-scroll
 
 返回结果属性介绍：
 
@@ -97,7 +97,7 @@ curl -X GET \
 
 ### q 查询语法举例
 
-q 的查询走的是 elasticsearch 的 [query string 语法](https://www.elastic.co/guide/en/elasticsearch/reference/6.5/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
+q 的查询走的是 elasticsearch 的 [query string 语法](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
 
 查询的关键字保留字符包括： `+ - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /`，当出现这些字符的时候，请对这些保留字符做 URL Escape 转义。
 
@@ -125,7 +125,7 @@ q 的查询走的是 elasticsearch 的 [query string 语法](https://www.elastic
 name:/joh?n(ath[oa]n)/
 ```
 
-正则的语法参考 [正则语法](https://www.elastic.co/guide/en/elasticsearch/reference/6.5/query-dsl-regexp-query.html#regexp-syntax)。
+正则的语法参考 [正则语法](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-regexp-query.html#regexp-syntax)。
 
 #### 模糊查询
 
@@ -288,7 +288,7 @@ curl -X GET \
 `fields`|可选|相似搜索匹配的字段列表，用逗号隔开，默认为所有索引字段 `_all`
 `include`|可选|关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
 
-更多内容参考 [ElasticSearch 文档](https://www.elastic.co/guide/en/elasticsearch/reference/6.5/query-dsl-mlt-query.html)。
+更多内容参考 [ElasticSearch 文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-mlt-query.html)。
 
 ## 自定义分词
 
@@ -398,7 +398,7 @@ searchQuery.fields = @[@"field1", @"field2"];
 /*!
  *  当前页面的scroll id，用于分页，可选。
  #  @warning 如非特殊需求，请不要手动设置 sid。每次 findObjects 之后，SDK 会自动更新 sid。如果手动设置了错误的sid，将无法获取到搜索结果。
- *  有关scroll id，可以参考 https://www.elastic.co/guide/en/elasticsearch/reference/6.5/search-request-scroll.html
+ *  有关scroll id，可以参考 https://www.elastic.co/guide/en/elasticsearch/reference/7.4/search-request-body.html#request-body-search-scroll
  */
 @property (nonatomic, retain) NSString *sid;
 ```
