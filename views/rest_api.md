@@ -1705,7 +1705,19 @@ curl -X GET \
 `$and` 操作符用于查询**符合全部条件**的对象，它的值为一个 JSON 数组。例如查找存在 price 字段且 price != 199 的对象：
 
 ```
---data-urlencode 'where={"$and":[{"price": {"$ne":199}},{"price":{"$exists":true}}]}' \
+where={"$and":[{"price": {"$ne":199}},{"price":{"$exists":true}}]}
+```
+
+不过，查询条件表达式列表隐含 `$and` 操作符，所以上面的查询条件也可以改写为：
+
+```
+where=[{"price": {"$ne":199}},{"price":{"$exists":true}}]
+```
+
+不过，如果查询条件包含不止一个 or 查询，那就必须使用 `$and` 了：
+
+```
+where={"$and":[{"$or":[{"pubUserCertificate":{"$gt":2}},{"pubUserCertificate":{"$lt":3}}]},{"$or":[{"pubUser":"LeanCloud官方客服"},{"pubUser":"LeanCloud工程师团队"}]}]}
 ```
 
 {{ docs.alert("在组合查询的子查询中不支持使用 limit、skip、order、include 等非过滤型的约束。") }}

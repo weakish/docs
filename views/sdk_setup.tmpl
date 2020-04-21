@@ -223,42 +223,27 @@ libraryDependencies += "cn.leancloud" %% "realtime-core" % "{{ version.unified }
 
 and for Gradle:
 ```
-    implementation('cn.leancloud:realtime-android:{{ version.unified }}') {
-        exclude group: 'com.alibaba', module: 'fastjson'
-        exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-    }
+    implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'com.alibaba:fastjson:1.1.71.android'
-    implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 ```
 
 #### 使用混合推送服务
 
 Example for Gradle：
 ```
-implementation('cn.leancloud:mixpush-android:{{ version.unified }}') {
-    exclude group: 'com.alibaba', module: 'fastjson'
-    exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-    // 如果接入的是华为推送，还需要加上：
-    // exclude group:'cn.leancloud', module:'huawei-hmsagent' 
-}
+implementation 'cn.leancloud:mixpush-android:{{ version.unified }}'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-implementation 'com.alibaba:fastjson:1.1.71.android'
-implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
 ```
 
 #### 对 fastjson 的特别说明
 
-从 fastjson 的[官网](https://github.com/alibaba/fastjson)我们可以看到，出于性能和安装包体积考虑，它针对纯的 Java 平台和 Android 平台分别推出了两个不同的版本（差异见[这里](https://github.com/alibaba/fastjson/wiki/Android%E7%89%88%E6%9C%AC)），所以我们的 SDK 也根据使用环境做了不同的依赖选择：
+从 `6.5.0` 版本开始，我们 Java 平台和 Android 平台的 SDK 都统一依赖 fastjson 最新的 JVM 版本（`1.2.68`），开发者在使用的时候不需要做特殊的处理。
 
+> 对 `6.5.0` 之前的 SDK 版本，我们根据使用环境做了不同的依赖选择：
 - storage-core 依赖的是面向纯 Java 平台的 fastjson（版本为 `1.2.60`）;
 - storage-android 和 realtime-android 以及其他推送 sdk 依赖的是面向 Android 平台的 fastjson（版本为 `1.1.71.android`）。
-
-这一点请特别注意，如果版本不兼容可能导致程序在运行时会出现各种 json 解析的问题。
-
-另外，我们发现 Android 版本的 fastjson 库在反序列化的时候，对 double 和 float 类型的处理存在漏洞。如果属性值中存在 `3.1415F` 或 `3.1415D` 这样的数字，JSON#parse 方法会抛出异常，异常信息类似于`com.alibaba.fastjson.JSONException: syntax error, pos 123, json : xxx `。
-
-为此我们提供了一个临时的 bugfix 版本供开发者下载使用，下载地址见[这里](https://github.com/leancloud/java-unified-sdk/tree/master/3rd-parties)。开发者可以通过引用本地文件的方式来依赖这个版本，build.gradle 中的依赖部分可按照如下示例进行更改：
+>
+> 同时，我们发现 Android 版本的 fastjson 库在反序列化的时候，对 double 和 float 类型的处理存在漏洞。如果属性值中存在 `3.1415F` 或 `3.1415D` 这样的数字，JSON#parse 方法会抛出异常，异常信息类似于 `com.alibaba.fastjson.JSONException: syntax error, pos 123, json : xxx `。为此我们提供了一个临时的 bugfix 版本供开发者下载使用，下载地址见[这里](https://github.com/leancloud/java-unified-sdk/tree/master/3rd-parties)。开发者可以通过引用本地文件的方式来依赖这个版本，build.gradle 中的依赖部分可按照如下示例进行更改：
 
 ```
     implementation fileTree(include: ['*.jar'], dir: 'libs') // 注意把上面的 lib 拷贝到该目录下
@@ -429,21 +414,21 @@ $ npm install leancloud-realtime leancloud-realtime-plugin-typed-message leanclo
 安装完成后，在代码中通过 `require` 获得 SDK 的引用：
 
 ```存储服务
-var AV = require('leancloud-storage');
-var { Query, User } = AV;
+const AV = require('leancloud-storage');
+const { Query, User } = AV;
 ```
 ```存储服务（LiveQuery)
-var AV = require('leancloud-storage/live-query');
-var { Query, User } = AV;
+const AV = require('leancloud-storage/live-query');
+const { Query, User } = AV;
 ```
 ```即时通讯
-var { Realtime, TextMessage } = require('leancloud-realtime');
+const { Realtime, TextMessage } = require('leancloud-realtime');
 ```
 ```即时通讯（含富媒体消息）
-var AV = require('leancloud-storage');
-var { Realtime, TextMessage } = require('leancloud-realtime');
+const AV = require('leancloud-storage');
+const { Realtime, TextMessage } = require('leancloud-realtime');
 // 富媒体消息插件暴露（export）的成员完整列表可以参考 [富媒体消息插件 API 文档](https://leancloud.github.io/js-realtime-sdk/plugins/typed-messages/docs/module-leancloud-realtime-plugin-typed-messages.html)。
-var { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+const { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
 ```
 
 {{ docs.langSpecStart('即时通讯 即时通讯（含富媒体消息）') }}
@@ -477,23 +462,23 @@ const { Realtime } = require('leancloud-realtime/es-latest');
 ```即时通讯（含富媒体消息）
 <script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/leancloud-realtime@{{jsimsdkversion}}/dist/im-browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leancloud-realtime-plugin-typed-messages@3.1.0/dist/typed-messages.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-realtime-plugin-typed-messages@3.1.0/dist/typed-messages.min.js"></script>
 ```
 
 通过这种方式引入的 SDK 可以通过全局变量 `AV` 获得引用：
 
 
 ```存储服务
-var { Query, User } = AV;
+const { Query, User } = AV;
 ```
 ```存储服务（LiveQuery)
-var { Query, User } = AV;
+const { Query, User } = AV;
 ```
 ```即时通讯
-var { Realtime, TextMessage } = AV;
+const { Realtime, TextMessage } = AV;
 ```
 ```即时通讯（含富媒体消息）
-var { Realtime, TextMessage, TypedMessagesPlugin, ImageMessage } = AV;
+const { Realtime, TextMessage, TypedMessagesPlugin, ImageMessage } = AV;
 ```
 
 {{ docs.langSpecStart('即时通讯') }}
@@ -599,20 +584,20 @@ CocosCreator 支持直接通过 npm 安装与引用 SDK，具体操作步骤请�
 
 ```存储服务
 // SDK 应用路径变更为
-- var AV = require('leancloud-storage');
-+ var AV = require('leancloud-storage/dist/av-weapp-min.js');
+- const AV = require('leancloud-storage');
++ const AV = require('leancloud-storage/dist/av-weapp-min.js');
 ```
 
 ```存储服务（LiveQuery)
 // SDK 应用路径变更为
-- var AV = require('leancloud-storage/live-query');
-+ var AV = require('leancloud-storage/dist/av-live-query-weapp-min.js');
+- const AV = require('leancloud-storage/live-query');
++ const AV = require('leancloud-storage/dist/av-live-query-weapp-min.js');
 ```
 
 ```即时通讯
 // SDK 应用路径变更为
-- var { Realtime } = require('leancloud-realtime');
-+ var { Realtime } = require('leancloud-realtime/dist/im-weapp.js');
+- const { Realtime } = require('leancloud-realtime');
++ const { Realtime } = require('leancloud-realtime/dist/im-weapp.js');
 ```
 
 ```即时通讯（含富媒体消息）
@@ -673,9 +658,9 @@ const reactNativeAdapters = require('@leancloud/platform-adapters-quickapp');
 setAdapters(reactNativeAdapters);
 ```
 ```即时通讯（含富媒体消息）
-var AV = require('leancloud-storage/core');
+const AV = require('leancloud-storage/core');
 const { Realtime, setAdapters } = require('leancloud-realtime/im');
-var { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+const { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
 const reactNativeAdapters = require('@leancloud/platform-adapters-quickapp');
 AV.setAdapters(reactNativeAdapters);
 setAdapters(reactNativeAdapters);
@@ -721,9 +706,9 @@ const reactNativeAdapters = require('@leancloud/platform-adapters-react-native')
 setAdapters(reactNativeAdapters);
 ```
 ```即时通讯（含富媒体消息）
-var AV = require('leancloud-storage/core');
+const AV = require('leancloud-storage/core');
 const { Realtime, setAdapters } = require('leancloud-realtime/im');
-var { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+const { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
 const reactNativeAdapters = require('@leancloud/platform-adapters-react-native');
 AV.setAdapters(reactNativeAdapters);
 setAdapters(reactNativeAdapters);
@@ -761,11 +746,11 @@ $ npm install leancloud-realtime leancloud-realtime-plugin-typed-message leanclo
 <script src="./node_modules/leancloud-storage/dist/av-live-query-min.js"></script>
 ```
 ```即时通讯
-<script src="./node_modules/leancloud-realtime/dist/dist/im-browser.min.js"></script>
+<script src="./node_modules/leancloud-realtime/dist/im-browser.min.js"></script>
 ```
 ```即时通讯（含富媒体消息）
 <script src="./node_modules/leancloud-storage/dist/av-min.js"></script>
-<script src="./node_modules/leancloud-realtime/dist/dist/im-browser.min.js"></script>
+<script src="./node_modules/leancloud-realtime/dist/im-browser.min.js"></script>
 <script src="./node_modules/leancloud-realtime-plugin-typed-messages/dist/typed-messages.js"></script>
 ```
 
@@ -798,9 +783,9 @@ const adapters = require('platform-adapters-xyz');
 setAdapters(adapters);
 ```
 ```即时通讯（含富媒体消息）
-var AV = require('leancloud-storage/core');
+const AV = require('leancloud-storage/core');
 const { Realtime, setAdapters } = require('leancloud-realtime/im');
-var { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+const { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
 const adapters = require('platform-adapters-xyz');
 AV.setAdapters(adapters);
 setAdapters(adapters);
@@ -953,7 +938,7 @@ AV.init({
 ```
 
 ```即时通讯
-var realtime = new Realtime({
+const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
   server: 'https://xxx.example.com',
@@ -961,7 +946,7 @@ var realtime = new Realtime({
 ```
 
 ```即时通讯（含富媒体消息）
-var realtime = new Realtime({
+const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
   server: 'https://xxx.example.com',
@@ -1119,7 +1104,7 @@ AVClient.Initialize("{{appid}}", "{{appkey}}", "https://xxx.example.com");
 
 ```cs
 Websockets.Net.WebsocketConnection.Link(); // Unity 下不需要此行设置
-var realtime = new AVRealtime(new AVRealtime.Configuration {
+const realtime = new AVRealtime(new AVRealtime.Configuration {
     ApplicationId = appId,
     ApplicationKey = appKey,
     RTMRouter = new Uri("https://xxx.example.com")
@@ -1134,7 +1119,7 @@ AVLiveQuery.Channel = realtime;
 在使用「即时通讯」服务前，调用如下代码：
 
 ```cs
-var realtime = new AVRealtime(new AVRealtime.Configuration
+const realtime = new AVRealtime(new AVRealtime.Configuration
 {
     ApplicationId = "{{appid}}",
     ApplicationKey = "{{appkey}}",
@@ -1379,10 +1364,10 @@ do {
 然后在项目中编写如下测试代码：
 
 ```js
-var TestObject = AV.Object.extend('TestObject');
-var testObject = new TestObject();
+const TestObject = AV.Object.extend('TestObject');
+const testObject = new TestObject();
 testObject.set('words', 'Hello world!');
-testObject.save().then(function (testObject) {
+testObject.save().then((testObject) => {
   console.log('保存成功。')
 })
 ```

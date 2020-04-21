@@ -5,7 +5,7 @@
 
 * iOS Objective C SDK 的 [AVConstants](https://github.com/leancloud/objc-sdk/blob/master/AVOS/AVOSCloud/AVConstants.h)。
 * PHP SDK 中与网络请求操作相关的错误码，比如 `28` 表示请求超时、`7` 表示连接服务器失败，请参考 [libcurl error codes](http://curl.haxx.se/libcurl/c/libcurl-errors.html)。
-* Android 的 AVException。
+* Android 的 [AVException](https://leancloud.cn/api-docs/android/cn/leancloud/AVException.html)。
 * JavaScript SDK 的 [AV.Error](https://leancloud.github.io/javascript-sdk/docs/AV.Error.html)。
 
 ## 0

@@ -246,12 +246,7 @@ adb shell am start -W -a "android.intent.action.VIEW"  \
 ```
     implementation("cn.leancloud:leancloud-search:{{ version.unified }}@aar")
     implementation("cn.leancloud:storage-android:{{ version.unified }}")
-    implementation("cn.leancloud:storage-core:{{ version.unified }}") {
-        exclude group: 'com.alibaba', module: 'fastjson'
-        exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
-    }
-    implementation "com.alibaba:fastjson:1.1.71.android"
-    implementation "org.ligboy.retrofit2:converter-fastjson-android:2.1.0"
+    implementation("cn.leancloud:storage-core:{{ version.unified }}")
 ```
 
 ##### 添加代码，实现基础功能
