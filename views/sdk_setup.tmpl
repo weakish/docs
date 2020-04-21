@@ -61,7 +61,7 @@ Java SDK 一共包含如下几个模块：
 
 ## 获取 SDK
 
-{% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "Android" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" %}
+{% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" or platform_name === "Flutter" %}
 获取 SDK 有多种方式，较为推荐的方式是通过包依赖管理工具下载最新版本。
 
 ### 包依赖管理工具安装
@@ -146,82 +146,6 @@ $ pod install --repo-update
 #### Swift Package Manager
 
 参考 [Apple 官方提供的集成文档](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app)，添加 [Swift SDK Repo](https://github.com/leancloud/swift-sdk) 即可。
-{% endif %}
-{% if platform_name === "Android" %}
-#### Gradle
-
-Gradle 是 Google 官方推荐的构建 Android 程序的工具，使用 Android Studio 进行开发的时候，它会自动在新建的项目中包含一个自带的命令行工具 **gradlew**。我们推荐开发者使用这个自带的命令行工具，这是因为 Gradle 存在版本兼容的问题，很多开发者即使正确配置了 Gradle 脚本，但由于使用了最新版本或不兼容的 Gradle 版本而仍然无法成功加载依赖包。
-
-##### Android Studio
-
-使用 Android Studio 创建一个新的项目的时候，它的目录结构如下：
-
-```
-.
-├── app                 // 应用源代码
-    ├── ...
-    ├── build.gradle    // 应用 Gradle 构建脚本
-    ├── ...
-├── build.gradle        // 项目 Gradle 构建脚本
-├── YOUR-APP-NAME.iml   // YOUR-APP-NAME 为你的应用名称
-├── gradle
-└── settings.gradle
-```
-
-首先打开 `app` 目录下的 `build.gradle` 进行如下配置：
-
-```
-android {
-    // 为了解决部分第三方库重复打包了META-INF的问题
-    packagingOptions {
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-    }
-    lintOptions {
-        abortOnError false
-    }
-}
-
-dependencies {
-    compile ('com.android.support:support-v4:21.0.3')
-
-    // LeanCloud 基础包
-    compile ('cn.leancloud.android:avoscloud-sdk:{{ version.leancloud }}')
-
-    // 推送与即时通讯需要的包
-    compile ('cn.leancloud.android:avoscloud-push:{{ version.leancloud }}@aar'){transitive = true}
-
-    // Android 混合推送需要的包
-    compile ('cn.leancloud.android:avoscloud-mixpush:{{ version.leancloud }}@aar'){transitive = true}
-
-    // LeanCloud 用户反馈包
-    compile ('cn.leancloud.android:avoscloud-feedback:{{ version.leancloud }}@aar')
-
-    // LeanCloud 应用内搜索包
-    compile ('cn.leancloud.android:avoscloud-search:{{ version.leancloud }}@aar')
-}
-```
-
-从 4.7.8 版本开始，我们已经把 SDK library 推送到了 maven central repository，推荐大家使用这种方式。
-
-#### Eclipse
-
-Eclipse 用户首先 [下载 SDK](sdk_down.html)，然后按照 [手动安装步骤](#手动安装) 将 SDK 导入到项目里。
-{% endif %}
-{% if platform_name === "Python" %}
-pip 是最推荐的 Python 包管理工具，它是 `easy_install` 的替代。安装 `leancloud-sdk` 只需执行以下命令：
-
-```sh
-pip install leancloud
-```
-
-也可以使用 `easy_install` 进行安装：
-
-```sh
-easy_install leancloud
-```
-
-根据你的环境，命令之前还可能需要加上 `sudo`。
 {% endif %}
 {% if platform_name === "PHP" %}
 #### composer
@@ -384,7 +308,21 @@ allprojects {
 ```
 
 {% endif %}
+{% if platform_name === "Flutter" %}
+ SDK 发布在 pub.dev:
+* [数据存储 SDK](https://pub.dev/packages/leancloud_storage)
 
+在 pubspec.yaml 中，将 SDK 添加到依赖项列表:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  ...
+  leancloud_storage: ^{{ version.flutter_storage }} //使用数据存储
+```
+
+{% endif %}
 ### 手动安装
 
 {% if platform_name === "Python" %}
@@ -434,48 +372,7 @@ $ gradle clean assemble
 {% if platform_name === "Swift" %}
 > 下载 Swift SDK 源码后，也需要等待 Swift Package Manager 下载并集成其它依赖，所以推荐直接使用 Swift Package Manager。
 {% endif %}
-{% if platform_name === "Android" %}
-对照以下包文件及其对应的功能模块，开发者可以自行 [编译源代码](https://github.com/leancloud/android-sdk-all/blob/master/README.md#%E7%BC%96%E8%AF%91) 来得到所需的包文件。
 
-```
-├── avoscloud-feedback-{{ version.leancloud }}.zip // LeanCloud 用户反馈模块
-├── avoscloud-push-{{ version.leancloud }}.jar     // LeanCloud 推送模块和即时通讯模块
-├── avoscloud-sdk-{{ version.leancloud }}.jar      // LeanCloud 基本存储模块
-├── avoscloud-search-{{ version.leancloud }}.zip   // LeanCloud 应用内搜索模块
-├── fastjson-{{ version.fastjson }}.jar            // LeanCloud 基本存储模块
-├── protobuf-java-3.4.0.jar                        // LeanCloud 推送模块和即时通讯模块
-├── okhttp-{{ version.okhttp }}.jar                // LeanCloud 基本存储模块
-├── okio-{{ version.okio }}.jar                    // LeanCloud 基本存储模块
-```
-
-#### LeanCloud 基本存储模块
-
-* `avoscloud-{{ version.leancloud }}.jar`
-* `okhttp-{{ version.okhttp }}.jar`
-* `okio-{{ version.okio }}.jar`
-* `fastjson-{{ version.fastjson }}.jar`
-
-#### LeanCloud 推送模块和即时通讯模块
-
-* LeanCloud 基础存储模块
-* `avoscloud-push-{{ version.leancloud }}.jar`
-* `avoscloud-mixpush-{{ version.leancloud }}.jar`
-* `protobuf-java-3.4.0.jar`
-
-我们提供的下载包里包含了必须的依赖库，自己下载官方库也可以，不过请确保版本一致。
-
-**注意：如果需要使用美国站点，并且 SDK 版本是 3.3 及以上，则不需要引入 SSL 证书。其他低版本的用户，需要下载 [SSL 证书](https://download.leancloud.cn/sdk/android/current/avoscloud_us_ssl.bks)，将其拷贝到项目的 `res/raw/` 之下。**
-
-#### Android Studio
-
-首先本地已经下载好了项目需要的 SDK 包，然后按照以下步骤导入：
-
-1. 打开 **File** > **Project Structure** > **Modules** 对话框，点击 **Dependencies**；
-2. 点击下方的 **+**（加号），选择要导入的 SDK 包（xxxx.jar），记得 **Scope** 选为 **Compile**；
-3. 重复第 2 步，直到所有需要的包均已正确导入。
-
-Eclipse 的导入与一般的 jar 导入无本质区别，因此不再赘述。
-{% endif %}
 {% endif %}
 {% if platform_name === "JavaScript" %}
 {{ docs.defaultLang('存储服务') }}
@@ -1010,6 +907,7 @@ do {
 {{ requireServerURL() }}
 
 ```swift
+//国际版应用初始化：
 do {
     try LCApplication.default.set(
         id: {{appid}},
@@ -1019,58 +917,6 @@ do {
 }
 ```
 
-{% endif %}
-{% if platform_name === "Android" %}
-然后新建一个 Java Class，名字叫做 **MyLeanCloudApp**，让它继承自 **Application** 类，实例代码如下：
-
-```java
-public class MyLeanCloudApp extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        // 初始化参数依次为 this，App Id，App Key
-        AVOSCloud.initialize(this,"{{appid}}","{{appkey}}");
-    }
-}
-```
-将上述代码中的 App ID 以及 App Key 替换成从控制台复制粘贴的对应的数据即可。
-
-然后打开 `AndroidManifest.xml` 文件来配置 SDK 所需要的手机的访问权限以及声明刚才我们创建的 `MyLeanCloudApp` 类：
-
-```xml
-<!-- 基础模块（必须加入以下声明）START -->
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.INTERNET"/>
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-<!-- 基础模块 END -->
-
-<application
-  ...
-  android:name=".MyLeanCloudApp" >
-
-  <!-- 即时通讯模块、推送（均需要加入以下声明）START -->
-  <!-- 即时通讯模块、推送都要使用 PushService -->
-  <service android:name="com.avos.avoscloud.PushService"/>
-  <receiver android:name="com.avos.avoscloud.AVBroadcastReceiver">
-    <intent-filter>
-      <action android:name="android.intent.action.BOOT_COMPLETED"/>
-      <action android:name="android.intent.action.USER_PRESENT"/>
-      <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-    </intent-filter>
-  </receiver>
-  <!-- 即时通讯模块、推送 END -->
-
-  <!-- 反馈组件（需要加入以下声明）START -->
-  <activity
-     android:name="com.avos.avoscloud.feedback.ThreadActivity" >
-  </activity>
-  <!-- 反馈组件 END -->
-</application>
-```
 {% endif %}
 {% if platform_name === "JavaScript" %}
 无论是通过 npm 安装还是直接通过 CDN 加载，初始化的方法都是一样的。
@@ -1284,6 +1130,28 @@ const realtime = new AVRealtime(new AVRealtime.Configuration
 {{ requireServerURL() }}
 {% endif %}
 
+{% if platform_name === "Flutter" %}
+使用 SDK 时添加下列导入语句到头部：
+
+```dart
+//数据存储
+import 'package:leancloud_storage/leancloud.dart';
+```
+
+然后在 lib/main.dart 设置 App ID，App Key 以及服务器地址：
+
+```dart
+LeanCloud.initialize(
+    '{{appid}}', '{{appkey}}',
+    server: 'https://xxx.example.com',
+    queryCache: new LCQueryCache());
+```
+
+{{ requireServerURL() }}
+{% endif %}
+
+
+{% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" %}
 ## 开启调试日志
 
 在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口，或是浏览器 Console 或是 LeanCloud 控制台的云引擎日志中。
@@ -1430,6 +1298,8 @@ LCApplication.logLevel = .off
 在应用发布之前，请关闭调试日志，以免暴露敏感数据。
 {% endcall %}
 
+{% endif %}
+
 ## 验证
 
 首先，确认本地网络环境是可以访问 LeanCloud 服务器的，可以执行以下命令：
@@ -1489,25 +1359,7 @@ do {
 
 然后，点击 `Run` 运行调试，真机和虚拟机均可。
 {% endif %}
-{% if platform_name === "Android" %}
-在 `MainActivity.java` 中的 `onCreate` 方法添加如下代码：
 
-```java
-AVObject testObject = new AVObject("TestObject");
-testObject.put("words", "Hello world!");
-testObject.saveInBackground().subscribe(new Observer<AVObject>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(AVObject testObject) {
-        System.out.println("保存成功。");
-    }
-    public void onError(Throwable throwable) {
-    }
-    public void onComplete() {}
-});
-```
-
-然后，点击 `Run` 运行调试，真机和虚拟机均可。
-{% endif %}
 {% if platform_name === "JavaScript" %}
 然后在项目中编写如下测试代码：
 
@@ -1574,6 +1426,18 @@ await saveTask;
 保存后运行程序。
 {% endif %}
 
+{% if platform_name === "Flutter" %}
+然后在项目中编写如下测试代码：
+
+```dart
+LCObject object = LCObject('TestObject');
+object['words'] = 'Hello world!';
+await object.save();
+```
+
+保存后运行程序。
+{% endif %}
+
 然后打开 **控制台 > 存储 > 数据 > `TestObject`**，如果看到如下内容，说明 SDK 已经正确地执行了上述代码，安装完毕。
 
 ![数据表中出现一行「words」值为「Hello world!」的数据。](images/testobject_saved.png)
@@ -1600,30 +1464,3 @@ SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前�
 ### 客户端无法访问网络
 
 客户端尤其是手机端，应用在访问网络的时候需要申请一定的权限。
-
-{% if platform_name === "Android" %}
-### 运行中遇到 `NoClassDefFoundError` 异常
-
-一般来说遇到这个问题只有两种可能：
-
-第一种是 Android SDK 的间接依赖并没有能全部下载导致的，可以通过在 gradle 配置中显式指定 `transitive=true` 来解决这个问题：
-
-```
-dependencies {
-    compile 'com.android.support:multidex:'
-    compile 'com.android.support:support-v4:21.0.3'
-    compile 'cn.leancloud.android:avoscloud-sdk:v3.+'
-    compile('cn.leancloud.android:avoscloud-push:v3.+@aar') { transitive = true }
-}
-```
-
-第二种情况则是由在 v3.13.+ 以后 Android SDK 引入了 Google ProtoBuf 来提高即时通讯模块的传输效率，随之而来的是类和方法数量的激增，超过了 Android 上存在着方法总数不能超过 65k 的上限而导致的。这个时候我们可以采用 Google 提出的 [解决方案](http://developer.android.com/intl/zh-cn/tools/building/multidex.html#about) 来解决这个问题。
-
-### 运行时遇到 `NoClassDefFoundError: java.util.Objects` 异常
-
-Android 4.4 之前（不含）不支持 `java.util.Objects`。
-如您的应用项目需要兼容 Android 4.4 之前的设备，请勿从[旧版 Android SDK]升级至 Java Unified SDK。
-
-[旧版 Android SDK]: https://github.com/leancloud/android-sdk-all/
-
-{% endif %}
