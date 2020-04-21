@@ -2903,16 +2903,16 @@ https://{{feedback_host}}/1.1/feedback/<:feedback_objectId>/threads
 
 ## 即时通讯 API
 
-请参考 [即时通讯 REST API](./realtime_rest_api_v2.html)。
+请参考 [即时通讯 REST API](realtime_rest_api_v2.html)。
 
 {% if node != 'qcloud' %}
 ## 事件流 API
 
-请参考 [事件流 REST API](./status_system.html#REST_API)。
+请参考 [事件流 REST API](status_system.html#REST_API)。
 {% endif %}
 ## 应用内搜索 API
 
-请参考 [搜索 API](./app_search_guide.html#搜索_api)。
+请参考 [应用内搜索  REST API](search-rest-api.html)。
 
 ## 数据导出 API
 

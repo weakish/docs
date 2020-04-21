@@ -1,11 +1,15 @@
 {% import "views/_helper.njk" as docs %}
 {% from "views/_data.njk" import libVersion as version %}
+
+{{ docs.defaultLang('js') }}
+{{ docs.useIMLangSpec()}}
+
 # 应用内搜索开发指南
 
 在应用内使用全文搜索是一个很常见的需求。例如一个阅读类的应用，里面有很多有价值的文章，开发者会提供一个搜索框，让用户键入关键字后就能查找到应用内相关的文章，并按照相关度排序，就好像我们打开浏览器用 Google 搜索关键字一样。
 虽然使用[正则查询](rest_api.html#正则查询)也可以实现全文搜索功能，但数据量较大的时候正则查询会有性能问题，因此 LeanCloud 提供了专门的应用内搜索功能。
 
-LeanCloud 也提供了与应用内搜索搭配使用的 [DeepLink](#deeplink) 功能，让应用可以响应外部调用链接。
+LeanCloud 也提供了与应用内搜索搭配使用的 [DeepLink](deeplink.html) 功能，让应用可以响应外部调用链接。
 
 ## 为 Class 启用搜索
 
@@ -22,82 +26,230 @@ LeanCloud 也提供了与应用内搜索搭配使用的 [DeepLink](#deeplink) �
 
 ## 搜索 API
 
-LeanCloud 提供了 `/1.1/search/select` REST API 接口来做应用内搜索。
+LeanCloud 提供了 [应用内搜索的 REST API 接口](search-rest-api.html)。
+JavaScript SDK、Objective C SDK、Java SDK 封装了这一接口。
 
-假设你对 GameScore 类[启用了应用内搜索](#为_Class_启用搜索)，你就可以尝试传入关键字来搜索，比如查询关键字 `dennis`，限定返回结果 200 个，并且按照 `score` 降序排序：
+假设你对 GameScore 类[启用了应用内搜索](#为_Class_启用搜索)，你就可以尝试传入关键字来搜索：
 
-``` sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  "https://{{host}}/1.1/search/select?q=dennis&limit=200&clazz=GameScore&order=-score"
+```js
+const query = new AV.SearchQuery('GameScore');
+query.queryString('dennis');
+query.find().then(function(results) {
+  console.log("Find " + query.hits() + " docs.");
+  //处理 results 结果
+}).catch(function(err){
+  //处理 err
+});
+```
+```objc
+AVSearchQuery *searchQuery = [AVSearchQuery searchWithQueryString:@"test-query"];
+searchQuery.className = @"GameScore";
+searchQuery.highlights = @"field1,field2";
+searchQuery.limit = 10;
+searchQuery.cachePolicy = kAVCachePolicyCacheElseNetwork;
+searchQuery.maxCacheAge = 60;
+searchQuery.fields = @[@"field1", @"field2"];
+[searchQuery findInBackground:^(NSArray *objects, NSError *error) {
+  for (AVObject *object in objects) {
+        NSString *appUrl = [object objectForKey:@"_app_url"];
+        NSString *deeplink = [object objectForKey:@"_deeplink"];
+        NSString *hightlight = [object objectForKey:@"_highlight"];
+        // other fields
+        // code is here
+    }
+}];
+```
+```java
+AVSearchQuery searchQuery = new AVSearchQuery("dennis");
+searchQuery.setClassName("GameScore");
+searchQuery.setLimit(10);
+searchQuery.orderByAscending("score"); //根据score字段升序排序。
+searchQuery.findInBackground().subscribe(new Observer<List<AVObject>>() {
+  @Override
+  public void onSubscribe(Disposable disposable) {}
+
+  @Override
+  public void onNext(List<AVObject> results) {
+    for (AVObject o:results) {
+      System.out.println(o);
+    }
+    testSucceed = true;
+    latch.countDown();
+  }
+
+  @Override
+  public void onError(Throwable throwable) {
+    throwable.printStackTrace();
+    testSucceed = true;
+    latch.countDown();
+  }
+
+  @Override
+  public void onComplete() {}
+});
 ```
 
-返回类似：
+有关查询语法，可以参考下文[q 查询语法举例](#q_查询语法举例)的介绍。
 
-``` json
+因为每次请求都有 limit 限制，所以一次请求可能并不能获取到所有满足条件的记录。
+`AV.SearchQuery` 的 `hits()` 标示所有满足查询条件的记录数。
+你可以多次调用同一个 `AV.SearchQuery` 的 `find()` 获取余下的记录。
+
+如果在不同请求之间无法保存查询的 query 对象，可以利用 sid 做到翻页，一次查询是通过 `AV.SearchQuery` 的 `_sid` 属性来标示的。
+你可以通过 `AV.SearchQuery` 的 `sid()` 来重建查询 query 对象，继续翻页查询。
+sid 在 5 分钟内有效。
+
+复杂排序可以使用 `AV.SearchSortBuilder`，例如，假设 `scores` 是由分数组成的数组，现在需要根据分数的平均分倒序排序，并且没有分数的排在最后：
+
+```js
+searchQuery.sortBy(new AV.SearchSortBuilder().descending('scores', 'avg', 'last'));
+```
+```objc
+AVSearchSortBuilder *builder = [AVSearchSortBuilder newBuilder];
+[builder orderByDescending:@"scores" withMode:@"max" andMissing:@"last"];
+searchQuery.AVSearchSortBuilder = builder;
+```
+```java
+AVSearchSortBuilder builder = AVSearchSortBuilder.newBuilder();
+builder.orderByDescending("scores","avg","last");
+searchQuery.setSortBuilder(builder);
+```
+
+更多 API 请参考 SDK API 文档：
+
+{{ docs.langSpecStart('js') }}
+- [AV.SearchQuery](https://leancloud.github.io/javascript-sdk/docs/AV.SearchQuery.html)
+- [AV.SearchSortBuilder](https://leancloud.github.io/javascript-sdk/docs/AV.SearchSortBuilder.html)
+{{ docs.langSpecEnd('js') }}
+{{ docs.langSpecStart('objc') }}
+- [AVSearchQuery](https://leancloud.cn/api-docs/iOS/Classes/AVSearchQuery.html)
+- [AVSearchSortBuilder](https://leancloud.cn/api-docs/iOS/Classes/AVSearchSortBuilder.html)
+{{ docs.langSpecEnd('objc') }}
+{{ docs.langSpecStart('java') }}
+- [AVSearchQuery](https://leancloud.cn/api-docs/android/index.html)
+- [AVSearchSortBuilder](https://leancloud.cn/api-docs/android/index.html)
+{{ docs.langSpecEnd('java') }}
+
+{{ docs.langSpecStart('java') }}
+## SearchActivity
+
+上面介绍的是 storage-core library 中包含的应用内搜索与 UI 无关的接口。
+除此以外，在 leancloud-search library 中还有一个 SearchActivity UI 类，主要是用来演示搜索结果的展示。
+
+### 添加依赖
+
+首先，修改项目的 build.gradle 文件，增加如下内容：
+
+```gradle
+implementation("cn.leancloud:leancloud-search:{{ version.unified }}@aar")
+implementation("cn.leancloud:storage-android:{{ version.unified }}")
+implementation("cn.leancloud:storage-core:{{ version.unified }}")
+```
+
+### 配置 AndroidManifest.xml
+
+打开 `AndroidManifest.xml` 文件，在里面添加需要用到的 activity 和需要的权限:
+
+``` xml
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <application...>
+       <activity
+        android:name="cn.leancloud.search.SearchActivity">
+       </activity>
+    </application>
+```
+
+注：由于一些 UI 的原因，**应用内搜索的最低 API level 要求是 12**，如你需要更低的版本支持，请参照文档中的[高级定制部分](#高级定制指南)进行开发。
+
+### 添加代码实现基础的应用内搜索功能
+
+``` java
+AVSearchQuery searchQuery = new AVSearchQuery("keyword");
+// 通过以下方法，你可以像指定html tag一样设定搜索匹配字符的高亮风格
+SearchActivity.setHighLightStyle("<font color='#E68A00'>"); 
+SearchActivity activity = new SearchActivity();
+activity.setSearchQuery(searchQuery);
+Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+intent.putExtra(AVSearchQuery.DATA_EXTRA_SEARCH_KEY, JSON.toJSONString(searchQuery));
+// 打开一个显式搜索结果的Activity
+startActivity(intent);
+```
+
+### 高级定制指南
+
+由于每个应用的数据、UI展现要求都有很大的差别，所以单一的搜索组件界面仅仅能够满足较为简单的要求，所以我们将数据接口和 UI 展示进行了分离，开发者可以在 AVSearchQuery 中配置展示的 `title` 和 `highlights` 属性，来动态改变 SearchActivity 中展示的内容。配置 API 如下：
+
+```java
+/**
+  * 指定 Title 所对应的 Field。
+  *
+  * @param titleAttribute
+  */
+public void setTitleAttribute(String titleAttribute);
+
+/**
+  * 设置返回的高亮语法，默认为"*"
+  * 语法规则可以参考 https://www.elastic.co/guide/en/elasticsearch/reference/6.5
+  * /search-request-highlighting.html#highlighting-settings
+  *
+  * @param hightlights
+  */
+public void setHightLights(String hightlights);
+```
+
+也可以参考 [我们的 `SearchActivity`](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/leancloud-search/src/main/java/cn/leancloud/search/SearchActivity.java) 来更好的指定你自己的搜索结果页面。
+
+{{ docs.langSpecEnd('java') }}
+
+## 自定义分词
+
+默认情况下， String 类型的字段都将被自动执行分词处理，我们使用的分词组件是 [mmseg](https://github.com/medcl/elasticsearch-analysis-mmseg)，词库来自搜狗。但是很多用户由于行业或者专业的特殊性，一般都有自定义词库的需求，因此我们提供了自定义词库的功能。应用创建者可以通过 **LeanCloud 控制台 > 存储 > 应用内搜索 > 自定义词库** 上传词库文件。
+
+词库文件要求为 UTF-8 编码，每个词单独一行，文件大小不能超过 512 K，例如：
+
+```
+面向对象编程
+函数式编程
+高阶函数
+响应式设计
+```
+
+将其保存为文本文件，如 `words.txt`，上传即可。上传后，分词将于 3 分钟后生效。开发者可以通过 `analyze` API（要求使用 master key）来测试：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  "https://{{host}}/1.1/search/analyze?clazz=GameScore&text=反应式设计"
+```
+
+参数包括 `clazz` 和 `text`。`text` 就是测试的文本段，返回结果：
+
+```json
 {
-"hits": 1,  
-"results": [
-  {
-    "_app_url": "http://stg.pass.com//1/go/com.leancloud/classes/GameScore/51e3a334e4b0b3eb44adbe1a",
-    "_deeplink": "com.leancloud.appSearchTest://leancloud/classes/GameScore/51e3a334e4b0b3eb44adbe1a",
-    "_highlight": null,
-    "updatedAt": "2011-08-20T02:06:57.931Z",
-    "playerName": "Sean Plott",
-    "objectId": "51e3a334e4b0b3eb44adbe1a",
-    "createdAt": "2011-08-20T02:06:57.931Z",
-    "cheatMode": false,
-    "score": 1337
-  }
-],
-"sid": "cXVlcnlUaGVuRmV0Y2g7Mzs0NDpWX0NFUmFjY1JtMnpaRDFrNUlBcTNnOzQzOlZfQ0VSYWNjUm0yelpEMWs1SUFxM2c7NDU6Vl9DRVJhY2NSbTJ6WkQxazVJQXEzZzswOw=="
+  "tokens" [
+             { "token":"反应式设计",
+               "start_offset":0,
+               "end_offset":5,
+               "type":"word",
+               "position":0 }
+           ]
 }
 ```
 
-查询的参数支持：
+自定义词库生效后，**仅对新添加或者更新的文档/记录才有效**，如果需要对原有的文档也生效的话，需要在 **存储** > **应用内搜索** 点击「强制重建索引」按钮，重建原有索引。
+同样，如果更新了自定义词库（包括删除自定义词库），也需要重建索引。
 
-参数|约束|说明
----|---|---
-`q`|必须|查询文本，支持 elasticsearch 的 query string 语法。
-`skip`|可选|跳过的文档数目，默认为 0
-`limit`|可选|返回集合大小，默认 100，最大 1000
-`sid`|可选|之前查询结果中返回的 sid 值，用于分页，对应于 elasticsearch 中的 [scroll id]。
-`fields`|可选|逗号隔开的字段列表，查询的字段列表
-<code class="text-nowrap">highlights</code>|可选|高亮字段，可以是通配符 `*`，也可以是字段列表逗号隔开的字符串。
-`clazz`|可选|类名，如果没有指定或者为空字符串，则搜索所有启用了应用内搜索的 class。
-`include`|可选|关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
-`order`|可选|排序字段，形如 `-score,createdAt` 逗号隔开的字段，负号表示倒序，可以多个字段组合排序。
-`sort`|可选|复杂排序字段，例如地理位置信息排序，见下文描述。
-
-[scroll id]: https://www.elastic.co/guide/en/elasticsearch/reference/7.4/search-request-body.html#request-body-search-scroll
-
-返回结果属性介绍：
-
-- `results`：符合查询条件的结果文档。
-- `hits`：符合查询条件的文档总数
-- `sid`：标记本次查询结果，下次查询继续传入这个 sid 用于查找后续的数据，用来支持翻页查询。
-
-返回结果 results 列表里是一个一个的对象，字段是你在应用内搜索设置里启用的字段列表，并且有三个特殊字段：
-
-- `_app_url`：应用内搜索结果在网站上的链接。
-- `_deeplink`：应用内搜索的程序调用 URL，也就是 deeplink。
-- `_highlight`: 高亮的搜索结果内容，关键字用 `em` 标签括起来。如果搜索时未传入 `highlights`　参数，则该字段为 null。 
-
-最外层的 `sid` 用来标记本次查询结果，下次查询继续传入这个 sid 将翻页查找后 200 条数据：
-
-``` sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  "https://{{host}}/1.1/search/select?q=dennis&limit=200&clazz=GameScore&order=-score&sid=cXVlcnlUaGVuRmV0Y2g7Mzs0NDpWX0NFUmFjY1JtMnpaRDFrNUlBcTNnOzQzOlZfQ0VSYWNjUm0yelpEMWs1SUFxM2c7NDU6Vl9DRVJhY2NSbTJ6WkQxazVJQXEzZzswOw"
-```
-
-直到返回结果为空。
-
-### q 查询语法举例
+## q 查询语法举例
 
 q 的查询走的是 elasticsearch 的 [query string 语法](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
+
+如果你非常熟悉 elasticsearch 的 query string 语法，那么可以跳至[地理位置信息查询](#地理位置信息查询)一节（地理位置查询是 LeanCloud 应用内搜索在 elasticsearch 上添加的扩展功能）。
 
 查询的关键字保留字符包括： `+ - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /`，当出现这些字符的时候，请对这些保留字符做 URL Escape 转义。
 
@@ -223,533 +375,3 @@ age:<=10
 ```
 
 `order` 和  `mode` 含义跟上述复杂排序里的一致，`unit` 用来指定距离单位，例如 `km` 表示千米，`m` 表示米，`cm` 表示厘米等。
-
-## moreLikeThis 相关性查询
-
-除了 `/1.1/search/select` 之外，我们还提供了 `/1.1/search/mlt` 的 API 接口，用于相似文档的查询，可以用来实现相关性推荐。
-
-假设我们有一个 Class 叫 `Post` 是用来保存博客文章的，我们想基于它的标签字段 `tags` 做相关性推荐，可以通过：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  "https://{{host}}/1.1/search/mlt?like=clojure&clazz=Post&fields=tags"
-```
-
-我们设定了 `like` 参数为 `clojure`，查询的相关性匹配字段 `fields` 是 `tags`，也就是从 `Post` 里查找 `tags` 字段跟 `clojure` 这个文本相似的对象，返回类似：
-
-``` json
-{
-"results": [
-  {  
-    "tags":[  
-          "clojure",
-           "数据结构与算法"
-     ],
-     "updatedAt":"2016-07-07T08:54:50.268Z",
-     "_deeplink":"cn.leancloud.qfo17qmvr8w2y6g5gtk5zitcqg7fyv4l612qiqxv8uqyo61n:\/\/leancloud\/classes\/Article\/577e18b50a2b580057469a5e",
-     "_app_url":"https:\/\/leancloud.cn\/1\/go\/cn.leancloud.qfo17qmvr8w2y6g5gtk5zitcqg7fyv4l612qiqxv8uqyo61n\/classes\/Article\/577e18b50a2b580057469a5e",
-     "objectId":"577e18b50a2b580057469a5e",
-     "_highlight":null,
-     "createdAt":"2016-07-07T08:54:13.250Z",
-     "className":"Article",
-     "title":"clojure persistent vector"
-  },
-  // ……
-],
-"sid": null
-}
-```
-
-除了可以通过指定 `like` 这样的相关性文本来指定查询相似的文档之外，还可以通过 likeObjectIds 指定一个对象的 objectId 列表，来查询相似的对象：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  "https://{{host}}/1.1/search/mlt?likeObjectIds=577e18b50a2b580057469a5e&clazz=Post&fields=tags"
-```
-
-这次我们换成了查找和 `577e18b50a2b580057469a5e` 这个 objectId 指代的对象相似的对象。
-
-更详细的查询参数说明：
-
-参数|约束|说明
----|---|---
-`clazz`|必须|类名
-`like`|可选|**和 `likeObjectIds` 参数二者必须提供其中之一**。代表相似的文本关键字。
-`likeObjectIds`|可选|**和 `like` 参数二者必须提供其中之一**。代表相似的对象 objectId 列表，用逗号隔开。
-`min_term_freq`|可选|**文档中一个词语至少出现次数，小于这个值的词将被忽略，默认是 2**，如果返回文档数目过少，可以尝试调低此值。
-`min_doc_freq`|可选|**词语至少出现的文档个数，少于这个值的词将被忽略，默认值为 5**，同样，如果返回文档数目过少，可以尝试调低此值。
-`max_doc_freq`|可选|词语最多出现的文档个数，超过这个值的词将被忽略，防止一些无意义的热频词干扰结果，默认无限制。
-`skip`|可选|跳过的文档数目，默认为 0
-`limit`|可选|返回集合大小，默认 100，最大 1000
-`fields`|可选|相似搜索匹配的字段列表，用逗号隔开，默认为所有索引字段 `_all`
-`include`|可选|关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
-
-更多内容参考 [ElasticSearch 文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-mlt-query.html)。
-
-## 自定义分词
-
-默认情况下， String 类型的字段都将被自动执行分词处理，我们使用的分词组件是 [mmseg](https://github.com/medcl/elasticsearch-analysis-mmseg)，词库来自搜狗。但是很多用户由于行业或者专业的特殊性，一般都有自定义词库的需求，因此我们提供了自定义词库的功能。应用创建者可以通过 **LeanCloud 控制台 > 存储 > 应用内搜索 > 自定义词库** 上传词库文件。
-
-词库文件要求为 UTF-8 编码，每个词单独一行，文件大小不能超过 512 K，例如：
-
-```
-面向对象编程
-函数式编程
-高阶函数
-响应式设计
-```
-
-将其保存为文本文件，如 `words.txt`，上传即可。上传后，分词将于 3 分钟后生效。开发者可以通过 `analyze` API（要求使用 master key）来测试：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{masterkey}},master" \
-  "https://{{host}}/1.1/search/analyze?clazz=GameScore&text=反应式设计"
-```
-
-参数包括 `clazz` 和 `text`。`text` 就是测试的文本段，返回结果：
-
-```json
-{
-  "tokens" [
-             { "token":"反应式设计",
-               "start_offset":0,
-               "end_offset":5,
-               "type":"word",
-               "position":0 }
-           ]
-}
-```
-
-自定义词库生效后，**仅对新添加或者更新的文档/记录才有效**，如果需要对原有的文档也生效的话，需要在 **存储** > **应用内搜索** 点击「强制重建索引」按钮，重建原有索引。
-同样，如果更新了自定义词库（包括删除自定义词库），也需要重建索引。
-
-## JavaScript 指南
-
-JavaScript SDK 下可以通过 `SearchQuery` 进行应用内搜索:
-
-``` javascript
-const query = new AV.SearchQuery('GameScore');
-query.queryString('dennis');
-query.find().then(function(results) {
-  console.log("Find " + query.hits() + " docs.");
-  //处理 results 结果
-}).catch(function(err){
-  //处理 err
-});
-```
-
-当 `query.hasMore()` 返回 `true` 的时候，你可以不停地调用 `query.find()` 来向下翻页。
-
-如果在不同请求之间无法保存查询的 query 对象，可以利用 sid 做到翻页，一次查询是通过 `query._sid` 来标示的，你可以通过 `query.sid("上次查询的query._sid")` 来重建查询 query 对象，继续翻页查询。sid 在 5 分钟内有效。
-
-复杂排序可以使用 `AV.SearchSortBuilder`：
-
-``` javascript
-const query = new AV.SearchQuery('GameScore');
-//假设 scores 是分数组成的数组，根据分数里的平均分倒序排序，并且没有分数的排在最后。
-query.sortBy(new AV.SearchSortBuilder().descending('scores','avg', 'last'));
-query.queryString('*');
-query.find().then(function(results) {
-      //处理结果
-});
-```
-
-更多 API 请参考 [AV.SearchQuery](https://leancloud.github.io/javascript-sdk/docs/AV.SearchQuery.html) 和 [AV.SearchSortBuilder](https://leancloud.github.io/javascript-sdk/docs/AV.SearchSortBuilder.html) 的文档。
-
-## iOS 集成
-
-你可以参照如下代码构造 AVSearchQuery 并获取搜索结果。
-
-``` objc
-AVSearchQuery *searchQuery = [AVSearchQuery searchWithQueryString:@"test-query"];
-searchQuery.className = @"className";
-searchQuery.highlights = @"field1,field2";
-searchQuery.limit = 10;
-searchQuery.cachePolicy = kAVCachePolicyCacheElseNetwork;
-searchQuery.maxCacheAge = 60;
-searchQuery.fields = @[@"field1", @"field2"];
-[searchQuery findInBackground:^(NSArray *objects, NSError *error) {
-  for (AVObject *object in objects) {
-        NSString *appUrl = [object objectForKey:@"_app_url"];
-        NSString *deeplink = [object objectForKey:@"_deeplink"];
-        NSString *hightlight = [object objectForKey:@"_highlight"];
-        // other fields
-        // code is here
-    }
-}];
-```
-
-有关查询语法，可以参考上文[搜索 API 部分](#q_查询语法举例)的介绍。
-
-对于分页，这里需要特别做出说明。因为每次请求都有 limit 限制，所以一次请求可能并不能获取到所有满足条件的记录。你可以多次调用同一个 `AVSearchQuery` 的 `findObjects` 或者 `findInBackground` 获取余下的记录。另外，`hits` 属性用于标示所有满足查询条件的记录数。
-
-``` objc
-/*!
- *  符合查询条件的记录条数，由 SDK 自动修改。
- */
-@property (nonatomic, assign) NSInteger hits;
-
-/*!
- *  当前页面的scroll id，用于分页，可选。
- #  @warning 如非特殊需求，请不要手动设置 sid。每次 findObjects 之后，SDK 会自动更新 sid。如果手动设置了错误的sid，将无法获取到搜索结果。
- *  有关scroll id，可以参考 https://www.elastic.co/guide/en/elasticsearch/reference/7.4/search-request-body.html#request-body-search-scroll
- */
-@property (nonatomic, retain) NSString *sid;
-```
-
-## Android 集成
-
-在 storage-core library 中已经包含了应用内搜索与 UI 无关的接口，在 leancloud-search library 中我们加入了一个 SearchActivity UI 类，主要是用来演示搜索结果的展示。大家可以根据自己的需要选择不同的 library 依赖：
-
-1. 如果希望直接使用我们的 SearchActivity 类来展示搜索结果，可以从 leancloud-search 开始依赖；
-2. 如果希望自己定制搜索和结果页面，可以借鉴 SearchActivity 的实现，自己实现 UI 层逻辑，而从 storage-core 开始依赖。
-
-下面的示例我们按照第一种方式来进行说明。
-
-### 添加依赖
-
-首先，修改项目的 build.gradle 文件，增加如下内容：
-
-```gradle
-implementation("cn.leancloud:leancloud-search:{{ version.unified }}@aar")
-implementation("cn.leancloud:storage-android:{{ version.unified }}")
-implementation("cn.leancloud:storage-core:{{ version.unified }}")
-```
-
-### 配置 AndroidManifest.xml
-
-打开 `AndroidManifest.xml` 文件，在里面添加需要用到的 activity 和需要的权限:
-
-``` xml
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <application...>
-       <activity
-        android:name="cn.leancloud.search.SearchActivity">
-       </activity>
-    </application>
-```
-
-注：由于一些 UI 的原因，**应用内搜索的最低 API level 要求是 12**，如你需要更低的版本支持，请参照文档中的[高级定制部分](#高级定制指南)进行开发。
-
-### 添加代码实现基础的应用内搜索功能
-
-``` java
-AVSearchQuery searchQuery = new AVSearchQuery("keyword");
-// 通过以下方法，你可以像指定html tag一样设定搜索匹配字符的高亮风格
-SearchActivity.setHighLightStyle("<font color='#E68A00'>"); 
-SearchActivity activity = new SearchActivity();
-activity.setSearchQuery(searchQuery);
-Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-intent.putExtra(AVSearchQuery.DATA_EXTRA_SEARCH_KEY, JSON.toJSONString(searchQuery));
-// 打开一个显式搜索结果的Activity
-startActivity(intent);
-```
-
-### 结果排序
-
-`AVSearchQuery` 支持排序，通过 `orderByAscending` 和 `orderByDescending` 传入要排序的字段，就可以实现按照升序或者降序排序搜索结果。多字段排序，通过 `addAscendingOrder` 和 `addDescendingOrder` 来添加多个排序字段。大体上，这块 API 调用跟 `AVQuery` 是类似的：
-
-``` java
-AVSearchQuery searchQuery = new AVSearchQuery("keyword");
-searchQuery.orderByAscending("score"); //根据score字段升序排序。
-```
-
-更复杂的排序功能，例如根据地理位置信息远近来排序，或者排序的字段是一个数组，你想使用数组内的最高值来排序等，都需要通过 `AVSearchSortBuilder` 来定制。
-
-根据地理信息位置排序：
-
-``` java
-AVSearchSortBuilder builder = AVSearchSortBuilder.newBuilder();
-builder.whereNear("location", new AVGeoPoint(30,30));
-searchQuery.setSortBuilder(builder);
-```
-
-根据数组内的最高值来排序，并且如果文档里没有这个值就放到最后：
-
-``` java
-builder.orderByDescending("scores","max","last");
-searchQuery.setSortBuilder(builder);
-```
-
-更多方法请参考 [API 文档](#q_查询语法举例)。
-
-### 高级定制指南
-
-由于每个应用的数据、UI展现要求都有很大的差别，所以单一的搜索组件界面仅仅能够满足较为简单的要求，所以我们将数据接口和 UI 展示进行了分离，开发者可以在 AVSearchQuery 中配置展示的 `title` 和 `highlights` 属性，来动态改变 SearchActivity 中展示的内容。配置 API 如下：
-
-```java
-/**
-  * 指定 Title 所对应的 Field。
-  *
-  * @param titleAttribute
-  */
-public void setTitleAttribute(String titleAttribute);
-
-/**
-  * 设置返回的高亮语法，默认为"*"
-  * 语法规则可以参考 https://www.elastic.co/guide/en/elasticsearch/reference/6.5
-  * /search-request-highlighting.html#highlighting-settings
-  *
-  * @param hightlights
-  */
-public void setHightLights(String hightlights);
-```
-
-也可以参考 [我们的 `SearchActivity`](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/leancloud-search/src/main/java/cn/leancloud/search/SearchActivity.java) 来更好的指定你自己的搜索结果页面。
-
-### 分页查询
-
-通过 `findInBackgroud` 方法做定制查询的话，如果需要分页，你仅仅需要通过多次调用同一个 `AVSearchQuery` 的 `findInBackgroud` 即可实现翻页效果，它将返回下一页搜索结果，直到末尾。
-
-搜索结果的文档总数可以通过 `AVSearchQuery` 的 `getHits` 方法得到。
-
-### 查询语法简介
-
-在AVSearchQuery中间可以设置query语句来指定查询条件：`AVSearchQuery.setQuery(String query)`。
-
-#### 基础搜索
-
-传入最简单的字符串查询
-
-``` java
-AVSearchQuery query = new AVSearchQuery("basic-query");//搜索包含basic-query的值
-```
-
-#### 字段搜索
-
-你也可以通过指定某个特定字段的值或者值域区间
-
-``` java
-query.setQuery("status:active");//搜索status字段包含active
-query.setQuery("title:(quick brown)");//搜索title包含quick或者brown
-query.setQuery("age:>=10");//搜索年龄大于等于10的数据
-query.setQuery("age:(>=10 AND < 20)");//搜索年龄在[10,20)区间内的数据
-```
-
-#### 模糊搜索
-
-``` java
-  query.setQuery("qu?c*k");//此处?代表一个字符，*代表0个或者多个字符。类似正则表达式通配符
-```
-
-也请参考 [API 文档的相应部分](#q_查询语法举例)。
-
-## DeepLink
-
-如上所述，DeepLink 功能让应用可以响应外部调用链接。
-这样，当用户在移动端网页搜索关键字之后：
-
-- 如果用户安装了应用，直接打开应用并跳转到正确的页面。
-- 如果用户没有安装应用，则显示出应用下载页面，让用户来安装应用。
-- 如果用户不愿意安装，那么用户仍然可以直接在网页查看搜索结果的内容。
-
-这是效果图，点击 **打开应用** 即可跳转到具体界面：
-
-![image](images/deeplink_tododemo.png)
-
-### 设置应用内搜索选项
-
-为了能够让用户直接在搜索结果中打开相关的应用，开发者需要让自己的应用支持外部调用。我们使用 AppURL 来指向一个可以在应用里展现的 Class 数据，格式如下：
-
-```
-{URL Scheme}://{ URL Host }/{ Resource Path }
-```
-进入 **控制台 > 存储 > 应用内搜索 > 基本设置**，注意以下几个关键的属性：
-
-- **应用名称**：你的应用名称（必须）
-- **应用 URL Scheme**：支持外部调用的 URL scheme，我们强制要求采用**域名反转**的方式，类似 Java 语言的 package 命名机制。假设你的应用的域名为 `myapp.company.com`，那么我们要求的 scheme 就是形如 `com.company.myapp` 的字符串。例如我们的 Todo Demo 设置的 scheme 为 `com.leancloud.todo`。如果你没有域名，那么我们推荐你使用 `com.leancloud.{appId的前8位}` 来作为 Scheme。我们会在保存的时候检测 scheme 是否冲突。
-- **应用 URL Host**：支持外部调用的 URL Host，可不设置，但是我们推荐使用默认值 `leancloud`，防止跟其他 AppURL 提供商冲突。
-
-其他一些属性，都是用于设置你的应用的下载地址，例如：
-
-- iPhone 应用下载地址：你的应用的 iPhone 版本的 App Store 下载链接，或者你的网站链接。
-- iPad 应用下载地址：你的应用的 iPad 版本的 App Store 下载链接，或者你的网站链接。
-
-这些链接都是可选的，当用户没有安装你的应用的时候，无法直接从搜索结果打开应用，将展示这些下载链接给用户下载你的应用。
-
-设置保存之后，你应该可以通过下列链接访问到你的应用信息：
-
-```
-https://{{host}}/1.1/go/{your uri scheme}/
-```
-
-查看到你的 App URL 应用设置信息。
-
-例如，我们的 todo 应用就是：
-
-```
-https://{{host}}/1.1/go/com.leancloud.todo
-```
-
-配置之后，还需要让你的应用响应搜索结果的 URL 调用。
-请参见下面 [iOS](#iOS_应用支持外部调用) 和 [Android](#Android_应用支持外部调用) 的说明。
-
-### 数据模板
-
-在为 Class 启用搜索时，可以配置数据模板。
-当外部调用无法打开应用（通常是用户没有安装应用）的时候，将渲染这个模板并展现给用户，默认的模板的只是渲染一些下载链接，你可以自定义这个模板的样式，比如加入你的应用 Logo， 添加 CSS 等。
-
-数据模板支持 [handlebars 模板语法](http://handlebarsjs.com/) ，支持的变量（使用两个大括号包起来 {{ docs.mustache("var") }}）包括：
-
-- **app_uri** (String) 打开应用的 URL，就是前面提到的 `{URL Scheme} : // {URL Host} / {Resource Path}`。
-
-- **applinks** (Object) 应用内搜索配置对象，包括：
-  
-  - app_name
-  - android_phone_link
-  - android_pad_link
-  - iphone_link
-  - ipad_link
-
-  等等，也就是应用名称，和各种平台应用的下载链接。
-
-- **qrcode_uri** (String) 本页面的二维码图片链接，用户可以用扫描器扫描打开该页面。
-
-- **object** (Object) 查询出来的 object 对象，默认至少包括：`objectId`、`createdAt`、`updatedAt` 三个属性。其他是你在选择开放的列。
-
-以我们的 Todo Demo 为例，我们启用了 Todo 的应用内搜索功能，选择了开放字段`content`，设定数据模板（省略了css）为：
-
-<pre><code class="lang-html">&lt;div class=&quot;wrap&quot;&gt;
-  &lt;div class=&quot;section section-open&quot;&gt;
-    &lt;div class=&quot;section-inner&quot;&gt;
-      &lt;p&gt;Todo Content: {{ docs.mustache("object.content") }}&lt;/p&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;section section-open&quot;&gt;
-    &lt;div class=&quot;section-inner&quot;&gt;
-      &lt;p&gt;已安装 {{ docs.mustache("applinks.app_name") }}？你可以:&lt;/p&gt;
-      &lt;p&gt;&lt;a href='{{ docs.mustache("app_uri") }}' class=&quot;btn&quot;&gt;直接打开应用&lt;/a&gt;&lt;/p&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;section section-download&quot; &gt;
-    &lt;div class=&quot;section-inner&quot;&gt;
-      &lt;p&gt;或者下载应用:&lt;/p&gt;
-      &lt;div &gt;
-        &lt;p&gt;&lt;a href='{{ docs.mustache("applinks.iphone_link") }}'&gt;iPhone 应用&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;a href='{{ docs.mustache("applinks.ipad_link") }}'&gt;iPad 应用&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;a href='{{ docs.mustache("applinks.android_phone_link") }}'&gt;Android 手机应用&lt;/a&gt;&lt;/p&gt;
-        &lt;p&gt;&lt;a href='{{ docs.mustache("applinks.android_pad_link") }}'&gt;Android 平板应用&lt;/a&gt;&lt;/p&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-</code></pre>
-
-在 LeanCloud 索引完成数据后，你应当可以通过下列 URL 访问到一条数据，如果在安装了 Todo Demo 应用的移动设备上访问下面这个URL，应该会打开应用展现这条 Todo 的内容:
-
-```
-https://{{host}}/1.1/go/com.leancloud.todo/classes/Todo/5371f3a9e4b02f7aee2c9a18
-```
-
-如果直接在 PC 浏览器打开上述链接会看到类似如下的数据渲染页面：
-
-![image](images/todo_render.png)
-
-### iOS 应用支持外部调用
-
-你可以通过编辑应用 [information property list](http://developer.apple.com/library/ios/#documentation/general/Reference/InfoPlistKeyReference/Introduction/Introduction.html)，使得你的应用可以处理 URL Scheme。下图展示了如何为你的应用注册 URL Scheme。
-
-![image](images/ios_register_url_scheme.png)
-
-需要注意的是，你这里的 URL Scheme 应该和你在我们网站上面设置的 URL Scheme 保持一致。
-
-注册完了 URL Scheme，你还需要实现 [application method openURL](http://developer.apple.com/library/ios/#DOCUMENTATION/UIKit/Reference/UIApplication_Class/Reference/Reference.html#jumpTo_37) 。对于 TodoDemo，应该按照如下方法实现。
-
-``` objc
-/*
- * 这里的 url.path 应该是 "com.leancloud.todo://leancloud/classes/Todo/5371f3a9e4b02f7aee2c9a18"
- */
-(BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    NSString *objectId = [url.path lastPathComponent];
-
-    AVObject *todo = [AVObject objectWithClassName:@"Todo"];
-    todo.objectId = objectId;
-    [todo fetchInBackgroundWithBlock:^(AVObject *object, NSError *error) {
-        // 调用展示数据的方法
-        // code is here
-    }];
-    return YES;
-}
-```
-
-### Android 应用支持外部调用
-
-在 Android 里，我们可以通过为 Activity 注册 `intent-filter` 来实现。以我们的 Todo Demo 为例，我们想在 `CreateTodo` 这个 Activity 里面展现搜索出来的某一条 Todo 内容，在 `AndroidManifest.xml` 注册 `intent-filter` 配置如下
-
-``` xml
-<activity android:name="com.avos.demo.CreateTodo" >
-  <intent-filter>
-    <action android:name="android.intent.action.VIEW" />
-    <category android:name="android.intent.category.DEFAULT" />
-    <category android:name="android.intent.category.BROWSABLE" />
-    <!-- 处理以"com.leancloud.todo://leancloud/classes/Todo/"开头的 URI -->
-    <data android:scheme="com.leancloud.todo" />
-    <data android:host="leancloud" />
-    <data android:pathPrefix="/classes/Todo/" />
-  </intent-filter>
-</activity>
-```
-
-- `android:scheme`：设置为你为应用选择的 URL Scheme，这里是 `com.leancloud.todo`
-- `android:host`：设置为你为应用选择的 URL Host，默认为 `leancloud`。
-- `android:pathPrefix`：具体的资源路径前缀，搜索结果的URL具体路径都将展现为`/classes/{className}/{objectId}`，这里的 className 就是 `Todo`，因此路径前缀为 `classes/Todo/`。
-- `action`：必须设置为`android.intent.action.VIEW`，并且加入 `DEFAULT` 和 `BROWSABLE` 的 Category。
-
-接下来在 `CreateTodo` Activity的 `onCreate` 方法里我们接收这个 action 并获取 URL 展现数据：
-
-``` java
-Intent intent = getIntent();
-// 通过搜索结果打开
-if (intent.getAction() == Intent.ACTION_VIEW) {
-  // 如果是VIEW action，我们通过getData获取URI
-  Uri uri = intent.getData();
-  String path = uri.getPath();
-  int index = path.lastIndexOf("/");
-  if (index > 0) {
-  // 获取objectId
-  objectId = path.substring(index + 1);
-  Todo todo = new Todo();
-  todo.setObjectId(objectId);
-  // 通过Fetch获取content内容
-  todo.fetchInBackground(new GetCallback<AVObject>() {
-    @Override
-    public void done(AVObject todo, AVException arg1) {
-    if (todo != null) {
-      String content = todo.getString("content");
-      if (content != null) {
-      contentText.setText(content);
-      }
-    }
-    }
-  });
-  }
-}
-```
-
-开发者可以参考我们的示例代码：[ResultItemActivity.java](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/leancloud-search-sample/src/main/java/cn/leancloud/demo/leancloud_search_sample/ResultItemActivity.java)。
-
-我们通过 `adb` 的 `am` 命令来测试配置是否有效，如果能够正常地调用 `CreateTodo`页面，则证明配置正确：
-
-``` sh
-adb shell am start -W -a "android.intent.action.VIEW" -d "yourUri" yourPackageName
-```
-
-在 Todo 例子里就是：
-
-``` sh
-adb shell am start -W -a "android.intent.action.VIEW"  \
-  -d "com.leancloud.todo://leancloud/classes/Todo/5371f3a9e4b02f7aee2c9a18" \
-  com.avos.demo
-```
-
-如果一切正常的话，这将直接打开应用并在 `CreateTodo` 里展现 objectId 为 `536cf746e4b0d914a19ec9b3` 的 Todo 对象数据数据。

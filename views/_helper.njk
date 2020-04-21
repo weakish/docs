@@ -315,4 +315,34 @@ className-{{ name }}
     { lang: "java", value: "AVIMMessageStatusFailed"},
     { lang: "cs", value: "AVIMMessageStatusFailed"}
   ])}}
+  {{ useLangSpec('AV.SearchQuery', [
+    { lang: "js", value: "AV.SearchQuery" },
+    { lang: "objc", value: "AVSearchQuery" },
+    { lang: "java", value: "AVSearchQuery" }
+  ])}}
+  {{ useLangSpec('hits()', [
+    { lang: "js", value: "hits()" },
+    { lang: "objc", value: "hits" },
+    { lang: "java", value: "getHits()" }
+  ])}}
+  {{ useLangSpec('find()', [
+    { lang: "js", value: "find()" },
+    { lang: "objc", value: "findInBackground()" },
+    { lang: "java", value: "findInBackgroud" }
+  ])}}
+  {{ useLangSpec('_sid', [
+    { lang: "js", value: "_sid" },
+    { lang: "objc", value: "sid" },
+    { lang: "java", value: "sid" }
+  ])}}
+  {{ useLangSpec('sid()', [
+    { lang: "js", value: "sid()" },
+    { lang: "objc", value: "sid" },
+    { lang: "java", value: "setSid()" }
+  ])}}
+  {{ useLangSpec('AV.SearchSortBuilder', [
+    { lang: "js", value: "AV.SearchSortBuilder" },
+    { lang: "objc", value: "AVSearchSortBuilder" },
+    { lang: "java", value: "AVSearchSortBuilder" }
+  ])}}
 {% endmacro %}
