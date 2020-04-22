@@ -8,7 +8,7 @@
 | /1.1/search/mlt | GET | moreLikeThis 相关性查询 |
 
 在调用应用内搜索的 REST API 接口前，需要首先[为相应的 Class 启用搜索](app_search_guide.html#为_Class_启用搜索)。
-另外也请参考 REST API 指南中关于 [API Base URL](rest_api.html#api-base-url)、[请求格式](rest_api.html#请求格式)、[响应格式](rest_api.html#响应格式)的说明，以及应用内搜索开发指南的 [自定义分词](app_search_guide.html#自定义分词)章节。
+另外也请参考 REST API 指南中关于 [API Base URL](rest_api.html#api-base-url)、[请求格式](rest_api.html#请求格式)、[响应格式](rest_api.html#响应格式)的说明，以及应用内搜索开发指南的[自定义分词](app_search_guide.html#自定义分词)章节。
 
 ## 全文搜索
 
@@ -88,7 +88,7 @@ curl -X GET \
 
 除了 `/1.1/search/select` 之外，我们还提供了 `/1.1/search/mlt` 的 API 接口，用于相似文档的查询，可以用来实现相关性推荐。
 
-假设我们有一个 Class 叫 `Post` 是用来保存博客文章的，我们想基于它的标签字段 `tags` 做相关性推荐，可以通过：
+假设我们有一个 Class 叫 `Post` 是用来保存博客文章的，我们想基于它的标签字段 `tags` 做相关性推荐：
 
 ```sh
 curl -X GET \

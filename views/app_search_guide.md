@@ -2,7 +2,7 @@
 {% from "views/_data.njk" import libVersion as version %}
 
 {{ docs.defaultLang('js') }}
-{{ docs.useIMLangSpec()}}
+{{ docs.useSearchLangSpec() }}
 
 # 应用内搜索开发指南
 
@@ -20,7 +20,7 @@ LeanCloud 也提供了与应用内搜索搭配使用的 [DeepLink](deeplink.html
 你可以在「控制台 > 存储 > 应用内搜索」为 Class 启用搜索，点击「添加 Class」：
 
 - **Class**：选择需要启用搜索的 Class。开发版应用最多允许 5 个 Class 启用应用内搜索，商用版应用最多允许 10 个 Class 启用应用内搜索。
-- **开放的列**：你可以选择哪些字段将加入索引引擎用于搜索。默认情况下，`objectId`、`createdAt`、`updatedAt` 三个字段将无条件加入开放字段列表。除了这三个字段外，开发版应用每个 Class 最多允许索引 5 个字段，商用版应用每个 Class 最多允许索引 10 个字段。请仔细挑选要索引的字段。
+- **开放的列**：你可以选择将哪些字段加入搜索索引。默认情况下，`objectId`、`createdAt`、`updatedAt` 三个字段将无条件加入开放字段列表。除了这三个字段外，开发版应用每个 Class 最多允许索引 5 个字段，商用版应用每个 Class 最多允许索引 10 个字段。请仔细挑选要索引的字段。
 
 **如果一个 Class 启用了应用内搜索，但是超过两周没有任何搜索调用，我们将自动禁用该 Class 的搜索功能。**
 
@@ -89,10 +89,10 @@ searchQuery.findInBackground().subscribe(new Observer<List<AVObject>>() {
 });
 ```
 
-有关查询语法，可以参考下文[q 查询语法举例](#q_查询语法举例)的介绍。
+有关查询语法，可以参考下文 [q 查询语法举例](#q_查询语法举例)的介绍。
 
 因为每次请求都有 limit 限制，所以一次请求可能并不能获取到所有满足条件的记录。
-`AV.SearchQuery` 的 `hits()` 标示所有满足查询条件的记录数。
+`AVSearchQuery` 的 `hits()` 标示所有满足查询条件的记录数。
 你可以多次调用同一个 `AV.SearchQuery` 的 `find()` 获取余下的记录。
 
 如果在不同请求之间无法保存查询的 query 对象，可以利用 sid 做到翻页，一次查询是通过 `AV.SearchQuery` 的 `_sid` 属性来标示的。
