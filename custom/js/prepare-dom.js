@@ -108,7 +108,7 @@ var codeBlockTabber = (function () {
       hash = ((hash << 5) - hash) + chr;
       hash |= 0; // Convert to 32bit integer
     }
-    return hash;
+    return hash.toString();
   };
 
   function checkApiName(targetLang) {
@@ -179,7 +179,7 @@ var codeBlockTabber = (function () {
         var codeKey = $(this).data('codeKey');
         if (codeKey) {
           var codeId = getHashCode(codeKey);
-          $(this).addClass(`${codeId}`);
+          $(this).addClass(codeId);
         }
       });
 
@@ -188,7 +188,7 @@ var codeBlockTabber = (function () {
         if (code.children().length > 0) return;
         var codeContent = code.html().toString();
         var codeId = getHashCode(codeContent);
-        code.attr("data-code-id", `${codeId}`);
+        code.attr("data-code-id", codeId);
       });
     }
   }
