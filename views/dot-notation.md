@@ -76,3 +76,11 @@ member.set("occupation": '{ "profession": "Software Developer" }')
 member.set("occupation": "{}")
 member.set("occupation.profession", "Software Developer")
 ```
+
+更新数组的操作（`add`、`addUnique`、`remove`）同样适用于内嵌于字段的数组，可以搭配点号使用。
+例如，假设 `Article` 类的 `section` 字段的类型为对象（object)，其中有一个属性 `tags` 是一个数组，那么我们可以通过以下方式新增标签：
+
+```js
+const article = new AV.Object.createWithoutData('Article', '582570f38ac247004f39c24b');
+article.addUnique('section.tags', ['LeanStorage', 'JavaScript']);
+```
