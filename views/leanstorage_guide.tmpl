@@ -4025,7 +4025,7 @@ AVQuery *priority2Query = [AVQuery queryWithClassName:@"Todo"];
 AVQuery *priority3Query = [AVQuery queryWithClassName:@"Todo"];
 [priority3Query whereKey:@"priority" equalTo:@3];
 
-AVQuery *priorityQuery = [AVQuery orQueryWithSubqueries:[NSArray arrayWithObjects:priority2Query, priority3Query, nil]]; 
+AVQuery *priorityQuery = [AVQuery orQueryWithSubqueries:[NSArray arrayWithObjects:priority2Query, priority3Query, nil]];
 AVQuery *timeLocationQuery = [AVQuery orQueryWithSubqueries:[NSArray arrayWithObjects:locationQuery, createdAtQuery, nil]];
 AVQuery *query = [AVQuery andQueryWithSubqueries:[NSArray arrayWithObjects:priorityQuery, timeLocationQuery, nil]];
 ```
@@ -4045,7 +4045,7 @@ priority2Query.equalTo('priority', 2);
 const priority3Query = new AV.Query('Todo');
 priority3Query.equalTo('priority', 3);
 
-const priorityQuery = AV.Query.or(priority2Query, priority3Query); 
+const priorityQuery = AV.Query.or(priority2Query, priority3Query);
 const timeLocationQuery = AV.Query.or(locationQuery, createdAtQuery);
 const query = AV.Query.and(priorityQuery, timeLocationQuery);
 ```
@@ -4070,7 +4070,7 @@ priority_3_query = Todo.query
 priority_3_query.equal_to('priority', 3)
 
 priority_query = leancloud.Query.or_(priority_2_query, priority_3_query)
-time_location_query = leancloud.Query.or_(created_at_query, location_query) 
+time_location_query = leancloud.Query.or_(created_at_query, location_query)
 query = leancloud.Query.and_(priority_query, time_location_query)
 ```
 {% endif %}
@@ -4091,8 +4091,8 @@ $priority2Query->equalTo("priority", 2);
 $priority3Query = new Query("Todo");
 $priority3Query->equalTo("priority", 3);
 
-$priorityQuery = Query::orQuery($priority2Query, $priority3Query)
-$timeLocationQuery = Query::orQuery($createdAtQuery, $locationQuery) 
+$priorityQuery = Query::orQuery($priority2Query, $priority3Query);
+$timeLocationQuery = Query::orQuery($createdAtQuery, $locationQuery);
 $query = Query::andQuery($priorityQuery, $timeLocationQuery);
 ```
 {% endif %}
@@ -4143,9 +4143,9 @@ priority2Query.whereKey("priority", .equalTo(2))
 let priority3Query = LCQuery(className: "Todo")
 priority3Query.whereKey("priority", .equalTo(3))
 
-let priorityQuery = priority2Query.or(priority3Query) 
+let priorityQuery = priority2Query.or(priority3Query)
 let timeLocationQuery = locationQuery.or(createdAtQuery)
-let query = priorityQuery.and(timeLocationQuery) 
+let query = priorityQuery.and(timeLocationQuery)
 ```
 {% endif %}
 {% if platform_name === "Flutter" %}
