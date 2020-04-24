@@ -302,9 +302,9 @@ AV.User.loginWithWeapp({
 
 用 unionid + openid 登录时，会按照下面的步骤进行用户匹配：
 
-1. 如果已经存在对应 unionid（`authData._weixin_unionid.uid`）的用户，则会直接作为这个用户登录，并将所有信息（`openid`、`session_key`、`unionid` 等）更新到该用户的 `authData.lc_ewapp` 中。
-2. 如果不存在匹配 unionid 的用户，但存在匹配 openid（`authData.lc_weapp.openid`）的用户，则会直接作为这个用户登录，并将所有信息（`session_key`、`unionid` 等）更新到该用户的 `authData.lc_ewapp` 中，同时将 `unionid` 保存到 `authData._weixin_unionid.uid` 中。
-3. 如果不存在匹配 unionid 的用户，也不存在匹配 openid 的用户，则创建一个新用户，将所有信息（`session_key`、`unionid` 等）更新到该用户的 `authData.lc_ewapp` 中，同时将 `unionid` 保存到 `authData._weixin_unionid.uid` 中。
+1. 如果已经存在对应 unionid（`authData._weixin_unionid.uid`）的用户，则会直接作为这个用户登录，并将所有信息（`openid`、`session_key`、`unionid` 等）更新到该用户的 `authData.lc_weapp` 中。
+2. 如果不存在匹配 unionid 的用户，但存在匹配 openid（`authData.lc_weapp.openid`）的用户，则会直接作为这个用户登录，并将所有信息（`session_key`、`unionid` 等）更新到该用户的 `authData.lc_weapp` 中，同时将 `unionid` 保存到 `authData._weixin_unionid.uid` 中。
+3. 如果不存在匹配 unionid 的用户，也不存在匹配 openid 的用户，则创建一个新用户，将所有信息（`session_key`、`unionid` 等）更新到该用户的 `authData.lc_weapp` 中，同时将 `unionid` 保存到 `authData._weixin_unionid.uid` 中。
 
 不管匹配的过程是如何的，最终登录用户的 `authData` 都会是上面这种结构。
 
