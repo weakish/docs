@@ -1918,7 +1918,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
 
 {{ docs.langSpecStart('objc') }}
 
-Objective-C SDK 是通过实现 `AVIMClientDelegate` 代理来响应新消息到达通知的，并且，分别使用了两个方法来分别处理普通的 `AVIMMessage` 消息和内建的多媒体消息 `AVIMTypedMessage`（包括应用层由此派生的自定义消息）：
+Objective-C SDK 是通过实现 `AVIMClientDelegate` 代理来响应新消息到达通知的，并且，分别使用了两个方法来分别处理普通的 `AVIMMessage` 消息和内建的多媒体消息 `AVIMTypedMessage`（包括应用层由此派生的[自定义消息](realtime-guide-intermediate.html#自定义消息类型)）：
 
 ```objc
 /*!
@@ -2079,7 +2079,11 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
       var location = message.getLocation();
       console.log('收到位置消息，纬度：' + location.latitude + '，经度：' + location.longitude);
       break;
+    case OperationMessage.TYPE:
+      console.log('OperationMessage 是自定义消息类型');
     default:
+      // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
+      // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
       console.warn('收到未知类型消息');
   }
 });
@@ -2112,47 +2116,14 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
                     print(locationMessage)
                 case let recalledMessage as IMRecalledMessage:
                     print(recalledMessage)
+                case let customMessage as CustomMessage:
+                    print("customMessage 是自定义消息类型")
                 default:
-                    break
-                }
+                    // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
+                    // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
+                    print("收到未知类型消息")
             } else {
                 print(message)
-            }
-        default:
-            break
-        }
-    default:
-        break
-    }
-}
-
-// 处理自定义类型消息
-class CustomMessage: IMCategorizedMessage {
-    
-    class override var messageType: MessageType {
-        return 1
-    }    
-}
-
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    
-    do {
-        try CustomMessage.register()
-    } catch {
-        print(error)
-        return false
-    }
-    
-    return true
-}
-
-func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
-    switch event {
-    case .message(event: let messageEvent):
-        switch messageEvent {
-        case .received(message: let message):
-            if let customMessage = message as? CustomMessage {
-                print(customMessage)
             }
         default:
             break
@@ -2177,25 +2148,16 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
         // 处理文件消息
     } else if(message.mediaType == kAVIMMessageMediaTypeText){
         // 处理文本消息
-    }
-}
-
-// 处理自定义类型消息
-
-// 1. 注册子类
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [AVIMCustomMessage registerSubclass];
-}
-// 2. 接收消息
-- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
-    if (message.mediaType == 1) {
-        AVIMCustomMessage *imageMessage = (AVIMCustomMessage *)message;
-        // 处理图像消息
+    } else if(message.mediaType == 123){
+        // 处理自定义的消息类型
+    } else {
+        // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
+        // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
     }
 }
 ```
 ```java
-// 1. 注册默认 handler
+// 1. 注册默认 handler，只有其他 handle 都没有被调用到时才会调用
 AVIMMessageManager.registerDefaultMessageHandler(new AVIMMessageHandler(){
     public void onMessage(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
         // 接收消息
@@ -2237,28 +2199,18 @@ AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, new AVIMTypedM
                 // 执行其他逻辑
                 AVIMRecalledMessage recalledMessage = (AVIMRecalledMessage)message;
                 break;
+            case 123:
+                // 这是一个自定义消息类型
+                // 执行其他逻辑
+                CustomMessage customMessage = (CustomMessage)message;
             default:
-                // UnsupportedMessageType
+                // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
+                // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
                 break;
         }
     }
 
     public void onMessageReceipt(AVIMTypedMessage message, AVIMConversation conversation, AVIMClient client) {
-        // 执行收到消息后的逻辑
-    }
-});
-
-// 处理自定义类型消息
-public class CustomMessage extends AVIMMessage {
-  
-}
-
-AVIMMessageManager.registerMessageHandler(CustomMessage.class, new MessageHandler<CustomMessage>(){
-    public void onMessage(CustomMessage message, AVIMConversation conversation, AVIMClient client) {
-        // 接收消息
-    }
-
-    public void onMessageReceipt(CustomMessage message, AVIMConversation conversation, AVIMClient client){
         // 执行收到消息后的逻辑
     }
 });
@@ -2287,10 +2239,15 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
     {
 
     }
+    else if (e.Message is InputtingMessage)
+    {
+        Debug.Log(string.Format("收到自定义消息 {0} {1}", inputtingMessage.TextContent, inputtingMessage.Ecode));
+    }
     else if (e.Message is AVIMTypedMessage baseTypedMessage)
     {
-
-    } // 这里可以继续添加自定义类型的判断条件
+        // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
+        // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
+    }
 }
 ```
 
