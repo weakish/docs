@@ -2079,7 +2079,7 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
       var location = message.getLocation();
       console.log('收到位置消息，纬度：' + location.latitude + '，经度：' + location.longitude);
       break;
-    case OperationMessage.TYPE:
+    case 1:
       console.log('OperationMessage 是自定义消息类型');
     default:
       // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
