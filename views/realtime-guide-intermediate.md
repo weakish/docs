@@ -1657,8 +1657,6 @@ messageWithCity["city"] = "北京";
 
 > 注意：如果你是使用 Kotlin 来开发，由于 Kotlin 对反射的处理方式与 Java 有细微差异，导致 `AVIMMessageField` 注释不能产生作用，所以 SDK 实际发送的自定义消息数据不全。我们已经在 `6.4.4` 版本的 SDK 中对这一问题进行了优化，请 Kotlin 开发者升级到 6.4.4 及其后续版本来定制子类化消息。
 
-`AVIMTextMessage` 的源码如下，可供参考：
-
 {{ docs.langSpecEnd('java') }}
 
 {{ docs.langSpecStart('cs') }}
@@ -1679,19 +1677,22 @@ var inherit = require('inherit');
 export const OperationMessage = inherit(TypedMessage);
 // 指定 type 类型，可以根据实际换成其他正整数
 messageType(1)(OperationMessage);
-// 申明需要发送 op 字段
+// 声明需要发送 op 字段
 messageField('op')(OperationMessage);
 // 注册消息类，否则收到消息时无法自动解析为 OperationMessage
 realtime.register(OperationMessage);
 ```
 ```swift
+// 定义 CustomMessage 类
 class CustomMessage: IMCategorizedMessage {
     
+    // 指定 type 类型，可以根据实际换成其他正整数
     class override var messageType: MessageType {
         return 1
     }
 }
 
+// 注册消息类型
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     
     do {
@@ -1702,22 +1703,6 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
     }
     
     return true
-}
-
-func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
-    switch event {
-    case .message(event: let messageEvent):
-        switch messageEvent {
-        case .received(message: let message):
-            if let customMessage = message as? CustomMessage {
-                print(customMessage)
-            }
-        default:
-            break
-        }
-    default:
-        break
-    }
 }
 ```
 ```objc
@@ -1737,25 +1722,16 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
 
 @end
 
-// 1. 注册子类
+// 注册子类
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [CustomMessage registerSubclass];
 }
-// 2. 接收消息
-- (void)conversation:(AVIMConversation *)conversation didReceiveTypedMessage:(AVIMTypedMessage *)message {
-    if (message.mediaType == 123) {
-        CustomMessage *imageMessage = (CustomMessage *)message;
-        [imageMessage setObject:@"value" forKey:@"customKey"];
-        NSString *value = [imageMessage objectForKey:@"customKey"];
-        // 处理自定义消息
-    }
-}
 ```
 ```java
-@AVIMMessageType(type = AVIMMessageType.TEXT_MESSAGE_TYPE)
-public class AVIMTextMessage extends AVIMTypedMessage {
+@AVIMMessageType(type = 123)
+public class CustomMessage extends AVIMTypedMessage {
   // 空的构造方法，不可遗漏
-  public AVIMTextMessage() {
+  public CustomMessage() {
 
   }
 
@@ -1780,6 +1756,9 @@ public class AVIMTextMessage extends AVIMTypedMessage {
     this.attrs = attr;
   }
 }
+
+// 注册自定义类型
+AVIMMessageManager.registerAVIMMessageType(CustomMessage.class); 
 ```
 ```cs
 // 定义自定义消息类名
@@ -1796,34 +1775,6 @@ public class InputtingMessage : AVIMTypedMessage
 
 // 注册子类
 realtime.RegisterMessageType<InputtingMessage>();
-
-// 现在我们发送一个自己定义的消息：
-var inputtingMessage = new InputtingMessage();
-// 这里的 TextContent 继承自 AVIMTypedMessage
-inputtingMessage.TextContent = "对方正在输入…";
-// 这里的 Ecode 是我们刚刚自己定义的
-inputtingMessage.Ecode = "#e001";
-        
-// 执行此行代码前，用户已经登录并拿到了当前的 conversation 对象
-await conversation.SendMessageAsync(inputtingMessage);
-
-// 在同一个 `conversation` 中的其他用户，接收该条自定义消息的方法为：
-async void Start() 
-{   
-    var jerry = await realtime.CreateClientAsync("jerry");
-    // 接收消息事件
-    jerry.OnMessageReceived += Jerry_OnMessageReceived;
-}
-void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
-{
-    if (e.Message is InputtingMessage)
-    {
-        var inputtingMessage = (InputtingMessage)e.Message;
-        Debug.Log(string.Format("收到自定义消息 {0} {1}", inputtingMessage.TextContent, inputtingMessage.Ecode));
-    }
-}
-
-// 在这个案例中，通过「对方正在输入…」这种场景，我们介绍了如何自定义消息，但要真正实现「对方正在输入…」这个完整的功能，我们还需要指定该条消息为「[暂态消息](#暂态消息)」。
 ```
 
 自定义消息的接收，可以参看 [前一章：再谈接收消息](realtime-guide-beginner.html#再谈接收消息)。
