@@ -2119,11 +2119,11 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
                 case let customMessage as CustomMessage:
                     print("customMessage 是自定义消息类型")
                 default:
-                    // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
-                    // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
-                    print("收到未知类型消息")
+                    break
             } else {
-                print(message)
+                // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
+                // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
+                print("收到未知类型消息")
             }
         default:
             break
@@ -2150,10 +2150,13 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
         // 处理文本消息
     } else if(message.mediaType == 123){
         // 处理自定义的消息类型
-    } else {
-        // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
-        // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
-    }
+    } 
+}
+
+// 处理未知消息类型
+- (void)conversation:(AVIMConversation *)conversation didReceiveCommonMessage:(AVIMMessage *)message {
+    // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
+    // 因此别忘了在这里处理未知类型，例如提示用户升级客户端至最新版本。
 }
 ```
 ```java
@@ -2164,7 +2167,8 @@ AVIMMessageManager.registerDefaultMessageHandler(new AVIMMessageHandler(){
     }
 
     public void onMessageReceipt(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
-        // 执行收到消息后的逻辑
+        // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
+        // 因此别忘了在这里处理未知类型，例如提示用户升级客户端至最新版本。
     }
 });
 // 2. 为每一种消息类型注册 handler
@@ -2203,9 +2207,6 @@ AVIMMessageManager.registerMessageHandler(AVIMTypedMessage.class, new AVIMTypedM
                 // 这是一个自定义消息类型
                 // 执行其他逻辑
                 CustomMessage customMessage = (CustomMessage)message;
-            default:
-                // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
-                // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
                 break;
         }
     }
@@ -2243,11 +2244,7 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
     {
         Debug.Log(string.Format("收到自定义消息 {0} {1}", inputtingMessage.TextContent, inputtingMessage.Ecode));
     }
-    else if (e.Message is AVIMTypedMessage baseTypedMessage)
-    {
-        // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
-        // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
-    }
+    // C# SDK 会直接丢弃未知类型的消息
 }
 ```
 
