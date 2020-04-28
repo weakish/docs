@@ -136,8 +136,8 @@ Node.js 的 `package.json` 中可以指定 [很多选项](https://docs.npmjs.com
 
 ```
 # 井号至行尾为注释
-leancloud>=2.0.0,<3.0.0
-Flask>=0.10.1,<1.0.0                               # 可以指定版本号／范围
+leancloud>=2.6.0,<3.0.0
+Flask>=1.0.0                                       # 可以指定版本号／范围
 git+https://github.com/foo/bar.git@master#egg=bar  # 可以使用 Git/SVN 等版本管理工具的远程地址
 ```
 
@@ -1345,8 +1345,8 @@ client.on('error', function (err) {
 要使用 LeanCache，首先将 `redis` 依赖添加到 `requirements.txt` 中：
 
 ```
-Flask>=0.10.1,<1.0.0
-leancloud>=2.0.0,<3.0.0
+Flask>=1.0.0
+leancloud>=2.6.0,<3.0.0
 …
 redis>=2.10.5,<3.0.0
 ```
