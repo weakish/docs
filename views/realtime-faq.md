@@ -68,7 +68,7 @@ LeanCloud 即时通讯服务是完全独立的即时通讯业务抽象，专注�
 
 ### 我自己没有云端，如何实现签名的功能？
 
-LeanCloud 云引擎提供了托管 Python 和 Node.js 运行的方式，开发者可以所以用这两种语言按照签名的算法实现签名，完全可以支持开发者的自定义权限控制。
+LeanCloud 云引擎提供了托管 Python 和 Node.js 运行的方式，开发者可以用这两种语言按照签名的算法实现签名，完全可以支持开发者的自定义权限控制。
 
 ### JavaScript SDK 即时通信使用 `leancloud-storage/live-query` SDK，创建图片消息报类型错误:「`TypeError：file must be an AV.File`」。
  
