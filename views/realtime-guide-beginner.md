@@ -67,6 +67,10 @@ AVIMClient tom = AVIMClient.getInstance("Tom");
 var realtime = new AVRealtime('your-app-id','your-app-key');
 var tom = await realtime.CreateClientAsync('Tom');
 ```
+```dart
+// clientId 为 Tom
+Client tom = Client(id: 'Tom');
+```
 
 注意这里一个 `IMClient` 实例就代表一个终端用户，我们需要把它全局保存起来，因为后续该用户在即时通讯上的所有操作都需要直接或者间接使用这个实例。
 
@@ -124,7 +128,12 @@ tom.open(new AVIMClientCallback() {
 var realtime = new AVRealtime('your-app-id','your-app-key');
 var tom = await realtime.CreateClientAsync('Tom');
 ```
-
+```dart
+// Tom 创建了一个 client，用自己的名字作为 clientId 登录
+Client tom = Client(id: 'Tom');
+// Tom 登录
+await tom.open();
+```
 ### 使用 `_User` 登录
 
 除了应用层指定 `clientId` 登录之外，我们也支持直接使用 `_User` 对象来创建 `IMClient` 并登录。这种方式能直接利用云端内置的用户鉴权系统而省掉 [登录签名](realtime-guide-senior.html#用户登录签名) 操作，更方便地将存储和即时通讯这两个模块结合起来使用。示例代码如下：
@@ -187,6 +196,9 @@ AVUser.logIn("Tom", "cat!@#123").subscribe(new Observer<AVUser>() {
 ```cs
 // 暂不支持
 ```
+```dart
+// 暂不支持
+```
 
 ### 创建对话 `Conversation`
 
@@ -241,6 +253,15 @@ tom.createConversation(Arrays.asList("Jerry"), "Tom & Jerry", null, false, true,
 ```cs
 var tom = await realtime.CreateClientAsync('Tom');
 var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry", isUnique:true);
+```
+```dart
+try {
+  // 创建与 Jerry 之间的对话
+  Conversation conversation = await tom.createConversation(
+      isUnique: true, members: {'Jerry'}, name: 'Tom & Jerry');
+} catch (e) {
+  print('创建会话失败:$e');
+}
 ```
 
 `createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开 **控制台 > 存储 > 数据** 查看数据。不同 SDK 提供的创建对话接口如下：
@@ -391,6 +412,68 @@ public Task<AVIMConversation> CreateConversationAsync(string member = null,
     bool isUnique = true,
     IDictionary<string, object> options = null);
 ```
+```dart
+/// To create a normal [Conversation].
+///
+/// [isUnique] is a special parameter, default is `true`, it affects the creation behavior and property [Conversation.isUnique].
+///   * When it is `true` and the relevant unique [Conversation] not exists in the server, this method will create a new unique [Conversation].
+///   * When it is `true` and the relevant unique [Conversation] exists in the server, this method will return that existing unique [Conversation].
+///   * When it is `false`, this method always create a new non-unique [Conversation].
+///
+/// [members] is the [Conversation.members].
+/// [name] is the [Conversation.name].
+/// [attributes] is the [Conversation.attributes].
+///
+/// Returns an instance of [Conversation].
+Future<Conversation> createConversation({
+  bool isUnique = true,
+  Set<String> members,
+  String name,
+  Map<String, dynamic> attributes,
+}) async {
+  return await _createConversation(
+    type: _ConversationType.normal,
+    isUnique: isUnique,
+    members: members,
+    name: name,
+    attributes: attributes,
+  );
+}
+
+/// To create a new [ChatRoom].
+///
+/// [name] is the [Conversation.name].
+/// [attributes] is the [Conversation.attributes].
+///
+/// Returns an instance of [ChatRoom].
+Future<ChatRoom> createChatRoom({
+  String name,
+  Map<String, dynamic> attributes,
+}) async {
+  return await _createConversation(
+    type: _ConversationType.transient,
+    name: name,
+    attributes: attributes,
+  );
+}
+
+/// To create a new [TemporaryConversation].
+///
+/// [members] is the [Conversation.members].
+/// [timeToLive] is the [TemporaryConversation.timeToLive].
+///
+/// Returns an instance of [TemporaryConversation].
+Future<TemporaryConversation> createTemporaryConversation({
+  Set<String> members,
+  int timeToLive,
+}) async {
+  return await _createConversation(
+    type: _ConversationType.temporary,
+    members: members,
+    ttl: timeToLive,
+  );
+}
+```
 
 虽然不同语言/平台接口声明有所不同，但是支持的参数是基本一致的。在创建一个对话的时候，我们主要可以指定：
 
@@ -456,6 +539,11 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
 var textMessage = new AVIMTextMessage("Jerry，起床了！");
 await conversation.SendMessageAsync(textMessage);
 ```
+```dart
+TextMessage textMessage = TextMessage();
+textMessage.text = 'Jerry，起床了！';
+await conversation.send(message: textMessage);
+```
 
 `Conversation#send` 接口实现的功能就是向对话中发送一条消息，同一对话中其他在线成员会立刻收到此消息。
 
@@ -508,7 +596,10 @@ jerry.open(new AVIMClientCallback(){
 var realtime = new AVRealtime('your-app-id','your-app-key');
 var jerry = await realtime.CreateClientAsync('Jerry');
 ```
-
+```dart
+Client jerry = Client(id: 'Jerry');
+await jerry.open();
+```
 Jerry 作为消息的被动接收方，他不需要主动创建与 Tom 的对话，可能也无法知道 Tom 创建好的对话信息，Jerry 端需要通过设置即时通讯客户端事件的回调函数，才能获取到 Tom 那边操作的通知。
 
 即时通讯客户端事件回调能处理多种服务端通知，这里我们先关注这里会出现的两个事件：
@@ -631,6 +722,22 @@ private void Jerry_OnMessageReceived(object sender, AVIMMessageEventArgs e)
 }
 jerry.OnMessageReceived += Jerry_OnMessageReceived;
 ```
+```dart
+jerry.onMessage = ({
+  Client client,
+  Conversation conversation,
+  Message message,
+}) async {
+  try {
+    if (message.stringContent != null) {
+      // receive text
+      print('收到的消息是：${message.stringContent}');
+    }
+  } catch (e) {
+    print(e);
+  }
+};
+```
 
 Jerry 端实现了上面两个事件通知函数之后，就顺利收到 Tom 发送的消息了。之后 Jerry 也可以回复消息给 Tom，而 Tom 端实现类似的接收流程，那么他们俩就可以开始愉快的聊天了。
 
@@ -730,6 +837,19 @@ var conversation = await tom.GetConversationAsync("CONVERSATION_ID");
 // 邀请 Mary 加入对话
 await tom.InviteAsync(conversation, "Mary");
 ```
+```dart
+// 首先根据 ID 获取 Conversation 实例
+ConversationQuery query = jerry.conversationQuery();
+query.whereString = jsonEncode({
+'objectId': 'CONVERSATION_ID',
+});
+List<Conversation> conversations = await query.find();
+Conversation conversation = conversations.first;
+// 邀请 Mary 加入对话
+MemberResult addResult = await conversation.addMembers(
+  members: {'Mary'},
+);
+```
 
 而 Jerry 端增加「新成员加入」的事件通知处理函数，就可以及时获知 Mary 被 Tom 邀请加入当前对话了：
 
@@ -800,6 +920,22 @@ private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
     Debug.Log(string.Format("{0} 邀请了 {1} 加入了 {2} 对话", e.InvitedBy,e.JoinedMembers, e.ConversationId));
 }
 jerry.OnMembersJoined += OnMembersJoined;
+```
+```dart
+//加入成员通知
+jerry.onMembersJoined = ({
+  Client client,
+  Conversation conversation,
+  List members,
+  String byClientID,
+  DateTime atDate,
+}) {
+  try {
+    print('成员 ${members.toString()} 加入会话');
+  } catch (e) {
+    print(e);
+  }
+};
 ```
 
 {{ docs.langSpecStart('js') }}
@@ -882,7 +1018,12 @@ tom.createConversation(Arrays.asList("Jerry","Mary"), "Tom & Jerry & friends", n
 ```cs
 var conversation = await tom.CreateConversationAsync(new string[]{ "Jerry","Mary" }, name:"Tom & Jerry & friends", isUnique:true);
 ```
-
+```dart
+Conversation conversation = await tom.createConversation(
+    isUnique: true,
+    members: {'Jerry', 'Mary'},
+    name: 'Tom & Jerry & friends');
+```
 ### 群发消息
 
 多人群聊中一个成员发送的消息，会实时同步到所有其他在线成员，其处理流程与单聊中 Jerry 接收消息的过程是一样的。
@@ -930,6 +1071,10 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
 ```cs
 var textMessage = new AVIMTextMessage("大家好，欢迎来到我们的群聊对话！");
 await conversation.SendMessageAsync(textMessage);
+```dart
+TextMessage textMessage = TextMessage();
+textMessage.text = '大家好，欢迎来到我们的群聊对话！';
+await conversation.send(message: textMessage);
 ```
 
 而 Jerry 和 Mary 端都会有 `Event.MESSAGE` 事件触发，利用它来接收群聊消息，并更新产品 UI。
@@ -982,7 +1127,9 @@ conv.kickMembers(Arrays.asList("Mary"),new AVIMConversationCallback(){
 ```cs
 await conversation.RemoveMembersAsync("Mary");
 ```
-
+```
+MemberResult removeMemberResult = await conversation.removeMembers(members: {'Mary'});
+```
 Tom 端执行了这段代码之后会触发如下流程：
 
 ```seq
@@ -1092,7 +1239,35 @@ private void OnKicked(object sender, AVIMOnInvitedEventArgs e)
 jerry.OnMembersLeft += OnMembersLeft;
 jerry.OnKicked += OnKicked;
 ```
-
+```dart
+// 有成员被从某个对话中移除
+jerry.onMembersLeft = ({
+  Client client,
+  Conversation conversation,
+  List members,
+  String byClientID,
+  DateTime atDate,
+}) {
+  try {
+    print('成员 ${members.toString()} 离开会话，操作者为: $byClientID');
+  } catch (e) {
+    print(e);
+  }
+};
+// 有用户被踢出某个对话
+jerry.onKicked = ({
+  Client client,
+  Conversation conversation,
+  String byClientID,
+  DateTime atDate,
+}) async {
+  try {
+    print('你已离开对话，操作者为： $byClientID');
+  } catch (e) {
+    print(e);
+  }
+};
+```
 ### 用户主动加入对话
 
 把 Mary 踢走之后，Tom 嫌人少不好玩，所以他找到了 William，说他和 Jerry 有一个很好玩的聊天群，并且把群的 ID（或名称）告知给了 William。William 也很想进入这个群看看他们究竟在聊什么，他自己主动加入了对话：
@@ -1155,6 +1330,15 @@ conv.join(new AVIMConversationCallback(){
 ```cs
 await william.JoinAsync("CONVERSATION_ID");
 ```
+```dart
+ConversationQuery query = William.conversationQuery();
+query.whereString = jsonEncode({
+  'objectId': 'CONVERSATION_ID',
+});
+List<Conversation> conversations = await query.find();
+Conversation conversation = conversations.first;
+MemberResult joinResult = await conversation.join();
+```
 
 执行了这段代码之后会触发如下流程：
 
@@ -1209,7 +1393,21 @@ private void OnMembersJoined(object sender, AVIMOnInvitedEventArgs e)
 }
 jerry.OnMembersJoined += OnMembersJoined;
 ```
-
+```dart
+jerry.onMembersJoined = ({
+  Client client,
+  Conversation conversation,
+  List members,
+  String byClientID,
+  DateTime atDate,
+}) {
+  try {
+    print('成员 ${members.toString()} 加入会话');
+  } catch (e) {
+    print(e);
+  }
+};
+```
 ### 用户主动退出对话
 
 随着 Tom 邀请进来的人越来越多，Jerry 觉得跟这些人都说不到一块去，他不想继续呆在这个对话里面了，所以选择自己主动退出对话，这时候可以调用 `Conversation#quit` 方法完成退群的操作：
@@ -1253,7 +1451,9 @@ conversation.quit(new AVIMConversationCallback(){
 ```cs
 await jerry.LeaveAsync(conversation);
 ```
-
+```dart
+MemberResult quitResult = await conversation.quit();
+```
 执行了这段代码 Jerry 就离开了这个聊天群，此后群里所有的事件 Jerry 都不会再知晓。各个成员接收到的事件通知流程如下：
 
 ```seq
@@ -1304,6 +1504,21 @@ private void OnMembersLeft(object sender, AVIMOnMembersLeftEventArgs e)
     // e.KickedBy 是该项操作的发起人，e.ConversationId 是该项操作针对的对话 ID
     Debug.Log(string.Format("{0} 离开了 {1} 对话，操作者是 {2}",e.JoinedMembers, e.ConversationId, e.KickedBy));
 }
+```
+```dart
+mary.onMembersLeft = ({
+  Client client,
+  Conversation conversation,
+  List members,
+  String byClientID,
+  DateTime atDate,
+}) {
+  try {
+    print('成员 ${members.toString()} 离开会话');
+  } catch (e) {
+    print(e);
+  }
+};
 ```
 
 ### 成员变更的事件通知总结
@@ -1521,6 +1736,19 @@ imageMessage.File = image;
 imageMessage.TextContent = "发自我的 Windows";
 await conversation.SendMessageAsync(imageMessage);
 ```
+```dart
+import 'package:flutter/services.dart' show rootBundle;
+
+//假设项目根目录有 assets 文件夹存放图片，并且在 pubspec.yaml 中已经将 assets 文件夹添加到工程中。
+ByteData imageData = await rootBundle.load('assets/test.png');
+// image message
+ImageMessage imageMessage = ImageMessage.from(
+  binaryData: imageData.buffer.asUint8List(),
+  format: 'png',
+  name: 'image.png',
+);
+conversation.send(message: imageMessage);
+```
 
 #### 发送图像链接
 
@@ -1587,7 +1815,14 @@ imageMessage.File = image;
 imageMessage.TextContent = "发自我的 Windows";
 await conversation.SendMessageAsync(imageMessage);
 ```
-
+```dart
+ImageMessage imageMessage = ImageMessage.from(
+  url: 'http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.gif',
+  format: 'png',
+  name: 'image.png',
+);
+conversation.send(message: imageMessage);
+```
 #### 接收图像消息
 
 图像消息的接收机制和之前是一样的，只需要修改一下接收消息的事件回调逻辑，根据消息类型来做不同的 UI 展现即可，例如：
@@ -1676,6 +1911,21 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
     }
 }
 ```
+```dart
+client.onMessage = ({
+  Client client,
+  Conversation conversation,
+  Message message,
+}) async {
+  try {
+    if (message is ImageMessage) {
+      print('收到图像消息，URL：${message.url}');
+    }
+  } catch (e) {
+    print(e);
+  }
+};
+```
 
 ### 发送音频消息/视频/文件
 
@@ -1762,7 +2012,18 @@ audioMessage.File = audio;
 audioMessage.TextContent = "听听人类的神曲";
 await conversation.SendMessageAsync(audioMessage);
 ```
+```dart
+import 'package:flutter/services.dart' show rootBundle;
 
+//假设项目根目录有 assets 文件夹存放 mp3 文件，并且在 pubspec.yaml 中已经将 assets 文件夹添加到工程中。
+ByteData audioData = await rootBundle.load('assets/test.mp3');
+AudioMessage audioMessage = AudioMessage.from(
+  binaryData: audioData.buffer.asUint8List(),
+  format: 'mp3',
+);
+audioMessage.text = '听听人类的神曲';
+await conversation.send(message: audioMessage);
+```
 与图像消息类似，音频消息也支持从 URL 构建：
 
 ```js
@@ -1825,6 +2086,13 @@ audioMessage.File = audio;
 audioMessage.TextContent = "来自苹果发布会现场的录音";
 await conversation.SendMessageAsync(audioMessage);
 ```
+```dart
+AudioMessage audioMessage = AudioMessage.from(
+  url: 'https://some.website.com/apple.acc',
+  name: 'apple.acc',
+);
+await conversation.send(message: audioMessage);
+```
 
 ### 发送地理位置消息
 
@@ -1884,6 +2152,13 @@ conversation.sendMessage(locationMessage, new AVIMConversationCallback() {
 var locationMessage = new AVIMLocationMessage();
 locationMessage.Location = new AVGeoPoint(31.3753285, 120.9664658);
 await conversation.SendMessageAsync(locationMessage);
+```
+```dart
+LocationMessage locationMessage = LocationMessage.from(
+  latitude: 22,
+  longitude: 33,
+);
+await conversation.send(message: locationMessage);
 ```
 
 ### 再谈接收消息
@@ -2293,7 +2568,35 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
     } // 这里可以继续添加自定义类型的判断条件
 }
 ```
-
+```dart
+jerry.onMessage = ({
+  Client client,
+  Conversation conversation,
+  Message message,
+}) async {
+  try {
+    if (message.stringContent != null) {
+      print('收到普通消息：${message.stringContent}');
+    } else if (message.binaryContent != null) {
+      print('收到二进制消息：${message.binaryContent.toString()}');
+    } else if (message is TextMessage) {
+      print('收到文本类型消息：${message.text}');
+    } else if (message is ImageMessage) {
+      print('收到图像消息，图像 URL：${message.url}');
+    } else if (message is AudioMessage) {
+      print('收到音频消息，消息时长：${message.duration}');
+    } else if (message is VideoMessage) {
+      print('收到视频消息，消息时长：${message.duration}');
+    } else if (message is LocationMessage) {
+      print('收到地理位置消息，坐标：${message.latitude},${message.longitude}');
+    } else if (message is FileMessage) {
+      print('收到文件消息，URL：${message.url}');
+    }
+  } catch (e) {
+    print(e);
+  }
+};
+```
 ## 扩展对话：支持自定义属性
 
 「对话（`Conversation`）」是即时通讯的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。默认提供的 **内置** 属性的对应关系如下：
@@ -2407,6 +2710,25 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 | `UpdatedAt`             | `updatedAt`        | 最后更新时间                                     |
 
 {{ docs.langSpecEnd('cs') }}
+{{ docs.langSpecStart('dart') }}
+
+| `Conversation` 属性名 | `_Conversation` 字段 | 含义 |
+| --- | --- | --- |
+| `id`                  | `objectId`         | 全局唯一的 ID                                      |
+| `name`                | `name`             | 成员共享的统一的名字                               |
+| `members`             | `m`                | 成员列表                                           |
+| `creator`             | `c`                | 对话创建者                                         |
+| `isMuted`             | N/A                | 当前用户是否静音该对话                             |
+| `isUnique`            | `unique`           | 是否是 `Unique Conversation` |
+| `createdAt`           | `createdAt`        | 创建时间                                           |
+| `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
+| `lastMessageAt`       | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
+| `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
+| `unreadMessagesCount` | N/A                | 未读消息数                                         |
+| `lastDeliveredAt`     | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `lastReadAt`          | N/A                | （仅限单聊）最后一条对方已读的消息时间             |                             
+
+{{ docs.langSpecEnd('dart') }}
 
 其实，我们可以通过「自定义属性」来在「对话」中保存更多业务层数据。
 
@@ -2473,7 +2795,18 @@ options.Add("type", "private");
 options.Add("pinned",true);
 var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry", isUnique:true, options:options);
 ```
-
+```dart
+Conversation conversation = await jerry.createConversation(
+  members: {'client1.id', 'client2.id'},
+  attributes: {
+    'members': ['Jerry'],
+    'name': '猫和老鼠',
+    'unique': true,
+    'type': 'private',
+    'pinned': true,
+  }, 
+);
+```
 **自定义属性在 SDK 级别是对所有成员可见的。**我们也支持通过自定义属性来查询对话，请参见 [使用复杂条件来查询对话](#使用复杂条件来查询对话)。
 
 ### 修改和使用属性
@@ -2522,7 +2855,11 @@ conversation.updateInfoInBackground(new AVIMConversationCallback(){
 conversation.Name = "聪明的喵星人";
 await conversation.SaveAsync();
 ```
-
+```dart
+await conversation.updateInfo(attributes: {
+  'name': '聪明的喵星人',
+});
+```
 而 `Conversation` 对象中自定义的属性，即时通讯服务也是允许对话内其他成员来读取、使用和修改的，示例代码如下：
 
 ```js
@@ -2583,7 +2920,14 @@ conversation["attr.pinned"] = false;
 // 保存
 await conversation.SaveAsync();
 ```
-
+```dart
+// 获取自定义属性
+String type = conversation.attributes['type'];
+// 为 pinned 属性设置新的值
+await conversation.updateInfo(attributes: {
+  'pinned': false,
+});
+```
 > 对自定义属性名的说明
 >
 > 在 `IMClient#createConversation` 接口中指定的自定义属性，会被存入 `_Conversation` 表的 `attr` 字段，所以在之后对这些属性进行读取或修改的时候，属性名需要指定完整的路径，例如上面的 `attr.type`，这一点需要特别注意。
@@ -2646,7 +2990,22 @@ public void onInfoChanged(AVIMClient client, AVIMConversation conversation, JSON
 ```cs
 // 暂不支持
 ```
-
+```dart
+jerry.onInfoUpdated = ({
+  Client client,
+  Conversation conversation,
+  Map updatingAttributes,
+  Map updatedAttributes,
+  String byClientID,
+  DateTime atDate,
+}) {
+  try {
+    print('会话：${conversation.id} 被更新');
+  } catch (e) {
+    print(e);
+  }
+};
+```
 > 使用提示：
 >
 > 应用层在该事件的响应函数中，可以获知当前什么属性被修改了，也可以直接从 SDK 的 `Conversation` 实例中获取最新的合并之后的属性值，然后依据需要来更新产品 UI。
@@ -2699,7 +3058,9 @@ conversation.fetchInfoInBackground(new AVIMConversationCallback() {
 ```cs
 // 暂不支持
 ```
-
+```dart
+//暂不支持
+```
 > 使用提示：
 >
 > 成员列表是对 ***普通对话*** 而言的，对于像「聊天室」「系统对话」这样的特殊对话，并不存在「成员列表」属性。
@@ -2757,6 +3118,13 @@ query.findInBackground(new AVIMConversationQueryCallback(){
 ```cs
 var query = tom.GetQuery();
 var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
+```
+```dart
+ConversationQuery query = tom.conversationQuery();
+query.whereString = jsonEncode({
+  'objectId': '551260efe4b01608686c3e0f',
+};
+await query.find();
 ```
 
 ### 基础的条件查询
@@ -2821,7 +3189,14 @@ query.findInBackground(new AVIMConversationQueryCallback(){
 var query = tom.GetQuery().WhereEqualTo("attr.type","private");
 await query.FindAsync();
 ```
-
+```dart
+ConversationQuery query = jerry.conversationQuery();
+query.whereString = jsonEncode({
+  'attr.type': 'private',
+});
+// conversations 就是想要的结果
+List<Conversation> conversations = await query.find();
+```
 对 LeanCloud 数据存储服务熟悉的开发者可以更容易理解对话的查询构建，因为对话查询和数据存储服务的对象查询在接口上是十分接近的：
 
 - 可以通过 `find` 获取当前结果页数据
@@ -2919,7 +3294,9 @@ query.whereMatches("language","[\\u4e00-\\u9fa5]"); // language 是中文字符
 ```cs
 query.WhereMatches("language","[\\u4e00-\\u9fa5]"); // language 是中文字符
 ```
-
+```dart
+//暂不支持
+```
 ### 字符串查询
 
 ***前缀查询*** 类似于 SQL 的 `LIKE 'keyword%'` 条件。例如查询名字以「教育」开头的对话：
@@ -2939,7 +3316,9 @@ query.whereStartsWith("name","教育");
 ```cs
 query.WhereStartsWith("name","教育");
 ```
-
+```dart
+//暂不支持
+```
 ***包含查询*** 类似于 SQL 的 `LIKE '%keyword%'` 条件。例如查询名字中包含「教育」的对话：
 
 ```js
@@ -2956,6 +3335,9 @@ query.whereContains("name","教育");
 ```
 ```cs
 query.WhereContains("name","教育");
+```
+```dart
+//暂不支持
 ```
 
 ***不包含查询*** 则可以使用 [正则匹配查询](#正则匹配查询) 来实现。例如查询名字中不包含「教育」的对话：
@@ -2976,7 +3358,9 @@ query.whereMatches("name","^((?!教育).)* $ ");
 ```cs
 query.WhereMatches("name","^((?!教育).)* $ ");
 ```
-
+```dart
+//暂不支持
+```
 ### 数组查询
 
 可以使用 `containsAll`、`containedIn`、`notContainedIn` 来对数组进行查询。例如查询成员中包含「Tom」的对话：
@@ -2998,7 +3382,9 @@ List<string> members = new List<string>();
 members.Add("Tom");
 query.WhereContainedIn("m", members);
 ```
-
+```dart
+//暂不支持
+```
 ### 空值查询
 
 空值查询是指查询相关列是否为空值的方法，例如要查询 `lm` 列为空值的对话：
@@ -3018,7 +3404,9 @@ query.whereDoesNotExist("lm");
 ```cs
 query.WhereDoesNotExist("lm");
 ```
-
+```dart
+//暂不支持
+```
 反过来，如果要查询 `lm` 列不为空的对话，则替换为如下条件即可：
 
 ```js
@@ -3036,7 +3424,9 @@ query.whereExists("lm");
 ```cs
 query.WhereExists("lm");
 ```
-
+```dart
+//暂不支持
+```
 ### 组合查询
 
 查询年龄小于 18 岁，并且关键字包含「教育」的对话：
@@ -3060,7 +3450,9 @@ query.whereLessThan("age", 18);
 ```cs
 query.WhereContains("keywords", "教育").WhereLessThan("age", 18);
 ```
-
+```dart
+//暂不支持
+```
 另外一种组合的方式是，两个查询采用 `or` 或者 `and` 的方式构建一个新的查询。
 
 查询年龄小于 18 或者关键字包含「教育」的对话：
@@ -3106,7 +3498,9 @@ var keywordsQuery = tom.GetQuery().WhereContains('keywords', '教育').
 
 var query = AVIMConversationQuery.or(new AVIMConversationQuery[] { ageQuery, keywordsQuery});
 ```
-
+```dart
+//暂不支持
+```
 ### 结果排序
 
 可以指定查询结果按照部分属性值的升序或降序来返回。例如：
@@ -3151,6 +3545,9 @@ tom.open(new AVIMClientCallback() {
 ```cs
 // 暂不支持
 ```
+```dart
+//暂不支持
+```
 
 ### 不带成员信息的精简模式
 
@@ -3191,7 +3588,9 @@ public void queryConversationCompact() {
 ```cs
 // 暂不支持
 ```
-
+```dart
+query.excludeMembers = true;
+```
 ### 让查询结果附带一条最新消息
 
 对于一个聊天应用，一个典型的需求是在对话的列表界面显示最后一条消息，默认情况下，针对对话的查询结果是不带最后一条消息的，需要单独打开相关选项：
@@ -3232,6 +3631,9 @@ public void queryConversationWithLastMessage() {
 ```
 ```cs
 // 暂不支持
+```
+```dart
+query.includeLastMessage = true;
 ```
 
 需要注意的是，这个选项真正的意义是「刷新对话的最后一条消息」，这意味着由于 SDK 缓存机制的存在，将这个选项设置为 `false` 查询得到的对话也还是有可能会存在最后一条消息的。
@@ -3397,6 +3799,11 @@ query.findInBackground(new AVIMConversationQueryCallback() {
 .NET SDK 暂不支持缓存功能。
 
 {{ docs.langSpecEnd('cs') }}
+{{ docs.langSpecStart('dart') }}
+
+Flutter SDK 暂不支持缓存功能。
+
+{{ docs.langSpecEnd('cs') }}
 
 ### 性能优化建议
 
@@ -3466,6 +3873,12 @@ foreach (var message in messages)
     var textMessage = (AVIMTextMessage)message;
   }
 }
+```
+```dart
+// limit 取值范围 1~100，如调用 queryMessage 时不带 limit 参数，默认获取 20 条消息记录
+List<Message> messages = await conversation.queryMessage(
+  limit: 10,
+);
 ```
 
 `queryMessage` 接口也是支持翻页的。LeanCloud 即时通讯云端通过消息的 `messageId` 和发送时间戳来唯一定位一条消息，因此要从某条消息起拉取后续的 N 条记录，只需要指定起始消息的 `messageId` 和发送时间戳作为锚定就可以了，示例代码如下：
@@ -3550,7 +3963,21 @@ var messages = await conversation.QueryMessageAsync(limit: 10);
 var oldestMessage = messages.ToList()[0];
 var messagesInPage = await conversation.QueryMessageAsync(beforeMessageId: oldestMessage.Id, beforeTimeStamp: oldestMessage.ServerTimestamp); 
 ```
-
+```dart
+//第一次查询成功
+List<Message> messages = await conversation.queryMessage(
+  limit: 10,
+);
+// 返回的消息一定是时间增序排列，也就是最早的消息一定是第一个
+Message oldMessage = messages.first;
+// 以第一页的最早的消息作为开始，继续向前拉取消息
+List<Message> messages2 = await conversation.queryMessage(
+  startTimestamp: oldMessage.sentTimestamp,
+  startMessageID: oldMessage.id,
+  startClosed: true,
+  limit: 10,
+);
+```
 ### 按照消息类型获取
 
 除了按照时间先后顺序拉取历史消息之外，即时通讯服务云端也支持按照消息的类型来拉去历史消息，这一功能可能对某些产品来说非常有用，例如我们需要展现某一个聊天群组里面所有的图像。
@@ -3594,6 +4021,9 @@ conversation.queryMessagesByType(msgType, limit, new AVIMMessagesQueryCallback()
 ```cs
 // 传入泛型参数，SDK 会自动读取类型的信息发送给服务端，用作筛选目标类型的消息
 var imageMessages = await conversation.QueryMessageAsync<AVIMImageMessage>();
+```
+```dart
+//暂不支持
 ```
 
 如要获取更多图像消息，可以效仿前一章节中的示例代码，继续翻页查询即可。
@@ -3645,7 +4075,11 @@ conversation.queryMessages(interval, AVIMMessageQueryDirectionFromOldToNew, limi
 ```cs
 var earliestMessages = await conversation.QueryMessageAsync(direction: 0);
 ```
-
+```dart
+List<Message> messages = await conversation.queryMessage (
+  direction: MessageQueryDirection.oldToNew,
+);
+```
 这种情况下要实现翻页，接口会稍微复杂一点，请继续阅读下一节。
 
 ### 从某一时间戳往某一方向查询
@@ -3713,6 +4147,15 @@ conversation.queryMessages(interval, direction, limit,
 var earliestMessages = await conversation.QueryMessageAsync(direction: 0, limit: 1);
 // 获取 earliestMessages.Last() 之后的消息
 var nextPageMessages = await conversation.QueryMessageAfterAsync(earliestMessages.Last());
+```
+```dart
+List<Message> messages = await conversation.queryMessage(
+  startTimestamp: textMessage.sentTimestamp,
+  startMessageID: textMessage.id,
+  startClosed: true,
+  direction: MessageQueryDirection.oldToNew,
+  limit: 10,
+);
 ```
 
 ### 获取指定区间内的消息
@@ -3785,7 +4228,16 @@ var latestMessage = await conversation.QueryMessageAsync(limit: 1);
 // messagesInInterval 最多可包含 100 条消息
 var messagesInInterval = await conversation.QueryMessageInIntervalAsync(earliestMessage.FirstOrDefault(), latestMessage.FirstOrDefault());
 ```
-
+```
+List<Message> messages = await conversation.queryMessage(
+  startTimestamp: textMessage.sentTimestamp,
+  startMessageID: textMessage.id,
+  startClosed: true,
+  endTimestamp: fileMessage.sentTimestamp,
+  endMessageID: fileMessage.id,
+  endClosed: true,
+);
+```
 ### 客户端消息缓存
 
 iOS 和 Android SDK 针对移动设备的特殊性，实现了客户端消息的缓存（JavaScript 和 C# 暂不支持）。开发者无需进行特殊设置，只要接收或者查询到的新消息，默认都会进入被缓存起来，该机制给开发者提供了如下便利：
@@ -3845,6 +4297,9 @@ AVIMClient.setMessageQueryCacheEnable(false);
 ```cs
 // 暂不支持
 ```
+```dart
+// 暂不支持
+```    
 
 ## 用户退出与网络状态变化
 
@@ -3887,7 +4342,9 @@ tom.close(new AVIMClientCallback(){
 ```cs
 await tom.CloseAsync();
 ```
-
+```dart
+await tom.close();
+```
 调用该接口之后，客户端就与即时通讯服务云端断开连接了，从云端查询前一 `clientId` 的状态，会显示「离线」状态。
 
 ### 客户端事件与网络状态响应
@@ -3979,6 +4436,17 @@ func client(_ client: IMClient, event: IMClientEvent) {
 - `OnReconnectFailed` 指重连失败，此时聊天服务不可用。
 
 {{ docs.langSpecEnd('cs') }}
+
+{{ docs.langSpecStart('dart') }}
+
+`Client` 有如下事件通知：
+
+- `onOpened` 用户登录即时通信的服务。
+- `onClosed` 用户退出即时通信服务。
+- `onResuming` 指网络正在尝试重连，此时聊天服务不可用。
+- `onDisconnected` 指网络连接断开事件发生，此时聊天服务不可用。
+
+{{ docs.langSpecEnd('dart') }}
 
 ## 其他开发建议
 

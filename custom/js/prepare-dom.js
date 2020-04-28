@@ -235,7 +235,8 @@ var codeBlockTabber = (function () {
       'lang-curl': 'curl',
       'lang-unity': 'Unity',
       'lang-nodejs': 'Node.js',
-      'lang-node': 'Node.js'
+      'lang-node': 'Node.js',
+      'lang-dart': 'Flutter'
     };
 
     // Multilingual init
