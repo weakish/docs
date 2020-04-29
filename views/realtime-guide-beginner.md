@@ -1127,7 +1127,7 @@ conv.kickMembers(Arrays.asList("Mary"),new AVIMConversationCallback(){
 ```cs
 await conversation.RemoveMembersAsync("Mary");
 ```
-```
+```dart
 MemberResult removeMemberResult = await conversation.removeMembers(members: {'Mary'});
 ```
 Tom 端执行了这段代码之后会触发如下流程：

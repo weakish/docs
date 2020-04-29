@@ -97,7 +97,6 @@ TextMessage message = TextMessage();
 message.text = '@Tom 早点回家';
 message.mentionMembers = ['Tom'];
 await conversation.send(message: message);
-
 ```
 
 或者也可以通过设置 `mentionAll` 属性值提醒所有人：
@@ -533,7 +532,7 @@ private void Tom_OnMessageRecalled(object sender, AVIMMessagePatchEventArgs e)
     // e.Messages 为被修改的消息，它是一个集合，SDK 可能会合并多次的消息撤回统一分发
 }
 ```
-```
+```dart
 tom.onMessageRecalled = ({
   Client client,
   Conversation conversation,
@@ -1531,7 +1530,7 @@ onUnreadMessagesCountUpdated(AVIMClient client, AVIMConversation conversation) {
 ```cs
 // 暂不支持
 ```
-```
+```dart
 tom.onUnreadMessageCountUpdated = ({
   Client client,
   Conversation conversation,
