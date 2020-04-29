@@ -2653,6 +2653,34 @@ public static Map<String, Object> onConversationUpdate(Map<String, Object> param
 }
 ```
 {% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMClientOnline{% endif %}{% if platformName === "Python" %}_clientOnline{% endif %}{% if platformName === "PHP" %}_clientOnline{% endif %}{% if platformName === "Java" %}clientOnline{% endif %}`
+
+客户端上线，客户端登录成功后调用。
+例如，客户端上线后更新云缓存，供查询客户端的实时在线状态：
+
+```js
+AV.Cloud.onIMClientOnline((request) => {
+  // 1 表示在线
+  redisClient.set(request.params.peerId, 1)
+})
+```
+
+#### `{% if platformName === "Node.js" %}onIMClientOffline{% endif %}{% if platformName === "Python" %}_clientOffline{% endif %}{% if platformName === "PHP" %}_clientOffline{% endif %}{% if platformName === "Java" %}clientOffline{% endif %}`
+
+客户端下线，客户端登出成功或意外下线后调用。
+
+```js
+AV.Cloud.onIMClientOffline((request) => {
+  // 0 表示下线
+  redisClient.set(request.params.peerId, 0)
+})
+```
+
+{% if platformName === "Node.js" %}
+[即时通讯中的在线状态查询](realtime-guide-onoff-status.html) 提供了完整的示例（包括云缓存连接，久未上线的客户端清理，配套的返回在线状态的云函数，以及如何在客户端调用）。
+{% endif %}
+
 {% endif %}
 
 ### Hook 函数错误响应码
