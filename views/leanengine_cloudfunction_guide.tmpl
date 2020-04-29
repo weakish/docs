@@ -2659,23 +2659,78 @@ public static Map<String, Object> onConversationUpdate(Map<String, Object> param
 客户端上线，客户端登录成功后调用。
 例如，客户端上线后更新云缓存，供查询客户端的实时在线状态：
 
+{% if platformName === "Node.js" %}
 ```js
 AV.Cloud.onIMClientOnline((request) => {
   // 1 表示在线
   redisClient.set(request.params.peerId, 1)
 })
 ```
+{% endif %}
+{% if platformName === "python" %}
+```python
+@engine.define
+def _clientOnline(**params):
+  # 1 表示在线
+  redis_client.set(params["peerId"], 1)
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_clientOnline', function($params, $user) {
+  // 1 表示在线
+  $redis->set($params["peerId"], 1);
+}
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.clientOnline)
+public static void onClientOnline(Map<String, Object> params) {
+  // 1 表示在线
+  jedis.set(params.get("peerId"), 1);  
+}
+```
+{% endif %}
 
 #### `{% if platformName === "Node.js" %}onIMClientOffline{% endif %}{% if platformName === "Python" %}_clientOffline{% endif %}{% if platformName === "PHP" %}_clientOffline{% endif %}{% if platformName === "Java" %}clientOffline{% endif %}`
 
 客户端下线，客户端登出成功或意外下线后调用。
 
+{% if platformName === "Node.js" %}
 ```js
 AV.Cloud.onIMClientOffline((request) => {
   // 0 表示下线
   redisClient.set(request.params.peerId, 0)
 })
 ```
+{% endif %}
+{% if platformName === "python" %}
+```python
+@engine.define
+def _clientOffline(**params):
+  # 0 表示下线
+  redis_client.set(params["peerId"], 0)
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_clientOffline', function($params, $user) {
+  // 0 表示下线 
+  $redis->set($params["peerId"], 0);
+}
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.clientOffline)
+public static void onClientOffline(Map<String, Object> params) {
+  // 0 表示下线 
+  jedis.set(params.get("peerId"), 0);  
+}
+```
+{% endif %}
+
 
 {% if platformName === "Node.js" %}
 [即时通讯中的在线状态查询](realtime-guide-onoff-status.html) 提供了完整的示例（包括云缓存连接，久未上线的客户端清理，配套的返回在线状态的云函数，以及如何在客户端调用）。
