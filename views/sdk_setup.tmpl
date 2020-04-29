@@ -2,7 +2,7 @@
 {% from "views/_data.njk" import android_groovy, android_key_init %}
 
 {% macro requireServerURL() %}
-请将 `xxx.example.com` 替换为你的应用[绑定的 API 域名](custom-api-domain-guide.html#API_域名)。
+请将 `https://please-replace-with-your-customized.domain.com` 替换为你的应用[绑定的 API 域名](custom-api-domain-guide.html#API_域名)。
 
 国际版应用不要求绑定自定义域名。
 如果你的国际版应用（App ID 后缀为 `-MdYXbMMI`）没有绑定自定义域名，**初始化 SDK 时不用传入服务器地址参数**。
@@ -873,7 +873,7 @@ PM> Install-Package LeanCloud.Realtime
 ```objc
 [AVOSCloud setApplicationId:{{appid}}
                   clientKey:{{appkey}}
-            serverURLString:"https://xxx.example.com"];
+            serverURLString:"https://please-replace-with-your-customized.domain.com"];
 ```
 
 {{ docs.alert("在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Server URL 的初始化。") }}
@@ -896,7 +896,7 @@ do {
     try LCApplication.default.set(
         id: {{appid}},
         key: {{appkey}},
-        serverURL: "https://xxx.example.com")
+        serverURL: "https://please-replace-with-your-customized.domain.com")
 } catch {
     print(error)
 }
@@ -925,7 +925,7 @@ do {
 AV.init({
   appId: "{{appid}}",
   appKey: "{{appkey}}",
-  serverURL: "https://xxx.example.com"
+  serverURL: "https://please-replace-with-your-customized.domain.com"
 });
 ```
 
@@ -933,7 +933,7 @@ AV.init({
 AV.init({
   appId: "{{appid}}",
   appKey: "{{appkey}}",
-  serverURL: "https://xxx.example.com"
+  serverURL: "https://please-replace-with-your-customized.domain.com"
 });
 ```
 
@@ -941,7 +941,7 @@ AV.init({
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
-  server: 'https://xxx.example.com',
+  server: 'https://please-replace-with-your-customized.domain.com',
 });
 ```
 
@@ -949,7 +949,7 @@ const realtime = new Realtime({
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
-  server: 'https://xxx.example.com',
+  server: 'https://please-replace-with-your-customized.domain.com',
   // 初始化即时通讯服务时需要指定富媒体消息插件
   plugins: [TypedMessagesPlugin],
 });
@@ -957,7 +957,7 @@ const realtime = new Realtime({
 AV.init({
   appId: "{{appid}}",
   appKey: "{{appkey}}",
-  serverURL: "https://xxx.example.com"
+  serverURL: "https://please-replace-with-your-customized.domain.com"
 });
 ```
 
@@ -1001,7 +1001,7 @@ public class MyLeanCloudApp extends Application {
 
         // 提供 this、App ID、App Key、Server Host 作为参数
         // 注意这里千万不要调用 cn.leancloud.core.AVOSCloud 的 initialize 方法，否则会出现 NetworkOnMainThread 等错误。
-        AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}", "https://xxx.example.com");
+        AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
     }
 }
 ```
@@ -1090,7 +1090,7 @@ using LeanCloud.Realtime;
 
 
 ```cs
-AVClient.Initialize("{{appid}}", "{{appkey}}", "https://xxx.example.com");
+AVClient.Initialize("{{appid}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
 ```
 
 {{ requireServerURL() }}
@@ -1107,7 +1107,7 @@ Websockets.Net.WebsocketConnection.Link(); // Unity 下不需要此行设置
 const realtime = new AVRealtime(new AVRealtime.Configuration {
     ApplicationId = appId,
     ApplicationKey = appKey,
-    RTMRouter = new Uri("https://xxx.example.com")
+    RTMRouter = new Uri("https://please-replace-with-your-customized.domain.com")
 });
 AVLiveQuery.Channel = realtime;
 ```
@@ -1123,7 +1123,7 @@ const realtime = new AVRealtime(new AVRealtime.Configuration
 {
     ApplicationId = "{{appid}}",
     ApplicationKey = "{{appkey}}",
-    RTMRouter = new Uri("https://xxx.example.com")
+    RTMRouter = new Uri("https://please-replace-with-your-customized.domain.com")
 });
 ```
 
@@ -1143,7 +1143,7 @@ import 'package:leancloud_storage/leancloud.dart';
 ```dart
 LeanCloud.initialize(
     '{{appid}}', '{{appkey}}',
-    server: 'https://xxx.example.com',
+    server: 'https://please-replace-with-your-customized.domain.com',
     queryCache: new LCQueryCache());
 ```
 

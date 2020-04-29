@@ -40,6 +40,21 @@ vendor | 厂商
 
 下面我们逐一看看如何对接华为、小米、魅族等厂商的推送服务，文档的最后也提及了在海外市场如何对接 Firebase Cloud Messaging 的方法。
 
+### 混合推送 library 的构成
+
+在 6.5.0 版本之前，我们提供了一个 all-in-one 的混合推送模块，统一支持华为（HMS）、小米、Oppo、Vivo、魅族推送，开发者依赖如下:
+'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
+
+从 6.5.1 版本开始，我们额外提供了单一厂商的推送 library，以支持不希望全部集成的产品之需求，新 library 与厂商的对应关系如下：
+
+- 华为（HMS) 'cn.leancloud:mixpush-hms:{{ version.unified }}@aar'
+- 小米 'cn.leancloud:mixpush-xiaomi:{{ version.unified }}@aar'
+- 魅族 'cn.leancloud:mixpush-meizu:{{ version.unified }}@aar'
+- Oppo 'cn.leancloud:mixpush-oppo:{{ version.unified }}@aar'
+- Vivo 'cn.leancloud:mixpush-vivo:{{ version.unified }}@aar'
+
+两组 library 的使用方法基本相同，开发者可以根据自己的需要选取合适的 library。
+
 ## 华为推送-HMS 版本
 
 ### 环境配置
@@ -125,6 +140,8 @@ dependencies {
 }
 ```
 
+> 如果只希望接入华为推送，可以将 `mixpush-android` 替换为 `mixpush-hms`。
+
 然后配置相关 AndroidManifest，添加 Permission(开发者要将其中的 `<包名>` 替换为自己的应用的 package)：
 
 ```xml
@@ -174,7 +191,11 @@ dependencies {
 
 ### 具体使用
 
-1. 在 application 的 onCreate 方法中调用 `AVOSCloud.initialize` 完成初始化之后，增加 `AVMixPushManager.registerHMSPush(context, profile)` 完成 HMS 推送的初始化。参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
+1. 在 application 的 onCreate 方法中调用 `AVOSCloud.initialize` 完成初始化之后，进行混合推送 library 的初始化：
+  - 使用 `mixpush-android` 的开发者，调用 `cn.leancloud.AVMixPushManager.registerHMSPush(context, profile)` 完成 HMS 推送的初始化。
+  - 使用 `mixpush-hms` 的开发者，调用 `cn.leancloud.hms.AVMixPushManager.registerHMSPush(context, profile)` 完成 HMS 推送的初始化。
+
+这里参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
 
 2. 务必在应用启动的首个 activity 的 `onCreate` 方法中调用 `AVMixPushManager.connectHMS(activity)` ，确保 HMS SDK 连接成功。
 如果开发者不通过 AppGallery Connect 配置文件来集成，我们也提供了 `AVMixPushManager.connectHMS(activity, huaweiAppId)` 来显式指定华为应用 id 完成连接。
@@ -326,7 +347,9 @@ dependencies {
 }
 ```
 
-注：如果是通过 jar 包导入，则需要手动下载 jar 包 [小米 Push SDK](http://dev.xiaomi.com/mipush/downpage/)。
+> 如果只希望接入小米推送，可以将 `mixpush-android` 替换为 `mixpush-xiaomi`。
+> 
+> 如果是通过 jar 包导入，则需要手动下载 jar 包 [小米 Push SDK](http://dev.xiaomi.com/mipush/downpage/)。
 
 然后配置相关 AndroidManifest。添加 Permission：
 
@@ -400,11 +423,12 @@ dependencies {
 
 ### 具体使用
 
-在 `AVOSCloud.initialize` 时调用以下函数：
+在 `AVOSCloud.initialize` 之后调用以下函数进行混合推送 library 的初始化：
 
-```java
-AVMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile)
-```
+  - 使用 `mixpush-android` 的开发者，调用 `cn.leancloud.AVMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile)` 。
+  - 使用 `mixpush-xiaomi` 的开发者，调用 `cn.leancloud.mi.AVMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile)` 。
+
+这里：
 
 - 参数 `miAppKey` 需要的是 AppKey，而在控制台的混合推送配置中 Profile 的第二个参数是 AppSecret，请注意区分，并分别正确填写。
 - 参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
@@ -454,7 +478,9 @@ dependencies {
 }
 ```
 
-注：如果是通过 jar 包导入，则需要手动下载 jar 包 [魅族 Push SDK](https://github.com/MEIZUPUSH/PushDemo-Eclipse/releases)。
+> 如果只希望接入魅族推送，可以将 `mixpush-android` 替换为 `mixpush-meizu`。
+> 
+> 如果是通过 jar 包导入，则需要手动下载 jar 包 [魅族 Push SDK](https://github.com/MEIZUPUSH/PushDemo-Eclipse/releases)。
 
 然后配置相关 AndroidManifest。添加 Permission：
 
@@ -492,7 +518,12 @@ dependencies {
 
 ### 具体使用
 
-在 `AVOSCloud.initialize` 时调用 `AVMixPushManager.registerFlymePush(context, flymeId, flymeKey, profile)` 即可。参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
+在 `AVOSCloud.initialize` 之后调用以下函数进行混合推送 library 的初始化：
+
+  - 使用 `mixpush-android` 的开发者，调用 `cn.leancloud.AVMixPushManager.registerFlymePush(context, flymeId, flymeKey, profile)` 。
+  - 使用 `mixpush-meizu` 的开发者，调用 `cn.leancloud.flyme.AVMixPushManager.registerFlymePush(context, flymeId, flymeKey, profile)` 。
+
+这里参数 `profile` 的用法可以参考 [Android 混合推送多配置区分](push_guide.html#Android_混合推送多配置区分)。
 
 注意，LeanCloud 云端只有在以下三个条件都满足的情况下，才会使用魅族推送。
 
@@ -529,6 +560,8 @@ dependencies {
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 }
 ```
+
+> 如果只希望接入 vivo 推送，可以将 `mixpush-android` 替换为 `mixpush-vivo`。
 
 接下来配置 AndroidManifest，添加权限声明：
 
@@ -577,7 +610,8 @@ dependencies {
 
 ```java
 import cn.leancloud.AVOSCloud;
-import cn.leancloud.AVMixPushManager;
+import cn.leancloud.AVMixPushManager;      // 使用 mixpush-android 的场合
+//import cn.leancloud.vivo.AVMixPushManager; // 使用 mixpush-vivo 的场合
 
 public class MyApp extends Application {
   // 请替换成您自己的 appId 和 appKey
@@ -595,6 +629,8 @@ public class MyApp extends Application {
     AVOSCloud.initialize(this,LC_APP_ID,LC_APP_KEY);
 
     // vivo 推送初始化
+    // 使用 mixpush-android 的场合，引用 cn.leancloud.AVMixPushManager
+    // 使用 mixpush-vivo 的场合，引用 cn.leancloud.vivo.AVMixPushManager
     AVMixPushManager.registerVIVOPush(this);
     AVMixPushManager.turnOnVIVOPush(new AVCallback<Boolean>() {
       @Override
@@ -713,6 +749,8 @@ dependencies {
 }
 ```
 
+> 如果只希望接入 oppo 推送，可以将 `mixpush-android` 替换为 `mixpush-oppo`。
+
 接下来配置 AndroidManifest，添加权限声明：
 
 ```xml
@@ -809,7 +847,8 @@ public class MyPushAdapter extends AVOPPOPushAdapter {
 
 // Application Class.
 import cn.leancloud.AVOSCloud;
-import cn.leancloud.AVMixPushManager;
+import cn.leancloud.AVMixPushManager;        // 使用 mixpush-android 的场合
+//import cn.leancloud.oppo.AVMixPushManager; // 使用 mixpush-oppo 的场合
 
 // Customized Application.
 public class MyApp extends Application {
@@ -830,6 +869,8 @@ public class MyApp extends Application {
     AVOSCloud.initialize(this,LC_APP_ID,LC_APP_KEY);
 
     // oppo 推送初始化
+    // 使用 mixpush-android 的场合，引用 cn.leancloud.AVMixPushManager
+    // 使用 mixpush-oppo 的场合，引用 cn.leancloud.oppo.AVMixPushManager
     AVMixPushManager.registerOppoPush(this, OPPO_APPKEY, OPPO_APPSECRET, new MyPushAdapter());
   }
 }
