@@ -1481,7 +1481,7 @@ AVIMOptions.getGlobalOptions().setUnreadNotificationEnabled(true);
 // 暂不支持
 ```
 ```dart
-// 默认支持，无需额外设置
+// Flutter 配置方式同 Swift SDK 与 Java SDK 
 ```
 
 客户端 SDK 会在 `AVIMConversation` 上维护一个 `unreadMessagesCount` 字段，来统计当前对话中存在有多少未读消息。
