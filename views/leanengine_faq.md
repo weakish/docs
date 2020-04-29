@@ -207,6 +207,20 @@ lean -p 3002
 4. 运行 `lean up`，在 <http://localhost:3001> 的调试界面中测试云函数和 Hook，然后运行 `lean deploy` 部署代码到云引擎（使用标准实例的用户还需要执行 `lean publish`）。
 5. 部署后请留意云引擎控制台上是否有错误产生。
 
+## 同一个项目如何批量部署到多个应用的云引擎？
+
+可以通过 `lean switch` 切换项目所属应用，然后通过 `lean deploy` 部署。
+`lean switch` 支持通过参数以非交互的方式使用：
+
+```sh
+lean switch --region REGION --group GROUP_NAME APP_ID
+lean deploy --prod 1
+```
+
+上述命令中，`REGION` 代表应用所在区域，目前支持的值为 `CN`（华北节点）、`TAB`（华东节点）、`US`（国际版）。
+`--prod 1` 表示部署到生产环境，如果希望部署到预备环境，换成 `lean deploy` 即可。
+基于这两个命令可以自行编写 CI 脚本快速部署至多个应用的云引擎实例。
+
 ## 为什么云函数中 include 的字段没有被完整地发给客户端？
 
 > 将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本可以彻底解决该问题。  
