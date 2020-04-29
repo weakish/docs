@@ -2350,7 +2350,7 @@ public static Map<String, Object> onConversationAdd(Map<String, Object> params) 
 
 #### `{% if platformName === "Node.js" %}onIMConversationRemove{% endif %}{% if platformName === "Python" %}_conversationRemove{% endif %}{% if platformName === "PHP" %}_conversationRemove{% endif %}{% if platformName === "Java" %}conversationRemove{% endif %}`
 
-从对话中踢出成员，在签名校验（如果开启）之后、实际踢出之前触发，用户自己退出对话不会触发。例如在踢出某一个成员时，在云引擎日志中打印出该成员的 `clientId`：
+从对话中踢出成员，在签名校验（如果开启）之后、实际踢出之前触发，用户自己退出对话不会触发。
 
 {% if platformName === "Node.js" %}
 ```js
@@ -2425,6 +2425,143 @@ public static Map<String, Object> onConversationRemove(Map<String, Object> param
     result.put("code", 9892);
   }
   return result;
+}
+```
+{% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMConversationAdded{% endif %}{% if platformName === "Python" %}_conversationAdded{% endif %}{% if platformName === "PHP" %}_conversationAdded{% endif %}{% if platformName === "Java" %}conversationAdded{% endif %}`
+
+成员成功加入对话后调用。
+
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMConversationAdded((request) => {
+  let params = request.params;
+  console.log('params:', params);
+
+  // params: {
+  //     initBy: 'Tom',
+  //     members: ['Mary'],
+  //     convId: '5789a33a1b8694ad267d8040',
+  //     __sign: '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0'
+  // }
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _conversationAdded(**params):
+    print('_conversationAdded start')
+    print('params:', params)
+    print('_conversationAdded end')
+
+# _conversationAdded start
+# params: {
+#   '__sign': '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0',
+#   'convId': '5789a33a1b8694ad267d8040',
+#   'initBy': 'Tom',
+#   'members': ['Mary']
+# }
+# _conversationAdded end
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_conversationAdded', function($params, $user) {
+    error_log('_conversationAdded start');
+    error_log('params:' . json_encode($params));
+
+    // _conversationAdded start
+    // params: {
+    //     initBy: 'Tom',
+    //     members: ['Mary'],
+    //     convId: '5789a33a1b8694ad267d8040',
+    //     __sign: '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0'
+    // }
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.conversationAdded)
+public static void onConversationAdded(Map<String, Object> params) {
+  System.out.println(params);
+  String[] members = (String[])params.get("members");
+  System.out.println("members");
+  System.out.println(members);
+}
+```
+{% endif %}
+
+#### `{% if platformName === "Node.js" %}onIMConversationRemoved{% endif %}{% if platformName === "Python" %}_conversationRemoved{% endif %}{% if platformName === "PHP" %}_conversationRemoved{% endif %}{% if platformName === "Java" %}conversationRemoved{% endif %}`
+
+成员成功离开对话后调用。
+
+{% if platformName === "Node.js" %}
+```js
+AV.Cloud.onIMConversationRemoved((request) => {
+  let params = request.params;
+  console.log('params:', params);
+  console.log('Removed clientId:', params.members[0]);
+
+  // params: {
+  //     initBy: 'Tom',
+  //     members: ['Jerry'],
+  //     convId: '57c8f3ac92509726c3dadaba',
+  //     __sign: '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38'
+  // }
+  // Removed clientId: Jerry
+});
+```
+{% endif %}
+{% if platformName === "Python" %}
+```python
+@engine.define
+def _conversationRemoved(**params):
+    print('_conversationRemoved start')
+    print('params:', params)
+    print('Removed clientId:', params['members'][0])
+    print('_conversationRemoved end')
+    return {}
+
+# _conversationRemoved start
+# params: {
+#   '__sign': '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38',
+#   'convId': '57c8f3ac92509726c3dadaba',
+#   'initBy': 'Tom',
+#   'members': ['Jerry']
+# }
+# Removed clientId: Jerry
+# _conversationRemoved end
+```
+{% endif %}
+{% if platformName === "PHP" %}
+```php
+Cloud::define('_conversationRemoved', function($params, $user) {
+
+    error_log('_conversationRemoved start');
+    error_log('params:' . json_encode($params));
+    error_log('Removed clientId:' . $params['members'][0]);
+
+    // _conversationRemoved start
+    // params: {
+    //     initBy: 'Tom',
+    //     members: ['Jerry'],
+    //     convId: '57c8f3ac92509726c3dadaba',
+    //     __sign: '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38'
+    // }
+    // Removed clientId: Jerry
+});
+```
+{% endif %}
+{% if platformName === "Java" %}
+```java
+@IMHook(type = IMHookType.conversationRemoved)
+public static void onConversationRemoved(Map<String, Object> params) {
+  System.out.println(params);
+  String[] members = (String[])params.get("members");
+  System.out.println("members");
 }
 ```
 {% endif %}
