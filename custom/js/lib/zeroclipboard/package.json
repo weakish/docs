@@ -35,7 +35,7 @@
     "jshint": "0.9.1",
     "handlebars": "4.5.3",
     "jsdom": "0.3.4",
-    "jquery": "3.4.1"
+    "jquery": "3.5.0"
   },
   "component": {
     "scripts": {
