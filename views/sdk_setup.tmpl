@@ -1283,8 +1283,6 @@ import LeanCloud
 
 {% endif %}
 
-
-{% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" or platform_name === "Flutter" %}
 ## 开启调试日志
 
 在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口，或是浏览器 Console 或是 LeanCloud 控制台的云引擎日志中。
@@ -1439,8 +1437,6 @@ LCLogger.setLevel(LCLogger.DebugLevel);
 {% call docs.alertWrap() %}
 在应用发布之前，请关闭调试日志，以免暴露敏感数据。
 {% endcall %}
-
-{% endif %}
 
 ## 验证
 

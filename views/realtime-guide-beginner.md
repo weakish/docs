@@ -2591,10 +2591,11 @@ jerry.onMessage = ({
       print('收到地理位置消息，坐标：${message.latitude},${message.longitude}');
     } else if (message is FileMessage) {
       print('收到文件消息，URL：${message.url}');
+    }else if (message is CustomMessage) {
+      //CustomMessage 是自定义的消息类型
+      print('收到自定义类型消息');
     } else {
       //这里可以继续添加自定义类型的判断条件
-      // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
-      // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
       print('收到未知消息类型');
     }
   } catch (e) {
