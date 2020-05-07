@@ -8248,7 +8248,15 @@ LeanCloud 云端首先会查找账户系统（_User 表），看看是否存在 
 例如，下面的代码可以解除用户和微信账户的关联：
 
 {% if platform_name === "Objective-C" %}
-{# TODO #}
+```objc
+[user disassociateWithPlatform:LeanCloudSocialPlatformWeiXin callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"成功");
+    }else{
+        NSLog(@"失败：%@",error.localizedFailureReason);
+    }
+}];
+```
 {% endif %}
 
 {% if platform_name === "JavaScript" %}
@@ -8262,11 +8270,15 @@ AV.User.dissociateAuthData('weixin').then((s) => {
 {% endif %}
 
 {% if platform_name === "Python" %}
-{# TODO #}
+```python
+// todo
+```
 {% endif %}
 
 {% if platform_name === "PHP" %}
-{# TODO #}
+```php
+// todo
+```
 {% endif %}
 
 {% if platform_name === "Android / Java" %}
@@ -8292,7 +8304,16 @@ avUser.dissociateWithAuthData("weixin").subscribe(new Observer<AVUser>() {
 {% endif %}
 
 {% if platform_name === "Swift" %}
-{# TODO #}
+```swift
+currentUser.disassociate(authData: .weixin) { (result) in
+    switch result {
+    case .success:
+        // 解除关联成功
+    case .failure(error: let error):
+        // 解除关联失败
+    }
+}
+```
 {% endif %}
 
 {% if platform_name === "Flutter" %}
