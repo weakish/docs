@@ -26,7 +26,7 @@
 * 你可以在某个 class 的其他菜单里找到权限设置、Class 绑定等高级功能。
 * 在应用设置的 **邮件模板** 菜单，你可以编辑并保存发送给注册用户的邮箱验证邮件模板等。
 * 适当使用 [查询缓存](leanstorage_guide-objc.html#缓存查询) 功能，可以提升查询性能，并提供离线浏览。
-* 实现应用 DeepLink，参考 [应用内搜索和 DeepLink 开发指南](app_search_guide.html)。
+* 实现应用 DeepLink，参考 [DeepLink 开发指南](deeplink.html)。
 * 想实现先验证手机号码再注册，可以用 `requestSMSCode`、`verifySMSCodeInBackground` 得到一个正确的手机号码再进行 `new AVUser()` 的注册。
 
 
