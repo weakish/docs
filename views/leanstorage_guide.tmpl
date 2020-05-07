@@ -8130,9 +8130,9 @@ LCUser currentUser = await LCUser.loginWithAuthData(thirdPartyData, 'weixin');
 {% endif %}
 
 `{{ userObjectName }}#loginWithAuthData` 系列方法需要两个参数来唯一确定一个账户：
-- 第三方平台的名字，就是前例中的 `weixin`，该名字由应用层自己决定。
-- 第三方平台的授权信息，就是前例中的 `thirdPartyData`（一般包括 `id`、`token`、`expires` 等信息，与具体的第三方平台有关）。
 
+- 第三方平台的名字，就是前例中的 `weixin`，该名字由应用层自己决定。
+- 第三方平台的授权信息，就是前例中的 `thirdPartyData`（一般包括 `uid`、`token`、`expires` 等信息，与具体的第三方平台有关）。
 
 LeanCloud 云端会使用第三方平台的鉴权信息来查询是否已经存在与之关联的账户。如果存在的话，则返回 `200 OK` 状态码，同时附上用户的信息（包括 [`sessionToken`](#设置当前用户)）。如果第三方平台的信息没有和任何账户关联，客户端会收到 `201 Created` 状态码，意味着新账户被创建，同时附上用户的 `objectId`、`createdAt`、`sessionToken` 和一个自动生成的 `username`，例如：
 
@@ -8226,7 +8226,7 @@ LeanCloud 云端会使用第三方平台的鉴权信息来查询是否已经存�
 
 LeanCloud 云端首先会查找账户系统（_User 表），看看是否存在 authData.weixin.openid = “OPENID” 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
 
-为避免出现重复数据，`_User` class 中每个用户的 `authData.<PLATFORM>.<openid>` 需要保持独一无二，这可以通过创建唯一索引来完成（通常 LeanCloud 云端会自动创建这一索引，如果不存在这一索引，开发者可联系我们人工追加此索引）。
+为避免出现重复数据，`_User` class 中每个用户的 `authData.<PLATFORM>.<uid>` 需要保持独一无二，这可以通过创建唯一索引来完成（通常 LeanCloud 云端会自动创建这一索引，如果不存在这一索引，开发者可联系我们人工追加此索引）。
 
 #### 自动验证第三方平台授权信息
 
@@ -8553,13 +8553,13 @@ LeanCloud 支持 `UnionID` 体系。你只需要给 `loginWithauthData` 和 `ass
 NSDictionary *thirdPartyData = @{
                             @"access_token":@"officetoken",
                             @"expires_in":@1384686496,
-                            @"openid":@"officeopenid",
+                            @"uid":@"officeopenid",
                             @"scope":@"SCOPE",
                             @"unionid":@"unionid4a" // 新增属性
                             };
 AVUser *currentuser = [AVUser user];
 AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
-option.platform = @“wxleanoffice”;
+option.platform = @"wxleanoffice";
 option.unionId = thirdPartyData[@"unionid"];
 option.isMainAccount = true;
 [currentuser loginWithAuthData:thirdPartyData platformId:@"wxleanoffice" options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
@@ -8577,7 +8577,7 @@ option.isMainAccount = true;
 const thirdPartyData = {
   access_token: 'officetoken',
   expires_in: 1384686496,
-  openid: 'officeopenid',
+  uid: 'officeopenid',
   scope: 'SCOPE',
 };
 
@@ -8601,7 +8601,7 @@ AV.User.loginWithAuthDataAndUnionId(
 let thirdPartyData: [String: Any] = [
     "access_token": "officetoken",
     "expires_in": 1384686496,
-    "openid": "officeopenid",
+    "uid": "officeopenid",
     "scope": "SCOPE",
     "unionid": "unionid4a" // 新增属性
 ]
@@ -8627,7 +8627,7 @@ user.logIn(
 ```java
 Map<String, Object> thirdPartyData = new HashMap<String, Object>();
 thirdPartyData.put("expires_in", 1384686496);
-thirdPartyData.put("openid", "officeopenid");
+thirdPartyData.put("uid", "officeopenid");
 thirdPartyData.put("access_token", "officetoken");
 thirdPartyData.put("scope", "SCOPE");
 AVUser.loginWithAuthData(thirdPartyData, "wxleanoffice",
@@ -8655,7 +8655,7 @@ AVUser.loginWithAuthData(thirdPartyData, "wxleanoffice",
 ```dart
 Map<String, dynamic> thirdPartyData = {
   // 必须
-  'openid': 'officeopenid',
+  'uid': 'officeopenid',
   'access_token': 'officetoken',
   'expires_in': 1384686496,
   'unionId': 'unionid4a',   // 新增属性
@@ -8673,13 +8673,15 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 ```
 {% endif %}
 
+> 注意代码中将微信传回来的 openid 属性改为了 uid，这是因为 LeanCloud 云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考[连接用户账户和第三方平台](rest_api.html#连接用户账户和第三方平台)。
+
 如果用户 A 是第一次在「LeanCloud 通讯」中通过微信登录，那么 _User 表中会增加一个新用户（假设其 objectId 为 `ThisIsUserA`），其 `authData` 的结果如下：
 
 ```json
 {
   "wxleanoffice": {
     "platform": "wxleanoffice",
-    "openid": "officeopenid",
+    "uid": "officeopenid",
     "expires_in": 1384686496,
     "main_account": true,
     "access_token": "officetoken",
@@ -8696,20 +8698,20 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 - 当 `asMainAccount` 为 true 时，LeanCloud 后台会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，当前账号就会作为这一个 UnionID 对应的主账号被唯一确定。
 - 当 `asMainAccount` 为 false 时，LeanCloud 后台不会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，此时如果通过提供的 UnionID 可以找到主账号，则会将当前的鉴权信息合并进主账号的 `authData` 属性里，同时返回主账号对应的 _User 表记录；如果通过提供的 UnionID 可以找不到主账号，则会根据平台的 `openid` 去查找账户，找到匹配的账户就返回匹配的，找不到就新建一个账户，此时的处理逻辑与不使用 UnionID 时的逻辑完全一致。
 
-接下来，用户 A 继续在「LenaCloud 技术支持」中进行微信登录，其登录逻辑为：
+接下来，用户 A 继续在「LeanCloud 技术支持」中进行微信登录，其登录逻辑为：
 
 {% if platform_name === "Objective-C" %}
 ```objc
 NSDictionary *thirdPartyData = @{
                             @"access_token":@"supporttoken",
                             @"expires_in":@1384686496,
-                            @"openid":@"supportopenid",
+                            @"uid":@"supportopenid",
                             @"scope":@"SCOPE",
                             @"unionid":@"unionid4a"
                             };
 AVUser *currentuser = [AVUser user];
 AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
-option.platform = @“wxleanoffice”;
+option.platform = @"wxleanoffice";
 option.unionId = thirdPartyData[@"unionid"];
 option.isMainAccount = false;
 [currentuser loginWithAuthData:thirdPartyData platformId:@"wxleansupport" options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
@@ -8727,7 +8729,7 @@ option.isMainAccount = false;
 const thirdPartyData = {
   access_token: 'supporttoken',
   expires_in: 1384686496,
-  openid: 'supportopenid',
+  uid: 'supportopenid',
   scope: 'SCOPE',
 };
 
@@ -8751,7 +8753,7 @@ AV.User.loginWithAuthDataAndUnionId(
 let thirdPartyData: [String: Any] = [
     "access_token": "supporttoken",
     "expires_in": 1384686496,
-    "openid": "supportopenid",
+    "uid": "supportopenid",
     "scope": "SCOPE",
     "unionid": "unionid4a"
 ]
@@ -8777,7 +8779,7 @@ user.logIn(
 ```java
 Map<String, Object> thirdPartyData = new HashMap<String, Object>();
 thirdPartyData.put("expires_in", 1384686496);
-thirdPartyData.put("openid", "supportopenid");
+thirdPartyData.put("uid", "supportopenid");
 thirdPartyData.put("access_token", "supporttoken");
 thirdPartyData.put("scope", "SCOPE");
 AVUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a", "wxleanoffice", false).subscribe(new Observer<AVUser>() {
@@ -8803,7 +8805,7 @@ AVUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a", "wxleanof
 ```dart
 Map<String, dynamic> thirdPartyData = {
   // 必须
-  'openid': 'supportopenid',
+  'uid': 'supportopenid',
   'access_token': 'supporttoken',
   'expires_in': 1384686496,
   'unionId': 'unionid4a',
@@ -8827,7 +8829,7 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 {
   "wxleanoffice": {
     "platform": "wxleanoffice",
-    "openid": "officeopenid",
+    "uid": "officeopenid",
     "expires_in": 1384686496,
     "main_account": true,
     "access_token": "officetoken",
@@ -8838,7 +8840,7 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
   },
   "wxleansupport": {
     "platform": "wxleanoffice",
-    "openid": "supportopenid",
+    "uid": "supportopenid",
     "expires_in": 1384686496,
     "main_account": false,
     "access_token": "supporttoken",
@@ -8847,19 +8849,19 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 }
 ```
 
-在新的登录方式中，当一个用户以「平台名为 `wxleanoffice`、OpenID 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录得到新的 `{{ userObjectName }}` 后，接下来这个用户以「平台名为 `wxleansupport`、OpenID 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录时，LeanCloud 判定是同样的 UnionID，就直接把来自 `wxleansupport` 的新用户数据加入到已有账户的 `authData` 里了，不会再创建新的账户。
+在新的登录方式中，当一个用户以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录得到新的 `{{ userObjectName }}` 后，接下来这个用户以「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录时，LeanCloud 判定是同样的 UnionID，就直接把来自 `wxleansupport` 的新用户数据加入到已有账户的 `authData` 里了，不会再创建新的账户。
 
 这样一来，LeanCloud 后台通过识别平台性的用户唯一标识 UnionID，让来自同一个 UnionID 体系内的应用程序、小程序等不同平台的用户都绑定到了一个 `{{ userObjectName }}` 上，实现互通。
 
-上面的流程是用户先登录了「LeanCloud 通讯」这个主应用，然后在登录「LeanCloud 技术支持」这个副应用，所以账号都被通过 UnionID 有效关联起来了。可能有人会想到另外一个问题，如果用户 B 先登录副应用，后登录主应用，这时候会发生什么事情呢？
+上面的流程是用户先登录了「LeanCloud 通讯」这个主应用，然后再登录「LeanCloud 技术支持」这个副应用，所以账号都被通过 UnionID 有效关联起来了。可能有人会想到另外一个问题，如果用户 B 先登录副应用，后登录主应用，这时候会发生什么事情呢？
 
-用户 B 首先登录副应用的时候，提供了「平台名为 `wxleansupport`、OpenID 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，并且指定「UnionIDPlatform 为 `wxleanoffice`、`asMainAccount` 为 false」（与上面的调用完全一致），此时 LeanCloud 后台由于找不到存在的 UnionID，会新建一个 `{{ userObjectName }}` 对象，该账户 `authData` 结果为：
+用户 B 首先登录副应用的时候，提供了「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，并且指定「UnionIDPlatform 为 `wxleanoffice`、`asMainAccount` 为 false」（与上面的调用完全一致），此时 LeanCloud 后台由于找不到存在的 UnionID，会新建一个 `{{ userObjectName }}` 对象，该账户 `authData` 结果为：
 
 ```json
 {
   "wxleansupport": {
     "platform": "wxleanoffice",
-    "openid": "supportopenid",
+    "uid": "supportopenid",
     "expires_in": 1384686496,
     "main_account": false,
     "access_token": "supporttoken",
@@ -8868,13 +8870,13 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 }
 ```
 
-用户 B 接着又使用了主应用，ta 再次通过微信登录，此时以「平台名为 `wxleanoffice`、OpenID 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，以及「UnionIDPlatform 为 `wxleanoffice`、`asMainAccount` 为 true」的参数进行登录，此时LeanCloud 后台由于找不到存在的 UnionID，会再次新建一个 `{{ userObjectName }}` 对象，该账户 `authData` 结果为：
+用户 B 接着又使用了主应用，ta 再次通过微信登录，此时以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，以及「UnionIDPlatform 为 `wxleanoffice`、`asMainAccount` 为 true」的参数进行登录，此时LeanCloud 后台由于找不到存在的 UnionID，会再次新建一个 `{{ userObjectName }}` 对象，该账户 `authData` 结果为：
 
 ```json
 {
   "wxleanoffice": {
     "platform": "wxleanoffice",
-    "openid": "officeopenid",
+    "uid": "officeopenid",
     "expires_in": 1384686496,
     "main_account": true,
     "access_token": "officetoken",
@@ -8886,7 +8888,7 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 }
 ```
 
-还有更复杂的情况。如果某公司的产品之前就接入了微信登录，产生了很多存量用户，并且分散在不同的子产品中，这时候怎么办？我们接下来专门讨论一下此时的解决方案。
+还有更复杂的情况。如果某公司的产品之前就接入了微信登录，产生了很多存量用户，并且分散在不同的子产品中，这时候怎么办？我们接下来专门讨论此时的解决方案。
 
 ##### 存量账户如何通过 UnionID 实现关联
 
@@ -8944,8 +8946,6 @@ objectId | 微信用户 | authData.<platform> | authData._{platform}_unionid
 4 | UserC | openid4（对应产品 2） | N/A
 5 | UserB | openid5（对应产品 1）/openid2（对应产品 2）/openid11（对应产品 3） | unionId_user_B
 6 | UserD | openid7（对应产品 1）/openid8（对应产品 2）/openid12（对应产品 3） | unionId_user_D
-
-
 
 ### 匿名用户
 
