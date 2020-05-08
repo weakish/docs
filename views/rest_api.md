@@ -2155,7 +2155,7 @@ curl -X POST \
   https://{{host}}/1.1/users
 ```
 
-LeanCloud 会校验提供的 `authData` 是否有效，并检查是否已经有一个用户连接了这个 `authData` 服务。如果已经有用户存在并连接了同一个 `authData`，那么返回 200 OK 和详细信息（包括用户的 `sessionToken`）：
+LeanCloud 会检查是否已经有一个用户连接了这个 `authData` 服务。如果已经有用户存在并连接了同一个 `authData`，那么返回 200 OK 和详细信息（包括用户的 `sessionToken`）：
 
 ```sh
 Status: 200 OK
@@ -2198,6 +2198,10 @@ Location: https://{{host}}/1.1/users/55a4800fe4b05001a7745c41
   "objectId":"55a4800fe4b05001a7745c41"
 }
 ```
+
+LeanCloud 会自动验证部分平台 access token 的有效性。
+详见数据存储开发指南[自动验证第三方平台授权信息](leanstorage_guide-js.html#自动验证第三方平台授权信息)章节。
+
 #### UnionID 注册和登录
 
 微信与新浪微博都有 UnionID 登录机制，使用 UnionID 注册登录，可以使得不同微信公众号或小程序之间共享用户。
@@ -2215,17 +2219,17 @@ Location: https://{{host}}/1.1/users/55a4800fe4b05001a7745c41
 }
 ```
 
-使用 UnionID 注册登录，需要提供带有 `unionid` 参数的 `authData`。另外需要配合传递 `main_account` 和 `platform` 这两个字段。
+使用 UnionID 注册登录，需要提供带有 `unionid` 参数的 `authData`。另外需要配合传递 `platform` 和 `main_account` 这两个字段。
 
-* `main_account`： `main_account` 为 true 表示使用 `unionid` 来登录或者注册。
-* `platform`：用来识别注册平台，如新浪微博或微信等。
+* `platform`：unionId 对应的注册平台，由应用自行指定。
+* `main_account`： `main_account` 为 true 把当前平台的鉴权信息 `unionid` 作为主账号。
 
-在服务端进行存储的时候会根据 `platform` 来命名新增的平台，如传入 `"platform" = "weibo"` 时，返回数据中会增加 `_weibo_unionid` 字段存储 `{"uid":"xxxxx"}`。
+在服务端进行存储的时候会根据 `platform` 来命名新增的平台，如传入 `"platform" = "wxleanoffice"` 时，返回数据中会增加 `_wxleanoffice_unionid` 字段存储 `{"uid":"xxxxx"}`。
 
 ```
-"_weibo_unionid": {
-            "uid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
-        }
+"_wxleanoffice_unionid": {
+  "uid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
+}
 ```
 
 完整的第三方注册登录请求如下，以使用微信 UnionId 为例：
@@ -2236,22 +2240,33 @@ curl -X POST \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
   -d '{
-     "authData": {
-       "weixin1": {
-         "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc",
-         "access_token": "12_b6mz7ujXbTY4vpbqCRaKVa_y0Ij3N9grCeVtM8VJT8KFd4qnQ9lXtBsZVxG6x9c9Nay_oNgvbKK7KYKbn8R2P7uEgA0EhsXMHmxkx-xU-Tk",
-         "expires_in": 7200,
-         "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838",
-          "scope": "snsapi_userinfo",
-          "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
-          "platform": "weixin",
-          "main_account":"true"
-         }
-    }
-    }' \
+    "authData": {
+      "wxleanoffice": {
+        "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc",
+        "access_token": "12_b6mz7ujXbTY4vpbqCRaKVa_y0Ij3N9grCeVtM8VJT8KFd4qnQ9lXtBsZVxG6x9c9Nay_oNgvbKK7KYKbn8R2P7uEgA0EhsXMHmxkx-xU-Tk",
+        "expires_in": 7200,
+        "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838",
+        "scope": "snsapi_userinfo",
+        "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
+        "platform": "wxleanoffice",
+        "main_account":"true"
+      },
+      "wxleansupport": {
+        "openid": "ZTY873cOa0gk5aOW5OaaOa3Q6PTc",
+        "access_token": "34_b6mO7OjXbTY6O-bOaRaaVa_O0aj5a9gOaeVOa8VaT8aad6OnQ9lXO-OZVOa6O9c9aaO_ZagObaa7aYabn8R4P7Oagn0ahOXaamOkO-OU-Tk",
+        "expires_in": 7200,
+        "refresh_token": "8-_78UYUnOaaOafekimOaOYj-afY67ilZ40faOOYkOlOZOOagc-hamQgaVhT6maWkRg0mngOX9kXeaaP8km-WdOUOc4ngRia4aaTWnaO4dO848",
+        "scope": "snsapi_userinfo",
+        "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
+        "platform": "wxleanoffice",
+        "main_account":"false"
+      },
+    }}' \
    https://{{host}}/1.1/users
-
 ```
+
+我们看到，在上面的例子中，`wxleanoffice` 和 `wxleansupport` 的 `unionid` 是一样的，`platform` 也均为 `wxleanoffice`（因为 `wxleanoffice` 是主账号，`main_account` 为 `true`，而 `wxleansupport` 的 `main_account` 为 `false`）。
+
 应答内容包括 objectId、createdAt、sessionToken、authData 以及一个自动生成的随机 username，应答的 body 类似：
 
 ```json
@@ -2263,23 +2278,35 @@ curl -X POST \
     "createdAt": "2018-08-16T08:03:44.203Z",
     "emailVerified": false,
     "authData": {
-        "weixin1": {
+        "wxleanoffice": {
             "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc",
             "access_token": "12_b6mz7ujXbTY4vpbqCRaKVa_y0Ij3N9grCeVtM8VJT8KFd4qnQ9lXtBsZVxG6x9c9Nay_oNgvbKK7KYKbn8R2P7uEgA0EhsXMHmxkx-xU-Tk",
             "expires_in": 7200,
             "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838",
             "scope": "snsapi_userinfo",
             "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
-            "platform": "weixin",
+            "platform": "wxleanoffice",
             "main_account": "true"
         },
-        "_weixin_unionid": {
+        "wxleansupport": {
+            "openid": "ZTY873cOa0gk5aOW5OaaOa3Q6PTc",
+            "access_token": "34_b6mO7OjXbTY6O-bOaRaaVa_O0aj5a9gOaeVOa8VaT8aad6OnQ9lXO-OZVOa6O9c9aaO_ZagObaa7aYabn8R4P7Oagn0ahOXaamOkO-OU-Tk",
+            "expires_in": 7200,
+            "refresh_token": "8-_78UYUnOaaOafekimOaOYj-afY67ilZ40faOOYkOlOZOOagc-hamQgaVhT6maWkRg0mngOX9kXeaaP8km-WdOUOc4ngRia4aaTWnaO4dO848",
+            "scope": "snsapi_userinfo",
+            "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
+            "platform": "wxleanoffice",
+            "main_account":"false"
+        },
+        "_wxleanoffice_unionid": {
             "uid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
         }
     },
     "mobilePhoneVerified": false
 }
 ```
+
+参见[数据存储开发指南相应章节](leanstorage_guide-js.html#扩展：接入_UnionID_体系，打通不同子产品的账号系统)的详细说明。
 
 #### 连接
 
