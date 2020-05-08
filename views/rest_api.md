@@ -2222,7 +2222,7 @@ LeanCloud 会自动验证部分平台 access token 的有效性。
 使用 UnionID 注册登录，需要提供带有 `unionid` 参数的 `authData`。另外需要配合传递 `platform` 和 `main_account` 这两个字段。
 
 * `platform`：unionId 对应的注册平台，由应用自行指定。
-* `main_account`： `main_account` 为 true 把当前平台的鉴权信息 `unionid` 作为主账号。
+* `main_account`： `main_account` 为 true 时把当前平台的鉴权信息作为主账号。
 
 在服务端进行存储的时候会根据 `platform` 来命名新增的平台，如传入 `"platform" = "wxleanoffice"` 时，返回数据中会增加 `_wxleanoffice_unionid` 字段存储 `{"uid":"xxxxx"}`。
 
