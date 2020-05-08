@@ -2,7 +2,7 @@
 
 # DeepLink 开发指南
 
-LeanCloud 提供了与应用内搜索搭配使用的 [DeepLink](#deeplink) 功能，让应用可以响应外部调用链接。
+LeanCloud 提供了与[应用内搜索](app_search_guide.html)搭配使用的 [DeepLink](#deeplink) 功能，让应用可以响应外部调用链接。
 
 这样，当用户在移动端网页搜索关键字之后：
 

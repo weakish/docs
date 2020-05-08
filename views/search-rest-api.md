@@ -1,6 +1,6 @@
 # 应用内搜索 REST API 指南
 
-应用内搜索提供以下 REST API 接口：
+[应用内搜索](app_search_guide.html)提供以下 REST API 接口：
 
 | URL | HTTP | 功能 |
 | - | - | - |
