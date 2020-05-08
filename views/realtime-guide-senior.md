@@ -1006,12 +1006,14 @@ query.findInBackground(new AVIMConversationQueryCallback() {
 var query = tom.GetChatRoomQuery();
 ```
 ```dart
-ConversationQuery query = tom.conversationQuery();
-query.whereString = jsonEncode({
-  'tr': true
-});
+try {
+  ConversationQuery query = tom.conversationQuery();
+  query.whereEqualTo('tr', true);
 // conversations 就是想要的结果
-List<Conversation> conversations = await query.find();
+  List<Conversation> conversations = await query.find();
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 > Java / Android / C# SDK 专门提供了 `AVIMClient#getChatRoomQuery` 方法来生成聊天室查询对象，屏蔽了 `transient` 属性的细节，建议开发者优先使用这些高层 API。
 
@@ -1209,9 +1211,13 @@ AVIMClient tom = AVIMClient.getInstance("Tom");
 // 暂不支持
 ```
 ```dart
-TextMessage message = TextMessage();
-message.text = '现在比分是 0:0，下半场中国队肯定要做出人员调整';
-await chatRoom.send(message: message, priority: MessagePriority.high);
+try {
+  TextMessage message = TextMessage();
+  message.text = '现在比分是 0:0，下半场中国队肯定要做出人员调整';
+  await chatRoom.send(message: message, priority: MessagePriority.high);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 > 注意：
@@ -1381,12 +1387,22 @@ tom.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversati
 var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 ```
 ```dart
-TemporaryConversation temporaryConversation = await jerry.createTemporaryConversation(
-  members: {'Jerry', 'William'},
-);
-TextMessage message = TextMessage();
-message.text = '这里是临时对话';
-await temporaryConversation.send(message: message);
+TemporaryConversation temporaryConversation;
+try {
+  temporaryConversation = await jerry.createTemporaryConversation(
+    members: {'Jerry', 'William'},
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
+
+try {
+  TextMessage message = TextMessage();
+  message.text = '这里是临时对话';
+  await temporaryConversation.send(message: message);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 与其他对话类型不同的是，临时对话有一个 **重要** 的属性：TTL。它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天。如果您的需求是一定要超过 30 天，请使用普通对话。传入 TTL 创建临时对话的代码如下：
 
@@ -1468,13 +1484,24 @@ client.open(new AVIMClientCallback() {
 var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 ```
 ```dart
-TemporaryConversation temporaryConversation = await jerry.createTemporaryConversation(
-  members: {'Jerry', 'William'},
-  timeToLive: 3600,
-);
-TextMessage message = TextMessage();
-message.text = '这里是临时对话，一小时之后，这个对话就会消失';
-await temporaryConversation.send(message: message);
+TemporaryConversation temporaryConversation;
+try {
+  temporaryConversation = await jerry.createTemporaryConversation(
+    members: {'Jerry', 'William'},
+    timeToLive: 3600,
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
+
+try {
+  TextMessage message = TextMessage();
+  message.text = '这里是临时对话，一小时之后，这个对话就会消失';
+  await temporaryConversation.send(message: message);
+} on LCException catch (e) {
+  print(e.message);
+}
+
 ```
 临时对话的其他操作与普通对话无异。
 

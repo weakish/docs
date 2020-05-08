@@ -93,10 +93,14 @@ var textMessage = new AVIMTextMessage("@Tom 早点回家")
 await conversation.SendMessageAsync(textMessage);
 ```
 ```dart
-TextMessage message = TextMessage();
-message.text = '@Tom 早点回家';
-message.mentionMembers = ['Tom'];
-await conversation.send(message: message);
+try {
+  TextMessage message = TextMessage();
+  message.text = '@Tom 早点回家';
+  message.mentionMembers = ['Tom'];
+  await conversation.send(message: message);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 或者也可以通过设置 `mentionAll` 属性值提醒所有人：
@@ -152,10 +156,14 @@ var textMessage = new AVIMTextMessage("@all")
 await conv.SendMessageAsync(textMessage);
 ```
 ```dart
-TextMessage message = TextMessage();
-message.text = 'content';
-message.mentionAll = true;
-await conversation.send(message: message);
+try {
+  TextMessage message = TextMessage();
+  message.text = 'content';
+  message.mentionAll = true;
+  await conversation.send(message: message);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 对于消息的接收方来说，可以通过调用 `mentionList` 和 `mentionAll` 的 getter 方法来获得提醒目标用户的信息，示例代码如下：
@@ -213,12 +221,8 @@ jerry.onMessage = ({
   Client client,
   Conversation conversation,
   Message message,
-}) async {
-  try {
-    List mentionList = message.mentionMembers;
-  } catch (e) {
-    print(e);
-  }
+}) {
+  List mentionList = message.mentionMembers;
 };
 ```
 
@@ -341,10 +345,14 @@ var newMessage = new AVIMTextMessage("修改后的消息内容");
 await conversation.UpdateAsync(oldMessage, newMessage);
 ```
 ```dart
-Message updatedMessage = await conversation.updateMessage(
-  oldMessage: oldMessage,
-  newMessage: newMessage,
-);
+try {
+  Message updatedMessage = await conversation.updateMessage(
+    oldMessage: oldMessage,
+    newMessage: newMessage,
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 消息修改成功之后，对话内的其他成员会立刻接收到 `MESSAGE_UPDATE` 事件：
 
@@ -411,9 +419,7 @@ tom.onMessageUpdated = ({
   int patchCode,
   String patchReason,
 }) {
-  try {
-    // updatedMessage 即为被修改的消息
-  } catch (e) {}
+  // updatedMessage 即为被修改的消息
 };
 ```
 对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部会先从缓存中修改这条消息记录，然后再通知应用层。所以对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（这时候消息列表会出现内容变化）。
@@ -473,9 +479,13 @@ conversation.recallMessage(message, new AVIMMessageRecalledCallback() {
 await conversation.RecallAsync(message);
 ```
 ```dart
-RecalledMessage recalledMessage = await conversation.recallMessage(
-  message: oldMessage,
-);
+try {
+  RecalledMessage recalledMessage = await conversation.recallMessage(
+    message: oldMessage,
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 成功撤回消息后，对话内的其他成员会接收到 `MESSAGE_RECALL` 的事件：
@@ -538,11 +548,7 @@ tom.onMessageRecalled = ({
   Conversation conversation,
   RecalledMessage recalledMessage,
 }) {
-  try {
-    // recalledMessage 即为被撤回的消息
-  } catch (e) {
-    print(e);
-  }
+  // recalledMessage 即为被撤回的消息
 };
 ```
 
@@ -745,10 +751,14 @@ var option = new AVIMSendOptions(){Transient = true};
 await conv.SendAsync(textMessage, option);
 ```
 ```dart
-TextMessage message = TextMessage();
-message.text = 'Tom 正在输入…';
+try {
+  TextMessage message = TextMessage();
+  message.text = 'Tom 正在输入…';
 //发送一条暂态消息
-await conversation.send(message: message,transient: true);
+  await conversation.send(message: message, transient: true);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 暂态消息的接收逻辑和普通消息一样，开发者可以按照消息类型进行判断和处理，这里不再赘述。上面使用了内建的文本消息只是一种示例，从展现端来说，我们如果使用特定的类型来表示「暂态消息」，是一种更好的方案。LeanCloud 即时通讯 SDK 并没有提供固定的「暂态消息」类型，可以由开发者根据自己的业务需要来实现专门的自定义，具体可以参考后述章节：[扩展自己的消息类型](#扩展自己的消息类型)。
@@ -804,9 +814,13 @@ var option = new AVIMSendOptions(){Receipt = true};
 await conv.SendAsync(textMessage, option);
 ```
 ```dart
-TextMessage message = TextMessage();
-message.text = '一条非常重要的消息。';
-await conversation.send(message: message,receipt: true);
+try {
+  TextMessage message = TextMessage();
+  message.text = '一条非常重要的消息。';
+  await conversation.send(message: message, receipt: true);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 > 注意：
 >
@@ -877,18 +891,14 @@ conversaion.OnMessageDeliverd += (s, e) =>
 await conversaion.SendTextMessageAsync("夜访蛋糕店，约吗？");
 ```
 ```dart
-jerry.onMessageDelivered = ({
+tom.onMessageDelivered = ({
   Client client,
   Conversation conversation,
   String messageID,
   String toClientID,
   DateTime atDate,
 }) {
-  try {
-    //消息已送达
-  } catch (e) {
-    print(e);
-  }
+  //消息已送达，在这里可以书写消息送达之后的业务逻辑代码
 };
 ```
 请注意这里送达回执的内容，不是某一条具体的消息，而是当前对话内最后一次送达消息的时间戳（`lastDeliveredAt`）。最开始我们有过解释，服务端在下发消息的时候，是能够保证顺序的，所以在送达回执的通知里面，我们不需要对逐条消息进行确认，只给出当前确认送达的最新消息的时间戳，那么在这之前的所有消息就都是已经送达的状态。在 UI 层展示的时候，可以将早于 `lastDeliveredAt` 的消息都标记为「已送达」。
@@ -1000,9 +1010,13 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
     // 暂不支持
     ```
     ```dart
-    TextMessage message = TextMessage();
-    message.text = '一条非常重要的消息。';
-    await conversation.send(message: message, receipt: true);
+    try {
+      TextMessage message = TextMessage();
+      message.text = '一条非常重要的消息。';
+      await conversation.send(message: message, receipt: true);
+    } on LCException catch (e) {
+      print(e.message);
+    }
     ```
 
 2. Jerry 阅读 Tom 发的消息后，调用对话上的 `read` 方法把「对话中最近的消息」标记为已读：
@@ -1084,11 +1098,7 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
     Client client,
     Conversation conversation,
     }) {
-     try {
-     // 在 UI 中将早于 lastReadAt 的消息都标记为「已读」
-     } catch (e) {
-     print(e);
-        }
+     // 在 UI 中将早于 lastReadAt 的消息都标记为「已读」        
     };
     ```
 
@@ -1171,9 +1181,14 @@ var sendOptions = new AVIMSendOptions()
 await conversation.SendAsync(message, sendOptions);
 ```
 ```dart
-TextMessage message = TextMessage();
-message.text = '我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。';
-await conversation.send(message: message, will: true);
+try {
+  TextMessage message = TextMessage();
+  message.text = '我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。';
+  await conversation.send(message: message, will: true);
+} on LCException catch (e) {
+  print(e.message);
+}
+
 ```
 
 客户端发送完毕之后就完全不用再关心这条消息了，云端会自动在发送方异常掉线后通知其他成员，接收端则根据自己的需求来做 UI 的展现。
@@ -1368,15 +1383,19 @@ LeanCloud 本就提供完善的消息推送服务，现在将推送与即时通�
   };
   ```
   ```dart
-  TextMessage message = TextMessage();
-  message.text = 'Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！';
-  await conversation.send(message: message, pushData: {
-    "alert": "您有一条未读的消息",
-    "category": "消息",
-    "badge": 1,
-    "sound": "message.mp3", // 声音文件名，前提在应用里存在
-    "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
-  });
+  try {
+    TextMessage message = TextMessage();
+    message.text = 'Jerry，今晚有比赛，我约了 Kate，咱们仨一起去酒吧看比赛啊？！';
+    await conversation.send(message: message, pushData: {
+      "alert": "您有一条未读的消息",
+      "category": "消息",
+      "badge": 1,
+      "sound": "message.mp3", // 声音文件名，前提在应用里存在
+      "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
+    });
+  } on LCException catch (e) {
+    print(e.message);
+  }
   ```
 
 3. 服务端动态生成通知内容
@@ -1535,11 +1554,7 @@ tom.onUnreadMessageCountUpdated = ({
   Client client,
   Conversation conversation,
 }) {
-  try {
-    //conversation.unreadMessageCount 即该 conversation 的未读消息数量
-  } catch (e) {
-    print(e);
-  }
+  //conversation.unreadMessageCount 即该 conversation 的未读消息数量
 };
 ```
 
@@ -1615,8 +1630,12 @@ currentClient.open(new AVIMClientCallback() {
 AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile", deviceId: "your-device-id");
 ```
 ```dart
-Client tom = Client(id: 'Tom', tag: 'Mobile');
-await tom.open();
+try {
+  Client tom = Client(id: 'Tom', tag: 'Mobile');
+  await tom.open();
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 之后如果同一个用户在另一个手机上再次登录，则较早前登录系统的客户端会被强制下线。
 
@@ -1679,13 +1698,9 @@ private void Tom_OnSessionClosed(object sender, AVIMSessionClosedEventArgs e)
 tom.onClosed = ({
   Client client,
   RTMException exception,
-}) async {
-  try {
-    if (exception.code == '4111') {
+}) {
+  if (exception.code == '4111') {
     // 适当的弹出友好提示，告知当前用户的 clientId 在其他设备上登录了
-    }
-  } catch (e) {
-    print(e);
   }
 };
 ```
@@ -1742,9 +1757,13 @@ currentClient.open(openOption, new AVIMClientCallback() {
 // 暂不支持
 ```
 ```dart
-Client tom = Client(id: 'Tom', tag: 'Mobile');
+try {
+  Client tom = Client(id: 'Tom', tag: 'Mobile');
 //冲突时登录失败，不会踢掉较早登录的设备
-await tom.open(reconnect: true);
+  await tom.open(reconnect: true);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ## 扩展自己的消息类型
@@ -2029,6 +2048,7 @@ class CustomMessage extends TypedMessage {
     this.text = text;
   }
 }
+TypedMessage.register(() => CustomMessage());
 ```
 
 自定义消息的接收，可以参看 [前一章：再谈接收消息](realtime-guide-beginner.html#再谈接收消息)。

@@ -259,8 +259,8 @@ try {
   // 创建与 Jerry 之间的对话
   Conversation conversation = await tom.createConversation(
       isUnique: true, members: {'Jerry'}, name: 'Tom & Jerry');
-} catch (e) {
-  print('创建会话失败:$e');
+} on LCException catch (e) {
+  print('创建会话失败:${e.message}');
 }
 ```
 
@@ -540,9 +540,13 @@ var textMessage = new AVIMTextMessage("Jerry，起床了！");
 await conversation.SendMessageAsync(textMessage);
 ```
 ```dart
-TextMessage textMessage = TextMessage();
-textMessage.text = 'Jerry，起床了！';
-await conversation.send(message: textMessage);
+try {
+  TextMessage textMessage = TextMessage();
+  textMessage.text = 'Jerry，起床了！';
+  await conversation.send(message: textMessage);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 `Conversation#send` 接口实现的功能就是向对话中发送一条消息，同一对话中其他在线成员会立刻收到此消息。
@@ -727,14 +731,9 @@ jerry.onMessage = ({
   Client client,
   Conversation conversation,
   Message message,
-}) async {
-  try {
-    if (message.stringContent != null) {
-      // receive text
-      print('收到的消息是：${message.stringContent}');
-    }
-  } catch (e) {
-    print(e);
+}) {
+  if (message.stringContent != null) {
+    print('收到的消息是：${message.stringContent}');
   }
 };
 ```
@@ -838,17 +837,24 @@ var conversation = await tom.GetConversationAsync("CONVERSATION_ID");
 await tom.InviteAsync(conversation, "Mary");
 ```
 ```dart
+List<Conversation> conversations;
+try {
 // 首先根据 ID 获取 Conversation 实例
-ConversationQuery query = jerry.conversationQuery();
-query.whereString = jsonEncode({
-'objectId': 'CONVERSATION_ID',
-});
-List<Conversation> conversations = await query.find();
-Conversation conversation = conversations.first;
+  ConversationQuery query = tom.conversationQuery();
+  query.whereEqualTo('objectId', 'CONVERSATION_ID');
+  conversations = await query.find();
+} on LCException catch (e) {
+  print(e.message);
+}
+try {
+  Conversation conversation = conversations.first;
 // 邀请 Mary 加入对话
-MemberResult addResult = await conversation.addMembers(
-  members: {'Mary'},
-);
+  MemberResult addResult = await conversation.addMembers(
+    members: {'Mary'},
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 而 Jerry 端增加「新成员加入」的事件通知处理函数，就可以及时获知 Mary 被 Tom 邀请加入当前对话了：
@@ -930,11 +936,7 @@ jerry.onMembersJoined = ({
   String byClientID,
   DateTime atDate,
 }) {
-  try {
-    print('成员 ${members.toString()} 加入会话');
-  } catch (e) {
-    print(e);
-  }
+  print('成员 ${members.toString()} 加入会话');
 };
 ```
 
@@ -1019,10 +1021,14 @@ tom.createConversation(Arrays.asList("Jerry","Mary"), "Tom & Jerry & friends", n
 var conversation = await tom.CreateConversationAsync(new string[]{ "Jerry","Mary" }, name:"Tom & Jerry & friends", isUnique:true);
 ```
 ```dart
-Conversation conversation = await tom.createConversation(
-    isUnique: true,
-    members: {'Jerry', 'Mary'},
-    name: 'Tom & Jerry & friends');
+try {
+  Conversation conversation = await jerry.createConversation(
+      isUnique: true,
+      members: {'Jerry', 'Mary'},
+      name: 'Tom & Jerry & friends');
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 ### 群发消息
 
@@ -1071,10 +1077,15 @@ conversation.sendMessage(msg, new AVIMConversationCallback() {
 ```cs
 var textMessage = new AVIMTextMessage("大家好，欢迎来到我们的群聊对话！");
 await conversation.SendMessageAsync(textMessage);
+```
 ```dart
-TextMessage textMessage = TextMessage();
-textMessage.text = '大家好，欢迎来到我们的群聊对话！';
-await conversation.send(message: textMessage);
+try {
+  TextMessage textMessage = TextMessage();
+  textMessage.text = '大家好，欢迎来到我们的群聊对话！';
+  await conversation.send(message: textMessage);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 而 Jerry 和 Mary 端都会有 `Event.MESSAGE` 事件触发，利用它来接收群聊消息，并更新产品 UI。
@@ -1128,7 +1139,11 @@ conv.kickMembers(Arrays.asList("Mary"),new AVIMConversationCallback(){
 await conversation.RemoveMembersAsync("Mary");
 ```
 ```dart
-MemberResult removeMemberResult = await conversation.removeMembers(members: {'Mary'});
+try {
+  MemberResult removeMemberResult = await conversation.removeMembers(members: {'Mary'});
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 Tom 端执行了这段代码之后会触发如下流程：
 
@@ -1248,11 +1263,7 @@ jerry.onMembersLeft = ({
   String byClientID,
   DateTime atDate,
 }) {
-  try {
-    print('成员 ${members.toString()} 离开会话，操作者为: $byClientID');
-  } catch (e) {
-    print(e);
-  }
+  print('成员 ${members.toString()} 离开会话，操作者为: $byClientID');
 };
 // 有用户被踢出某个对话
 jerry.onKicked = ({
@@ -1260,12 +1271,8 @@ jerry.onKicked = ({
   Conversation conversation,
   String byClientID,
   DateTime atDate,
-}) async {
-  try {
-    print('你已离开对话，操作者为： $byClientID');
-  } catch (e) {
-    print(e);
-  }
+}) {
+  print('你已离开对话，操作者为： $byClientID');
 };
 ```
 ### 用户主动加入对话
@@ -1331,13 +1338,21 @@ conv.join(new AVIMConversationCallback(){
 await william.JoinAsync("CONVERSATION_ID");
 ```
 ```dart
-ConversationQuery query = William.conversationQuery();
-query.whereString = jsonEncode({
-  'objectId': 'CONVERSATION_ID',
-});
-List<Conversation> conversations = await query.find();
-Conversation conversation = conversations.first;
-MemberResult joinResult = await conversation.join();
+List<Conversation> conversations;
+try {
+  ConversationQuery query = william.conversationQuery();
+  query.whereEqualTo('objectId', 'CONVERSATION_ID');
+  conversations = await query.find();
+} on LCException catch (e) {
+  print(e.message);
+}
+
+try {
+  Conversation conversation = conversations.first;
+  MemberResult joinResult = await conversation.join();
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 执行了这段代码之后会触发如下流程：
@@ -1401,11 +1416,7 @@ jerry.onMembersJoined = ({
   String byClientID,
   DateTime atDate,
 }) {
-  try {
-    print('成员 ${members.toString()} 加入会话');
-  } catch (e) {
-    print(e);
-  }
+  print('成员 ${members.toString()} 加入会话');
 };
 ```
 ### 用户主动退出对话
@@ -1452,7 +1463,11 @@ conversation.quit(new AVIMConversationCallback(){
 await jerry.LeaveAsync(conversation);
 ```
 ```dart
-MemberResult quitResult = await conversation.quit();
+try {
+  MemberResult quitResult = await conversation.quit();
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 执行了这段代码 Jerry 就离开了这个聊天群，此后群里所有的事件 Jerry 都不会再知晓。各个成员接收到的事件通知流程如下：
 
@@ -1513,11 +1528,7 @@ mary.onMembersLeft = ({
   String byClientID,
   DateTime atDate,
 }) {
-  try {
-    print('成员 ${members.toString()} 离开会话');
-  } catch (e) {
-    print(e);
-  }
+  print('成员 ${members.toString()} 离开会话');
 };
 ```
 
@@ -1747,7 +1758,11 @@ ImageMessage imageMessage = ImageMessage.from(
   format: 'png',
   name: 'image.png',
 );
-conversation.send(message: imageMessage);
+try {
+  conversation.send(message: imageMessage);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 #### 发送图像链接
@@ -1821,7 +1836,11 @@ ImageMessage imageMessage = ImageMessage.from(
   format: 'png',
   name: 'image.png',
 );
-conversation.send(message: imageMessage);
+try {
+  conversation.send(message: imageMessage);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 #### 接收图像消息
 
@@ -1912,17 +1931,13 @@ private void OnMessageReceived(object sender, AVIMMessageEventArgs e)
 }
 ```
 ```dart
-client.onMessage = ({
+lient.onMessage = ({
   Client client,
   Conversation conversation,
   Message message,
-}) async {
-  try {
-    if (message is ImageMessage) {
-      print('收到图像消息，URL：${message.url}');
-    }
-  } catch (e) {
-    print(e);
+}) {
+  if (message is ImageMessage) {
+    print('收到图像消息，URL：${message.url}');
   }
 };
 ```
@@ -2022,7 +2037,11 @@ AudioMessage audioMessage = AudioMessage.from(
   format: 'mp3',
 );
 audioMessage.text = '听听人类的神曲';
-await conversation.send(message: audioMessage);
+try {
+  await conversation.send(message: audioMessage);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 与图像消息类似，音频消息也支持从 URL 构建：
 
@@ -2091,7 +2110,11 @@ AudioMessage audioMessage = AudioMessage.from(
   url: 'https://some.website.com/apple.acc',
   name: 'apple.acc',
 );
-await conversation.send(message: audioMessage);
+try {
+  await conversation.send(message: audioMessage);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ### 发送地理位置消息
@@ -2158,7 +2181,11 @@ LocationMessage locationMessage = LocationMessage.from(
   latitude: 22,
   longitude: 33,
 );
-await conversation.send(message: locationMessage);
+try {
+  await conversation.send(message: locationMessage);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ### 再谈接收消息
@@ -2573,33 +2600,32 @@ jerry.onMessage = ({
   Client client,
   Conversation conversation,
   Message message,
-}) async {
-  try {
-    if (message.stringContent != null) {
-      print('收到普通消息：${message.stringContent}');
-    } else if (message.binaryContent != null) {
-      print('收到二进制消息：${message.binaryContent.toString()}');
-    } else if (message is TextMessage) {
-      print('收到文本类型消息：${message.text}');
-    } else if (message is ImageMessage) {
+}) {
+  if (message.binaryContent != null) {
+    print('收到二进制消息：${message.binaryContent.toString()}');
+  } else if (message is TextMessage) {
+    print('收到文本类型消息：${message.text}');
+  } else if (message is LocationMessage) {
+    print('收到地理位置消息，坐标：${message.latitude},${message.longitude}');
+  } else if (message is FileMessage) {
+    if (message is ImageMessage) {
       print('收到图像消息，图像 URL：${message.url}');
     } else if (message is AudioMessage) {
       print('收到音频消息，消息时长：${message.duration}');
     } else if (message is VideoMessage) {
       print('收到视频消息，消息时长：${message.duration}');
-    } else if (message is LocationMessage) {
-      print('收到地理位置消息，坐标：${message.latitude},${message.longitude}');
-    } else if (message is FileMessage) {
-      print('收到文件消息，URL：${message.url}');
-    }else if (message is CustomMessage) {
-      //CustomMessage 是自定义的消息类型
-      print('收到自定义类型消息');
     } else {
-      //这里可以继续添加自定义类型的判断条件
-      print('收到未知消息类型');
+      print('收到.txt/.doc/.md 等各种类型的普通文件消息，URL：${message.url}');
     }
-  } catch (e) {
-    print(e);
+  } else if (message is CustomMessage) {
+    // CustomMessage 是自定义的消息类型
+    print('收到自定义类型消息');
+  } else {
+    // 这里可以继续添加自定义类型的判断条件
+    print('收到未知消息类型');
+    if (message.stringContent != null) {
+      print('收到普通消息：${message.stringContent}');
+    }
   }
 };
 ```
@@ -2728,7 +2754,6 @@ jerry.onMessage = ({
 | `isUnique`            | `unique`           | 是否是 `Unique Conversation` |
 | `createdAt`           | `createdAt`        | 创建时间                                           |
 | `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
-| `lastMessageAt`       | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
 | `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
 | `unreadMessagesCount` | N/A                | 未读消息数                                         |
 | `lastDeliveredAt`     | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
@@ -2802,16 +2827,20 @@ options.Add("pinned",true);
 var conversation = await tom.CreateConversationAsync("Jerry", name:"Tom & Jerry", isUnique:true, options:options);
 ```
 ```dart
-Conversation conversation = await jerry.createConversation(
-  members: {'client1.id', 'client2.id'},
-  attributes: {
-    'members': ['Jerry'],
-    'name': '猫和老鼠',
-    'unique': true,
-    'type': 'private',
-    'pinned': true,
-  }, 
-);
+try {
+  Conversation conversation = await jerry.createConversation(
+    members: {'client1.id', 'client2.id'},
+    attributes: {
+      'members': ['Jerry'],
+      'name': '猫和老鼠',
+      'unique': true,
+      'type': 'private',
+      'pinned': true,
+    },
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 **自定义属性在 SDK 级别是对所有成员可见的。**我们也支持通过自定义属性来查询对话，请参见 [使用复杂条件来查询对话](#使用复杂条件来查询对话)。
 
@@ -2862,9 +2891,13 @@ conversation.Name = "聪明的喵星人";
 await conversation.SaveAsync();
 ```
 ```dart
-await conversation.updateInfo(attributes: {
-  'name': '聪明的喵星人',
-});
+try {
+  await conversation.updateInfo(attributes: {
+    'name': '聪明的喵星人',
+  });
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 而 `Conversation` 对象中自定义的属性，即时通讯服务也是允许对话内其他成员来读取、使用和修改的，示例代码如下：
 
@@ -2927,12 +2960,16 @@ conversation["attr.pinned"] = false;
 await conversation.SaveAsync();
 ```
 ```dart
+try {
 // 获取自定义属性
-String type = conversation.attributes['type'];
+  String type = conversation.attributes['type'];
 // 为 pinned 属性设置新的值
-await conversation.updateInfo(attributes: {
-  'pinned': false,
-});
+  await conversation.updateInfo(attributes: {
+    'pinned': false,
+  });
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 > 对自定义属性名的说明
 >
@@ -3005,11 +3042,7 @@ jerry.onInfoUpdated = ({
   String byClientID,
   DateTime atDate,
 }) {
-  try {
-    print('会话：${conversation.id} 被更新');
-  } catch (e) {
-    print(e);
-  }
+  print('会话：${conversation.id} 被更新');
 };
 ```
 > 使用提示：
@@ -3126,11 +3159,13 @@ var query = tom.GetQuery();
 var conversation = await query.GetAsync("551260efe4b01608686c3e0f");
 ```
 ```dart
-ConversationQuery query = tom.conversationQuery();
-query.whereString = jsonEncode({
-  'objectId': '551260efe4b01608686c3e0f',
-};
-await query.find();
+try {
+  ConversationQuery query = tom.conversationQuery();
+  query.whereEqualTo('objectId', '551260efe4b01608686c3e0f');
+  await query.find();
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ### 基础的条件查询
@@ -3196,12 +3231,14 @@ var query = tom.GetQuery().WhereEqualTo("attr.type","private");
 await query.FindAsync();
 ```
 ```dart
-ConversationQuery query = jerry.conversationQuery();
-query.whereString = jsonEncode({
-  'attr.type': 'private',
-});
+try {
+  ConversationQuery query = jerry.conversationQuery();
+  query.whereEqualTo('attr.type', 'private');
 // conversations 就是想要的结果
-List<Conversation> conversations = await query.find();
+  List<Conversation> conversations = await query.find();
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 对 LeanCloud 数据存储服务熟悉的开发者可以更容易理解对话的查询构建，因为对话查询和数据存储服务的对象查询在接口上是十分接近的：
 
@@ -3882,9 +3919,13 @@ foreach (var message in messages)
 ```
 ```dart
 // limit 取值范围 1~100，如调用 queryMessage 时不带 limit 参数，默认获取 20 条消息记录
-List<Message> messages = await conversation.queryMessage(
-  limit: 10,
-);
+try {
+  List<Message> messages = await conversation.queryMessage(
+    limit: 10,
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 `queryMessage` 接口也是支持翻页的。LeanCloud 即时通讯云端通过消息的 `messageId` 和发送时间戳来唯一定位一条消息，因此要从某条消息起拉取后续的 N 条记录，只需要指定起始消息的 `messageId` 和发送时间戳作为锚定就可以了，示例代码如下：
@@ -3970,19 +4011,29 @@ var oldestMessage = messages.ToList()[0];
 var messagesInPage = await conversation.QueryMessageAsync(beforeMessageId: oldestMessage.Id, beforeTimeStamp: oldestMessage.ServerTimestamp); 
 ```
 ```dart
+List<Message> messages;
+try {
 //第一次查询成功
-List<Message> messages = await conversation.queryMessage(
-  limit: 10,
-);
-// 返回的消息一定是时间增序排列，也就是最早的消息一定是第一个
-Message oldMessage = messages.first;
+  messages = await conversation.queryMessage(
+    limit: 10,
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
+
+try {
+  // 返回的消息一定是时间增序排列，也就是最早的消息一定是第一个
+  Message oldMessage = messages.first;
 // 以第一页的最早的消息作为开始，继续向前拉取消息
-List<Message> messages2 = await conversation.queryMessage(
-  startTimestamp: oldMessage.sentTimestamp,
-  startMessageID: oldMessage.id,
-  startClosed: true,
-  limit: 10,
-);
+  List<Message> messages2 = await conversation.queryMessage(
+    startTimestamp: oldMessage.sentTimestamp,
+    startMessageID: oldMessage.id,
+    startClosed: true,
+    limit: 10,
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 ### 按照消息类型获取
 
@@ -4029,7 +4080,11 @@ conversation.queryMessagesByType(msgType, limit, new AVIMMessagesQueryCallback()
 var imageMessages = await conversation.QueryMessageAsync<AVIMImageMessage>();
 ```
 ```dart
-//暂不支持
+try {
+  List<Message> messages = await conversation.queryMessage(type: -2);
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 如要获取更多图像消息，可以效仿前一章节中的示例代码，继续翻页查询即可。
@@ -4082,9 +4137,13 @@ conversation.queryMessages(interval, AVIMMessageQueryDirectionFromOldToNew, limi
 var earliestMessages = await conversation.QueryMessageAsync(direction: 0);
 ```
 ```dart
-List<Message> messages = await conversation.queryMessage (
-  direction: MessageQueryDirection.oldToNew,
-);
+try {
+  List<Message> messages = await conversation.queryMessage(
+    direction: MessageQueryDirection.oldToNew,
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 这种情况下要实现翻页，接口会稍微复杂一点，请继续阅读下一节。
 
@@ -4155,13 +4214,17 @@ var earliestMessages = await conversation.QueryMessageAsync(direction: 0, limit:
 var nextPageMessages = await conversation.QueryMessageAfterAsync(earliestMessages.Last());
 ```
 ```dart
-List<Message> messages = await conversation.queryMessage(
-  startTimestamp: textMessage.sentTimestamp,
-  startMessageID: textMessage.id,
-  startClosed: true,
-  direction: MessageQueryDirection.oldToNew,
-  limit: 10,
-);
+try {
+  List<Message> messages = await conversation.queryMessage(
+    startTimestamp: textMessage.sentTimestamp,
+    startMessageID: textMessage.id,
+    startClosed: true,
+    direction: MessageQueryDirection.oldToNew,
+    limit: 10,
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ### 获取指定区间内的消息
@@ -4234,15 +4297,19 @@ var latestMessage = await conversation.QueryMessageAsync(limit: 1);
 // messagesInInterval 最多可包含 100 条消息
 var messagesInInterval = await conversation.QueryMessageInIntervalAsync(earliestMessage.FirstOrDefault(), latestMessage.FirstOrDefault());
 ```
-```
-List<Message> messages = await conversation.queryMessage(
-  startTimestamp: textMessage.sentTimestamp,
-  startMessageID: textMessage.id,
-  startClosed: true,
-  endTimestamp: fileMessage.sentTimestamp,
-  endMessageID: fileMessage.id,
-  endClosed: true,
-);
+```dart
+try {
+  List<Message> messages = await conversation.queryMessage(
+    startTimestamp: textMessage.sentTimestamp,
+    startMessageID: textMessage.id,
+    startClosed: true,
+    endTimestamp: fileMessage.sentTimestamp,
+    endMessageID: fileMessage.id,
+    endClosed: true,
+  );
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 ### 客户端消息缓存
 
