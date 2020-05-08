@@ -92,6 +92,11 @@ if (dataLength > 0) {
 ```
 或者使用 Swift SDK 替换 Objective-C SDK。
 
+### iOS 推送报错 「部分推送被 APNs 拒绝，拒绝原因是: BadDeviceToken」
+
+这个报错是因为推送环境不正确，例如推送时通过 prod 参数设置推送给测试环境的设备(即 `"prod": "dev"`），则生产环境的设备无法收到推送。
+同理，如果指定推送给生产环境的设备(即 `"prod": "prod"`），则测试环境的设备无法收到推送。
+关于 iOS 的推送环境参考：[推送环境](ios_push_guide.html#推送环境)。
 
 ### iOS 推送如何选择推送证书？
 推送消息接口有一个参数：**prod**。
