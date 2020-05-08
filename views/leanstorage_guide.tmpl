@@ -8545,7 +8545,7 @@ try {
 
 LeanCloud 支持 `UnionID` 体系。你只需要给 `loginWithauthData` 和 `associateWithauthData` 接口传入更多的第三方鉴权信息，即可完成新 UnionID 体系的集成。新增加的第三方鉴权登录选项包括：
 - unionId，指第三方平台返回的 UnionId 字符串。
-- unionId platform，指 unionId 对应的 platform 字符串（就是之前使用的「平台名」，由应用层自己指定）。
+- unionId platform，指 unionId 对应的 platform 字符串，由应用层自己指定，[后面](#该如何指定-unionIdPlatform)会详述。
 - asMainAccount，指示是否把当前平台的鉴权信息作为主账号来使用。如果作为主账号，那么就由当前用户唯一占有该 unionId，以后其他平台使用同样的 unionId 登录的话，会绑定到当前的用户记录上来；否则，当前应用的鉴权信息会被绑定到其他账号上去。
 
 下面让我们通过一个例子来说明如何使用这些参数完成 UnionID 登录。
@@ -8580,7 +8580,7 @@ NSDictionary *thirdPartyData = @{
                             };
 AVUser *currentuser = [AVUser user];
 AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
-option.platform = @"wxleanoffice";
+option.platform = @"weixin";   // 这里指定 UnionIdPlatform，使用「weixin」来指代微信平台。
 option.unionId = thirdPartyData[@"unionid"];
 option.isMainAccount = true;
 [currentuser loginWithAuthData:thirdPartyData platformId:@"wxleanoffice" options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
@@ -8606,7 +8606,7 @@ AV.User.loginWithAuthDataAndUnionId(
   thirdPartyData,
   'wxleanoffice', 'unionid4a',  // 新增参数
   {
-    unionIdPlatform: 'wxleanoffice',
+    unionIdPlatform: 'weixin',   // 这里指定 UnionIdPlatform，使用「weixin」来指代微信平台。
     asMainAccount: true,
   }
 ).then((user) => {
@@ -8631,7 +8631,7 @@ user.logIn(
     authData: thirdPartyData,
     platform: .custom("wxleanoffice"),
     unionID: thirdPartyData["unionid"] as? String,
-    unionIDPlatform: .custom("wxleanoffice"),
+    unionIDPlatform: .weixin,   // 这里指定 UnionIdPlatform，使用「weixin」来指代微信平台。
     options: [.mainAccount])
 { (result) in
     switch result {
@@ -8652,7 +8652,8 @@ thirdPartyData.put("uid", "officeopenid");
 thirdPartyData.put("access_token", "officetoken");
 thirdPartyData.put("scope", "SCOPE");
 AVUser.loginWithAuthData(thirdPartyData, "wxleanoffice",
-   "unionid4a", "wxleanoffice", true)   // 新增参数，分别表示 uniondId，unionIdPlatform，asMainAccount
+   "unionid4a", "weixin", true)   // 新增参数，分别表示 uniondId，unionIdPlatform，asMainAccount
+                                  // 对于 unionIdPlatform，这里使用「weixin」来指代微信平台。
    .subscribe(new Observer<AVUser>() {
     @Override
     public void onSubscribe(Disposable d) {
@@ -8687,7 +8688,7 @@ Map<String, dynamic> thirdPartyData = {
 };
 LCUserAuthDataLoginOption option = LCUserAuthDataLoginOption();
 option.asMainAccount = true;
-option.unionIdPlatform = 'wxleanoffice';
+option.unionIdPlatform = 'weixin';
 LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
     thirdPartyData, 'wxleanoffice', 'unionid4a',
     option: option);
@@ -8701,23 +8702,24 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 ```json
 {
   "wxleanoffice": {
-    "platform": "wxleanoffice",
+    "platform": "weixin",
     "uid": "officeopenid",
     "expires_in": 1384686496,
     "main_account": true,
     "access_token": "officetoken",
     "unionid": "unionid4a"
   },
-  "_wxleanoffice_unionid": {   // 新增键值对
+  "_weixin_unionid": {   // 新增键值对
     "uid": "unionid4a"
   }
 }
 ```
 
-可以看到，与之前的第三方登录 API 相比，这里由于登录时指定了 `asMainAccount` 为 true，所以 authData 的第一级子目录中增加了 `_wxleanoffice_unionid` 的键值对，这里的 `wxleanoffice` 就是我们指定的 `unionIdPlatform` 的值。`_wxleanoffice_unionid` 这个增加的键值对非常重要，以后我们判断是否存在同样 UnionID 的账户就是依靠它来查找的，而是否增加这个键值对，则是由登录时指定的 `asMainAccount` 的值决定的：
+可以看到，与之前的第三方登录 API 相比，这里由于登录时指定了 `asMainAccount` 为 true，所以 authData 的第一级子目录中增加了 `_weixin_unionid` 的键值对，这里的 `weixin` 就是我们指定的 `unionIdPlatform` 的值。`_weixin_unionid` 这个增加的键值对非常重要，以后我们判断是否存在同样 UnionID 的账户就是依靠它来查找的，而是否增加这个键值对，则是由登录时指定的 `asMainAccount` 的值决定的：
 
 - 当 `asMainAccount` 为 true 时，LeanCloud 后台会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，当前账号就会作为这一个 UnionID 对应的主账号被唯一确定。
 - 当 `asMainAccount` 为 false 时，LeanCloud 后台不会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，此时如果通过提供的 UnionID 可以找到主账号，则会将当前的鉴权信息合并进主账号的 `authData` 属性里，同时返回主账号对应的 _User 表记录；如果通过提供的 UnionID 可以找不到主账号，则会根据平台的 `openid` 去查找账户，找到匹配的账户就返回匹配的，找不到就新建一个账户，此时的处理逻辑与不使用 UnionID 时的逻辑完全一致。
+
 
 接下来，用户 A 继续在「LeanCloud 技术支持」中进行微信登录，其登录逻辑为：
 
@@ -8732,7 +8734,7 @@ NSDictionary *thirdPartyData = @{
                             };
 AVUser *currentuser = [AVUser user];
 AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
-option.platform = @"wxleanoffice";
+option.platform = @"weixin";   // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
 option.unionId = thirdPartyData[@"unionid"];
 option.isMainAccount = false;
 [currentuser loginWithAuthData:thirdPartyData platformId:@"wxleansupport" options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
@@ -8758,7 +8760,7 @@ AV.User.loginWithAuthDataAndUnionId(
   thirdPartyData,
   'wxleansupport', 'unionid4a',
   {
-    unionIdPlatform: 'wxleanoffice',
+    unionIdPlatform: 'weixin',   // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
     asMainAccount: false,
   }
 ).then((user) => {
@@ -8783,7 +8785,7 @@ user.logIn(
     authData: thirdPartyData,
     platform: .custom("wxleansupport"),
     unionID: thirdPartyData["unionid"] as? String,
-    unionIDPlatform: .custom("wxleanoffice"),
+    unionIDPlatform: .weixin,  // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
     options: [.mainAccount])
 { (result) in
     switch result {
@@ -8803,7 +8805,9 @@ thirdPartyData.put("expires_in", 1384686496);
 thirdPartyData.put("uid", "supportopenid");
 thirdPartyData.put("access_token", "supporttoken");
 thirdPartyData.put("scope", "SCOPE");
-AVUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a", "wxleanoffice", false).subscribe(new Observer<AVUser>() {
+AVUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a",
+  "weixin",     // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
+  false).subscribe(new Observer<AVUser>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
@@ -8837,7 +8841,7 @@ Map<String, dynamic> thirdPartyData = {
 };
 LCUserAuthDataLoginOption option = LCUserAuthDataLoginOption();
 option.asMainAccount = false;
-option.unionIdPlatform = 'wxleanoffice';
+option.unionIdPlatform = 'weixin';     // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
 LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
     thirdPartyData, 'wxleansupport', 'unionid4a',
     option: option);
@@ -8849,18 +8853,18 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 ```json
 {
   "wxleanoffice": {
-    "platform": "wxleanoffice",
+    "platform": "weixin",
     "uid": "officeopenid",
     "expires_in": 1384686496,
     "main_account": true,
     "access_token": "officetoken",
     "unionid": "unionid4a"
   },
-  "_wxleanoffice_unionid": {
+  "_weixin_unionid": {
     "uid": "unionid4a"
   },
   "wxleansupport": {
-    "platform": "wxleanoffice",
+    "platform": "weixin",
     "uid": "supportopenid",
     "expires_in": 1384686496,
     "main_account": false,
@@ -8874,14 +8878,33 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 
 这样一来，LeanCloud 后台通过识别平台性的用户唯一标识 UnionID，让来自同一个 UnionID 体系内的应用程序、小程序等不同平台的用户都绑定到了一个 `{{ userObjectName }}` 上，实现互通。
 
+##### 该如何指定 unionIdPlatform
+
+从上面的例子可以看出，使用 UnionID 登录的时候，需要指定 `unionIdPlatform` 的主要目的，就是为了便于查找已经存在的唯一主账号。LeanCloud 云端会在主账号对应账户的 `authData` 属性中增加一个 `_{unionIdPlatform}_unionid` 键值对来标记唯一性，终端用户在其他应用中登录的时候，LeanCloud 云端会根据参数中提供的 `uniondId` + `unionIdPlatform` 的组合，在 `_User` 表中进行查找，这样来确定唯一的既存主账号。
+
+本来 `unionIdPlatform` 的取值，应该是开发者可以自行决定的，但是 Javascript SDK 基于易用性的目的，在 `loginWithAuthDataAndUnionId` 之外，还额外提供了两个接口：
+
+- `AV.User.loginWithQQAppWithUnionId`，这里默认使用 `qq` 作为 `unionIdPlatform`。
+- `AV.User.loginWithWeappWithUnionId`，这里默认使用 `weixin` 作为 `unionIdPlatform`。
+
+从我们的统计来看，这两个接口已经被很多开发者接受，在大量线上产品中产生着实际数据。所以为了避免数据在不同平台（例如 Android 和 iOS 应用）间发生冲突，建议大家统一按照 Javascript SDK 的默认值来设置 `unionIdPlatform`，即：
+
+- 微信平台的多个应用，统一使用 `weixin` 作为 `unionIdPlatform`；
+- QQ 平台的多个应用，统一使用 `qq` 作为 `unionIdPlatform`；
+- 微博平台的多个应用，统一使用 `weibo` 作为 `unionIdPlatform`；
+- 除此之外的其他平台，开发者可以自行定义 `unionIdPlatform` 的名字，只要自己保证多个应用间统一即可。
+
+
+##### 主副应用不同登录顺序出现的不同结果
+
 上面的流程是用户先登录了「LeanCloud 通讯」这个主应用，然后再登录「LeanCloud 技术支持」这个副应用，所以账号都被通过 UnionID 有效关联起来了。可能有人会想到另外一个问题，如果用户 B 先登录副应用，后登录主应用，这时候会发生什么事情呢？
 
-用户 B 首先登录副应用的时候，提供了「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，并且指定「UnionIDPlatform 为 `wxleanoffice`、`asMainAccount` 为 false」（与上面的调用完全一致），此时 LeanCloud 后台由于找不到存在的 UnionID，会新建一个 `{{ userObjectName }}` 对象，该账户 `authData` 结果为：
+用户 B 首先登录副应用的时候，提供了「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，并且指定「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 false」（与上面的调用完全一致），此时 LeanCloud 后台由于找不到存在的 UnionID，会新建一个 `{{ userObjectName }}` 对象，该账户 `authData` 结果为：
 
 ```json
 {
   "wxleansupport": {
-    "platform": "wxleanoffice",
+    "platform": "weixin",
     "uid": "supportopenid",
     "expires_in": 1384686496,
     "main_account": false,
@@ -8891,19 +8914,19 @@ LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
 }
 ```
 
-用户 B 接着又使用了主应用，ta 再次通过微信登录，此时以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，以及「UnionIDPlatform 为 `wxleanoffice`、`asMainAccount` 为 true」的参数进行登录，此时LeanCloud 后台由于找不到存在的 UnionID，会再次新建一个 `{{ userObjectName }}` 对象，该账户 `authData` 结果为：
+用户 B 接着又使用了主应用，ta 再次通过微信登录，此时以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，以及「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 true」的参数进行登录，此时 LeanCloud 后台由于找不到存在的 UnionID，会再次新建一个 `{{ userObjectName }}` 对象，该账户 `authData` 结果为：
 
 ```json
 {
   "wxleanoffice": {
-    "platform": "wxleanoffice",
+    "platform": "weixin",
     "uid": "officeopenid",
     "expires_in": 1384686496,
     "main_account": true,
     "access_token": "officetoken",
     "unionid": "unionid4a"
   },
-  "_wxleanoffice_unionid": {
+  "_weixin_unionid": {
     "uid": "unionid4a"
   }
 }
