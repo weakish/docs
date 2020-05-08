@@ -1,6 +1,6 @@
 # 应用内搜索 REST API 指南
 
-应用内搜索提供以下 REST API 接口：
+[应用内搜索](app_search_guide.html)提供以下 REST API 接口：
 
 | URL | HTTP | 功能 |
 | - | - | - |
@@ -84,7 +84,7 @@ curl -X GET \
 
 直到返回结果为空。
 
-### q 查询语法举例
+### q 查询语法
 
 q 的查询走的是 elasticsearch 的 [query string 语法](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
 
