@@ -2221,13 +2221,13 @@ LeanCloud 会自动验证部分平台 access token 的有效性。
 
 使用 UnionID 注册登录，需要提供带有 `unionid` 参数的 `authData`。另外需要配合传递 `platform` 和 `main_account` 这两个字段。
 
-* `platform`：unionId 对应的注册平台，由应用自行指定。
+* `platform`：unionId 对应的注册平台，可由应用自行指定，微信、QQ、微博平台建议设为[数据存储开发指南·该如何指定 unionIdPlatform](leanstorage_guide-js.html#该如何指定_unionIdPlatform)中推荐的值。
 * `main_account`： `main_account` 为 true 时把当前平台的鉴权信息作为主账号。
 
-在服务端进行存储的时候会根据 `platform` 来命名新增的平台，如传入 `"platform" = "wxleanoffice"` 时，返回数据中会增加 `_wxleanoffice_unionid` 字段存储 `{"uid":"xxxxx"}`。
+在服务端进行存储的时候会根据 `platform` 来命名新增的平台，如传入 `"platform" = "weixin"` 时，返回数据中会增加 `_weixin_unionid` 字段存储 `{"uid":"xxxxx"}`。
 
 ```
-"_wxleanoffice_unionid": {
+"_weixin_unionid": {
   "uid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
 }
 ```
@@ -2248,7 +2248,7 @@ curl -X POST \
         "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838",
         "scope": "snsapi_userinfo",
         "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
-        "platform": "wxleanoffice",
+        "platform": "weixin",
         "main_account":"true"
       },
       "wxleansupport": {
@@ -2258,14 +2258,14 @@ curl -X POST \
         "refresh_token": "8-_78UYUnOaaOafekimOaOYj-afY67ilZ40faOOYkOlOZOOagc-hamQgaVhT6maWkRg0mngOX9kXeaaP8km-WdOUOc4ngRia4aaTWnaO4dO848",
         "scope": "snsapi_userinfo",
         "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
-        "platform": "wxleanoffice",
+        "platform": "weixin",
         "main_account":"false"
       },
     }}' \
    https://{{host}}/1.1/users
 ```
 
-我们看到，在上面的例子中，`wxleanoffice` 和 `wxleansupport` 的 `unionid` 是一样的，`platform` 也均为 `wxleanoffice`（因为 `wxleanoffice` 是主账号，`main_account` 为 `true`，而 `wxleansupport` 的 `main_account` 为 `false`）。
+我们看到，在上面的例子中，`wxleanoffice` 和 `wxleansupport` 的 `unionid` 是一样的，`platform` 均指定为 `weixin`，`wxleanoffice` 是主账号，`main_account` 为 `true`。
 
 应答内容包括 objectId、createdAt、sessionToken、authData 以及一个自动生成的随机 username，应答的 body 类似：
 
@@ -2285,7 +2285,7 @@ curl -X POST \
             "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838",
             "scope": "snsapi_userinfo",
             "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
-            "platform": "wxleanoffice",
+            "platform": "weixin",
             "main_account": "true"
         },
         "wxleansupport": {
@@ -2295,7 +2295,7 @@ curl -X POST \
             "refresh_token": "8-_78UYUnOaaOafekimOaOYj-afY67ilZ40faOOYkOlOZOOagc-hamQgaVhT6maWkRg0mngOX9kXeaaP8km-WdOUOc4ngRia4aaTWnaO4dO848",
             "scope": "snsapi_userinfo",
             "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
-            "platform": "wxleanoffice",
+            "platform": "weixin",
             "main_account":"false"
         },
         "_wxleanoffice_unionid": {
