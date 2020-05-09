@@ -259,8 +259,8 @@ try {
   // 创建与 Jerry 之间的对话
   Conversation conversation = await tom.createConversation(
       isUnique: true, members: {'Jerry'}, name: 'Tom & Jerry');
-} on LCException catch (e) {
-  print('创建会话失败:${e.message}');
+} catch (e) {
+  print('创建会话失败:$e');
 }
 ```
 
@@ -544,8 +544,8 @@ try {
   TextMessage textMessage = TextMessage();
   textMessage.text = 'Jerry，起床了！';
   await conversation.send(message: textMessage);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -843,8 +843,8 @@ try {
   ConversationQuery query = tom.conversationQuery();
   query.whereEqualTo('objectId', 'CONVERSATION_ID');
   conversations = await query.find();
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 try {
   Conversation conversation = conversations.first;
@@ -852,8 +852,8 @@ try {
   MemberResult addResult = await conversation.addMembers(
     members: {'Mary'},
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -1026,8 +1026,8 @@ try {
       isUnique: true,
       members: {'Jerry', 'Mary'},
       name: 'Tom & Jerry & friends');
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 ### 群发消息
@@ -1083,8 +1083,8 @@ try {
   TextMessage textMessage = TextMessage();
   textMessage.text = '大家好，欢迎来到我们的群聊对话！';
   await conversation.send(message: textMessage);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -1141,8 +1141,8 @@ await conversation.RemoveMembersAsync("Mary");
 ```dart
 try {
   MemberResult removeMemberResult = await conversation.removeMembers(members: {'Mary'});
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 Tom 端执行了这段代码之后会触发如下流程：
@@ -1343,15 +1343,15 @@ try {
   ConversationQuery query = william.conversationQuery();
   query.whereEqualTo('objectId', 'CONVERSATION_ID');
   conversations = await query.find();
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 
 try {
   Conversation conversation = conversations.first;
   MemberResult joinResult = await conversation.join();
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -1465,8 +1465,8 @@ await jerry.LeaveAsync(conversation);
 ```dart
 try {
   MemberResult quitResult = await conversation.quit();
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 执行了这段代码 Jerry 就离开了这个聊天群，此后群里所有的事件 Jerry 都不会再知晓。各个成员接收到的事件通知流程如下：
@@ -1760,8 +1760,8 @@ ImageMessage imageMessage = ImageMessage.from(
 );
 try {
   conversation.send(message: imageMessage);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -1838,8 +1838,8 @@ ImageMessage imageMessage = ImageMessage.from(
 );
 try {
   conversation.send(message: imageMessage);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 #### 接收图像消息
@@ -2039,8 +2039,8 @@ AudioMessage audioMessage = AudioMessage.from(
 audioMessage.text = '听听人类的神曲';
 try {
   await conversation.send(message: audioMessage);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 与图像消息类似，音频消息也支持从 URL 构建：
@@ -2112,8 +2112,8 @@ AudioMessage audioMessage = AudioMessage.from(
 );
 try {
   await conversation.send(message: audioMessage);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -2183,8 +2183,8 @@ LocationMessage locationMessage = LocationMessage.from(
 );
 try {
   await conversation.send(message: locationMessage);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -2838,8 +2838,8 @@ try {
       'pinned': true,
     },
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 **自定义属性在 SDK 级别是对所有成员可见的。**我们也支持通过自定义属性来查询对话，请参见 [使用复杂条件来查询对话](#使用复杂条件来查询对话)。
@@ -2895,8 +2895,8 @@ try {
   await conversation.updateInfo(attributes: {
     'name': '聪明的喵星人',
   });
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 而 `Conversation` 对象中自定义的属性，即时通讯服务也是允许对话内其他成员来读取、使用和修改的，示例代码如下：
@@ -2967,8 +2967,8 @@ try {
   await conversation.updateInfo(attributes: {
     'pinned': false,
   });
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 > 对自定义属性名的说明
@@ -3163,8 +3163,8 @@ try {
   ConversationQuery query = tom.conversationQuery();
   query.whereEqualTo('objectId', '551260efe4b01608686c3e0f');
   await query.find();
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -3236,8 +3236,8 @@ try {
   query.whereEqualTo('attr.type', 'private');
 // conversations 就是想要的结果
   List<Conversation> conversations = await query.find();
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 对 LeanCloud 数据存储服务熟悉的开发者可以更容易理解对话的查询构建，因为对话查询和数据存储服务的对象查询在接口上是十分接近的：
@@ -3923,8 +3923,8 @@ try {
   List<Message> messages = await conversation.queryMessage(
     limit: 10,
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -4017,8 +4017,8 @@ try {
   messages = await conversation.queryMessage(
     limit: 10,
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 
 try {
@@ -4031,8 +4031,8 @@ try {
     startClosed: true,
     limit: 10,
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 ### 按照消息类型获取
@@ -4082,8 +4082,8 @@ var imageMessages = await conversation.QueryMessageAsync<AVIMImageMessage>();
 ```dart
 try {
   List<Message> messages = await conversation.queryMessage(type: -2);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -4141,8 +4141,8 @@ try {
   List<Message> messages = await conversation.queryMessage(
     direction: MessageQueryDirection.oldToNew,
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 这种情况下要实现翻页，接口会稍微复杂一点，请继续阅读下一节。
@@ -4222,8 +4222,8 @@ try {
     direction: MessageQueryDirection.oldToNew,
     limit: 10,
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -4307,8 +4307,8 @@ try {
     endMessageID: fileMessage.id,
     endClosed: true,
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 ### 客户端消息缓存

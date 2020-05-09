@@ -98,8 +98,8 @@ try {
   message.text = '@Tom 早点回家';
   message.mentionMembers = ['Tom'];
   await conversation.send(message: message);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -161,8 +161,8 @@ try {
   message.text = 'content';
   message.mentionAll = true;
   await conversation.send(message: message);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -350,8 +350,8 @@ try {
     oldMessage: oldMessage,
     newMessage: newMessage,
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 消息修改成功之后，对话内的其他成员会立刻接收到 `MESSAGE_UPDATE` 事件：
@@ -483,8 +483,8 @@ try {
   RecalledMessage recalledMessage = await conversation.recallMessage(
     message: oldMessage,
   );
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -756,8 +756,8 @@ try {
   message.text = 'Tom 正在输入…';
 //发送一条暂态消息
   await conversation.send(message: message, transient: true);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
@@ -818,8 +818,8 @@ try {
   TextMessage message = TextMessage();
   message.text = '一条非常重要的消息。';
   await conversation.send(message: message, receipt: true);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 > 注意：
@@ -1014,8 +1014,8 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
       TextMessage message = TextMessage();
       message.text = '一条非常重要的消息。';
       await conversation.send(message: message, receipt: true);
-    } on LCException catch (e) {
-      print(e.message);
+    } catch (e) {
+      print(e);
     }
     ```
 
@@ -1185,8 +1185,8 @@ try {
   TextMessage message = TextMessage();
   message.text = '我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。';
   await conversation.send(message: message, will: true);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 
 ```
@@ -1393,8 +1393,8 @@ LeanCloud 本就提供完善的消息推送服务，现在将推送与即时通�
       "sound": "message.mp3", // 声音文件名，前提在应用里存在
       "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
     });
-  } on LCException catch (e) {
-    print(e.message);
+  } catch (e) {
+    print(e);
   }
   ```
 
@@ -1633,8 +1633,8 @@ AVIMClient tom = await realtime.CreateClientAsync("Tom", tag: "Mobile", deviceId
 try {
   Client tom = Client(id: 'Tom', tag: 'Mobile');
   await tom.open();
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 之后如果同一个用户在另一个手机上再次登录，则较早前登录系统的客户端会被强制下线。
@@ -1761,8 +1761,8 @@ try {
   Client tom = Client(id: 'Tom', tag: 'Mobile');
 //冲突时登录失败，不会踢掉较早登录的设备
   await tom.open(reconnect: true);
-} on LCException catch (e) {
-  print(e.message);
+} catch (e) {
+  print(e);
 }
 ```
 
