@@ -223,8 +223,8 @@ libraryDependencies += "cn.leancloud" %% "realtime-core" % "{{ version.unified }
 
 and for Gradle:
 ```
-    implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 ```
 
 #### 使用混合推送服务
@@ -309,8 +309,11 @@ allprojects {
 
 {% endif %}
 {% if platform_name === "Flutter" %}
- SDK 发布在 pub.dev:
+SDK 发布在 pub.dev:
 * [数据存储 SDK](https://pub.dev/packages/leancloud_storage)
+* [即时通信 SDK](https://pub.dev/packages/leancloud_official_plugin)
+
+#### 使用数据存储
 
 在 pubspec.yaml 中，将 SDK 添加到依赖项列表:
 
@@ -319,10 +322,45 @@ dependencies:
   flutter:
     sdk: flutter
   ...
-  leancloud_storage: ^{{ version.flutter_storage }} //使用数据存储
+  leancloud_storage: ^{{ version.flutter_storage }}
 ```
 
+#### 使用即时通信
+
+即时通信的 Flutter 插件 SDK 基于 [Swift SDK](https://github.com/leancloud/swift-sdk) 以及 [Java Unified SDK](https://github.com/leancloud/java-unified-sdk) 开发。
+
+##### 第一步
+
+在 pubspec.yaml 中，将 SDK 添加到依赖项列表:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  ...
+  leancloud_official_plugin: ^{{ version.flutter_official_plugin }}
+```
+
+##### 第二步
+
+**Android 开发者**要配置 Gradle 安装 Java Unified SDK，打开工程目录 android/app/build.gradle，添加如下依赖：
+
+```yaml
+dependencies {
+implementation 'cn.leancloud:storage-android:{{ version.unified }}'
+implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
+implementation 'io.reactivex.rxjava2:rxandroid:{{ version.unified }}'
+}
+```
+**iOS 开发者**需要通过 CocoaPods 安装 Swift SDK：
+
+```yaml
+$ cd ios/
+$ pod update # 或者 $ pod install --repo-update
+```
 {% endif %}
+
+{% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" %}
 ### 手动安装
 
 {% if platform_name === "Python" %}
@@ -855,6 +893,7 @@ PM> Install-Package LeanCloud.LiveQuery
 PM> Install-Package LeanCloud.Realtime
 ```
 {% endif %}
+{% endif %}
 
 ## 初始化
 
@@ -1131,10 +1170,11 @@ const realtime = new AVRealtime(new AVRealtime.Configuration
 {% endif %}
 
 {% if platform_name === "Flutter" %}
+
+#### 数据存储
 使用 SDK 时添加下列导入语句到头部：
 
 ```dart
-//数据存储
 import 'package:leancloud_storage/leancloud.dart';
 ```
 
@@ -1148,8 +1188,91 @@ LeanCloud.initialize(
 ```
 
 {{ requireServerURL() }}
-{% endif %}
 
+#### 即时通信
+
+**使用Flutter 即时通信插件需要在 Android 和 iOS 平台分别初始化。**
+
+##### Android 平台初始化
+
+首先向 Application 类的 onCreate 方法添加：
+```java
+import cn.leancloud.AVOSCloud;
+import cn.leancloud.AVLogger;
+import io.flutter.app.FlutterApplication;
+
+public class MyLeanCloudApp extends FlutterApplication {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        //开启未读消息数更新通知
+        AVIMOptions.getGlobalOptions().setUnreadNotificationEnabled(true);
+        //开启调试日志
+        AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
+        // 提供 this、App ID、App Key、Server Host 作为参数
+        // 请将 xxx.example.com 替换为你的应用绑定的 API 域名
+        AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}", "https://xxx.example.com");
+    }
+}
+```
+然后指定 SDK 需要的权限并在 AndroidManifest.xml 里面声明 MyLeanCloudApp 类：
+
+```xml
+<!-- 基本模块（必须）START -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<!-- 基本模块 END -->
+
+<application
+  …
+  android:name=".MyLeanCloudApp" >
+
+  <!-- 即时通讯和推送 START -->
+  <!-- 即时通讯和推送都需要 PushService -->
+  <service android:name="cn.leancloud.push.PushService"/>
+  <receiver android:name="cn.leancloud.push.AVBroadcastReceiver">
+    <intent-filter>
+      <action android:name="android.intent.action.BOOT_COMPLETED"/>
+      <action android:name="android.intent.action.USER_PRESENT"/>
+      <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+    </intent-filter>
+  </receiver>
+  <!-- 即时通讯和推送 END -->
+</application>
+```
+##### iOS 平台初始化
+
+在 AppDelegate.swift 中加入如下初始化代码：
+
+```swift
+import Flutter
+import LeanCloud
+
+@UIApplicationMain
+@objc class AppDelegate: FlutterAppDelegate {
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        do {
+            LCApplication.logLevel = .all
+            try LCApplication.default.set(
+                id: "{{appid}}",
+                key: "{{appkey}}",
+                serverURL: "https://xxx.example.com")
+            GeneratedPluginRegistrant.register(with: self)
+            return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        } catch {
+            fatalError("\(error)")
+        }
+    }
+}
+```
+
+{% endif %}
 
 ## 开启调试日志
 
@@ -1293,6 +1416,15 @@ LCApplication.logLevel = .off
 {% endif %}
 {% endif %}
 
+{% if platform_name === "Flutter" %}
+数据存储服务开启调试日志：
+```dart
+// 在 LeanCloud.initialize 初始化之后执行
+LCLogger.setLevel(LCLogger.DebugLevel);
+```
+即时通信服务开启调试日志方式同 Swift SDK 与 Java Unified SDK。
+{% endif %}
+
 {% call docs.alertWrap() %}
 在应用发布之前，请关闭调试日志，以免暴露敏感数据。
 {% endcall %}
@@ -1424,7 +1556,7 @@ await saveTask;
 {% endif %}
 
 {% if platform_name === "Flutter" %}
-然后在项目中编写如下测试代码：
+然后在项目 lib/main.dart 中编写如下测试代码：
 
 ```dart
 LCObject object = LCObject('TestObject');

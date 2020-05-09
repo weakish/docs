@@ -378,6 +378,9 @@ var config = new AVRealtime.Configuration()
 };
 var realtime = new AVRealtime(config);
 ```
+```dart
+<!-- Todo -->
+```
 
 {{ docs.alert("需要强调的是：开发者切勿在客户端直接使用 Master Key 进行签名操作，因为 Master Key 一旦泄露，会造成应用的数据处于高危状态，后果不容小视。因此，强烈建议开发者将签名的具体代码托管在安全性高稳定性好的云端服务器上（例如 LeanCloud 云引擎）。") }}
 
@@ -443,6 +446,9 @@ AVUser.logInInBackground("username", "password", new LogInCallback<AVUser>() {
 });
 ```
 ```cs
+// 暂不支持
+```
+```dart
 // 暂不支持
 ```
 
@@ -514,6 +520,9 @@ public void updateMemberRole(final String memberId, final ConversationMemberRole
 ```cs
 // 暂不支持
 ```
+```dart
+// 暂不支持
+```
 
 ### 获取成员权限
 
@@ -568,6 +577,9 @@ public void updateMemberRole(final String memberId, final ConversationMemberRole
   ```cs
   // 暂不支持
   ```
+  ```dart
+  // 暂不支持
+  ```
 
 - `Conversation#getMemberInfo(memberId)` 可用来获取指定成员的权限信息
 
@@ -607,6 +619,9 @@ public void updateMemberRole(final String memberId, final ConversationMemberRole
   public void getMemberInfo(final String memberId, final AVIMConversationMemberQueryCallback callback);
   ```
   ```cs
+  // 暂不支持
+  ```
+  ```dart
   // 暂不支持
   ```
 
@@ -725,6 +740,9 @@ public void unmuteMembers(final List<String> memberIds, final AVIMOperationParti
 public void queryMutedMembers(int offset, int limit, final AVIMConversationSimpleResultCallback callback);
 ```
 ```cs
+// 暂不支持
+```
+```dart
 // 暂不支持
 ```
 
@@ -860,6 +878,9 @@ public void queryBlockedMembers(int offset, int limit, final AVIMConversationSim
 ```cs
 // 暂不支持
 ```
+```dart
+// 暂不支持
+```
 
 > 注意这里对黑名单操作的结果与禁言操作一样，是 ***部分成功结果***。
 
@@ -925,6 +946,9 @@ tom.createChatRoom("聊天室", null,
 // 最直接的方式，传入 name 即可
 tom.CreateChatRoomAsync("聊天室");
 ```
+```dart
+ChatRoom chatRoom = await jerry.createChatRoom(name: '聊天室');
+```
 
 在创建聊天室的时候，开发者可以指定聊天室的名字和附加属性（非必须），与 [创建普通对话的接口](realtime-guide-beginner.html#创建对话 Conversation) 相比，有如下差异：
 
@@ -981,7 +1005,16 @@ query.findInBackground(new AVIMConversationQueryCallback() {
 ```cs
 var query = tom.GetChatRoomQuery();
 ```
-
+```dart
+try {
+  ConversationQuery query = tom.conversationQuery();
+  query.whereEqualTo('tr', true);
+// conversations 就是想要的结果
+  List<Conversation> conversations = await query.find();
+} catch (e) {
+  print(e);
+}
+```
 > Java / Android / C# SDK 专门提供了 `AVIMClient#getChatRoomQuery` 方法来生成聊天室查询对象，屏蔽了 `transient` 属性的细节，建议开发者优先使用这些高层 API。
 
 ### 加入和离开聊天室
@@ -1073,6 +1106,9 @@ public async void CountMembers_SampleCode()
     AVIMConversation conversation = (await client.GetQuery().FindAsync()).FirstOrDefault(); // 获取对话列表，找到第一个对话
     int membersCount = await conversation.CountMembersAsync();
 }
+```
+```dart
+int count = await chatRoom.countMembers();
 ```
 
 ### 消息等级
@@ -1174,6 +1210,15 @@ AVIMClient tom = AVIMClient.getInstance("Tom");
 ```cs
 // 暂不支持
 ```
+```dart
+try {
+  TextMessage message = TextMessage();
+  message.text = '现在比分是 0:0，下半场中国队肯定要做出人员调整';
+  await chatRoom.send(message: message, priority: MessagePriority.high);
+} catch (e) {
+  print(e);
+}
+```
 
 > 注意：
 >
@@ -1246,6 +1291,9 @@ tom.open(new AVIMClientCallback(){
 ```
 ```cs
 // 暂不支持
+```
+```dart
+await chatRoom.mute();
 ```
 
 设置静音之后，iOS 及启用混合推送的 Android 用户就不会收到推送消息了。与之对应的就是取消静音的操作（`Conversation#unmute` 方法），即取消免打扰模式。
@@ -1338,7 +1386,24 @@ tom.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversati
 ```cs
 var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 ```
+```dart
+TemporaryConversation temporaryConversation;
+try {
+  temporaryConversation = await jerry.createTemporaryConversation(
+    members: {'Jerry', 'William'},
+  );
+} catch (e) {
+  print(e);
+}
 
+try {
+  TextMessage message = TextMessage();
+  message.text = '这里是临时对话';
+  await temporaryConversation.send(message: message);
+} catch (e) {
+  print(e);
+}
+```
 与其他对话类型不同的是，临时对话有一个 **重要** 的属性：TTL。它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天。如果您的需求是一定要超过 30 天，请使用普通对话。传入 TTL 创建临时对话的代码如下：
 
 ```js
@@ -1418,7 +1483,26 @@ client.open(new AVIMClientCallback() {
 ```cs
 var temporaryConversation = await tom.CreateTemporaryConversationAsync();
 ```
+```dart
+TemporaryConversation temporaryConversation;
+try {
+  temporaryConversation = await jerry.createTemporaryConversation(
+    members: {'Jerry', 'William'},
+    timeToLive: 3600,
+  );
+} catch (e) {
+  print(e);
+}
 
+try {
+  TextMessage message = TextMessage();
+  message.text = '这里是临时对话，一小时之后，这个对话就会消失';
+  await temporaryConversation.send(message: message);
+} catch (e) {
+  print(e);
+}
+
+```
 临时对话的其他操作与普通对话无异。
 
 ## 进一步阅读
