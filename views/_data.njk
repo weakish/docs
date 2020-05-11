@@ -136,3 +136,7 @@ public class MyLeanCloudApp extends Application {
 否则，以比较大小为条件查询对象的时候，需要特殊处理，
 `< a` 需改查 `< a + e`，`> a` 需改查 `> a - e`，`== a` 需改查 `> a - e` 且 `< a + e`，其中 `e` 为误差范围，据所需精度取值，比如 `0.0001`。
 {% endmacro %}
+
+{% macro channel_naming() %}
+频道名称只能包含大小写英文字母、数字、下划线（`_`）、连字符（`-`）、等号（`=`）、汉字（中日韩统一表意文字）。
+{% endmacro %}

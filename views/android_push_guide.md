@@ -1,5 +1,6 @@
 {% from "views/_data.njk" import libVersion as version %}
 {% import "views/_helper.njk" as docs %}
+{% import "views/_data.njk" as data %}
 {% import "views/_parts.html" as include %}
 
 {{ include.setService('push') }}
@@ -172,8 +173,8 @@ PushService.subscribe(this, "protected", Callback2.class);
 
 注意：
 
-- 频道名称：**每个 channel 名称只能包含 26 个英文字母和数字。**
-- 回调对象：指用户点击通知栏的通知进入的 Activity 页面。
+- **{{ data.channel_naming() }}**
+- 回调对象指用户点击通知栏的通知进入的 Activity 页面。
 
 退订频道也很简单：
 

@@ -1,3 +1,5 @@
+{% import "views/_data.njk" as data %}
+
 # iOS 消息推送开发指南
 
 本文介绍了如何在 iOS 设备中使用 LeanCloud 的推送功能。建议先阅读 [消息推送概览](push_guide.html) 了解相关概念。
@@ -227,7 +229,7 @@ iOS 应用所处的推送环境完全由 App 的分发方式决定。
 
 使用频道（channel）可以实现「发布—订阅」的模型。设备订阅某个频道，然后发送消息的时候指定要发送的频道即可。
 
-<div class="callout callout-info">每个 channel 名称只能包含 26 个英文字母和数字。</div>
+<div class="callout callout-info">{{ data.channel_naming() }}</div>
 
 ### 订阅和退订
 
