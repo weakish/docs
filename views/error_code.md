@@ -1,4 +1,6 @@
 {% import "views/_im.njk" as im %}
+{% import "views/_data.njk" as data %}
+
 # 错误码详解
 
 本文档列举出服务端和 SDK 返回的错误码及相应说明。其他由各 SDK 产生的错误码，请参考以下链接：
@@ -71,8 +73,8 @@
 
 ## 112
 
-* 信息 - `Invalid channel name. A channel name is either an empty string (the broadcast channel) or contains only a-zA-Z0-9_ characters and starts with a letter.`
-* 含义 - 推送订阅的频道无效，频道名称必须不是空字符串，只能包含英文字母、数字以及下划线，并且只能以英文字母开头。
+* 信息 - `Invalid channel name. A channel name is either an empty string (the broadcast channel) or contains only a-zA-Z0-9_=, '-' or chinese characters.`
+* 含义 - 推送订阅的频道无效，{{ data.channel_naming() }}频道名称为空字符串表示广播。
 
 ## 113
 
