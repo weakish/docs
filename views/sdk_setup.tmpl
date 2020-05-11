@@ -65,6 +65,7 @@ Java SDK 一共包含如下几个模块：
 获取 SDK 有多种方式，较为推荐的方式是通过包依赖管理工具下载最新版本。
 
 ### 包依赖管理工具安装
+{% endif %}
 
 {% if platform_name === "Objective-C" %}
 通过 [CocoaPods](https://cocoapods.org) 安装可以最大化地简化安装过程。
@@ -362,12 +363,13 @@ $ pod update # 或者 $ pod install --repo-update
 
 {% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" %}
 ### 手动安装
+{% endif %}
 
 {% if platform_name === "Python" %}
 <a class="btn btn-default" target="_blank" href="https://releases.leanapp.cn/#/leancloud/python-sdk/releases">下载 SDK</a>
 {% elif platform_name === "PHP" %}
 <a class="btn btn-default" target="_blank" href="https://releases.leanapp.cn/#/leancloud/php-sdk/releases">下载 SDK</a>
-{% else %}
+{% elif platform_name === "Android / Java" or platform_name === "Objective-C" %}
 <a class="btn btn-default" target="_blank" href="sdk_down.html">下载 SDK</a>
 {% endif %}
 
@@ -387,7 +389,6 @@ $ cd android-sdk/
 $ gradle clean assemble
 ```
 {% endif %}
-
 {% if platform_name === "Objective-C" %}
 #### 下载源码
 
@@ -411,7 +412,6 @@ $ gradle clean assemble
 > 下载 Swift SDK 源码后，也需要等待 Swift Package Manager 下载并集成其它依赖，所以推荐直接使用 Swift Package Manager。
 {% endif %}
 
-{% endif %}
 {% if platform_name === "JavaScript" %}
 {{ docs.defaultLang('存储服务') }}
 
@@ -845,7 +845,6 @@ https://cdn.jsdelivr.net/npm/leancloud-realtime@{{jsimsdkversion}}/dist/im.min.j
 ```
 
 开发者可以自行实现目标平台的 Adapters 来适配该平台。Adapters 的接口定义可以在 package [`@leancloud/adapter-types`](https://unpkg.com/browse/@leancloud/adapter-types@1.0.2/types.d.ts) 中找到。你也可以通过关键字 [`platform-adapters`](https://www.npmjs.com/search?q=keywords:platform-adapters) 查找社区中其他开发者贡献的 Adapters。
-
 {% endif %}
 
 {% if platform_name === ".NET" %}
@@ -892,7 +891,6 @@ PM> Install-Package LeanCloud.LiveQuery
 # 安装即时通讯，可选，如果需要接入聊天则需要安装
 PM> Install-Package LeanCloud.Realtime
 ```
-{% endif %}
 {% endif %}
 
 ## 初始化
