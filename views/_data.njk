@@ -15,7 +15,7 @@
       "ACL",
       "createdAt",
       "updatedAt"
-    ] 
+    ]
   %}
   {{ preservedWordList | sort | join(delimeter) }}
 {%- endmacro %}
@@ -43,12 +43,12 @@
 {% endif -%}
 ```sql
 -- 找出积分高于 80、region 为 cn 的玩家记录
-SELECT * 
-FROM   player 
-WHERE  NAME IN (SELECT NAME 
-                FROM   gamescore 
-                WHERE  score > 80) 
-       AND region = 'cn' 
+SELECT *
+FROM   player
+WHERE  NAME IN (SELECT NAME
+                FROM   gamescore
+                WHERE  score > 80)
+       AND region = 'cn'
 ```
 
 LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌/子查询（和普通查询一样，limit 默认为 100，最大  1000），然后将子查询的结果填入主查询的对应位置，再执行主查询。
@@ -64,7 +64,7 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
 
 {% set libVersion = {
     leancloud:  "4.7.15",
-    unified:    "6.5.1",
+    unified:    "6.5.3",
     fastjson:   "1.2.68",
     okhttp:     "3.8.0",
     okio:       "1.13.0",
