@@ -298,7 +298,7 @@ $ lean deploy
 $ lean deploy -m 'Be more awesome! 这是定制的部署备注'
 ```
 
-部署之后可以通过 curl 命令来测试你的云引擎代码，或者访问你已设置开发域名的预备环境 `stg-${应用的域名}.{{engineDomain}}`。
+部署之后需要[绑定一个云引擎自定义域名](custom-api-domain-guide.html#云引擎域名)，然后通过 curl 命令来测试你的云引擎代码，或者通过浏览器访问相应的网址。
 
 #### 部署时忽略部分文件
 
