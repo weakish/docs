@@ -47,13 +47,14 @@ vendor | 厂商
 
 从 6.5.1 版本开始，我们额外提供了单一厂商的推送 library，以支持不希望全部集成的产品之需求，新 library 与厂商的对应关系如下：
 
-- 华为（HMS) 'cn.leancloud:mixpush-hms:{{ version.unified }}@aar'
-- 小米 'cn.leancloud:mixpush-xiaomi:{{ version.unified }}@aar'
-- 魅族 'cn.leancloud:mixpush-meizu:{{ version.unified }}@aar'
-- Oppo 'cn.leancloud:mixpush-oppo:{{ version.unified }}@aar'
-- Vivo 'cn.leancloud:mixpush-vivo:{{ version.unified }}@aar'
+- 华为（HMS) 'cn.leancloud:mixpush-hms:{{ version.unified }}'
+- 小米 'cn.leancloud:mixpush-xiaomi:{{ version.unified }}'
+- 魅族 'cn.leancloud:mixpush-meizu:{{ version.unified }}'
+- Oppo 'cn.leancloud:mixpush-oppo:{{ version.unified }}'
+- Vivo 'cn.leancloud:mixpush-vivo:{{ version.unified }}'
 
-两组 library 的使用方法基本相同，开发者可以根据自己的需要选取合适的 library。
+两组 library 的使用方法基本相同，开发者可以根据自己的需要选取合适的 library。有一点需要注意的是，在 6.5.1 及后续版本的 library 中，由于小米、Oppo、Vivo 并没有将他们的 SDK 包发布到公开源供开发者引用，所以如果是使用这几个厂商的推送，需要开发者将对应的 jar/aar 包（下载地址见[这里](https://github.com/leancloud/java-unified-sdk/tree/master/android-sdk/mixpush-android/libs)）手动加入工程中。
+
 
 ## 华为推送-HMS 版本
 
@@ -131,7 +132,7 @@ android {
 ```
 dependencies {
   //混合推送需要的包
-  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}'
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
@@ -340,7 +341,8 @@ AndroidManifest.xml 中把 AVHMSMessageService 替换为你自定义的 MyHuawei
 ```
 dependencies {
   //混合推送需要的包
-  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
+  implementation fileTree(dir: 'libs', include: ['*.jar']) // 需将 MiPush_SDK_Client_3_7_5.jar 放入应用的 libs 目录下
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}'
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
@@ -471,7 +473,7 @@ dependencies {
   //魅族推送需要的包
   implementation 'com.meizu.flyme.internet:push-internal:3.6.+@aar'
   //混合推送需要的包
-  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}'
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
@@ -554,7 +556,8 @@ dependencies {
 ```
 dependencies {
   //混合推送需要的包
-  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
+  implementation files("libs/vivo_pushsdk-v2.9.0.0.aar") // 将 vivo_pushsdk-v2.9.0.0.aar 置于应用 libs 目录下
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}'
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
@@ -742,7 +745,8 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 ```
 dependencies {
   //混合推送需要的包
-  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}@aar'
+  implementation fileTree(dir: 'libs', include: ['*.jar']) // 将 oppo-mcssdk-2.0.2.jar 置于应用 libs 目录下
+  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}'
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
