@@ -110,6 +110,25 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 `system` | 是否属于系统对话消息。
 `sourceIP` | 消息发送者的 IP。
 
+参数示例：
+
+```
+{
+  "fromPeer": "Tom",
+  "receipt": false,
+  "groupId": null,
+  "system": null,
+  "content": "{\"_lctext\":\"来我们去 XX 传奇玩吧\",\"_lctype\":-1}",
+  "convId": "5789a33a1b8694ad267d8040",
+  "toPeers": ["Jerry"],
+  "__sign": "1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9",
+  "bin": false,
+  "transient": false,
+  "sourceIP": "121.239.62.103",
+  "timestamp": 1472200796764
+};
+```
+
 返回值：
 
 参数 | 约束 | 说明
@@ -125,21 +144,6 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 
 ```js
 AV.Cloud.onIMMessageReceived((request) => {
-    // request.params = {
-    //     fromPeer: 'Tom',
-    //     receipt: false,
-    //     groupId: null,
-    //     system: null,
-    //     content: '{"_lctext":"来我们去 XX 传奇玩吧","_lctype":-1}',
-    //     convId: '5789a33a1b8694ad267d8040',
-    //     toPeers: ['Jerry'],
-    //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
-    //     bin: false,
-    //     transient: false,
-    //     sourceIP: '121.239.62.103',
-    //     timestamp: 1472200796764
-    // };
-
     let content = request.params.content;
     console.log('content', content);
     let processedContent = content.replace('XX 传奇', '**');
@@ -152,20 +156,6 @@ AV.Cloud.onIMMessageReceived((request) => {
 ```python
 @engine.define
 def _messageReceived(**params):
-    # params = {
-    #     'fromPeer': 'Tom',
-    #     'receipt': false,
-    #     'groupId': null,
-    #     'system': null,
-    #     'content': '{"_lctext":"来我们去 XX 传奇玩吧","_lctype":-1}',
-    #     'convId': '5789a33a1b8694ad267d8040',
-    #     'toPeers': ['Jerry'],
-    #     '__sign': '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
-    #     'bin': false,
-    #     'transient': false,
-    #     'sourceIP': '121.239.62.103',
-    #     'timestamp': 1472200796764,
-    # }
     print('_messageReceived start')
     content = json.loads(params['content'])
     text = content._lctext
@@ -179,21 +169,6 @@ def _messageReceived(**params):
 ```
 ```php
 Cloud::define("_messageReceived", function($params, $user) {
-    // params = {
-    //     fromPeer: 'Tom',
-    //     receipt: false,
-    //     groupId: null,
-    //     system: null,
-    //     content: '{"_lctext":"来我们去 XX 传奇玩吧","_lctype":-1}',
-    //     convId: '5789a33a1b8694ad267d8040',
-    //     toPeers: ['Jerry'],
-    //     __sign: '1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9',
-    //     bin: false,
-    //     transient: false,
-    //     sourceIP: '121.239.62.103',
-    //     timestamp: 1472200796764
-    // };
-
     error_log('_messageReceived start');
     $content = json_decode($params["content"], true);
     $text = $content["_lctext"];
@@ -372,6 +347,25 @@ Cloud::define('_receiversOffline', function($params, $user) {
 `timestamp`	| 服务器收到消息的时间戳（毫秒）。
 `sourceIP` | 消息发送者的 IP。
 
+参数示例：
+
+```
+{
+  "fromPeer": "Tom",
+  "receipt": false,
+  "onlinePeers": [],
+  "content": "12345678",
+  "convId": "5789a33a1b8694ad267d8040",
+  "msgId": "fptKnuYYQMGdiSt_Zs7zDA",
+  "__sign": "1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711",
+  "bin": false,
+  "transient": false,
+  "sourceIP": "114.219.127.186",
+  "offlinePeers": [ "Jerry" ],
+  "timestamp": 1472703266522
+}
+```
+
 返回值：
 
 这个 hook 不会对返回值进行检查。只需返回 `{}` 即可。
@@ -383,20 +377,6 @@ Cloud::define('_receiversOffline', function($params, $user) {
 ```js
 AV.Cloud.onIMMessageSent((request) => {
     console.log('params', request.params);
-
-    // 在云引擎中打印的日志如下：
-    // params { fromPeer: 'Tom',
-    //   receipt: false,
-    //   onlinePeers: [],
-    //   content: '12345678',
-    //   convId: '5789a33a1b8694ad267d8040',
-    //   msgId: 'fptKnuYYQMGdiSt_Zs7zDA',
-    //   __sign: '1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711',
-    //   bin: false,
-    //   transient: false,
-    //   sourceIP: '114.219.127.186',
-    //   offlinePeers: [ 'Jerry' ],
-    //   timestamp: 1472703266522 }
 });
 ```
 ```python
@@ -406,43 +386,12 @@ def _messageSent(**params):
     print('params:', params)
     print('_messageSent end')
     return {}
-
-# 在云引擎中打印的日志如下：
-# _messageSent start
-# params: {'__sign': '1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711',
-#  'bin': False,
-#  'content': '12345678',
-#  'convId': '5789a33a1b8694ad267d8040',
-#  'fromPeer': 'Tom',
-#  'msgId': 'fptKnuYYQMGdiSt_Zs7zDA',
-#  'offlinePeers': ['Jerry'],
-#  'onlinePeers': [],
-#  'receipt': False,
-#  'sourceIP': '114.219.127.186',
-#  'timestamp': 1472703266522,
-#  'transient': False}
-# _messageSent end
 ```
 ```php
 Cloud::define('_messageSent', function($params, $user) {
     error_log('_messageSent start');
     error_log('params' . json_encode($params));
     return array();
-
-    // 在云引擎中打印的日志如下：
-    // _messageSent start
-    // params { fromPeer: 'Tom',
-    //   receipt: false,
-    //   onlinePeers: [],
-    //   content: '12345678',
-    //   convId: '5789a33a1b8694ad267d8040',
-    //   msgId: 'fptKnuYYQMGdiSt_Zs7zDA',
-    //   __sign: '1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711',
-    //   bin: false,
-    //   transient: false,
-    //   sourceIP: '114.219.127.186',
-    //   offlinePeers: [ 'Jerry' ],
-    //   timestamp: 1472703266522 }
 });
 ```
 ```java
@@ -450,7 +399,6 @@ Cloud::define('_messageSent', function($params, $user) {
   public static Map<String, Object> onMessageSent(Map<String, Object> params) {
     System.out.println(params);
     Map<String, Object> result = new HashMap<String, Object>();
-    // ...
     return result;
 }
 ```
@@ -503,6 +451,19 @@ Cloud::define('_messageSent', function($params, $user) {
 `members` | 初始成员数组，包含初始成员。
 `attr` | 创建对话时的额外属性。
 
+参数示例：
+
+```
+{
+  "initBy": "Tom",
+  "members": ["Tom", "Jerry"],
+  "attr": {
+    "name": "Tom & Jerry"
+  },
+  "__sign": "1472703266397,b57285517a95028f8b7c34c68f419847a049ef26"
+}
+```
+
 返回值：
 
 参数 | 约束 | 说明
@@ -511,67 +472,55 @@ Cloud::define('_messageSent', function($params, $user) {
 `code` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。
 `detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。
 
-例如对话创建时，在云引擎中打印一下日志：
+例如，初始成员不足四人，不允许创建对话：
 
 ```js
 AV.Cloud.onIMConversationStart((request) => {
-  let params = request.params;
-  console.log('params:', params);
-
-  // params: {
-  //     initBy: 'Tom',
-  //     members: ['Tom', 'Jerry'],
-  //     attr: {
-  //         name: 'Tom & Jerry'
-  //     },
-  //     __sign: '1472703266397,b57285517a95028f8b7c34c68f419847a049ef26'
-  // }
+  if (request.params.members.length < 4) {
+    return {
+      "reject": true,
+      "code": 1234,
+      "detail": "至少邀请 3 人开启对话",
+    };
+  } else {
+    return {};
+  }
 });
 ```
 ```python
 @engine.define
 def _conversationStart(**params):
-    print('_conversationStart start')
-    print('params:', params)
-    print('_conversationStart end')
-    return {}
-
-# _conversationStart start
-# params: {
-#   '__sign': '1472703266397,b57285517a95028f8b7c34c68f419847a049ef26',
-#   'attr': {'name': 'Tom & Jerry'},
-#   'initBy': 'Tom',
-#   'members': ['Tom', 'Jerry']
-# }
-# _conversationStart end
+    if len(params["members"]) < 4:
+      return {
+        "reject": True,
+        "code": 1234,
+        "detail": "至少邀请 3 人开启对话",      
+      }
+    else:
+      return {}
 ```
 ```php
 Cloud::define('_conversationStart', function($params, $user) {
-    error_log('_conversationStart start');
-    error_log('params:' . json_encode($params));
-    return array();
-
-    // _conversationStart start
-    // params: {
-    //     initBy: 'Tom',
-    //     members: ['Tom', 'Jerry'],
-    //     attr: {
-    //         name: 'Tom & Jerry'
-    //     },
-    //     __sign: '1472703266397,b57285517a95028f8b7c34c68f419847a049ef26'
-    // }
+    if (count($params["members"]) < 4) {
+      return [
+        "reject" => true,
+        "code" => 1234,
+        "detail" => "至少邀请 3 人开启对话", 
+      ];
+    } else {
+      return array();
+    }
 });
 ```
 ```java
 @IMHook(type = IMHookType.conversationStart)
 public static Map<String, Object> onConversationStart(Map<String, Object> params) {
-  System.out.println(params);
+  String[] members = (String[])params.get("members");
   Map<String, Object> result = new HashMap<String, Object>();
-  // 如果创建者是 Tom 则拒绝创建对话
-  if ("Tom".equals(params.get("initBy"))) {
+  if (members.length < 4) {
     result.put("reject", true);
-    // 这个数字是由开发者自定义的
-    result.put("code", 9890);
+    result.put("code", 1234);
+    result.put("detail", "至少邀请 3 人开启对话");
   }
   return result;
 }
@@ -591,54 +540,32 @@ public static Map<String, Object> onConversationStart(Map<String, Object> params
 
 这个 hook 不对返回值进行处理，只需返回 `{}` 即可。
 
-例如对话创建之后，在云引擎打印一下日志：
+例如，创建对话后，将对话的 ID 存储到云缓存的最近创建对话列表：
 
 ```js
 AV.Cloud.onIMConversationStarted((request) => {
-  let params = request.params;
-  console.log('params:', params);
-
-  // params: {
-  //     convId: '5789a33a1b8694ad267d8040',
-  //     __sign: '1472723167361,f5ceedde159408002fc4edb96b72aafa14bc60bb'
-  // }
+  redisClient.lpush("recent_conversations", request.params.convId);
+  return {};
 });
 ```
 ```python
 @engine.define
 def _conversationStarted(**params):
-    print('_conversationStarted start')
-    print('params:', params)
-    print('_conversationStarted end')
+    redis_client.lpush("recent_conversations", params["convId"])
     return {}
-
-# _conversationStarted start
-# params: {
-#   '__sign': '1472723167361,f5ceedde159408002fc4edb96b72aafa14bc60bb',
-#   'convId': '5789a33a1b8694ad267d8040'
-# }
-# _conversationStarted end
 ```
 ```php
 Cloud::define('_conversationStarted', function($params, $user) {
-    error_log('_conversationStarted start');
-    error_log('params:' . json_encode($params));
+    $redis->lpush("recent_conversations", $params["convId"]);
     return array();
-
-    // _conversationStarted start
-    // params: {
-    //     convId: '5789a33a1b8694ad267d8040',
-    //     __sign: '1472723167361,f5ceedde159408002fc4edb96b72aafa14bc60bb'
-    // }
 });
 ```
 ```java
 @IMHook(type = IMHookType.conversationStarted)
 public static Map<String, Object> onConversationStarted(Map<String, Object> params) throws Exception {
-  System.out.println(params);
-  Map<String, Object> result = new HashMap<String, Object>();
   String convId = (String)params.get("convId");
-  System.out.println(convId);
+  jedis.lpush("recent_conversations", params.get("convId"));
+  Map<String, Object> result = new HashMap<String, Object>(); 
   return result;
 }
 ```
@@ -663,66 +590,54 @@ public static Map<String, Object> onConversationStarted(Map<String, Object> para
 `code` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。
 `detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。
 
-例如在云引擎中打印成员加入时的日志：
+例如，不允许某成员创建的对话新增成员：
 
 ```js
 AV.Cloud.onIMConversationAdd((request) => {
-  let params = request.params;
-  console.log('params:', params);
-
-  // params: {
-  //     initBy: 'Tom',
-  //     members: ['Mary'],
-  //     convId: '5789a33a1b8694ad267d8040',
-  //     __sign: '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0'
-  // }
+  if (request.params.initBy === "Tom") {
+    return {
+      "reject": true,
+      "code": 9890,
+      "detail": "会话已封闭，不允许新增成员。"
+    };
+  } else {
+    return {}
+  }
 });
 ```
 ```python
 @engine.define
 def _conversationAdd(**params):
-    print('_conversationAdd start')
-    print('params:', params)
-    print('_conversationAdd end')
+  if params["initBy"] == "Tom":
+    return {
+      "reject": True,
+      "code": 9890,
+      "detail": "会话已封闭，不允许新增成员。"
+    }
+  else:
     return {}
-
-# _conversationAdd start
-# params: {
-#   '__sign': '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0',
-#   'convId': '5789a33a1b8694ad267d8040',
-#   'initBy': 'Tom',
-#   'members': ['Mary']
-# }
-# _conversationAdd end
 ```
 ```php
 Cloud::define('_conversationAdd', function($params, $user) {
-    error_log('_conversationAdd start');
-    error_log('params:' . json_encode($params));
+  if ($params["initBy"] === "Tom") {
+    return [
+      "reject" => true,
+      "code" => 9890,
+      "detail" => "会话已封闭，不允许新增成员。", 
+    ];
+  } else {
     return array();
-
-    // _conversationAdd start
-    // params: {
-    //     initBy: 'Tom',
-    //     members: ['Mary'],
-    //     convId: '5789a33a1b8694ad267d8040',
-    //     __sign: '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0'
-    // }
+  }
 });
 ```
 ```java
 @IMHook(type = IMHookType.conversationAdd)
 public static Map<String, Object> onConversationAdd(Map<String, Object> params) {
-  System.out.println(params);
-  String[] members = (String[])params.get("members");
   Map<String, Object> result = new HashMap<String, Object>();
-  System.out.println("members");
-  System.out.println(members);
-  // 如果创建者是 Tom 则拒绝新增成员
   if ("Tom".equals(params.get("initBy"))) {
     result.put("reject", true);
-    // 这个数字是由开发者自定义
     result.put("code", 9890);
+    result.put("detail", "会话已封闭，不允许新增成员。")
   }
   return result;
 }
@@ -748,72 +663,66 @@ public static Map<String, Object> onConversationAdd(Map<String, Object> params) 
 `code` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。
 `detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。
 
-示例代码：
+例如，某个应用会让官方运营人员加入每个聊天群，希望加上群主无法踢掉官方运营的限制：
 
 ```js
-AV.Cloud.onIMConversationRemove((request) => {
-  let params = request.params;
-  console.log('params:', params);
-  console.log('Removed clientId:', params.members[0]);
-
-  // params: {
-  //     initBy: 'Tom',
-  //     members: ['Jerry'],
-  //     convId: '57c8f3ac92509726c3dadaba',
-  //     __sign: '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38'
-  // }
-  // Removed clientId: Jerry
-});
+AV.Cloud.onIMConversationRemove(async (request) => {
+  const supporters = ["Bast", "Hypnos", "Kthanid"];
+  const members = request.params.members;
+  for (const member of members) {
+    if (supporters.includes(member)) {
+      return {
+        "reject": true,
+        "code": 1928,
+        "detail": `不允许移除官方运营人员 ${member}`,
+      };
+    }
+  }
+  return {};
+}
 ```
 ```python
 @engine.define
 def _conversationRemove(**params):
-    print('_conversationRemove start')
-    print('params:', params)
-    print('Removed clientId:', params['members'][0])
-    print('_conversationRemove end')
+    supporters = ["Bast", "Hypnos", "Kthanid"]
+    members = params["members"]
+    for member in members:
+        if member in supporters:
+            return {
+              "reject": True,
+              "code": 1928,
+              "detail": f"不允许移除官方运营人员 {member}"
+            }
     return {}
-
-# _conversationRemove start
-# params: {
-#   '__sign': '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38',
-#   'convId': '57c8f3ac92509726c3dadaba',
-#   'initBy': 'Tom',
-#   'members': ['Jerry']
-# }
-# Removed clientId: Jerry
-# _conversationRemove end
 ```
 ```php
 Cloud::define('_conversationRemove', function($params, $user) {
-
-    error_log('_conversationRemove start');
-    error_log('params:' . json_encode($params));
-    error_log('Removed clientId:' . $params['members'][0]);
-    return array();
-
-    // _conversationRemove start
-    // params: {
-    //     initBy: 'Tom',
-    //     members: ['Jerry'],
-    //     convId: '57c8f3ac92509726c3dadaba',
-    //     __sign: '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38'
-    // }
-    // Removed clientId: Jerry
+  $supporters = array("Bast", "Hypnos", "Kthanid");
+  $members = $params["members"];
+  foreach ($members as $member) {
+    if (in_array($member, $supporters)) {
+      return [
+        "reject" => true,
+        "code" => 1928,
+        "detail" => "不允许移除官方运营人员 $member",
+      ];
+    }
+  }
+  return array();
 });
 ```
 ```java
 @IMHook(type = IMHookType.conversationRemove)
 public static Map<String, Object> onConversationRemove(Map<String, Object> params) {
-  System.out.println(params);
+  String[] supporters = {"Bast", "Hypnos", "Kthanid"};
   String[] members = (String[])params.get("members");
   Map<String, Object> result = new HashMap<String, Object>();
-  System.out.println("members");
-  // 如果创建者是 Tom 则拒绝踢出成员
-  if ("Tom".equals(params.get("initBy"))) {
-    result.put("reject", true);
-    // 这个数字是由开发者自定义
-    result.put("code", 9892);
+  for (String member : members) {
+    if (Arrays.asList(supporters).contains(member)) {
+      result.put("reject", true);
+      result.put("code", 1928);
+      result.put("detail", "不允许移除官方运营人员 " + member);
+    }
   }
   return result;
 }
@@ -835,58 +744,71 @@ public static Map<String, Object> onConversationRemove(Map<String, Object> param
 
 这个 hook 不会对返回值进行检查。
 
-示例代码：
+例如，如果一个群一次性加入了 10 个以上的成员，那么给运营人员发送一条通知短信：
 
 ```js
 AV.Cloud.onIMConversationAdded((request) => {
-  let params = request.params;
-  console.log('params:', params);
-
-  // params: {
-  //     initBy: 'Tom',
-  //     members: ['Mary'],
-  //     convId: '5789a33a1b8694ad267d8040',
-  //     __sign: '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0'
-  // }
+  if (request.params.members.length > 10) {
+    AV.Cloud.requestSmsCode({
+      mobilePhoneNumber: "18200008888",
+      template: "Group_Notice",
+      sign: "sign_example",
+      conv_id: request.params.convId,
+    }).then(
+      function () { /* 调用成功 */ },
+      function (err) { /* 调用失败 */}
+    );
+  }
 });
 ```
 ```python
 @engine.define
 def _conversationAdded(**params):
-    print('_conversationAdded start')
-    print('params:', params)
-    print('_conversationAdded end')
-
-# _conversationAdded start
-# params: {
-#   '__sign': '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0',
-#   'convId': '5789a33a1b8694ad267d8040',
-#   'initBy': 'Tom',
-#   'members': ['Mary']
-# }
-# _conversationAdded end
+    if len(params["members"]) > 10:
+        cloud.request_sms_code(
+            "18200008888",
+            template="Group_Notice", sign: "sign_example",
+            params={"conv_id": params["convId"]}
+        )
 ```
 ```php
 Cloud::define('_conversationAdded', function($params, $user) {
-    error_log('_conversationAdded start');
-    error_log('params:' . json_encode($params));
-
-    // _conversationAdded start
-    // params: {
-    //     initBy: 'Tom',
-    //     members: ['Mary'],
-    //     convId: '5789a33a1b8694ad267d8040',
-    //     __sign: '1472786231813,a262494c252e82cb7a342a3c62c6d15fffbed5a0'
-    // }
+  if (count($params["members"]) > 10) {
+    $options = [
+      "template" => "Group_Notice",
+      "name" => "sign_example",
+      "conv_id" => $params["convId"],
+    ];
+    SMS::requestSmsCode("18200008888", $options);
+  }
 });
 ```
 ```java
 @IMHook(type = IMHookType.conversationAdded)
 public static void onConversationAdded(Map<String, Object> params) {
-  System.out.println(params);
   String[] members = (String[])params.get("members");
-  System.out.println("members");
-  System.out.println(members);
+  if (members.length > 10) {
+    AVSMSOption option = new AVSMSOption();
+    option.setTemplateName("Group_Notice");
+    option.setSignatureName("sign_example");
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("conv_id", params.get("convId")); 
+    option.setEnvMap(parameters);
+    AVSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<AVNull>() {
+      @Override
+      public void onSubscribe(Disposable disposable) {}
+      @Override
+      public void onNext(AVNull avNull) {
+        Log.d("TAG","Result: Successfully sent text message.");
+      }
+      @Override
+      public void onError(Throwable throwable) {
+        Log.d("TAG","Result: Failed to send text message. Reason: " + throwable.getMessage());
+      }
+      @Override
+      public void onComplete() {}
+    });
+  }
 }
 ```
 
@@ -906,65 +828,49 @@ public static void onConversationAdded(Map<String, Object> params) {
 
 这个 hook 不会对返回值进行检查。
 
-示例代码：
+例如，如果用户自行离开了对话，那么将这个对话的 ID 存储到云缓存（应用可以利用这些数据实现展示「最近离开的对话」乃至重新加入的功能）：
 
 ```js
 AV.Cloud.onIMConversationRemoved((request) => {
-  let params = request.params;
-  console.log('params:', params);
-  console.log('Removed clientId:', params.members[0]);
-
-  // params: {
-  //     initBy: 'Tom',
-  //     members: ['Jerry'],
-  //     convId: '57c8f3ac92509726c3dadaba',
-  //     __sign: '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38'
-  // }
-  // Removed clientId: Jerry
+  const initBy = request.params.initBy;
+  const members = request.params.members;
+  if (members.length === 1) {
+    if (members[0] === initBy) {
+      redisClient.lpush(initBy, request.params.convId);
+    }
+  }
 });
 ```
 ```python
 @engine.define
 def _conversationRemoved(**params):
-    print('_conversationRemoved start')
-    print('params:', params)
-    print('Removed clientId:', params['members'][0])
-    print('_conversationRemoved end')
-    return {}
-
-# _conversationRemoved start
-# params: {
-#   '__sign': '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38',
-#   'convId': '57c8f3ac92509726c3dadaba',
-#   'initBy': 'Tom',
-#   'members': ['Jerry']
-# }
-# Removed clientId: Jerry
-# _conversationRemoved end
+    init_by = params["initBy"]
+    members = params["members"]
+    if len(members) == 1:
+      if members[0] == init_by:
+        redis_client.lpush(init_by, params["convId"])
 ```
 ```php
 Cloud::define('_conversationRemoved', function($params, $user) {
-
-    error_log('_conversationRemoved start');
-    error_log('params:' . json_encode($params));
-    error_log('Removed clientId:' . $params['members'][0]);
-
-    // _conversationRemoved start
-    // params: {
-    //     initBy: 'Tom',
-    //     members: ['Jerry'],
-    //     convId: '57c8f3ac92509726c3dadaba',
-    //     __sign: '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38'
-    // }
-    // Removed clientId: Jerry
+    $initBy = $params['initBy'];
+    $members = $params['members'];
+    if (count($members) === 1) {
+      if (members[0] === $initBy) {
+        $redis->lpush($initBy, $params["convId"]);
+      }
+    }
 });
 ```
 ```java
 @IMHook(type = IMHookType.conversationRemoved)
 public static void onConversationRemoved(Map<String, Object> params) {
-  System.out.println(params);
   String[] members = (String[])params.get("members");
-  System.out.println("members");
+  String initBy = (String)params.get("initBy");
+  if (members.length == 1) {
+    if (initBy.equals(members[0])) {
+      jedis.lpush(initBy, params.get("convId"));
+    }
+  }
 }
 ```
 
@@ -995,79 +901,49 @@ public static void onConversationRemoved(Map<String, Object> params) {
 
 `mute` 和 `attr` 参数互斥，不能同时返回。并且返回值必须与请求对应，请求中如果带着 `attr`，则返回值中只有 `attr` 参数有效，返回 `mute` 会被丢弃。同理，请求中如果带着 `mute`，返回值中如果有 `attr` 则 `attr` 会被丢弃。
 
-例如在更新发生时，在云引擎日志中打印出对话的名称：
+例如，不允许修改对话名称：
 
 ```js
 AV.Cloud.onIMConversationUpdate((request) => {
-  let params = request.params;
-  console.log('params:', params);
-  console.log('name:', params.attr.name);
-
-  // params: {
-  //     convId: '57c9208292509726c3dadb4b',
-  //     initBy: 'Tom',
-  //     attr: {
-  //         name: 'Tom and Jerry',
-  //         type: 'public'
-  //     }
-  // }
-  // name: Tom and Jerry
+  if ('attr' in requst.params && 'name' in request.params.attr) {
+    return {
+      "reject": true,
+      "code": 1949,
+      "detail": "对话名称不可修改",
+    };
+  }
 });
 ```
 ```python
 @engine.define
 def _conversationUpdate(**params):
-    print('_conversationUpdate start')
-    print('params:', params)
-    print('name:', params['attr']['name'])
-    print('_conversationUpdate end')
-    return {}
-
-# _conversationUpdate start
-# params: {
-#   '__sign': '1472787372605,abdf92b1c2fc4c9820bc02304f192dab6473cd38',
-#   'convId': '57c8f3ac92509726c3dadaba',
-#   'initBy': 'Tom',
-#   'members': ['Jerry']
-# }
-# name: Tom and Jerry
-# _conversationUpdate end
+    if ('attr' in params) and ('name' in params['attr']):
+      return {
+        "reject": True,
+        "code": 1949,
+        "detail": "对话名称不可修改"
+      }
 ```
 ```php
 Cloud::define('_conversationUpdate', function($params, $user) {
-    error_log('_conversationUpdate start');
-    error_log('params:' . json_encode($params));
-    error_log('name:' . $params['attr']['name']);
-    return array();
-
-    // _conversationUpdate start
-    // params: {
-    //     convId: '57c9208292509726c3dadb4b',
-    //     initBy: 'Tom',
-    //     attr: {
-    //         name: 'Tom and Jerry',
-    //         type: 'public'
-    //     }
-    // }
-    // name: Tom and Jerry
+  if (array_key_exists('attr', $params) && array_key_exists('name', $params["attr"])) {
+    return [
+        "reject" => true,
+        "code" => 1949,
+        "detail" => "对话名称不可修改",   
+    ];
+  }
 });
 ```
 ```java
 @IMHook(type = IMHookType.conversationUpdate)
 public static Map<String, Object> onConversationUpdate(Map<String, Object> params) {
-  System.out.println(params);
   Map<String, Object> result = new HashMap<String, Object>();
   Map<String,Object> attr = (Map<String,Object>)params.get("attr");
-  System.out.println(attr);
-  // Map<String,Object> attrMap = (Map<String,Object>)JSON.parse(attr);
-  String name = (String)attr.get("name");
-  // System.out.println(attrMap);
-  System.out.println(name);
-  // 如果创建者是 Tom 则拒绝修改属性
-  if ("Tom".equals(params.get("initBy"))) {
+  if (attr != null && attr.containsKey("name")) {
     result.put("reject", true);
-    // 这个数字是由开发者自定义
-    result.put("code", 9893);
+    result.put("code", 1949);
+    result.put("detail", "对话名称不可修改");
   }
   return result;
 }
