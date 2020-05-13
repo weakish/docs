@@ -203,7 +203,3 @@ lean deploy --prod 1
 例如，假定你在控制台绑定了 `web.example.com` 这个域名，即可通过 `https://web.example.com` 访问你的应用（生产环境）。
 
 [engine-domain]: custom-api-domain-guide.html#云引擎域名
-
-你也可以在 **控制台 > 云引擎 > 设置** 的「Web 主机域名」部分，申请一个云引擎开发域名。
-然后通过控制台生成的域名访问你的应用。
-注意，该域名仅供开发测试期间使用，不保证可用性，3 个月后可能被停用，网站正式上线前请绑定自定义域名。
