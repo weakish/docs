@@ -128,7 +128,23 @@ acl.set_write_access('user_objectId', True)
 post.set_acl(acl)
 post.save()
 ```
+```dart
+try {
+  // 新建一个帖子对象
+  LCObject post = LCObject("Post");
+  // 为属性赋值
+  post['title'] = '大家好，我是新人';
+  //新建一个 ACL 实例
+  LCACL acl = LCACL();
+  acl.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
+  acl.setUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+  post.acl = acl; //将 ACL 实例赋予 Post对象
 
+  await post.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
 以上代码产生的效果在 **控制台** > **存储** > **Post 表** 可以看到，这条记录的 ACL 列上的值为：
 
 ```json
@@ -289,6 +305,27 @@ acl.set_write_access(leancloud.User.get_current().id, True)
 acl.set_write_access('55f1572460b2ce30e8b7afde', True)
 post.set_acl(acl)
 post.save()
+```
+```dart
+try {
+  LCQuery<LCUser> userQuery = LCUser.getQuery();
+  LCUser otherUser = await userQuery.get('55f1572460b2ce30e8b7afde');
+  // 新建一个帖子对象
+  LCObject post = LCObject("Post");
+  post['title'] = '这是我的第二条发言，谢谢大家！';
+  post['content'] = '我最近喜欢看足球和篮球了。';
+
+  //新建一个 ACL 实例
+  LCACL acl = LCACL();
+  acl.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
+  acl.setUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+  acl.setUserWriteAccess(otherUser, true);
+  post.acl = acl; //将 ACL 实例赋予 Post对象
+
+  await post.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
 ```
 
 执行完毕上面的代码，回到控制台，可以看到，该条 Post 记录里面的 ACL 列的内容如下：
@@ -452,6 +489,21 @@ relation = administrator_role.get_users()
 relation.add(leancloud.User.get_current())  # 为当前用户赋予该角色
 administrator_role.save()  # 保存
 ```
+```dart
+try {
+  // 设定角色本身的 ACL
+  LCACL roleACL = LCACL();
+  roleACL.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
+  roleACL.setUserWriteAccess(currentUser, true);
+
+  // 创建角色，并且保存
+  LCRole administratorRole = LCRole.create('Administrator', roleACL);
+  administratorRole.addRelation('users', currentUser);
+  await administratorRole.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
 
 执行完毕之后，在控制台可以查看 `_Role` 表里已经存在了一个 **Administrator** 角色。
 
@@ -530,7 +582,7 @@ do {
 }
 ```
 ```java
-  // 新建一个帖子对象
+// 新建一个帖子对象
 final AVObject post = new AVObject("Post");
 post.put("title", "夏天吃什么夜宵比较爽？");
 post.put("content", "求推荐啊！");
@@ -624,6 +676,28 @@ acl.set_role_write_access(administrator_role, True)
 post.set_acl(acl)
 post.save()
 ```
+```dart
+try {
+  // 新建一个帖子对象
+  LCObject post = LCObject("Post");
+  post['title'] = '夏天吃什么夜宵比较爽？';
+  post['content'] = '求推荐啊！';
+  // 假设之前创建的 Administrator 角色 objectId 为 55fc0eb700b039e44440016c
+  LCQuery roleQuery = LCRole.getQuery();
+  LCRole administratorRole = await roleQuery.get('55fc0eb700b039e44440016c');
+  //新建一个 ACL 实例
+  LCACL acl = LCACL();
+  acl.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
+  acl.setUserWriteAccess(currentUser, true);
+  acl.setRoleWriteAccess(administratorRole, true);
+
+  post.acl = acl; //将 ACL 实例赋予 Post对象
+  await post.save();
+} on LCException catch (e) {
+  // 登录失败（可能是密码错误）
+  print('${e.code} : ${e.message}');
+}
+```
 
 #### 用户角色的赋予和剥夺
 经过以上两步，我们还差一个给具体的用户设置角色的操作，这样才可以完整地实现基于角色的权限管理。
@@ -650,7 +724,7 @@ AVQuery *roleQuery= [AVRole query];
                 [[administrator users] addObject:[AVUser currentUser]];
                 [administrator save];
             } else {
-                NSLog(@"已经拥有 Moderator 角色了。");
+                NSLog(@"已经拥有 Administrator 角色了。");
             }
         }];
     } else {
@@ -808,6 +882,34 @@ else:
     relation = administrator_role.get_users()
     relation.add(leancloud.User.get_current())
     administrator_role.save()
+```
+```dart
+try {
+  LCQuery roleQuery = LCRole.getQuery();
+  roleQuery.whereEqualTo('name', 'Administrator');
+  List<LCRole> administratorRoles = await roleQuery.find();
+  // 如果角色存在
+  if (administratorRoles.length > 0) {
+    LCRole administrator = administratorRoles.first;
+    roleQuery.whereEqualTo('users', currentUser);
+    List<LCRole> roles = await roleQuery.find();
+    if (roles.length == 0) {
+      //为用户赋予角色
+      administrator.addRelation('users', currentUser);
+      await administrator.save();
+    } else {
+      print('已经拥有 Administrator 角色了。');
+    }
+  } else {
+    // 角色不存在，就新建角色
+    LCRole administratorRole = LCRole();
+    administratorRole.name = 'Administrator';
+    administratorRole.addRelation('users', currentUser);
+    await administratorRole.save();
+  }
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
 ```
 
 角色赋予成功之后，基于角色的权限管理的功能才算完成。
@@ -969,6 +1071,28 @@ else:
     # 该角色不存在，可以新建该角色，并把当前用户设置成该角色
     pass
 ```
+```dart
+try {
+  LCQuery roleQuery = LCRole.getQuery();
+  roleQuery.whereEqualTo('name', 'Moderator');
+  List<LCRole> roles = await roleQuery.find();
+  // 如果角色存在
+  if (roles.length > 0) {
+    LCRole moderatorRole = roles.first;
+    roleQuery.whereEqualTo('users', currentUser);
+    List<LCRole> userRoles = await roleQuery.find();
+    // 如果用户确实拥有该角色，那么就剥夺
+    if (userRoles.length > 0) {
+      moderatorRole.removeRelation('users', currentUser);
+      await moderatorRole.save();
+    }
+  } else {
+    print('角色不存在');
+  }
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
 
 #### 角色的查询
 除了在控制台可以直接查看已有角色之外，通过代码也可以直接查询当前应用中已存在的角色。
@@ -1087,6 +1211,21 @@ else:
     # 该角色不存在，可以新建该角色，并把当前用户设置成该角色
     pass
 ```
+```dart
+try {
+  LCQuery roleQuery = LCRole.getQuery();
+  roleQuery.whereEqualTo('name', 'Administrator');
+  List<LCRole> roles = await roleQuery.find();
+  LCRole administrator = roles.first;
+
+  LCRelation userRelation = administrator.users;
+  LCQuery userQuery = userRelation.query();
+  // objects 就是拥有该角色权限的所有用户了。
+  List<LCObject> objects = await userQuery.find();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
 
 查询某一个用户拥有哪些角色：
 
@@ -1189,7 +1328,17 @@ role_query = leancloud.Query(leancloud.Role)
 role_query.equal_to('users', leancloud.User.get_current())
 role_query_list = role_query.find()  # 返回当前用户的角色列表
 ```
-
+```dart
+try {
+  LCUser currentUser = await LCUser.getCurrent();
+  LCQuery roleQuery = LCRole.getQuery();
+  roleQuery.whereEqualTo('users', currentUser);
+  // roles 就是一个 AVRole 的 List，这些 LCRole 就是当前用户所在拥有的角色
+  List<LCRole> roles = await roleQuery.find();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
 查询都有哪些用户被赋予了 `Moderator` 角色：
 
 ```objc
@@ -1215,7 +1364,7 @@ _ = userQuery?.find { result in
 }
 ```
 ```java
-AVRole moderatorRole= new AVRole("Moderator"); //根据 id 查询或者根据 name 查询出一个实例
+AVRole moderatorRole = // 根据 id 查询或者根据 name 查询 Moderator 实例
 AVRelation<AVUser> userRelation= moderatorRole.getUsers();
 AVQuery<AVUser> userQuery = userRelation.getQuery();
 userQuery.findInBackground().subscribe(new Observer<List<AVUser>>() {
@@ -1258,6 +1407,23 @@ role = role_query.get('573d5fdc2e958a0069f5d6fe')  # 根据 objectId 获取 role
 user_relation = role.get_users()  # 获取 user 的 relation
 
 user_list = user_relation.query.find()  # 根据 relation 查找所包含的用户列表
+```
+```dart
+try {
+  //根据 name 查询出一个实例
+  LCQuery roleQuery = LCRole.getQuery();
+  roleQuery.whereEqualTo('name', 'Moderator');
+  List<LCRole> roles = await roleQuery.find();
+  LCRole moderatorRole = roles.first;
+  
+  LCRelation userRelation = moderatorRole.users;
+  LCQuery userQuery = userRelation.query();
+  // users 就是拥有 Moderator 角色权限的所有用户了
+  List<LCObject> users = await userQuery.find();
+  print(users.length);
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
 ```
 
 #### 角色的从属关系
@@ -1332,6 +1498,26 @@ moderator_role.save()
 # 将 Administrator 设为 moderator_role 一个子角色
 moderator_role.get_roles().add(administrator_role)
 moderator_role.save()
+```
+```dart
+try {
+  //根据 name 查询出一个 Administrator 实例
+  LCQuery query = LCRole.getQuery();
+  query.whereEqualTo('name', 'Administrator');
+  List<LCRole> roles = await query.find();
+  LCRole administratorRole = roles.first;
+
+  //根据 name 查询出一个 Moderator 实例
+  LCQuery roleQuery = LCRole.getQuery();
+  roleQuery.whereEqualTo('name', 'Moderator');
+  List<LCRole> moderatorRoles = await roleQuery.find();
+  LCRole moderatorRole = moderatorRoles.first;
+
+  // 向 moderatorRole 的 roles（LCRelation）中添加 administratorRole
+  moderatorRole.addRelation('roles', administratorRole);
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
 ```
 
 权限隔离也就是两个角色不存在从属关系，但是某些权限又是共享的，此时不妨设计一个中间角色，让前面两个角色从属于中间角色，这样在逻辑上可以很快梳理，其实本质上还是使用了角色的从属关系。
@@ -1599,6 +1785,47 @@ digital_post.set_acl(digital_acl)
 photographic_post.save()
 mobile_post.save()
 digital_post.save()
+```
+```dart
+try {
+  LCRole photographicRole; //创建或者从服务端查询出 Photographic 角色实例
+  LCRole digitalRole; //创建或从服务端查询出 Mobile 角色实例
+  LCRole mobileRole; //创建或从服务端查询出 Digital 角色实例
+
+  // photographicRole 和 mobileRole 继承了 digitalRole
+  digitalRole.addRelation('roles', photographicRole);
+  digitalRole.addRelation('roles', mobileRole);
+  await digitalRole.save();
+  // 新建一个帖子对象
+  LCObject photographicPost = LCObject("Post");
+  LCObject mobilePost = LCObject("Post");
+  LCObject digitalPost = LCObject("Post");
+  //.....此处省略一些具体的值设定
+
+  LCACL photographicACL = LCACL();
+  photographicACL.setRoleWriteAccess(photographicRole, true);
+  photographicACL.setPublicReadAccess(true);
+  photographicACL.setRoleWriteAccess(photographicRole, true);
+  photographicPost.acl = photographicACL;
+
+  LCACL mobileACL = LCACL();
+  mobileACL.setRoleReadAccess(mobileRole, true);
+  mobileACL.setRoleWriteAccess(mobileRole, true);
+  mobilePost.acl = mobileACL;
+
+  LCACL digitalACL = LCACL();
+  digitalACL.setRoleWriteAccess(digitalRole, true);
+  digitalPost.acl = digitalACL;
+
+  // photographicPost 只有 photographicRole 可以读写
+  // mobilePost 只有 mobileRole 可以读写
+  // 而 photographicRole，mobileRole，digitalRole 均可以对 digitalPost 进行读写
+  await mobilePost.save();
+  await photographicPost.save();
+  await digitalPost.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
 ```
 
 ### 权限的分级
