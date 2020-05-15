@@ -117,6 +117,16 @@ SMS::requestSMSCode("18200008888", $options);
 from leancloud import cloud
 cloud.request_sms_code("18200008888", template="Register_Notice", sign="LeanCloud")
 ```
+```dart
+try {
+// 往 18200008888 这个手机号码发送短信，使用预设的模板和签名
+  await LCSMSClient.requestSMSCode('18200008888',
+      template: 'Register_Notice', // 控制台预设的模板名称
+      signature: 'LeanCloud'); // 控制台预设的短信签名
+} on LCException catch (e) {
+  print(e.message);
+}
+```
 
 用户收到的短信内容如下：
 
@@ -256,7 +266,15 @@ cloud.request_sms_code("18200008888", template="Register_Notice", sign="LeanClou
   }
   cloud.request_sms_code("18200008888", sign="应用名称", params=options)
   ```
-
+```dart
+try {
+//验证码有效时间为 10 分钟
+  await LCSMSClient.requestSMSCode('18200008888',
+      variables: {'name': '应用名称', 'ttl': 10, 'op': '某种操作'});
+} on LCException catch (e) {
+  print(e.message);
+}
+```
 3. **用户收到短信，并且输入了验证码**  
   在进行下一步之前，我们建议先进行客户端验证（对有效性进行基本验证，例如长度、特殊字符等），这样就避免了错误的验证码被服务端驳回而产生的流量，以及与服务端沟通的时间，有助于提升用户体验。
   
@@ -321,6 +339,13 @@ cloud.request_sms_code("18200008888", template="Register_Notice", sign="LeanClou
   from leancloud import cloud
   # 注意，Python SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
   cloud.verify_sms_code('18200008888', '123456')
+  ```
+  ```dart
+  try {
+    await LCSMSClient.verifyMobilePhone('18200008888', '123456');
+  } on LCException catch (e) {
+  print(e.message);
+  }
   ```
 
 针对上述的需求，可以把场景换成异地登录验证、修改个人敏感信息验证等一些常见的场景，步骤是类似的，调用的接口也是一样的，仅仅是在做 UI 展现的时候需要开发者自己去优化验证过程。
@@ -394,6 +419,13 @@ SMS::requestSMSCode("18200008888", $options);
 ```python
 from leancloud import cloud
 cloud.request_sms_code("18200008888", sms_type="voice")
+```
+```dart
+try {
+  await LCSMSClient.requestVoiceCode('18200008888');
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 发送成功之后，用户的手机就会收到一段语音通话，它会播报 6 位数的验证码，然后开发者需要再次调用：
@@ -603,6 +635,16 @@ options = {
 }
 cloud.request_sms_code("18200008888",
   template="Order_Notice", sign="sign_BuyBuyBuy", params=options)
+```
+```dart
+try {
+  await LCSMSClient.requestSMSCode('18200008888',
+      template: 'Order_Notice',
+      signature: 'sign_BuyBuyBuy',
+      variables: {'order_id': '7623432424540'}); // 使用实际的值来替换模板中的变量
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 用户收到的内容如下：
@@ -917,6 +959,17 @@ AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
 from leancloud import cloud
 captcha = cloud.request_captcha(width=100, height=50)
 ```
+```dart
+try {
+  LCCaptcha captcha = await LCCaptchaClient.requestCaptcha();
+  //图形验证码的 token
+  String token = captcha.token;
+  //图片的 URL
+  String url = captcha.url;
+} on LCException catch (e) {
+  print(e.message);
+}
+```
 
 #### 校验图形验证码
 
@@ -974,6 +1027,14 @@ AVCloud.VerifyCaptchaAsync("这里填写用户输入的图形验证码，例如 
 ```python
 # captcha 是上一步得到的验证码实例对象
 validate_token = captcha.verify("这里填写用户输入的图形验证码，例如 AM8N")
+```
+```dart
+try {
+  LCCaptcha verifyCaptcha = await LCCaptchaClient.verifyCaptcha('这里填写用户输入的图形验证码，例如 AM8N', captcha.token);
+  String validate_token = verifyCaptcha.token;
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 #### 使用 `validate_token` 发送短信
@@ -1067,6 +1128,16 @@ from leancloud import cloud
 options = { "validate_token": validate_token }
 cloud.request_sms_code("18200008888",
   template="New_Series", sign="sign_BuyBuyBuy", params=options)
+```
+```dart
+try {
+  await LCSMSClient.requestSMSCode('18200008888',
+      template: 'Order_Notice',
+      signature: 'sign_BuyBuyBuy',
+      variables: {'validate_token': validate_token}); //上一步返回的 validate_token
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ## 国际短信
