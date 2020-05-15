@@ -491,12 +491,12 @@ administrator_role.save()  # 保存
 ```
 ```dart
 try {
-// 设定角色本身的 ACL
+  // 设定角色本身的 ACL
   LCACL roleACL = LCACL();
   roleACL.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
   roleACL.setUserWriteAccess(currentUser, true);
 
-// 创建角色，并且保存
+  // 创建角色，并且保存
   LCRole administratorRole = LCRole.create('Administrator', roleACL);
   administratorRole.addRelation('users', currentUser);
   await administratorRole.save();
@@ -582,7 +582,7 @@ do {
 }
 ```
 ```java
-  // 新建一个帖子对象
+// 新建一个帖子对象
 final AVObject post = new AVObject("Post");
 post.put("title", "夏天吃什么夜宵比较爽？");
 post.put("content", "求推荐啊！");
@@ -678,14 +678,14 @@ post.save()
 ```
 ```dart
 try {
-// 新建一个帖子对象
+  // 新建一个帖子对象
   LCObject post = LCObject("Post");
   post['title'] = '夏天吃什么夜宵比较爽？';
   post['content'] = '求推荐啊！';
-// 假设之前创建的 Administrator 角色 objectId 为 55fc0eb700b039e44440016c
+  // 假设之前创建的 Administrator 角色 objectId 为 55fc0eb700b039e44440016c
   LCQuery roleQuery = LCRole.getQuery();
   LCRole administratorRole = await roleQuery.get('55fc0eb700b039e44440016c');
-//新建一个 ACL 实例
+  //新建一个 ACL 实例
   LCACL acl = LCACL();
   acl.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
   acl.setUserWriteAccess(currentUser, true);
@@ -1220,7 +1220,7 @@ try {
 
   LCRelation userRelation = administrator.users;
   LCQuery userQuery = userRelation.query();
-// objects 就是拥有该角色权限的所有用户了。
+  // objects 就是拥有该角色权限的所有用户了。
   List<LCObject> objects = await userQuery.find();
 } on LCException catch (e) {
   print('${e.code} : ${e.message}');
