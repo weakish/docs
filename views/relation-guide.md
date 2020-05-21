@@ -399,10 +399,10 @@ dongGuan.fetchInBackground("dependent").subscribe(new Observer<AVObject>() {
     province.fetch()  # 根据 objectId 获取 province
 ```
 ```cs
-    AVObject guangDong = AVObject.CreateWithoutData("Province", "56545c5b00b09f857a603632");
-    guangDong.FetchAsync(new string[] { "dependent" }).ContinueWith(t =>
+    AVObject dongGuan = AVObject.CreateWithoutData("City", "56545c5b00b09f857a603632");
+    dongGuan.FetchAsync(new string[] { "dependent" }).ContinueWith(t =>
     {
-        var province = guangDong.Get<AVObject>("dependent");
+        var province = dongGuan.Get<AVObject>("dependent");
         var name = province["name"];
     });
 ```
