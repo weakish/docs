@@ -2680,7 +2680,7 @@ jerry.onMessage = ({
 | `getUpdatedAt`             | `updatedAt`        | 最后更新时间                                     |
 | `isSystem`                | `sys`              | 是否为系统对话                                   |
 | `isTemporary`             | N/A                | 是否为临时对话（临时对话数据不保存到 `_Conversation` 表中 ）
-| `isTransient`           | `tr`               | 是否为暂态对话                                     |
+| `isTransient`           | `tr`               | 是否为聊天室                                     |
 | `isUnique`                      | `unique`           | 是否是 `Unique Conversation` |
 | `unreadMessagesMentioned` | N/A                | 未读消息是否 @ 了当前的 `Client` |
 
@@ -2690,20 +2690,19 @@ jerry.onMessage = ({
 
 | `AVIMConversation` 属性名 | `_Conversation` 字段 | 含义 |
 | --- | --- | --- |
-| `Id`                    | `objectId`         | 全局唯一的 ID                                    |
+| `CurrentClient`         | N/A                | 对话所属的 `AVIMClient` 对象 |
+| `ConversationId`        | `objectId`         | 全局唯一的 ID                                    |
 | `Name`                  | `name`             | 成员共享的统一的名字                             |
 | `MemberIds`             | `m`                | 成员列表                                         |
 | `MuteMemberIds`         | `mu`               | 静音该对话的成员                                 |
 | `Creator`               | `c`                | 对话创建者                                       |
 | `IsTransient`           | `tr`               | 是否为聊天室                                     |
-| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话                         |
 | `IsSystem`              | `sys`              | 是否为系统对话                                   |
-| `LastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
-| `LastMessage`           | N/A                | 最后一条消息，可能会空                           |
-| `LastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间         |
-| `LastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间           |
+| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话                         |
+| `IsTemporary`           | N/A                | 是否为临时对话（临时对话数据不保存到 `_Conversation` 表中 ） |
 | `CreatedAt`             | `createdAt`        | 创建时间                                         |
 | `UpdatedAt`             | `updatedAt`        | 最后更新时间                                     |
+| `LastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
 
 {{ docs.langSpecEnd('cs') }}
 {{ docs.langSpecStart('dart') }}
