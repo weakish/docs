@@ -625,8 +625,6 @@ roleQuery.getInBackground("55fc0eb700b039e44440016c").subscribe(new Observer<AVR
   // 新建一个角色，并把为当前用户赋予该角色
   var administratorRole = new AV.Role('Administrator');
 
-  var relation = administratorRole.getUsers();
-
   //为当前用户赋予该角色
   administratorRole.getUsers().add(AV.User.current());
 
@@ -829,30 +827,42 @@ roleQuery.findInBackground().subscribe(new Observer<List<AVRole>>() {
 });
 ```
 ```js
-  // 构建 AV.Role 的查询
-  var administratorRole= //假设 administratorRole 是之前创建的 「Administrator」 角色;
-  var roleQuery = new AV.Query(AV.Role);
-  // 角色名称等于 Administrator
-  roleQuery.equalTo('name', 'Administrator');
-  // 检查当前用户是否已经拥有了 Administrator 角色
-  roleQuery.equalTo('users', AV.User.current());
-  roleQuery.find().then(function (results) {
-    if (results.length > 0) {
-      // 当前用户已经具备了 Administrator 角色，因此不需要做任何操作
-      var administratorRole = results[0];
-      return administratorRole;
-    } else {
-      // 当前用户不具备 Administrator，因此你需要把当前用户添加到 Role 的 Users 中
-      var relation = administratorRole.getUsers();
-      relation.add(AV.User.current());
-      return administratorRole.save();
-    }
-  }).then(function (administratorRole) {
-    //此时 administratorRole 已经包含了当前用户
-  }).catch(function (error) {
-    // 输出错误
-    console.log(error);
-  });
+// 构建 AV.Role 的查询
+var roleQuery = new AV.Query(AV.Role);
+// 角色名称等于 Administrator
+roleQuery.equalTo('name', 'Administrator');
+// 检查 Administrator 角色是否存在
+roleQuery.find().then(function (results) {
+  if (results.length > 0) { // 该角色存在 
+    var administratorRole = results[0];
+    roleQuery.equalTo('users', AV.User.current());
+    roleQuery.find().then(function (results) {
+      if (results.length == 0) {
+        // 当前用户不具备 Administrator，因此你需要把当前用户添加到 Role 的 Users 中
+        administratorRole.getUsers().add(AV.User.current());
+        administratorRole.save().then(function(administratorRole) {
+          console.log("已将当前用户设置为 Administrator");
+        }).catch(function (error) {
+          console.error(error);
+        });
+      } else {
+        console.log("administratorRole 已经包含了当前用户");
+      }
+    }).catch(function (error) {
+      console.error(error);
+    }); 
+  } else { // 角色不存在，可以新建该角色，并把当前用户设置成该角色
+    var administratorRole = new AV.Role('Administrator');
+    administratorRole.getUsers().add(AV.User.current());
+    administratorRole.save().then(function(administratorRole) {
+      console.log("创建了新角色 Administrator，并将当前用户设置为 Administrator");
+    }).catch(function (error) {
+      console.error(error);
+    });
+  }
+).catch(function (error) {
+  console.error(error);
+});
 ```
 ```python
 import leancloud
