@@ -2665,6 +2665,7 @@ jerry.onMessage = ({
 
 | `AVIMConversation` get 方法名 | `_Conversation` 字段 | 含义 |
 | --- | --- | --- |
+| `getAttributes`            | `attr`             | 自定义属性                                         |
 | `getConversationId`        | `objectId`         | 全局唯一的 ID                                    |
 | `getCreatedAt`             | `createdAt`        | 创建时间                                         |
 | `getCreator`               | `c`                | 对话创建者                                       |
