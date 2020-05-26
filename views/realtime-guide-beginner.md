@@ -2591,21 +2591,21 @@ jerry.onMessage = ({
 
 | `Conversation` 属性名 | `_Conversation` 字段 | 含义 |
 | --- | --- | --- |
-| `id`                  | `objectId`         | 全局唯一的 ID                                      |
-| `name`                | `name`             | 成员共享的统一的名字                               |
-| `members`             | `m`                | 成员列表                                           |
-| `creator`             | `c`                | 对话创建者                                         |
-| `transient`           | `tr`               | 是否为聊天室                                       |
-| `system`              | `sys`              | 是否为服务号（系统对话）                           |
-| `mutedMembers`        | `mu`               | 静音该对话的成员                                   |
-| `muted`               | N/A                | 当前用户是否静音该对话                             |
 | `createdAt`           | `createdAt`        | 创建时间                                           |
-| `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
-| `lastMessageAt`       | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
-| `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
-| `unreadMessagesCount` | N/A                | 未读消息数                                         |
+| `creator`             | `c`                | 对话创建者                                         |
+| `id`                  | `objectId`         | 全局唯一的 ID                                      |
 | `lastDeliveredAt`     | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
+| `lastMessageAt`       | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
 | `lastReadAt`          | N/A                | （仅限单聊）最后一条对方已读的消息时间             |
+| `members`             | `m`                | 成员列表                                           |
+| `muted`               | N/A                | 当前用户是否静音该对话                             |
+| `mutedMembers`        | `mu`               | 静音该对话的成员                                   |
+| `name`                | `name`             | 成员共享的统一的名字                               |
+| `system`              | `sys`              | 是否为服务号（系统对话）                           |
+| `transient`           | `tr`               | 是否为暂态会话                                       |
+| `unreadMessagesCount` | N/A                | 未读消息数                                         |
+| `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
 
 {{ docs.langSpecEnd('js') }}
 
@@ -2613,22 +2613,23 @@ jerry.onMessage = ({
 
 | `IMConversation` 属性名 | `_Conversation` 字段 | 含义 |
 | --- | --- | --- |
+| `client`                        | N/A                | 会话所属的 `Client` |
 | `ID`                            | `objectId`         | 会话的全局唯一 `ID` |
-| `uniqueID`                      | `uniqueId`         | `Unique Conversation` 全局唯一的 `ID` |
+| `clientID`                      | N/A                | 会话所属的 `Client` 的 `ID` |
 | `isUnique`                      | `unique`           | 是否是 `Unique Conversation` |
+| `uniqueID`                      | `uniqueId`         | `Unique Conversation` 全局唯一的 `ID` |
 | `name`                          | `name`             | 会话的名称 |
-| `members`                       | `m`                | 会话的成员列表 |
 | `creator`                       | `c`                | 会话的创建者 |
-| `attributes`                    | `attr`             | 会话的自定义属性 |
 | `createdAt`                     | `createdAt`        | 会话的创建时间 |
 | `updatedAt`                     | `updatedAt`        | 会话的最后更新时间 |
-| `lastMessage`                   | N/A                | 最新一条消息，可能会空 |
+| `attributes`                    | `attr`             | 会话的自定义属性 |
+| `members`                       | `m`                | 会话的成员列表 |
 | `isMuted`                       | N/A                | 当前用户是否静音该对话 |
+| `isOutdated`                    | N/A                | 会话的属性是否过期，可以根据该属性来决定是否更新会话的数据 |
+| `lastMessage`                   | N/A                | 最新一条消息，可能会空 |
 | `unreadMessageCount`            | N/A                | 未读消息数 |
 | `isUnreadMessageContainMention` | N/A                | 未读消息是否 @ 了当前的 `Client` |
-| `client`                        | N/A                | 会话所属的 `Client` |
-| `clientID`                      | N/A                | 会话所属的 `Client` 的 `ID` |
-| `isOutdated`                    | N/A                | 会话的属性是否过期，可以根据该属性来决定是否更新会话的数据 |
+| `memberInfoTable`               | N/A                | 成员信息表 |
 
 {{ docs.langSpecEnd('swift') }}
 
@@ -2636,43 +2637,52 @@ jerry.onMessage = ({
 
 | `AVIMConversation` 属性名 | `_Conversation` 字段 | 含义 |
 | --- | --- | --- |
+| `clientID`              | N/A                | 会话所属的 `Client` 的 `ID` |
 | `conversationId`        | `objectId`         | 全局唯一的 ID                                      |
-| `name`                  | `name`             | 成员共享的统一的名字                               |
-| `members`               | `m`                | 成员列表                                           |
 | `creator`               | `c`                | 对话创建者                                         |
-| `attributes`            | `attr`             | 自定义属性                                         |
-| `transient`             | `tr`               | 是否为聊天室                                       |
 | `createdAt`             | `createdAt`        | 创建时间                                           |
 | `updatedAt`             | `updatedAt`        | 最后更新时间                                       |
-| `system`                | `sys`              | 是否为系统对话                                     |
-| `lastMessageAt`         | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
 | `lastMessage`           | N/A                | 最后一条消息，可能会空                             |
-| `muted`                 | N/A                | 当前用户是否静音该对话                             |
-| `unreadMessagesCount`   | N/A                | 未读消息数                                         |
-| `lastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `lastMessageAt`         | `lm`               | 最后一条消息发送时间，也可以理解为最后一次活跃时间 |
 | `lastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间             |
-
+| `lastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `unreadMessagesCount`   | N/A                | 未读消息数                                         |
+| `unreadMessageContainMention` | N/A                | 未读消息是否 @ 了当前的 `Client` |
+| `name`                  | `name`             | 成员共享的统一的名字                               |
+| `members`               | `m`                | 成员列表                                           |
+| `attributes`            | `attr`             | 自定义属性                                         |
+| `uniqueId`                      | `uniqueId`         | `Unique Conversation` 全局唯一的 `ID` |
+| `unique`                      | `unique`           | 是否是 `Unique Conversation` |
+| `transient`             | `tr`               | 是否为暂态会话                                       |
+| `system`                | `sys`              | 是否为系统对话                                     |
+| `temporary`             | N/A                | 是否为临时对话（临时对话数据不保存到 `_Conversation` 表中 ）
+| `temporaryTTL`             | N/A                | 临时对话存活时间                              | 
+| `muted`                 | N/A                | 当前用户是否静音该对话                             |
+| `imClient`              | N/A                | 对话所属的 `AVIMClient` 对象 |
 {{ docs.langSpecEnd('objc') }}
 
 {{ docs.langSpecStart('java') }}
 
-| `AVIMConversation` 属性名 | `_Conversation` 字段 | 含义 |
+| `AVIMConversation` get 方法名 | `_Conversation` 字段 | 含义 |
 | --- | --- | --- |
-| `conversationId`        | `objectId`         | 全局唯一的 ID                                    |
-| `name`                  | `name`             | 成员共享的统一的名字                             |
-| `members`               | `m`                | 成员列表                                         |
-| `creator`               | `c`                | 对话创建者                                       |
-| `attributes`            | `attr`             | 自定义属性                                       |
+| `getConversationId`        | `objectId`         | 全局唯一的 ID                                    |
+| `getCreatedAt`             | `createdAt`        | 创建时间                                         |
+| `getCreator`               | `c`                | 对话创建者                                       |
+| `getLastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间         |
+| `getLastMessage`           | N/A                | 最后一条消息，可能会空                           |
+| `getLastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
+| `getLastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间           |
+| `getMembers`               | `m`                | 成员列表                                         |
+| `getName`                  | `name`             | 成员共享的统一的名字                             |
+| `getTemporaryExpiredat`    | N/A                | 临时对话存活时间 |
+| `getUniqueId`                      | `uniqueId`         | `Unique Conversation` 全局唯一的 `ID` |
+| `getUnreadMessagesCount`   | N/A                | 未读消息数                                       |
+| `getUpdatedAt`             | `updatedAt`        | 最后更新时间                                     |
+| `isSystem`                | `sys`              | 是否为系统对话                                   |
+| `isTemporary`             | N/A                | 是否为临时对话（临时对话数据不保存到 `_Conversation` 表中 ）
 | `isTransient`           | `tr`               | 是否为聊天室                                     |
-| `lastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
-| `lastMessage`           | N/A                | 最后一条消息，可能会空                           |
-| `muted`                 | N/A                | 当前用户是否静音该对话                           |
-| `unreadMessagesCount`   | N/A                | 未读消息数                                       |
-| `lastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间         |
-| `lastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间           |
-| `createdAt`             | `createdAt`        | 创建时间                                         |
-| `updatedAt`             | `updatedAt`        | 最后更新时间                                     |
-| `system`                | `sys`              | 是否为系统对话                                   |
+| `isUnique`                      | `unique`           | 是否是 `Unique Conversation` |
+| `unreadMessagesMentioned` | N/A                | 未读消息是否 @ 了当前的 `Client` |
 
 {{ docs.langSpecEnd('java') }}
 
@@ -2680,38 +2690,41 @@ jerry.onMessage = ({
 
 | `AVIMConversation` 属性名 | `_Conversation` 字段 | 含义 |
 | --- | --- | --- |
-| `Id`                    | `objectId`         | 全局唯一的 ID                                    |
+| `CurrentClient`         | N/A                | 对话所属的 `AVIMClient` 对象 |
+| `ConversationId`        | `objectId`         | 全局唯一的 ID                                    |
 | `Name`                  | `name`             | 成员共享的统一的名字                             |
 | `MemberIds`             | `m`                | 成员列表                                         |
 | `MuteMemberIds`         | `mu`               | 静音该对话的成员                                 |
 | `Creator`               | `c`                | 对话创建者                                       |
 | `IsTransient`           | `tr`               | 是否为聊天室                                     |
-| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话                         |
 | `IsSystem`              | `sys`              | 是否为系统对话                                   |
-| `LastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
-| `LastMessage`           | N/A                | 最后一条消息，可能会空                           |
-| `LastDeliveredAt`       | N/A                | （仅限单聊）最后一条已送达对方的消息时间         |
-| `LastReadAt`            | N/A                | （仅限单聊）最后一条对方已读的消息时间           |
+| `IsUnique`              | `unique`           | 是否为相同成员的唯一对话                         |
+| `IsTemporary`           | N/A                | 是否为临时对话（临时对话数据不保存到 `_Conversation` 表中 ） |
 | `CreatedAt`             | `createdAt`        | 创建时间                                         |
 | `UpdatedAt`             | `updatedAt`        | 最后更新时间                                     |
+| `LastMessageAt`         | `lm`               | 该对话最后一条消息，也可以理解为最后一次活跃时间 |
 
 {{ docs.langSpecEnd('cs') }}
 {{ docs.langSpecStart('dart') }}
 
 | `Conversation` 属性名 | `_Conversation` 字段 | 含义 |
 | --- | --- | --- |
-| `id`                  | `objectId`         | 全局唯一的 ID                                      |
-| `name`                | `name`             | 成员共享的统一的名字                               |
-| `members`             | `m`                | 成员列表                                           |
+| `attributes`            | `attr`             | 自定义属性                                         |
+| `client`         | N/A                | 对话所属的 `Client` 对象 |
+| `createdAt`           | `createdAt`        | 创建时间                                           |
 | `creator`             | `c`                | 对话创建者                                         |
+| `id`                  | `objectId`         | 全局唯一的 ID                                      |
 | `isMuted`             | N/A                | 当前用户是否静音该对话                             |
 | `isUnique`            | `unique`           | 是否是 `Unique Conversation` |
-| `createdAt`           | `createdAt`        | 创建时间                                           |
-| `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
-| `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
-| `unreadMessagesCount` | N/A                | 未读消息数                                         |
 | `lastDeliveredAt`     | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
 | `lastReadAt`          | N/A                | （仅限单聊）最后一条对方已读的消息时间             |                             
+| `members`             | `m`                | 成员列表                                           |
+| `name`                | `name`             | 成员共享的统一的名字                               |
+| `uniqueID`            | `uniqueId`           | `Unique Conversation` 的唯一 ID |
+| `unreadMessagesCount` | N/A                | 未读消息数                                         |
+| `unreadMessagesMentioned` | N/A                | 未读消息是否 @ 了当前的 `Client` |
+| `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
 
 {{ docs.langSpecEnd('dart') }}
 
