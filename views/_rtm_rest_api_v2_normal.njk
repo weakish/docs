@@ -18,8 +18,17 @@ curl -X POST \
 传入 `"unique": true` 参数可以保证对话的唯一性。
 
 返回
-```
-{"objectId"=>"5a5d7432c3422b31ed845e75", "createdAt"=>"2018-01-16T03:40:32.814Z"}
+
+```json
+{
+  "unique":true,
+  "updatedAt":"2020-05-26T06:42:31.492Z",
+  "name":"My First Conversation",
+  "objectId":"5eccba570d3a42c5fd4e25c3",
+  "m":["BillGates","SteveJobs"],
+  "createdAt":"2020-05-26T06:42:31.482Z",
+  "uniqueId":"6c7b0e5afcae9aa1139a0afa25833dec"
+}
 ```
 
 需要注意，群聊与单聊的唯一区别是 client 数量，API 层面保持一致。
