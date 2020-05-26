@@ -2709,18 +2709,22 @@ jerry.onMessage = ({
 
 | `Conversation` 属性名 | `_Conversation` 字段 | 含义 |
 | --- | --- | --- |
-| `id`                  | `objectId`         | 全局唯一的 ID                                      |
-| `name`                | `name`             | 成员共享的统一的名字                               |
-| `members`             | `m`                | 成员列表                                           |
+| `attributes`            | `attr`             | 自定义属性                                         |
+| `client`         | N/A                | 对话所属的 `Client` 对象 |
+| `createdAt`           | `createdAt`        | 创建时间                                           |
 | `creator`             | `c`                | 对话创建者                                         |
+| `id`                  | `objectId`         | 全局唯一的 ID                                      |
 | `isMuted`             | N/A                | 当前用户是否静音该对话                             |
 | `isUnique`            | `unique`           | 是否是 `Unique Conversation` |
-| `createdAt`           | `createdAt`        | 创建时间                                           |
-| `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
-| `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
-| `unreadMessagesCount` | N/A                | 未读消息数                                         |
 | `lastDeliveredAt`     | N/A                | （仅限单聊）最后一条已送达对方的消息时间           |
+| `lastMessage`         | N/A                | 最后一条消息，可能会空                             |
 | `lastReadAt`          | N/A                | （仅限单聊）最后一条对方已读的消息时间             |                             
+| `members`             | `m`                | 成员列表                                           |
+| `name`                | `name`             | 成员共享的统一的名字                               |
+| `uniqueID`            | `uniqueId`           | `Unique Conversation` 的唯一 ID |
+| `unreadMessagesCount` | N/A                | 未读消息数                                         |
+| `unreadMessagesMentioned` | N/A                | 未读消息是否 @ 了当前的 `Client` |
+| `updatedAt`           | `updatedAt`        | 最后更新时间                                       |
 
 {{ docs.langSpecEnd('dart') }}
 
