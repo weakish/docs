@@ -711,43 +711,55 @@ React Native 通过 npm 安装与引用 SDK，同时由独立的 Adapters 库（
 安装：
 
 ```存储服务
-$ npm install leancloud-storage @leancloud/platform-adapters-react-native --save
+$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@^2.0.0-rc.3
+# for React Native 0.60+
+$ npx pod-install
+# for React Native <= 0.59 
+# npx react-native link @react-native-community/async-storage
 ```
 
 ```存储服务（LiveQuery)
-$ npm install leancloud-storage @leancloud/platform-adapters-react-native --save
+$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@^2.0.0-rc.3
+# for React Native 0.60+
+$ npx pod-install
+# for React Native <= 0.59 
+# npx react-native link @react-native-community/async-storage
 ```
 
 ```即时通讯
-$ npm install leancloud-realtime @leancloud/platform-adapters-react-native --save
+$ yarn add leancloud-realtime @leancloud/platform-adapters-react-native
 ```
 
 ```即时通讯（含富媒体消息）
-$ npm install leancloud-realtime leancloud-realtime-plugin-typed-message leancloud-storage @leancloud/platform-adapters-react-native --save
+$ yarn add leancloud-realtime leancloud-realtime-plugin-typed-message leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@^2.0.0-rc.3
+# for React Native 0.60+
+$ npx pod-install
+# for React Native <= 0.59 
+# npx react-native link @react-native-community/async-storage
 ```
 
 获得引用：
 
 ```存储服务
-const AV = require('leancloud-storage/core');
-const reactNativeAdapters = require('@leancloud/platform-adapters-react-native');
+import AV from 'leancloud-storage/core';
+import * as adapters from '@leancloud/platform-adapters-react-native';
 AV.setAdapters(reactNativeAdapters);
 ```
 ```存储服务（LiveQuery)
-const AV = require('leancloud-storage/live-query-core');
-const reactNativeAdapters = require('@leancloud/platform-adapters-react-native');
+import AV from 'leancloud-storage/live-query-core';
+import * as adapters from '@leancloud/platform-adapters-react-native';
 AV.setAdapters(reactNativeAdapters);
 ```
 ```即时通讯
-const { Realtime, setAdapters } = require('leancloud-realtime/im');
-const reactNativeAdapters = require('@leancloud/platform-adapters-react-native');
+import { Realtime, setAdapters } from 'leancloud-realtime/im';
+import * as adapters from '@leancloud/platform-adapters-react-native';
 setAdapters(reactNativeAdapters);
 ```
 ```即时通讯（含富媒体消息）
-const AV = require('leancloud-storage/core');
-const { Realtime, setAdapters } = require('leancloud-realtime/im');
-const { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
-const reactNativeAdapters = require('@leancloud/platform-adapters-react-native');
+import AV from 'leancloud-storage/core';
+import { Realtime, setAdapters } from 'leancloud-realtime/im';
+import { TypedMessagesPlugin, ImageMessage } from 'leancloud-realtime-plugin-typed-messages';
+import * as adapters from '@leancloud/platform-adapters-react-native';
 AV.setAdapters(reactNativeAdapters);
 setAdapters(reactNativeAdapters);
 ```
