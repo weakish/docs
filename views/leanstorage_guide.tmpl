@@ -240,10 +240,8 @@ AVObject *testObject = [AVObject objectWithClassName:@"TestObject"];
 {% endif %}
 {% if platform_name === "JavaScript" %}
 ```js
-// 声明 class
-const TestObject = AV.Object.extend('TestObject');
-
 // 基本类型
+const bool   = true;
 const number = 2018;
 const string = `${number} 流行音乐榜单`;
 const date   = new Date();
@@ -253,18 +251,14 @@ const object = {
   string: string
 };
 
-// 指向另一个 class 的 AV.Object
-const pointer = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
-
 // 构建对象
+const TestObject = AV.Object.extend('TestObject');
 const testObject = new TestObject();
 testObject.set('testNumber',  number);
 testObject.set('testString',  string);
 testObject.set('testDate',    date);
 testObject.set('testArray',   array);
 testObject.set('testObject',  object);
-testObject.set('testNull',    null);
-testObject.set('testPointer', pointer);
 testObject.save();
 ```
 {% endif %}
@@ -272,13 +266,12 @@ testObject.save();
 ```dart
 // 基本类型
 int intValue = 2018;
-double doubleValue = 10.1;
 bool boolValue = true;
 String stringValue = 'hello, world';
 DateTime now = DateTime.now();
-Uint8List data = utf8.encode(stringValue);
 List intList = [1, 2, 3];
 Map<String, dynamic> stringMap = {
+  'year': 1780,
   'first': 'partridge',
   'second': 'turtledoves',
   'fifth': 'golden rings'
@@ -286,34 +279,38 @@ Map<String, dynamic> stringMap = {
 
 // 构建对象
 LCObject object = new LCObject('Hello');
-object['intValue'] = 123;
-object['boolValue'] = true;
-object['stringValue'] = 'hello, world';
-object['time'] = DateTime.now();
-object['intList'] = [1, 1, 2, 3, 5, 8];
-object['stringMap'] = {'k1': 111, 'k2': true, 'k3': 'Hi'};
-LCObject nestedObj = LCObject('World');
-nestedObj['content'] = '7788';
-object['objectValue'] = nestedObj;
-object['pointerList'] = [new LCObject('World'), nestedObj];
+object['intValue'] = intValue;
+object['boolValue'] = boolValue;
+object['stringValue'] = stringValue;
+object['time'] = now;
+object['intList'] = intList;
+object['stringMap'] = stringMap;
 ```
 {% endif %}
 {% if platform_name === "Python" %}
 ```python
 from datetime import datetime
 
-# 声明 class
-TestObject = leancloud.Object.extend('TestObject')
+# 基本类型
+bool = True
+number = 2018
+string = 'Top Hit Songs'
+date = datetime.now()
+list = [string, number]
+dictionary = {
+    'number': number,
+    'string': string
+}
 
 # 构建对象
+TestObject = leancloud.Object.extend('TestObject')
 test_object = TestObject()
-test_object.set('testString',  '工作')
-test_object.set('testInt',     108)
-test_object.set('testFloat',   1.890)
-test_object.set('testBoolean', True)
-test_object.set('testList',    [1, 2, [3, 4, 'string']])
-test_object.set('testDict',    {'item1': 12, 'item2': 'string', 'item3': [1, 2, '3']})
-test_object.set('testDate',    datetime.now())
+test_object.set('testString', string)
+test_object.set('testNumber', number)
+test_object.set('testBoolean', bool)
+test_object.set('testList', list)
+test_object.set('testDict', dictionary)
+test_object.set('testDate', date)
 test_object.save()
 ```
 {% endif %}
@@ -324,19 +321,17 @@ $bool       = true;
 $number     = 2018;
 $string     = $number . " 流行音乐榜单";
 $date       = new \DateTime();
-$bytesArray = Bytes::createFromBase64Data(base64_encode("Hello world!"));
+$mixedArray = array($string, $number);
+$dictionary = array("number" => $number, "string" => $string);
 
 // 构建对象
 $testObject = new LeanObject("TestObject");
 $testObject->set("testBoolean", $bool);
-$testObject->set("testInteger", $number);
+$testObject->set("testNumber", $number);
 $testObject->set("testString",  $string);
-$testObject->set("testData",    $bytesArray);
-$testObject->set("testDate",    $date);
-$testObject->set("testArray",   array($string, $number));
-$testObject->set("testAssociativeArray",
-                 array("number" => $number,
-                       "string" => $string));
+$testObject->set("testDate", $date);
+$testObject->set("testArray", $mixedArray);
+$testObject->set("testAssociativeArray", $dictionary);
 $testObject->save();
 ```
 {% endif %}
