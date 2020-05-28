@@ -265,7 +265,7 @@ testObject.save();
 {% if platform_name === "Flutter" %}
 ```dart
 // 基本类型
-int intValue = 2018;
+int numberValue = 2018;
 bool boolValue = true;
 String stringValue = 'hello, world';
 DateTime now = DateTime.now();
@@ -279,7 +279,7 @@ Map<String, dynamic> stringMap = {
 
 // 构建对象
 LCObject object = new LCObject('Hello');
-object['intValue'] = intValue;
+object['numberValue'] = numberValue;
 object['boolValue'] = boolValue;
 object['stringValue'] = stringValue;
 object['time'] = now;
