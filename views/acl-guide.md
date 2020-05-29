@@ -1899,43 +1899,22 @@ update | 保存一个已经存在并且被修改的对象
 ```objc
 AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
 query.includeACL = YES;
-[query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-    
-}];
 ```
 ```swift
 let query = LCQuery(className: "Todo")
 query.includeACL = true
-_ = query.find { (result) in
-    
-}
 ```
 ```java
 AVQuery<AVObject> query = new AVQuery<>("Todo");
 query.includeACL(true);
-query.findInBackground().subscribe(new Observer<List<AVObject>>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(List<AVObject> avObjects) {
-    }
-    @Override
-    public void onError(Throwable e) {
-    }
-    @Override
-    public void onComplete() {
-    }
-});
 ```
 ```js
 var query = new AV.Query('Todo');
 query.includeACL(true);
-query.find().then(function(todos) {
-  // 查询结果
-}).catch(function(error){
-  // 异常处理
-})
+```
+```dart
+LCQuery<LCObject> query = LCQuery('Todo');
+query.includeACL(true);
 ```
 
 ## 超级权限
