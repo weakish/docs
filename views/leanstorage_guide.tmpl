@@ -3985,7 +3985,7 @@ let query = startDateQuery.and(endDateQuery)
 {% if platform_name === "Flutter" %}
 ```dart
 LCQuery<LCObject> startDateQuery = new LCQuery('Todo');
-startDateQuery.whereGreaterThanOrEqualTo('createdAt',DateTime.parse('2016-11-13 00:00:00Z'));
+startDateQuery.whereGreaterThanOrEqualTo('createdAt', DateTime.parse('2016-11-13 00:00:00Z'));
 
 LCQuery<LCObject> endDateQuery = new LCQuery('Todo');
 endDateQuery.whereLessThan('createdAt', DateTime.parse('2016-12-03 00:00:00Z'));
@@ -4146,18 +4146,21 @@ let query = priorityQuery.and(timeLocationQuery)
 {% if platform_name === "Flutter" %}
 ```dart
 LCQuery<LCObject> createdAtQuery = LCQuery('Todo');
-createdAtQuery.whereGreaterThanOrEqualTo('createdAt',DateTime.parse('2018-04-30 00:00:00Z'));
+createdAtQuery.whereGreaterThanOrEqualTo('createdAt', DateTime.parse('2018-04-30 00:00:00Z'));
 createdAtQuery.whereLessThan('createdAt', DateTime.parse('2018-05-01 00:00:00Z'));
 
 LCQuery<LCObject> locationQuery = LCQuery('Todo');
 locationQuery.whereDoesNotExist('location');
 
-LCQuery<LCObject> priorityQuery = LCQuery('Todo');
+LCQuery<LCObject> priority2Query = LCQuery('Todo');
+priorityQuery.whereEqualTo('priority', 2);
+
+LCQuery<LCObject> priority3Query = LCQuery('Todo');
 priorityQuery.whereEqualTo('priority', 3);
 
-LCQuery<LCObject> orQuery = LCQuery.or([locationQuery, priorityQuery]);
-LCQuery<LCObject> query = LCQuery.and([createdAtQuery, orQuery]);
-List<LCObject> results = await query.find();
+LCQuery<LCObject> priorityQuery = LCQuery.or([priority2Query, priority3Query]);
+LCQuery<LCObject> timeLocationQuery = LCQuery.or([locationQuery, createdAtQuery]); 
+LCQuery<LCObject> query = LCQuery.and([priorityQuery, timeLocationQuery]);
 ```
 {% endif %}
 
