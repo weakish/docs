@@ -164,6 +164,18 @@ RDBMS 中通过 Person_ID 域来连接 PERSON 表和 CAR 表，以此支持应�
     studentTom["address"] = addr;
     studentTom.SaveAsync();
 ```
+```dart
+// 构建对象
+LCObject studentTom = LCObject('Student');
+studentTom['name'] = 'Tom';
+Map<String, dynamic> address = {
+  'city': '北京',
+  'address': '西城区西长安街 1 号',
+  'postcode': '100017'
+};
+studentTom['address'] = address;
+await studentTom.save();
+```
 
 但并不是所有的一对一关系都适合内嵌的方式，对下面的情况后文介绍的「引用」（等同于 MongoDB 的 reference）方式会更加合适：
 
@@ -277,6 +289,16 @@ guangZhou.saveInBackground().subscribe(new Observer<AVObject>() {
 
     guangZhou.SaveAsync();// 广东无需被单独保存，因为在保存广州的时候已经上传到服务端。
 ```
+```dart
+LCObject guangZhou = LCObject('City');
+guangZhou['name'] = '广州';
+
+LCObject guangDong = LCObject('Province');
+guangDong['name'] = '广东';
+
+guangZhou['dependent'] = guangDong;
+await guangZhou.save();
+```
 
 注意：保存关联对象的同时，被关联的对象也会随之被保存到云端。
 
@@ -335,7 +357,13 @@ guangZhou.saveInBackground().subscribe(new Observer<AVObject>() {
 
     dongGuan["dependent"] = guangDong;// 为东莞设置 dependent 属性为广东
 ```
-
+```dart
+LCObject GuangDong = LCObject.createWithoutData('Province', '56545c5b00b09f857a603632');
+LCObject DongGuan = LCObject('City');
+DongGuan['name'] = '东莞';
+DongGuan['dependent'] = 'GuangDong';
+await DongGuan.save();
+```
 执行上述代码后，在应用控制台可以看到 `dependent` 字段显示为 Pointer 数据类型，而它本质上存储的是一个指向 `Province` 这张表的某个 AVObject 的指针。
 
 ### Pointers 查询
@@ -406,7 +434,12 @@ dongGuan.fetchInBackground("dependent").subscribe(new Observer<AVObject>() {
         var name = province["name"];
     });
 ```
-
+```
+LCObject DongGuan = LCObject.createWithoutData('City', '568e743c00b09aa22162b11f');
+LCObject object = await DongGuan.fetch(includes: ['dependent']);
+// 获取广东省
+LCObject province = object['dependent'];
+```
 假如查询结果中包含了城市，并想通过一次查询同时把对应的省份也一并加载到本地：
 
 ```objc
@@ -511,7 +544,20 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
         });
     });
 ```
-
+```dart
+LCQuery<LCObject> query = LCQuery('City');
+// 查询名字是广州的城市
+query.whereEqualTo('name', '广州');
+// 找出对应城市的省份
+query.include('dependent');
+// list 的结果为 name 等于广州的城市的集合，当然我们知道现实中只存在一个广州市
+List<LCObject> list = await query.find();
+for (LCObject city in list) {
+  // 该操作无需网络连接
+  // 获取对应的省份
+  LCObject province = city['dependent'];
+}
+```
 假如已知一个省份，要找出它的所有下辖城市：
 
 {% block code_query_city_by_province %}{% endblock %}
@@ -599,6 +645,13 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
             var name = city.Get<string>("name");
         });
     });
+```
+```dart
+LCObject guangDong = LCObject.createWithoutData('Province', '56545c5b00b09f857a603632');
+LCQuery<LCObject> query = LCQuery('City');
+query.whereEqualTo('dependent', guangDong);
+// list 的结果为广东省下辖的所有城市
+List<LCObject> list = await query.find();
 ```
 
 大多数场景下，Pointers 是实现一对多关系的最好选择。
@@ -994,7 +1047,25 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
     // 保存选课表对象
     studentCourseMapTom.SaveAsync();
 ```
+```dart
+LCObject studentTom = LCObject('Student');
+studentTom['name'] = 'Tom';
 
+LCObject courseLinearAlgebra = LCObject('Course');
+courseLinearAlgebra['name'] = '线性代数';
+
+LCObject studentCourseMapTom = LCObject('StudentCourseMap');
+
+// 设置关联
+studentCourseMapTom['student'] = studentTom;
+studentCourseMapTom['course'] = courseLinearAlgebra;
+// 设置学习周期
+studentCourseMapTom['duration'] = ['2016-02-19', '2016-04-21'];
+// 获取操作平台
+studentCourseMapTom['platform'] = 'iOS';
+// 保存选课表对象
+await studentCourseMapTom.save();
+```
 查询选修了某一课程的所有学生：
 
 ```objc
@@ -1133,6 +1204,23 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
         }
     });
 ```
+```dart
+// 微积分课程
+LCObject courseCalculus = LCObject.createWithoutData('Course', '562da3fdddb2084a8a576d49');
+// 构建 StudentCourseMap 的查询
+LCQuery<LCObject> query = LCQuery('StudentCourseMap');
+// 查询所有选择了线性代数的学生
+query.whereEqualTo('course', courseCalculus);
+List<LCObject> list = await query.find();
+// list 是所有 course 等于线性代数的选课对象
+// 然后遍历过程中可以访问每一个选课对象的 student,course,duration,platform 等属性
+for (LCObject studentCourseMap in list) {
+  LCObject student = studentCourseMap['student'];
+  LCObject course = studentCourseMap['course'];
+  List<String> duration = studentCourseMap['duration'];
+  String platform = studentCourseMap['platform'];
+}
+```
 同样我们也可以很简单地查询某一个学生选修的所有课程，只需将上述代码变换查询条件即可：
 
 {% block code_query_relationTable_courses_by_student %}{% endblock %}
@@ -1167,6 +1255,11 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
     AVQuery<AVObject> query = new AVQuery<AVObject>("StudentCourseMap");
     AVObject studentTom = AVObject.CreateWithoutData("Student", "562da3fc00b0bf37b117c250");
     query.WhereEqualTo("student", studentTom);
+```
+```dart
+LCQuery<LCObject> query = LCQuery('StudentCourseMap');
+LCObject studentTom = LCObject.createWithoutData('Student', '562da3fc00b0bf37b117c250');
+query.whereEqualTo('student', studentTom);
 ```
 
 {#
@@ -1486,4 +1579,8 @@ if(存在附加属性){
 ```cs
     AVObject beckham = new AVObject("Boy");
     beckham.Add("tags", new string[] { "颜值爆表", "明星范儿" });
+```
+```dart
+LCObject beckham = LCObject('Boy');
+beckham['tags'] = ['颜值爆表', '明星范儿'];
 ```
