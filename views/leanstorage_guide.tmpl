@@ -7606,7 +7606,7 @@ _ = LCUser.resetPassword(mobilePhoneNumber: "+8618200008888", verificationCode: 
 {% endif %}
 {% if platform_name === "Flutter" %}
 ```dart
-await LCUser.resetPasswordBySmsCode('"+8618200008888"', '123456', 'cat!@#123');
+await LCUser.resetPasswordBySmsCode('+8618200008888', '123456', 'cat!@#123');
 ```
 {% endif %}
 
@@ -9121,7 +9121,12 @@ if (currentUser.isAnonymous()) {
 {% endif %}
 {% if platform_name === "Android / Java" %}
 ```java
-{# TODO #}
+AVUser currentUser = AVUser.getCurrentUser();
+if (currentUser.isAnonymous()) {
+  // currentUser 是匿名用户
+} else {
+  // currentUser 不是匿名用户
+}
 ```
 {% endif %}
 {% if platform_name === "Flutter" %}
