@@ -40,6 +40,7 @@
 ### 创建 `IMClient`
 
 假设我们产品中有一个叫「Tom」的用户，首先我们在 SDK 中创建出一个与之对应的 `IMClient` 实例：
+（创建实例前请确保已经成功[初始化了 SDK](start.html)）
 
 ```js
 // Tom 用自己的名字作为 clientId 来登录即时通讯服务
