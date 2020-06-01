@@ -6570,6 +6570,8 @@ _ = LCUser.signUpOrLogIn(mobilePhoneNumber: "+8618200008888", verificationCode: 
 
 {% call docs.noteWrap() %}
 `username` 将与 `mobilePhoneNumber` 相同，`password` 会由云端随机生成。
+如果希望让用户指定密码，可以在客户端让用户填写手机号和密码，然后按照上一小节使用用户名和密码注册的流程，将用户填写的手机号作为 `username` 和 `mobilePhoneNumber` 的值同时提交。
+同时根据业务需求，在「控制台 > 存储 > 用户 > 设置」勾选「从客户端注册或更新手机号时，向注册手机号码发送验证短信」、「未验证手机号码的用户，禁止登录」、「已验证手机号码的用户，允许以短信验证码登录」。 
 {% endcall %}
 
 #### 手机号格式
