@@ -66,25 +66,24 @@ var AV = require('leanengine')
 const {redisClient} = require('../redis')
 ```
 
-在 `_clientOffline` 中拿到下线的 `clientId`，将 `clientId` 和下线状态存储到 `LeanCache` 中。代码如下：
+在 `onIMClientOffline` 中拿到下线的 `clientId`，将 `clientId` 和下线状态存储到 `LeanCache` 中。代码如下：
 
 ```js
-AV.Cloud.define('_clientOffline', async (request) => {
+AV.Cloud.onIMClientOffline(async (request) => {
   // 设置某一客户端 ID 对应的值为 0，表示下线状态，同时设置过期计时
   // 对于下线后长久未上线的客户端 ID，可以用过期时间来删除数据节省空间
   redisClient.set(request.params.peerId, 0, 'EX', 604800)
 })
 ```
 
-在 `_clientOnline` 中拿到上线的 `clientId`，将 `clientId` 和上线状态存储到 `LeanCache` 中。代码如下：
+在 `onIMClientOnline` 中拿到上线的 `clientId`，将 `clientId` 和上线状态存储到 `LeanCache` 中。代码如下：
 
 ```js
-AV.Cloud.define('_clientOnline', async (request) => {
+AV.Cloud.onIMClientOnline(async (request) => {
   // 设置某一客户端 ID 对应的值为 1，表示上线状态，同时清空过期计时
   redisClient.set(request.params.peerId, 1)
 })
 ```
-
 
 ### 撰写返回用户状态的云函数
 现在我们撰写供客户端调用的云函数，在这个云函数中返回用户的在线状态。在 `rtm-onoff-status.js` 中添加如下代码：
