@@ -1892,7 +1892,7 @@ update | 保存一个已经存在并且被修改的对象
 查询数据时，SDK 默认不会返回对象的 ACL 值。如果想在获取对象的同时返回对象的 ACL 值，需要同时满足下面两个条件：
 
 1. 进入 **控制台 > 存储 > 设置 > 其他**，勾选「查询时返回值包括 ACL」。
-2. 客户端查询对象时指定 `includeACL`。
+2. 客户端查询对象时指定返回 ACL。
 
 代码如下：
 
@@ -1911,6 +1911,9 @@ query.includeACL(true);
 ```js
 var query = new AV.Query('Todo');
 query.includeACL(true);
+```
+```python
+query = leancloud.Object.extend('Todo').query.include_acl(True)
 ```
 ```dart
 LCQuery<LCObject> query = LCQuery('Todo');
