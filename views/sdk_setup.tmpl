@@ -248,19 +248,19 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
 > ```
 >     implementation fileTree(include: ['*.jar'], dir: 'libs') // 注意把上面的 lib 拷贝到该目录下
-> 
+>
 >     implementation('cn.leancloud:realtime-android:6.4.4') { // 注意替换具体的版本号
 >         exclude group: 'com.alibaba', module: 'fastjson'
 >         exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
 >     }
-> 
+>
 >     implementation('cn.leancloud:storage-android:6.4.4') { // 注意替换具体的版本号
 >         exclude group: 'com.alibaba', module: 'fastjson'
 >         exclude group: 'org.ligboy.retrofit2', module: 'converter-fastjson'
 >     }
-> 
+>
 >     // implementation 'com.alibaba:fastjson:1.1.71.android'  // 注意删除这一行
-> 
+>
 >     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 >     implementation("org.ligboy.retrofit2:converter-fastjson-android:2.1.0") {
 >         exclude group: 'com.alibaba', module: 'fastjson' // 注意增加这一行
@@ -542,46 +542,63 @@ Node.js 中 SDK 的安装与引用也是通过包管理工具 npm，请参考 [n
 
 ### 微信 / QQ 小程序
 
-{{ docs.note('QQ 小程序兼容微信小程序的 API，因此两者使用同一个 SDK，安装与使用方法也是一样的。')}}
+{{ docs.note('QQ 小程序兼容微信小程序的 API，因此两者使用同一个 SDK，安装与使用方法也是一样的。不过 QQ 小程序使用的 Adapters 与微信小程序不同，请前往 [QQ 小程序 Adapters 下载页](https://cdn.jsdelivr.net/npm/@leancloud/platform-adapters-qqapp/lib/) 下载。')}}
 
 #### 手动导入文件
 
 {{ docs.langSpecStart('存储服务') }}
-前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-weapp-min.js`，移动到 `libs` 目录。
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-core-min.js`，移动到 `libs` 目录。
 {{ docs.langSpecEnd('存储服务') }}
 
 {{ docs.langSpecStart('存储服务（LiveQuery)') }}
-前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-live-query-weapp-min.js`，移动到 `libs` 目录。
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-live-query-core-min.js`，移动到 `libs` 目录。
 {{ docs.langSpecEnd('存储服务（LiveQuery)') }}
 
 {{ docs.langSpecStart('即时通讯') }}
-前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im-weapp.min.js`，移动到 `libs` 目录。
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im.min.js`，移动到 `libs` 目录。
 {{ docs.langSpecEnd('即时通讯') }}
 
 {{ docs.langSpecStart('即时通讯（含富媒体消息）') }}
-前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-weapp-min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-storage.js`。
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-core-min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-storage.js`。
 
-前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im-weapp.min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-realtime.js`。
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im.min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-realtime.js`。
 
-下载 [`typed-messages.min.js`](https://cdn.jsdelivr.net/npm/leancloud-realtime-plugin-typed-messages@3/dist/typed-messages.min.js)，移动到 `libs` 目录。必须保证<u>三个文件在同一目录中</u>。
+下载 [`typed-messages.min.js`](https://cdn.jsdelivr.net/npm/leancloud-realtime-plugin-typed-messages@3/dist/typed-messages.min.js)，移动到 `libs` 目录。必须保证<strong>三个文件在同一目录中</strong>。
 {{ docs.langSpecEnd('即时通讯（含富媒体消息）') }}
 
-在 `app.js` 中引用 SDK（在其他文件中使用时请将路径替换成对应的相对路径）：
+前往 [微信小程序 Adapters 下载页](https://cdn.jsdelivr.net/npm/@leancloud/platform-adapters-weapp/lib/)，下载最新版本的 `index.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-adapters-weapp.js`。
+
+在 `app.js` 中引用 SDK，并设置 Adapters ：
+
+{{ docs.note('在其他文件中引用 SDK 时请将路径替换成对应的相对路径，Adapters 仅需在 app.js 中设置。') }}
 
 ```存储服务
-const AV = require('./libs/av-weapp-min.js');
+const AV = require('./libs/av-core-min.js');
+const adapters = require('./libs/leancloud-adapters-weapp.js');
+
+AV.setAdapters(adapters);
 ```
 ```存储服务（LiveQuery)
-const AV = require('./libs/av-live-query-weapp-min.js');
+const AV = require('./libs/av-live-query-core-min.js');
+const adapters = require('./libs/leancloud-adapters-weapp.js');
+
+AV.setAdapters(adapters);
 ```
 ```即时通讯
-const { Realtime, TextMessage } = require('./libs/im-weapp.min.js');
+const { Realtime, TextMessage, setAdapters } = require('./libs/im.min.js');
+const adapters = require('./libs/leancloud-adapters-weapp.js');
+
+setAdapters(adapters);
 ```
 ```即时通讯（含富媒体消息）
 // 需要保证依次加载三个文件
 const AV = require('./libs/leancloud-storage.js');
-const { Realtime, TextMessage } = require('./libs/im-weapp.min.js');
+const { Realtime, TextMessage, setAdapters } = require('./libs/leancloud-realtime.js');
 const { TypedMessagesPlugin, ImageMessage } = require('./libs/typed-messages.min.js');
+const adapters = require('./libs/leancloud-adapters-weapp.js');
+
+AV.setAdapters(adapters); // 为存储 SDK 设置 adapters
+setAdapters(adapters);    // 为即时通讯 SDK 设置 adapters
 ```
 
 #### WePY
@@ -714,7 +731,7 @@ React Native 通过 npm 安装与引用 SDK，同时由独立的 Adapters 库（
 $ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage-backend-legacy@^2.0.0-rc.3
 # for React Native 0.60+
 $ npx pod-install
-# for React Native <= 0.59 
+# for React Native <= 0.59
 # npx react-native link @react-native-community/async-storage-backend-legacy
 ```
 
@@ -722,7 +739,7 @@ $ npx pod-install
 $ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage-backend-legacy@^2.0.0-rc.3
 # for React Native 0.60+
 $ npx pod-install
-# for React Native <= 0.59 
+# for React Native <= 0.59
 # npx react-native link @react-native-community/async-storage-backend-legacy
 ```
 
@@ -734,7 +751,7 @@ $ yarn add leancloud-realtime @leancloud/platform-adapters-react-native
 $ yarn add leancloud-realtime leancloud-realtime-plugin-typed-message leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage-backend-legacy@^2.0.0-rc.3
 # for React Native 0.60+
 $ npx pod-install
-# for React Native <= 0.59 
+# for React Native <= 0.59
 # npx react-native link @react-native-community/async-storage-backend-legacy
 ```
 
