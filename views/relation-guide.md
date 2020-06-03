@@ -1075,7 +1075,7 @@ await studentCourseMapTom.save();
     // 构建 StudentCourseMap 的查询
     AVQuery *query = [AVQuery queryWithClassName:@"StudentCourseMap"];
 
-    // 查询所有选择了线性代数的学生
+    // 查询所有选择了微积分的学生
     [query whereKey:@"course" equalTo:courseCalculus];
 
     // 执行查询
@@ -1114,7 +1114,7 @@ await studentCourseMapTom.save();
 AVObject courseCalculus = AVObject.createWithoutData("Course", "562da3fdddb2084a8a576d49");
 // 构建 StudentCourseMap 的查询
 AVQuery<AVObject> query = new AVQuery<>("StudentCourseMap");
-// 查询所有选择了线性代数的学生
+// 查询所有选择了微积分的学生
 query.whereEqualTo("course", courseCalculus);
 // 执行查询
 query.findInBackground().subscribe(new Observer<List<AVObject>>() {
@@ -1141,7 +1141,7 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
 });
 ```
 ```js
-    // 微积分课程
+    // 线性代数课程
     var courseLinearAlgebra = AV.Object.createWithoutData('Course', '562da3fdddb2084a8a576d49');
     
     // 构建 StudentCourseMap 的查询
@@ -1169,7 +1169,7 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
     query = leancloud.Query('Student_course_map')
     query.equal_to('course', course_calculus)
 
-    # 查询所有选择了线性代数的学生
+    # 查询所有选择了微积分的学生
     student_course_map_list = query.find()
 
     # list 是所有 course 等于线性代数的选课对象,
@@ -1187,7 +1187,7 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
     // 构建 StudentCourseMap 的查询
     AVQuery<AVObject> query = new AVQuery<AVObject>("StudentCourseMap");
 
-    // 查询所有选择了线性代数的学生
+    // 查询所有选择了微积分的学生
     query.WhereEqualTo("course", courseCalculus);
 
     // 执行查询
@@ -1209,7 +1209,7 @@ query.findInBackground().subscribe(new Observer<List<AVObject>>() {
 LCObject courseCalculus = LCObject.createWithoutData('Course', '562da3fdddb2084a8a576d49');
 // 构建 StudentCourseMap 的查询
 LCQuery<LCObject> query = LCQuery('StudentCourseMap');
-// 查询所有选择了线性代数的学生
+// 查询所有选择了微积分的学生
 query.whereEqualTo('course', courseCalculus);
 List<LCObject> list = await query.find();
 // list 是所有 course 等于线性代数的选课对象
