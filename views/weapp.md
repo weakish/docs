@@ -46,7 +46,10 @@
 
 ```javascript
 // 获取 AV 命名空间的方式根据不同的安装方式而异，这里假设是通过手动导入文件的方式安装的 SDK
-const AV = require('./libs/av-weapp-min.js');
+const AV = require('./libs/av-core-min.js');
+const adapters = require('./libs/leancloud-adapters-weapp.js');
+
+AV.setAdapters(adapters);
 AV.init({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
@@ -198,12 +201,12 @@ wx.chooseImage({
 
 SDK 提供了一系列小程序特有的用户相关的 API，适用于不同的使用场景：
 
-|微信|QQ|作用|
-|--|--|--|
-|`AV.User.loginWithWeapp`<br/>`AV.User#loginWithWeapp`|`AV.User.loginWithQQApp`<br/>`AV.User#loginWithQQApp`|一键使用当前平台用户身份登录
-|`AV.User.loginWithWeappWithUnionId`<br/>`AV.User#loginWithWeappWithUnionId`|`AV.User.loginWithQQAppWithUnionId`<br/>`AV.User#loginWithQQAppWithUnionId`|使用 unionid 并使用当前平台用户身份登录
-|`AV.User#associateWithWeapp`|`AV.User#associateWithQQApp`|当前登录用户关联当前平台用户
-|`AV.User#associateWithWeappWithUnionId`|`AV.User#associateWithQQAppWithUnionId`|当前登录用户关联当前平台用户与 unionid
+|API|作用|
+|--|--|
+|`AV.User.loginWithMiniApp`<br/>`AV.User#loginWithMiniApp`|一键使用当前平台用户身份登录
+|`AV.User#associateWithMiniApp`|当前登录用户关联当前平台用户
+
+以上 API 均使用微信 Adapters 的 `AuthInfo` 进行登录。`AuthInfo` 可通过 Adapters 的 `getAuthInfo` 函数获取。若未提供 `AuthInfo` ，API 会使用默认参数调用 `getAuthInfo` 函数自动获取。
 
 下面我们以微信平台为例讨论不同场景下的使用方式。
 
@@ -216,7 +219,7 @@ LeanCloud 的用户系统支持一键使用微信用户身份登录。要使用�
 这样你就可以在应用中使用 `AV.User.loginWithWeapp()` 方法来使用当前用户身份登录了。
 
 ```javascript
-AV.User.loginWithWeapp().then(user => {
+AV.User.loginWithMiniApp().then(user => {
   this.globalData.user = user;
 }).catch(console.error);
 ```
@@ -257,7 +260,7 @@ wx.getUserInfo({
 
 `authData` 默认只有对应用户可见，开发者可以使用 masterKey 在云引擎中获取该用户的 `openid` 与 `session_key` 进行支付、推送等操作。详情的示例请参考 [支付](#支付)。
 
-{{ docs.note("小程序的登录态（`session_key`）存在有效期，可以通过 [`wx.checkSession()`](https://developers.weixin.qq.com/miniprogram/dev/api/wx.checkSession.html) 方法检测当前用户登录态是否有效，失效后可以通过调用 `AV.User.loginWithWeapp()` 重新登录。") }}
+{{ docs.note("小程序的登录态（`session_key`）存在有效期，可以通过 [`wx.checkSession()`](https://developers.weixin.qq.com/miniprogram/dev/api/wx.checkSession.html) 方法检测当前用户登录态是否有效，失效后可以通过调用 `AV.User.loginWithMiniApp()` 重新登录。") }}
 
 ### 使用 unionid
 
@@ -269,16 +272,18 @@ wx.getUserInfo({
 
 #### 一键登录时静默获取 unionid
 
-当满足以下条件时，一键登录 API `AV.User.loginWithWeapp()` 能静默地获取到用户的 unionid 并用 unionid + openid 进行匹配登录。
+当满足以下条件时，server 端能静默地获取到用户的 unionid 并用 unionid + openid 进行匹配登录。
 
 - 微信开放平台帐号下存在同主体的公众号，并且该用户已经关注了该公众号。
 - 微信开放平台帐号下存在同主体的公众号或移动应用，并且该用户已经授权登录过该公众号或移动应用。
 
-要启用这种方式，需要在一键登录时指定参数 `preferUnionId` 为 true：
+要启用这种方式，需要在获取 `AuthInfo` 时指定参数 `preferUnionId` 为 true：
 
 ```js
-AV.User.loginWithWeapp({
+adapters.getAuthInfo({
   preferUnionId: true,
+}).then(authInfo => {
+  return AV.User.loginWithMiniApp(authInfo);
 });
 ```
 
@@ -330,12 +335,15 @@ AV.User.loginWithWeapp({
 
 #### 通过其他方式获取 unionid 后登录
 
-如果开发者自行获得了用户的 unionid（例如通过解密 wx.getUserInfo 获取到的用户信息），可以在小程序中调用 `AV.User.loginWithWeappWithUnionId()` 投入 unionid 完成登录授权：
+如果开发者自行获得了用户的 unionid（例如通过解密 wx.getUserInfo 获取到的用户信息），可以在小程序中调用 `AV.User.mergeUnionId()` 将 unionid 合并到 `AuthInfo` 中，完成登录授权：
 
 ```javascript
-AV.User.loginWithWeappWithUnionId(unionid, {
-  asMainAccount: true
-}).then(console.log, console.error);
+adapters.getAuthInfo().then(authInfo => {
+  authInfo = AV.User.mergeUnionId(authInfo, unionid, {
+    asMainAccount: true
+  });
+  return AV.User.loginWithMiniApp(authInfo);
+});
 ```
 
 #### 通过其他方式获取 unionid 与 openid 后登录
@@ -390,9 +398,12 @@ AV.User.loginWithAuthDataAndUnionId(authData, platform, unionid, {
 
 ```javascript
 const user = AV.User.current(); // 获取当前登录用户
-user.associateWithWeappWithUnionId(unionid, {
-  asMainAccount: true
-}).then(console.log, console.error);
+adapters.getAuthInfo().then(authInfo => {
+  authInfo = AV.User.mergeUnionId(authInfo, unionid, {
+    asMainAccount: true
+  });
+  return user.associateWithMiniApp(authInfo);
+});
 ```
 
 ### 启用其他登录方式
@@ -400,7 +411,7 @@ user.associateWithWeappWithUnionId(unionid, {
 
 ```javascript
 // 小程序登录
-AV.User.loginWithWeapp().then(user => {
+AV.User.loginWithMiniApp().then(user => {
   // 设置并保存手机号
   user.setMobilePhoneNumber('13000000000');
   return user.save();
@@ -423,7 +434,7 @@ AV.User.loginWithWeapp().then(user => {
 // 首先，使用用户名与密码登录一个已经存在的用户
 AV.User.logIn('username', 'password').then(user => {
   // 将当前的微信用户与当前登录用户关联
-  return user.associateWithWeapp();
+  return user.associateWithMiniApp();
 }).catch(console.error);
 ```
 
@@ -438,7 +449,10 @@ AV.User.logIn('username', 'password').then(user => {
 
 ```javascript
 // Realtime 类获取的方式根据不同的安装方式而异，这里假设是通过手动导入文件的方式安装的 SDK
-const { Realtime } = require('./libs/realtime-weapp.min.js');
+const { Realtime, setAdapters } = require('./libs/im.min.js');
+const adapters = require('./libs/leancloud-adapters-weapp.js');
+
+setAdapters(adapters);
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
@@ -451,7 +465,10 @@ const realtime = new Realtime({
 
 ```js
 // app.js
-const { Realtime } = require('./libs/realtime-weapp.min.js');
+const { Realtime, setAdapters } = require('./libs/im.min.js');
+const adapters = require('./libs/leancloud-adapters-weapp.js');
+
+setAdapters(adapters);
 const realtime = new Realtime({
   appId: '{{appid}}',
   appKey: '{{appkey}}',
@@ -478,12 +495,14 @@ const realtime = getApp().realtime;
 4. 在 `app.js` 中<u>依次加载</u> `leancloud-storage.js`、`leancloud-realtime.js` 和 `leancloud-realtime-plugin-typed-messages.js`。
   ```javascript
   const AV = require('./libs/leancloud-storage.js');
-  const Realtime = require('./libs/leancloud-realtime.js').Realtime;
-  const TypedMessagesPlugin = require('./libs/leancloud-realtime-plugin-typed-messages.js').TypedMessagesPlugin;
-  const ImageMessage = require('./libs/leancloud-realtime-plugin-typed-messages.js').ImageMessage;
+  const { Realtime, setAdapters } = require('./libs/leancloud-realtime.js');
+  const { TypedMessagesPlugin } = require('./libs/leancloud-realtime-plugin-typed-messages.js');
+  const { ImageMessage } = require('./libs/leancloud-realtime-plugin-typed-messages.js');
   ```
 5. 在 `app.js` 中初始化应用：
   ```javascript
+  AV.setAdapters(adapters);
+  setAdapters(adapters);
   // 初始化存储 SDK
   AV.init({
     appId: '{{appid}}',
