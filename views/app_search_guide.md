@@ -89,7 +89,7 @@ searchQuery.findInBackground().subscribe(new Observer<List<AVObject>>() {
 });
 ```
 
-有关查询语法，可以参考 [q 查询语法举例](search-rest-api.html#q_查询语法举例)。
+有关查询语法，可以参考 [q 查询语法](search-rest-api.html#q_查询语法)。
 
 因为每次请求都有 limit 限制，所以一次请求可能并不能获取到所有满足条件的记录。
 `AVSearchQuery` 的 `hits()` 标示所有满足查询条件的记录数。
