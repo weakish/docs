@@ -6995,12 +6995,11 @@ await LCUser.requestEmailVerify('tom@leancloud.rocks');
 
 用户点击邮件内的链接后，`emailVerified` 会变为 `true`。如果用户的 `email` 属性为空，则该属性永远不会为 `true`。
 
-{% if node !== "qcloud" %}
 ### 验证手机号
 
 和 [验证邮箱](#验证邮箱) 类似，应用还可以要求用户在登录或使用特定功能之前验证手机号。默认情况下，当用户注册或变更手机号后，`mobilePhoneVerified` 会被设为 `false`。在应用的「控制台 > 存储 > 用户 > 设置」中，可以开启 **从客户端注册或更新手机号时，向注册手机号码发送验证短信** 选项，这样当用户注册或变更手机号时，会收到一条含有验证码的短信。在同一设置页面还可找到阻止未验证手机号的用户登录的选项。
 
-可以随时用下面的代码发送一条新的验证码：
+可以用下面的代码发送一条新的验证码：（如果相应用户的 `mobilePhoneVerified` 已经为 `true`，那么验证短信不会发送） 
 
 {% if platform_name === "Objective-C" %}
 ```objc
