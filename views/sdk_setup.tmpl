@@ -417,9 +417,9 @@ $ gradle clean assemble
 
 本指南按照应用的适用平台来介绍各自的安装与集成方式。
 
-|[<img src="images/platforms/html5.svg" width="100"/>](#Web)|[<img src="images/platforms/node-js.svg" width="100"/>](#Node.js)|[<img src="images/platforms/weapp.svg" width="100"/>](#微信 / QQ 小程序)|[<img src="images/platforms/weapp-game.svg" width="100"/>](#微信 / QQ 小游戏)|[<img src="images/platforms/cocos.png" width="100"/>](#CocosCreator)|[<img src="images/platforms/laya.png" width="100"/>](#LayaAir)|[<img src="images/platforms/quickapp.png" width="100"/>](#快应用)|[<img src="images/platforms/react-native.svg" width="100"/>](#React-Native)|[<img src="images/platforms/electron.svg" width="100"/>](#Electron)|[<img src="images/platforms/other.svg" width="100"/>](#其他平台)
+|[<img src="images/platforms/html5.svg" width="80"/>](#Web)|[<img src="images/platforms/node-js.svg" width="80"/>](#Node.js)|[<img src="images/platforms/weapp.svg" width="80"/>](#微信 / QQ 小程序)|[<img src="images/platforms/weapp-game.svg" width="80"/>](#微信 / QQ 小游戏)|[<img src="images/platforms/alipay-mini-app.png" width="65"/>](#支付宝小程序)|[<img src="images/platforms/baidu-mini-app.png" width="65"/>](#百度小程序)|[<img src="images/platforms/toutiao-mini-app.png" width="65"/>](#字节跳动小程序)|[<img src="images/platforms/cocos.png" width="80"/>](#CocosCreator)|[<img src="images/platforms/laya.png" width="80"/>](#LayaAir)|[<img src="images/platforms/quickapp.png" width="80"/>](#快应用)|[<img src="images/platforms/react-native.svg" width="80"/>](#React-Native)|[<img src="images/platforms/electron.svg" width="80"/>](#Electron)|[<img src="images/platforms/other.svg" width="80"/>](#其他平台)
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|Web|Node.js|微信 / QQ 小程序|微信 / QQ 小游戏|CocosCreator|LayaAir|快应用|React Native|Electron|其他|
+|Web|Node.js|微信 / QQ 小程序|微信 / QQ 小游戏|支付宝小程序|百度小程序|字节跳动小程序|CocosCreator|LayaAir|快应用|React Native|Electron|其他|
 
 ### Web
 
@@ -628,6 +628,167 @@ import AV from 'leancloud-storage/dist/av-weapp.js';
 小游戏手动导入 SDK 的步骤与小程序一致，请参考 [微信 / QQ 小程序 · 手动导入文件](#手动导入文件)。
 
 如果使用游戏引擎提供的开发工具开发小游戏，请参照对应的游戏引擎章节。
+
+### 支付宝小程序
+
+支付宝小程序通过 npm 安装与引用 SDK，同时由独立的 Adapters 库（@leancloud/platform-adapters-alipay）提供支持。
+
+安装：
+
+```存储服务
+$ npm install leancloud-storage @leancloud/platform-adapters-alipay
+```
+
+```存储服务（LiveQuery)
+$ npm install leancloud-storage @leancloud/platform-adapters-alipay
+```
+
+```即时通讯
+$ npm install leancloud-realtime @leancloud/platform-adapters-alipay
+```
+
+```即时通讯（含富媒体消息）
+$ npm install leancloud-realtime leancloud-realtime-plugin-typed-message leancloud-storage @leancloud/platform-adapters-alipay
+```
+
+获得引用：
+
+```存储服务
+const AV = require('leancloud-storage/core');
+const adapters = require('@leancloud/platform-adapters-alipay');
+
+AV.setAdapters(adapters);
+```
+```存储服务（LiveQuery)
+const AV = require('leancloud-storage/live-query-core');
+const adapters = require('@leancloud/platform-adapters-alipay');
+
+AV.setAdapters(adapters);
+```
+```即时通讯
+const { Realtime, setAdapters } = require('leancloud-realtime/im');
+const adapters = require('@leancloud/platform-adapters-alipay');
+
+setAdapters(adapters);
+```
+```即时通讯（含富媒体消息）
+const AV = require('leancloud-storage/core');
+const { Realtime, setAdapters } = require('leancloud-realtime/im');
+const { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+const adapters = require('@leancloud/platform-adapters-alipay');
+
+AV.setAdapters(adapters); // 为存储 SDK 设置 adapters
+setAdapters(adapters);    // 为即时通讯 SDK 设置 adapters
+```
+
+### 百度小程序
+
+支付宝小程序通过 npm 安装与引用 SDK，同时由独立的 Adapters 库（@leancloud/platform-adapters-baidu）提供支持。
+
+安装：
+
+```存储服务
+$ npm install leancloud-storage @leancloud/platform-adapters-baidu
+```
+
+```存储服务（LiveQuery)
+$ npm install leancloud-storage @leancloud/platform-adapters-baidu
+```
+
+```即时通讯
+$ npm install leancloud-realtime @leancloud/platform-adapters-baidu
+```
+
+```即时通讯（含富媒体消息）
+$ npm install leancloud-realtime leancloud-realtime-plugin-typed-message leancloud-storage @leancloud/platform-adapters-baidu
+```
+
+获得引用：
+
+```存储服务
+const AV = require('leancloud-storage/core');
+const adapters = require('@leancloud/platform-adapters-baidu');
+
+AV.setAdapters(adapters);
+```
+```存储服务（LiveQuery)
+const AV = require('leancloud-storage/live-query-core');
+const adapters = require('@leancloud/platform-adapters-baidu');
+
+AV.setAdapters(adapters);
+```
+```即时通讯
+const { Realtime, setAdapters } = require('leancloud-realtime/im');
+const adapters = require('@leancloud/platform-adapters-baidu');
+
+setAdapters(adapters);
+```
+```即时通讯（含富媒体消息）
+const AV = require('leancloud-storage/core');
+const { Realtime, setAdapters } = require('leancloud-realtime/im');
+const { TypedMessagesPlugin, ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+const adapters = require('@leancloud/platform-adapters-baidu');
+
+AV.setAdapters(adapters); // 为存储 SDK 设置 adapters
+setAdapters(adapters);    // 为即时通讯 SDK 设置 adapters
+```
+
+### 字节跳动小程序
+
+{{ docs.langSpecStart('存储服务') }}
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-core-min.js`，移动到 `libs` 目录。
+{{ docs.langSpecEnd('存储服务') }}
+
+{{ docs.langSpecStart('存储服务（LiveQuery)') }}
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-live-query-core-min.js`，移动到 `libs` 目录。
+{{ docs.langSpecEnd('存储服务（LiveQuery)') }}
+
+{{ docs.langSpecStart('即时通讯') }}
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im.min.js`，移动到 `libs` 目录。
+{{ docs.langSpecEnd('即时通讯') }}
+
+{{ docs.langSpecStart('即时通讯（含富媒体消息）') }}
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-core-min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-storage.js`。
+
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im.min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-realtime.js`。
+
+下载 [`typed-messages.min.js`](https://cdn.jsdelivr.net/npm/leancloud-realtime-plugin-typed-messages@3/dist/typed-messages.min.js)，移动到 `libs` 目录。必须保证<strong>三个文件在同一目录中</strong>。
+{{ docs.langSpecEnd('即时通讯（含富媒体消息）') }}
+
+前往 [字节跳动小程序 Adapters 下载页](https://cdn.jsdelivr.net/npm/@leancloud/platform-adapters-toutiao/lib/)，下载最新版本的 `index.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-adapters-toutiao.js`。
+
+在 `app.js` 中引用 SDK，并设置 Adapters ：
+
+{{ docs.note('在其他文件中引用 SDK 时请将路径替换成对应的相对路径，Adapters 仅需在 app.js 中设置。') }}
+
+```存储服务
+const AV = require('./libs/av-core-min.js');
+const adapters = require('./libs/leancloud-adapters-toutiao.js');
+
+AV.setAdapters(adapters);
+```
+```存储服务（LiveQuery)
+const AV = require('./libs/av-live-query-core-min.js');
+const adapters = require('./libs/leancloud-adapters-toutiao.js');
+
+AV.setAdapters(adapters);
+```
+```即时通讯
+const { Realtime, TextMessage, setAdapters } = require('./libs/im.min.js');
+const adapters = require('./libs/leancloud-adapters-toutiao.js');
+
+setAdapters(adapters);
+```
+```即时通讯（含富媒体消息）
+// 需要保证依次加载三个文件
+const AV = require('./libs/leancloud-storage.js');
+const { Realtime, TextMessage, setAdapters } = require('./libs/leancloud-realtime.js');
+const { TypedMessagesPlugin, ImageMessage } = require('./libs/typed-messages.min.js');
+const adapters = require('./libs/leancloud-adapters-toutiao.js');
+
+AV.setAdapters(adapters); // 为存储 SDK 设置 adapters
+setAdapters(adapters);    // 为即时通讯 SDK 设置 adapters
+```
 
 ### CocosCreator
 
@@ -873,7 +1034,7 @@ https://cdn.jsdelivr.net/npm/leancloud-realtime@{{jsimsdkversion}}/dist/im.min.j
 // 不支持该方式
 ```
 
-开发者可以自行实现目标平台的 Adapters 来适配该平台。Adapters 的接口定义可以在 package [`@leancloud/adapter-types`](https://unpkg.com/browse/@leancloud/adapter-types@1.0.2/types.d.ts) 中找到。你也可以通过关键字 [`platform-adapters`](https://www.npmjs.com/search?q=keywords:platform-adapters) 查找社区中其他开发者贡献的 Adapters。
+开发者可以自行实现目标平台的 Adapters 来适配该平台。Adapters 的接口定义可以在 package [`@leancloud/adapter-types`](https://unpkg.com/browse/@leancloud/adapter-types/types.d.ts) 中找到。你也可以通过关键字 [`platform-adapters`](https://www.npmjs.com/search?q=keywords:platform-adapters) 查找社区中其他开发者贡献的 Adapters。
 {% endif %}
 
 {% if platform_name === ".NET" %}
