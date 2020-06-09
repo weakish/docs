@@ -6,6 +6,7 @@
 | - | - | - |
 | /1.1/search/select | GET | 全文搜索 |
 | /1.1/search/mlt | GET | moreLikeThis 相关性查询 |
+| /1.1/search/analyze | GET | 分词结果查询 |
 
 在调用应用内搜索的 REST API 接口前，需要首先[为相应的 Class 启用搜索](app_search_guide.html#为_Class_启用搜索)。
 另外也请参考 REST API 指南中关于 [API Base URL](rest_api.html#api-base-url)、[请求格式](rest_api.html#请求格式)、[响应格式](rest_api.html#响应格式)的说明，以及应用内搜索开发指南的[自定义分词](app_search_guide.html#自定义分词)章节。
@@ -280,3 +281,64 @@ curl -X GET \
 `include`|可选|关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
 
 更多内容参考 [ElasticSearch 文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-mlt-query.html)。
+
+## 分词结果查询
+
+应用内搜索会对 String 类型的字段自动进行分词处理。
+如果发现搜索结果不符合预期，推荐先通过 `analyze` API 检查分词结果（要求使用 master key）。
+`analyze` API 也用于验证[自定义词库](app_search_guide.html#自定义分词)是否生效。
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  "https://{{host}}/1.1/search/analyze?clazz=GameScore&text=响应式设计"
+```
+
+参数包括 `clazz` 和 `text`。`text` 就是测试的文本段，返回结果：
+
+
+```json
+{
+  "tokens": [
+    {
+      "token": "响应",
+      "start_offset": 0,
+      "end_offset": 2,
+      "type": "word",
+      "position": 0
+    },
+    {
+      "token": "式",
+      "start_offset": 2,
+      "end_offset": 3,
+      "type": "word",
+      "position": 1
+    },
+    {
+      "token": "设计",
+      "start_offset": 3,
+      "end_offset": 5,
+      "type": "word",
+      "position": 2
+    }
+  ]
+}
+```
+
+可以看到，分词系统将「响应式设计」分为了三个词。
+如果分词系统认为「响应式设计」是一个词（比如上传了包含「响应式设计」一词的自定义词库），那么返回结果会是：
+
+```json
+{
+  "tokens": [
+    {
+      "token": "响应式设计",
+      "start_offset": 0,
+      "end_offset": 5,
+      "type": "word",
+      "position": 0
+    }
+  ]
+}
+```
