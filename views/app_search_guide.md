@@ -219,28 +219,7 @@ public void setHightLights(String hightlights);
 响应式设计
 ```
 
-将其保存为文本文件，如 `words.txt`，上传即可。上传后，分词将于 3 分钟后生效。开发者可以通过 `analyze` API（要求使用 master key）来测试：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{masterkey}},master" \
-  "https://{{host}}/1.1/search/analyze?clazz=GameScore&text=反应式设计"
-```
-
-参数包括 `clazz` 和 `text`。`text` 就是测试的文本段，返回结果：
-
-```json
-{
-  "tokens" [
-             { "token":"反应式设计",
-               "start_offset":0,
-               "end_offset":5,
-               "type":"word",
-               "position":0 }
-           ]
-}
-```
+将其保存为文本文件，如 `words.txt`，上传即可。上传后，分词将于 3 分钟后生效。开发者可以通过 [`analyze` API](search-rest-api.html#分词结果查询)（要求使用 master key）来测试。
 
 自定义词库生效后，**仅对新添加或者更新的文档/记录才有效**，如果需要对原有的文档也生效的话，需要在 **存储** > **应用内搜索** 点击「强制重建索引」按钮，重建原有索引。
 同样，如果更新了自定义词库（包括删除自定义词库），也需要重建索引。
