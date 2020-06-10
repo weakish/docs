@@ -678,6 +678,51 @@ AVPush *push = [[AVPush alloc] init];
 
 <div class="callout callout-info">我们建议给 iOS 设备的推送都设置过期时间，才能保证推送的当时，如果用户设置了飞行模式，在关闭飞行模式之后可以收到推送消息，可以参考 [Stackoverflow - Push notification is not being delivered when iPhone comes back online](http://stackoverflow.com/questions/24026544/push-notification-is-not-being-delivered-when-iphone-comes-back-online)。</div>
 
+## 定时推送
+
+Push 提供了设置推送时间的方法，可以在指定的时间进行推送：
+
+```swift
+let pushDate = Date(timeIntervalSinceNow: 6000)
+let messageData: [String: Any] = [
+    "alert": "Push this notification at a later time."
+]
+LCPush.send(data: messageData, pushDate: pushDate) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+```objc
+NSDateComponents *comps = [[NSDateComponents alloc] init];
+[comps setYear:2013];
+[comps setMonth:10];
+[comps setDay:12];
+NSCalendar *gregorian =
+  [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+NSDate *date = [gregorian dateFromComponents:comps];
+
+AVPush *push = [[AVPush alloc] init];
+[push setPushDate:date];
+[push setMessage:@"Push this notification on 2013-10-12."];
+[push sendPushInBackground];
+```
+
+定时推送同样可以设置过期时间，例如同时指定时间间隔：
+
+```swift
+LCPush.send(data: messageData, pushDate: pushDate, expirationInterval: expirationInterval) { /* 略 */ }
+```
+```objc
+AVPush *push = [[AVPush alloc] init];
+[push setPushDate:date];
+[push expireAfterTimeInterval:interval];
+// 下略
+```
+
 ### 指定设备平台
 
 跨平台的应用，可能想指定发送的平台，比如 iOS 或者 Android:
@@ -733,10 +778,6 @@ AVPush *iOSPush = [[AVPush alloc] init];
 [iOSPush setQuery:query];
 [iOSPush sendPushInBackground];
 ```
-
-## 定时推送
-
-请进入消息推送的 Web 管理平台，可以做到定时推送（延迟或者指定时间）。
 
 
 ## 接收推送通知
