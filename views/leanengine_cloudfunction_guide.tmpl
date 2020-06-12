@@ -536,7 +536,7 @@ AVCloud.callFunctionWithCacheInBackground("averageStars", dicParameters, AVQuery
 
 ### 云引擎调用云函数
 
-在云引擎中可以使用 `{% if platformName === "Node.js" %}AV.Cloud.run{% endif %}{% if platformName === "Python" %}leancloud.cloudfunc.run{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::run{% endif %}{% if platformName === "Java" %}AVCloud.callFunction{% endif %}{% if platformName === ".NET" %}AVCloud.CallFunctionAsync{% endif %}` 调用 `{% if platformName === "Node.js" %}AV.Cloud.define{% endif %}{% if platformName === "Python" %}engine.define{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::define{% endif %}{% if platformName === "Java" %}@EngineFunction{% endif %}{% if platformName === ".NET" %}EngineFunctionAttribute{% endif %}` 定义的云函数：
+在云引擎中可以使用 `{% if platformName === "Node.js" %}AV.Cloud.run{% endif %}{% if platformName === "Python" %}leancloud.cloudfunc.run{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::run{% endif %}{% if platformName === "Java" %}AVCloud.callFunctionInBackground{% endif %}{% if platformName === ".NET" %}AVCloud.CallFunctionAsync{% endif %}` 调用 `{% if platformName === "Node.js" %}AV.Cloud.define{% endif %}{% if platformName === "Python" %}engine.define{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::define{% endif %}{% if platformName === "Java" %}@EngineFunction{% endif %}{% if platformName === ".NET" %}EngineFunctionAttribute{% endif %}` 定义的云函数：
 
 {% if platformName === "Node.js" %}
 ```js
