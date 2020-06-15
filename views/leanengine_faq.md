@@ -316,6 +316,14 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 
 见 [网站托管开发指南 · Java](leanengine_webhosting_guide-java.html#项目骨架)。
 
+## PHP 项目从 files.phpcomposer.com 下载文件失败，部署失败怎么办？
+
+phpcomposer.com 镜像已经停止服务，PHP 项目的 `composer.lock` 文件如果包含了这个地址的 url，会导致依赖安装失败。
+解决方法有两种：
+
+1. 移除 `composer.lock` 后再部署（云引擎会直接根据 `coposer.json` 安装依赖）。
+2. 在本地正确配置仓库地址后，运行 `composer update --lock` 更新 `composer.lock` 文件中的下载链接（不改变具体的版本）。
+
 ## 云引擎会重复提交请求吗？
 
 云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的。
