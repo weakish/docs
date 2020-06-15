@@ -180,6 +180,8 @@ LeanEngine PHP 不依赖第三方框架，你可以使用你最熟悉的框架�
 对于 PHP 项目，我们默认每 64 MB 内存分配一个 PHP-FPM Worker，如果希望自定义 Worker 数量，可以在云引擎设置页面的「自定义环境变量」中添加名为 `PHP_WORKERS` 的环境变量，值是一个数字。设置过低会导致收到新请求时无可用的 Worker；过高会导致内存不足、请求处理失败，建议谨慎调整。
 
 在 PHP 7.2 中官方从核心中移除了 `mcrypt` 这个拓展，云引擎以选装的方式继续提供支持，在 `composer.json` 的 `require` 中加入 `ext-mcrypt: *` 即可，使用 `mcrypt` 会增加部署耗时，如果没有用到请不要加。
+
+在项目中存在 `composer.lock` 文件时，云引擎会优先根据 composer.lock 安装依赖。
 {% endif %}
 {% if platformName === "Java" %}
 云引擎目前支持 Java 8、11、12、13、14 运行环境和 war 包运行，你的项目需要遵循一定格式才会被云引擎识别并运行。
