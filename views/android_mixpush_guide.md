@@ -232,13 +232,14 @@ LeanCloud 云端只有在**满足以下全部条件**的情况下才会使用华
 
 一般情况下，这里 intent-filter 的内容都不需要修改。如果同一开发者有多个应用都使用了我们的 HMS 混合推送，或者终端用户安装了多个使用我们的 HMS 混合推送的应用，那么在同一个终端上，LeanCloud 推送消息在通知栏被点击之后，因为多个应用都响应同样的 intent-filter，所以会出现要选择应用来打开的情况。这可以通过在 intent-filter 中配置不一样的 `android:host` 解决。在 LeanCloud 控制台，增加华为 HMS 推送配置的时候，开发者可以指定自己的 Android Intent Hostname（不指定就使用默认值 `cn.leancloud.push`），然后在这里的 intent-filter 中填上***同样***的值，客户端就可以区分不同应用的通知栏消息了。
 
-在 HMS 推送中，我们是通过自定义 `intent` 参数来指定响应 activity 的（具体可参考华为文档[服务端发送 push 消息](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_api_reference_agent_s2)）。对于开发者[自定义的属性](https://leancloud.cn/docs/push_guide.html#hash1053488444)，在调用 HMS 推送接口的时候，LeanCloud 云端会使用固定的 intentUri pattern 来封装自定义属性，intentUri 的固定格式为：
+在 HMS 推送中，只能通过自定义 `intent` 参数来指定响应 activity 的（具体可参考华为文档[服务端发送 push 消息](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_api_reference_agent_s2)）。LeanCloud 云端在调用 HMS 推送接口的时候，会把开发者[自定义的属性](https://leancloud.cn/docs/push_guide.html#hash1053488444)，使用固定的 intentUri pattern 来封装成 `intent` 数据，其中 `intentUri` 的固定格式为：
 
 ```
 intent://{host}/notify_detail#Intent;scheme=lcpushscheme;S.content=XXXX;launchFlags=0x10000000;end
 ```
 
 其中 `{host}` 就是上面配置的 Android Intent Hostname，默认值为 `cn.leancloud.push`；`XXX` 就是开发者自定义参数的 JSON 字符串做了 URL Encode 之后的值，只有这部分内容是开发者可以指定的。
+
 在 LeanCloud 后端发送这种推送的例子如下：
 
 ```
@@ -256,7 +257,7 @@ curl -X POST \
   https://api.leancloud.cn/1.1/push
 ```
 
-LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为：
+LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为（其中 `{"k1" : "v1","k2" : "v2"}` 这个 JSON 串经过了 URLEncode 处理）：
 
 ```
 {"hps":
@@ -275,6 +276,8 @@ LeanCloud 云端最终发送给 HMS Server 的请求中 payload 字段为：
   }
 }
 ```
+
+到目前为止，我们只支持一种 intentUri 格式，所以所有的推送请求都会被同一个 activity 响应。如果开发者需要最终显示不同的页面，可以由这个接收 activity 进行一次转发。
 
 ### 华为推送自定义 Receiver
 如果你想推送消息，但不显示在 Android 系统的通知栏中，而是执行应用程序预定义的逻辑，可以 [自定义 Receiver](android_push_guide.html#自定义_Receiver)。华为混合推送自定义 Receiver 需要继承 AVHMSMessageService，在收到透传消息的回调方法 `onMessageReceived` 获取推送消息数据。
@@ -725,7 +728,7 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 - oppo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush-demos/tree/master/oppo)。
 - oppo 推送服务 sdk 支持的最低安卓版本为 Android 4.0 系统。
 
-注意，oppo 推送服务仅支持 ColorOS 下的 Android 应用，且仅支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。
+注意，oppo 推送服务仅支持 ColorOS 下的 Android 应用，且仅支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。用户点击通知启动应用，期间接收推送消息、展示在通知栏、点击通知这一系列操作，OS 系统模块都不会进行方法回调。
 
 ### 环境配置
 在开始接入之前，有两项准备工作：
