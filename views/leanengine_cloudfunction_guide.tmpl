@@ -660,7 +660,7 @@ cloudfunc.rpc('averageStars', movie='夏洛特烦恼')
 Map<String, String> dicParameters = new HashMap<String, String>();
 dicParameters.put("movie", "夏洛特烦恼");
 
-AVCloud.callRPCInBackground("averageStars", dicParameters).subscribe(new Observer<AVObject>() {
+AVCloud.<AVObject>callRPCInBackground("averageStars", dicParameters).subscribe(new Observer<AVObject>() {
   @Override
   public void onSubscribe(Disposable disposable) {
 
