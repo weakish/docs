@@ -1287,10 +1287,10 @@ AVIMOptions.getGlobalOptions().setDisableAutoLogin4Push(true);
 ```java
 import cn.leancloud.core.AVOSCloud;
 
-AVOSCloud.initialize("{{appid}}", "{{appkey}}");
+AVOSCloud.initialize("{{appid}}", "{{appkey}}", "{{serverUrl}}");
 ```
 
-注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
+注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名（`serverUrl`）。
 模板项目和[云引擎网站托管开发指南](leanengine_webhosting_guide-java.html)中的示例代码均未配置 API 自定义域名，
 请勿调用 `setServer`，否则会变成公网访问，影响性能。
 
@@ -1399,7 +1399,7 @@ public class MyLeanCloudApp extends FlutterApplication {
         AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
         // 提供 this、App ID、App Key、Server Host 作为参数
         // 请将 xxx.example.com 替换为你的应用绑定的 API 域名
-        AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}", "https://xxx.example.com");
+        AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
     }
 }
 ```
