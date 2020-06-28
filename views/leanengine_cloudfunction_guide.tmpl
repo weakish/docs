@@ -159,7 +159,7 @@ LeanClient::useProduction(false); // 调用预备环境
 ```java
 AVCloud.setProductionMode(false); // 调用预备环境
 ```
-```flutter
+```dart
 LCCloud.setProduction(false); // 调用预备环境
 ```
 
@@ -532,7 +532,7 @@ AVCloud.callFunctionWithCacheInBackground("averageStars", dicParameters, AVQuery
   }
 });
 ```
-```flutter
+```dart
 try {
   Map response = await LCCloud.run('averageStars', params: { 'movie': "夏洛特烦恼" });
   // 处理结果
@@ -720,7 +720,7 @@ AVCloud.callRPCWithCacheInBackground("averageStars", dicParameters, AVQuery.Cach
 });
 
 ```
-```flutter
+```dart
 try {
   LCObject response = await LCCloud.rpc('averageStars', params: { 'movie': "夏洛特烦恼" });
   // 处理结果
