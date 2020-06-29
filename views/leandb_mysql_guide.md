@@ -118,6 +118,7 @@ try {
     ```
 
 - 更多的用法请参考 [MySQL Connector/J 文档](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-usagenotes-connect-drivermanager.html)
+
 ### Python
 
 在 Python 中你可以这样连接到 MySQL:
