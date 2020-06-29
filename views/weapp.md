@@ -216,7 +216,7 @@ LeanCloud 的用户系统支持一键使用微信用户身份登录。要使用�
 1. 登录 [微信公众平台](https://mp.weixin.qq.com)，在 **设置** > **开发设置** 中获得 AppID 与 AppSecret。
 2. 前往 LeanCloud 控制台 > 存储 > 用户 > 设置 > 第三方集成，启用「微信小程序」后填写 AppID 与 AppSecret。
 
-这样你就可以在应用中使用 `AV.User.loginWithWeapp()` 方法来使用当前用户身份登录了。
+这样你就可以在应用中使用 `AV.User.loginWithMiniApp()` 方法来使用当前用户身份登录了。
 
 ```javascript
 AV.User.loginWithMiniApp().then(user => {
@@ -243,7 +243,7 @@ AV.User.loginWithMiniApp().then(user => {
 用户的登录状态会保存在客户端中，可以使用 `AV.User.current()` 方法来获取当前登录的用户，下面的例子展示了如何为登录用户保存额外的信息：
 
 ```javascript
-// 假设已经通过 AV.User.loginWithWeapp() 登录
+// 假设已经通过 AV.User.loginWithMiniApp() 登录
 // 获得当前登录用户
 const user = AV.User.current();
 // 调用小程序 API，得到用户信息
@@ -428,7 +428,7 @@ AV.User.loginWithMiniApp().then(user => {
 {{ docs.note("验证手机号码功能要求在「控制台 > 存储 > 用户 > 设置」中启用「用户注册时，向注册手机号码发送验证短信」。") }}
 
 ### 绑定现有用户
-如果你的应用已经在使用 LeanCloud 的用户系统，或者用户已经通过其他方式注册了你的应用（比如在 Web 端通过用户名密码注册），可以通过在小程序中调用 `AV.User#associateWithWeapp()` 来关联已有的账户：
+如果你的应用已经在使用 LeanCloud 的用户系统，或者用户已经通过其他方式注册了你的应用（比如在 Web 端通过用户名密码注册），可以通过在小程序中调用 `AV.User#associateWithMiniApp()` 来关联已有的账户：
 
 ```javascript
 // 首先，使用用户名与密码登录一个已经存在的用户
