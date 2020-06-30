@@ -696,7 +696,7 @@ AVCloud.<AVObject>callRPCInBackground("averageStars", dicParameters).subscribe(n
 // Java SDK 还提供了一个支持缓存的版本，和 AVQuery 一样，开发者在请求的时候，可以指定 CachePolicy 以及缓存的
 // 最长期限，这样可以避免短时间一直直接请求云端服务器。
 // 下面的请求表示优先使用上次缓存的结果，缓存有效期为 30 秒（30000 毫秒）。
-AVCloud.callRPCWithCacheInBackground("averageStars", dicParameters, AVQuery.CachePolicy.CACHE_ELSE_NETWORK, 30000)
+AVCloud.<AVObject>callRPCWithCacheInBackground("averageStars", dicParameters, AVQuery.CachePolicy.CACHE_ELSE_NETWORK, 30000)
 .subscribe(new Observer<AVObject>() {
   @Override
   public void onSubscribe(Disposable disposable) {
