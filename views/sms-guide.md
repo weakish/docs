@@ -344,7 +344,7 @@ try {
   try {
     await LCSMSClient.verifyMobilePhone('18200008888', '123456');
   } on LCException catch (e) {
-  print(e.message);
+    print(e.message);
   }
   ```
 
@@ -486,6 +486,12 @@ SMS::verifySmsCode('18200008888', '123456');
 ```python
 from leancloud import cloud
 cloud.verify_sms_code('18200008888', '123456')
+```dart
+try {
+  await LCSMSClient.verifyMobilePhone('18200008888', '123456');
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 再次验证用户输入的验证码是否正确。
