@@ -461,5 +461,5 @@ iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系�
 
 {% if node != 'qcloud' and node != 'us' %}
 ## 短信常见问题
-请参见 [短信收发常见问题一览](rest_sms_api.html#常见问题_FAQ)。
+请参见 [短信收发常见问题一览](sms-faq.html)。
 {% endif %}
