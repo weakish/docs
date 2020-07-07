@@ -467,9 +467,9 @@ AV.Cloud.run('averageStars', paramsJson).then(function (data) {
 });
 ```
 ```python
-from leancloud import cloudfunc
+from leancloud import cloud
 
-cloudfunc.run('averageStars', movie='夏洛特烦恼')
+cloud.run('averageStars', movie='夏洛特烦恼')
 ```
 ```php
 use \LeanCloud\Engine\Cloud;
@@ -547,7 +547,7 @@ try {
 
 ### 云引擎调用云函数
 
-在云引擎中可以使用 `{% if platformName === "Node.js" %}AV.Cloud.run{% endif %}{% if platformName === "Python" %}leancloud.cloudfunc.run{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::run{% endif %}{% if platformName === "Java" %}AVCloud.callFunctionInBackground{% endif %}{% if platformName === ".NET" %}AVCloud.CallFunctionAsync{% endif %}` 调用 `{% if platformName === "Node.js" %}AV.Cloud.define{% endif %}{% if platformName === "Python" %}engine.define{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::define{% endif %}{% if platformName === "Java" %}@EngineFunction{% endif %}{% if platformName === ".NET" %}EngineFunctionAttribute{% endif %}` 定义的云函数：
+在云引擎中可以使用 `{% if platformName === "Node.js" %}AV.Cloud.run{% endif %}{% if platformName === "Python" %}leancloud.cloud.run{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::run{% endif %}{% if platformName === "Java" %}AVCloud.callFunctionInBackground{% endif %}{% if platformName === ".NET" %}AVCloud.CallFunctionAsync{% endif %}` 调用 `{% if platformName === "Node.js" %}AV.Cloud.define{% endif %}{% if platformName === "Python" %}engine.define{% endif %}{% if platformName === "PHP" %}LeanCloudEngineCloud::define{% endif %}{% if platformName === "Java" %}@EngineFunction{% endif %}{% if platformName === ".NET" %}EngineFunctionAttribute{% endif %}` 定义的云函数：
 
 {% if platformName === "Node.js" %}
 ```js
@@ -579,12 +579,12 @@ AV.Cloud.run('averageStars', { movie: '夏洛特烦恼' }, { remote: true }).the
 {% endif %}
 {% if platformName === "Python" %}
 ```python
-from leancloud import cloudfunc
+from leancloud import cloud
 
-cloudfunc.run('averageStars', movie='夏洛特烦恼')
+cloud.run('averageStars', movie='夏洛特烦恼')
 ```
 
-但是这样调用会真的发起一次 HTTP 请求，去请求部署在云引擎上的云函数。如果想要直接调用本地（当前进程）中的云函数，或者发起调用就是在云引擎中，想要省去一次 HTTP 调用的开销，可以使用 `leancloud.cloudfunc.run.local` 来取代 `leanengine.cloudfunc.run`，这样会直接在当前进程中执行一个函数调用，而不会发起 HTTP 请求来调用此云函数。
+但是这样调用会真的发起一次 HTTP 请求，去请求部署在云引擎上的云函数。如果想要直接调用本地（当前进程）中的云函数，或者发起调用就是在云引擎中，想要省去一次 HTTP 调用的开销，可以使用 `leancloud.cloud.run.local` 来取代 `leanengine.cloud.run`，这样会直接在当前进程中执行一个函数调用，而不会发起 HTTP 请求来调用此云函数。
 {% endif %}
 {% if platformName === "PHP" %}
 ```php
@@ -662,9 +662,9 @@ AV.Cloud.rpc('averageStars', paramsJson).then(function (object) {
 });
 ```
 ```python
-from leancloud import cloudfunc
+from leancloud import cloud
 
-cloudfunc.rpc('averageStars', movie='夏洛特烦恼')
+cloud.rpc('averageStars', movie='夏洛特烦恼')
 ```
 ```java
 // 构建参数
