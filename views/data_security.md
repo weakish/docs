@@ -35,30 +35,28 @@ LeanCloud 允许你对两种目标设置 ACL：
 #### Class 级别的 ACL
 创建 Class 的时候，控制台会弹出一个窗口，如下图：
 
-<div style="width: 600px;"><img src="images/security/acl_template.png" class="img-responsive" /></div>
+![创建 Class 对话框](images/security/acl_template.png)
 
-在这里选择一个默认的 ACL 权限。
+在这里，你可以设置默认的 ACL 和 Class 的访问权限：
 
-另外，针对已经存在的 Class 你可以更新整个 Class 权限。进入 **控制台 > 存储 > 数据**，选择一个 Class，再点击右侧菜单中的 **其他 > 权限设置**。
-
-![image](images/cla_permission.png)
-
-在这里，你可以设置在一个 Class 上的不同操作权限：
-
-* GET - 通过 objectId 获取单个对象。
-* Find - 通过指定条件来遍历所有符合目标的对象。
-* Update - 修改一个已经存在的对象。
-* Create - 在 Class 表中插入一个新对象。
-* Delete - 删除任意既有对象。
-* Add fields - 给 Class 增加新的属性列
+- `add_fields` - 给 Class 增加新的属性列。
+- `create` - 在 Class 表中插入一个新对象。
+- `delete` - 删除任意既有对象。
+- `update` - 修改一个已经存在的对象。
+- `find` - 通过指定条件来遍历所有符合目标的对象。
+- `get` - 通过 objectId 获取单个对象。
 
 对于每一种权限，又可以开放给不同用户：
 
 * 所有用户 － 指所有客户端都可以进行这一操作，相当于 public 权限
-* 登录用户 － 只有使用 LeanCloud 内建账户系统（AVUser）并且进行了登录的客户端，才可以执行这一操作。
+* 登录用户 － 只有使用 LeanCloud 内建账户系统（`_User` 表）并且进行了登录的客户端，才可以执行这一操作。
 * 指定用户 － 只有指定用户或者角色才可以执行这一操作，这是对操作权限进行最精确控制的方式。
 
 譬如我们有一个匿名发帖的应用，所有人都可以发表帖子，但是只有经过管理员审核后的帖子才能被展示出来。我们可以有两张表，第一张表用来存放审核前的帖子，这张表的 create 权限就可以开放给所有用户；第二张表用来存放审核后的帖子，这张表的 create 权限就只开放给管理员。
+
+另外，针对已经存在的 Class 你可以更新默认 ACL 和访问权限。进入**控制台 > 存储 > 结构化数据**，选择一个 Class，再点击**权限**标签页。
+
+![image](images/cla_permission.png)
 
 ##### 设置列的权限
 
@@ -75,7 +73,7 @@ LeanCloud 也允许将部分列的数据设置为 「客户端不可见」。设
 #### Object 级别的 ACL
 在 LeanCloud 中，还可以对 Class 中的每一条记录（Object）单独设置 ACL，这时是按照读、写分离来对不同用户、角色进行授权的。在应用控制台中进行操作的界面如下图所示：
 
-![image](images/acl.png)
+![设置对象的 ACL 权限](images/acl.png)
 
 这样我们就可以做到：
 
@@ -120,9 +118,6 @@ https:
 在 WebView 中使用，建议通过 WebView 去加载一个部署好的、有域名的 Web，然后缓存在本地，这样可以通过 **Web 安全域名** 来做限制。
 
 如果在前端使用 JavaScript SDK，当你打算正式发布出去的时候，请务必配置 **Web 安全域名**，方法是进入 **控制台 > 设置 > 安全中心 > Web 安全域名**。
-
-
-![image](images/security/web-host.png)
 
 ## 安全中心
 
