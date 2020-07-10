@@ -1662,11 +1662,13 @@ func client(_ client: IMClient, event: IMClientEvent) {
 }
 ```
 ```objc
--(void)client:(AVIMClient *)client didOfflineWithError:(NSError *)error{
-    if ([error code]  == 4111) {
+- (void)imClientClosed:(AVIMClient *)imClient error:(NSError * _Nullable)error
+{
+    if ([error.domain isEqualToString:kLeanCloudErrorDomain] &&
+        error.code == 4111) {
         // 适当的弹出友好提示，告知当前用户的 clientId 在其他设备上登录了
     }
-};
+}
 ```
 ```java
 public class AVImClientManager extends AVIMClientEventHandler {
@@ -1719,13 +1721,15 @@ realtime.createIMClient('Tom', { tag: 'Mobile', isReconnect: true }).then(functi
 ```
 ```swift
 do {
-    let client = try IMClient(ID: "CLIENT_ID", tag: "Mobile")
-    client.open([.reconnect]) { (result) in
+    let client = try IMClient(ID: "Tom", tag: "Mobile")
+    client.open(options: [.reconnect]) { (result) in
         switch result {
         case .success:
             break
         case .failure(error: let error):
-            print(error)
+            if error.code == 4111 {
+                // 冲突时登录失败，不会踢掉较早登录的设备
+            }
         }
     }
 } catch {
@@ -1733,12 +1737,18 @@ do {
 }
 ```
 ```objc
-AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile"];
-[currentClient openWithOption:AVIMClientOpenOptionReopen callback:^(BOOL succeeded, NSError *error) {
-    if (succeeded) {
-        // 与云端建立连接成功
-    }
-}];
+NSError *err;
+AVIMClient *currentClient = [[AVIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile" error:&err];
+if (err) {
+    NSLog(@"init failed with error: %@", err);
+} else {
+    [currentClient openWithOption:AVIMClientOpenOptionReopen callback:^(BOOL succeeded, NSError * _Nullable error) {
+        if ([error.domain isEqualToString:kLeanCloudErrorDomain] &&
+            error.code == 4111) {
+            // 冲突时登录失败，不会踢掉较早登录的设备
+        }
+    }];
+}
 ```
 ```java
 AVIMClientOpenOption openOption = new AVIMClientOpenOption();

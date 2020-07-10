@@ -49,16 +49,26 @@ realtime.createIMClient('Tom').then(function(tom) {
 }).catch(console.error);
 ```
 ```swift
+// 定义一个常驻内存的全局变量
+var tom: IMClient
+// 初始化
 do {
-    let tom = try IMClient(ID: "Tom")
+    tom = try IMClient(ID: "Tom")
 } catch {
     print(error)
 }
 ```
 ```objc
-@property (nonatomic, strong) AVIMClient *tom;
-// clientId 为 Tom
-tom = [[AVIMClient alloc] initWithClientId:@"Tom"]
+// 定义一个常驻内存的属性变量
+@property (nonatomic) AVIMClient *tom;
+// 初始化
+NSError *error;
+tom = [[AVIMClient alloc] initWithClientId:@"Tom" error:&error];
+if (error) {
+    NSLog(@"init failed with error: %@", error);
+} else {
+    NSLog(@"init succeeded");
+}
 ```
 ```java
 // clientId 为 Tom
@@ -88,8 +98,11 @@ realtime.createIMClient('Tom').then(function(tom) {
 }).catch(console.error);
 ```
 ```swift
+// 定义一个常驻内存的全局变量
+var tom: IMClient
+// 初始化，然后登陆
 do {
-    let tom = try IMClient(ID: "Tom")
+    tom = try IMClient(ID: "Tom")
     tom.open { (result) in
         switch result {
         case .success:
@@ -103,14 +116,20 @@ do {
 }
 ```
 ```objc
-// Tom 创建了一个 client，用自己的名字作为 clientId
-AVIMClient *tom = [[AVIMClient alloc] initWithClientId:@"Tom"];
-// Tom 登录
-[tom openWithCallback:^(BOOL succeeded, NSError *error) {
-  if(succeeded) {
-    // 成功打开连接
-  }
-}];
+// 定义一个常驻内存的属性变量
+@property (nonatomic) AVIMClient *tom;
+// 初始化，然后登陆
+NSError *error;
+tom = [[AVIMClient alloc] initWithClientId:@"Tom" error:&error];
+if (error) {
+    NSLog(@"init failed with error: %@", error);
+} else {
+    [tom openWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            // open succeeded
+        }
+    }];
+}
 ```
 ```java
 // Tom 创建了一个 client，用自己的名字作为 clientId 登录
@@ -147,14 +166,17 @@ AV.User.logIn('username', 'password').then(function(user) {
 }).catch(console.error.bind(console));
 ```
 ```swift
-_ = LCUser.logIn(username: "username", password: "password") { (result) in
+// 定义一个常驻内存的全局变量
+var client: IMClient
+// 登陆 User，然后使用登陆成功的 User 初始化 Client 并登陆
+LCUser.logIn(username: USER_NAME, password: PASSWORD) { (result) in
     switch result {
     case .success(object: let user):
         do {
-            let client = try IMClient(user: user)
-            client.open(completion: { (result) in
-                // 执行其他逻辑
-            })
+            client = try IMClient(user: user)
+            client.open { (result) in
+                // handle result
+            }
         } catch {
             print(error)
         }
@@ -164,14 +186,23 @@ _ = LCUser.logIn(username: "username", password: "password") { (result) in
 }
 ```
 ```objc
-// 以 AVUser 的用户名和密码登录到 LeanCloud 云端
-[AVUser logInWithUsernameInBackground:username password:password block:^(AVUser * _Nullable user, NSError * _Nullable error) {
-    // 以 AVUser 实例创建了一个 client
-    AVIMClient *client = [[AVIMClient alloc] initWithUser:user];
-    // 打开 client，与云端进行连接
-    [client openWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
-        // 执行其他逻辑
-    }];
+// 定义一个常驻内存的属性变量
+@property (nonatomic) AVIMClient *client;
+// 登陆 User，然后使用登陆成功的 User 初始化 Client 并登陆
+[AVUser logInWithUsernameInBackground:USER_NAME password:PASSWORD block:^(AVUser * _Nullable user, NSError * _Nullable error) {
+    if (user) {
+        NSError *err;
+        client = [[AVIMClient alloc] initWithUser:user error:&err];
+        if (err) {
+            NSLog(@"init failed with error: %@", err);
+        } else {
+            [client openWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
+                if (succeeded) {
+                    // open succeeded
+                }
+            }];
+        }
+    }
 }];
 ```
 ```java
@@ -4431,6 +4462,13 @@ realtime.on(Event.RECONNECT, function() {
 
 {{ docs.langSpecStart('swift') }}
 
+在 `IMClientDelegate` 的 `IMClientDelegate.client(_:event:)` 函数里，可以接收到如下所示的事件通知：
+
+* `sessionDidOpen`：连接自动恢复了
+* `sessionDidPause`：连接断开了；该事件被触发的常见场景：网络无法访问、应用进入后台
+* `sessionDidResume`：正在重新建立连接
+* `sessionDidClose`：连接关闭，且不会自动重连；该事件被触发的常见场景：单设备登陆冲突、后台主动把该 client 下线
+
 ```swift
 func client(_ client: IMClient, event: IMClientEvent) {
     switch event {
@@ -4450,11 +4488,34 @@ func client(_ client: IMClient, event: IMClientEvent) {
 
 {{ docs.langSpecStart('objc') }}
 
-在 AVIMClientDelegate 上会有如下事件通知：
+在 `AVIMClientDelegate` 里，可以接收到如下所示的事件通知：
 
-- `imClientPaused:(AVIMClient *)imClient` 指网络连接断开事件发生，此时聊天服务不可用。
-- `imClientResuming:(AVIMClient *)imClient` 指网络断开后开始重连，此时聊天服务依然不可用。
-- `imClientResumed:(AVIMClient *)imClient` 指网络连接恢复正常，此时聊天服务变得可用。
+* `imClientResumed`：连接自动恢复了
+* `imClientPaused`：连接断开了；该事件被触发的常见场景：网络无法访问、应用进入后台
+* `imClientResuming`：正在重新建立连接
+* `imClientClosed`：连接关闭，且不会自动重连；该事件被触发的常见场景：单设备登陆冲突、后台主动把该 client 下线
+
+```objc
+- (void)imClientResumed:(AVIMClient *)imClient
+{
+    
+}
+
+- (void)imClientResuming:(AVIMClient *)imClient
+{
+    
+}
+
+- (void)imClientPaused:(AVIMClient *)imClient error:(NSError * _Nullable)error
+{
+    
+}
+
+- (void)imClientClosed:(AVIMClient *)imClient error:(NSError * _Nullable)error
+{
+    
+}
+```
 
 {{ docs.langSpecEnd('objc') }}
 
