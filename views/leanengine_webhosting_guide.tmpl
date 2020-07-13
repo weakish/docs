@@ -1611,7 +1611,6 @@ systemDependencies:
 `LEANCLOUD_APP_ENV` | 当前的应用环境：<ul><li>开发环境没有该环境变量，或值为 `development`（一般指本地开发）。</li><li>预备环境值为 `stage`。</li><li>生产环境值为 `production`。</li></ul>
 `LEANCLOUD_APP_PORT` | 当前应用开放给外网的端口，只有监听此端口，用户才可以访问到你的服务。
 `LEANCLOUD_API_SERVER` | 访问存储服务时使用的地址（类似于 `https://api.leancloud.cn`）。该值会因为所在数据中心等原因导致不一样，所以使用 REST API 请求存储服务或 LeanCloud 其他服务时请使用此环境变量的值。在云引擎中 **不要** 直接使用 `https://api.leancloud.cn`。
-`LEANCLOUD_AVAILABLE_CPUS` | 云引擎实例可用 CPU 的数量，高规格实例（如：2 CPU 1024 MB 内存）时该值大于 1。应用可以根据该值启动对应数量的线程或者进程。在云引擎中 **不要** 直接使用操作系统 CPU 核数，否则可能启动过多的进程导致超出实例规格而异常退出。
 `LEANCLOUD_APP_GROUP`| 云引擎实例所在的组。当使用云引擎 [组管理](leanengine_plan.html#组管理) 功能时，该值为组的名称。
 `LEANCLOUD_REGION` | 云引擎服务所在区域，值为 `CN` 或 `US`，分别表示国内版和国际版。
 `LEANCLOUD_VERSION_TAG` | 云引擎实例部署的版本号
