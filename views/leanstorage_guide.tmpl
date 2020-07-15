@@ -7122,6 +7122,7 @@ await LCUser.verifyMobilePhone('+8618200008888','123456');
 也就时说，绑定手机号或修改手机号时先请求发送验证码（用户需处于登录状态），再凭短信验证码完成绑定或修改操作。
 
 {% if platform_name === "JavaScript" %}
+```js
 AV.User.requestChangePhoneNumber('+8618200008888');
 
 AV.User.changePhoneNumber('+8618200008888', '123456').then(() => {
@@ -7130,9 +7131,11 @@ AV.User.changePhoneNumber('+8618200008888', '123456').then(() => {
     currentUser.setMobilePhoneNumber('+8618200008888');
 }, (error) => {
     // 验证码不正确
-}); 
+});
+```
 {% endif %}
 {% if platform_name === "Objective-C" %}
+```objc
 [AVUser requestVerificationCodeForUpdatingPhoneNumber:@"+8618200008888" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
         // 请求成功
@@ -7149,11 +7152,15 @@ AV.User.changePhoneNumber('+8618200008888', '123456').then(() => {
         // 验证码不正确
     }
 }];
+```
 {% endif %}
 {% if platform_name === "Swift" %}
+```swift
 // 即将支持
+```
 {% endif %}
 {% if platform_name === "Android / Java" %}
+```java
 AVUser.requestSMSCodeForUpdatingPhoneNumberInBackground("+8618200008888").blockingSubscribe();
 
 AVUser.verifySMSCodeForUpdatingPhoneNumberInBackground("123456", "+8618200008888").subscribe(new Observer<AVNull>() {
@@ -7168,30 +7175,37 @@ AVUser.verifySMSCodeForUpdatingPhoneNumberInBackground("123456", "+8618200008888
     }
     public void onComplete() {}
 });
+```
 {% endif %}
 {% if platform_name === "Flutter" %}
+```dart
 await LCUser.requestSMSCodeForUpdatingPhoneNumber('+8618200008888');
 
 await LCUser.verifyCodeForUpdatingPhoneNumber('+8618200008888', '123456');
 // 更新本地数据
 LCUser currentUser = await LCUser.getCurrent();
 user.mobile = '+8618200008888';
+```
 {% endif %}
 {% if platform_name === "Python" %}
+```python
 User.request_change_phone_number("+8618200008888")
 
 User.change_phone_number("123456", "+8618200008888")
 # 更新本地数据
 current_user = leancloud.User.get_current()
 current_user.set_mobile_phone_number("+8618200008888")
+```
 {% endif %}
 {% if platform_name === "PHP" %}
+```php
 User::requestChangePhoneNumber("+8618200008888");
 
 User::changePhoneNumber("123456", "+8618200008888");
 // 更新本地数据
 $currentUser = User::getCurrentUser();
 $user->setMobilePhoneNumber("+8618200008888");
+```
 {% endif %}
 
 ### 当前用户
