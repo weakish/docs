@@ -722,18 +722,18 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 
 ## Oppo 推送
 
-我们新推出了支持 Oppo 手机的混合推送（基于 Oppo 2.0.2 版本SDK），欢迎感兴趣的开发者试用，也期待大家给我们更多的反馈。
+LeanCloud 混合推送/Oppo 模块基于 oppo Push SDK v2.1.0 版本，支持 Android 4.4 或以上版本的手机系统，服务支持信息如下：
+- 支持平台：ColorOS 3.1 及以上的系统的 OPPO 机型，一加 5/5t 及以上机型，realme 所有机型。
+- 通知消息类型：只支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。具体限制可参考 [oppo 官方文档](https://open.oppomobile.com/wiki/doc#id=10704)。
 
+在接入时，开发者可以参考我们的源码和 demo：
 - oppo 混合推送 SDK 源代码：可参照 [这里](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush)。
 - oppo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush-demos/tree/master/oppo)。
-- oppo 推送服务 sdk 支持的最低安卓版本为 Android 4.0 系统。
-
-注意，oppo 推送服务仅支持 ColorOS 下的 Android 应用，且仅支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。用户点击通知启动应用，期间接收推送消息、展示在通知栏、点击通知这一系列操作，OS 系统模块都不会进行方法回调。
 
 ### 环境配置
 在开始接入之前，有两项准备工作：
 - 在 [oppo 开放平台](https://open.oppomobile.com/)注册一个账号，并创建好应用。
-- 从 Oppo 官网下载 推送 SDK(地址如下：[Oppo Push 客户端 SDK](https://open.oppomobile.com/wiki/doc#id=10201))。LeanCloud 混合推送目前是基于 2.0.2 版本进行开发的，大家也可以从[混合推送源码](https://github.com/leancloud/android-sdk-all/tree/master/avoscloud-mixpush/libs)里得到这一版本的 jar 包。
+- 从 oppo 官网下载 aar 资源。OPPO 官方 aar 下载地址为：https://pfs.oppomobile.com/static/document/com.heytap.msp-push-2.1.0.aar。
 
 这里假设大家已经完成上述操作，创建好了应用，并获取了 `appKey` 、 `appSecret`和 `masterSecret`，请保存好这三个值，下一步接入的时候会用到：
 
@@ -741,25 +741,29 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 - 服务端设置需要使用  `appKey`和 `masterSecret`。
 
 ### 接入 SDK
-当前版本的 SDK 是基于 oppo 官方文档 [push SDK 接入文档](https://open.oppomobile.com/wiki/doc#id=10196) 封装而来，我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/oppo/)）来解释整个接入流程。
 
-首先将 demo 工程 app/libs 目录下的所有 jar 包（如有）拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+#### 下载 SDk
+
+- 将之前下载的 SDK（com.heytap.msp-push-2.1.0.aar）复制到工程 libs/ 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
 ```
 dependencies {
   //混合推送需要的包
-  implementation fileTree(dir: 'libs', include: ['*.jar']) // 将 oppo-mcssdk-2.0.2.jar 置于应用 libs 目录下
-  implementation 'cn.leancloud:mixpush-android:{{ version.unified }}'
+  implementation fileTree(dir: 'libs', include: ['*.aar'])
+  implementation 'cn.leancloud:mixpush-oppo:{{ version.unified }}-opf'
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
-  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 }
 ```
 
-> 如果只希望接入 oppo 推送，可以将 `mixpush-android` 替换为 `mixpush-oppo`。
+> 注意对于 6.5.10 版 SDK，我们有一个专门为 OPPO 推送发布的 bugfix 版本：`6.5.10-opf`，开发者应该使用这一个版本。
+ 
+#### 配置 AndroidManifest.xml
 
-接下来配置 AndroidManifest，添加权限声明：
+注意：oppo 推送服务SDK 2.1.0 版本支持的最低安卓版本为 Android 4.4 系统（`minSdkVersion="19"`）。
 
+- 增加权限列表（如果应用无透传权限，则不用配置）
 ```xml
     <!-- 基础模块（必须加入以下声明）START -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -768,29 +772,30 @@ dependencies {
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <!-- 基础模块 END -->
+
     <uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE"/>
     <uses-permission android:name="com.heytap.mcs.permission.RECIEVE_MCS_MESSAGE"/>
 ```
 
-最后在 AndroidManifest 中添加 oppo PushService ：
-
+- 推送服务组件注册（如果应用无透传权限，则不用配置）
 ```xml
 <service
-  android:name="com.heytap.mcssdk.PushService"
-  android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
+   android:name="com.heytap.msp.push.service.CompatibleDataMessageCallbackService"     
+android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
     <intent-filter>
-      <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE"/>
+     <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE"/>
     </intent-filter>
-</service>
-
+</service> <!--兼容Q以下版本-->
 <service
-   android:name="com.heytap.mcssdk.AppPushService"
-   android:permission="com.heytap.mcs.permission.SEND_MCS_MESSAGE">
-   <intent-filter>
+   android:name="com.heytap.msp.push.service.DataMessageCallbackService"     
+android:permission="com.heytap.mcs.permission.SEND_PUSH_MESSAGE">
+    <intent-filter>
      <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE"/>
-   </intent-filter>
-</service>
+ <action android:name="com.heytap.msp.push.RECEIVE_MCS_MESSAGE"/>
+    </intent-filter>
+</service> <!--兼容Q版本-->
 ```
+
 
 接下来我们看看代码上要怎么做。
 
@@ -799,63 +804,10 @@ dependencies {
 与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行 oppo 推送的初始化：
 
 ```java
-import cn.leancloud.AVOPPOPushAdapter;
-
-// Customized Push Adapter.
-public class MyPushAdapter extends AVOPPOPushAdapter {
-  @Override
-  public void onGetAliases(int var1, List<SubscribeResult> var2) {
-  }
-
-  @Override
-  public void onSetAliases(int var1, List<SubscribeResult> var2) {
-  }
-
-  @Override
-  public void onUnsetAliases(int var1, List<SubscribeResult> var2) {
-  }
-
-  @Override
-  public void onSetUserAccounts(int var1, List<SubscribeResult> var2) {
-  }
-
-  @Override
-  public void onUnsetUserAccounts(int var1, List<SubscribeResult> var2) {
-  }
-
-  @Override
-  public void onGetUserAccounts(int var1, List<SubscribeResult> var2) {
-  }
-
-  @Override
-  public void onSetTags(int var1, List<SubscribeResult> var2) {
-  }
-
-  @Override
-  public void onUnsetTags(int var1, List<SubscribeResult> var2) {
-  }
-
-  @Override
-  public void onGetTags(int var1, List<SubscribeResult> var2) {
-  }
-
-  @Override
-  public void onGetPushStatus(int var1, int var2) {
-  }
-
-  @Override
-  public void onGetNotificationStatus(int var1, int var2) {
-  }
-
-  @Override
-  public void onSetPushTime(int var1, String var2) {
-  }
-}
-
-// Application Class.
 import cn.leancloud.AVOSCloud;
-import cn.leancloud.AVMixPushManager;        // 使用 mixpush-android 的场合
-//import cn.leancloud.oppo.AVMixPushManager; // 使用 mixpush-oppo 的场合
+import cn.leancloud.AVOPPOPushAdapter;
+import cn.leancloud.oppo.AVMixPushManager;     // 使用 mixpush-oppo 的场合
+//import cn.leancloud.AVMixPushManager;        // 使用 mixpush-android 的场合
 
 // Customized Application.
 public class MyApp extends Application {
@@ -878,112 +830,17 @@ public class MyApp extends Application {
     // oppo 推送初始化
     // 使用 mixpush-android 的场合，引用 cn.leancloud.AVMixPushManager
     // 使用 mixpush-oppo 的场合，引用 cn.leancloud.oppo.AVMixPushManager
-    AVMixPushManager.registerOppoPush(this, OPPO_APPKEY, OPPO_APPSECRET, new MyPushAdapter());
+    AVMixPushManager.registerOppoPush(this, OPPO_APPKEY, OPPO_APPSECRET, new AVOPPOPushAdapter());
   }
 }
 ```
 
-开发者也可以在 `onCreate` 方法中调用 AVMixPushManager 的其他方法，以使用 oppo 推送的全部客户端功能：
+开发者也可以在 `onCreate` 方法中调用 AVMixPushManager 的其他方法，以使用 oppo 推送的全部客户端功能，具体可以参看 AVMixPushManager 的接口文档，或参考[官方文档-详细 API 说明](https://open.oppomobile.com/wiki/doc#id=10704) 来了解具体信息。
 
-```java
-public class AVMixPushManager {
-  /**
-   * judgement if support oppo push or not.
-   *
-   * @param context
-   * @return
-   */
-  public static boolean isSupportOppoPush(Context context);
-  /**
-   * pause oppo push
-   */
-  public static void pauseOppoPush();
-  /**
-   * resume oppo push
-   */
-  public static void resumeOppoPush();
-
-  /**
-   * set oppo push time.
-   */
-  public static void setOppoPushTime(List<Integer> weekDays, int startHour, int startMinute, int endHour, int endMinute);
-
-  /**
-   * retrieve oppo push time.
-   */
-  public static void getOppoPushTime();
-
-  /**
-   * set oppo push aliases.
-   * @param aliases
-   */
-  public static void setOppoAliases(List<String> aliases);
-
-  /**
-   * unset oppo push aliases.
-   * @param alias
-   */
-  public static void unsetOppoAlias(String alias);
-
-  /**
-   * get oppo aliases.
-   */
-  public static void getOppoAliases();
-
-  /**
-   * set oppo push account.
-   * @param account
-   */
-  public static void setOppoUserAccount(String account);
-
-  /**
-   * unset oppo push accounts.
-   * @param accounts
-   */
-  public static void unsetOppoUserAccouts(List<String> accounts);
-
-  /**
-   * get oppo push accounts.
-   */
-  public static void getOppoUserAccounts();
-
-  /**
-   * set oppo push tags.
-   * @param tags
-   */
-  public static void setOppoTags(List<String> tags);
-
-  /**
-   * unset oppo push tags.
-   * @param tags
-   */
-  public static void unsetOppoTags(List<String> tags);
-
-  /**
-   * retrieve oppo push tags.
-   */
-  public static void getOppoTags();
-
-  /**
-   * get oppo push status
-   */
-  public static void getOppoPushStatus();
-
-  /**
-   * get oppo notification status.
-   */
-  public static void getOppoNotificationStatus();
-}
-```
-
-AVMixPushManager 封装的这些接口与 oppo 官方文档的接口完全一致，可参考[官方文档-详细 API 说明](https://open.oppomobile.com/wiki/doc#id=10196) 来了解具体信息，也可以参考该文档里面的错误码定义来进行集成测试。
 
 #### 添加 oppo 推送配置
 
 在应用控制台 - 消息 - 推送 - 设置 页面开启混合推送服务，并且在「oppo 推送配置」一节设置好准备阶段申请好的「oppo app key」和「oppo master secret」，就可以了。
-
-
-
 
 #### 响应通知栏消息的点击事件
 
