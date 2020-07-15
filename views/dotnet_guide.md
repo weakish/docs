@@ -572,6 +572,18 @@ await AVUser.RequestMobilePhoneVerifyAsync ("18688888888").ContinueWith(t=>
 
 验证成功后，用户的 `mobilePhoneVerified` 属性变为true，并且调用云引擎的 `AV.Cloud.onVerifed('sms', function)` 方法。
 
+除了在用户绑定、修改手机号**之后**进行验证，LeanCloud 也支持在用户绑定或修改手机号**之前**先通过短信验证。
+也就时说，绑定手机号或修改手机号时先请求发送验证码（用户需处于登录状态），再凭短信验证码完成绑定或修改操作。
+
+```cs
+await LCUser.RequestSMSCodeForUpdatingPhoneNumber("+8618200008888");
+
+await LCUser.VerifyCodeForUpdatingPhoneNumber("+8618200008888", "123456");
+// 更新本地数据
+var user = AVUser.CurrentUser;
+user.MobilePhoneNumber = "+8618200008888";
+```
+
 <div class="callout callout-info">以上只是针对 `_User` 表的一个属性 `mobilePhoneNumber` 进行验证，但是存在另一种需求，类似于支付宝在进行交易的时候会要求进行实时的短信认证，这一机制现在已经普遍存在于各种应用中进行敏感操作的首选，并不局限于注册登录这种通用功能，LeanCloud 也提供了这一机制。</div>
 
 #### 手机短信针对应用自定义操作的验证
