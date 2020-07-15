@@ -668,7 +668,7 @@ cloud.rpc('averageStars', movie='夏洛特烦恼')
 ```
 ```java
 // 构建参数
-Map<String, String> dicParameters = new HashMap<String, String>();
+Map<String, Object> dicParameters = new HashMap<>();
 dicParameters.put("movie", "夏洛特烦恼");
 
 AVCloud.<AVObject>callRPCInBackground("averageStars", dicParameters).subscribe(new Observer<AVObject>() {
