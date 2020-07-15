@@ -723,7 +723,7 @@ public class MyPushMessageReceiver extends AVVIVOPushMessageReceiver {
 ## Oppo 推送
 
 LeanCloud 混合推送/Oppo 模块基于 oppo Push SDK v2.1.0 版本，支持 Android 4.4 或以上版本的手机系统，服务支持信息如下：
-- 支持平台：ColorOS 3.1及以上的系统的 OPPO 机型，一加 5/5t 及以上机型，realme 所有机型。
+- 支持平台：ColorOS 3.1 及以上的系统的 OPPO 机型，一加 5/5t 及以上机型，realme 所有机型。
 - 通知消息类型：只支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。具体限制可参考[oppo 官方文档](https://open.oppomobile.com/wiki/doc#id=10704)。
 
 在接入时，开发者可以参考我们的源码和 demo：
