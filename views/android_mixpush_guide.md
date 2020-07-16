@@ -750,14 +750,13 @@ LeanCloud 混合推送/Oppo 模块基于 oppo Push SDK v2.1.0 版本，支持 An
 dependencies {
   //混合推送需要的包
   implementation fileTree(dir: 'libs', include: ['*.aar'])
-  implementation 'cn.leancloud:mixpush-oppo:{{ version.unified }}-opf'
+  implementation 'cn.leancloud:mixpush-oppo:{{ version.unified }}'
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 }
 ```
 
-> 注意对于 6.5.10 版 SDK，我们有一个专门为 OPPO 推送发布的 bugfix 版本：`6.5.10-opf`，开发者应该使用这一个版本。
  
 #### 配置 AndroidManifest.xml
 
