@@ -121,7 +121,6 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
   "content": "{\"_lctext\":\"来我们去 XX 传奇玩吧\",\"_lctype\":-1}",
   "convId": "5789a33a1b8694ad267d8040",
   "toPeers": ["Jerry"],
-  "__sign": "1472200796787,a0e99be208c6bce92d516c10ff3f598de8f650b9",
   "bin": false,
   "transient": false,
   "sourceIP": "121.239.62.103",
@@ -357,7 +356,6 @@ Cloud::define('_receiversOffline', function($params, $user) {
   "content": "12345678",
   "convId": "5789a33a1b8694ad267d8040",
   "msgId": "fptKnuYYQMGdiSt_Zs7zDA",
-  "__sign": "1472703266575,30e1c9b325410f96c804f737035a0f6a2d86d711",
   "bin": false,
   "transient": false,
   "sourceIP": "114.219.127.186",
@@ -459,8 +457,7 @@ Cloud::define('_messageSent', function($params, $user) {
   "members": ["Tom", "Jerry"],
   "attr": {
     "name": "Tom & Jerry"
-  },
-  "__sign": "1472703266397,b57285517a95028f8b7c34c68f419847a049ef26"
+  }
 }
 ```
 
