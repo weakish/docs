@@ -7156,7 +7156,26 @@ AV.User.changePhoneNumber('+8618200008888', '123456').then(() => {
 {% endif %}
 {% if platform_name === "Swift" %}
 ```swift
-// 即将支持
+_ = LCUser.requestVerificationCode(forUpdatingMobilePhoneNumber: "+8618200008888") { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+
+_ = LCUser.verifyVerificationCode("123456", toUpdateMobilePhoneNumber:"+8618200008888") { result in
+    switch result {
+    case .success:
+        // mobilePhoneNumber 变为 +8618200008888
+        // mobilePhoneVerified 变为 true
+        break
+    case .failure(error: let error):
+        // 验证码不正确
+        print(error)
+    }
+}
 ```
 {% endif %}
 {% if platform_name === "Android / Java" %}
