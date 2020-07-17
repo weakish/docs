@@ -573,7 +573,7 @@ await AVUser.RequestMobilePhoneVerifyAsync ("18688888888").ContinueWith(t=>
 验证成功后，用户的 `mobilePhoneVerified` 属性变为true，并且调用云引擎的 `AV.Cloud.onVerifed('sms', function)` 方法。
 
 除了在用户绑定、修改手机号**之后**进行验证，LeanCloud 也支持在用户绑定或修改手机号**之前**先通过短信验证。
-也就时说，绑定手机号或修改手机号时先请求发送验证码（用户需处于登录状态），再凭短信验证码完成绑定或修改操作。
+也就是说，绑定手机号或修改手机号时先请求发送验证码（用户需处于登录状态），再凭短信验证码完成绑定或修改操作。
 
 ```cs
 await LCUser.RequestSMSCodeForUpdatingPhoneNumber("+8618200008888");
