@@ -74,7 +74,7 @@
 ## 112
 
 * 信息 - `Invalid channel name. A channel name is either an empty string (the broadcast channel) or contains only a-zA-Z0-9_=, '-' or chinese characters.`
-* 含义 - 推送订阅的频道无效，{{ data.channel_naming() }}频道名称为空字符串表示广播。
+* 含义 - 推送订阅的频道无效，{{ data.channel_naming }}频道名称为空字符串表示广播。
 
 ## 113
 
