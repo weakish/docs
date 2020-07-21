@@ -6,7 +6,7 @@
 
 # 云引擎 REST API 使用指南
 
-LeanCloud 云端提供的统一的访问云函数的接口，所有的客户端 SDK 也都是封装了这个接口从而实现对云函数的调用。
+LeanCloud 云端提供的统一的访问云函数的 REST API 接口，所有的客户端 SDK 也都是封装了这个接口从而实现对云函数的调用。
 
 我们推荐使用 [Postman](http://www.getpostman.com/) 来调试 REST API，我们的社区中有一篇 [使用 Postman 调试 REST API 教程](https://forum.leancloud.cn/t/postman-rest-api/8638)。
 
@@ -25,18 +25,8 @@ LeanCloud 云端提供的统一的访问云函数的接口，所有的客户端 
 
 ## 云函数
 
-云函数可以通过 REST API 来使用，比如调用一个叫 hello 的云函数：
-
-```sh
-curl -X POST \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -H "Content-Type: application/json" \
-  -d '{}' \
-  https://{{host}}/1.1/functions/hello
-```
-
-通过 `POST /functions/:name` 这个 API 调用时，参数和结果都是 JSON 格式。例如，我们传入电影的名字来获取电影的目前的评分：
+通过 `POST /functions/:name` 可以调用云函数，参数和结果都是 JSON 格式。
+例如，我们传入电影的名字来获取电影的目前的评分：
 
 ```sh
 curl -X POST -H "Content-Type: application/json; charset=utf-8" \
@@ -45,8 +35,6 @@ curl -X POST -H "Content-Type: application/json; charset=utf-8" \
        -d '{"movie":"夏洛特烦恼"}' \
 https://{{host}}/1.1/functions/averageStars
 ```
-
-上述命令行实际上就是向云端发送一个 JSON 对象作为参数，请求 `averageStars` 云函数，参数的内容是要查询的电影的名字。
 
 响应：
 
@@ -57,6 +45,18 @@ https://{{host}}/1.1/functions/averageStars
     "stars": "2.5"
   }
 }
+```
+
+如果调用的云函数需要关联用户，那么可以通过 `X-LC-Session` 传入相应的 `sessionToken`：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  -H "Content-Type: application/json" \
+  -d '{}' \
+  https://{{host}}/1.1/functions/hello
 ```
 
 有些时候我们希望使用 AVObject 作为云函数的参数，或者希望以 AVObject 为云函数的返回值，这时我们可以使用 `POST /1.1/call/:name` 这个 RPC 调用的 API，云函数 SDK 会将参数解释为一个 AVObject，同时在返回 AVObject 时提供必要的元信息：
@@ -111,7 +111,7 @@ RPC 调用时，不仅可以返回单个 AVObject，还可以返回包含 AVObje
 
 如果云函数超时，客户端会收到 HTTP status code 为 503、524、141 等的响应。
 
-你还可以阅读以下云引擎开发指南来获取更多的信息。
+你还可以阅读以下云函数开发指南来获取更多的信息。
 
 * [云引擎 Node.js 环境](leanengine_cloudfunction_guide-node.html)
 * [云引擎 Python 环境](leanengine_cloudfunction_guide-python.html)
