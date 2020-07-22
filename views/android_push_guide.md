@@ -173,7 +173,7 @@ PushService.subscribe(this, "protected", Callback2.class);
 
 注意：
 
-- **{{ data.channel_naming() }}**
+- **{{ data.channel_naming }}**
 - 回调对象指用户点击通知栏的通知进入的 Activity 页面。
 
 退订频道也很简单：
