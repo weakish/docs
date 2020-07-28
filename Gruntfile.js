@@ -484,7 +484,7 @@ grunt.registerMultiTask('docmeta', '增加 Title、文档修改日期、设置�
 
       } // 更新标题更新为「h1 - LeanCloud 文档」（首页除外）
       else {
-        // 2017-02-06 如果 h1 不存在就不更新 title，如 start.html
+        // 2017-02-06 如果 h1 不存在就不更新 title
         let h1 = $('.doc-content h1');
         if ( h1.length ){
           $('title').text(function(){
