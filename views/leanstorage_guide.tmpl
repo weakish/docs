@@ -8262,6 +8262,93 @@ LeanCloud 云端会使用第三方平台的鉴权信息来查询是否已经存�
 
 开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到 LeanCloud 云端来登录。
 
+{% if platform_name in ["Swift", "Objective-C"] %}
+
+#### Signin With Apple
+如果你需要开发 [Sigin With Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api)，LeanCloud 可以帮你校验 `identityToken`，并获取 Apple 的 `access_token`。Apple Sign In 的 `authData` 结构如下：
+
+```
+{
+  "lc_apple": {
+    "uid" : "从 Apple 获取到的 User Identifier",
+    "identity_token" : "从苹果获取到的 identityToken"
+    "code" : "从苹果获取到的 Authorization Code"
+  }
+}
+```
+`authData` 中的 key 的作用：
+
+* **`lc_apple`**：只有 platform 为 `lc_apple` 时，LeanCloud 才会执行 `identity_token` 和 `code` 的逻辑。
+* **`uid`**：必填。LeanCloud 通过 `uid` 判断是否存在用户。
+* **`identity_token`**：可选。`authData` 中有 `identity_token` 时 LeanCloud 会自动校验 `identity_token` 的有效性。开发者需要在 LeanCloud 控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
+* **`code`**：可选。authData` 中有 `code` 时 LeanCloud 会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在 LeanCloud 控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
+
+##### 获取 Client ID
+
+Client ID 用于校验 `identity_token` 及获取 `access_token`，指的是 Apple 应用的 identifier，也就是 AppID 或 serviceID。对于原生应用来说，指的是 Xcode 中的 Bundle Identifier，例如 `com.mytest.app`。详情请参考 [Apple 的文档](https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens)。
+
+##### 获取 Private Key 及 Private Key ID
+
+Private Key 用于获取 `access_token`。登录 Apple 开发者平台，在左侧的 「Certificates, Identifiers & Profiles」 中选择 「Keys」，添加一个用于 Apple Sign In 的 Private Key，下载 XXXXX.p8 文件，同时在下载 Key 的页面获得 Private Key ID。详情请参考[ Apple 的文档](https://help.apple.com/developer-account/#/dev77c875b7e)。
+
+将 Key ID 填写到控制台，将下载下来的 Private Key 文件上传到控制台。控制台只能上传 Private Key 文件，无法查看及下载其内容。
+
+##### 获取 Team ID
+
+Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上角或 Membership 页面即可看到自己所属开发团队的 Team ID。注意选择 Bundle ID 对应的 Team。
+
+##### 使用 Apple Sign In 登录 LeanCloud
+
+在控制台填写完成所有信息后，使用以下代码登录
+
+{% endif %}
+
+{% if platform_name === "Objective-C" %}
+```objc
+NSDictionary *appleAuthData = @{
+                            // 必须
+                            @"uid":@"USER IDENTIFIER",
+                            // 可选
+                            @"identity_token":@"IDENTITY TOKEN",
+                            @"code":@"AUTHORIZATION CODE",
+                            };
+AVUser *user = [AVUser user];
+[user loginWithAuthData:appleAuthData platformId:"lc_apple" options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"登录成功");
+    }else{
+        NSLog(@"登录失败：%@",error.localizedFailureReason);
+    }
+}];
+
+```
+
+{% endif %}
+
+
+{% if platform_name === "swift" %}
+```swift
+let appleData: [String: Any] = [
+    // 必须
+    "uid":        "USER IDENTIFIER",
+    // 可选
+    "identity_token": "IDENTITY TOKEN",
+    "code":         "AUTHORIZATION CODE"
+]
+let user = LCUser()
+user.logIn(authData: appleData, platform: .custom("lc_apple")) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+
+```
+
+{% endif %}
+
 #### 鉴权数据的保存
 
 `_User` class 中的 `authData` 是一个以平台名为键名，鉴权信息为键值的 JSON 对象。

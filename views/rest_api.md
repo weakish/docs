@@ -2103,6 +2103,20 @@ LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾�
 }
 ```
 
+[Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api) 的 authData 内容：
+
+```json
+{
+  "authData": {
+    "lc_apple": {
+      "uid": "从 Apple 获取到的 User Identifier",
+      "identity_token": "从苹果获取到的 identity Token",
+      "code": "从苹果获取到的 Authorization Code"
+    }
+  }
+}
+```
+
 匿名用户(Anonymous user)的 authData 内容：
 
 ```json
