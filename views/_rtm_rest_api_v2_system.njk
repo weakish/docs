@@ -248,7 +248,7 @@ curl -X POST \
   https://{{host}}/1.2/rtm/service-conversations/{conv_id}/messages
 ```
 **注意**，由于这个接口的管理性质，当你通过这个接口发送消息时，我们不会检查 **from_client** 是否有权限给这个服务号发送消息，而是统统放行，请谨慎使用这个接口。
-如果你在应用中使用了我们内部定义的 [富媒体消息格式](./realtime_v2.html#消息（Message）)，在发送消息时 **message** 字段需要遵守一定的格式要求，[富媒体消息格式说明](./realtime_rest_api.html#富媒体消息格式说明) 中有详细说明。
+如果你在应用中使用了我们内部定义的 [富媒体消息格式](./realtime_v2.html#消息（Message）)，在发送消息时 **message** 字段需要遵守一定的格式要求，[富媒体消息格式说明](./realtime_v2.html#富媒体消息) 中有详细说明。
 
 
 参数 | 约束 | 说明
