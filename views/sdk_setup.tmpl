@@ -348,14 +348,14 @@ dependencies:
 
 ```yaml
 dependencies {
-implementation 'cn.leancloud:storage-android:{{ version.unified }}'
-implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
-implementation 'io.reactivex.rxjava2:rxandroid:{{ version.unified }}'
+  implementation 'cn.leancloud:storage-android:{{ version.unified }}'
+  implementation 'cn.leancloud:realtime-android:{{ version.unified }}'
+  implementation 'io.reactivex.rxjava2:rxandroid:{{ version.unified }}'
 }
 ```
 **iOS 开发者**需要通过 CocoaPods 安装 Swift SDK：
 
-```yaml
+```sh
 $ cd ios/
 $ pod update # 或者 $ pod install --repo-update
 ```
@@ -1378,6 +1378,12 @@ LeanCloud.initialize(
 {{ requireServerURL() }}
 
 #### 即时通信
+
+使用 SDK 时添加下列导入语句到头部：
+
+```dart
+import 'package:leancloud_official_plugin/leancloud_plugin.dart';
+```
 
 **使用Flutter 即时通信插件需要在 Android 和 iOS 平台分别初始化。**
 
