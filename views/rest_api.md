@@ -2109,9 +2109,9 @@ LeanCloud 允许你连接你的用户到其他服务，比如新浪微博和腾�
 {
   "authData": {
     "lc_apple": {
-      "uid": "user identifier",
-      "identity_token": "identity_token.identity_token.sign",
-      "code": "code"
+      "uid": "从 Apple 获取到的 User Identifier",
+      "identity_token": "从苹果获取到的 identity Token",
+      "code": "从苹果获取到的 Authorization Code"
     }
   }
 }

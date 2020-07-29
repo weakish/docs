@@ -8265,7 +8265,7 @@ LeanCloud 云端会使用第三方平台的鉴权信息来查询是否已经存�
 {% if platform_name in ["Swift", "Objective-C"] %}
 
 #### Signin With Apple
-如果你需要开发 Sigin With Apple，LeanCloud 可以帮你校验 `identityToken`，并获取 Apple 的 `access_token`。Apple Sign In 的 `authData` 结构如下：
+如果你需要开发 [Sigin With Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api)，LeanCloud 可以帮你校验 `identityToken`，并获取 Apple 的 `access_token`。Apple Sign In 的 `authData` 结构如下：
 
 ```
 {
@@ -8281,7 +8281,7 @@ LeanCloud 云端会使用第三方平台的鉴权信息来查询是否已经存�
 * **`lc_apple`**：只有 platform 为 `lc_apple` 时，LeanCloud 才会执行 `identity_token` 和 `code` 的逻辑。
 * **`uid`**：必填。LeanCloud 通过 `uid` 判断是否存在用户。
 * **`identity_token`**：可选。`authData` 中有 `identity_token` 时 LeanCloud 会自动校验 `identity_token` 的有效性。开发者需要在 LeanCloud 控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
-* **`code`**`：可选。authData` 中有 `code` 时 LeanCloud 会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在 LeanCloud 控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
+* **`code`**：可选。authData` 中有 `code` 时 LeanCloud 会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在 LeanCloud 控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
 
 ##### 获取 Client ID
 
@@ -8313,9 +8313,7 @@ NSDictionary *appleAuthData = @{
                             @"code":@"AUTHORIZATION CODE",
                             };
 AVUser *user = [AVUser user];
-AVUserAuthDataLoginOption *option = [AVUserAuthDataLoginOption new];
-option.platform = "lc_apple";
-[user loginWithAuthData:appleAuthData platformId:"lc_apple" options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+[user loginWithAuthData:appleAuthData platformId:"lc_apple" options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
         NSLog(@"登录成功");
     }else{
@@ -8338,7 +8336,7 @@ let appleData: [String: Any] = [
     "code":         "AUTHORIZATION CODE"
 ]
 let user = LCUser()
-user.logIn(authData: appleData, platform: "lc_apple") { (result) in
+user.logIn(authData: appleData, platform: .custom("lc_apple")) { (result) in
     switch result {
     case .success:
         assert(user.objectId != nil)
