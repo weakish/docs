@@ -17,11 +17,12 @@ Key|Value|含义|来源
 
 ## 相关概念
 
-`_Conversation` 表 包含一些内置的关键字段定义了对话的属性、成员等，单聊/群聊、聊天室、服务号均在此表中，可以在 [即时通讯概览 - 对话](./realtime_v2.html#对话（Conversation）) 中了解。
+`_Conversation` 表包含一些内置的关键字段定义了对话的属性、成员等，单聊/群聊、聊天室、服务号均在此表中，可以在 [即时通讯概览 - 对话](./realtime_v2.html#对话（Conversation）) 中了解。
+不过为了避免出现数据不一致问题，我们不推荐调用数据存储相关的 API 直接操作 `_Conversation` 表中的数据。
 
 ## 新特性
 
-在 [1.1 版本的 API](realtime_rest_api.html) 中，所有类型的对话 API 混淆在一起，1.2 版本将「对话」这一概念按照类型进行了拆分，目前有三类：
+在 1.1 版本的 API 中，所有类型的对话 API 混淆在一起，1.2 版本将「对话」这一概念按照类型进行了拆分，目前有三类：
 
 - 单聊/群聊，相关 API 以 `rtm/conversations` 标示
 - 聊天室，相关 API 以 `rtm/chatrooms` 标示，在 `_Conversation` 表内用字段 `tr` 为 true 标示。
@@ -203,9 +204,8 @@ curl -X GET \
 
 1.1 版本：
 
-* [发送消息](realtime_rest_api.html#通过 REST API 发消息)
-* [修改与撤回消息](realtime_rest_api.html#修改与撤回消息)
-* [系统对话给用户发消息](realtime_rest_api.html#系统对话给用户发消息)
+* 发送消息、系统对话给用户发消息 (`/1.1/rtm/messages`)
+* 修改与撤回消息 (`/1.1/rtm/patch/message`)
 
 1.2 版本：
 
@@ -254,7 +254,7 @@ curl -X GET \
 
 1.1 版本：
 
-* [系统对话发送订阅消息](realtime_rest_api.html#系统对话发送订阅消息)
+* 系统对话发送订阅消息 （`/1.1/rtm/broadcast/subscriber`）
 
 1.2 版本：
 
@@ -275,7 +275,7 @@ curl -X GET \
 
 1.1 版本：
 
-* [发送广播消息](realtime_rest_api.html#系统对话发送广播消息)
+* 发送广播消息 （`/1.1/rtm/broadcast`）
 
 1.2 版本：
 

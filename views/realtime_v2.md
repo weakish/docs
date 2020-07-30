@@ -210,7 +210,7 @@ LeanCloud 即时通讯系统设计了四种类型的「对话」来满足不同�
 
 我们对普通消息提供「至少一次」的到达保证，并且在官方 SDK 中支持对消息的去重，开发者无需关心。开发者可以通过 SDK 或 REST API 发送消息。SDK 通常用于最终用户发送消息，而 REST API 是开发者从云端发送消息的接口。当从 REST API 发送消息时，开发者可以指定消息的发送者、对话 ID，对于系统对话还可以指定消息的接收者。
 
-#### 默认支持的富媒体消息
+#### 富媒体消息
 
 为了方便开发者的使用，我们提供了几种封装好的基于 JSON 格式的富媒体消息类型（`TypedMessage`），譬如：
 
@@ -224,7 +224,194 @@ LeanCloud 即时通讯系统设计了四种类型的「对话」来满足不同�
 
 ![TypedMessage 继承自 Message。TextMessage、ImageMessage、AudioMessage、VideoMessage、LocationMessage 和其他消息类型继承自 TypedMessage。](images/realtime_v2_message_types.svg)
 
-关于这部分消息的格式请参考 [即时通讯 REST API · 富媒体消息格式说明](realtime_rest_api.html#富媒体消息格式说明) 了解。开发者也可以基于我们的框架，方便地扩展出自己的消息类型。
+如上所述，富媒体消息基于 JSON 格式，通过 REST API 发送时需要序列化为包含以下属性的 JSON 字符串（使用客户端 SDK 发送消息时，SDK 会自动完成相应的转换）：
+
+属性 |约束| 说明
+--- |---|---
+`_lctype` | |富媒体消息的类型<table><thead><tr><th>消息</th><th>类型</th></tr></thead><tbody><tr><td>文本消息</td><td>-1</td></tr><tr><td>图像消息</td><td>-2</td></tr><tr><td>音频消息</td><td>-3</td></tr><tr><td>视频消息</td><td>-4</td></tr><tr><td>位置消息</td><td>-5</td></tr><tr><td>文件消息</td><td>-6</td></tr></tbody></table>以上类型均使用负数，所有正数留给自定义扩展类型使用，0 作为「没有类型」被保留起来。
+`_lctext` | |富媒体消息的文字说明
+`_lcattrs` | |JSON 字符串，用来给开发者存储自定义属性。
+`_lcfile` | |如果是包含了文件（图像、音频、视频、通用文件）的消息 ，<br/>`_lcfile` 就包含了它的文件实体的相关信息。
+`url` | |文件在上传之后的物理地址（注意，绑定或换绑自定义域名后，历史消息中的 url 不会更新）
+`objId` |可选 |文件对应的在 `_File` 表里面的 objectId
+`metaData` | 可选|文件的元数据
+
+以上为所有类型的富媒体消息共有的属性。
+
+开发者可以基于我们的框架，方便地扩展出自己的消息类型。
+
+下面给出内置富媒体消息类型序列化为 JSON 的例子。
+
+##### 文本消息
+
+```json
+{
+  "_lctype": -1,
+  "_lctext": "这是一个纯文本消息",
+  "_lcattrs": {
+    "a": "_lcattrs 是用来存储用户自定义的一些键值对"
+  }
+}
+```
+
+##### 图像消息
+
+```json
+{
+  "_lctype":    -2,                    // 必要参数
+  "_lctext":    "图像的文字说明",
+  "_lcattrs": {
+    "a":        "_lcattrs 是用来存储用户自定义的一些键值对",
+    "b":        true,
+    "c":        12
+  },
+  "_lcfile": {
+    "url":      "http://ac-p2bpmgci.clouddn.com/246b8acc-2e12-4a9d-a255-8d17a3059d25", // 必要参数
+    "objId":    "54699d87e4b0a56c64f470a4", // 文件对应的AVFile.objectId
+    "metaData": {
+      "name":   "IMG_20141223.jpeg",   // 图像的名称
+      "format": "png",                 // 图像的格式
+      "height": 768,                   // 单位：像素
+      "width":  1024,                  // 单位：像素
+      "size":   18                     // 单位：b
+    }
+  }
+}
+```
+
+上面是完整的例子，如果只想简单的发送图像 URL：
+
+```json
+{
+  "_lctype": -2,
+  "_lcfile": {
+    "url":   "http://ac-p2bpmgci.clouddn.com/246b8acc-2e12-4a9d-a255-8d17a3059d25"
+  }
+}
+```
+
+##### 音频消息
+
+```json
+{
+  "_lctype":      -3,
+  "_lctext":      "这是一个音频消息",
+  "_lcattrs": {
+    "a":          "_lcattrs 是用来存储用户自定义的一些键值对"
+  },
+  "_lcfile": {
+    "url":        "http://ac-p2bpmgci.clouddn.com/246b8acc-2e12-4a9d-a255-8d17a3059d25",
+    "objId":      "54699d87e4b0a56c64f470a4//文件对应的AVFile.objectId",
+    "metaData": {
+      "name":     "我的滑板鞋.wav",
+      "format":   "wav",
+      "duration": 26,    // 单位：秒
+      "size":     2738   // 单位：b
+    }
+  }
+}
+```
+
+简略版：
+
+```json
+{
+  "_lctype": -3,
+  "_lcfile": {
+    "url":   "http://www.somemusic.com/x.mp3"
+  }
+}
+```
+
+##### 视频消息
+
+```json
+{
+  "_lctype":      -4,
+  "_lctext":      "这是一个视频消息",
+  "_lcattrs": {
+    "a":          "_lcattrs 是用来存储用户自定义的一些键值对"
+  },
+  "_lcfile": {
+    "url":        "http://ac-p2bpmgci.clouddn.com/99de0f45-171c-4fdd-82b8-1877b29bdd12",
+    "objId":      "54699d87e4b0a56c64f470a4", //文件对应的 AVFile.objectId
+    "metaData": {
+      "name":     "录制的视频.mov",
+      "format":   "avi",
+      "duration": 168,      // 单位：秒
+      "size":     18689     // 单位：b
+    }
+  }
+}
+```
+
+简略版：
+
+```json
+{
+  "_lctype": -4,
+  "_lcfile": {
+    "url":   "http://www.somevideo.com/Y.flv"
+  }
+}
+```
+
+##### 通用文件消息
+
+```json
+{
+  "_lctype": -6,
+  "_lctext": "这是一个普通文件类型",
+  "_lcattrs": {
+    "a":     "_lcattrs 是用来存储用户自定义的一些键值对"
+  },
+  "_lcfile": {
+    "url":   "http://www.somefile.com/jianli.doc",
+    "name":  "我的简历.doc",
+    "size":  18689          // 单位：b
+  }
+}
+```
+
+简略版：
+
+```json
+{
+  "_lctype": -6,
+  "_lcfile": {
+    "url":   "http://www.somefile.com/jianli.doc",
+    "name":  "我的简历.doc"
+  }
+}
+```
+
+##### 地理位置消息
+
+```json
+{
+  "_lctype":     -5,
+  "_lctext":     "这是一个地理位置消息",
+  "_lcattrs": {
+    "a":         "_lcattrs 是用来存储用户自定义的一些键值对"
+  },
+  "_lcloc": {
+    "longitude": 23.2,
+    "latitude":  45.2
+  }
+}
+```
+
+简略版：
+
+```json
+{
+  "_lctype":     -5,
+  "_lcloc": {
+    "longitude": 23.2,
+    "latitude":  45.2
+  }
+}
+```
 
 #### 与消息相关的其他功能需求
 
