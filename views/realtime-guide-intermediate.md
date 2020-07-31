@@ -1188,7 +1188,6 @@ try {
 } catch (e) {
   print(e);
 }
-
 ```
 
 客户端发送完毕之后就完全不用再关心这条消息了，云端会自动在发送方异常掉线后通知其他成员，接收端则根据自己的需求来做 UI 的展现。
@@ -1554,7 +1553,7 @@ tom.onUnreadMessageCountUpdated = ({
   Client client,
   Conversation conversation,
 }) {
-  //conversation.unreadMessageCount 即该 conversation 的未读消息数量
+  // conversation.unreadMessageCount 即该 conversation 的未读消息数量
 };
 ```
 
@@ -1769,7 +1768,7 @@ currentClient.open(openOption, new AVIMClientCallback() {
 ```dart
 try {
   Client tom = Client(id: 'Tom', tag: 'Mobile');
-//冲突时登录失败，不会踢掉较早登录的设备
+  // 冲突时登录失败，不会踢掉较早登录的设备
   await tom.open(reconnect: true);
 } catch (e) {
   print(e);
@@ -1996,7 +1995,7 @@ public class InputtingMessage : AVIMTypedMessage
 realtime.RegisterMessageType<InputtingMessage>();
 ```
 ```dart
-//自定义消息类型 CustomMessage
+// 自定义消息类型 CustomMessage
 class CustomMessage extends TypedMessage {
   @override
 
