@@ -1310,7 +1310,9 @@ await chatRoom.mute();
 消息内容实时过滤属于系统层面的修改消息，发送者会收到 `MESSAGE_UPDATE` 事件。
 应用可以在客户端监听该事件，实现相应的业务逻辑，相关代码示例可以参考[前一章「修改消息」一节](realtime-guide-intermediate.html#修改消息)。
 
-过滤的词库由 LeanCloud 统一提供。商用版应用还支持开发者使用自定义敏感词词库，只需在 **控制台 > 消息 > 即时通讯 > 设置** 中上传敏感词文件。开发者上传的自定义敏感词词库会替换 LeanCloud 提供的默认词库。
+过滤的词库由 LeanCloud 统一提供。商用版应用还支持开发者使用自定义敏感词词库，只需在 **控制台 > 消息 > 即时通讯 > 设置** 中上传敏感词文件。
+敏感词文件为 UTF-8 编码的纯文本文件，一行一个敏感词。
+开发者上传的自定义敏感词词库会替换 LeanCloud 提供的默认词库。
 
 如果开发者有较为复杂的过滤需求，我们推荐使用 [云引擎 hook `_messageReceived`](realtime-guide-systemconv.html#_messageReceived) 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
 
