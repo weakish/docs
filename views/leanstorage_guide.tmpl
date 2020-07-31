@@ -8326,14 +8326,14 @@ AVUser *user = [AVUser user];
 {% endif %}
 
 
-{% if platform_name === "swift" %}
+{% if platform_name === "Swift" %}
 ```swift
 let appleData: [String: Any] = [
     // 必须
-    "uid":        "USER IDENTIFIER",
+    "uid":             "USER IDENTIFIER",
     // 可选
-    "identity_token": "IDENTITY TOKEN",
-    "code":         "AUTHORIZATION CODE"
+    "identity_token":  "IDENTITY TOKEN",
+    "code":            "AUTHORIZATION CODE"
 ]
 let user = LCUser()
 user.logIn(authData: appleData, platform: .custom("lc_apple")) { (result) in
