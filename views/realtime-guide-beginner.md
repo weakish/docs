@@ -2098,7 +2098,7 @@ AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"来自苹果发�
 }];
 ```
 ```java
-AVFile file = new AVFile("apple.acc", "https://some.website.com/apple.aac", null);
+AVFile file = new AVFile("apple.aac", "https://some.website.com/apple.aac", null);
 AVIMAudioMessage m = new AVIMAudioMessage(file);
 m.setText("来自苹果发布会现场的录音");
 conv.sendMessage(m, new AVIMConversationCallback() {
@@ -2111,7 +2111,7 @@ conv.sendMessage(m, new AVIMConversationCallback() {
 });
 ```
 ```cs
-var audio = new AVFile("apple.acc", "https://some.website.com/apple.aac");
+var audio = new AVFile("apple.aac", "https://some.website.com/apple.aac");
 var audioMessage = new AVIMAudioMessage();
 audioMessage.File = audio;
 audioMessage.TextContent = "来自苹果发布会现场的录音";
@@ -2119,7 +2119,7 @@ await conversation.SendMessageAsync(audioMessage);
 ```
 ```dart
 AudioMessage audioMessage = AudioMessage.from(
-  url: 'https://some.website.com/apple.acc',
+  url: 'https://some.website.com/apple.aac',
   name: 'apple.aac',
 );
 try {
