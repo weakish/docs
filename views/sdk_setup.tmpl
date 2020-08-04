@@ -163,6 +163,15 @@ composer require leancloud/leancloud-sdk
 - 如果 composer 访问 packagist 仓库有问题，需要 [设置镜像](https://mirrors.aliyun.com/composer/) 或者通过代理（设置 `http_proxy` 环境变量）访问。
 
 {% endif %}
+{% if platform_name === "Python" %}
+#### pip
+
+```sh
+pip install leancloud
+```
+
+取决于系统环境，可能需要在命令前加 `sudo`。
+{% endif %}
 
 {% if platform_name === "Android / Java" %}
 
