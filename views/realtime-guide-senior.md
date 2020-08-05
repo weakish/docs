@@ -1009,7 +1009,7 @@ var query = tom.GetChatRoomQuery();
 try {
   ConversationQuery query = tom.conversationQuery();
   query.whereEqualTo('tr', true);
-// conversations 就是想要的结果
+  // conversations 就是想要的结果
   List<Conversation> conversations = await query.find();
 } catch (e) {
   print(e);
@@ -1503,7 +1503,6 @@ try {
 } catch (e) {
   print(e);
 }
-
 ```
 临时对话的其他操作与普通对话无异。
 
