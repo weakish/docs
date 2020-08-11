@@ -898,19 +898,27 @@ React Native 通过 npm 安装与引用 SDK，同时由独立的 Adapters 库（
 安装：
 
 ```存储服务
-$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage-backend-legacy@^2.0.0-rc.3
-# for React Native 0.60+
+# Step 1: Install
+$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@1
+
+# Step 2: Link
+# For React Native 0.60+
 $ npx pod-install
-# for React Native <= 0.59
-# npx react-native link @react-native-community/async-storage-backend-legacy
+# For React Native <= 0.59
+# npx react-native link @react-native-community/async-storage
+# For Expo (SDK >= 38) 无需 link
 ```
 
 ```存储服务（LiveQuery)
-$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage-backend-legacy@^2.0.0-rc.3
-# for React Native 0.60+
+# Step 1: Install
+$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@1
+
+# Step 2: Link
+# For React Native 0.60+
 $ npx pod-install
-# for React Native <= 0.59
-# npx react-native link @react-native-community/async-storage-backend-legacy
+# For React Native <= 0.59
+# npx react-native link @react-native-community/async-storage
+# For Expo (SDK >= 38) 无需 link
 ```
 
 ```即时通讯
@@ -918,11 +926,15 @@ $ yarn add leancloud-realtime @leancloud/platform-adapters-react-native
 ```
 
 ```即时通讯（含富媒体消息）
-$ yarn add leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage-backend-legacy@^2.0.0-rc.3
-# for React Native 0.60+
+# Step 1: Install
+$ yarn add leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@1
+
+# Step 2: Link
+# For React Native 0.60+
 $ npx pod-install
-# for React Native <= 0.59
-# npx react-native link @react-native-community/async-storage-backend-legacy
+# For React Native <= 0.59
+# npx react-native link @react-native-community/async-storage
+# For Expo (SDK >= 38) 无需 link
 ```
 
 获得引用：
