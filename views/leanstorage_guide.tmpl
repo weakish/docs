@@ -5614,7 +5614,7 @@ await file.save();
 {% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" %}
 ### 图像缩略图
 
-保存图像时，如果想在下载原图之前先得到缩略图，方法如下：
+成功保存图像后，除了可以获取指向该文件的 URL 外，还可以获取图像的缩略图 URL，并且可以指定缩略图的宽度和高度：
 
 {% if platform_name === "Objective-C" %}
 ```objc
