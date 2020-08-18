@@ -3065,13 +3065,13 @@ query.whereContains('title', 'lunch');
 
 {% if platform_name === "Objective-C" %}
 <pre><code class="lang-objc">AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
-// "title" 不包含 "ticket"（区分大小写）
-[query whereKey:@"title" matchesRegex:@"{{ regex() | safe }}];
+// "title" 不包含 "ticket"（不区分大小写）
+[query whereKey:@"title" matchesRegex:@"{{ regex() | safe }}, modifiers:"i"];
 </code></pre>
 {% endif %}
 {% if platform_name === "JavaScript" %}
 <pre><code class="lang-js">const query = new AV.Query('Todo');
-// 'title' 不包含 'ticket'（区分大小写）
+// 'title' 不包含 'ticket'（不区分大小写）
 const regExp = new RegExp('{{ regex(true) | safe }}, 'i');
 query.matches('title', regExp);
 </code></pre>
@@ -3079,31 +3079,31 @@ query.matches('title', regExp);
 {% if platform_name === "Python" %}
 <pre><code class="lang-python">Todo = leancloud.Object.extend('Todo')
 query = Todo.query
-# 'title' 不包含 'ticket'（区分大小写）
-query.matched('title', '{{ regex(true) | safe }})
+# 'title' 不包含 'ticket'（不区分大小写）
+query.matched('title', '{{ regex(true) | safe }}, ignore_case=True)
 </code></pre>
 {% endif %}
 {% if platform_name === "PHP" %}
 <pre><code class="lang-php">$query = new Query("Todo");
-// "title" 不包含 "ticket"（区分大小写）
-$query->matches("title","{{ regex() | safe }});
+// "title" 不包含 "ticket"（不区分大小写）
+$query->matches("title", "{{ regex() | safe }}, "i");
 </code></pre>
 {% endif %}
 {% if platform_name === "Android / Java" %}
 <pre><code class="lang-java">AVQuery<AVObject> query = new AVQuery<>("Todo");
-// "title" 不包含 "ticket"（区分大小写）
-query.whereMatches("title","{{ regex() | safe }});
+// "title" 不包含 "ticket"（不区分大小写）
+query.whereMatches("title","{{ regex() | safe }}, "i");
 </code></pre>
 {% endif %}
 {% if platform_name === "Swift" %}
 <pre><code class="lang-swift">let query = LCQuery(className: "Todo")
 // "title" 不包含 "ticket"（区分大小写）
-query.whereKey("title", .matchedPattern("{{ regex() | safe }}, option: nil))
+query.whereKey("title", .matchedRegularExpression("{{ regex() | safe }}, option: "i"))
 </code></pre>
 {% endif %}
 {% if platform_name === "Flutter" %}
 <pre><code class="lang-java">LCQuery query = LCQuery('Todo');
-// 'title' 不包含 "ticket"（区分大小写）
+// 'title' 不包含 "ticket"（不区分大小写）
 query.whereMatches('title','{{ regexFlutter() | safe }}', modifiers: 'i');
 </code></pre>
 {% endif %}
