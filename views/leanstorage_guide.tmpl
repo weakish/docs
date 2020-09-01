@@ -8336,7 +8336,7 @@ let appleData: [String: Any] = [
     "code":            "AUTHORIZATION CODE"
 ]
 let user = LCUser()
-user.logIn(authData: appleData, platform: .custom("lc_apple")) { (result) in
+user.logIn(authData: appleData, platform: .apple) { (result) in
     switch result {
     case .success:
         assert(user.objectId != nil)
