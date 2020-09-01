@@ -956,7 +956,7 @@ override func applicationDidBecomeActive(_ application: UIApplication) {
     [application setApplicationIconBadgeNumber:0];
     //currentInstallation 的角标清零
     [AVInstallation defaultInstallation].badge = 0;
-     [[AVInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    [[AVInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
          if (succeeded) {
              // save succeeded
          } else if (error) {
