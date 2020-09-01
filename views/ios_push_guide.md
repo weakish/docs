@@ -929,4 +929,42 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 }
 ```
 
+## 清除 Badge
+
+一般需要在打开应用或者退出应用时，将 badge 数目清零。
+
+```swift
+override func applicationDidBecomeActive(_ application: UIApplication) {
+    //本地清空角标
+    application.applicationIconBadgeNumber = 0
+    //currentInstallation 的角标清零
+    LCApplication.default.currentInstallation.badge = 0
+    LCApplication.default.currentInstallation.save { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+ }
+```
+
+```objc
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    //本地清空角标
+    [application setApplicationIconBadgeNumber:0];
+    //currentInstallation 的角标清零
+    [AVInstallation defaultInstallation].badge = 0;
+     [[AVInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+         if (succeeded) {
+             // save succeeded
+         } else if (error) {
+             NSLog(@"%@", error);
+         }
+     }];
+}
+```
+
+
 你可以阅读 [Apple 本地化和推送的文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40008194-CH1-SW1) 来更多地了解推送通知。
