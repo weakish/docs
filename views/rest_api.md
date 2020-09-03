@@ -1409,6 +1409,11 @@ curl -X GET \
 反向选择同样适用于内置字段，比如 `keys=-createdAt,-updatedAt,-objectId`。
 另外反向选择同样可以和点号组合使用，例如 `keys=-pubUser.createdAt,-pubUser.updatedAt`。
 
+### 返回 ACL 字段
+
+默认情况下不会返回 ACL 字段。
+**控制台 > 存储 > 服务设置 > 查询设置** 中勾选 **查询时返回值包括 ACL**，且指定了 `returnACL=true` 时返回结果中才会包含 ACL 字段。
+
 所有以上这些参数都可以组合使用。
 
 ### 正则查询
@@ -2540,20 +2545,6 @@ curl -X GET \
 }
 ```
 
-注意 users 和 roles 关系无法在 JSON 中见到，你需要相应地用 `$relatedTo` 操作符来查询角色中的子角色和用户。
-
-```
-where={
-  "$relatedTo":{
-    "object":{
-      "__type":"Pointer",
-      "className":"_Role",
-      "objectId":"objectId of a role"
-  },
-  "key":"users"}
-}
-```
-
 ### 更新角色
 
 更新一个角色通常可以像更新其他对象一样使用，但是 name 字段是不可以更改的。加入和删除 users 和 roles 可以通过使用`AddRelation` 和 `RemoveRelation`操作来进行。
@@ -2601,6 +2592,32 @@ curl -X PUT \
       }' \
   https://{{host}}/1.1/roles/55a48351e4b05001a774a89f
 ```
+
+### 查询角色
+
+查询用户具有哪些角色：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'where={"users": {"__type": "Pointer", "className": "_User", "objectId": "5e03100ed4b56c008e4a91dc"}}' \
+  https://{{host}}/1.1/roles
+```
+
+查询角色包含哪些用户（不计子角色中的用户）：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode '"$relatedTo":{"object":{"__type":"Pointer","className":"_Role","objectId":"5f3dea7b7a53400006b13886"},"key":"users"}' \
+  https://{{host}}/1.1/users
+```
+
+可以像查询普通对象一样，根据角色的属性进行查询。
 
 ### 删除角色
 
