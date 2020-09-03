@@ -3065,13 +3065,13 @@ query.whereContains('title', 'lunch');
 
 {% if platform_name === "Objective-C" %}
 <pre><code class="lang-objc">AVQuery *query = [AVQuery queryWithClassName:@"Todo"];
-// "title" 不包含 "ticket"（区分大小写）
-[query whereKey:@"title" matchesRegex:@"{{ regex() | safe }}];
+// "title" 不包含 "ticket"（不区分大小写）
+[query whereKey:@"title" matchesRegex:@"{{ regex() | safe }}, modifiers:"i"];
 </code></pre>
 {% endif %}
 {% if platform_name === "JavaScript" %}
 <pre><code class="lang-js">const query = new AV.Query('Todo');
-// 'title' 不包含 'ticket'（区分大小写）
+// 'title' 不包含 'ticket'（不区分大小写）
 const regExp = new RegExp('{{ regex(true) | safe }}, 'i');
 query.matches('title', regExp);
 </code></pre>
@@ -3079,32 +3079,32 @@ query.matches('title', regExp);
 {% if platform_name === "Python" %}
 <pre><code class="lang-python">Todo = leancloud.Object.extend('Todo')
 query = Todo.query
-# 'title' 不包含 'ticket'（区分大小写）
-query.matched('title', '{{ regex(true) | safe }})
+# 'title' 不包含 'ticket'（不区分大小写）
+query.matched('title', '{{ regex(true) | safe }}, ignore_case=True)
 </code></pre>
 {% endif %}
 {% if platform_name === "PHP" %}
 <pre><code class="lang-php">$query = new Query("Todo");
-// "title" 不包含 "ticket"（区分大小写）
-$query->matches("title","{{ regex() | safe }});
+// "title" 不包含 "ticket"（不区分大小写）
+$query->matches("title", "{{ regex() | safe }}, "i");
 </code></pre>
 {% endif %}
 {% if platform_name === "Android / Java" %}
 <pre><code class="lang-java">AVQuery<AVObject> query = new AVQuery<>("Todo");
-// "title" 不包含 "ticket"（区分大小写）
-query.whereMatches("title","{{ regex() | safe }});
+// "title" 不包含 "ticket"（不区分大小写）
+query.whereMatches("title", "{{ regex() | safe }}, "i");
 </code></pre>
 {% endif %}
 {% if platform_name === "Swift" %}
 <pre><code class="lang-swift">let query = LCQuery(className: "Todo")
-// "title" 不包含 "ticket"（区分大小写）
-query.whereKey("title", .matchedPattern("{{ regex() | safe }}, option: nil))
+// "title" 不包含 "ticket"（不区分大小写）
+query.whereKey("title", .matchedRegularExpression("{{ regex() | safe }}, option: "i"))
 </code></pre>
 {% endif %}
 {% if platform_name === "Flutter" %}
-<pre><code class="lang-java">LCQuery query = LCQuery('Todo');
-// 'title' 不包含 "ticket"（区分大小写）
-query.whereMatches('title','{{ regexFlutter() | safe }}', modifiers: 'i');
+<pre><code class="lang-dart">LCQuery query = LCQuery('Todo');
+// 'title' 不包含 "ticket"（不区分大小写）
+query.whereMatches('title', '{{ regexFlutter() | safe }}', modifiers: 'i');
 </code></pre>
 {% endif %}
 
@@ -5614,7 +5614,7 @@ await file.save();
 {% if platform_name === "Objective-C" or platform_name === "Swift" or platform_name === "JavaScript" or platform_name === "Python" or platform_name === "PHP" or platform_name === "Android / Java" %}
 ### 图像缩略图
 
-保存图像时，如果想在下载原图之前先得到缩略图，方法如下：
+成功保存图像后，除了可以获取指向该文件的 URL 外，还可以获取图像的缩略图 URL，并且可以指定缩略图的宽度和高度：
 
 {% if platform_name === "Objective-C" %}
 ```objc
@@ -6153,7 +6153,7 @@ List<LCObject> todos = await query.find();
 像 `{% if platform_name === "Objective-C" %}orderByAscending{% endif %}{% if platform_name === "JavaScript" %}ascending{% endif %}{% if platform_name === "Python" %}ascending{% endif %}{% if platform_name === "PHP" %}ascend{% endif %}{% if platform_name === "Android / Java" %}orderByAscending{% endif %}{% if platform_name === "Swift" %}.ascending{% endif %}{% if platform_name === "Flutter" %}orderByAscending{% endif %}` 和 `{% if platform_name === "Objective-C" %}orderByDescending{% endif %}{% if platform_name === "JavaScript" %}descending{% endif %}{% if platform_name === "Python" %}descending{% endif %}{% if platform_name === "PHP" %}descend{% endif %}{% if platform_name === "Android / Java" %}orderByDescending{% endif %}{% if platform_name === "Swift" %}.descending{% endif %}{% if platform_name === "Flutter" %}orderByDescending{% endif %}` 这样额外的排序条件会获得比默认的距离排序更高的优先级。
 {% endcall %}
 
-若要限制结果和给定地点之间的距离，可以参考 API 文档中的 {% if platform_name === "Objective-C" %}`withinKilometers`、`withinMiles` 和 `withinRadians`{% endif %}{% if platform_name === "JavaScript" %}`withinKilometers`、`withinMiles` 和 `withinRadians`{% endif %}{% if platform_name === "Python" %}`within_kilometers`、`within_miles` 和 `within_radians`{% endif %}{% if platform_name === "PHP" %}`withinKilometers`、`withinMiles` 和 `withinRadians`{% endif %}{% if platform_name === "Android / Java" %}`whereWithinKilometers`、`whereWithinMiles` 和 `whereWithinRadians`{% endif %}{% if platform_name === "Swift" %} `kilometersTo`、`milesTo` 和 `radiansTo` 参数{% endif %}orderByDescending。
+若要限制结果和给定地点之间的距离，可以参考 API 文档中的 {% if platform_name === "Objective-C" %}`withinKilometers`、`withinMiles` 和 `withinRadians`{% endif %}{% if platform_name === "JavaScript" %}`withinKilometers`、`withinMiles` 和 `withinRadians`{% endif %}{% if platform_name === "Python" %}`within_kilometers`、`within_miles` 和 `within_radians`{% endif %}{% if platform_name === "PHP" %}`withinKilometers`、`withinMiles` 和 `withinRadians`{% endif %}{% if platform_name === "Android / Java" %}`whereWithinKilometers`、`whereWithinMiles` 和 `whereWithinRadians`{% endif %}{% if platform_name === "Swift" %} `kilometersTo`、`milesTo` 和 `radiansTo`{% endif %} 参数。
 
 若要查询在某一矩形范围内的对象，可以用 {% if platform_name === "Objective-C" %}`withinGeoBoxFromSouthwest` 和 `toNortheast`{% endif %}{% if platform_name === "JavaScript" %}`withinGeoBox`{% endif %}{% if platform_name === "Python" %}`within_geo_box`{% endif %}{% if platform_name === "PHP" %}`withinBox`{% endif %}{% if platform_name === "Android / Java" %}`whereWithinGeoBox`{% endif %}{% if platform_name === "Swift" %}`.locatedWithin`{% endif %}{% if platform_name === "Flutter" %}`whereWithinGeoBox`{% endif %}：
 
@@ -8262,6 +8262,93 @@ LeanCloud 云端会使用第三方平台的鉴权信息来查询是否已经存�
 
 开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到 LeanCloud 云端来登录。
 
+{% if platform_name in ["Swift", "Objective-C"] %}
+
+#### Signin With Apple
+如果你需要开发 [Sigin With Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api)，LeanCloud 可以帮你校验 `identityToken`，并获取 Apple 的 `access_token`。Apple Sign In 的 `authData` 结构如下：
+
+```
+{
+  "lc_apple": {
+    "uid" : "从 Apple 获取到的 User Identifier",
+    "identity_token" : "从苹果获取到的 identityToken"
+    "code" : "从苹果获取到的 Authorization Code"
+  }
+}
+```
+`authData` 中的 key 的作用：
+
+* **`lc_apple`**：只有 platform 为 `lc_apple` 时，LeanCloud 才会执行 `identity_token` 和 `code` 的逻辑。
+* **`uid`**：必填。LeanCloud 通过 `uid` 判断是否存在用户。
+* **`identity_token`**：可选。`authData` 中有 `identity_token` 时 LeanCloud 会自动校验 `identity_token` 的有效性。开发者需要在 LeanCloud 控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
+* **`code`**：可选。authData` 中有 `code` 时 LeanCloud 会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在 LeanCloud 控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
+
+##### 获取 Client ID
+
+Client ID 用于校验 `identity_token` 及获取 `access_token`，指的是 Apple 应用的 identifier，也就是 AppID 或 serviceID。对于原生应用来说，指的是 Xcode 中的 Bundle Identifier，例如 `com.mytest.app`。详情请参考 [Apple 的文档](https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens)。
+
+##### 获取 Private Key 及 Private Key ID
+
+Private Key 用于获取 `access_token`。登录 Apple 开发者平台，在左侧的 「Certificates, Identifiers & Profiles」 中选择 「Keys」，添加一个用于 Apple Sign In 的 Private Key，下载 XXXXX.p8 文件，同时在下载 Key 的页面获得 Private Key ID。详情请参考[ Apple 的文档](https://help.apple.com/developer-account/#/dev77c875b7e)。
+
+将 Key ID 填写到控制台，将下载下来的 Private Key 文件上传到控制台。控制台只能上传 Private Key 文件，无法查看及下载其内容。
+
+##### 获取 Team ID
+
+Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上角或 Membership 页面即可看到自己所属开发团队的 Team ID。注意选择 Bundle ID 对应的 Team。
+
+##### 使用 Apple Sign In 登录 LeanCloud
+
+在控制台填写完成所有信息后，使用以下代码登录
+
+{% endif %}
+
+{% if platform_name === "Objective-C" %}
+```objc
+NSDictionary *appleAuthData = @{
+                            // 必须
+                            @"uid":@"USER IDENTIFIER",
+                            // 可选
+                            @"identity_token":@"IDENTITY TOKEN",
+                            @"code":@"AUTHORIZATION CODE",
+                            };
+AVUser *user = [AVUser user];
+[user loginWithAuthData:appleAuthData platformId:"lc_apple" options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"登录成功");
+    }else{
+        NSLog(@"登录失败：%@",error.localizedFailureReason);
+    }
+}];
+
+```
+
+{% endif %}
+
+
+{% if platform_name === "Swift" %}
+```swift
+let appleData: [String: Any] = [
+    // 必须
+    "uid":             "USER IDENTIFIER",
+    // 可选
+    "identity_token":  "IDENTITY TOKEN",
+    "code":            "AUTHORIZATION CODE"
+]
+let user = LCUser()
+user.logIn(authData: appleData, platform: .apple) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+
+```
+
+{% endif %}
+
 #### 鉴权数据的保存
 
 `_User` class 中的 `authData` 是一个以平台名为键名，鉴权信息为键值的 JSON 对象。
@@ -8333,14 +8420,11 @@ LeanCloud 云端首先会查找账户系统（_User 表），看看是否存在 
 
 为了确保账户数据的有效性，LeanCloud 云端还支持对部分平台的 access token 的有效性进行自动验证，以防止伪造账户数据。如果有效性验证不通过，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，开发者需要自己去验证 access token 的有效性（可通过云引擎的 [onLogin hook 函数](leanengine_cloudfunction_guide-node.html#onLogin)来实现）。
 
-如果希望使用这一功能，则在开始使用前，需要在 **控制台 > 组件 > 社交** 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。点击保存，自动生成 **回调 URL** 和 **登录 URL**。
+如果希望使用这一功能，则在开始使用前，需要在 **控制台 > 组件 > 社交** 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。
 
 如果不希望云端自动验证 access token，可以在 **控制台 > 存储 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
 
-以微博开放平台举例，它需要单独配置 **回调 URL**。在微博开放平台的 **应用信息** > **高级信息** > **OAuth2.0 授权设置** 里的「授权回调页」中绑定生成的 **回调 URL**。测试阶段，在微博开放平台的 **应用信息** > **测试信息** 添加微博账号，在腾讯开放平台的 **QQ 登录** > **应用调试者** 里添加 QQ 账号即可。在应用通过审核后，可以获取公开的第三方登录能力。
-
 配置平台账号的目的在于创建 `{{ userObjectName }}` 时，LeanCloud 云端会使用相关信息去校验请求参数 `thirdPartyData` 的合法性，确保 `{{ userObjectName }}` 实际对应着一个合法真实的用户，确保平台安全性。
-
 
 #### 解除与第三方账户的关联
 

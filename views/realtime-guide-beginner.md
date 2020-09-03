@@ -462,15 +462,7 @@ Future<Conversation> createConversation({
   Set<String> members,
   String name,
   Map<String, dynamic> attributes,
-}) async {
-  return await _createConversation(
-    type: _ConversationType.normal,
-    isUnique: isUnique,
-    members: members,
-    name: name,
-    attributes: attributes,
-  );
-}
+}) async {}
 
 /// To create a new [ChatRoom].
 ///
@@ -481,13 +473,7 @@ Future<Conversation> createConversation({
 Future<ChatRoom> createChatRoom({
   String name,
   Map<String, dynamic> attributes,
-}) async {
-  return await _createConversation(
-    type: _ConversationType.transient,
-    name: name,
-    attributes: attributes,
-  );
-}
+}) async {}
 
 /// To create a new [TemporaryConversation].
 ///
@@ -498,13 +484,7 @@ Future<ChatRoom> createChatRoom({
 Future<TemporaryConversation> createTemporaryConversation({
   Set<String> members,
   int timeToLive,
-}) async {
-  return await _createConversation(
-    type: _ConversationType.temporary,
-    members: members,
-    ttl: timeToLive,
-  );
-}
+}) async {}
 ```
 
 虽然不同语言/平台接口声明有所不同，但是支持的参数是基本一致的。在创建一个对话的时候，我们主要可以指定：
@@ -2081,7 +2061,7 @@ try {
 var AV = require('leancloud-storage');
 var { AudioMessage } = require('leancloud-realtime-plugin-typed-messages');
 
-var file = new AV.File.withURL('apple.acc', 'https://some.website.com/apple.acc');
+var file = new AV.File.withURL('apple.aac', 'https://some.website.com/apple.aac');
 file.save().then(function() {
   var message = new AudioMessage(file);
   message.setText('来自苹果发布会现场的录音');
@@ -2092,8 +2072,8 @@ file.save().then(function() {
 ```
 ```swift
 do {
-    if let url = URL(string: "https://some.website.com/apple.acc") {
-        let audioMessage = IMAudioMessage(url: url, format: "acc")
+    if let url = URL(string: "https://some.website.com/apple.aac") {
+        let audioMessage = IMAudioMessage(url: url, format: "aac")
         audioMessage.text = "来自苹果发布会现场的录音"
         try conversation.send(message: audioMessage, completion: { (result) in
             switch result {
@@ -2109,7 +2089,7 @@ do {
 }
 ```
 ```objc
-AVFile *file = [AVFile fileWithRemoteURL:[NSURL URLWithString:@"https://some.website.com/apple.acc"]];
+AVFile *file = [AVFile fileWithRemoteURL:[NSURL URLWithString:@"https://some.website.com/apple.aac"]];
 AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"来自苹果发布会现场的录音" file:file attributes:nil];
 [conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
@@ -2118,7 +2098,7 @@ AVIMAudioMessage *message = [AVIMAudioMessage messageWithText:@"来自苹果发�
 }];
 ```
 ```java
-AVFile file = new AVFile("apple.acc", "https://some.website.com/apple.acc", null);
+AVFile file = new AVFile("apple.aac", "https://some.website.com/apple.aac", null);
 AVIMAudioMessage m = new AVIMAudioMessage(file);
 m.setText("来自苹果发布会现场的录音");
 conv.sendMessage(m, new AVIMConversationCallback() {
@@ -2131,7 +2111,7 @@ conv.sendMessage(m, new AVIMConversationCallback() {
 });
 ```
 ```cs
-var audio = new AVFile("apple.acc", "https://some.website.com/apple.acc");
+var audio = new AVFile("apple.aac", "https://some.website.com/apple.aac");
 var audioMessage = new AVIMAudioMessage();
 audioMessage.File = audio;
 audioMessage.TextContent = "来自苹果发布会现场的录音";
@@ -2139,8 +2119,8 @@ await conversation.SendMessageAsync(audioMessage);
 ```
 ```dart
 AudioMessage audioMessage = AudioMessage.from(
-  url: 'https://some.website.com/apple.acc',
-  name: 'apple.acc',
+  url: 'https://some.website.com/apple.aac',
+  name: 'apple.aac',
 );
 try {
   await conversation.send(message: audioMessage);
@@ -3846,7 +3826,7 @@ query.findInBackground(new AVIMConversationQueryCallback() {
 
 Flutter SDK 暂不支持缓存功能。
 
-{{ docs.langSpecEnd('cs') }}
+{{ docs.langSpecEnd('dart') }}
 
 ### 性能优化建议
 
@@ -4024,7 +4004,7 @@ try {
 try {
   // 返回的消息一定是时间增序排列，也就是最早的消息一定是第一个
   Message oldMessage = messages.first;
-// 以第一页的最早的消息作为开始，继续向前拉取消息
+  // 以第一页的最早的消息作为开始，继续向前拉取消息
   List<Message> messages2 = await conversation.queryMessage(
     startTimestamp: oldMessage.sentTimestamp,
     startMessageID: oldMessage.id,

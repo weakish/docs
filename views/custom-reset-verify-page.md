@@ -15,7 +15,7 @@
 
     中的 `api.example.com` 替换为你的应用绑定的[自定义 API 域名](custom-api-domain-guide.html#API_域名)。
 
-2. （可选）可以视情况在页面加上应用名称、联系方式之类的 HTML 代码。
+2. （可选）可以根据项目需求在页面添加更多功能，比如在页面上添加应用名称、联系方式，设置验证成功后跳转到应用网站等。
 
 3. 将 `verify-template.html` 重命名为 `verify.html` （可以根据需要使用其他的文件名称）。
 
@@ -38,7 +38,7 @@ url:"https://api.example.com/1/resetPassword/"+token,
 默认发送的邮件验证邮件和重设密码邮件的内容可以在「控制台 > 设置 > 邮件模板」看到。
 
 你可以修改邮件主题和内容，保存后即可生效。
-主题和内容都支持[handlebar模板](http://handlebarsjs.com/)，并且预定义了部分变量。
+主题和内容都支持 [handlebar 模板](http://handlebarsjs.com/)，并且预定义了部分变量。
 
 验证邮箱邮件中支持的变量包括：
 

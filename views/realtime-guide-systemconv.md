@@ -93,7 +93,7 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 
 <div class="callout callout-info">请注意，在这个 hook 的代码实现的任何分支上 **请确保最终会调用 `response.success` 返回结果**，使得消息可以尽快投递给收件人。这个 hook 将 **阻塞发送流程**，因此请尽量减少无谓的代码调用，提升效率。</div>
 
-如果你使用了 LeanCloud 默认提供的富媒体消息格式，云引擎参数中的 `content` 接收的是 JSON 结构的字符串形式。关于这个结构的详细说明，请参考 [即时通讯 REST API 指南 · 富媒体消息格式说明](./realtime_rest_api.html#富媒体消息格式说明)。
+如果你使用了 LeanCloud 默认提供的富媒体消息格式，云引擎参数中的 `content` 接收的是 JSON 结构的字符串形式。关于这个结构的详细说明，请参考 [即时通讯 REST API 指南 · 富媒体消息格式说明](./realtime_v2.html#富媒体消息)。
 
 参数：
 
@@ -409,7 +409,7 @@ Cloud::define('_messageSent', function($params, $user) {
 
 <div class="callout callout-info">请注意，在这个 hook 的代码实现的任何分支上 **请确保最终会调用 `response.success` 返回结果**，使得修改消息可以尽快投递给收件人。这个 hook 将 **阻塞发送流程**，因此请尽量减少无谓的代码调用，提升效率。</div>
 
-如果你使用了 LeanCloud 默认提供的富媒体消息格式，云引擎参数中的 `content` 接收的是 JSON 结构的字符串形式。关于这个结构的详细说明，请参考 [即时通讯 REST API 指南 · 富媒体消息格式说明](./realtime_rest_api.html#富媒体消息格式说明)。
+如果你使用了 LeanCloud 默认提供的富媒体消息格式，云引擎参数中的 `content` 接收的是 JSON 结构的字符串形式。关于这个结构的详细说明，请参考 [即时通讯 REST API 指南 · 富媒体消息格式说明](./realtime_v2.html#富媒体消息)。
 
 参数：
 
