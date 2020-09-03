@@ -27,6 +27,7 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
       'php': 'PHP',
       'weapp': '微信小程序',
       'reactnative': 'React Native',
+      'flutter': 'Flutter',
       'typescript': 'TypeScript'
     }
     $scope.demos = {
@@ -204,6 +205,14 @@ angular.module('app').controller('DemoCtrl', ['$http', '$scope', '$rootScope', '
         downPath: '',
         mdPath: 'https://github.com/leancloud/react-native-installation-demo',
         type: 'reactnative',
+        qcloudShow: true
+      }],
+      'flutter': [{
+        name: 'LeanCN',
+        desc: '使用 Flutter 数据存储 SDK 开发周报请假应用',
+        downPath: 'https://apps.apple.com/us/app/id1518553843',
+        mdPath: 'https://github.com/SXiaoXu/FlutterLeaveDemo',
+        type: 'flutter',
         qcloudShow: true
       }],
       'node': [{
