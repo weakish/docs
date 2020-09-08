@@ -2741,7 +2741,15 @@ jerry.onMessage = ({
 
 {{ docs.langSpecEnd('dart') }}
 
-其实，我们可以通过「自定义属性」来在「对话」中保存更多业务层数据。
+不过，我们不建议直接对 `_Conversation` 进行写操作，因为：
+
+- 客户端 SDK 查询会话数据是走 websocket 长连接，会首先从即时通讯服务器的内存缓存中查。直接操作 `_Conversation` 表，不会更新即时通讯服务器的缓存，这就带来了缓存不一致问题。
+- 直接操作 `_Conversation` 表的情况下，即时通讯服务器不会下发相应的事件通知客户端，客户端自然也就无从响应。
+- 如果定义了[即时通讯服务的 hook 函数](realtime-guide-systemconv.html#万能的_Hook_机制)，直接操作 `_Conversation` 表不会触发这些 hook。
+
+如有管理需求，我们推荐调用[专门的即时通讯 REST API 接口](realtime_rest_api_v2.html)。
+
+另外，我们可以通过「自定义属性」来在「对话」中保存更多业务层数据。
 
 ### 创建自定义属性
 
