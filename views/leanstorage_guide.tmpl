@@ -2163,6 +2163,7 @@ query.find().then((students) => {
 ```python
 Student = leancloud.Object.extend('Student')
 query = Student.query
+# 以上两行等价于 query = leancloud.Query('Student')
 query.equal_to('lastName', 'Smith')
 student_list = query.find()
 ```
