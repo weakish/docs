@@ -288,9 +288,6 @@ curl -X POST \
 }
 ```
 
-除了主动请求发送验证短信，在「控制台 > 存储 > 用户 > 设置」中，你还可以选择开启「从客户端注册或更新手机号时，向注册手机号码发送验证短信」。
-这样当用户在注册时填写了 `mobilePhoneNumber` 字段， 以及绑定、修改手机号时，LeanCloud  会向该手机号码发送一条附带验证码的验证短信。
-
 调用 `/requestMobilePhoneVerify` 接口时，如果相应用户的 `mobilePhoneNumberVerified` 为 `true`，那么将不会向相应手机发送验证短信。 
 
 以上选项会在用户绑定或修改手机号**之后**进行验证，如果希望用户绑定或修改手机号**之前**先通过短信验证，可以使用 `requestChangePhoneNumber` 和 `changePhoneNumber` 这两个接口。
