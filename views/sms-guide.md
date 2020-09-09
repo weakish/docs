@@ -1172,8 +1172,8 @@ LeanCloud 提供了内建的 [账户系统](leanstorage_guide-js.html#用户) �
 我们可以在「控制台 > 存储 > 用户 > 设置」查看相关选项：
 
 {{ include.checkbox(true) }}**从客户端注册或更新手机号时，向注册手机号码发送验证短信**
-- 开启：调用 `AVUser` 注册相关的接口时，如果传入了手机号，系统则会自动发送验证短信，然后开发者需要手动调用一下验证接口，这样 `_User` 表中的 `mobilePhoneVerified` 值才会被置为 `true`。
-- 关闭：调用 `AVUser` 注册相关的接口不会发送短信。
+- 开启：调用 `AVUser` 相关接口时，如果传入了手机号，系统则会自动发送验证短信。不过，即使开启这一选项，开发者仍然需要手动调用验证接口（`/verifyMobilePhone/<code>`），这样 `_User` 表中的 `mobilePhoneVerified` 值才会被置为 `true`。因此我们不建议勾选这一选项，如果需要在绑定或更新手机号时验证手机号，可以使用 `requestChangePhoneNumber` 接口。
+- 关闭：调用 `AVUser` 相关接口不会发送短信。
 
 {{ include.checkbox() }}**未验证手机号码的用户，禁止登录**
 - 开启：未验证手机号的 `AVUser` 不能使用「手机号 + 密码」以及「手机号 + 短信验证码」的方式登录，但是<u>用户名搭配密码的登录方式不会失败</u>。
