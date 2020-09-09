@@ -476,6 +476,18 @@ xxx.example.com.	3600	IN	CNAME	yyy.zzz.com.
 如 dig 命令查不到相应的 CNAME 记录，请返回域名商控制台检查配置是否正确，如仍有疑问，请联系域名商客服。
 如 dig 命令能查到预期的 CNAME 记录，但控制台仍显示「等待配置 CNAME 阶段」，请通过工单或 <support@leancloud.rocks> 联系我们。
 
+## SSL 证书
+
+在控制台绑定自定义域名时，可以选择自动管理 SSL 证书或手动管理 SSL 证书。
+如果选择自动模式，LeanCloud 会自动申请、续期 [Let's Encrypt] 证书。
+如果选择手动模式，则需要上传自己的 SSL 证书（通常是 `.crt` 或 `.pem` 文件）和 SSL 私钥（通常是 `.key` 文件），并在证书过期前自行续期及再次上传。
+SSL 证书通常可以在你的域名服务商处购买，你也可以自行申请免费的证书。
+Let's Encrypt 之外，比较知名的免费 SSL 证书提供商有 [buypass] 和 [TrustAsia]。
+
+[Let's Encrypt]: https://letsencrypt.org/
+[buypass]: https://www.buypass.com/ssl/products/acme
+[TrustAsia]: https://freessl.cn/
+
 ## 备案
 
 根据工信部规定，在 LeanCloud 华北、华东节点绑定的文件域名、云引擎域名、API 域名，都需要备案。
