@@ -72,7 +72,6 @@ LeanCloud 即时通讯服务提供的主要功能有：
 
 * Android 聊天应用：
   * [ChatKit，自带 UI 的聊天工具包](chatkit-android.html)
-  * [LeanChat Android 版](https://github.com/leancloud/leanchat-android)
 
 * JavaScript 聊天应用：
   * [LeanMessage Demo 网页版](https://github.com/leancloud/leanmessage-demo)
