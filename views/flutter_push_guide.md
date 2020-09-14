@@ -1,5 +1,5 @@
 {% import "views/_data.njk" as data %}
-
+{% from "views/_data.njk" import libVersion as version %}
 # Flutter 消息推送开发指南
 
 本文介绍了如何在 Flutter 环境中使用 LeanCloud 的推送功能。建议先阅读 [消息推送概览](push_guide.html) 了解相关概念。
@@ -55,9 +55,9 @@ import UserNotifications
         do {
             LCApplication.logLevel = .all
             try LCApplication.default.set(
-                id: YOUR_LC_APP_ID,
-                key: YOUR_LC_APP_KEY,
-                serverURL: YOUR_LC_SERVER_URL)
+                id: "{{appid}}",
+                key: "{{appkey}}",
+                serverURL: "https://please-replace-with-your-customized.domain.com")
             GeneratedPluginRegistrant.register(with: self)
             /*
             register APNs to access token, like this:
